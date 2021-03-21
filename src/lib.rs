@@ -1,50 +1,47 @@
-//#![feature(generic_associated_types)]
+#![feature(generic_associated_types)]
 //#![feature(trait_alias)]
 
+use std::iter::IntoIterator;
 use std::ops::{Deref, Index};
-use std::{iter::IntoIterator, marker::PhantomData};
 
 trait RepeatedField<T>
 where
-    Self: Index<usize, Output = T>,
+    Self: ,
 {
 }
 
-trait RepeatedFieldRef<'a, T: 'a, R: 'a>
+trait RepeatedFieldRef<'a, T: 'a, R>
 where
-    Self: Deref<Target = R>,
-    Self: IntoIterator<Item = &'a T>,
-    R: RepeatedField<T> + ?Sized,
+    Self: Deref<Target = R> + IntoIterator<Item = &'a T>,
+    R: ?Sized + Index<usize, Output = T>,
 {
 }
 
-impl<T> RepeatedField<T> for [T] {}
 impl<'a, T: 'a> RepeatedFieldRef<'a, T, [T]> for &'a [T] {}
 
 // Read-only trait
-trait Msg<'a> {
+trait Msg {
     #[allow(non_camel_case_types)]
-    type RepeatedField_rival: 'a + RepeatedField<i64> + ?Sized;
+    type RepeatedField_rival: ?Sized + Index<usize, Output = i64>;
     #[allow(non_camel_case_types)]
-    type RepeatedFieldRef_rival: RepeatedFieldRef<'a, i64, Self::RepeatedField_rival>;
-    fn ival(&'a self) -> i64;
-    fn rival(&'a self) -> Self::RepeatedFieldRef_rival;
+    type RepeatedFieldRef_rival<'a>: RepeatedFieldRef<'a, i64, Self::RepeatedField_rival>;
+    fn ival(&self) -> i64;
+    fn rival(&self) -> Self::RepeatedFieldRef_rival<'_>;
 }
 
-struct MsgReadOnlyImpl<'a> {
+struct MsgReadOnlyImpl {
     ival: i64,
     rival: Vec<i64>,
-    _phantom_data: PhantomData<&'a Self>,
 }
-impl<'a> Msg<'a> for MsgReadOnlyImpl<'a> {
+impl Msg for MsgReadOnlyImpl {
     type RepeatedField_rival = [i64];
-    type RepeatedFieldRef_rival = &'a [i64];
+    type RepeatedFieldRef_rival<'a> = &'a [i64];
 
     fn ival(&self) -> i64 {
         self.ival
     }
 
-    fn rival(&'a self) -> Self::RepeatedFieldRef_rival {
+    fn rival(&self) -> Self::RepeatedFieldRef_rival<'_> {
         &self.rival
     }
 }
