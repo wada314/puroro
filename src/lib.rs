@@ -1,39 +1,50 @@
-#![feature(generic_associated_types)]
+//#![feature(generic_associated_types)]
+//#![feature(trait_alias)]
 
-use std::iter::IntoIterator;
-use std::ops::Deref;
-use std::ops::Index;
+use std::ops::{Deref, Index};
+use std::{iter::IntoIterator, marker::PhantomData};
 
-trait RepeatedFieldView<'a, T: 'a, U>
+trait RepeatedField<T>
 where
-    Self: IntoIterator<Item = &'a T> + Deref<Target = U>,
-    U: Index<usize, Output = T> + ?Sized,
+    Self: Index<usize, Output = T>,
 {
 }
-impl<'a, T: 'a> RepeatedFieldView<'a, T, [T]> for &'a [T] {}
-// Read-only trait
-trait Msg {
-    #[allow(non_camel_case_types)]
-    type RepeatedFieldView_rival<'a>: RepeatedFieldView<'a, i64, Self::RepeatedField_rival>;
-    #[allow(non_camel_case_types)]
-    type RepeatedField_rival: Index<usize, Output = i64> + ?Sized;
-    fn ival(&self) -> i64;
-    fn rival(&self) -> Self::RepeatedFieldView_rival<'_>;
+
+trait RepeatedFieldRef<'a, T: 'a, R: 'a>
+where
+    Self: Deref<Target = R>,
+    Self: IntoIterator<Item = &'a T>,
+    R: RepeatedField<T> + ?Sized,
+{
 }
 
-struct MsgReadOnlyImpl {
+impl<T> RepeatedField<T> for [T] {}
+impl<'a, T: 'a> RepeatedFieldRef<'a, T, [T]> for &'a [T] {}
+
+// Read-only trait
+trait Msg<'a> {
+    #[allow(non_camel_case_types)]
+    type RepeatedField_rival: 'a + RepeatedField<i64> + ?Sized;
+    #[allow(non_camel_case_types)]
+    type RepeatedFieldRef_rival: RepeatedFieldRef<'a, i64, Self::RepeatedField_rival>;
+    fn ival(&'a self) -> i64;
+    fn rival(&'a self) -> Self::RepeatedFieldRef_rival;
+}
+
+struct MsgReadOnlyImpl<'a> {
     ival: i64,
     rival: Vec<i64>,
+    _phantom_data: PhantomData<&'a Self>,
 }
-impl Msg for MsgReadOnlyImpl {
-    type RepeatedFieldView_rival<'a> = &'a [i64];
+impl<'a> Msg<'a> for MsgReadOnlyImpl<'a> {
     type RepeatedField_rival = [i64];
+    type RepeatedFieldRef_rival = &'a [i64];
 
     fn ival(&self) -> i64 {
         self.ival
     }
 
-    fn rival(&self) -> Self::RepeatedFieldView_rival<'_> {
+    fn rival(&'a self) -> Self::RepeatedFieldRef_rival {
         &self.rival
     }
 }
