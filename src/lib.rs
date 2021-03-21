@@ -4,13 +4,34 @@
 use std::iter::IntoIterator;
 use std::ops::{Deref, Index};
 
+trait HasLength {
+    fn len(&self) -> usize;
+}
+
+impl<T> HasLength for [T] {
+    fn len(&self) -> usize {
+        self.len()
+    }
+}
+impl<U, T> HasLength for U
+where
+    U: Deref<Target = T>,
+    T: ?Sized + HasLength,
+{
+    fn len(&self) -> usize {
+        T::len(self.deref())
+    }
+}
+
 // Read-only trait
 trait Msg {
-    type RepeatedField2: ?Sized + Index<usize, Output = i64>;
+    type RepeatedField2: ?Sized + Index<usize, Output = i64> + HasLength;
     type RepeatedField2Ref<'a>: Deref<Target = Self::RepeatedField2>
         + IntoIterator<Item = &'a i64, IntoIter = Self::RepeatedField2Iterator<'a>>;
     type RepeatedField2Iterator<'a>: Iterator<Item = &'a i64>;
-    type RepeatedField4<'a>: ?Sized + Index<usize, Output = Self::RepeatedField4Item<'a>>;
+    type RepeatedField4<'a>: ?Sized
+        + Index<usize, Output = Self::RepeatedField4Item<'a>>
+        + HasLength;
     type RepeatedField4Ref<'a>: Deref<Target = Self::RepeatedField4<'a>>
         + IntoIterator<
             Item = &'a Self::RepeatedField4Item<'a>,
@@ -64,6 +85,7 @@ mod tests {
         for _i in m.rival() {
             let t = _i;
         }
-        let l = m.rival().into_iter();
+        let _l = m.rival().into_iter();
+        let _j = m.rsval().len();
     }
 }
