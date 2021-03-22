@@ -40,12 +40,18 @@ trait Msg {
     // Types for SubMsg item in this message
     type Field5: Msg_SubMsg;
     type Field5Ref<'a>: Deref<Target = Self::Field5>;
+    type Field6<'a>: ?Sized + Index<usize, Output = Self::Field6Item<'a>> + HasLength;
+    type Field6Ref<'a>: Deref<Target = Self::Field6<'a>>
+        + IntoIterator<Item = &'a Self::Field6Item<'a>, IntoIter = Self::Field6Iterator<'a>>;
+    type Field6Iterator<'a>: Iterator<Item = &'a Self::Field6Item<'a>>;
+    type Field6Item<'a>: 'a + Msg_SubMsg;
 
     fn ival(&self) -> i64;
     fn rival(&self) -> Self::Field2Ref<'_>;
     fn sval(&self) -> Self::Field3<'_>;
     fn rsval(&self) -> Self::Field4Ref<'_>;
     fn msg(&self) -> Option<Self::Field5Ref<'_>>;
+    fn rmsg(&self) -> Self::Field6Ref<'_>;
 }
 
 trait Msg_SubMsg {}
@@ -56,6 +62,7 @@ struct MsgReadOnlyImpl {
     sval: String,
     rsval: Vec<String>,
     msg: Option<Msg_SubMsgReadOnlyImpl>,
+    rmsg: Vec<Msg_SubMsgReadOnlyImpl>,
 }
 
 struct Msg_SubMsgReadOnlyImpl {}
@@ -71,6 +78,10 @@ impl Msg for MsgReadOnlyImpl {
     type Field4Item<'a> = String;
     type Field5 = Msg_SubMsgReadOnlyImpl;
     type Field5Ref<'a> = &'a Msg_SubMsgReadOnlyImpl;
+    type Field6<'a> = Vec<Msg_SubMsgReadOnlyImpl>;
+    type Field6Ref<'a> = &'a Vec<Msg_SubMsgReadOnlyImpl>;
+    type Field6Iterator<'a> = std::slice::Iter<'a, Msg_SubMsgReadOnlyImpl>;
+    type Field6Item<'a> = Msg_SubMsgReadOnlyImpl;
 
     fn ival(&self) -> i64 {
         self.ival
@@ -86,6 +97,9 @@ impl Msg for MsgReadOnlyImpl {
     }
     fn msg(&self) -> Option<Self::Field5Ref<'_>> {
         self.msg.as_ref()
+    }
+    fn rmsg(&self) -> Self::Field6Ref<'_> {
+        &self.rmsg
     }
 }
 
