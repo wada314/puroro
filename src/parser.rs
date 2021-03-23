@@ -40,7 +40,7 @@ impl<'a> Variant<'a> {
 }
 
 impl<'a> Variant<'a> {
-    fn as_unsigned<T: Unsigned>(&self) -> Result<T, ParseError> {
+    fn to_unsigned<T: Unsigned>(&self) -> Result<T, ParseError> {
         debug_assert!(self.0.len() >= 1);
         let mut value: T = T::zero();
         let bits: usize = std::mem::size_of::<T>() * 8;
@@ -52,8 +52,7 @@ impl<'a> Variant<'a> {
         }
         // last byte for this int size.
         let i = self.0.len() - 1;
-        let remaining_bits = bits - i * 7;
-        debug_assert_eq!(remaining_bits, (bits + 6) % 7 + 1);
+        let remaining_bits = (bits - i * 7).min(7);
         debug_assert!(remaining_bits <= 7);
         let remaining_bits_mask = ((1u32 << remaining_bits) - 1) as u8;
         if (self.0[i] & !remaining_bits_mask) != 0 {
@@ -62,11 +61,11 @@ impl<'a> Variant<'a> {
         value |= T::from_u8(self.0[i]) << (i * 7);
         Ok(value)
     }
-    pub(crate) fn as_u32(&self) -> Result<u32, ParseError> {
-        self.as_unsigned::<u32>()
+    pub(crate) fn to_u32(&self) -> Result<u32, ParseError> {
+        self.to_unsigned::<u32>()
     }
-    pub(crate) fn as_u64(&self) -> Result<u64, ParseError> {
-        self.as_unsigned::<u64>()
+    pub(crate) fn to_u64(&self) -> Result<u64, ParseError> {
+        self.to_unsigned::<u64>()
     }
 
     #[cfg(test)]
@@ -99,6 +98,29 @@ mod tests {
         }
         expect_ok(&[0x00], 1, &[]);
         expect_ok(&[0x00, 0x80, 0x81], 1, &[0x80, 0x81]);
+        expect_ok(&[0x80, 0x40], 2, &[]);
+        expect_ok(&[0x80, 0x00, 0x00, 0x40], 4, &[]);
         expect_err(&[0x80], ParseError::UnexpectedInputTermination);
+    }
+
+    #[test]
+    fn test_variant_unsigned() {
+        fn get_u32(input: &[u8]) -> Result<u32, ParseError> {
+            let (v, _) = Variant::from_bytes(input)?;
+            v.to_u32()
+        }
+        assert_eq!(get_u32(&[0x00]), Ok(0));
+        assert_eq!(get_u32(&[0x01]), Ok(1));
+        assert_eq!(get_u32(&[0x7F]), Ok(0x7F));
+        assert_eq!(get_u32(&[0x80, 0x01]), Ok(0x80));
+        assert_eq!(get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0x0F]), Ok(0xFFFFFFFF));
+        assert_eq!(
+            get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0x1F]),
+            Err(ParseError::IntegerOverflow)
+        );
+        assert_eq!(
+            get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F]),
+            Err(ParseError::IntegerOverflow)
+        );
     }
 }
