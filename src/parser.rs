@@ -1,3 +1,4 @@
+use ::itertools::Itertools;
 use ::num_traits::{One, PrimInt, Zero};
 use std::ops::BitOrAssign;
 
@@ -17,30 +18,33 @@ impl Unsigned for u64 {
 
 #[derive(::thiserror::Error, Debug, PartialEq)]
 pub(crate) enum ParseError {
-    #[error("The input binary has terminated in irregular position.")]
-    UnexpectedInputTermination,
     #[error("A value of an integer type has too large or too small value.")]
     IntegerOverflow,
+    #[error("Unexpected field type. e.g. Expected int32, but found a Message field")]
+    UnexpectedFieldType,
 }
+type Result<T> = std::result::Result<T, ParseError>;
+
+#[derive(::thiserror::Error, Debug, PartialEq)]
+pub(crate) enum LexerError {
+    #[error("The input binary has terminated in irregular position.")]
+    UnexpectedInputTermination,
+}
+type LexResult<T> = std::result::Result<T, LexerError>;
 
 #[derive(Debug)]
-struct Variant<'a>(&'a [u8]);
-impl<'a> Variant<'a> {
-    pub(crate) fn from_bytes(bytes: &'a [u8]) -> Result<(Self, &'a [u8]), ParseError> {
-        let mut i = 0;
-        while i < bytes.len() {
-            if (bytes[i] & 0x80) == 0 {
-                let (variant, remaining) = bytes.split_at(i + 1);
-                return Ok((Self(variant), remaining));
-            }
-            i += 1;
-        }
-        Err(ParseError::UnexpectedInputTermination)
-    }
+struct Variant<'a, I>(I)
+where
+    I: Iterator<Item = &'a u8>;
+impl<'a, I> Variant<'a, I>
+where
+    I: Iterator<Item = &'a u8> + Clone,
+{
+    pub(crate) fn from_bytes(mut bytes: I) -> Result<(Self, I)> {}
 }
 
-impl<'a> Variant<'a> {
-    fn to_unsigned<T: Unsigned>(&self) -> Result<T, ParseError> {
+impl<'a, I> Variant<'a, I> {
+    fn to_unsigned<T: Unsigned>(&self) -> Result<T> {
         debug_assert!(self.0.len() >= 1);
         let mut value: T = T::zero();
         let bits: usize = std::mem::size_of::<T>() * 8;
@@ -61,10 +65,10 @@ impl<'a> Variant<'a> {
         value |= T::from_u8(self.0[i]) << (i * 7);
         Ok(value)
     }
-    pub(crate) fn to_u32(&self) -> Result<u32, ParseError> {
+    pub(crate) fn to_u32(&self) -> Result<u32> {
         self.to_unsigned::<u32>()
     }
-    pub(crate) fn to_u64(&self) -> Result<u64, ParseError> {
+    pub(crate) fn to_u64(&self) -> Result<u64> {
         self.to_unsigned::<u64>()
     }
 
@@ -74,9 +78,26 @@ impl<'a> Variant<'a> {
     }
 }
 
+#[derive(Clone, Debug)]
+struct ParseState<'a> {
+    cur: &'a [u8],
+}
+
+impl<'a> ParseState<'a> {
+    fn try_parse_message<T, H: ParseEventHandler>(&self, handler: &mut H) -> Result<T> {
+        todo!()
+    }
+
+    fn try_parse_as_packed_variants<T: ParseEventHandler>(&self, handler: &T) -> Result<()> {
+        todo!()
+    }
+}
+
 trait ParseEventHandler {
-    fn found_variant_field(&mut self, field_number: usize, value: &Variant);
-    fn found_binary_field(&mut self, field_number: usize, value: &[u8]);
+    fn start_parse_message<T>(&mut self, state: ParseState);
+
+    fn met_variant_field(&mut self, field_number: usize, value: &Variant) -> Result<()>;
+    fn met_binary_field(&mut self, field_number: usize, state: ParseState) -> Result<()>;
 }
 
 #[cfg(test)]
@@ -105,7 +126,7 @@ mod tests {
 
     #[test]
     fn test_variant_unsigned() {
-        fn get_u32(input: &[u8]) -> Result<u32, ParseError> {
+        fn get_u32(input: &[u8]) -> Result<u32> {
             let (v, _) = Variant::from_bytes(input)?;
             v.to_u32()
         }
