@@ -1,7 +1,7 @@
 #![feature(generic_associated_types)]
 //#![feature(min_type_alias_impl_trait)]
 
-mod parser;
+mod stream_parser;
 
 use std::iter::IntoIterator;
 use std::ops::{Deref, Index};
