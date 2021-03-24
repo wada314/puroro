@@ -1,7 +1,7 @@
 #![feature(generic_associated_types)]
 //#![feature(min_type_alias_impl_trait)]
 
-mod stream_parser;
+mod stream_deserializer;
 
 use std::iter::IntoIterator;
 use std::ops::{Deref, Index};
