@@ -87,7 +87,19 @@ impl Variant {
     }
 }
 
-struct MessageParsingState<'a, I>
+struct Deserializer {}
+impl Deserializer {
+    fn parse_read<T, H>(input: T, handler: H)
+    where
+        T: std::io::Read,
+        H: DeserializeEventHandler,
+    {
+        let mut counting_iterator = CountingIterator::new(input.bytes());
+        let mut state = MessageDeserializingState::new(&mut counting_iterator, 0, None);
+    }
+}
+
+struct MessageDeserializingState<'a, I>
 where
     I: 'a + Iterator<Item = IoResult<u8>>,
 {
@@ -96,7 +108,7 @@ where
     expected_length: Option<usize>,
 }
 
-impl<'a, I> MessageParsingState<'a, I>
+impl<'a, I> MessageDeserializingState<'a, I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
@@ -112,25 +124,37 @@ where
         }
     }
 
-    fn deserialize_message<H: DeserializeEventHandler>(
+    fn deserialize_as_message<H: DeserializeEventHandler>(
         &mut self,
         opt_length: Option<usize>,
         handler: &mut H,
-    ) -> Result<()> {
-        let mut iter = CountingIterator::new(self.iter.by_ref());
+    ) -> Result<H::Target> {
         todo!()
     }
 
-    fn deserialize_field_or_eof(&mut self) {}
-
-    fn deserialize_as_packed_variants<T: DeserializeEventHandler>(&mut self) -> Result<()> {
+    fn deserialize_as_packed_variants<H: DeserializeEventHandler>(
+        &mut self,
+        handler: &mut H,
+    ) -> Result<()> {
         todo!()
     }
 }
 
-trait DeserializeEventHandler {
+trait DeserializeEventHandler: Sized {
     type Target;
-    fn met_variant<I>(&mut self, field_id: usize, variant: Variant) -> Result<()>
+    fn new() -> Result<Self>;
+    fn finish(self) -> Result<Self::Target>;
+
+    fn deserialized_variant<I>(&mut self, field_id: usize, variant: Variant) -> Result<()>
+    where
+        I: Iterator<Item = IoResult<u8>>;
+
+    fn deserialize_length_delimited<'a, 'b, I>(
+        &'a mut self,
+        field_id: usize,
+        length: usize,
+        state: &'b mut MessageDeserializingState<'b, I>,
+    ) -> Result<()>
     where
         I: Iterator<Item = IoResult<u8>>;
 }
@@ -244,19 +268,40 @@ mod tests {
         struct Test1 {
             a: i32,
         }
+        #[derive(Default)]
         struct Handler {
             msg: Test1,
         }
         impl DeserializeEventHandler for Handler {
             type Target = Test1;
 
-            fn met_variant<I>(&mut self, field_id: usize, variant: Variant) -> Result<()>
+            fn new() -> Result<Self> {
+                Ok(Handler::default())
+            }
+
+            fn finish(self) -> Result<Self::Target> {
+                Ok(self.msg)
+            }
+
+            fn deserialized_variant<I>(&mut self, field_id: usize, variant: Variant) -> Result<()>
             where
                 I: Iterator<Item = IoResult<u8>>,
             {
                 assert_eq!(field_id, 1);
                 self.msg.a = variant.to_i32()?;
                 Ok(())
+            }
+
+            fn deserialize_length_delimited<'a, 'b, I>(
+                &'a mut self,
+                field_id: usize,
+                length: usize,
+                state: &'b mut MessageDeserializingState<'b, I>,
+            ) -> Result<()>
+            where
+                I: Iterator<Item = IoResult<u8>>,
+            {
+                todo!()
             }
         }
 
