@@ -100,8 +100,6 @@ where
 mod tests {
     use super::*;
     use std::io::ErrorKind;
-    const IO_ERROR1: IoError = IoError::new(ErrorKind::InvalidData, "");
-    const IO_ERROR2: IoError = IoError::new(ErrorKind::NotConnected, "");
 
     fn into_iter<'a>(slice: &'a [u8]) -> impl Iterator<Item = IoResult<u8>> + 'a {
         slice.iter().copied().map(|x| Ok(x))
@@ -112,6 +110,8 @@ mod tests {
 
     #[test]
     fn test_variant_from_bytes() {
+        let io_error1 = IoError::new(ErrorKind::InvalidData, "");
+
         fn expect_ok(input: &[u8], expected_value: u64, expected_remaining: &[u8]) {
             let mut iter = into_iter(input);
             let result = Variant::from_bytes(&mut iter);
@@ -135,11 +135,11 @@ mod tests {
             &[],
         );
         assert!(matches!(
-            get_err(vec![Ok(0x00)]),
+            get_err(vec![Ok(0x80)]),
             DeserializeError::UnexpectedInputTermination
         ));
         assert!(matches!(
-            get_err(vec![Err(IO_ERROR1)]),
+            get_err(vec![Err(io_error1)]),
             DeserializeError::IteratorError(_)
         ));
     }
