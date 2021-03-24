@@ -4,6 +4,16 @@ use std::io::{Error as IoError, Result as IoResult};
 use std::marker::PhantomData;
 use std::num::TryFromIntError;
 
+#[non_exhaustive]
+enum WireType {
+    Variant = 0,
+    Bytes64 = 1,
+    LengthDelimited = 2,
+    StartGroup = 3,
+    EndGroup = 4,
+    Bytes32 = 5,
+}
+
 #[derive(::thiserror::Error, Debug)]
 pub(crate) enum DeserializeError {
     #[error("The input binary has terminated in irregular position.")]
@@ -12,19 +22,21 @@ pub(crate) enum DeserializeError {
     IntegerOverflow(#[from] std::num::TryFromIntError),
     #[error("A variant integer type is longer than 10 bytes.")]
     TooLargeVariant,
-    #[error("Unexpected field type. e.g. Expected int32, but found a Message field")]
+    #[error("Unexpected field type. e.g. Expected int32, but found a Message field.")]
     UnexpectedFieldType,
+    #[error("Unexpected field number. In protobuf standard, the deserializer should accept this though.")]
+    UnexpectedFieldId,
     #[error("The bytestream iterator returned an error: {0}")]
     IteratorError(#[from] IoError),
 }
 type Result<T> = std::result::Result<T, DeserializeError>;
 
 #[derive(Debug)]
-struct Variant(u64);
+struct Variant([u8; 8]);
 impl Variant {
-    pub(crate) fn from_bytes<T>(bytes: &mut T) -> Result<Self>
+    pub(crate) fn from_bytes<I>(bytes: &mut I) -> Result<Self>
     where
-        T: Iterator<Item = IoResult<u8>>,
+        I: Iterator<Item = IoResult<u8>>,
     {
         let mut x = 0u64;
         for i in 0..9 {
@@ -33,7 +45,7 @@ impl Variant {
                     let byte = maybe_byte?;
                     x |= ((byte & 0x7F) as u64) << (i * 7);
                     if byte < 0x80 {
-                        return Ok(Variant(x));
+                        return Ok(Variant(x.to_ne_bytes()));
                     }
                 }
                 None => {
@@ -49,7 +61,7 @@ impl Variant {
                 if byte & 0xFE != 0 {
                     return Err(DeserializeError::TooLargeVariant);
                 } else {
-                    return Ok(Variant(x));
+                    return Ok(Variant(x.to_ne_bytes()));
                 }
             }
             None => {
@@ -59,41 +71,92 @@ impl Variant {
     }
 
     pub(crate) fn to_u32(&self) -> Result<u32> {
-        Ok(u32::try_from(self.0)?)
+        Ok(u32::try_from(u64::from_ne_bytes(self.0))?)
     }
     pub(crate) fn to_u64(&self) -> Result<u64> {
-        Ok(self.0)
+        Ok(u64::from_ne_bytes(self.0))
+    }
+    fn to_usize(&self) -> Result<usize> {
+        Ok(usize::try_from(u64::from_ne_bytes(self.0))?)
+    }
+    pub(crate) fn to_i32(&self) -> Result<i32> {
+        Ok(i32::try_from(i64::from_ne_bytes(self.0))?)
+    }
+    pub(crate) fn to_i64(&self) -> Result<i64> {
+        Ok(i64::from_ne_bytes(self.0))
     }
 }
 
-struct ParseState<I>
+struct MessageParsingState<'a, I>
+where
+    I: 'a + Iterator<Item = IoResult<u8>>,
+{
+    iter: &'a mut CountingIterator<I>,
+    start_pos: usize,
+    expected_length: Option<usize>,
+}
+
+impl<'a, I> MessageParsingState<'a, I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
+    fn new(
+        iter: &'a mut CountingIterator<I>,
+        start_pos: usize,
+        expected_length: Option<usize>,
+    ) -> Self {
+        Self {
+            iter,
+            start_pos,
+            expected_length,
+        }
+    }
+
+    fn deserialize_message<H: DeserializeEventHandler>(
+        &mut self,
+        opt_length: Option<usize>,
+        handler: &mut H,
+    ) -> Result<()> {
+        let mut iter = CountingIterator::new(self.iter.by_ref());
+        todo!()
+    }
+
+    fn deserialize_field_or_eof(&mut self) {}
+
+    fn deserialize_as_packed_variants<T: DeserializeEventHandler>(&mut self) -> Result<()> {
+        todo!()
+    }
+}
+
+trait DeserializeEventHandler {
+    type Target;
+    fn met_variant<I>(&mut self, field_id: usize, variant: Variant) -> Result<()>
+    where
+        I: Iterator<Item = IoResult<u8>>;
+}
+
+struct CountingIterator<I> {
+    counter: usize,
     iter: I,
 }
-
-impl<I> ParseState<I>
+impl<I> Iterator for CountingIterator<I>
 where
-    I: Iterator<Item = IoResult<u8>>,
+    I: Iterator,
 {
-    fn try_parse_message<T, H: ParseEventHandler<I>>(&self, handler: &mut H) -> Result<T> {
-        todo!()
-    }
+    type Item = <I as Iterator>::Item;
 
-    fn try_parse_as_packed_variants<T: ParseEventHandler<I>>(&self, handler: &T) -> Result<()> {
-        todo!()
+    fn next(&mut self) -> Option<Self::Item> {
+        self.counter += 1;
+        self.iter.next()
     }
 }
-
-trait ParseEventHandler<I>
-where
-    I: Iterator<Item = IoResult<u8>>,
-{
-    fn start_parse_message(&mut self, state: ParseState<I>);
-
-    fn met_variant_field(&mut self, field_number: usize, value: &Variant) -> Result<()>;
-    fn met_binary_field(&mut self, field_number: usize, state: ParseState<I>) -> Result<()>;
+impl<I> CountingIterator<I> {
+    fn new(iter: I) -> Self {
+        CountingIterator { counter: 0, iter }
+    }
+    fn count(&self) -> usize {
+        self.counter
+    }
 }
 
 #[cfg(test)]
@@ -117,7 +180,7 @@ mod tests {
             let result = Variant::from_bytes(&mut iter);
             assert!(result.is_ok());
             let variant = result.unwrap();
-            assert_eq!(variant.0, expected_value);
+            assert_eq!(variant.0, expected_value.to_ne_bytes());
             assert_eq!(collect_iter(iter), expected_remaining);
         }
         fn get_err(input: Vec<IoResult<u8>>) -> DeserializeError {
@@ -168,5 +231,35 @@ mod tests {
             get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F]).unwrap_err(),
             DeserializeError::IntegerOverflow(_)
         ));
+    }
+
+    #[test]
+    fn do_parse_test1() {
+        // https://developers.google.com/protocol-buffers/docs/encoding#simple
+        // message Test1 {
+        //   optional int32 a = 1;
+        // }
+        let input: &[u8] = &[0x08, 0x96, 0x01];
+        #[derive(Default)]
+        struct Test1 {
+            a: i32,
+        }
+        struct Handler {
+            msg: Test1,
+        }
+        impl DeserializeEventHandler for Handler {
+            type Target = Test1;
+
+            fn met_variant<I>(&mut self, field_id: usize, variant: Variant) -> Result<()>
+            where
+                I: Iterator<Item = IoResult<u8>>,
+            {
+                assert_eq!(field_id, 1);
+                self.msg.a = variant.to_i32()?;
+                Ok(())
+            }
+        }
+
+        let input = into_iter(&[0x08, 0x96, 0x01]);
     }
 }
