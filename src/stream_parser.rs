@@ -45,7 +45,7 @@ impl Variant {
                 break;
             }
         }
-        // i == 9, so now checking a last MSB.
+        // i == 9, so now checking a last MSBit.
         match bytes.next() {
             Some(maybe_byte) => {
                 let byte = maybe_byte?;
