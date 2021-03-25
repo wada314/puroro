@@ -14,6 +14,15 @@ enum WireType {
     Bytes32 = 5,
 }
 
+#[non_exhaustive]
+enum LengthDelimitedFieldInterpretation {
+    Unknown = 0,
+    String = 1,
+    Bytes = 2,
+    Message = 3,
+    PackedRepeatedFields = 4,
+}
+
 #[derive(::thiserror::Error, Debug)]
 pub(crate) enum DeserializeError {
     #[error("The input binary has terminated in irregular position.")]
@@ -89,13 +98,17 @@ impl Variant {
 
 struct Deserializer {}
 impl Deserializer {
-    fn parse_read<T, H>(input: T, handler: H)
+    fn new() -> Self {
+        Self {}
+    }
+    fn parse_read<T, H>(&mut self, input: T, mut handler: H) -> Result<H::Target>
     where
         T: std::io::Read,
         H: DeserializeEventHandler,
     {
         let mut counting_iterator = CountingIterator::new(input.bytes());
         let mut state = MessageDeserializingState::new(&mut counting_iterator, 0, None);
+        state.deserialize_as_message(None, &mut handler)
     }
 }
 
@@ -145,18 +158,12 @@ trait DeserializeEventHandler: Sized {
     fn new() -> Result<Self>;
     fn finish(self) -> Result<Self::Target>;
 
-    fn deserialized_variant<I>(&mut self, field_id: usize, variant: Variant) -> Result<()>
-    where
-        I: Iterator<Item = IoResult<u8>>;
+    fn deserialized_variant(&mut self, field_id: usize, variant: Variant) -> Result<()>;
 
-    fn deserialize_length_delimited<'a, 'b, I>(
-        &'a mut self,
+    fn met_length_delimited_field(
+        &mut self,
         field_id: usize,
-        length: usize,
-        state: &'b mut MessageDeserializingState<'b, I>,
-    ) -> Result<()>
-    where
-        I: Iterator<Item = IoResult<u8>>;
+    ) -> Result<LengthDelimitedFieldInterpretation>;
 }
 
 struct CountingIterator<I> {
@@ -257,54 +264,65 @@ mod tests {
         ));
     }
 
+    #[derive(Default)]
+    struct MockHandler<T: Default> {
+        value: T,
+        deserialized_variant: Option<Box<dyn Fn(&mut T, usize, Variant) -> Result<()>>>,
+        met_length_delimited_field:
+            Option<Box<dyn Fn(&mut T, usize) -> Result<LengthDelimitedFieldInterpretation>>>,
+    }
+    impl<T: Default> DeserializeEventHandler for MockHandler<T> {
+        type Target = T;
+
+        fn new() -> Result<Self> {
+            Ok(Default::default())
+        }
+        fn finish(self) -> Result<Self::Target> {
+            todo!()
+        }
+        fn deserialized_variant(&mut self, field_id: usize, variant: Variant) -> Result<()> {
+            let value_mut = &mut self.value;
+            self.deserialized_variant
+                .as_ref()
+                .map_or(Ok(()), |f| (f)(value_mut, field_id, variant))
+        }
+
+        fn met_length_delimited_field(
+            &mut self,
+            field_id: usize,
+        ) -> Result<LengthDelimitedFieldInterpretation> {
+            let value_mut = &mut self.value;
+            self.met_length_delimited_field
+                .as_ref()
+                .map_or(Ok(LengthDelimitedFieldInterpretation::Unknown), |f| {
+                    (f)(value_mut, field_id)
+                })
+        }
+    }
+
     #[test]
     fn do_parse_test1() {
         // https://developers.google.com/protocol-buffers/docs/encoding#simple
         // message Test1 {
         //   optional int32 a = 1;
         // }
+        // a = 150
         let input: &[u8] = &[0x08, 0x96, 0x01];
-        #[derive(Default)]
+        #[derive(Default, PartialEq)]
         struct Test1 {
             a: i32,
         }
-        #[derive(Default)]
-        struct Handler {
-            msg: Test1,
-        }
-        impl DeserializeEventHandler for Handler {
-            type Target = Test1;
 
-            fn new() -> Result<Self> {
-                Ok(Handler::default())
-            }
+        let mut handler = MockHandler::<Test1>::new().unwrap();
+        handler.deserialized_variant = Some(Box::new(|value, field_id, variant| {
+            assert_eq!(field_id, 1);
+            value.a = variant.to_i32()?;
+            Ok(())
+        }));
 
-            fn finish(self) -> Result<Self::Target> {
-                Ok(self.msg)
-            }
-
-            fn deserialized_variant<I>(&mut self, field_id: usize, variant: Variant) -> Result<()>
-            where
-                I: Iterator<Item = IoResult<u8>>,
-            {
-                assert_eq!(field_id, 1);
-                self.msg.a = variant.to_i32()?;
-                Ok(())
-            }
-
-            fn deserialize_length_delimited<'a, 'b, I>(
-                &'a mut self,
-                field_id: usize,
-                length: usize,
-                state: &'b mut MessageDeserializingState<'b, I>,
-            ) -> Result<()>
-            where
-                I: Iterator<Item = IoResult<u8>>,
-            {
-                todo!()
-            }
-        }
-
-        let input = into_iter(&[0x08, 0x96, 0x01]);
+        let mut deserializer = Deserializer::new();
+        let result = deserializer.parse_read(input, handler);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().a, 150);
     }
 }
