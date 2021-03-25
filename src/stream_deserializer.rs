@@ -186,7 +186,7 @@ impl<I> CountingIterator<I> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::io::ErrorKind;
+    use std::io::{ErrorKind, Read};
 
     fn into_iter<'a>(slice: &'a [u8]) -> impl Iterator<Item = IoResult<u8>> + 'a {
         slice.iter().copied().map(|x| Ok(x))
@@ -200,7 +200,7 @@ mod tests {
         let io_error1 = IoError::new(ErrorKind::InvalidData, "");
 
         fn expect_ok(input: &[u8], expected_value: u64, expected_remaining: &[u8]) {
-            let mut iter = into_iter(input);
+            let mut iter = input.bytes();
             let result = Variant::from_bytes(&mut iter);
             assert!(result.is_ok());
             let variant = result.unwrap();
@@ -234,7 +234,7 @@ mod tests {
     #[test]
     fn test_variant_unsigned() {
         fn get_u32(input: &[u8]) -> Result<u32> {
-            let mut iter = into_iter(input);
+            let mut iter = input.bytes();
             let v = Variant::from_bytes(&mut iter)?;
             assert_eq!(collect_iter(iter), Vec::<u8>::new());
             v.to_u32()
