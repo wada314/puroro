@@ -1,10 +1,13 @@
 use ::itertools::Itertools;
+use ::num_derive::FromPrimitive;
+use ::num_traits::FromPrimitive;
 use std::convert::TryFrom;
 use std::io::{Error as IoError, Result as IoResult};
 use std::marker::PhantomData;
 use std::num::TryFromIntError;
 
 #[non_exhaustive]
+#[derive(FromPrimitive)]
 enum WireType {
     Variant = 0,
     Bytes64 = 1,
@@ -25,6 +28,8 @@ enum LengthDelimitedFieldInterpretation {
 
 #[derive(::thiserror::Error, Debug)]
 pub(crate) enum DeserializeError {
+    #[error("The input binary has terminated.")]
+    ExpectedInputTermination,
     #[error("The input binary has terminated in irregular position.")]
     UnexpectedInputTermination,
     #[error("A variant integer type has too large or too small value.")]
@@ -106,8 +111,8 @@ impl Deserializer {
         T: std::io::Read,
         H: DeserializeEventHandler,
     {
-        let mut counting_iterator = CountingIterator::new(input.bytes());
-        let mut state = MessageDeserializingState::new(&mut counting_iterator, 0, None);
+        let mut counting_iterator = IndexedIterator::new(input.bytes());
+        let mut state = MessageDeserializingState::new(&mut counting_iterator);
         state.deserialize_as_message(None, &mut handler)
     }
 }
@@ -116,25 +121,15 @@ struct MessageDeserializingState<'a, I>
 where
     I: 'a + Iterator<Item = IoResult<u8>>,
 {
-    iter: &'a mut CountingIterator<I>,
-    start_pos: usize,
-    expected_length: Option<usize>,
+    indexed_iter: &'a mut IndexedIterator<I>,
 }
 
 impl<'a, I> MessageDeserializingState<'a, I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
-    fn new(
-        iter: &'a mut CountingIterator<I>,
-        start_pos: usize,
-        expected_length: Option<usize>,
-    ) -> Self {
-        Self {
-            iter,
-            start_pos,
-            expected_length,
-        }
+    fn new(indexed_iter: &'a mut IndexedIterator<I>) -> Self {
+        Self { indexed_iter }
     }
 
     fn deserialize_as_message<H: DeserializeEventHandler>(
@@ -142,7 +137,60 @@ where
         opt_length: Option<usize>,
         handler: &mut H,
     ) -> Result<H::Target> {
-        todo!()
+        let start_pos = self.indexed_iter.count();
+        loop {
+            // Check message length if possible
+            if let Some(message_length) = opt_length {
+                if start_pos + message_length >= self.indexed_iter.index() {
+                    break;
+                }
+            }
+
+            // get field number, wire type
+            let (wire_type, field_number) = match self.try_get_wire_type_and_field_number() {
+                Ok(x) => x,
+                Err(DeserializeError::ExpectedInputTermination) => {
+                    break;
+                } // This is ok. finish This message deserialization.
+                Err(e) => {
+                    return Err(e);
+                }
+            };
+
+            match wire_type {
+                WireType::Variant => {
+                    let variant = Variant::from_bytes(self.indexed_iter)?;
+                    handler.deserialized_variant(field_number, variant)?;
+                }
+                WireType::LengthDelimited => {
+                    let field_length = Variant::from_bytes(self.indexed_iter)?.to_usize()?;
+                    match handler.met_length_delimited_field(field_number)? {
+                        LengthDelimitedFieldInterpretation::Message => {
+                            todo!()
+                        }
+                        _ => {
+                            todo!()
+                        }
+                    }
+                }
+                _ => {
+                    todo!()
+                }
+            }
+        }
+
+        handler.finish()
+    }
+
+    // May expectedly fail if reached to the eof
+    fn try_get_wire_type_and_field_number(&mut self) -> Result<(WireType, usize)> {
+        let mut peekable = self.indexed_iter.by_ref().peekable();
+        if let None = peekable.peek() {
+            // Found EOF at first byte. Successfull failure.
+            return Err(DeserializeError::ExpectedInputTermination);
+        }
+        let key = Variant::from_bytes(&mut peekable)?.to_usize()?;
+        Ok((WireType::from_usize(key & 0x07).unwrap(), (key >> 3)))
     }
 
     fn deserialize_as_packed_variants<H: DeserializeEventHandler>(
@@ -158,35 +206,35 @@ trait DeserializeEventHandler: Sized {
     fn new() -> Result<Self>;
     fn finish(self) -> Result<Self::Target>;
 
-    fn deserialized_variant(&mut self, field_id: usize, variant: Variant) -> Result<()>;
+    fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> Result<()>;
 
     fn met_length_delimited_field(
         &mut self,
-        field_id: usize,
+        field_number: usize,
     ) -> Result<LengthDelimitedFieldInterpretation>;
 }
 
-struct CountingIterator<I> {
-    counter: usize,
+struct IndexedIterator<I> {
+    index: usize,
     iter: I,
 }
-impl<I> Iterator for CountingIterator<I>
+impl<I> Iterator for IndexedIterator<I>
 where
     I: Iterator,
 {
     type Item = <I as Iterator>::Item;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.counter += 1;
+        self.index += 1;
         self.iter.next()
     }
 }
-impl<I> CountingIterator<I> {
+impl<I> IndexedIterator<I> {
     fn new(iter: I) -> Self {
-        CountingIterator { counter: 0, iter }
+        IndexedIterator { index: 0, iter }
     }
-    fn count(&self) -> usize {
-        self.counter
+    fn index(&self) -> usize {
+        self.index
     }
 }
 
@@ -280,22 +328,22 @@ mod tests {
         fn finish(self) -> Result<Self::Target> {
             todo!()
         }
-        fn deserialized_variant(&mut self, field_id: usize, variant: Variant) -> Result<()> {
+        fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> Result<()> {
             let value_mut = &mut self.value;
             self.deserialized_variant
                 .as_ref()
-                .map_or(Ok(()), |f| (f)(value_mut, field_id, variant))
+                .map_or(Ok(()), |f| (f)(value_mut, field_number, variant))
         }
 
         fn met_length_delimited_field(
             &mut self,
-            field_id: usize,
+            field_number: usize,
         ) -> Result<LengthDelimitedFieldInterpretation> {
             let value_mut = &mut self.value;
             self.met_length_delimited_field
                 .as_ref()
                 .map_or(Ok(LengthDelimitedFieldInterpretation::Unknown), |f| {
-                    (f)(value_mut, field_id)
+                    (f)(value_mut, field_number)
                 })
         }
     }
@@ -314,8 +362,8 @@ mod tests {
         }
 
         let mut handler = MockHandler::<Test1>::new().unwrap();
-        handler.deserialized_variant = Some(Box::new(|value, field_id, variant| {
-            assert_eq!(field_id, 1);
+        handler.deserialized_variant = Some(Box::new(|value, field_number, variant| {
+            assert_eq!(field_number, 1);
             value.a = variant.to_i32()?;
             Ok(())
         }));
