@@ -106,14 +106,14 @@ impl Deserializer {
     fn new() -> Self {
         Self {}
     }
-    fn parse_read<T, H>(&mut self, input: T, mut handler: H) -> Result<H::Target>
+    fn parse_read<T, H>(&mut self, input: T, handler: H) -> Result<H::Target>
     where
         T: std::io::Read,
         H: DeserializeEventHandler,
     {
         let mut counting_iterator = IndexedIterator::new(input.bytes());
         let mut state = MessageDeserializingState::new(&mut counting_iterator);
-        state.deserialize_as_message(None, &mut handler)
+        state.deserialize_as_message(None, handler)
     }
 }
 
@@ -132,10 +132,10 @@ where
         Self { indexed_iter }
     }
 
-    fn deserialize_as_message<H: DeserializeEventHandler>(
+    pub(crate) fn deserialize_as_message<H: DeserializeEventHandler>(
         &mut self,
         opt_length: Option<usize>,
-        handler: &mut H,
+        mut handler: H,
     ) -> Result<H::Target> {
         let start_pos = self.indexed_iter.count();
         loop {
@@ -164,14 +164,7 @@ where
                 }
                 WireType::LengthDelimited => {
                     let field_length = Variant::from_bytes(self.indexed_iter)?.to_usize()?;
-                    match handler.met_length_delimited_field(field_number)? {
-                        LengthDelimitedFieldInterpretation::Message => {
-                            todo!()
-                        }
-                        _ => {
-                            todo!()
-                        }
-                    }
+                    handler.met_length_delimited_field(field_number, field_length, self)?;
                 }
                 _ => {
                     todo!()
@@ -193,7 +186,7 @@ where
         Ok((WireType::from_usize(key & 0x07).unwrap(), (key >> 3)))
     }
 
-    fn deserialize_as_packed_variants<H: DeserializeEventHandler>(
+    pub(crate) fn deserialize_as_packed_variants<H: DeserializeEventHandler>(
         &mut self,
         handler: &mut H,
     ) -> Result<()> {
@@ -208,10 +201,14 @@ trait DeserializeEventHandler: Sized {
 
     fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> Result<()>;
 
-    fn met_length_delimited_field(
+    fn met_length_delimited_field<'a, I>(
         &mut self,
         field_number: usize,
-    ) -> Result<LengthDelimitedFieldInterpretation>;
+        length: usize,
+        state: &mut MessageDeserializingState<'a, I>,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = IoResult<u8>>;
 }
 
 struct IndexedIterator<I> {
@@ -316,8 +313,10 @@ mod tests {
     struct MockHandler<T: Default> {
         value: T,
         deserialized_variant: Option<Box<dyn Fn(&mut T, usize, Variant) -> Result<()>>>,
-        met_length_delimited_field:
-            Option<Box<dyn Fn(&mut T, usize) -> Result<LengthDelimitedFieldInterpretation>>>,
+
+        met_length_delimited_field: Option<
+            Box<dyn Fn(&mut T, usize, usize, &mut MessageDeserializingState<'a, I>) -> Result<()>>,
+        >,
     }
     impl<T: Default> DeserializeEventHandler for MockHandler<T> {
         type Target = T;
@@ -335,16 +334,16 @@ mod tests {
                 .map_or(Ok(()), |f| (f)(value_mut, field_number, variant))
         }
 
-        fn met_length_delimited_field(
+        fn met_length_delimited_field<'a, I>(
             &mut self,
             field_number: usize,
-        ) -> Result<LengthDelimitedFieldInterpretation> {
-            let value_mut = &mut self.value;
-            self.met_length_delimited_field
-                .as_ref()
-                .map_or(Ok(LengthDelimitedFieldInterpretation::Unknown), |f| {
-                    (f)(value_mut, field_number)
-                })
+            length: usize,
+            state: &mut MessageDeserializingState<'a, I>,
+        ) -> Result<()>
+        where
+            I: Iterator<Item = IoResult<u8>>,
+        {
+            todo!()
         }
     }
 
