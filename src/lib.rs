@@ -1,7 +1,8 @@
 #![feature(generic_associated_types)]
 //#![feature(min_type_alias_impl_trait)]
 
-mod stream_deserializer;
+pub mod deserializer;
+pub mod types;
 
 use std::iter::IntoIterator;
 use std::ops::{Deref, Index};
