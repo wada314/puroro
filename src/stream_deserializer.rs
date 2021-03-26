@@ -3,8 +3,6 @@ use ::num_derive::FromPrimitive;
 use ::num_traits::FromPrimitive;
 use std::convert::TryFrom;
 use std::io::{Error as IoError, Result as IoResult};
-use std::marker::PhantomData;
-use std::num::TryFromIntError;
 
 #[non_exhaustive]
 #[derive(FromPrimitive)]
@@ -15,15 +13,6 @@ enum WireType {
     StartGroup = 3,
     EndGroup = 4,
     Bytes32 = 5,
-}
-
-#[non_exhaustive]
-enum LengthDelimitedFieldInterpretation {
-    Unknown = 0,
-    String = 1,
-    Bytes = 2,
-    Message = 3,
-    PackedRepeatedFields = 4,
 }
 
 #[derive(::thiserror::Error, Debug)]
@@ -390,7 +379,7 @@ mod tests {
             Ok(())
         }));
 
-        let mut deserializer = DeserializerImpl::<_>::new(input);
+        let deserializer = DeserializerImpl::<_>::new(input);
         let result = deserializer.parse_read(handler);
         assert!(result.is_ok());
         assert_eq!(result.unwrap().a, 150);
