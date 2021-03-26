@@ -41,7 +41,8 @@ pub trait State: Sized {
         handler: H,
     ) -> Result<H::Target>;
 
-    fn deserialize_as_packed_variants<H: Handler<Self>>(&mut self, handler: &mut H) -> Result<()>;
+    fn deserialize_as_string(&mut self) -> Result<()>;
+    fn deserialize_as_packed_variants(&mut self) -> Result<()>;
 }
 
 struct StateImpl<I>
@@ -119,7 +120,11 @@ where
         handler.finish()
     }
 
-    fn deserialize_as_packed_variants<H: Handler<Self>>(&mut self, handler: &mut H) -> Result<()> {
+    fn deserialize_as_string(&mut self) -> Result<()> {
+        todo!()
+    }
+
+    fn deserialize_as_packed_variants(&mut self) -> Result<()> {
         todo!()
     }
 }
