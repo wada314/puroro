@@ -42,7 +42,7 @@ where
     pub(crate) fn new(indexed_iter: &'a mut IndexedIterator<I>) -> Self {
         Self { indexed_iter }
     }
-    fn make_sub_deserializer<'b>(&'b mut self) -> impl LengthDelimitedDeserializer + 'b
+    fn make_sub_deserializer<'b>(&'b mut self) -> LengthDelimitedDeserializerImpl<'b, I>
     where
         'a: 'b,
     {
