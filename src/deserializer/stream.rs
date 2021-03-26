@@ -1,4 +1,5 @@
 use crate::types::*;
+use std::io::Read;
 
 pub mod error;
 mod impls;
@@ -12,6 +13,9 @@ pub trait Deserializer {
     fn parse_read<H>(self, handler: H) -> Result<H::Target>
     where
         H: Handler<<Self as Deserializer>::State>;
+}
+pub fn deserializer_from_read<R: Read>(read: R) -> impl Deserializer {
+    impls::DeserializerImpl::<R>::new(read)
 }
 
 pub trait State: Sized {

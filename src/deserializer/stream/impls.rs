@@ -3,7 +3,7 @@ use std::io::Result as IoResult;
 
 use super::*;
 
-struct DeserializerImpl<T> {
+pub(crate) struct DeserializerImpl<T> {
     input: T,
 }
 impl<T: std::io::Read> Deserializer for DeserializerImpl<T> {
@@ -18,12 +18,12 @@ impl<T: std::io::Read> Deserializer for DeserializerImpl<T> {
     }
 }
 impl<T: std::io::Read> DeserializerImpl<T> {
-    fn new(input: T) -> Self {
+    pub(crate) fn new(input: T) -> Self {
         Self { input }
     }
 }
 
-struct StateImpl<I>
+pub(crate) struct StateImpl<I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
