@@ -3,40 +3,51 @@ use std::io::Result as IoResult;
 
 use super::*;
 
-pub(crate) struct DeserializerImpl<T> {
-    input: T,
-}
-impl<T: std::io::Read> Deserializer for DeserializerImpl<T> {
-    type State = StateImpl<std::io::Bytes<T>>;
-
-    fn parse_read<H>(self, handler: H) -> Result<H::Target>
-    where
-        H: Handler<<Self as Deserializer>::State>,
-    {
-        let mut state = StateImpl::new(self.input.bytes());
-        state.deserialize_as_message(None, handler)
-    }
-}
-impl<T: std::io::Read> DeserializerImpl<T> {
-    pub(crate) fn new(input: T) -> Self {
-        Self { input }
-    }
-}
-
-pub(crate) struct StateImpl<I>
+pub(crate) struct DeserializerImpl<I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
     indexed_iter: IndexedIterator<I>,
 }
-
-impl<I> StateImpl<I>
+impl<I> DeserializerImpl<I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
-    fn new(iter: I) -> Self {
+    pub(crate) fn new(iter: I) -> Self {
         Self {
             indexed_iter: IndexedIterator::new(iter),
+        }
+    }
+}
+impl<I> Deserializer for DeserializerImpl<I>
+where
+    I: Iterator<Item = IoResult<u8>>,
+{
+    fn deserialize<H: Handler>(mut self, handler: H) -> Result<H::Target> {
+        LengthDelimitedDeserializerImpl::new(&mut self.indexed_iter)
+            .deserialize_as_message(None, handler)
+    }
+}
+
+pub(crate) struct LengthDelimitedDeserializerImpl<'a, I>
+where
+    I: Iterator<Item = IoResult<u8>>,
+{
+    indexed_iter: &'a mut IndexedIterator<I>,
+}
+impl<'a, I> LengthDelimitedDeserializerImpl<'a, I>
+where
+    I: Iterator<Item = IoResult<u8>>,
+{
+    pub(crate) fn new(indexed_iter: &'a mut IndexedIterator<I>) -> Self {
+        Self { indexed_iter }
+    }
+    fn make_sub_deserializer<'b>(&'b mut self) -> impl LengthDelimitedDeserializer + 'b
+    where
+        'a: 'b,
+    {
+        LengthDelimitedDeserializerImpl {
+            indexed_iter: self.indexed_iter,
         }
     }
 
@@ -51,12 +62,12 @@ where
         Ok((WireType::from_usize(key & 0x07).unwrap(), (key >> 3)))
     }
 }
-impl<I> State for StateImpl<I>
+impl<'a, I> LengthDelimitedDeserializer for LengthDelimitedDeserializerImpl<'a, I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
-    fn deserialize_as_message<H: Handler<Self>>(
-        &mut self,
+    fn deserialize_as_message<H: Handler>(
+        mut self,
         opt_length: Option<usize>,
         mut handler: H,
     ) -> Result<H::Target> {
@@ -87,7 +98,12 @@ where
                 }
                 WireType::LengthDelimited => {
                     let field_length = Variant::from_bytes(&mut self.indexed_iter)?.to_usize()?;
-                    handler.deserialize_length_delimited_field(field_number, field_length, self)?;
+                    let deserializer_for_inner = self.make_sub_deserializer();
+                    handler.deserialize_length_delimited_field(
+                        deserializer_for_inner,
+                        field_number,
+                        field_length,
+                    )?;
                 }
                 _ => {
                     todo!()
@@ -98,11 +114,11 @@ where
         handler.finish()
     }
 
-    fn deserialize_as_string(&mut self) -> Result<()> {
+    fn deserialize_as_string(self) -> Result<()> {
         todo!()
     }
 
-    fn deserialize_as_packed_variants(&mut self) -> Result<()> {
+    fn deserialize_as_packed_variants(self) -> Result<()> {
         todo!()
     }
 }
@@ -132,7 +148,7 @@ mod tests {
             Ok(())
         }));
 
-        let deserializer = DeserializerImpl::<_>::new(input);
+        let deserializer = LengthDelimitedDeserializerImpl::<_>::new(input);
         let result = deserializer.parse_read(handler);
         assert!(result.is_ok());
         assert_eq!(result.unwrap().a, 150);

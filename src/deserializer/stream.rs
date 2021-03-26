@@ -9,41 +9,38 @@ pub use error::{DeserializeError, Result};
 pub use variant::Variant;
 
 pub trait Deserializer {
-    type State: State;
-    fn parse_read<H>(self, handler: H) -> Result<H::Target>
-    where
-        H: Handler<<Self as Deserializer>::State>;
+    fn deserialize<H: Handler>(self, handler: H) -> Result<H::Target>;
 }
 pub fn deserializer_from_read<R: Read>(read: R) -> impl Deserializer {
-    impls::DeserializerImpl::<R>::new(read)
+    impls::DeserializerImpl::<std::io::Bytes<R>>::new(read.bytes())
 }
 
-pub trait State: Sized {
-    fn deserialize_as_message<H: Handler<Self>>(
-        &mut self,
+pub trait LengthDelimitedDeserializer: Sized {
+    fn deserialize_as_message<H: Handler>(
+        self,
         opt_length: Option<usize>,
         handler: H,
-    ) -> Result<H::Target>;
+    ) -> Result<<H as Handler>::Target>;
 
-    fn deserialize_as_string(&mut self) -> Result<()>;
-    fn deserialize_as_packed_variants(&mut self) -> Result<()>;
+    fn deserialize_as_string(self) -> Result<()>;
+    fn deserialize_as_packed_variants(self) -> Result<()>;
 }
 
-pub trait Handler<S: State> {
+pub trait Handler {
     type Target;
     fn finish(self) -> Result<Self::Target>;
 
     fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> Result<()>;
 
-    fn deserialize_length_delimited_field(
+    fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
         &mut self,
+        deserializer: D,
         field_number: usize,
         length: usize,
-        state: &mut S,
     ) -> Result<()>;
 }
 
-struct IndexedIterator<I> {
+pub(crate) struct IndexedIterator<I> {
     index: usize,
     iter: I,
 }
