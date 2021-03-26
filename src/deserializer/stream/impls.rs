@@ -125,7 +125,6 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::super::tests::*;
     use super::*;
 
     #[test]
@@ -140,15 +139,24 @@ mod tests {
         struct Test1 {
             a: i32,
         }
+        impl Handler for Test1 {
+            type Target = Self;
+            fn finish(self) -> Result<Self::Target> {
+                Ok(self)
+            }
+            fn deserialized_variant(
+                &mut self,
+                field_number: usize,
+                variant: Variant,
+            ) -> Result<()> {
+                assert_eq!(1, field_number);
+                self.a = variant.to_i32()?;
+                Ok(())
+            }
+        }
 
-        let mut handler = MockHandler::<Test1>::new();
-        handler.deserialized_variant = Some(Box::new(|value, field_number, variant| {
-            assert_eq!(field_number, 1);
-            value.a = variant.to_i32()?;
-            Ok(())
-        }));
-
-        let mut deserializer = DeserializerImpl::<_>::new(input.bytes());
+        let handler = Test1::default();
+        let deserializer = DeserializerImpl::<_>::new(input.bytes());
         let result = deserializer.deserialize(handler);
         assert!(result.is_ok());
         assert_eq!(result.unwrap().a, 150);

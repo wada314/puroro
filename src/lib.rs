@@ -26,7 +26,6 @@ where
     }
 }
 
-pub(crate) use msg::{Msg, MsgReadOnlyImpl};
 mod msg {
     use super::*;
 
@@ -117,6 +116,7 @@ mod msg {
     mod tests {
         use super::*;
 
+        #[allow(unused)]
         fn hoge<M: Msg>(m: M) {
             let _i = m.rival()[0];
             for _i in m.rival() {
