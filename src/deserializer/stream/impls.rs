@@ -141,15 +141,15 @@ mod tests {
             a: i32,
         }
 
-        let mut handler = MockHandler::<Test1, _>::new();
+        let mut handler = MockHandler::<Test1>::new();
         handler.deserialized_variant = Some(Box::new(|value, field_number, variant| {
             assert_eq!(field_number, 1);
             value.a = variant.to_i32()?;
             Ok(())
         }));
 
-        let deserializer = LengthDelimitedDeserializerImpl::<_>::new(input);
-        let result = deserializer.parse_read(handler);
+        let mut deserializer = DeserializerImpl::<_>::new(input.bytes());
+        let result = deserializer.deserialize(handler);
         assert!(result.is_ok());
         assert_eq!(result.unwrap().a, 150);
     }

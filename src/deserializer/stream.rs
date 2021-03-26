@@ -30,7 +30,11 @@ pub trait Handler {
     type Target;
     fn finish(self) -> Result<Self::Target>;
 
-    fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> Result<()>;
+    fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> Result<()> {
+        #[cfg(not(test))]
+        compile_error!("Please provide the implementation for every handler method!");
+        Ok(())
+    }
 
     fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
         &mut self,
@@ -68,16 +72,17 @@ impl<I> IndexedIterator<I> {
 mod tests {
     use super::*;
 
+    // A handler to test the implementation of `Deserializer` and `LengthDelimitedDeserializer`.
     #[derive(Default)]
-    pub(crate) struct MockHandler<T: Default, S: State> {
+    pub(crate) struct MockHandler<T: Default, D: LengthDelimitedDeserializer> {
         pub(crate) value: T,
         pub(crate) deserialized_variant: Option<Box<dyn Fn(&mut T, usize, Variant) -> Result<()>>>,
 
         pub(crate) deserialize_length_delimited_field:
-            Option<Box<dyn Fn(&mut T, usize, usize, &mut S) -> Result<()>>>,
+            Option<Box<dyn Fn(&mut T, D, usize, usize) -> Result<()>>>,
     }
 
-    impl<T: Default, S: State> MockHandler<T, S> {
+    impl<T: Default, D: LengthDelimitedDeserializer> MockHandler<T, D> {
         pub(crate) fn new() -> Self {
             Self {
                 value: Default::default(),
@@ -86,7 +91,7 @@ mod tests {
             }
         }
     }
-    impl<T: Default, S: State> Handler<S> for MockHandler<T, S> {
+    impl<T: Default, D: LengthDelimitedDeserializer> Handler for MockHandler<T, D> {
         type Target = T;
 
         fn finish(self) -> Result<Self::Target> {
@@ -99,16 +104,18 @@ mod tests {
                 .map_or(Ok(()), |f| (f)(value_mut, field_number, variant))
         }
 
-        fn deserialize_length_delimited_field(
+        fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
             &mut self,
+            deserializer: D,
             field_number: usize,
             length: usize,
-            state: &mut S,
         ) -> Result<()> {
             let value_mut = &mut self.value;
             self.deserialize_length_delimited_field
                 .as_ref()
-                .map_or(Ok(()), |f| (f)(value_mut, field_number, length, state))
+                .map_or(Ok(()), |f| {
+                    (f)(value_mut, deserializer, field_number, length)
+                })
         }
     }
 }
