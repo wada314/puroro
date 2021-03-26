@@ -40,6 +40,11 @@ impl Variant {
             }
         }
     }
+    fn to_sint(&self) -> Result<i64> {
+        // decode zigzag encoding for sint32 and sint64.
+        let x = self.to_i64()?;
+        Ok((x ^ (0 - (x & 1))) >> 1)
+    }
 
     pub fn to_u32(&self) -> Result<u32> {
         Ok(u32::try_from(u64::from_ne_bytes(self.0))?)
@@ -55,6 +60,12 @@ impl Variant {
     }
     pub fn to_i64(&self) -> Result<i64> {
         Ok(i64::from_ne_bytes(self.0))
+    }
+    pub fn to_si32(&self) -> Result<i32> {
+        Ok(i32::try_from(self.to_sint()?)?)
+    }
+    pub fn to_si64(&self) -> Result<i64> {
+        Ok(self.to_sint()?)
     }
 }
 
@@ -125,6 +136,33 @@ mod tests {
         ));
         assert!(matches!(
             get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F]).unwrap_err(),
+            DeserializeError::IntegerOverflow(_)
+        ));
+    }
+
+    #[test]
+    fn test_variant_signed_zigzag() {
+        fn get_si32(input: &[u8]) -> Result<i32> {
+            let mut iter = input.bytes();
+            let v = Variant::from_bytes(&mut iter)?;
+            assert_eq!(collect_iter(iter), Vec::<u8>::new());
+            v.to_si32()
+        }
+        assert_eq!(get_si32(&[0x00]).unwrap(), 0);
+        assert_eq!(get_si32(&[0x01]).unwrap(), -1);
+        assert_eq!(get_si32(&[0x02]).unwrap(), 1);
+        assert_eq!(get_si32(&[0x7F]).unwrap(), -0x40);
+        assert_eq!(get_si32(&[0x80, 0x01]).unwrap(), 0x40);
+        assert_eq!(
+            get_si32(&[0xFF, 0xFF, 0xFF, 0xFF, 0x0F]).unwrap(),
+            -0x80000000
+        );
+        assert!(matches!(
+            get_si32(&[0xFF, 0xFF, 0xFF, 0xFF, 0x1F]).unwrap_err(),
+            DeserializeError::IntegerOverflow(_)
+        ));
+        assert!(matches!(
+            get_si32(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F]).unwrap_err(),
             DeserializeError::IntegerOverflow(_)
         ));
     }
