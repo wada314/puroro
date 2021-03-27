@@ -1,5 +1,5 @@
 use crate::types::*;
-use std::io::Read;
+use std::io::{Read, Result as IoResult};
 
 pub mod error;
 mod impls;
@@ -15,15 +15,28 @@ pub fn deserializer_from_read<R: Read>(read: R) -> impl Deserializer {
     impls::DeserializerImpl::<std::io::Bytes<R>>::new(read.bytes())
 }
 
-pub trait LengthDelimitedDeserializer: Sized {
+pub trait LengthDelimitedDeserializer: Sized + Iterator<Item = IoResult<u8>> {
     fn deserialize_as_message<H: Handler>(
         self,
         opt_length: Option<usize>,
         handler: H,
     ) -> Result<<H as Handler>::Target>;
 
-    fn deserialize_as_string(self) -> Result<()>;
-    fn deserialize_as_packed_variants(self) -> Result<()>;
+    fn deserialize_as_string(self) -> Result<CharsIterator<Self>> {
+        Ok(CharsIterator {
+            iter: ::utf8_decode::UnsafeDecoder::new(self),
+        })
+    }
+}
+struct CharsIterator<T: LengthDelimitedDeserializer> {
+    iter: ::utf8_decode::UnsafeDecoder<T>,
+}
+impl<T: LengthDelimitedDeserializer> Iterator for CharsIterator<T> {
+    type Item = Result<char>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|r| r.map_err(|e| e.into()))
+    }
 }
 
 pub trait Handler {

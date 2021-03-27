@@ -62,6 +62,16 @@ where
         Ok((WireType::from_usize(key & 0x07).unwrap(), (key >> 3)))
     }
 }
+impl<'a, I> Iterator for LengthDelimitedDeserializerImpl<'a, I>
+where
+    I: Iterator<Item = IoResult<u8>>,
+{
+    type Item = IoResult<u8>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.indexed_iter.next()
+    }
+}
 impl<'a, I> LengthDelimitedDeserializer for LengthDelimitedDeserializerImpl<'a, I>
 where
     I: Iterator<Item = IoResult<u8>>,
@@ -112,14 +122,6 @@ where
         }
 
         handler.finish()
-    }
-
-    fn deserialize_as_string(self) -> Result<()> {
-        todo!()
-    }
-
-    fn deserialize_as_packed_variants(self) -> Result<()> {
-        todo!()
     }
 }
 
