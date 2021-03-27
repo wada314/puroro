@@ -28,7 +28,7 @@ pub trait LengthDelimitedDeserializer: Sized + Iterator<Item = IoResult<u8>> {
         })
     }
 }
-struct CharsIterator<T: LengthDelimitedDeserializer> {
+pub struct CharsIterator<T: LengthDelimitedDeserializer> {
     iter: ::utf8_decode::UnsafeDecoder<T>,
 }
 impl<T: LengthDelimitedDeserializer> Iterator for CharsIterator<T> {

@@ -130,7 +130,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn do_parse_test1() {
+    fn do_parse_test_variant() {
         // https://developers.google.com/protocol-buffers/docs/encoding#simple
         // message Test1 {
         //   optional int32 a = 1;
@@ -162,5 +162,43 @@ mod tests {
         let result = deserializer.deserialize(handler);
         assert!(result.is_ok());
         assert_eq!(result.unwrap().a, 150);
+    }
+
+    #[test]
+    fn do_parse_test_string() {
+        // https://developers.google.com/protocol-buffers/docs/encoding#strings
+        // message Test2 {
+        //   optional string b = 2;
+        // }
+        // b = "testing"
+        let input: &[u8] = &[0x12, 0x07, 0x74, 0x65, 0x73, 0x74, 0x69, 0x6e, 0x67];
+        #[derive(Default, PartialEq)]
+        struct Test2 {
+            b: String,
+        }
+        impl Handler for Test2 {
+            type Target = Self;
+            fn finish(self) -> Result<Self::Target> {
+                Ok(self)
+            }
+            fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+                &mut self,
+                deserializer: D,
+                field_number: usize,
+                _length: usize,
+            ) -> Result<()> {
+                assert_eq!(field_number, 2);
+                self.b = deserializer
+                    .deserialize_as_string()?
+                    .collect::<Result<String>>()?;
+                Ok(())
+            }
+        }
+
+        let handler = Test2::default();
+        let deserializer = DeserializerImpl::<_>::new(input.bytes());
+        let result = deserializer.deserialize(handler);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().b, "testing");
     }
 }
