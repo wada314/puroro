@@ -16,22 +16,47 @@ pub fn deserializer_from_read<R: Read>(read: R) -> impl Deserializer {
 }
 
 pub trait LengthDelimitedDeserializer: Sized + Iterator<Item = IoResult<u8>> {
-    fn deserialize_as_message<H: Handler>(
-        self,
-        opt_length: Option<usize>,
-        handler: H,
-    ) -> Result<<H as Handler>::Target>;
+    fn index(&self) -> usize;
+    // Note: Don't use ExactSizeIterator because the iterator might terminate in middle.
+    fn length(&self) -> Option<usize>;
 
-    fn deserialize_as_string(self) -> Result<CharsIterator<Self>> {
-        Ok(CharsIterator {
-            iter: ::utf8_decode::UnsafeDecoder::new(self),
-        })
+    fn deserialize_as_message<H: Handler>(self, handler: H) -> Result<<H as Handler>::Target>;
+
+    fn deserialize_as_string<H>(mut self, handler: H) -> Result<()>
+    where
+        H: StringHandler,
+    {
+        let start_pos = self.index();
+        if let Some(length) = self.length() {
+            let iter = CharsIterator::new(self.by_ref().take(length));
+            handler.handle(iter)?;
+        } else {
+            let iter = CharsIterator::new(self.by_ref());
+            handler.handle(iter)?;
+        }
+        let end_pos = self.index();
+        if let Some(length) = self.length() {
+            if end_pos - start_pos == length {
+                Ok(())
+            } else {
+                Err(DeserializeError::InvalidStringLength)
+            }
+        } else {
+            Ok(())
+        }
     }
 }
-pub struct CharsIterator<T: LengthDelimitedDeserializer> {
+pub struct CharsIterator<T: Iterator<Item = IoResult<u8>>> {
     iter: ::utf8_decode::UnsafeDecoder<T>,
 }
-impl<T: LengthDelimitedDeserializer> Iterator for CharsIterator<T> {
+impl<T: Iterator<Item = IoResult<u8>>> CharsIterator<T> {
+    pub fn new(iter: T) -> Self {
+        Self {
+            iter: ::utf8_decode::UnsafeDecoder::new(iter),
+        }
+    }
+}
+impl<T: Iterator<Item = IoResult<u8>>> Iterator for CharsIterator<T> {
     type Item = Result<char>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -58,6 +83,18 @@ pub trait Handler {
     ) -> Result<()> {
         // Providing a default implementation just for testing.
         panic!("Please provide the implementation for every handler method!");
+    }
+}
+pub trait StringHandler {
+    fn handle<I: Iterator<Item = Result<char>>>(self, iter: I) -> Result<()>;
+}
+impl<F> StringHandler for F
+where
+    F: FnOnce(String) -> Result<()>,
+{
+    fn handle<I: Iterator<Item = Result<char>>>(self, iter: I) -> Result<()> {
+        let string = iter.collect::<Result<String>>()?;
+        (self)(string)
     }
 }
 

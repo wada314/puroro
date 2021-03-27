@@ -24,8 +24,8 @@ where
     I: Iterator<Item = IoResult<u8>>,
 {
     fn deserialize<H: Handler>(mut self, handler: H) -> Result<H::Target> {
-        LengthDelimitedDeserializerImpl::new(&mut self.indexed_iter)
-            .deserialize_as_message(None, handler)
+        LengthDelimitedDeserializerImpl::new(&mut self.indexed_iter, None)
+            .deserialize_as_message(handler)
     }
 }
 
@@ -34,20 +34,28 @@ where
     I: Iterator<Item = IoResult<u8>>,
 {
     indexed_iter: &'a mut IndexedIterator<I>,
+    bytes_len: Option<usize>,
 }
 impl<'a, I> LengthDelimitedDeserializerImpl<'a, I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
-    pub(crate) fn new(indexed_iter: &'a mut IndexedIterator<I>) -> Self {
-        Self { indexed_iter }
+    pub(crate) fn new(indexed_iter: &'a mut IndexedIterator<I>, bytes_len: Option<usize>) -> Self {
+        Self {
+            indexed_iter,
+            bytes_len,
+        }
     }
-    fn make_sub_deserializer<'b>(&'b mut self) -> LengthDelimitedDeserializerImpl<'b, I>
+    fn make_sub_deserializer<'b>(
+        &'b mut self,
+        new_length: usize,
+    ) -> LengthDelimitedDeserializerImpl<'b, I>
     where
         'a: 'b,
     {
         LengthDelimitedDeserializerImpl {
             indexed_iter: self.indexed_iter,
+            bytes_len: Some(new_length),
         }
     }
 
@@ -76,15 +84,19 @@ impl<'a, I> LengthDelimitedDeserializer for LengthDelimitedDeserializerImpl<'a, 
 where
     I: Iterator<Item = IoResult<u8>>,
 {
-    fn deserialize_as_message<H: Handler>(
-        mut self,
-        opt_length: Option<usize>,
-        mut handler: H,
-    ) -> Result<H::Target> {
+    fn index(&self) -> usize {
+        self.indexed_iter.index()
+    }
+
+    fn length(&self) -> Option<usize> {
+        self.bytes_len
+    }
+
+    fn deserialize_as_message<H: Handler>(mut self, mut handler: H) -> Result<H::Target> {
         let start_pos = self.indexed_iter.index();
         loop {
             // Check message length if possible
-            if let Some(message_length) = opt_length {
+            if let Some(message_length) = self.bytes_len {
                 if start_pos + message_length >= self.indexed_iter.index() {
                     break;
                 }
@@ -108,7 +120,7 @@ where
                 }
                 WireType::LengthDelimited => {
                     let field_length = Variant::from_bytes(&mut self.indexed_iter)?.to_usize()?;
-                    let deserializer_for_inner = self.make_sub_deserializer();
+                    let deserializer_for_inner = self.make_sub_deserializer(field_length);
                     handler.deserialize_length_delimited_field(
                         deserializer_for_inner,
                         field_number,
@@ -188,9 +200,10 @@ mod tests {
                 _length: usize,
             ) -> Result<()> {
                 assert_eq!(field_number, 2);
-                self.b = deserializer
-                    .deserialize_as_string()?
-                    .collect::<Result<String>>()?;
+                deserializer.deserialize_as_string(|s| {
+                    self.b = s;
+                    Ok(())
+                })?;
                 Ok(())
             }
         }

@@ -15,5 +15,7 @@ pub enum DeserializeError {
     UnexpectedFieldId,
     #[error("The bytestream iterator returned an error: {0}")]
     IteratorError(#[from] IoError),
+    #[error("The string length is not correct.")]
+    InvalidStringLength,
 }
 pub type Result<T> = std::result::Result<T, DeserializeError>;
