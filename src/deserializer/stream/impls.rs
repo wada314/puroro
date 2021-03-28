@@ -61,7 +61,7 @@ where
 
     // May expectedly fail if reached to the eof
     fn try_get_wire_type_and_field_number(&mut self) -> Result<(WireType, usize)> {
-        let mut peekable = self.by_ref().peekable();
+        let mut peekable = self.indexed_iter.by_ref().peekable();
         if let None = peekable.peek() {
             // Found EOF at first byte. Successfull failure.
             return Err(DeserializeError::ExpectedInputTermination);
@@ -70,34 +70,17 @@ where
         Ok((WireType::from_usize(key & 0x07).unwrap(), (key >> 3)))
     }
 }
-impl<'a, I> Iterator for LengthDelimitedDeserializerImpl<'a, I>
-where
-    I: Iterator<Item = IoResult<u8>>,
-{
-    type Item = IoResult<u8>;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        self.indexed_iter.next()
-    }
-}
 impl<'a, I> LengthDelimitedDeserializer for LengthDelimitedDeserializerImpl<'a, I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
-    fn index(&self) -> usize {
-        self.indexed_iter.index()
-    }
-
-    fn length(&self) -> Option<usize> {
-        self.bytes_len
-    }
-
     fn deserialize_as_message<H: Handler>(mut self, mut handler: H) -> Result<H::Target> {
-        let start_pos = self.index();
+        let start_pos = self.indexed_iter.index();
         loop {
             // Check message length if possible
-            if let Some(message_length) = self.length() {
-                if start_pos + message_length >= self.index() {
+            if let Some(message_length) = self.bytes_len {
+                if start_pos + message_length >= self.indexed_iter.index() {
                     break;
                 }
             }
@@ -115,11 +98,11 @@ where
 
             match wire_type {
                 WireType::Variant => {
-                    let variant = Variant::from_bytes(&mut self)?;
+                    let variant = Variant::from_bytes(&mut self.indexed_iter)?;
                     handler.deserialized_variant(field_number, variant)?;
                 }
                 WireType::LengthDelimited => {
-                    let field_length = Variant::from_bytes(&mut self)?.to_usize()?;
+                    let field_length = Variant::from_bytes(&mut self.indexed_iter)?.to_usize()?;
                     let deserializer_for_inner = self.make_sub_deserializer(field_length);
                     handler.deserialize_length_delimited_field(
                         deserializer_for_inner,
@@ -134,6 +117,119 @@ where
         }
 
         handler.finish()
+    }
+
+    fn deserialize_as_string<H>(self, handler: H) -> Result<()>
+    where
+        H: RepeatedFieldHandler<char>,
+    {
+        let start_pos = self.indexed_iter.index();
+        if let Some(length) = self.bytes_len {
+            let iter = CharsIterator::new(self.indexed_iter.by_ref().take(length));
+            handler.handle(iter)?;
+        } else {
+            let iter = CharsIterator::new(self.indexed_iter.by_ref());
+            handler.handle(iter)?;
+        }
+        let end_pos = self.indexed_iter.index();
+        if let Some(length) = self.bytes_len {
+            if end_pos - start_pos == length {
+                Ok(())
+            } else {
+                Err(DeserializeError::InvalidFieldLength)
+            }
+        } else {
+            Ok(())
+        }
+    }
+
+    fn deserialize_as_bytes<H>(self, handler: H) -> Result<()>
+    where
+        H: RepeatedFieldHandler<u8>,
+    {
+        let start_pos = self.indexed_iter.index();
+        if let Some(length) = self.bytes_len {
+            let iter = self
+                .indexed_iter
+                .by_ref()
+                .take(length)
+                .map(|r| r.map_err(|e| e.into()));
+            handler.handle(iter)?;
+        } else {
+            let iter = self.indexed_iter.by_ref().map(|r| r.map_err(|e| e.into()));
+            handler.handle(iter)?;
+        }
+        let end_pos = self.indexed_iter.index();
+        if let Some(length) = self.bytes_len {
+            if end_pos - start_pos == length {
+                Ok(())
+            } else {
+                Err(DeserializeError::InvalidFieldLength)
+            }
+        } else {
+            Ok(())
+        }
+    }
+    fn deserialize_as_variants<H>(self, handler: H) -> Result<()>
+    where
+        H: RepeatedFieldHandler<Variant>,
+    {
+        let start_pos = self.indexed_iter.index();
+        if let Some(length) = self.bytes_len {
+            let iter = VariantsIterator::new(self.indexed_iter.by_ref().take(length));
+            handler.handle(iter)?;
+        } else {
+            let iter = VariantsIterator::new(self.indexed_iter.by_ref());
+            handler.handle(iter)?;
+        }
+        let end_pos = self.indexed_iter.index();
+        if let Some(length) = self.bytes_len {
+            if end_pos - start_pos == length {
+                Ok(())
+            } else {
+                Err(DeserializeError::InvalidFieldLength)
+            }
+        } else {
+            Ok(())
+        }
+    }
+}
+
+pub struct CharsIterator<T: Iterator<Item = IoResult<u8>>> {
+    iter: ::utf8_decode::UnsafeDecoder<T>,
+}
+impl<T: Iterator<Item = IoResult<u8>>> CharsIterator<T> {
+    pub fn new(iter: T) -> Self {
+        Self {
+            iter: ::utf8_decode::UnsafeDecoder::new(iter),
+        }
+    }
+}
+impl<T: Iterator<Item = IoResult<u8>>> Iterator for CharsIterator<T> {
+    type Item = Result<char>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|r| r.map_err(|e| e.into()))
+    }
+}
+
+pub struct VariantsIterator<I: Iterator<Item = IoResult<u8>>> {
+    iter: I,
+}
+impl<I: Iterator<Item = IoResult<u8>>> VariantsIterator<I> {
+    pub fn new(iter: I) -> Self {
+        Self { iter }
+    }
+}
+impl<I: Iterator<Item = IoResult<u8>>> Iterator for VariantsIterator<I> {
+    type Item = Result<Variant>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut peekable = self.iter.peekable();
+        if let None = peekable.peek() {
+            return None;
+        }
+        Some(Variant::from_bytes(&mut peekable))
     }
 }
 

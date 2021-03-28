@@ -15,53 +15,18 @@ pub fn deserializer_from_read<R: Read>(read: R) -> impl Deserializer {
     impls::DeserializerImpl::<std::io::Bytes<R>>::new(read.bytes())
 }
 
-pub trait LengthDelimitedDeserializer: Sized + Iterator<Item = IoResult<u8>> {
-    fn index(&self) -> usize;
-    // Note: Don't use ExactSizeIterator because the iterator might terminate in middle.
-    fn length(&self) -> Option<usize>;
-
+pub trait LengthDelimitedDeserializer: Sized {
     fn deserialize_as_message<H: Handler>(self, handler: H) -> Result<<H as Handler>::Target>;
 
-    fn deserialize_as_string<H>(mut self, handler: H) -> Result<()>
+    fn deserialize_as_string<H>(self, handler: H) -> Result<()>
     where
-        H: RepeatedFieldHandler<char>,
-    {
-        let start_pos = self.index();
-        if let Some(length) = self.length() {
-            let iter = CharsIterator::new(self.by_ref().take(length));
-            handler.handle(iter)?;
-        } else {
-            let iter = CharsIterator::new(self.by_ref());
-            handler.handle(iter)?;
-        }
-        let end_pos = self.index();
-        if let Some(length) = self.length() {
-            if end_pos - start_pos == length {
-                Ok(())
-            } else {
-                Err(DeserializeError::InvalidStringLength)
-            }
-        } else {
-            Ok(())
-        }
-    }
-}
-pub struct CharsIterator<T: Iterator<Item = IoResult<u8>>> {
-    iter: ::utf8_decode::UnsafeDecoder<T>,
-}
-impl<T: Iterator<Item = IoResult<u8>>> CharsIterator<T> {
-    pub fn new(iter: T) -> Self {
-        Self {
-            iter: ::utf8_decode::UnsafeDecoder::new(iter),
-        }
-    }
-}
-impl<T: Iterator<Item = IoResult<u8>>> Iterator for CharsIterator<T> {
-    type Item = Result<char>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|r| r.map_err(|e| e.into()))
-    }
+        H: RepeatedFieldHandler<char>;
+    fn deserialize_as_bytes<H>(self, handler: H) -> Result<()>
+    where
+        H: RepeatedFieldHandler<u8>;
+    fn deserialize_as_variants<H>(self, handler: H) -> Result<()>
+    where
+        H: RepeatedFieldHandler<Variant>;
 }
 
 pub trait Handler {
