@@ -24,7 +24,7 @@ pub trait LengthDelimitedDeserializer: Sized + Iterator<Item = IoResult<u8>> {
 
     fn deserialize_as_string<H>(mut self, handler: H) -> Result<()>
     where
-        H: StringHandler,
+        H: RepeatedFieldHandler<char>,
     {
         let start_pos = self.index();
         if let Some(length) = self.length() {
@@ -85,16 +85,22 @@ pub trait Handler {
         panic!("Please provide the implementation for every handler method!");
     }
 }
-pub trait StringHandler {
-    fn handle<I: Iterator<Item = Result<char>>>(self, iter: I) -> Result<()>;
+pub trait RepeatedFieldHandler<T> {
+    fn handle<I: Iterator<Item = Result<T>>>(self, iter: I) -> Result<()>;
 }
-impl<F> StringHandler for F
-where
-    F: FnOnce(String) -> Result<()>,
-{
+impl<F: FnOnce(String) -> Result<()>> RepeatedFieldHandler<char> for F {
     fn handle<I: Iterator<Item = Result<char>>>(self, iter: I) -> Result<()> {
-        let string = iter.collect::<Result<String>>()?;
-        (self)(string)
+        (self)(iter.collect::<Result<String>>()?)
+    }
+}
+impl<F: FnOnce(Vec<u8>) -> Result<()>> RepeatedFieldHandler<u8> for F {
+    fn handle<I: Iterator<Item = Result<u8>>>(self, iter: I) -> Result<()> {
+        (self)(iter.collect::<Result<Vec<u8>>>()?)
+    }
+}
+impl<F: FnOnce(Vec<Variant>) -> Result<()>> RepeatedFieldHandler<Variant> for F {
+    fn handle<I: Iterator<Item = Result<Variant>>>(self, iter: I) -> Result<()> {
+        (self)(iter.collect::<Result<Vec<Variant>>>()?)
     }
 }
 
