@@ -15,7 +15,7 @@ pub fn deserializer_from_read<R: Read>(read: R) -> impl Deserializer {
     impls::DeserializerImpl::<std::io::Bytes<R>>::new(read.bytes())
 }
 
-pub trait LengthDelimitedDeserializer: Sized {
+pub trait LengthDelimitedDeserializer<'a>: Sized {
     fn deserialize_as_message<H: MessageHandler>(
         self,
         handler: H,
@@ -30,6 +30,63 @@ pub trait LengthDelimitedDeserializer: Sized {
     fn deserialize_as_variants<H>(self, handler: H) -> Result<()>
     where
         H: RepeatedFieldHandler<Variant>;
+
+    // Delay the deserializing
+    fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer>;
+}
+
+pub struct DelayedLengthDelimitedDeserializer {
+    contents: Vec<u8>,
+}
+impl DelayedLengthDelimitedDeserializer {
+    fn new(contents: Vec<u8>) -> Self {
+        Self { contents }
+    }
+}
+impl LengthDelimitedDeserializer<'static> for DelayedLengthDelimitedDeserializer {
+    fn deserialize_as_message<H: MessageHandler>(
+        self,
+        handler: H,
+    ) -> Result<<H as MessageHandler>::Target> {
+        let mut iter = impls::IndexedIterator::new(self.contents.bytes());
+        let deser =
+            impls::LengthDelimitedDeserializerImpl::new(&mut iter, Some(self.contents.len()));
+        deser.deserialize_as_message(handler)
+    }
+
+    fn deserialize_as_string<H>(self, handler: H) -> Result<()>
+    where
+        H: RepeatedFieldHandler<char>,
+    {
+        let mut iter = impls::IndexedIterator::new(self.contents.bytes());
+        let deser =
+            impls::LengthDelimitedDeserializerImpl::new(&mut iter, Some(self.contents.len()));
+        deser.deserialize_as_string(handler)
+    }
+
+    fn deserialize_as_bytes<H>(self, handler: H) -> Result<()>
+    where
+        H: RepeatedFieldHandler<u8>,
+    {
+        let mut iter = impls::IndexedIterator::new(self.contents.bytes());
+        let deser =
+            impls::LengthDelimitedDeserializerImpl::new(&mut iter, Some(self.contents.len()));
+        deser.deserialize_as_bytes(handler)
+    }
+
+    fn deserialize_as_variants<H>(self, handler: H) -> Result<()>
+    where
+        H: RepeatedFieldHandler<Variant>,
+    {
+        let mut iter = impls::IndexedIterator::new(self.contents.bytes());
+        let deser =
+            impls::LengthDelimitedDeserializerImpl::new(&mut iter, Some(self.contents.len()));
+        deser.deserialize_as_variants(handler)
+    }
+
+    fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer> {
+        Ok(self)
+    }
 }
 
 pub trait MessageHandler {
@@ -55,7 +112,7 @@ pub trait MessageHandler {
     }
 
     #[allow(unused_variables)]
-    fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+    fn deserialize_length_delimited_field<'a, D: LengthDelimitedDeserializer<'a>>(
         &mut self,
         deserializer: D,
         field_number: usize,

@@ -78,7 +78,7 @@ where
     }
 }
 
-impl<'a, I> LengthDelimitedDeserializer for LengthDelimitedDeserializerImpl<'a, I>
+impl<'a, I> LengthDelimitedDeserializer<'a> for LengthDelimitedDeserializerImpl<'a, I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
@@ -215,6 +215,14 @@ where
             Ok(())
         }
     }
+
+    fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer> {
+        Ok(DelayedLengthDelimitedDeserializer::new(
+            self.indexed_iter
+                .collect::<IoResult<Vec<_>>>()
+                .map_err(|e| DeserializeError::from(e))?,
+        ))
+    }
 }
 
 pub(crate) struct IndexedIterator<I> {
@@ -233,7 +241,7 @@ where
     }
 }
 impl<I> IndexedIterator<I> {
-    fn new(iter: I) -> Self {
+    pub(crate) fn new(iter: I) -> Self {
         IndexedIterator { index: 0, iter }
     }
     fn index(&self) -> usize {
@@ -335,7 +343,7 @@ mod tests {
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
             }
-            fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+            fn deserialize_length_delimited_field<'a, D: LengthDelimitedDeserializer<'a>>(
                 &mut self,
                 deserializer: D,
                 field_number: usize,
@@ -396,7 +404,7 @@ mod tests {
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
             }
-            fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+            fn deserialize_length_delimited_field<'a, D: LengthDelimitedDeserializer<'a>>(
                 &mut self,
                 deserializer: D,
                 field_number: usize,
@@ -431,7 +439,7 @@ mod tests {
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
             }
-            fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+            fn deserialize_length_delimited_field<'a, D: LengthDelimitedDeserializer<'a>>(
                 &mut self,
                 deserializer: D,
                 field_number: usize,

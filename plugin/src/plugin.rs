@@ -58,7 +58,7 @@ impl MessageHandler for Version {
         return Err(DeserializeError::UnexpectedFieldType);
     }
 
-    fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+    fn deserialize_length_delimited_field<'a, D: LengthDelimitedDeserializer<'a>>(
         &mut self,
         deserializer: D,
         field_number: usize,
