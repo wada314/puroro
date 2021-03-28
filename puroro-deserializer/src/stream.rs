@@ -1,11 +1,10 @@
 use crate::types::*;
 use std::io::Read;
 
-pub mod error;
 mod impls;
 pub mod variant;
 
-pub use error::{DeserializeError, Result};
+pub use ::puroro::{PuroroError, Result};
 pub use variant::Variant;
 
 pub trait Deserializer {

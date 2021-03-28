@@ -1,4 +1,4 @@
-use super::{DeserializeError, Result};
+use super::{PuroroError, Result};
 use std::convert::TryFrom;
 use std::io::Result as IoResult;
 
@@ -20,7 +20,7 @@ impl Variant {
                     }
                 }
                 None => {
-                    return Err(DeserializeError::UnexpectedInputTermination);
+                    return Err(PuroroError::UnexpectedInputTermination);
                 }
             }
         }
@@ -30,13 +30,13 @@ impl Variant {
                 let byte = maybe_byte?;
                 x |= ((byte & 0x01) as u64) << 63;
                 if byte & 0xFE != 0 {
-                    return Err(DeserializeError::TooLargeVariant);
+                    return Err(PuroroError::TooLargeVariant);
                 } else {
                     return Ok(Variant(x.to_ne_bytes()));
                 }
             }
             None => {
-                return Err(DeserializeError::UnexpectedInputTermination);
+                return Err(PuroroError::UnexpectedInputTermination);
             }
         }
     }
@@ -90,7 +90,7 @@ mod tests {
             assert_eq!(variant.0, expected_value.to_ne_bytes());
             assert_eq!(collect_iter(iter), expected_remaining);
         }
-        fn get_err(input: Vec<IoResult<u8>>) -> DeserializeError {
+        fn get_err(input: Vec<IoResult<u8>>) -> PuroroError {
             let mut iter = input.into_iter();
             let result = Variant::from_bytes(&mut iter);
             assert!(result.is_err());
@@ -106,11 +106,11 @@ mod tests {
         );
         assert!(matches!(
             get_err(vec![Ok(0x80)]),
-            DeserializeError::UnexpectedInputTermination
+            PuroroError::UnexpectedInputTermination
         ));
         assert!(matches!(
             get_err(vec![Err(io_error1)]),
-            DeserializeError::IteratorError(_)
+            PuroroError::IteratorError(_)
         ));
     }
 
@@ -132,11 +132,11 @@ mod tests {
         );
         assert!(matches!(
             get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0x1F]).unwrap_err(),
-            DeserializeError::IntegerOverflow(_)
+            PuroroError::IntegerOverflow(_)
         ));
         assert!(matches!(
             get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F]).unwrap_err(),
-            DeserializeError::IntegerOverflow(_)
+            PuroroError::IntegerOverflow(_)
         ));
     }
 
@@ -159,11 +159,11 @@ mod tests {
         );
         assert!(matches!(
             get_si32(&[0xFF, 0xFF, 0xFF, 0xFF, 0x1F]).unwrap_err(),
-            DeserializeError::IntegerOverflow(_)
+            PuroroError::IntegerOverflow(_)
         ));
         assert!(matches!(
             get_si32(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F]).unwrap_err(),
-            DeserializeError::IntegerOverflow(_)
+            PuroroError::IntegerOverflow(_)
         ));
     }
 }

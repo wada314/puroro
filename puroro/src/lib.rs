@@ -1,13 +1,7 @@
 use std::iter::FromIterator;
-#[derive(::thiserror::Error, Debug)]
-pub enum PuroroError {
-    #[error("Invalid wire type.")]
-    InvalidWireType,
-    #[error("Deserializer error: {0}")]
-    DeserializeError(Box<dyn std::error::Error>),
-    #[error("Other error: {0}")]
-    OtherErrors(Box<dyn std::error::Error>),
-}
+
+pub mod error;
+pub use error::PuroroError;
 pub type Result<T> = std::result::Result<T, PuroroError>;
 
 pub trait Message: Sized {

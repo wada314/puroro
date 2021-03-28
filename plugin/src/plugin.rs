@@ -1,7 +1,6 @@
 use ::puroro_deserializer as deser;
 use deser::stream::{
-    DeserializeError, LengthDelimitedDeserializer, MessageHandler, RepeatedFieldHandler, Result,
-    Variant,
+    LengthDelimitedDeserializer, MessageHandler, PuroroError, RepeatedFieldHandler, Result, Variant,
 };
 
 macro_rules! proto_readable_struct {
@@ -44,18 +43,18 @@ impl MessageHandler for Version {
                 self.patch = variant.to_i32()?;
             }
             _ => {
-                return Err(DeserializeError::UnexpectedFieldType);
+                return Err(PuroroError::UnexpectedFieldType);
             }
         }
         Ok(())
     }
 
     fn deserialized_32bits(&mut self, _field_number: usize, _value: [u8; 4]) -> Result<()> {
-        return Err(DeserializeError::UnexpectedFieldType);
+        return Err(PuroroError::UnexpectedFieldType);
     }
 
     fn deserialized_64bits(&mut self, _field_number: usize, _value: [u8; 8]) -> Result<()> {
-        return Err(DeserializeError::UnexpectedFieldType);
+        return Err(PuroroError::UnexpectedFieldType);
     }
 
     fn deserialize_length_delimited_field<'a, D: LengthDelimitedDeserializer<'a>>(
@@ -64,7 +63,7 @@ impl MessageHandler for Version {
         field_number: usize,
     ) -> Result<()> {
         if field_number != 4 {
-            return Err(DeserializeError::UnexpectedFieldType);
+            return Err(PuroroError::UnexpectedFieldType);
         }
         deserializer.deserialize_as_string(|s| {
             self.suffix = s;

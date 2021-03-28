@@ -66,20 +66,23 @@ where
     }
 
     // May expectedly fail if reached to the eof
-    fn try_get_wire_type_and_field_number(&mut self) -> Result<(WireType, usize)> {
+    fn try_get_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, usize)>> {
         let mut peekable = self.indexed_iter.by_ref().peekable();
         if let None = peekable.peek() {
             // Found EOF at first byte. Successfull failure.
-            return Err(DeserializeError::ExpectedInputTermination);
+            return Ok(None);
         }
         let key = Variant::from_bytes(&mut peekable)?.to_usize()?;
-        Ok((WireType::from_usize(key & 0x07).unwrap(), (key >> 3)))
+        Ok(Some((
+            WireType::from_usize(key & 0x07).ok_or(PuroroError::InvalidWireType)?,
+            (key >> 3),
+        )))
     }
 
     fn eat_one_byte(&mut self) -> Result<u8> {
         self.indexed_iter
             .next()
-            .ok_or(DeserializeError::UnexpectedInputTermination)
+            .ok_or(PuroroError::UnexpectedInputTermination)
             .and_then(|r| r.map_err(|e| e.into()))
     }
 
@@ -108,8 +111,8 @@ where
 
             // get field number, wire type
             let (wire_type, field_number) = match self.try_get_wire_type_and_field_number() {
-                Ok(x) => x,
-                Err(DeserializeError::ExpectedInputTermination) => {
+                Ok(Some(x)) => x,
+                Ok(None) => {
                     break;
                 } // This is ok. finish This message deserialization.
                 Err(e) => {
@@ -173,7 +176,7 @@ where
             if end_pos - start_pos == length {
                 Ok(())
             } else {
-                Err(DeserializeError::InvalidFieldLength)
+                Err(PuroroError::InvalidFieldLength)
             }
         } else {
             Ok(())
@@ -202,7 +205,7 @@ where
             if end_pos - start_pos == length {
                 Ok(())
             } else {
-                Err(DeserializeError::InvalidFieldLength)
+                Err(PuroroError::InvalidFieldLength)
             }
         } else {
             Ok(())
@@ -226,7 +229,7 @@ where
             if end_pos - start_pos == length {
                 Ok(())
             } else {
-                Err(DeserializeError::InvalidFieldLength)
+                Err(PuroroError::InvalidFieldLength)
             }
         } else {
             Ok(())
@@ -238,7 +241,7 @@ where
         Ok(DelayedLengthDelimitedDeserializer::new(
             self.indexed_iter
                 .collect::<IoResult<Vec<_>>>()
-                .map_err(|e| DeserializeError::from(e))?,
+                .map_err(|e| PuroroError::from(e))?,
         ))
     }
 }
