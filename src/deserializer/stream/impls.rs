@@ -80,7 +80,7 @@ where
         loop {
             // Check message length if possible
             if let Some(message_length) = self.bytes_len {
-                if start_pos + message_length >= self.indexed_iter.index() {
+                if start_pos + message_length <= self.indexed_iter.index() {
                     break;
                 }
             }
@@ -104,11 +104,8 @@ where
                 WireType::LengthDelimited => {
                     let field_length = Variant::from_bytes(&mut self.indexed_iter)?.to_usize()?;
                     let deserializer_for_inner = self.make_sub_deserializer(field_length);
-                    handler.deserialize_length_delimited_field(
-                        deserializer_for_inner,
-                        field_number,
-                        field_length,
-                    )?;
+                    handler
+                        .deserialize_length_delimited_field(deserializer_for_inner, field_number)?;
                 }
                 _ => {
                     todo!()
@@ -225,7 +222,7 @@ impl<I: Iterator<Item = IoResult<u8>>> Iterator for VariantsIterator<I> {
     type Item = Result<Variant>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut peekable = self.iter.peekable();
+        let mut peekable = self.iter.by_ref().peekable();
         if let None = peekable.peek() {
             return None;
         }
@@ -238,7 +235,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn do_parse_test_variant() {
+    fn deserialize_test1() {
         // https://developers.google.com/protocol-buffers/docs/encoding#simple
         // message Test1 {
         //   optional int32 a = 1;
@@ -273,7 +270,7 @@ mod tests {
     }
 
     #[test]
-    fn do_parse_test_string() {
+    fn deserialize_test2() {
         // https://developers.google.com/protocol-buffers/docs/encoding#strings
         // message Test2 {
         //   optional string b = 2;
@@ -293,7 +290,6 @@ mod tests {
                 &mut self,
                 deserializer: D,
                 field_number: usize,
-                _length: usize,
             ) -> Result<()> {
                 assert_eq!(field_number, 2);
                 deserializer.deserialize_as_string(|s| {
@@ -309,5 +305,63 @@ mod tests {
         let result = deserializer.deserialize(handler);
         assert!(result.is_ok());
         assert_eq!(result.unwrap().b, "testing");
+    }
+
+    #[test]
+    fn deserialize_test3() {
+        // https://developers.google.com/protocol-buffers/docs/encoding#embedded
+        // message Test1 {
+        //   optional int32 a = 1;
+        // }
+        // message Test3 {
+        //   optional Test1 c = 3;
+        // }
+        // a = 150
+        let input: &[u8] = &[0x1a, 0x03, 0x08, 0x96, 0x01];
+        #[derive(Default, PartialEq)]
+        struct Test1 {
+            a: i32,
+        }
+        #[derive(Default, PartialEq)]
+        struct Test3 {
+            c: Test1,
+        }
+
+        impl Handler for Test1 {
+            type Target = Self;
+            fn finish(self) -> Result<Self::Target> {
+                Ok(self)
+            }
+            fn deserialized_variant(
+                &mut self,
+                field_number: usize,
+                variant: Variant,
+            ) -> Result<()> {
+                assert_eq!(1, field_number);
+                self.a = variant.to_i32()?;
+                Ok(())
+            }
+        }
+        impl Handler for Test3 {
+            type Target = Self;
+            fn finish(self) -> Result<Self::Target> {
+                Ok(self)
+            }
+            fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+                &mut self,
+                deserializer: D,
+                field_number: usize,
+            ) -> Result<()> {
+                assert_eq!(3, field_number);
+                self.c = deserializer.deserialize_as_message(Test1::default())?;
+                Ok(())
+            }
+        }
+
+        let handler = Test3::default();
+        let deserializer = DeserializerImpl::<_>::new(input.bytes());
+        let result = deserializer.deserialize(handler);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().c.a, 150);
     }
 }

@@ -1,5 +1,5 @@
 use crate::types::*;
-use std::io::{Read, Result as IoResult};
+use std::io::Read;
 
 pub mod error;
 mod impls;
@@ -44,7 +44,6 @@ pub trait Handler {
         &mut self,
         deserializer: D,
         field_number: usize,
-        length: usize,
     ) -> Result<()> {
         // Providing a default implementation just for testing.
         panic!("Please provide the implementation for every handler method!");

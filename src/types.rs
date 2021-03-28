@@ -1,6 +1,6 @@
 use ::num_derive::FromPrimitive;
 #[non_exhaustive]
-#[derive(FromPrimitive)]
+#[derive(FromPrimitive, Debug)]
 pub enum WireType {
     Variant = 0,
     Bytes64 = 1,
