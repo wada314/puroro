@@ -67,27 +67,3 @@ impl<F: FnOnce(Vec<Variant>) -> Result<()>> RepeatedFieldHandler<Variant> for F 
         (self)(iter.collect::<Result<Vec<Variant>>>()?)
     }
 }
-
-pub(crate) struct IndexedIterator<I> {
-    index: usize,
-    iter: I,
-}
-impl<I> Iterator for IndexedIterator<I>
-where
-    I: Iterator,
-{
-    type Item = <I as Iterator>::Item;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.index += 1;
-        self.iter.next()
-    }
-}
-impl<I> IndexedIterator<I> {
-    fn new(iter: I) -> Self {
-        IndexedIterator { index: 0, iter }
-    }
-    fn index(&self) -> usize {
-        self.index
-    }
-}

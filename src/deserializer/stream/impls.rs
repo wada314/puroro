@@ -192,6 +192,30 @@ where
     }
 }
 
+pub(crate) struct IndexedIterator<I> {
+    index: usize,
+    iter: I,
+}
+impl<I> Iterator for IndexedIterator<I>
+where
+    I: Iterator,
+{
+    type Item = <I as Iterator>::Item;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.index += 1;
+        self.iter.next()
+    }
+}
+impl<I> IndexedIterator<I> {
+    fn new(iter: I) -> Self {
+        IndexedIterator { index: 0, iter }
+    }
+    fn index(&self) -> usize {
+        self.index
+    }
+}
+
 pub struct CharsIterator<T: Iterator<Item = IoResult<u8>>> {
     iter: ::utf8_decode::UnsafeDecoder<T>,
 }
