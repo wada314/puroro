@@ -259,7 +259,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn deserialize_test1() {
+    fn deserialize_samples_test1() {
         // https://developers.google.com/protocol-buffers/docs/encoding#simple
         // message Test1 {
         //   optional int32 a = 1;
@@ -294,7 +294,7 @@ mod tests {
     }
 
     #[test]
-    fn deserialize_test2() {
+    fn deserialize_samples_test2() {
         // https://developers.google.com/protocol-buffers/docs/encoding#strings
         // message Test2 {
         //   optional string b = 2;
@@ -332,7 +332,7 @@ mod tests {
     }
 
     #[test]
-    fn deserialize_test3() {
+    fn deserialize_samples_test3() {
         // https://developers.google.com/protocol-buffers/docs/encoding#embedded
         // message Test1 {
         //   optional int32 a = 1;
@@ -390,7 +390,7 @@ mod tests {
     }
 
     #[test]
-    fn deserialize_test4() {
+    fn deserialize_samples_test4() {
         // https://developers.google.com/protocol-buffers/docs/encoding#packed
         // message Test4 {
         //   repeated int32 d = 4 [packed=true];
