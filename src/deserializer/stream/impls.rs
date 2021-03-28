@@ -61,7 +61,7 @@ where
 
     // May expectedly fail if reached to the eof
     fn try_get_wire_type_and_field_number(&mut self) -> Result<(WireType, usize)> {
-        let mut peekable = self.indexed_iter.by_ref().peekable();
+        let mut peekable = self.by_ref().peekable();
         if let None = peekable.peek() {
             // Found EOF at first byte. Successfull failure.
             return Err(DeserializeError::ExpectedInputTermination);
@@ -93,11 +93,11 @@ where
     }
 
     fn deserialize_as_message<H: Handler>(mut self, mut handler: H) -> Result<H::Target> {
-        let start_pos = self.indexed_iter.index();
+        let start_pos = self.index();
         loop {
             // Check message length if possible
-            if let Some(message_length) = self.bytes_len {
-                if start_pos + message_length >= self.indexed_iter.index() {
+            if let Some(message_length) = self.length() {
+                if start_pos + message_length >= self.index() {
                     break;
                 }
             }
@@ -115,11 +115,11 @@ where
 
             match wire_type {
                 WireType::Variant => {
-                    let variant = Variant::from_bytes(&mut self.indexed_iter)?;
+                    let variant = Variant::from_bytes(&mut self)?;
                     handler.deserialized_variant(field_number, variant)?;
                 }
                 WireType::LengthDelimited => {
-                    let field_length = Variant::from_bytes(&mut self.indexed_iter)?.to_usize()?;
+                    let field_length = Variant::from_bytes(&mut self)?.to_usize()?;
                     let deserializer_for_inner = self.make_sub_deserializer(field_length);
                     handler.deserialize_length_delimited_field(
                         deserializer_for_inner,
