@@ -4,7 +4,6 @@ use ::puroro_deserializer::stream::*;
 use std::collections::HashMap;
 
 type Result<T> = std::result::Result<T, PuroroError>;
-type DResult<T> = std::result::Result<T, DeserializeError>;
 
 #[derive(Debug)]
 enum Field {
@@ -38,15 +37,14 @@ impl UnknownMessage {
                         dldd.deserialize_as_variants(|vs| {
                             variants = vs;
                             Ok(())
-                        })
-                        .map_err(|e| PuroroError::DeserializeError(Box::new(e)))?;
+                        })?;
                         if let Some(variant) = variants.last() {
                             return Ok(variant.clone());
                         }
                     }
                     _ => {
                         // found fixed32 or fixed64 field
-                        return Err(PuroroError::InvalidWireType);
+                        return Err(PuroroError::UnexpectedWireType);
                     }
                 }
             }
@@ -58,11 +56,11 @@ impl UnknownMessage {
 impl MessageHandler for UnknownMessage {
     type Target = Self;
 
-    fn finish(self) -> DResult<Self::Target> {
+    fn finish(self) -> Result<Self::Target> {
         Ok(self)
     }
 
-    fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> DResult<()> {
+    fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> Result<()> {
         self.fields
             .entry(field_number)
             .or_insert(Vec::new())
@@ -70,7 +68,7 @@ impl MessageHandler for UnknownMessage {
         Ok(())
     }
 
-    fn deserialized_32bits(&mut self, field_number: usize, value: [u8; 4]) -> DResult<()> {
+    fn deserialized_32bits(&mut self, field_number: usize, value: [u8; 4]) -> Result<()> {
         self.fields
             .entry(field_number)
             .or_insert(Vec::new())
@@ -78,7 +76,7 @@ impl MessageHandler for UnknownMessage {
         Ok(())
     }
 
-    fn deserialized_64bits(&mut self, field_number: usize, value: [u8; 8]) -> DResult<()> {
+    fn deserialized_64bits(&mut self, field_number: usize, value: [u8; 8]) -> Result<()> {
         self.fields
             .entry(field_number)
             .or_insert(Vec::new())
@@ -90,7 +88,7 @@ impl MessageHandler for UnknownMessage {
         &mut self,
         deserializer: D,
         field_number: usize,
-    ) -> DResult<()> {
+    ) -> Result<()> {
         self.fields
             .entry(field_number)
             .or_insert(Vec::new())
@@ -101,35 +99,26 @@ impl MessageHandler for UnknownMessage {
 
 impl Message for UnknownMessage {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self> {
-        deserializer_from_bytes(iter)
-            .deserialize(UnknownMessage::new())
-            .map_err(|e| PuroroError::DeserializeError(Box::new(e)))
+        deserializer_from_bytes(iter).deserialize(UnknownMessage::new())
     }
 
     fn get_field_as_i32(&self, field_number: usize) -> Result<i32> {
-        self.get_last_variant_field(field_number)?
-            .to_i32()
-            .map_err(|e| PuroroError::DeserializeError(Box::new(e)))
+        self.get_last_variant_field(field_number)?.to_i32()
     }
-
     fn get_field_as_i64(&self, field_number: usize) -> Result<i64> {
-        todo!()
+        self.get_last_variant_field(field_number)?.to_i64()
     }
-
     fn get_field_as_si32(&self, field_number: usize) -> Result<i32> {
-        todo!()
+        self.get_last_variant_field(field_number)?.to_si32()
     }
-
     fn get_field_as_si64(&self, field_number: usize) -> Result<i64> {
-        todo!()
+        self.get_last_variant_field(field_number)?.to_si64()
     }
-
     fn get_field_as_u32(&self, field_number: usize) -> Result<u32> {
-        todo!()
+        self.get_last_variant_field(field_number)?.to_u32()
     }
-
     fn get_field_as_u64(&self, field_number: usize) -> Result<u64> {
-        todo!()
+        self.get_last_variant_field(field_number)?.to_u64()
     }
 
     fn collect_field_as_repeated_i32<T: std::iter::FromIterator<i32>>(
