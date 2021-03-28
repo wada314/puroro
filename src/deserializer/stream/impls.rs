@@ -388,4 +388,42 @@ mod tests {
         assert!(result.is_ok());
         assert_eq!(result.unwrap().c.a, 150);
     }
+
+    #[test]
+    fn deserialize_test4() {
+        // https://developers.google.com/protocol-buffers/docs/encoding#packed
+        // message Test4 {
+        //   repeated int32 d = 4 [packed=true];
+        // }
+        // d = [3, 270, 86942]
+        let input: &[u8] = &[0x22, 0x06, 0x03, 0x8E, 0x02, 0x9E, 0xA7, 0x05];
+        #[derive(Default, PartialEq)]
+        struct Test4 {
+            d: Vec<i32>,
+        }
+        impl Handler for Test4 {
+            type Target = Self;
+            fn finish(self) -> Result<Self::Target> {
+                Ok(self)
+            }
+            fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+                &mut self,
+                deserializer: D,
+                field_number: usize,
+            ) -> Result<()> {
+                assert_eq!(4, field_number);
+                deserializer.deserialize_as_variants(|variants: Vec<Variant>| {
+                    self.d = variants.iter().map(|v| v.to_i32()).collect::<Result<_>>()?;
+                    Ok(())
+                })?;
+                Ok(())
+            }
+        }
+
+        let handler = Test4::default();
+        let deserializer = DeserializerImpl::<_>::new(input.bytes());
+        let result = deserializer.deserialize(handler);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().d, [3, 270, 86942]);
+    }
 }
