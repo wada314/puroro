@@ -3,9 +3,11 @@ use std::io::Read;
 
 pub mod error;
 mod impls;
+pub mod unknown_message;
 pub mod variant;
 
 pub use error::{DeserializeError, Result};
+pub use unknown_message::UnknownMessage;
 pub use variant::Variant;
 
 pub trait Deserializer {

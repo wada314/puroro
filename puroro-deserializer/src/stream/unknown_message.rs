@@ -1,7 +1,4 @@
-use puroro_deserializer::stream::{
-    DelayedLengthDelimitedDeserializer, LengthDelimitedDeserializer, MessageHandler,
-    Result as DResult, Variant,
-};
+use super::*;
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -29,11 +26,11 @@ pub struct UnknownMessage {
 impl MessageHandler for UnknownMessage {
     type Target = Self;
 
-    fn finish(self) -> DResult<Self::Target> {
+    fn finish(self) -> Result<Self::Target> {
         Ok(self)
     }
 
-    fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> DResult<()> {
+    fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> Result<()> {
         self.fields
             .entry(field_number)
             .or_insert(Vec::new())
@@ -41,7 +38,7 @@ impl MessageHandler for UnknownMessage {
         Ok(())
     }
 
-    fn deserialized_32bits(&mut self, field_number: usize, value: [u8; 4]) -> DResult<()> {
+    fn deserialized_32bits(&mut self, field_number: usize, value: [u8; 4]) -> Result<()> {
         self.fields
             .entry(field_number)
             .or_insert(Vec::new())
@@ -49,7 +46,7 @@ impl MessageHandler for UnknownMessage {
         Ok(())
     }
 
-    fn deserialized_64bits(&mut self, field_number: usize, value: [u8; 8]) -> DResult<()> {
+    fn deserialized_64bits(&mut self, field_number: usize, value: [u8; 8]) -> Result<()> {
         self.fields
             .entry(field_number)
             .or_insert(Vec::new())
@@ -61,7 +58,7 @@ impl MessageHandler for UnknownMessage {
         &mut self,
         deserializer: D,
         field_number: usize,
-    ) -> DResult<()> {
+    ) -> Result<()> {
         self.fields
             .entry(field_number)
             .or_insert(Vec::new())
