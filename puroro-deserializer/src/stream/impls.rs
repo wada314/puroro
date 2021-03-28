@@ -35,6 +35,8 @@ where
 {
     indexed_iter: &'a mut IndexedIterator<I>,
     bytes_len: Option<usize>,
+    #[cfg(debug_assertions)]
+    deserialized: bool,
 }
 impl<'a, I> LengthDelimitedDeserializerImpl<'a, I>
 where
@@ -44,6 +46,8 @@ where
         Self {
             indexed_iter,
             bytes_len,
+            #[cfg(debug_assertions)]
+            deserialized: false,
         }
     }
     fn make_sub_deserializer<'b>(
@@ -56,6 +60,8 @@ where
         LengthDelimitedDeserializerImpl {
             indexed_iter: self.indexed_iter,
             bytes_len: Some(new_length),
+            #[cfg(debug_assertions)]
+            deserialized: false,
         }
     }
 
@@ -76,6 +82,13 @@ where
             .ok_or(DeserializeError::UnexpectedInputTermination)
             .and_then(|r| r.map_err(|e| e.into()))
     }
+
+    #[cfg(debug_assertions)]
+    fn mark_deserialized(&mut self) {
+        self.deserialized = true;
+    }
+    #[cfg(not(debug_assertions))]
+    fn mark_deserialized(&mut self) {}
 }
 
 impl<'a, I> LengthDelimitedDeserializer<'a> for LengthDelimitedDeserializerImpl<'a, I>
@@ -83,6 +96,7 @@ where
     I: Iterator<Item = IoResult<u8>>,
 {
     fn deserialize_as_message<H: MessageHandler>(mut self, mut handler: H) -> Result<H::Target> {
+        self.mark_deserialized();
         let start_pos = self.indexed_iter.index();
         loop {
             // Check message length if possible
@@ -141,10 +155,11 @@ where
         handler.finish()
     }
 
-    fn deserialize_as_string<H>(self, handler: H) -> Result<()>
+    fn deserialize_as_string<H>(mut self, handler: H) -> Result<()>
     where
         H: RepeatedFieldHandler<char>,
     {
+        self.mark_deserialized();
         let start_pos = self.indexed_iter.index();
         if let Some(length) = self.bytes_len {
             let iter = CharsIterator::new(self.indexed_iter.by_ref().take(length));
@@ -165,10 +180,11 @@ where
         }
     }
 
-    fn deserialize_as_bytes<H>(self, handler: H) -> Result<()>
+    fn deserialize_as_bytes<H>(mut self, handler: H) -> Result<()>
     where
         H: RepeatedFieldHandler<u8>,
     {
+        self.mark_deserialized();
         let start_pos = self.indexed_iter.index();
         if let Some(length) = self.bytes_len {
             let iter = self
@@ -192,10 +208,11 @@ where
             Ok(())
         }
     }
-    fn deserialize_as_variants<H>(self, handler: H) -> Result<()>
+    fn deserialize_as_variants<H>(mut self, handler: H) -> Result<()>
     where
         H: RepeatedFieldHandler<Variant>,
     {
+        self.mark_deserialized();
         let start_pos = self.indexed_iter.index();
         if let Some(length) = self.bytes_len {
             let iter = VariantsIterator::new(self.indexed_iter.by_ref().take(length));
@@ -216,13 +233,27 @@ where
         }
     }
 
-    fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer> {
+    fn leave_as_unknown(mut self) -> Result<DelayedLengthDelimitedDeserializer> {
+        self.mark_deserialized();
         Ok(DelayedLengthDelimitedDeserializer::new(
             self.indexed_iter
                 .collect::<IoResult<Vec<_>>>()
                 .map_err(|e| DeserializeError::from(e))?,
         ))
     }
+}
+impl<'a, I> Drop for LengthDelimitedDeserializerImpl<'a, I>
+where
+    I: Iterator<Item = IoResult<u8>>,
+{
+    #[cfg(debug_assertions)]
+    fn drop(&mut self) {
+        if !self.deserialized {
+            panic!("You MUST call one of the methods of LengthDelimitedDeserializer!!");
+        }
+    }
+    #[cfg(not(debug_assertions))]
+    fn drop(&mut self) {}
 }
 
 pub(crate) struct IndexedIterator<I> {

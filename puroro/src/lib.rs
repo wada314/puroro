@@ -28,7 +28,7 @@ enum Field {
     Variant(Variant),
     Value32([u8; 4]),
     Value64([u8; 8]),
-    LengthDelimited(),
+    LengthDelimited(LengthDelimitedField),
 }
 enum LengthDelimitedField {
     String(String),
@@ -38,7 +38,7 @@ enum LengthDelimitedField {
 }
 
 struct UnknownMessage {
-    fields: HashMap<usize, Variant>,
+    fields: HashMap<usize, Vec<Field>>,
 }
 
 impl MessageHandler for UnknownMessage {
@@ -49,18 +49,27 @@ impl MessageHandler for UnknownMessage {
     }
 
     fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> DResult<()> {
-        // Providing a default implementation just for testing convenience.
-        panic!("Please provide the implementation for every handler method!");
+        self.fields
+            .entry(field_number)
+            .or_insert(Vec::new())
+            .push(Field::Variant(variant));
+        Ok(())
     }
 
     fn deserialized_32bits(&mut self, field_number: usize, value: [u8; 4]) -> DResult<()> {
-        // Providing a default implementation just for testing convenience.
-        panic!("Please provide the implementation for every handler method!");
+        self.fields
+            .entry(field_number)
+            .or_insert(Vec::new())
+            .push(Field::Value32(value));
+        Ok(())
     }
 
     fn deserialized_64bits(&mut self, field_number: usize, value: [u8; 8]) -> DResult<()> {
-        // Providing a default implementation just for testing convenience.
-        panic!("Please provide the implementation for every handler method!");
+        self.fields
+            .entry(field_number)
+            .or_insert(Vec::new())
+            .push(Field::Value64(value));
+        Ok(())
     }
 
     fn deserialize_length_delimited_field<'a, D: LengthDelimitedDeserializer<'a>>(
@@ -68,8 +77,13 @@ impl MessageHandler for UnknownMessage {
         deserializer: D,
         field_number: usize,
     ) -> DResult<()> {
-        // Providing a default implementation just for testing convenience.
-        panic!("Please provide the implementation for every handler method!");
+        self.fields
+            .entry(field_number)
+            .or_insert(Vec::new())
+            .push(Field::LengthDelimited(LengthDelimitedField::Unknown(
+                deserializer.leave_as_unknown()?,
+            )));
+        Ok(())
     }
 }
 
