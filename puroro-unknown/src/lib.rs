@@ -289,6 +289,15 @@ impl Message for UnknownMessage {
         &self,
         field_number: usize,
     ) -> Result<U> {
-        todo!()
+        if let Some(fields) = self.fields.get(&field_number) {
+            return fields
+                .iter()
+                .map(|field| match field {
+                    Field::LengthDelimited(ref dldd) => T::from_bytes(dldd.bytes()),
+                    _ => Err(PuroroError::InvalidWireType),
+                })
+                .collect::<Result<U>>();
+        }
+        Ok(std::iter::empty().collect::<U>())
     }
 }
