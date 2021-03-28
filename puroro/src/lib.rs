@@ -1,4 +1,5 @@
 use std::iter::FromIterator;
+use std::marker::PhantomData;
 
 pub mod error;
 pub use error::PuroroError;
@@ -37,6 +38,12 @@ pub trait Message: Sized {
         field_number: usize,
     ) -> Result<T>;
 
+    fn handle_field_as_repeated_i32<H: RepeatedFieldHandler<Item = i32>>(
+        &self,
+        field_number: usize,
+        handler: H,
+    ) -> Result<H::Output>;
+
     fn collect_field_as_str<S: FromIterator<char>>(&self, field_number: usize) -> Result<S>;
     fn collect_field_as_repeated_str<S: FromIterator<char>, T: FromIterator<S>>(
         &self,
@@ -51,19 +58,22 @@ pub trait Message: Sized {
     ) -> Result<U>;
 }
 
-pub struct Merged<T: Message, U: Message> {
-    prior: T,
-    later: U,
+pub trait RepeatedFieldHandler {
+    type Item;
+    type Output;
+    fn handle<I: Iterator<Item = Result<Self::Item>>>(self, iter: I) -> Result<Self::Output>;
 }
-pub fn merge<T: Message, U: Message>(prior: T, later: U) -> Merged<T, U> {
-    Merged { prior, later }
-}
-//TODO: impl Message for Merged
+struct RepeatedFieldCollecter<T, U>(PhantomData<(T, U)>)
+where
+    U: FromIterator<T>;
+impl<T, U> RepeatedFieldHandler for RepeatedFieldCollecter<T, U>
+where
+    U: FromIterator<T>,
+{
+    type Item = T;
+    type Output = U;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn handle<I: Iterator<Item = Result<Self::Item>>>(self, iter: I) -> Result<Self::Output> {
+        iter.collect::<Result<U>>()
     }
 }

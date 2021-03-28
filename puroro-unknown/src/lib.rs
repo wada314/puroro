@@ -306,4 +306,14 @@ impl Message for UnknownMessage {
         }
         Ok(std::iter::empty().collect::<U>())
     }
+
+    fn handle_field_as_repeated_i32<H>(&self, field_number: usize, handler: H) -> Result<H::Output>
+    where
+        H: puroro::RepeatedFieldHandler<Item = i32>,
+    {
+        handler.handle(
+            self.get_variant_field_iterator(field_number)
+                .map(|r| r.and_then(|v| v.to_i32())),
+        )
+    }
 }
