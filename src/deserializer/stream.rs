@@ -9,14 +9,17 @@ pub use error::{DeserializeError, Result};
 pub use variant::Variant;
 
 pub trait Deserializer {
-    fn deserialize<H: Handler>(self, handler: H) -> Result<H::Target>;
+    fn deserialize<H: MessageHandler>(self, handler: H) -> Result<H::Target>;
 }
 pub fn deserializer_from_read<R: Read>(read: R) -> impl Deserializer {
     impls::DeserializerImpl::<std::io::Bytes<R>>::new(read.bytes())
 }
 
 pub trait LengthDelimitedDeserializer: Sized {
-    fn deserialize_as_message<H: Handler>(self, handler: H) -> Result<<H as Handler>::Target>;
+    fn deserialize_as_message<H: MessageHandler>(
+        self,
+        handler: H,
+    ) -> Result<<H as MessageHandler>::Target>;
 
     fn deserialize_as_string<H>(self, handler: H) -> Result<()>
     where
@@ -29,13 +32,25 @@ pub trait LengthDelimitedDeserializer: Sized {
         H: RepeatedFieldHandler<Variant>;
 }
 
-pub trait Handler {
+pub trait MessageHandler {
     type Target;
     fn finish(self) -> Result<Self::Target>;
 
     #[allow(unused_variables)]
     fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> Result<()> {
-        // Providing a default implementation just for testing.
+        // Providing a default implementation just for testing convenience.
+        panic!("Please provide the implementation for every handler method!");
+    }
+
+    #[allow(unused_variables)]
+    fn deserialized_32bits(&mut self, field_number: usize, value: [u8; 4]) -> Result<()> {
+        // Providing a default implementation just for testing convenience.
+        panic!("Please provide the implementation for every handler method!");
+    }
+
+    #[allow(unused_variables)]
+    fn deserialized_64bits(&mut self, field_number: usize, value: [u8; 8]) -> Result<()> {
+        // Providing a default implementation just for testing convenience.
         panic!("Please provide the implementation for every handler method!");
     }
 
@@ -45,10 +60,11 @@ pub trait Handler {
         deserializer: D,
         field_number: usize,
     ) -> Result<()> {
-        // Providing a default implementation just for testing.
+        // Providing a default implementation just for testing convenience.
         panic!("Please provide the implementation for every handler method!");
     }
 }
+
 pub trait RepeatedFieldHandler<T> {
     fn handle<I: Iterator<Item = Result<T>>>(self, iter: I) -> Result<()>;
 }

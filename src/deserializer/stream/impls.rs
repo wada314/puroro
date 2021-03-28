@@ -23,7 +23,7 @@ impl<I> Deserializer for DeserializerImpl<I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
-    fn deserialize<H: Handler>(mut self, handler: H) -> Result<H::Target> {
+    fn deserialize<H: MessageHandler>(mut self, handler: H) -> Result<H::Target> {
         LengthDelimitedDeserializerImpl::new(&mut self.indexed_iter, None)
             .deserialize_as_message(handler)
     }
@@ -69,13 +69,20 @@ where
         let key = Variant::from_bytes(&mut peekable)?.to_usize()?;
         Ok((WireType::from_usize(key & 0x07).unwrap(), (key >> 3)))
     }
+
+    fn eat_one_byte(&mut self) -> Result<u8> {
+        self.indexed_iter
+            .next()
+            .ok_or(DeserializeError::UnexpectedInputTermination)
+            .and_then(|r| r.map_err(|e| e.into()))
+    }
 }
 
 impl<'a, I> LengthDelimitedDeserializer for LengthDelimitedDeserializerImpl<'a, I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
-    fn deserialize_as_message<H: Handler>(mut self, mut handler: H) -> Result<H::Target> {
+    fn deserialize_as_message<H: MessageHandler>(mut self, mut handler: H) -> Result<H::Target> {
         let start_pos = self.indexed_iter.index();
         loop {
             // Check message length if possible
@@ -107,8 +114,26 @@ where
                     handler
                         .deserialize_length_delimited_field(deserializer_for_inner, field_number)?;
                 }
+                WireType::Bytes32 => {
+                    let v0 = self.eat_one_byte()?;
+                    let v1 = self.eat_one_byte()?;
+                    let v2 = self.eat_one_byte()?;
+                    let v3 = self.eat_one_byte()?;
+                    handler.deserialized_32bits(field_number, [v0, v1, v2, v3])?;
+                }
+                WireType::Bytes64 => {
+                    let v0 = self.eat_one_byte()?;
+                    let v1 = self.eat_one_byte()?;
+                    let v2 = self.eat_one_byte()?;
+                    let v3 = self.eat_one_byte()?;
+                    let v4 = self.eat_one_byte()?;
+                    let v5 = self.eat_one_byte()?;
+                    let v6 = self.eat_one_byte()?;
+                    let v7 = self.eat_one_byte()?;
+                    handler.deserialized_64bits(field_number, [v0, v1, v2, v3, v4, v5, v6, v7])?;
+                }
                 _ => {
-                    todo!()
+                    unimplemented!("WIP for group support");
                 }
             }
         }
@@ -270,7 +295,7 @@ mod tests {
         struct Test1 {
             a: i32,
         }
-        impl Handler for Test1 {
+        impl MessageHandler for Test1 {
             type Target = Self;
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
@@ -305,7 +330,7 @@ mod tests {
         struct Test2 {
             b: String,
         }
-        impl Handler for Test2 {
+        impl MessageHandler for Test2 {
             type Target = Self;
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
@@ -351,7 +376,7 @@ mod tests {
             c: Test1,
         }
 
-        impl Handler for Test1 {
+        impl MessageHandler for Test1 {
             type Target = Self;
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
@@ -366,7 +391,7 @@ mod tests {
                 Ok(())
             }
         }
-        impl Handler for Test3 {
+        impl MessageHandler for Test3 {
             type Target = Self;
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
@@ -401,7 +426,7 @@ mod tests {
         struct Test4 {
             d: Vec<i32>,
         }
-        impl Handler for Test4 {
+        impl MessageHandler for Test4 {
             type Target = Self;
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
