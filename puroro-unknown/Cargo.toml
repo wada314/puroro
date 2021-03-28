@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 puroro = { path = "../puroro" }
 puroro-deserializer = { path = "../puroro-deserializer" }
+itertools = "0.10.0"

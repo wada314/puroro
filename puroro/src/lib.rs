@@ -6,6 +6,8 @@ pub type Result<T> = std::result::Result<T, PuroroError>;
 
 pub trait Message: Sized {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self>;
+    type MergedType: Message;
+    fn merge(&self, latter: &Self) -> Result<Self::MergedType>;
 
     fn get_field_as_i32(&self, field_number: usize) -> Result<i32>;
     fn get_field_as_i64(&self, field_number: usize) -> Result<i64>;
@@ -35,7 +37,9 @@ pub trait Message: Sized {
         &self,
         field_number: usize,
     ) -> Result<T>;
-    fn get_field_as_message<T: Message>(&self, field_number: usize) -> Result<T>;
+    fn get_field_as_message<T>(&self, field_number: usize) -> Result<Option<T>>
+    where
+        T: Message<MergedType = T>;
     fn collect_field_as_repeated_message<T: Message, U: FromIterator<T>>(
         &self,
         field_number: usize,

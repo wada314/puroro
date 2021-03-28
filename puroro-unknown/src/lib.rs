@@ -1,3 +1,4 @@
+use ::itertools::Either;
 use ::puroro::Message;
 use ::puroro::PuroroError;
 use ::puroro_deserializer::stream::*;
@@ -5,7 +6,7 @@ use std::collections::HashMap;
 
 type Result<T> = std::result::Result<T, PuroroError>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Field {
     Variant(Variant),
     Value32([u8; 4]),
@@ -13,7 +14,7 @@ enum Field {
     LengthDelimited(DelayedLengthDelimitedDeserializer),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UnknownMessage {
     fields: HashMap<usize, Vec<Field>>,
 }
@@ -26,8 +27,8 @@ impl UnknownMessage {
     }
 
     fn get_last_variant_field(&self, field_number: usize) -> Result<Variant> {
-        if let Some(field) = self.fields.get(&field_number) {
-            if let Some(last_field) = field.last() {
+        if let Some(fields) = self.fields.get(&field_number) {
+            if let Some(last_field) = fields.last() {
                 match last_field {
                     Field::Variant(ref variant) => {
                         return Ok(variant.clone());
@@ -50,6 +51,32 @@ impl UnknownMessage {
             }
         }
         Ok(Variant::default())
+    }
+
+    fn get_variant_field_iterator(
+        &self,
+        field_number: usize,
+    ) -> impl Iterator<Item = Result<Variant>> + '_ {
+        let fields_iter = if let Some(fields) = self.fields.get(&field_number) {
+            Either::Left(fields.iter())
+        } else {
+            Either::Right(std::iter::empty::<&Field>())
+        };
+        fields_iter.flat_map(|field| match field {
+            Field::Variant(ref variant) => Either::Left(std::iter::once(Ok(variant.clone()))),
+            Field::LengthDelimited(ref dldd) => {
+                let mut variants = Vec::new();
+                if let Err(e) = dldd.deserialize_as_variants(|vs: Vec<Variant>| {
+                    variants = vs.iter().map(|v| Ok(v.clone())).collect::<Vec<_>>();
+                    Ok(())
+                }) {
+                    Either::Left(std::iter::once(Err(e)))
+                } else {
+                    Either::Right(variants.into_iter())
+                }
+            }
+            _ => Either::Left(std::iter::once(Err(PuroroError::UnexpectedWireType))),
+        })
     }
 }
 
@@ -101,6 +128,18 @@ impl Message for UnknownMessage {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self> {
         deserializer_from_bytes(iter).deserialize(UnknownMessage::new())
     }
+    type MergedType = UnknownMessage;
+    fn merge(&self, latter: &Self) -> Result<UnknownMessage> {
+        let mut new_message = self.clone();
+        for (k, v) in &latter.fields {
+            new_message
+                .fields
+                .entry(*k)
+                .and_modify(|fields| fields.extend(v.iter().cloned()))
+                .or_insert_with(|| v.clone());
+        }
+        Ok(new_message)
+    }
 
     fn get_field_as_i32(&self, field_number: usize) -> Result<i32> {
         self.get_last_variant_field(field_number)?.to_i32()
@@ -125,49 +164,78 @@ impl Message for UnknownMessage {
         &self,
         field_number: usize,
     ) -> Result<T> {
-        todo!()
+        self.get_variant_field_iterator(field_number)
+            .map(|r| r.and_then(|v| v.to_i32()))
+            .collect::<Result<T>>()
     }
 
     fn collect_field_as_repeated_i64<T: std::iter::FromIterator<i64>>(
         &self,
         field_number: usize,
     ) -> Result<T> {
-        todo!()
+        self.get_variant_field_iterator(field_number)
+            .map(|r| r.and_then(|v| v.to_i64()))
+            .collect::<Result<T>>()
     }
 
     fn collect_field_as_repeated_si32<T: std::iter::FromIterator<i32>>(
         &self,
         field_number: usize,
     ) -> Result<T> {
-        todo!()
+        self.get_variant_field_iterator(field_number)
+            .map(|r| r.and_then(|v| v.to_si32()))
+            .collect::<Result<T>>()
     }
 
     fn collect_field_as_repeated_si64<T: std::iter::FromIterator<i64>>(
         &self,
         field_number: usize,
     ) -> Result<T> {
-        todo!()
+        self.get_variant_field_iterator(field_number)
+            .map(|r| r.and_then(|v| v.to_si64()))
+            .collect::<Result<T>>()
     }
 
     fn collect_field_as_repeated_u32<T: std::iter::FromIterator<u32>>(
         &self,
         field_number: usize,
     ) -> Result<T> {
-        todo!()
+        self.get_variant_field_iterator(field_number)
+            .map(|r| r.and_then(|v| v.to_u32()))
+            .collect::<Result<T>>()
     }
 
     fn collect_field_as_repeated_u64<T: std::iter::FromIterator<u64>>(
         &self,
         field_number: usize,
     ) -> Result<T> {
-        todo!()
+        self.get_variant_field_iterator(field_number)
+            .map(|r| r.and_then(|v| v.to_u64()))
+            .collect::<Result<T>>()
     }
 
     fn collect_field_as_str<S: std::iter::FromIterator<char>>(
         &self,
         field_number: usize,
     ) -> Result<S> {
-        todo!()
+        if let Some(fields) = self.fields.get(&field_number) {
+            if let Some(last_field) = fields.last() {
+                match last_field {
+                    Field::LengthDelimited(ref dldd) => {
+                        let mut string = String::new();
+                        dldd.deserialize_as_string(|s| {
+                            string = s;
+                            Ok(())
+                        })?;
+                        return Ok(string.chars().collect::<S>());
+                    }
+                    _ => {
+                        return Err(PuroroError::InvalidWireType);
+                    }
+                }
+            }
+        }
+        Ok(std::iter::empty().collect::<S>())
     }
 
     fn collect_field_as_repeated_str<
@@ -177,11 +245,44 @@ impl Message for UnknownMessage {
         &self,
         field_number: usize,
     ) -> Result<T> {
-        todo!()
+        if let Some(fields) = self.fields.get(&field_number) {
+            return fields
+                .iter()
+                .map(|field| match field {
+                    Field::LengthDelimited(ref dldd) => {
+                        let mut string = String::new();
+                        dldd.deserialize_as_string(|s| {
+                            string = s;
+                            Ok(())
+                        })?;
+                        return Ok(string.chars().collect::<S>());
+                    }
+                    _ => {
+                        return Err(PuroroError::InvalidWireType);
+                    }
+                })
+                .collect::<Result<T>>();
+        }
+        Ok(std::iter::empty().collect::<T>())
     }
 
-    fn get_field_as_message<T: Message>(&self, field_number: usize) -> Result<T> {
-        todo!()
+    fn get_field_as_message<T>(&self, field_number: usize) -> Result<Option<T>>
+    where
+        T: Message<MergedType = T>,
+    {
+        if let Some(fields) = self.fields.get(&field_number) {
+            return fields
+                .iter()
+                .map(|field| match field {
+                    Field::LengthDelimited(ref dldd) => T::from_bytes(dldd.bytes()),
+                    _ => Err(PuroroError::UnexpectedWireType),
+                })
+                .try_fold(None, |acc: Option<T>, r| match acc {
+                    None => Ok(Some(r?)),
+                    Some(acc_msg) => Ok(Some(acc_msg.merge(&r?)?)),
+                });
+        }
+        Ok(None)
     }
 
     fn collect_field_as_repeated_message<T: Message, U: std::iter::FromIterator<T>>(

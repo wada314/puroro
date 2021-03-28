@@ -47,6 +47,9 @@ impl DelayedLengthDelimitedDeserializer {
     fn new(contents: Vec<u8>) -> Self {
         Self { contents }
     }
+    pub fn bytes(&self) -> std::io::Bytes<&[u8]> {
+        self.contents.bytes()
+    }
 }
 impl<'a> LengthDelimitedDeserializer<'a> for &'a DelayedLengthDelimitedDeserializer {
     fn deserialize_as_message<H: MessageHandler>(
