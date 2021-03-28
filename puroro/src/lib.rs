@@ -1,8 +1,12 @@
 use std::iter::FromIterator;
 #[derive(::thiserror::Error, Debug)]
 pub enum PuroroError {
-    #[error("Internal error: {0}")]
-    OtherErrors(#[from] Box<dyn std::error::Error>),
+    #[error("Invalid wire type.")]
+    InvalidWireType,
+    #[error("Deserializer error: {0}")]
+    DeserializeError(Box<dyn std::error::Error>),
+    #[error("Other error: {0}")]
+    OtherErrors(Box<dyn std::error::Error>),
 }
 pub type Result<T> = std::result::Result<T, PuroroError>;
 

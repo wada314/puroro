@@ -2,7 +2,7 @@ use super::{DeserializeError, Result};
 use std::convert::TryFrom;
 use std::io::Result as IoResult;
 
-#[derive(Debug)]
+#[derive(Debug, Default, Clone)]
 pub struct Variant([u8; 8]);
 impl Variant {
     pub fn from_bytes<I>(bytes: &mut I) -> Result<Self>

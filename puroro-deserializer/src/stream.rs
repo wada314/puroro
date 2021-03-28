@@ -3,11 +3,9 @@ use std::io::Read;
 
 pub mod error;
 mod impls;
-pub mod unknown_message;
 pub mod variant;
 
 pub use error::{DeserializeError, Result};
-pub use unknown_message::UnknownMessage;
 pub use variant::Variant;
 
 pub trait Deserializer {
@@ -15,6 +13,11 @@ pub trait Deserializer {
 }
 pub fn deserializer_from_read<R: Read>(read: R) -> impl Deserializer {
     impls::DeserializerImpl::<std::io::Bytes<R>>::new(read.bytes())
+}
+pub fn deserializer_from_bytes<I: Iterator<Item = std::io::Result<u8>>>(
+    iter: I,
+) -> impl Deserializer {
+    impls::DeserializerImpl::<I>::new(iter)
 }
 
 pub trait LengthDelimitedDeserializer<'a>: Sized {
@@ -37,7 +40,7 @@ pub trait LengthDelimitedDeserializer<'a>: Sized {
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer>;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DelayedLengthDelimitedDeserializer {
     contents: Vec<u8>,
 }
@@ -46,7 +49,7 @@ impl DelayedLengthDelimitedDeserializer {
         Self { contents }
     }
 }
-impl LengthDelimitedDeserializer<'static> for DelayedLengthDelimitedDeserializer {
+impl<'a> LengthDelimitedDeserializer<'a> for &'a DelayedLengthDelimitedDeserializer {
     fn deserialize_as_message<H: MessageHandler>(
         self,
         handler: H,
@@ -88,7 +91,7 @@ impl LengthDelimitedDeserializer<'static> for DelayedLengthDelimitedDeserializer
     }
 
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer> {
-        Ok(self)
+        Ok(self.clone())
     }
 }
 
