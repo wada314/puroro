@@ -35,6 +35,7 @@ pub trait LengthDelimitedDeserializer<'a>: Sized {
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer>;
 }
 
+#[derive(Debug)]
 pub struct DelayedLengthDelimitedDeserializer {
     contents: Vec<u8>,
 }
