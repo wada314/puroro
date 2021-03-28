@@ -4,6 +4,8 @@ pub enum PuroroError {
     UnexpectedInputTermination,
     #[error("A variant integer type has too large or too small value.")]
     IntegerOverflow(#[from] std::num::TryFromIntError),
+    #[error("A boolean value is nither 0 or 1.")]
+    InvalidBooleanValue,
     #[error("A variant integer type is longer than 10 bytes.")]
     TooLargeVariant,
     #[error("Invalid wire type.")]

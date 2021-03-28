@@ -67,6 +67,13 @@ impl Variant {
     pub fn to_si64(&self) -> Result<i64> {
         Ok(self.to_sint()?)
     }
+    pub fn to_bool(&self) -> Result<bool> {
+        match self.to_u64()? {
+            0 => Ok(false),
+            1 => Ok(true),
+            _ => Err(PuroroError::InvalidBooleanValue),
+        }
+    }
 }
 
 #[cfg(test)]

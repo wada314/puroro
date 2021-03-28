@@ -15,6 +15,7 @@ pub trait Message: Sized {
     fn get_field_as_si64(&self, field_number: usize) -> Result<i64>;
     fn get_field_as_u32(&self, field_number: usize) -> Result<u32>;
     fn get_field_as_u64(&self, field_number: usize) -> Result<u64>;
+    fn get_field_as_bool(&self, field_number: usize) -> Result<bool>;
     fn collect_field_as_repeated_i32<T: FromIterator<i32>>(&self, field_number: usize)
         -> Result<T>;
     fn collect_field_as_repeated_i64<T: FromIterator<i64>>(&self, field_number: usize)
@@ -31,6 +32,10 @@ pub trait Message: Sized {
         -> Result<T>;
     fn collect_field_as_repeated_u64<T: FromIterator<u64>>(&self, field_number: usize)
         -> Result<T>;
+    fn collect_field_as_repeated_bool<T: FromIterator<bool>>(
+        &self,
+        field_number: usize,
+    ) -> Result<T>;
 
     fn collect_field_as_str<S: FromIterator<char>>(&self, field_number: usize) -> Result<S>;
     fn collect_field_as_repeated_str<S: FromIterator<char>, T: FromIterator<S>>(

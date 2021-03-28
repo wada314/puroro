@@ -159,6 +159,9 @@ impl Message for UnknownMessage {
     fn get_field_as_u64(&self, field_number: usize) -> Result<u64> {
         self.get_last_variant_field(field_number)?.to_u64()
     }
+    fn get_field_as_bool(&self, field_number: usize) -> Result<bool> {
+        self.get_last_variant_field(field_number)?.to_bool()
+    }
 
     fn collect_field_as_repeated_i32<T: std::iter::FromIterator<i32>>(
         &self,
@@ -168,7 +171,6 @@ impl Message for UnknownMessage {
             .map(|r| r.and_then(|v| v.to_i32()))
             .collect::<Result<T>>()
     }
-
     fn collect_field_as_repeated_i64<T: std::iter::FromIterator<i64>>(
         &self,
         field_number: usize,
@@ -177,7 +179,6 @@ impl Message for UnknownMessage {
             .map(|r| r.and_then(|v| v.to_i64()))
             .collect::<Result<T>>()
     }
-
     fn collect_field_as_repeated_si32<T: std::iter::FromIterator<i32>>(
         &self,
         field_number: usize,
@@ -186,7 +187,6 @@ impl Message for UnknownMessage {
             .map(|r| r.and_then(|v| v.to_si32()))
             .collect::<Result<T>>()
     }
-
     fn collect_field_as_repeated_si64<T: std::iter::FromIterator<i64>>(
         &self,
         field_number: usize,
@@ -195,7 +195,6 @@ impl Message for UnknownMessage {
             .map(|r| r.and_then(|v| v.to_si64()))
             .collect::<Result<T>>()
     }
-
     fn collect_field_as_repeated_u32<T: std::iter::FromIterator<u32>>(
         &self,
         field_number: usize,
@@ -204,13 +203,20 @@ impl Message for UnknownMessage {
             .map(|r| r.and_then(|v| v.to_u32()))
             .collect::<Result<T>>()
     }
-
     fn collect_field_as_repeated_u64<T: std::iter::FromIterator<u64>>(
         &self,
         field_number: usize,
     ) -> Result<T> {
         self.get_variant_field_iterator(field_number)
             .map(|r| r.and_then(|v| v.to_u64()))
+            .collect::<Result<T>>()
+    }
+    fn collect_field_as_repeated_bool<T: std::iter::FromIterator<bool>>(
+        &self,
+        field_number: usize,
+    ) -> Result<T> {
+        self.get_variant_field_iterator(field_number)
+            .map(|r| r.and_then(|v| v.to_bool()))
             .collect::<Result<T>>()
     }
 
