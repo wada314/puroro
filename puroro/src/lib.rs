@@ -63,7 +63,7 @@ pub trait RepeatedFieldHandler {
     type Output;
     fn handle<I: Iterator<Item = Result<Self::Item>>>(self, iter: I) -> Result<Self::Output>;
 }
-struct RepeatedFieldCollecter<T, U>(PhantomData<(T, U)>)
+ struct RepeatedFieldCollecter<T, U>(PhantomData<(T, U)>)
 where
     U: FromIterator<T>;
 impl<T, U> RepeatedFieldHandler for RepeatedFieldCollecter<T, U>

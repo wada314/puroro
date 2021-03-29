@@ -1,6 +1,5 @@
 use ::itertools::Either;
-use ::puroro::Message;
-use ::puroro::PuroroError;
+use ::puroro::{Message, PuroroError, RepeatedFieldHandler};
 use ::puroro_deserializer::stream::*;
 use std::collections::HashMap;
 
@@ -53,6 +52,13 @@ impl UnknownMessage {
         Ok(Variant::default())
     }
 
+    fn get_variant_field_as<T: variant::VariantType>(
+        &self,
+        field_number: usize,
+    ) -> Result<T::NativeType> {
+        self.get_last_variant_field(field_number)?.to_native::<T>()
+    }
+
     fn get_variant_field_iterator(
         &self,
         field_number: usize,
@@ -77,6 +83,21 @@ impl UnknownMessage {
             }
             _ => Either::Left(std::iter::once(Err(PuroroError::UnexpectedWireType))),
         })
+    }
+
+    fn handle_repeated_varient_field<T, H>(
+        &self,
+        field_number: usize,
+        handler: H,
+    ) -> Result<H::Output>
+    where
+        T: variant::VariantType,
+        H: RepeatedFieldHandler<Item = T::NativeType>,
+    {
+        let iter = self
+            .get_variant_field_iterator(field_number)
+            .map(|r| r.and_then(|variant| variant.to_native::<T>()));
+        handler.handle(iter)
     }
 }
 
@@ -142,25 +163,25 @@ impl Message for UnknownMessage {
     }
 
     fn get_field_as_i32(&self, field_number: usize) -> Result<i32> {
-        self.get_last_variant_field(field_number)?.to_i32()
+        self.get_variant_field_as::<variant::Int32>(field_number)
     }
     fn get_field_as_i64(&self, field_number: usize) -> Result<i64> {
-        self.get_last_variant_field(field_number)?.to_i64()
+        self.get_variant_field_as::<variant::Int64>(field_number)
     }
     fn get_field_as_si32(&self, field_number: usize) -> Result<i32> {
-        self.get_last_variant_field(field_number)?.to_si32()
+        self.get_variant_field_as::<variant::SInt32>(field_number)
     }
     fn get_field_as_si64(&self, field_number: usize) -> Result<i64> {
-        self.get_last_variant_field(field_number)?.to_si64()
+        self.get_variant_field_as::<variant::SInt64>(field_number)
     }
     fn get_field_as_u32(&self, field_number: usize) -> Result<u32> {
-        self.get_last_variant_field(field_number)?.to_u32()
+        self.get_variant_field_as::<variant::UInt32>(field_number)
     }
     fn get_field_as_u64(&self, field_number: usize) -> Result<u64> {
-        self.get_last_variant_field(field_number)?.to_u64()
+        self.get_variant_field_as::<variant::UInt64>(field_number)
     }
     fn get_field_as_bool(&self, field_number: usize) -> Result<bool> {
-        self.get_last_variant_field(field_number)?.to_bool()
+        self.get_variant_field_as::<variant::Bool>(field_number)
     }
 
     fn collect_field_as_repeated_i32<T: std::iter::FromIterator<i32>>(
@@ -311,9 +332,6 @@ impl Message for UnknownMessage {
     where
         H: puroro::RepeatedFieldHandler<Item = i32>,
     {
-        handler.handle(
-            self.get_variant_field_iterator(field_number)
-                .map(|r| r.and_then(|v| v.to_i32())),
-        )
+        self.handle_repeated_varient_field::<variant::Int32, H>(field_number, handler)
     }
 }
