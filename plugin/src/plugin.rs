@@ -12,7 +12,7 @@ message Version {
   optional string suffix = 4;
 }
 */
-proto_readable_struct! {
+proto_struct! {
     struct Version {
         major: i32 = 1,
         minor: i32 = 2,
