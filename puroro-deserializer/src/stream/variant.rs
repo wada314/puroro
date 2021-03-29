@@ -4,11 +4,12 @@ use std::io::Result as IoResult;
 
 #[derive(Debug, Default, Clone)]
 pub struct Variant([u8; 8]);
+
 impl Variant {
     fn new(bytes: [u8; 8]) -> Self {
         Variant(bytes)
     }
-    pub fn decode_bytes<I>(bytes: &mut I) -> Result<Self>
+    pub(crate) fn decode_bytes<I>(bytes: &mut I) -> Result<Self>
     where
         I: Iterator<Item = IoResult<u8>>,
     {
@@ -59,52 +60,27 @@ impl Variant {
         let encoded = (x >> 63) ^ (x << 1);
         Self(encoded.to_le_bytes())
     }
+}
 
-    pub fn to_u32(&self) -> Result<u32> {
-        self.to_native::<UInt32>()
-    }
-    pub fn to_u64(&self) -> Result<u64> {
-        self.to_native::<UInt64>()
-    }
-    pub fn to_usize(&self) -> Result<usize> {
-        self.to_native::<RustUsize>()
-    }
-    pub fn to_i32(&self) -> Result<i32> {
-        self.to_native::<Int32>()
-    }
-    pub fn to_i64(&self) -> Result<i64> {
-        self.to_native::<Int64>()
-    }
-    pub fn to_si32(&self) -> Result<i32> {
-        self.to_native::<SInt32>()
-    }
-    pub fn to_si64(&self) -> Result<i64> {
-        self.to_native::<SInt64>()
-    }
-    pub fn to_bool(&self) -> Result<bool> {
-        self.to_native::<Bool>()
-    }
-    pub fn from_u32(val: u32) -> Result<Variant> {
-        UInt32::to_variant(val)
-    }
-    pub fn from_u64(val: u64) -> Result<Variant> {
-        UInt64::to_variant(val)
-    }
-    pub fn from_usize(val: usize) -> Result<Variant> {
-        RustUsize::to_variant(val)
-    }
-    pub fn from_i32(val: i32) -> Result<Variant> {
-        Int32::to_variant(val)
-    }
-    pub fn from_i64(val: i64) -> Result<Variant> {
-        Int64::to_variant(val)
-    }
-    pub fn from_s32(val: i32) -> Result<Variant> {
-        SInt32::to_variant(val)
-    }
-    pub fn from_s64(val: i64) -> Result<Variant> {
-        SInt64::to_variant(val)
-    }
+macro_rules! define_convert_methods {
+    ($vtype:ty, $toname:ident, $fromname:ident) => {
+        pub fn $toname(&self) -> Result<<$vtype as VariantType>::NativeType> {
+            self.to_native::<$vtype>()
+        }
+        pub fn $fromname(val: <$vtype as VariantType>::NativeType) -> Result<Variant> {
+            <$vtype as VariantType>::to_variant(val)
+        }
+    };
+}
+impl Variant {
+    define_convert_methods!(UInt32, to_u32, from_u32);
+    define_convert_methods!(UInt64, to_u64, from_u64);
+    define_convert_methods!(SInt32, to_si32, from_si32);
+    define_convert_methods!(SInt64, to_si64, from_si64);
+    define_convert_methods!(Int32, to_i32, from_i32);
+    define_convert_methods!(Int64, to_i64, from_i64);
+    define_convert_methods!(Bool, to_bool, from_bool);
+    define_convert_methods!(RustUsize, to_usize, from_usize);
 }
 
 pub trait VariantType {
@@ -112,6 +88,7 @@ pub trait VariantType {
     fn from_variant(var: &Variant) -> Result<Self::NativeType>;
     fn to_variant(val: Self::NativeType) -> Result<Variant>;
 }
+
 pub struct Int32();
 pub struct UInt32();
 pub struct SInt32();
