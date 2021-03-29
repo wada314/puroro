@@ -5,7 +5,10 @@ use std::io::Result as IoResult;
 #[derive(Debug, Default, Clone)]
 pub struct Variant([u8; 8]);
 impl Variant {
-    pub fn from_bytes<I>(bytes: &mut I) -> Result<Self>
+    fn new(bytes: [u8; 8]) -> Self {
+        Variant(bytes)
+    }
+    pub fn decode_bytes<I>(bytes: &mut I) -> Result<Self>
     where
         I: Iterator<Item = IoResult<u8>>,
     {
@@ -40,39 +43,139 @@ impl Variant {
             }
         }
     }
+    pub fn to_native<T: VariantType>(&self) -> Result<T::NativeType> {
+        T::from_variant(self)
+    }
+    pub fn from_native<T: VariantType>(val: T::NativeType) -> Result<Variant> {
+        T::to_variant(val)
+    }
+
     fn to_sint(&self) -> Result<i64> {
         // decode zigzag encoding for sint32 and sint64.
         let x = self.to_i64()?;
         Ok((x ^ (0 - (x & 1))) >> 1)
     }
+    fn from_sint(x: i64) -> Self {
+        let encoded = (x >> 63) ^ (x << 1);
+        Self(encoded.to_le_bytes())
+    }
 
     pub fn to_u32(&self) -> Result<u32> {
-        Ok(u32::try_from(u64::from_ne_bytes(self.0))?)
+        self.to_native::<UInt32>()
     }
     pub fn to_u64(&self) -> Result<u64> {
-        Ok(u64::from_ne_bytes(self.0))
+        self.to_native::<UInt64>()
     }
     pub fn to_usize(&self) -> Result<usize> {
-        Ok(usize::try_from(u64::from_ne_bytes(self.0))?)
+        self.to_native::<RustUsize>()
     }
     pub fn to_i32(&self) -> Result<i32> {
-        Ok(i32::try_from(i64::from_ne_bytes(self.0))?)
+        self.to_native::<Int32>()
     }
     pub fn to_i64(&self) -> Result<i64> {
-        Ok(i64::from_ne_bytes(self.0))
+        self.to_native::<Int64>()
     }
     pub fn to_si32(&self) -> Result<i32> {
-        Ok(i32::try_from(self.to_sint()?)?)
+        self.to_native::<SInt32>()
     }
     pub fn to_si64(&self) -> Result<i64> {
-        Ok(self.to_sint()?)
+        self.to_native::<SInt64>()
     }
     pub fn to_bool(&self) -> Result<bool> {
-        match self.to_u64()? {
+        self.to_native::<Bool>()
+    }
+}
+
+pub trait VariantType {
+    type NativeType;
+    fn from_variant(var: &Variant) -> Result<Self::NativeType>;
+    fn to_variant(val: Self::NativeType) -> Result<Variant>;
+}
+pub struct Int32();
+pub struct UInt32();
+pub struct SInt32();
+pub struct Int64();
+pub struct UInt64();
+pub struct SInt64();
+pub struct Bool();
+
+pub struct RustUsize();
+
+impl VariantType for Int32 {
+    type NativeType = i32;
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
+        Ok(i32::try_from(i64::from_le_bytes(var.0))?)
+    }
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+        Ok(Variant::new(i64::to_le_bytes(i64::from(val))))
+    }
+}
+impl VariantType for UInt32 {
+    type NativeType = u32;
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
+        Ok(u32::try_from(u64::from_le_bytes(var.0))?)
+    }
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+        Ok(Variant::new(u64::to_le_bytes(u64::from(val))))
+    }
+}
+impl VariantType for SInt32 {
+    type NativeType = i32;
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
+        Ok(i32::try_from(var.to_sint()?)?)
+    }
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+        Ok(Variant::from_sint(i64::from(val)))
+    }
+}
+
+impl VariantType for Int64 {
+    type NativeType = i64;
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
+        Ok(i64::from_le_bytes(var.0))
+    }
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+        Ok(Variant::new(i64::to_le_bytes(val)))
+    }
+}
+impl VariantType for UInt64 {
+    type NativeType = u64;
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
+        Ok(u64::from_le_bytes(var.0))
+    }
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+        Ok(Variant::new(u64::to_le_bytes(val)))
+    }
+}
+impl VariantType for SInt64 {
+    type NativeType = i64;
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
+        Ok(var.to_sint()?)
+    }
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+        Ok(Variant::from_sint(val))
+    }
+}
+impl VariantType for Bool {
+    type NativeType = bool;
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
+        match u64::from_le_bytes(var.0) {
             0 => Ok(false),
             1 => Ok(true),
             _ => Err(PuroroError::InvalidBooleanValue),
         }
+    }
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+        Ok(Variant::new(u64::to_le_bytes(if val { 1 } else { 0 })))
+    }
+}
+impl VariantType for RustUsize {
+    type NativeType = usize;
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
+        Ok(usize::try_from(u64::from_le_bytes(var.0))?)
+    }
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+        Ok(Variant::new(u64::to_le_bytes(u64::try_from(val)?)))
     }
 }
 
@@ -91,7 +194,7 @@ mod tests {
 
         fn expect_ok(input: &[u8], expected_value: u64, expected_remaining: &[u8]) {
             let mut iter = input.bytes();
-            let result = Variant::from_bytes(&mut iter);
+            let result = Variant::decode_bytes(&mut iter);
             assert!(result.is_ok());
             let variant = result.unwrap();
             assert_eq!(variant.0, expected_value.to_ne_bytes());
@@ -99,7 +202,7 @@ mod tests {
         }
         fn get_err(input: Vec<IoResult<u8>>) -> PuroroError {
             let mut iter = input.into_iter();
-            let result = Variant::from_bytes(&mut iter);
+            let result = Variant::decode_bytes(&mut iter);
             assert!(result.is_err());
             result.unwrap_err()
         }
@@ -125,7 +228,7 @@ mod tests {
     fn test_variant_unsigned() {
         fn get_u32(input: &[u8]) -> Result<u32> {
             let mut iter = input.bytes();
-            let v = Variant::from_bytes(&mut iter)?;
+            let v = Variant::decode_bytes(&mut iter)?;
             assert_eq!(collect_iter(iter), Vec::<u8>::new());
             v.to_u32()
         }
@@ -151,7 +254,7 @@ mod tests {
     fn test_variant_signed_zigzag() {
         fn get_si32(input: &[u8]) -> Result<i32> {
             let mut iter = input.bytes();
-            let v = Variant::from_bytes(&mut iter)?;
+            let v = Variant::decode_bytes(&mut iter)?;
             assert_eq!(collect_iter(iter), Vec::<u8>::new());
             v.to_si32()
         }

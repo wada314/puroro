@@ -72,7 +72,7 @@ where
             // Found EOF at first byte. Successfull failure.
             return Ok(None);
         }
-        let key = Variant::from_bytes(&mut peekable)?.to_usize()?;
+        let key = Variant::decode_bytes(&mut peekable)?.to_usize()?;
         Ok(Some((
             WireType::from_usize(key & 0x07).ok_or(PuroroError::InvalidWireType)?,
             (key >> 3),
@@ -122,11 +122,11 @@ where
 
             match wire_type {
                 WireType::Variant => {
-                    let variant = Variant::from_bytes(&mut self.indexed_iter)?;
+                    let variant = Variant::decode_bytes(&mut self.indexed_iter)?;
                     handler.deserialized_variant(field_number, variant)?;
                 }
                 WireType::LengthDelimited => {
-                    let field_length = Variant::from_bytes(&mut self.indexed_iter)?.to_usize()?;
+                    let field_length = Variant::decode_bytes(&mut self.indexed_iter)?.to_usize()?;
                     let deserializer_for_inner = self.make_sub_deserializer(field_length);
                     handler
                         .deserialize_length_delimited_field(deserializer_for_inner, field_number)?;
@@ -317,7 +317,7 @@ impl<I: Iterator<Item = IoResult<u8>>> Iterator for VariantsIterator<I> {
         if let None = peekable.peek() {
             return None;
         }
-        Some(Variant::from_bytes(&mut peekable))
+        Some(Variant::decode_bytes(&mut peekable))
     }
 }
 
