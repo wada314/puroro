@@ -1,11 +1,5 @@
-use ::puroro_deserializer as deser;
-use deser::stream::{
-    LengthDelimitedDeserializer, MessageHandler, PuroroError, RepeatedFieldHandler, Result, Variant,
-};
-
-macro_rules! proto_readable_struct {
-    (struct $strname:ident { $($fname:ident: $ftype:ty = $fid:expr),* }) => {};
-}
+use ::puroro::{PuroroError, Result};
+use ::puroro_deserializer::stream::{LengthDelimitedDeserializer, MessageHandler, Variant};
 
 /*
 // The version number of protocol compiler.
@@ -18,14 +12,23 @@ message Version {
   optional string suffix = 4;
 }
 */
-struct Version {
+proto_readable_struct! {
+    struct Version {
+        major: i32 = 1,
+        minor: i32 = 2,
+        patch: i32 = 3,
+        suffix: String = 4,
+    }
+}
+
+struct Version_ {
     major: i32,
     minor: i32,
     patch: i32,
     suffix: String,
 }
-impl MessageHandler for Version {
-    type Target = Version;
+impl MessageHandler for Version_ {
+    type Target = Version_;
 
     fn finish(self) -> Result<Self::Target> {
         Ok(self)

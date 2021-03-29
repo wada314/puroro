@@ -8,3 +8,5 @@ edition = "2018"
 
 [dependencies]
 puroro-deserializer = { path = "../puroro-deserializer" }
+puroro = { path = "../puroro" }
+puroro-unknown = { path = "../puroro-unknown" }

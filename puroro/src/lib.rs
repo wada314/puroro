@@ -5,11 +5,7 @@ pub mod error;
 pub use error::PuroroError;
 pub type Result<T> = std::result::Result<T, PuroroError>;
 
-pub trait Message: Sized {
-    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self>;
-    type MergedType: Message;
-    fn merge(&self, latter: &Self) -> Result<Self::MergedType>;
-
+pub trait Message {
     fn get_field_as_i32(&self, field_number: usize) -> Result<i32>;
     fn get_field_as_i64(&self, field_number: usize) -> Result<i64>;
     fn get_field_as_si32(&self, field_number: usize) -> Result<i32>;
@@ -60,11 +56,19 @@ pub trait Message: Sized {
     ) -> Result<T>;
     fn get_field_as_message<T>(&self, field_number: usize) -> Result<Option<T>>
     where
-        T: Message<MergedType = T>;
-    fn collect_field_as_repeated_message<T: Message, U: FromIterator<T>>(
+        T: Mergeable<MergedType = T> + Deserializable;
+    fn collect_field_as_repeated_message<T: Deserializable, U: FromIterator<T>>(
         &self,
         field_number: usize,
     ) -> Result<U>;
+}
+
+pub trait Deserializable: Sized {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self>;
+}
+pub trait Mergeable {
+    type MergedType;
+    fn merge(&self, latter: &Self) -> Result<Self::MergedType>;
 }
 
 pub trait RepeatedFieldHandler {
@@ -72,10 +76,19 @@ pub trait RepeatedFieldHandler {
     type Output;
     fn handle<I: Iterator<Item = Result<Self::Item>>>(self, iter: I) -> Result<Self::Output>;
 }
-struct RepeatedFieldCollecter<T, U>(PhantomData<(T, U)>)
+pub struct RepeatedFieldCollector<T, U>(PhantomData<(T, U)>)
 where
     U: FromIterator<T>;
-impl<T, U> RepeatedFieldHandler for RepeatedFieldCollecter<T, U>
+
+impl<T, U> RepeatedFieldCollector<T, U>
+where
+    U: FromIterator<T>,
+{
+    pub fn new() -> Self {
+        Self(PhantomData)
+    }
+}
+impl<T, U> RepeatedFieldHandler for RepeatedFieldCollector<T, U>
 where
     U: FromIterator<T>,
 {

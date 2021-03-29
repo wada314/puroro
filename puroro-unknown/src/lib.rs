@@ -1,5 +1,5 @@
 use ::itertools::Either;
-use ::puroro::{Message, PuroroError, RepeatedFieldHandler};
+use ::puroro::{Deserializable, Mergeable, Message, PuroroError, RepeatedFieldHandler};
 use ::puroro_deserializer::stream::*;
 use std::collections::HashMap;
 
@@ -164,22 +164,6 @@ macro_rules! define_variant_methods {
 }
 
 impl Message for UnknownMessage {
-    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self> {
-        deserializer_from_bytes(iter).deserialize(UnknownMessage::new())
-    }
-    type MergedType = UnknownMessage;
-    fn merge(&self, latter: &Self) -> Result<UnknownMessage> {
-        let mut new_message = self.clone();
-        for (k, v) in &latter.fields {
-            new_message
-                .fields
-                .entry(*k)
-                .and_modify(|fields| fields.extend(v.iter().cloned()))
-                .or_insert_with(|| v.clone());
-        }
-        Ok(new_message)
-    }
-
     define_variant_methods!(
         variant::Int32,
         get_field_as_i32,
@@ -270,7 +254,7 @@ impl Message for UnknownMessage {
 
     fn get_field_as_message<T>(&self, field_number: usize) -> Result<Option<T>>
     where
-        T: Message<MergedType = T>,
+        T: Mergeable<MergedType = T> + Deserializable,
     {
         if let Some(fields) = self.fields.get(&field_number) {
             return fields
@@ -287,7 +271,7 @@ impl Message for UnknownMessage {
         Ok(None)
     }
 
-    fn collect_field_as_repeated_message<T: Message, U: std::iter::FromIterator<T>>(
+    fn collect_field_as_repeated_message<T: Deserializable, U: std::iter::FromIterator<T>>(
         &self,
         field_number: usize,
     ) -> Result<U> {
@@ -301,5 +285,24 @@ impl Message for UnknownMessage {
                 .collect::<Result<U>>();
         }
         Ok(std::iter::empty().collect::<U>())
+    }
+}
+impl Deserializable for UnknownMessage {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self> {
+        deserializer_from_bytes(iter).deserialize(UnknownMessage::new())
+    }
+}
+impl Mergeable for UnknownMessage {
+    type MergedType = UnknownMessage;
+    fn merge(&self, latter: &Self) -> Result<UnknownMessage> {
+        let mut new_message = self.clone();
+        for (k, v) in &latter.fields {
+            new_message
+                .fields
+                .entry(*k)
+                .and_modify(|fields| fields.extend(v.iter().cloned()))
+                .or_insert_with(|| v.clone());
+        }
+        Ok(new_message)
     }
 }
