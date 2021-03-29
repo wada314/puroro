@@ -145,6 +145,24 @@ impl MessageHandler for UnknownMessage {
     }
 }
 
+macro_rules! define_variant_methods {
+    ($vtype:ty, $singular_get:ident, $repeated_handle:ident) => {
+        fn $singular_get(
+            &self,
+            field_number: usize,
+        ) -> Result<<$vtype as variant::VariantType>::NativeType> {
+            self.get_variant_field_as::<$vtype>(field_number)
+        }
+
+        fn $repeated_handle<H>(&self, field_number: usize, handler: H) -> Result<H::Output>
+        where
+            H: puroro::RepeatedFieldHandler<Item = <$vtype as variant::VariantType>::NativeType>,
+        {
+            self.handle_repeated_varient_field::<$vtype, H>(field_number, handler)
+        }
+    };
+}
+
 impl Message for UnknownMessage {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self> {
         deserializer_from_bytes(iter).deserialize(UnknownMessage::new())
@@ -162,84 +180,41 @@ impl Message for UnknownMessage {
         Ok(new_message)
     }
 
-    fn get_field_as_i32(&self, field_number: usize) -> Result<i32> {
-        self.get_variant_field_as::<variant::Int32>(field_number)
-    }
-    fn get_field_as_i64(&self, field_number: usize) -> Result<i64> {
-        self.get_variant_field_as::<variant::Int64>(field_number)
-    }
-    fn get_field_as_si32(&self, field_number: usize) -> Result<i32> {
-        self.get_variant_field_as::<variant::SInt32>(field_number)
-    }
-    fn get_field_as_si64(&self, field_number: usize) -> Result<i64> {
-        self.get_variant_field_as::<variant::SInt64>(field_number)
-    }
-    fn get_field_as_u32(&self, field_number: usize) -> Result<u32> {
-        self.get_variant_field_as::<variant::UInt32>(field_number)
-    }
-    fn get_field_as_u64(&self, field_number: usize) -> Result<u64> {
-        self.get_variant_field_as::<variant::UInt64>(field_number)
-    }
-    fn get_field_as_bool(&self, field_number: usize) -> Result<bool> {
-        self.get_variant_field_as::<variant::Bool>(field_number)
-    }
-
-    fn collect_field_as_repeated_i32<T: std::iter::FromIterator<i32>>(
-        &self,
-        field_number: usize,
-    ) -> Result<T> {
-        self.get_variant_field_iterator(field_number)
-            .map(|r| r.and_then(|v| v.to_i32()))
-            .collect::<Result<T>>()
-    }
-    fn collect_field_as_repeated_i64<T: std::iter::FromIterator<i64>>(
-        &self,
-        field_number: usize,
-    ) -> Result<T> {
-        self.get_variant_field_iterator(field_number)
-            .map(|r| r.and_then(|v| v.to_i64()))
-            .collect::<Result<T>>()
-    }
-    fn collect_field_as_repeated_si32<T: std::iter::FromIterator<i32>>(
-        &self,
-        field_number: usize,
-    ) -> Result<T> {
-        self.get_variant_field_iterator(field_number)
-            .map(|r| r.and_then(|v| v.to_si32()))
-            .collect::<Result<T>>()
-    }
-    fn collect_field_as_repeated_si64<T: std::iter::FromIterator<i64>>(
-        &self,
-        field_number: usize,
-    ) -> Result<T> {
-        self.get_variant_field_iterator(field_number)
-            .map(|r| r.and_then(|v| v.to_si64()))
-            .collect::<Result<T>>()
-    }
-    fn collect_field_as_repeated_u32<T: std::iter::FromIterator<u32>>(
-        &self,
-        field_number: usize,
-    ) -> Result<T> {
-        self.get_variant_field_iterator(field_number)
-            .map(|r| r.and_then(|v| v.to_u32()))
-            .collect::<Result<T>>()
-    }
-    fn collect_field_as_repeated_u64<T: std::iter::FromIterator<u64>>(
-        &self,
-        field_number: usize,
-    ) -> Result<T> {
-        self.get_variant_field_iterator(field_number)
-            .map(|r| r.and_then(|v| v.to_u64()))
-            .collect::<Result<T>>()
-    }
-    fn collect_field_as_repeated_bool<T: std::iter::FromIterator<bool>>(
-        &self,
-        field_number: usize,
-    ) -> Result<T> {
-        self.get_variant_field_iterator(field_number)
-            .map(|r| r.and_then(|v| v.to_bool()))
-            .collect::<Result<T>>()
-    }
+    define_variant_methods!(
+        variant::Int32,
+        get_field_as_i32,
+        handle_field_as_repeated_i32
+    );
+    define_variant_methods!(
+        variant::Int64,
+        get_field_as_i64,
+        handle_field_as_repeated_i64
+    );
+    define_variant_methods!(
+        variant::UInt32,
+        get_field_as_u32,
+        handle_field_as_repeated_u32
+    );
+    define_variant_methods!(
+        variant::UInt64,
+        get_field_as_u64,
+        handle_field_as_repeated_u64
+    );
+    define_variant_methods!(
+        variant::SInt32,
+        get_field_as_si32,
+        handle_field_as_repeated_si32
+    );
+    define_variant_methods!(
+        variant::SInt64,
+        get_field_as_si64,
+        handle_field_as_repeated_si64
+    );
+    define_variant_methods!(
+        variant::Bool,
+        get_field_as_bool,
+        handle_field_as_repeated_bool
+    );
 
     fn collect_field_as_str<S: std::iter::FromIterator<char>>(
         &self,
@@ -326,12 +301,5 @@ impl Message for UnknownMessage {
                 .collect::<Result<U>>();
         }
         Ok(std::iter::empty().collect::<U>())
-    }
-
-    fn handle_field_as_repeated_i32<H>(&self, field_number: usize, handler: H) -> Result<H::Output>
-    where
-        H: puroro::RepeatedFieldHandler<Item = i32>,
-    {
-        self.handle_repeated_varient_field::<variant::Int32, H>(field_number, handler)
     }
 }

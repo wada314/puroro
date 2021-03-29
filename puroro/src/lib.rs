@@ -17,28 +17,37 @@ pub trait Message: Sized {
     fn get_field_as_u32(&self, field_number: usize) -> Result<u32>;
     fn get_field_as_u64(&self, field_number: usize) -> Result<u64>;
     fn get_field_as_bool(&self, field_number: usize) -> Result<bool>;
-    fn collect_field_as_repeated_i32<T: FromIterator<i32>>(&self, field_number: usize)
-        -> Result<T>;
-    fn collect_field_as_repeated_i64<T: FromIterator<i64>>(&self, field_number: usize)
-        -> Result<T>;
-    fn collect_field_as_repeated_si32<T: FromIterator<i32>>(
-        &self,
-        field_number: usize,
-    ) -> Result<T>;
-    fn collect_field_as_repeated_si64<T: FromIterator<i64>>(
-        &self,
-        field_number: usize,
-    ) -> Result<T>;
-    fn collect_field_as_repeated_u32<T: FromIterator<u32>>(&self, field_number: usize)
-        -> Result<T>;
-    fn collect_field_as_repeated_u64<T: FromIterator<u64>>(&self, field_number: usize)
-        -> Result<T>;
-    fn collect_field_as_repeated_bool<T: FromIterator<bool>>(
-        &self,
-        field_number: usize,
-    ) -> Result<T>;
-
     fn handle_field_as_repeated_i32<H: RepeatedFieldHandler<Item = i32>>(
+        &self,
+        field_number: usize,
+        handler: H,
+    ) -> Result<H::Output>;
+    fn handle_field_as_repeated_i64<H: RepeatedFieldHandler<Item = i64>>(
+        &self,
+        field_number: usize,
+        handler: H,
+    ) -> Result<H::Output>;
+    fn handle_field_as_repeated_u32<H: RepeatedFieldHandler<Item = u32>>(
+        &self,
+        field_number: usize,
+        handler: H,
+    ) -> Result<H::Output>;
+    fn handle_field_as_repeated_u64<H: RepeatedFieldHandler<Item = u64>>(
+        &self,
+        field_number: usize,
+        handler: H,
+    ) -> Result<H::Output>;
+    fn handle_field_as_repeated_si32<H: RepeatedFieldHandler<Item = i32>>(
+        &self,
+        field_number: usize,
+        handler: H,
+    ) -> Result<H::Output>;
+    fn handle_field_as_repeated_si64<H: RepeatedFieldHandler<Item = i64>>(
+        &self,
+        field_number: usize,
+        handler: H,
+    ) -> Result<H::Output>;
+    fn handle_field_as_repeated_bool<H: RepeatedFieldHandler<Item = bool>>(
         &self,
         field_number: usize,
         handler: H,
@@ -63,7 +72,7 @@ pub trait RepeatedFieldHandler {
     type Output;
     fn handle<I: Iterator<Item = Result<Self::Item>>>(self, iter: I) -> Result<Self::Output>;
 }
- struct RepeatedFieldCollecter<T, U>(PhantomData<(T, U)>)
+struct RepeatedFieldCollecter<T, U>(PhantomData<(T, U)>)
 where
     U: FromIterator<T>;
 impl<T, U> RepeatedFieldHandler for RepeatedFieldCollecter<T, U>
