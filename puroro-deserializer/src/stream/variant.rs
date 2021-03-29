@@ -84,6 +84,27 @@ impl Variant {
     pub fn to_bool(&self) -> Result<bool> {
         self.to_native::<Bool>()
     }
+    pub fn from_u32(val: u32) -> Result<Variant> {
+        UInt32::to_variant(val)
+    }
+    pub fn from_u64(val: u64) -> Result<Variant> {
+        UInt64::to_variant(val)
+    }
+    pub fn from_usize(val: usize) -> Result<Variant> {
+        RustUsize::to_variant(val)
+    }
+    pub fn from_i32(val: i32) -> Result<Variant> {
+        Int32::to_variant(val)
+    }
+    pub fn from_i64(val: i64) -> Result<Variant> {
+        Int64::to_variant(val)
+    }
+    pub fn from_s32(val: i32) -> Result<Variant> {
+        SInt32::to_variant(val)
+    }
+    pub fn from_s64(val: i64) -> Result<Variant> {
+        SInt64::to_variant(val)
+    }
 }
 
 pub trait VariantType {
