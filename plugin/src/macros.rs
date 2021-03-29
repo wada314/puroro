@@ -90,7 +90,30 @@ macro_rules! proto_struct {
                     field_number)
             }
         }
+    )*};
+}
 
+macro_rules! proto_enum {
+    ($(enum $enumname:ident { $($ename:ident = $evalue:expr),*, })*) => {$(
+        #[derive(::num_derive::FromPrimitive)]
+        enum $enumname {
+            $(
+                #[allow(non_camel_case)]
+                $ename = $evalue
+            ),*,
+        }
+        impl $crate::macros::FieldTypeTag for std::result::Result<$enumname, i32> {
+            type Output = std::result::Result<$enumname, i32>;
+            fn get_from_unknown_message(msg: &::puroro_unknown::UnknownMessage, field_number: usize) -> ::puroro::Result<Self::Output> {
+                use ::puroro::Message;
+                use ::num_traits::FromPrimitive;
+                let raw = msg.get_field_as_i32(field_number)?;
+                match $enumname::from_i32(raw) {
+                    Some(enumified) => Ok(Ok(enumified)),
+                    None => Ok(Err(raw)),
+                }
+            }
+        }
     )*};
 }
 

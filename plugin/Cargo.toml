@@ -10,3 +10,5 @@ edition = "2018"
 puroro-deserializer = { path = "../puroro-deserializer" }
 puroro = { path = "../puroro" }
 puroro-unknown = { path = "../puroro-unknown" }
+num-derive = "0.3.3"
+num-traits = "0.2.14"
