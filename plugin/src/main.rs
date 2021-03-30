@@ -10,5 +10,5 @@ use plugin::*;
 
 fn main() {
     let cgr = CodeGeneratorRequest::from_bytes(stdin().bytes()).unwrap();
-    println!("{:?}", cgr);
+    eprintln!("{:?}", cgr);
 }
