@@ -10,7 +10,7 @@ proto_struct! {
     struct CodeGeneratorRequest {
         file_to_generate: Vec<String> = 1,
         parameter: String = 2,
-        // proto_file: Vec<FileDescriptorProto> = 15,
+        proto_file: Vec<FileDescriptorProto> = 15,
         compiler_version: Option<Version> = 3,
     }
     struct CodeGeneratorResponse {
@@ -62,7 +62,7 @@ proto_struct! {
     struct DescriptorProto_ExtensionRange {
         start: i32 = 1,
         end: i32 = 2,
-        options: ExtensionRangeOptions = 3,
+        options: Option<ExtensionRangeOptions> = 3,
     }
     struct DescriptorProto_ReservedRange {
         start: i32 = 1,
@@ -75,8 +75,8 @@ proto_struct! {
     struct FieldDescriptorProto {
         name: String = 1,
         number: i32 = 3,
-        label: FieldDescriptorProto_Label = 4,
-        type_: FieldDescriptorProto_Type = 5,
+        label: Result<FieldDescriptorProto_Label, i32> = 4,
+        type_: Result<FieldDescriptorProto_Type, i32> = 5,
         type_name: String = 6,
         extendee: String = 2,
         default_value: String = 7,
@@ -176,10 +176,5 @@ proto_enum! {
         LABEL_OPTIONAL = 1,
         LABEL_REQUIRED = 2,
         LABEL_REPEATED = 3,
-    }
-    enum FileOptions_OptimizeMode {
-        SPEED = 1,
-        CODE_SIZE = 2,
-        LITE_RUNTIME = 3,
     }
 }
