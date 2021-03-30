@@ -1,4 +1,4 @@
-use super::{PuroroError, Result};
+use crate::{PuroroError, Result};
 use std::convert::TryFrom;
 use std::io::Result as IoResult;
 

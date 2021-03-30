@@ -2,10 +2,9 @@ use crate::types::*;
 use std::io::Read;
 
 mod impls;
-pub mod variant;
 
+pub use crate::variant::Variant;
 pub use ::puroro::{PuroroError, Result};
-pub use variant::Variant;
 
 pub trait Deserializer {
     fn deserialize<H: MessageHandler>(self, handler: H) -> Result<H::Target>;
