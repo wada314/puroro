@@ -1,5 +1,5 @@
 [package]
-name = "puroro-deserializer"
+name = "puroro-serializer"
 version = "0.1.0"
 authors = ["Shohei Wada <pc@wada314.jp>"]
 edition = "2018"

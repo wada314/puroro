@@ -1,6 +1,6 @@
 use ::itertools::Either;
 use ::puroro::{Deserializable, Mergeable, Message, PuroroError, RepeatedFieldHandler};
-use ::puroro_deserializer::stream::*;
+use ::puroro_serializer::deserializer::stream::*;
 use std::collections::HashMap;
 
 type Result<T> = std::result::Result<T, PuroroError>;

@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-puroro-deserializer = { path = "../puroro-deserializer" }
+puroro-serializer = { path = "../puroro-serializer" }
 puroro = { path = "../puroro" }
 puroro-unknown = { path = "../puroro-unknown" }
 num-derive = "0.3.3"
