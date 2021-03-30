@@ -1,6 +1,3 @@
-use ::puroro::{PuroroError, Result};
-use ::puroro_deserializer::stream::{LengthDelimitedDeserializer, MessageHandler, Variant};
-
 // From plugin.proto
 
 proto_struct! {
@@ -34,9 +31,3 @@ proto_enum! {
         FEATURE_PROTO3_OPTIONAL = 1,
     }
 }
-/*
-  enum Feature {
-    FEATURE_NONE = 0;
-    FEATURE_PROTO3_OPTIONAL = 1;
-  }
-} */
