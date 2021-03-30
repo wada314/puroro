@@ -49,6 +49,21 @@ pub trait Message {
         handler: H,
     ) -> Result<H::Output>;
 
+    fn handle_field_as_str<H: RepeatedFieldHandler<Item = char>>(
+        &self,
+        field_number: usize,
+        handler: H,
+    ) -> Result<H::Output>;
+    fn handle_field_as_repeated_str<
+        H: RepeatedFieldHandler<Item = char>,
+        G: RepeatedFieldHandler<Item = H::Output>,
+    >(
+        &self,
+        field_number: usize,
+        string_handler: H,
+        strings_handler: G,
+    ) -> Result<G::Output>;
+
     fn collect_field_as_str<S: FromIterator<char>>(&self, field_number: usize) -> Result<S>;
     fn collect_field_as_repeated_str<S: FromIterator<char>, T: FromIterator<S>>(
         &self,
@@ -76,6 +91,7 @@ pub trait RepeatedFieldHandler {
     type Output;
     fn handle<I: Iterator<Item = Result<Self::Item>>>(self, iter: I) -> Result<Self::Output>;
 }
+
 pub struct RepeatedFieldCollector<T, U>(PhantomData<(T, U)>)
 where
     U: FromIterator<T>;

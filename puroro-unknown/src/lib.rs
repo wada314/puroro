@@ -70,14 +70,11 @@ impl UnknownMessage {
         fields_iter.flat_map(|field| match field {
             Field::Variant(ref variant) => Either::Left(std::iter::once(Ok(variant.clone()))),
             Field::LengthDelimited(ref dldd) => {
-                let mut variants = Vec::new();
-                if let Err(e) = dldd.deserialize_as_variants(|vs: Vec<Variant>| {
-                    variants = vs.iter().map(|v| Ok(v.clone())).collect::<Vec<_>>();
-                    Ok(())
-                }) {
-                    Either::Left(std::iter::once(Err(e)))
-                } else {
-                    Either::Right(variants.into_iter())
+                match dldd
+                    .deserialize_as_variants(RepeatedFieldCollector::<Variant, Vec<Variant>>::new())
+                {
+                    Err(e) => Either::Left(std::iter::once(Err(e))),
+                    Ok(variants) => Either::Right(variants.into_iter()),
                 }
             }
             _ => Either::Left(std::iter::once(Err(PuroroError::UnexpectedWireType))),
@@ -199,6 +196,37 @@ impl Message for UnknownMessage {
         handle_field_as_repeated_bool
     );
 
+    fn handle_field_as_str<H: RepeatedFieldHandler<Item = char>>(
+        &self,
+        field_number: usize,
+        handler: H,
+    ) -> puroro::Result<H::Output> {
+        self.fields
+            .get(&field_number)
+            .iter()
+            .map(|x| *x)
+            .flatten()
+            .last()
+            .map(|field| {
+                if let Field::LengthDelimited(ref dldd) = field {
+                    todo!()
+                }
+            });
+        todo!()
+    }
+
+    fn handle_field_as_repeated_str<
+        H: RepeatedFieldHandler<Item = char>,
+        G: RepeatedFieldHandler<Item = H::Output>,
+    >(
+        &self,
+        field_number: usize,
+        string_handler: H,
+        strings_handler: G,
+    ) -> puroro::Result<G::Output> {
+        todo!()
+    }
+
     fn collect_field_as_str<S: std::iter::FromIterator<char>>(
         &self,
         field_number: usize,
@@ -207,11 +235,10 @@ impl Message for UnknownMessage {
             if let Some(last_field) = fields.last() {
                 match last_field {
                     Field::LengthDelimited(ref dldd) => {
-                        let mut string = String::new();
-                        dldd.deserialize_as_string(|s| {
-                            string = s;
-                            Ok(())
-                        })?;
+                        let mut string =
+                            dldd.deserialize_as_string(
+                                RepeatedFieldCollector::<char, String>::new(),
+                            )?;
                         return Ok(string.chars().collect::<S>());
                     }
                     _ => {
@@ -235,11 +262,10 @@ impl Message for UnknownMessage {
                 .iter()
                 .map(|field| match field {
                     Field::LengthDelimited(ref dldd) => {
-                        let mut string = String::new();
-                        dldd.deserialize_as_string(|s| {
-                            string = s;
-                            Ok(())
-                        })?;
+                        let mut string =
+                            dldd.deserialize_as_string(
+                                RepeatedFieldCollector::<char, String>::new(),
+                            )?;
                         return Ok(string.chars().collect::<S>());
                     }
                     _ => {

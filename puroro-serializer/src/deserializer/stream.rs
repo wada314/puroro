@@ -3,6 +3,8 @@ use std::io::Read;
 
 mod impls;
 
+pub use ::puroro::{RepeatedFieldCollector, RepeatedFieldHandler};
+
 pub use crate::variant::Variant;
 pub use ::puroro::{PuroroError, Result};
 
@@ -24,15 +26,15 @@ pub trait LengthDelimitedDeserializer<'a>: Sized {
         handler: H,
     ) -> Result<<H as MessageHandler>::Target>;
 
-    fn deserialize_as_string<H>(self, handler: H) -> Result<()>
+    fn deserialize_as_string<H>(self, handler: H) -> Result<H::Output>
     where
-        H: RepeatedFieldHandler<char>;
-    fn deserialize_as_bytes<H>(self, handler: H) -> Result<()>
+        H: RepeatedFieldHandler<Item = char>;
+    fn deserialize_as_bytes<H>(self, handler: H) -> Result<H::Output>
     where
-        H: RepeatedFieldHandler<u8>;
-    fn deserialize_as_variants<H>(self, handler: H) -> Result<()>
+        H: RepeatedFieldHandler<Item = u8>;
+    fn deserialize_as_variants<H>(self, handler: H) -> Result<H::Output>
     where
-        H: RepeatedFieldHandler<Variant>;
+        H: RepeatedFieldHandler<Item = Variant>;
 
     // Delay the deserializing
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer>;
@@ -61,9 +63,9 @@ impl<'a> LengthDelimitedDeserializer<'a> for &'a DelayedLengthDelimitedDeseriali
         deser.deserialize_as_message(handler)
     }
 
-    fn deserialize_as_string<H>(self, handler: H) -> Result<()>
+    fn deserialize_as_string<H>(self, handler: H) -> Result<H::Output>
     where
-        H: RepeatedFieldHandler<char>,
+        H: RepeatedFieldHandler<Item = char>,
     {
         let mut iter = impls::IndexedIterator::new(self.contents.bytes());
         let deser =
@@ -71,9 +73,9 @@ impl<'a> LengthDelimitedDeserializer<'a> for &'a DelayedLengthDelimitedDeseriali
         deser.deserialize_as_string(handler)
     }
 
-    fn deserialize_as_bytes<H>(self, handler: H) -> Result<()>
+    fn deserialize_as_bytes<H>(self, handler: H) -> Result<H::Output>
     where
-        H: RepeatedFieldHandler<u8>,
+        H: RepeatedFieldHandler<Item = u8>,
     {
         let mut iter = impls::IndexedIterator::new(self.contents.bytes());
         let deser =
@@ -81,9 +83,9 @@ impl<'a> LengthDelimitedDeserializer<'a> for &'a DelayedLengthDelimitedDeseriali
         deser.deserialize_as_bytes(handler)
     }
 
-    fn deserialize_as_variants<H>(self, handler: H) -> Result<()>
+    fn deserialize_as_variants<H>(self, handler: H) -> Result<H::Output>
     where
-        H: RepeatedFieldHandler<Variant>,
+        H: RepeatedFieldHandler<Item = Variant>,
     {
         let mut iter = impls::IndexedIterator::new(self.contents.bytes());
         let deser =
@@ -126,24 +128,5 @@ pub trait MessageHandler {
     ) -> Result<()> {
         // Providing a default implementation just for testing convenience.
         panic!("Please provide the implementation for every handler method!");
-    }
-}
-
-pub trait RepeatedFieldHandler<T> {
-    fn handle<I: Iterator<Item = Result<T>>>(self, iter: I) -> Result<()>;
-}
-impl<F: FnOnce(String) -> Result<()>> RepeatedFieldHandler<char> for F {
-    fn handle<I: Iterator<Item = Result<char>>>(self, iter: I) -> Result<()> {
-        (self)(iter.collect::<Result<String>>()?)
-    }
-}
-impl<F: FnOnce(Vec<u8>) -> Result<()>> RepeatedFieldHandler<u8> for F {
-    fn handle<I: Iterator<Item = Result<u8>>>(self, iter: I) -> Result<()> {
-        (self)(iter.collect::<Result<Vec<u8>>>()?)
-    }
-}
-impl<F: FnOnce(Vec<Variant>) -> Result<()>> RepeatedFieldHandler<Variant> for F {
-    fn handle<I: Iterator<Item = Result<Variant>>>(self, iter: I) -> Result<()> {
-        (self)(iter.collect::<Result<Vec<Variant>>>()?)
     }
 }

@@ -1,3 +1,4 @@
+use ::either::Either;
 use ::num_traits::FromPrimitive;
 use std::io::Result as IoResult;
 
@@ -158,81 +159,77 @@ where
         handler.finish()
     }
 
-    fn deserialize_as_string<H>(mut self, handler: H) -> Result<()>
+    fn deserialize_as_string<H>(mut self, handler: H) -> Result<H::Output>
     where
-        H: RepeatedFieldHandler<char>,
+        H: RepeatedFieldHandler<Item = char>,
     {
         self.mark_deserialized();
         let start_pos = self.indexed_iter.index();
-        if let Some(length) = self.bytes_len {
-            let iter = CharsIterator::new(self.indexed_iter.by_ref().take(length));
-            handler.handle(iter)?;
+        let maybe_has_length_bytes_iter = if let Some(length) = self.bytes_len {
+            Either::Left(self.indexed_iter.by_ref().take(length))
         } else {
-            let iter = CharsIterator::new(self.indexed_iter.by_ref());
-            handler.handle(iter)?;
-        }
+            Either::Right(self.indexed_iter.by_ref())
+        };
+        let chars = CharsIterator::new(maybe_has_length_bytes_iter);
+        let retval = handler.handle(chars)?;
         let end_pos = self.indexed_iter.index();
         if let Some(length) = self.bytes_len {
             if end_pos - start_pos == length {
-                Ok(())
+                Ok(retval)
             } else {
                 Err(PuroroError::InvalidFieldLength)
             }
         } else {
-            Ok(())
+            Ok(retval)
         }
     }
 
-    fn deserialize_as_bytes<H>(mut self, handler: H) -> Result<()>
+    fn deserialize_as_bytes<H>(mut self, handler: H) -> Result<H::Output>
     where
-        H: RepeatedFieldHandler<u8>,
+        H: RepeatedFieldHandler<Item = u8>,
     {
         self.mark_deserialized();
         let start_pos = self.indexed_iter.index();
-        if let Some(length) = self.bytes_len {
-            let iter = self
-                .indexed_iter
-                .by_ref()
-                .take(length)
-                .map(|r| r.map_err(|e| e.into()));
-            handler.handle(iter)?;
+        let maybe_has_length_bytes_iter = if let Some(length) = self.bytes_len {
+            Either::Left(self.indexed_iter.by_ref().take(length))
         } else {
-            let iter = self.indexed_iter.by_ref().map(|r| r.map_err(|e| e.into()));
-            handler.handle(iter)?;
-        }
+            Either::Right(self.indexed_iter.by_ref())
+        };
+        let bytes_with_puroro_error = maybe_has_length_bytes_iter.map(|r| r.map_err(|e| e.into()));
+        let retval = handler.handle(bytes_with_puroro_error)?;
         let end_pos = self.indexed_iter.index();
         if let Some(length) = self.bytes_len {
             if end_pos - start_pos == length {
-                Ok(())
+                Ok(retval)
             } else {
                 Err(PuroroError::InvalidFieldLength)
             }
         } else {
-            Ok(())
+            Ok(retval)
         }
     }
-    fn deserialize_as_variants<H>(mut self, handler: H) -> Result<()>
+    fn deserialize_as_variants<H>(mut self, handler: H) -> Result<H::Output>
     where
-        H: RepeatedFieldHandler<Variant>,
+        H: RepeatedFieldHandler<Item = Variant>,
     {
         self.mark_deserialized();
         let start_pos = self.indexed_iter.index();
-        if let Some(length) = self.bytes_len {
-            let iter = VariantsIterator::new(self.indexed_iter.by_ref().take(length));
-            handler.handle(iter)?;
+        let maybe_has_length_bytes_iter = if let Some(length) = self.bytes_len {
+            Either::Left(self.indexed_iter.by_ref().take(length))
         } else {
-            let iter = VariantsIterator::new(self.indexed_iter.by_ref());
-            handler.handle(iter)?;
-        }
+            Either::Right(self.indexed_iter.by_ref())
+        };
+        let variants = VariantsIterator::new(maybe_has_length_bytes_iter);
+        let retval = handler.handle(variants)?;
         let end_pos = self.indexed_iter.index();
         if let Some(length) = self.bytes_len {
             if end_pos - start_pos == length {
-                Ok(())
+                Ok(retval)
             } else {
                 Err(PuroroError::InvalidFieldLength)
             }
         } else {
-            Ok(())
+            Ok(retval)
         }
     }
 
@@ -323,6 +320,8 @@ impl<I: Iterator<Item = IoResult<u8>>> Iterator for VariantsIterator<I> {
 
 #[cfg(test)]
 mod tests {
+    use puroro::RepeatedFieldCollector;
+
     use super::*;
 
     #[test]
@@ -383,10 +382,8 @@ mod tests {
                 field_number: usize,
             ) -> Result<()> {
                 assert_eq!(field_number, 2);
-                deserializer.deserialize_as_string(|s| {
-                    self.b = s;
-                    Ok(())
-                })?;
+                self.b = deserializer
+                    .deserialize_as_string(RepeatedFieldCollector::<char, String>::new())?;
                 Ok(())
             }
         }
@@ -479,10 +476,14 @@ mod tests {
                 field_number: usize,
             ) -> Result<()> {
                 assert_eq!(4, field_number);
-                deserializer.deserialize_as_variants(|variants: Vec<Variant>| {
-                    self.d = variants.iter().map(|v| v.to_i32()).collect::<Result<_>>()?;
-                    Ok(())
-                })?;
+                self.d =
+                    deserializer
+                        .deserialize_as_variants(
+                            RepeatedFieldCollector::<Variant, Vec<Variant>>::new(),
+                        )?
+                        .into_iter()
+                        .map(|v| v.to_i32())
+                        .collect::<Result<Vec<_>>>()?;
                 Ok(())
             }
         }
