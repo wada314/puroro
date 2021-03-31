@@ -30,25 +30,17 @@ impl UnknownMessage {
     fn get_last_variant_field(&self, field_number: usize) -> Result<Variant> {
         if let Some(fields) = self.fields.get(&field_number) {
             if let Some(last_field) = fields.last() {
-                match last_field {
-                    Field::Variant(ref variant) => {
-                        return Ok(variant.clone());
-                    }
-                    Field::LengthDelimited(ref dldd) => {
-                        let mut variants = Vec::new();
-                        dldd.deserialize_as_variants(|vs| {
-                            variants = vs;
-                            Ok(())
-                        })?;
-                        if let Some(variant) = variants.last() {
-                            return Ok(variant.clone());
-                        }
-                    }
+                return match last_field {
+                    Field::Variant(ref variant) => Ok(variant.clone()),
+                    Field::LengthDelimited(ref dldd) => dldd
+                        .deserialize_as_variants_iter()
+                        .last()
+                        .unwrap_or(Ok(Variant::default())),
                     _ => {
                         // found fixed32 or fixed64 field
-                        return Err(PuroroError::UnexpectedWireType);
+                        Err(PuroroError::UnexpectedWireType)
                     }
-                }
+                };
             }
         }
         Ok(Variant::default())
@@ -69,14 +61,7 @@ impl UnknownMessage {
         };
         fields_iter.flat_map(|field| match field {
             Field::Variant(ref variant) => Either::Left(std::iter::once(Ok(variant.clone()))),
-            Field::LengthDelimited(ref dldd) => {
-                match dldd
-                    .deserialize_as_variants(RepeatedFieldCollector::<Variant, Vec<Variant>>::new())
-                {
-                    Err(e) => Either::Left(std::iter::once(Err(e))),
-                    Ok(variants) => Either::Right(variants.into_iter()),
-                }
-            }
+            Field::LengthDelimited(ref dldd) => Either::Right(dldd.deserialize_as_variants_iter()),
             _ => Either::Left(std::iter::once(Err(PuroroError::UnexpectedWireType))),
         })
     }
