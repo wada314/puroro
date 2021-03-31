@@ -36,6 +36,15 @@ pub trait LengthDelimitedDeserializer<'a>: Sized {
     where
         H: RepeatedFieldHandler<Item = Variant>;
 
+    type BytesIterator: Iterator<Item = Result<u8>>;
+    fn deserialize_as_bytes_iter(self) -> Self::BytesIterator;
+
+    type CharsIterator: Iterator<Item = Result<char>>;
+    fn deserialize_as_chars_iter(self) -> Self::CharsIterator;
+
+    type VariantsIterator: Iterator<Item = Result<Variant>>;
+    fn deserialize_as_variants_iter(self) -> Self::VariantsIterator;
+
     // Delay the deserializing
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer>;
 }

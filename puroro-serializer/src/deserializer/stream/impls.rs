@@ -1,6 +1,7 @@
 use ::either::Either;
 use ::num_traits::FromPrimitive;
-use std::io::Result as IoResult;
+use std::io::{Bytes, Result as IoResult};
+use utf8_decode::UnsafeDecoder;
 
 use super::*;
 
@@ -38,6 +39,7 @@ where
     bytes_len: Option<usize>,
     #[cfg(debug_assertions)]
     deserialized: bool,
+    sub_deserializer_expected_finish_pos: Option<usize>,
 }
 impl<'a, I> LengthDelimitedDeserializerImpl<'a, I>
 where
@@ -49,6 +51,8 @@ where
             bytes_len,
             #[cfg(debug_assertions)]
             deserialized: false,
+            #[cfg(debug_assertions)]
+            sub_deserializer_expected_finish_pos: None,
         }
     }
     fn make_sub_deserializer<'b>(
@@ -58,11 +62,18 @@ where
     where
         'a: 'b,
     {
+        assert!(
+            self.sub_deserializer_expected_finish_pos.is_none(),
+             "The previous field is not preccessed yet. i.e. The iterator is still in the previous field."
+        );
+        self.sub_deserializer_expected_finish_pos = Some(new_length + self.indexed_iter.index());
         LengthDelimitedDeserializerImpl {
             indexed_iter: self.indexed_iter,
             bytes_len: Some(new_length),
             #[cfg(debug_assertions)]
             deserialized: false,
+            #[cfg(debug_assertions)]
+            sub_deserializer_expected_finish_pos: None,
         }
     }
 
@@ -93,6 +104,33 @@ where
     }
     #[cfg(not(debug_assertions))]
     fn mark_deserialized(&mut self) {}
+}
+
+impl<'a, I> Iterator for LengthDelimitedDeserializerImpl<'a, I>
+where
+    I: Iterator<Item = IoResult<u8>>,
+{
+    type Item = <I as Iterator>::Item;
+    #[cfg(debug_assertions)]
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(expected_pos) = self.sub_deserializer_expected_finish_pos.take() {
+            assert_eq!(
+                expected_pos,
+                self.indexed_iter.index(),
+                concat!(
+                    "The previous field is not finished yet! ",
+                    "Since this deserializer uses an Iterator as input, ",
+                    "you need to make sure the previous field has read the ",
+                    "all its contents from the input Iterator."
+                )
+            );
+        }
+        self.indexed_iter.next()
+    }
+    #[cfg(not(debug_assertions))]
+    fn next(&mut self) -> Option<Self::Item> {
+        self.indexed_iter.next()
+    }
 }
 
 impl<'a, I> LengthDelimitedDeserializer<'a> for LengthDelimitedDeserializerImpl<'a, I>
@@ -208,6 +246,7 @@ where
             Ok(retval)
         }
     }
+
     fn deserialize_as_variants<H>(mut self, handler: H) -> Result<H::Output>
     where
         H: RepeatedFieldHandler<Item = Variant>,
@@ -240,6 +279,21 @@ where
                 .collect::<IoResult<Vec<_>>>()
                 .map_err(|e| PuroroError::from(e))?,
         ))
+    }
+
+    type BytesIterator = BytesIterator<'a, I>;
+    fn deserialize_as_bytes_iter(self) -> Self::BytesIterator {
+        BytesIterator::new(self)
+    }
+
+    type CharsIterator = CharsIterator2<'a, I>;
+    fn deserialize_as_chars_iter(self) -> Self::CharsIterator {
+        CharsIterator2::new(self)
+    }
+
+    type VariantsIterator = VariantsIterator2<'a, I>;
+    fn deserialize_as_variants_iter(self) -> Self::VariantsIterator {
+        VariantsIterator2::new(self)
     }
 }
 impl<'a, I> Drop for LengthDelimitedDeserializerImpl<'a, I>
@@ -277,6 +331,56 @@ impl<I> IndexedIterator<I> {
     }
     fn index(&self) -> usize {
         self.index
+    }
+}
+
+pub struct BytesIterator<'a, I: Iterator<Item = IoResult<u8>>> {
+    iter: LengthDelimitedDeserializerImpl<'a, I>,
+}
+
+impl<'a, I: Iterator<Item = IoResult<u8>>> BytesIterator<'a, I> {
+    fn new(iter: LengthDelimitedDeserializerImpl<'a, I>) -> Self {
+        Self { iter }
+    }
+}
+impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for BytesIterator<'a, I> {
+    type Item = Result<u8>;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|ior| ior.map_err(|ioe| ioe.into()))
+    }
+}
+pub struct CharsIterator2<'a, I: Iterator<Item = IoResult<u8>>> {
+    iter: ::utf8_decode::UnsafeDecoder<LengthDelimitedDeserializerImpl<'a, I>>,
+}
+impl<'a, I: Iterator<Item = IoResult<u8>>> CharsIterator2<'a, I> {
+    fn new(iter: LengthDelimitedDeserializerImpl<'a, I>) -> Self {
+        Self {
+            iter: ::utf8_decode::UnsafeDecoder::new(iter),
+        }
+    }
+}
+impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for CharsIterator2<'a, I> {
+    type Item = Result<char>;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|ior| ior.map_err(|ioe| ioe.into()))
+    }
+}
+pub struct VariantsIterator2<'a, I: Iterator<Item = IoResult<u8>>> {
+    iter: LengthDelimitedDeserializerImpl<'a, I>,
+}
+impl<'a, I: Iterator<Item = IoResult<u8>>> VariantsIterator2<'a, I> {
+    fn new(iter: LengthDelimitedDeserializerImpl<'a, I>) -> Self {
+        Self { iter }
+    }
+}
+impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for VariantsIterator2<'a, I> {
+    type Item = Result<Variant>;
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut peekable = self.iter.by_ref().peekable();
+        if let None = peekable.peek() {
+            return None;
+        }
+        Some(Variant::decode_bytes(&mut peekable))
     }
 }
 
