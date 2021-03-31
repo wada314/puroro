@@ -1,5 +1,5 @@
 use crate::types::*;
-use std::io::Read;
+use std::io::{Read, Result as IoResult};
 
 mod impls;
 
@@ -104,6 +104,74 @@ impl<'a> LengthDelimitedDeserializer<'a> for &'a DelayedLengthDelimitedDeseriali
 
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer> {
         Ok(self.clone())
+    }
+
+    type BytesIterator = BytesIterator<std::io::Bytes<&'a [u8]>>;
+
+    fn deserialize_as_bytes_iter(self) -> Self::BytesIterator {
+        BytesIterator::new(self.contents.bytes())
+    }
+
+    type CharsIterator = CharsIterator2<std::io::Bytes<&'a [u8]>>;
+
+    fn deserialize_as_chars_iter(self) -> Self::CharsIterator {
+        CharsIterator2::new(self.contents.bytes())
+    }
+
+    type VariantsIterator = VariantsIterator2<std::io::Bytes<&'a [u8]>>;
+
+    fn deserialize_as_variants_iter(self) -> Self::VariantsIterator {
+        VariantsIterator2::new(self.contents.bytes())
+    }
+}
+
+pub struct BytesIterator<I: Iterator<Item = IoResult<u8>>> {
+    iter: I,
+}
+
+impl<'a, I: Iterator<Item = IoResult<u8>>> BytesIterator<I> {
+    fn new(iter: I) -> Self {
+        Self { iter }
+    }
+}
+impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for BytesIterator<I> {
+    type Item = Result<u8>;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|ior| ior.map_err(|ioe| ioe.into()))
+    }
+}
+pub struct CharsIterator2<I: Iterator<Item = IoResult<u8>>> {
+    iter: ::utf8_decode::UnsafeDecoder<I>,
+}
+impl<'a, I: Iterator<Item = IoResult<u8>>> CharsIterator2<I> {
+    fn new(iter: I) -> Self {
+        Self {
+            iter: ::utf8_decode::UnsafeDecoder::new(iter),
+        }
+    }
+}
+impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for CharsIterator2<I> {
+    type Item = Result<char>;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|ior| ior.map_err(|ioe| ioe.into()))
+    }
+}
+pub struct VariantsIterator2<I: Iterator<Item = IoResult<u8>>> {
+    iter: I,
+}
+impl<'a, I: Iterator<Item = IoResult<u8>>> VariantsIterator2<I> {
+    fn new(iter: I) -> Self {
+        Self { iter }
+    }
+}
+impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for VariantsIterator2<I> {
+    type Item = Result<Variant>;
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut peekable = self.iter.by_ref().peekable();
+        if let None = peekable.peek() {
+            return None;
+        }
+        Some(Variant::decode_bytes(&mut peekable))
     }
 }
 

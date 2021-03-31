@@ -281,17 +281,17 @@ where
         ))
     }
 
-    type BytesIterator = BytesIterator<'a, I>;
+    type BytesIterator = BytesIterator<Self>;
     fn deserialize_as_bytes_iter(self) -> Self::BytesIterator {
         BytesIterator::new(self)
     }
 
-    type CharsIterator = CharsIterator2<'a, I>;
+    type CharsIterator = CharsIterator2<Self>;
     fn deserialize_as_chars_iter(self) -> Self::CharsIterator {
         CharsIterator2::new(self)
     }
 
-    type VariantsIterator = VariantsIterator2<'a, I>;
+    type VariantsIterator = VariantsIterator2<Self>;
     fn deserialize_as_variants_iter(self) -> Self::VariantsIterator {
         VariantsIterator2::new(self)
     }
@@ -334,55 +334,6 @@ impl<I> IndexedIterator<I> {
     }
 }
 
-pub struct BytesIterator<'a, I: Iterator<Item = IoResult<u8>>> {
-    iter: LengthDelimitedDeserializerImpl<'a, I>,
-}
-
-impl<'a, I: Iterator<Item = IoResult<u8>>> BytesIterator<'a, I> {
-    fn new(iter: LengthDelimitedDeserializerImpl<'a, I>) -> Self {
-        Self { iter }
-    }
-}
-impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for BytesIterator<'a, I> {
-    type Item = Result<u8>;
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|ior| ior.map_err(|ioe| ioe.into()))
-    }
-}
-pub struct CharsIterator2<'a, I: Iterator<Item = IoResult<u8>>> {
-    iter: ::utf8_decode::UnsafeDecoder<LengthDelimitedDeserializerImpl<'a, I>>,
-}
-impl<'a, I: Iterator<Item = IoResult<u8>>> CharsIterator2<'a, I> {
-    fn new(iter: LengthDelimitedDeserializerImpl<'a, I>) -> Self {
-        Self {
-            iter: ::utf8_decode::UnsafeDecoder::new(iter),
-        }
-    }
-}
-impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for CharsIterator2<'a, I> {
-    type Item = Result<char>;
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|ior| ior.map_err(|ioe| ioe.into()))
-    }
-}
-pub struct VariantsIterator2<'a, I: Iterator<Item = IoResult<u8>>> {
-    iter: LengthDelimitedDeserializerImpl<'a, I>,
-}
-impl<'a, I: Iterator<Item = IoResult<u8>>> VariantsIterator2<'a, I> {
-    fn new(iter: LengthDelimitedDeserializerImpl<'a, I>) -> Self {
-        Self { iter }
-    }
-}
-impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for VariantsIterator2<'a, I> {
-    type Item = Result<Variant>;
-    fn next(&mut self) -> Option<Self::Item> {
-        let mut peekable = self.iter.by_ref().peekable();
-        if let None = peekable.peek() {
-            return None;
-        }
-        Some(Variant::decode_bytes(&mut peekable))
-    }
-}
 
 pub struct CharsIterator<T: Iterator<Item = IoResult<u8>>> {
     iter: ::utf8_decode::UnsafeDecoder<T>,
