@@ -1,8 +1,8 @@
 use ::either::Either;
 use ::num_traits::FromPrimitive;
-use std::io::{Bytes, Result as IoResult};
-use utf8_decode::UnsafeDecoder;
+use std::io::Result as IoResult;
 
+use super::iters::{BytesIterator, CharsIterator2, VariantsIterator2};
 use super::*;
 
 pub(crate) struct DeserializerImpl<I>
@@ -333,7 +333,6 @@ impl<I> IndexedIterator<I> {
         self.index
     }
 }
-
 
 pub struct CharsIterator<T: Iterator<Item = IoResult<u8>>> {
     iter: ::utf8_decode::UnsafeDecoder<T>,
