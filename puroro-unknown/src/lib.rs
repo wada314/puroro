@@ -33,7 +33,7 @@ impl UnknownMessage {
                 return match last_field {
                     Field::Variant(ref variant) => Ok(variant.clone()),
                     Field::LengthDelimited(ref dldd) => dldd
-                        .deserialize_as_variants_iter()
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Ok(Variant::default())),
                     _ => {
@@ -61,7 +61,7 @@ impl UnknownMessage {
         };
         fields_iter.flat_map(|field| match field {
             Field::Variant(ref variant) => Either::Left(std::iter::once(Ok(variant.clone()))),
-            Field::LengthDelimited(ref dldd) => Either::Right(dldd.deserialize_as_variants_iter()),
+            Field::LengthDelimited(ref dldd) => Either::Right(dldd.deserialize_as_variants()),
             _ => Either::Left(std::iter::once(Err(PuroroError::UnexpectedWireType))),
         })
     }
@@ -220,11 +220,7 @@ impl Message for UnknownMessage {
             if let Some(last_field) = fields.last() {
                 match last_field {
                     Field::LengthDelimited(ref dldd) => {
-                        let mut string =
-                            dldd.deserialize_as_string(
-                                RepeatedFieldCollector::<char, String>::new(),
-                            )?;
-                        return Ok(string.chars().collect::<S>());
+                        return Ok(dldd.deserialize_as_chars().collect::<Result<S>>()?);
                     }
                     _ => {
                         return Err(PuroroError::InvalidWireType);
@@ -247,11 +243,7 @@ impl Message for UnknownMessage {
                 .iter()
                 .map(|field| match field {
                     Field::LengthDelimited(ref dldd) => {
-                        let mut string =
-                            dldd.deserialize_as_string(
-                                RepeatedFieldCollector::<char, String>::new(),
-                            )?;
-                        return Ok(string.chars().collect::<S>());
+                        return Ok(dldd.deserialize_as_chars().collect::<Result<S>>()?);
                     }
                     _ => {
                         return Err(PuroroError::InvalidWireType);

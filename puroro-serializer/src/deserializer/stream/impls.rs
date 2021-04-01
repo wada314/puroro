@@ -2,7 +2,7 @@ use ::either::Either;
 use ::num_traits::FromPrimitive;
 use std::io::Result as IoResult;
 
-use super::iters::{BytesIterator, CharsIterator2, VariantsIterator2};
+use super::iters::{BytesIterator, CharsIterator, VariantsIterator};
 use super::*;
 
 pub(crate) struct DeserializerImpl<I>
@@ -37,8 +37,6 @@ where
 {
     indexed_iter: &'a mut IndexedIterator<I>,
     bytes_len: Option<usize>,
-    #[cfg(debug_assertions)]
-    deserialized: bool,
     sub_deserializer_expected_finish_pos: Option<usize>,
 }
 impl<'a, I> LengthDelimitedDeserializerImpl<'a, I>
@@ -49,8 +47,6 @@ where
         Self {
             indexed_iter,
             bytes_len,
-            #[cfg(debug_assertions)]
-            deserialized: false,
             #[cfg(debug_assertions)]
             sub_deserializer_expected_finish_pos: None,
         }
@@ -70,8 +66,6 @@ where
         LengthDelimitedDeserializerImpl {
             indexed_iter: self.indexed_iter,
             bytes_len: Some(new_length),
-            #[cfg(debug_assertions)]
-            deserialized: false,
             #[cfg(debug_assertions)]
             sub_deserializer_expected_finish_pos: None,
         }
@@ -97,13 +91,6 @@ where
             .ok_or(PuroroError::UnexpectedInputTermination)
             .and_then(|r| r.map_err(|e| e.into()))
     }
-
-    #[cfg(debug_assertions)]
-    fn mark_deserialized(&mut self) {
-        self.deserialized = true;
-    }
-    #[cfg(not(debug_assertions))]
-    fn mark_deserialized(&mut self) {}
 }
 
 impl<'a, I> Iterator for LengthDelimitedDeserializerImpl<'a, I>
@@ -138,7 +125,6 @@ where
     I: Iterator<Item = IoResult<u8>>,
 {
     fn deserialize_as_message<H: MessageHandler>(mut self, mut handler: H) -> Result<H::Target> {
-        self.mark_deserialized();
         let start_pos = self.indexed_iter.index();
         loop {
             // Check message length if possible
@@ -197,117 +183,28 @@ where
         handler.finish()
     }
 
-    fn deserialize_as_string<H>(mut self, handler: H) -> Result<H::Output>
-    where
-        H: RepeatedFieldHandler<Item = char>,
-    {
-        self.mark_deserialized();
-        let start_pos = self.indexed_iter.index();
-        let maybe_has_length_bytes_iter = if let Some(length) = self.bytes_len {
-            Either::Left(self.indexed_iter.by_ref().take(length))
-        } else {
-            Either::Right(self.indexed_iter.by_ref())
-        };
-        let chars = CharsIterator::new(maybe_has_length_bytes_iter);
-        let retval = handler.handle(chars)?;
-        let end_pos = self.indexed_iter.index();
-        if let Some(length) = self.bytes_len {
-            if end_pos - start_pos == length {
-                Ok(retval)
-            } else {
-                Err(PuroroError::InvalidFieldLength)
-            }
-        } else {
-            Ok(retval)
-        }
+    type BytesIterator = BytesIterator<Self>;
+    fn deserialize_as_bytes(self) -> Self::BytesIterator {
+        BytesIterator::new(self)
     }
 
-    fn deserialize_as_bytes<H>(mut self, handler: H) -> Result<H::Output>
-    where
-        H: RepeatedFieldHandler<Item = u8>,
-    {
-        self.mark_deserialized();
-        let start_pos = self.indexed_iter.index();
-        let maybe_has_length_bytes_iter = if let Some(length) = self.bytes_len {
-            Either::Left(self.indexed_iter.by_ref().take(length))
-        } else {
-            Either::Right(self.indexed_iter.by_ref())
-        };
-        let bytes_with_puroro_error = maybe_has_length_bytes_iter.map(|r| r.map_err(|e| e.into()));
-        let retval = handler.handle(bytes_with_puroro_error)?;
-        let end_pos = self.indexed_iter.index();
-        if let Some(length) = self.bytes_len {
-            if end_pos - start_pos == length {
-                Ok(retval)
-            } else {
-                Err(PuroroError::InvalidFieldLength)
-            }
-        } else {
-            Ok(retval)
-        }
+    type CharsIterator = CharsIterator<Self>;
+    fn deserialize_as_chars(self) -> Self::CharsIterator {
+        CharsIterator::new(self)
     }
 
-    fn deserialize_as_variants<H>(mut self, handler: H) -> Result<H::Output>
-    where
-        H: RepeatedFieldHandler<Item = Variant>,
-    {
-        self.mark_deserialized();
-        let start_pos = self.indexed_iter.index();
-        let maybe_has_length_bytes_iter = if let Some(length) = self.bytes_len {
-            Either::Left(self.indexed_iter.by_ref().take(length))
-        } else {
-            Either::Right(self.indexed_iter.by_ref())
-        };
-        let variants = VariantsIterator::new(maybe_has_length_bytes_iter);
-        let retval = handler.handle(variants)?;
-        let end_pos = self.indexed_iter.index();
-        if let Some(length) = self.bytes_len {
-            if end_pos - start_pos == length {
-                Ok(retval)
-            } else {
-                Err(PuroroError::InvalidFieldLength)
-            }
-        } else {
-            Ok(retval)
-        }
+    type VariantsIterator = VariantsIterator<Self>;
+    fn deserialize_as_variants(self) -> Self::VariantsIterator {
+        VariantsIterator::new(self)
     }
 
-    fn leave_as_unknown(mut self) -> Result<DelayedLengthDelimitedDeserializer> {
-        self.mark_deserialized();
+    fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer> {
         Ok(DelayedLengthDelimitedDeserializer::new(
             self.indexed_iter
                 .collect::<IoResult<Vec<_>>>()
                 .map_err(|e| PuroroError::from(e))?,
         ))
     }
-
-    type BytesIterator = BytesIterator<Self>;
-    fn deserialize_as_bytes_iter(self) -> Self::BytesIterator {
-        BytesIterator::new(self)
-    }
-
-    type CharsIterator = CharsIterator2<Self>;
-    fn deserialize_as_chars_iter(self) -> Self::CharsIterator {
-        CharsIterator2::new(self)
-    }
-
-    type VariantsIterator = VariantsIterator2<Self>;
-    fn deserialize_as_variants_iter(self) -> Self::VariantsIterator {
-        VariantsIterator2::new(self)
-    }
-}
-impl<'a, I> Drop for LengthDelimitedDeserializerImpl<'a, I>
-where
-    I: Iterator<Item = IoResult<u8>>,
-{
-    #[cfg(debug_assertions)]
-    fn drop(&mut self) {
-        if !self.deserialized {
-            panic!("You MUST call one of the methods of LengthDelimitedDeserializer!!");
-        }
-    }
-    #[cfg(not(debug_assertions))]
-    fn drop(&mut self) {}
 }
 
 pub(crate) struct IndexedIterator<I> {
@@ -334,48 +231,8 @@ impl<I> IndexedIterator<I> {
     }
 }
 
-pub struct CharsIterator<T: Iterator<Item = IoResult<u8>>> {
-    iter: ::utf8_decode::UnsafeDecoder<T>,
-}
-impl<T: Iterator<Item = IoResult<u8>>> CharsIterator<T> {
-    pub fn new(iter: T) -> Self {
-        Self {
-            iter: ::utf8_decode::UnsafeDecoder::new(iter),
-        }
-    }
-}
-impl<T: Iterator<Item = IoResult<u8>>> Iterator for CharsIterator<T> {
-    type Item = Result<char>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|r| r.map_err(|e| e.into()))
-    }
-}
-
-pub struct VariantsIterator<I: Iterator<Item = IoResult<u8>>> {
-    iter: I,
-}
-impl<I: Iterator<Item = IoResult<u8>>> VariantsIterator<I> {
-    pub fn new(iter: I) -> Self {
-        Self { iter }
-    }
-}
-impl<I: Iterator<Item = IoResult<u8>>> Iterator for VariantsIterator<I> {
-    type Item = Result<Variant>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let mut peekable = self.iter.by_ref().peekable();
-        if let None = peekable.peek() {
-            return None;
-        }
-        Some(Variant::decode_bytes(&mut peekable))
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use puroro::RepeatedFieldCollector;
-
     use super::*;
 
     #[test]
@@ -437,7 +294,8 @@ mod tests {
             ) -> Result<()> {
                 assert_eq!(field_number, 2);
                 self.b = deserializer
-                    .deserialize_as_string(RepeatedFieldCollector::<char, String>::new())?;
+                    .deserialize_as_chars()
+                    .collect::<Result<String>>()?;
                 Ok(())
             }
         }
@@ -530,14 +388,10 @@ mod tests {
                 field_number: usize,
             ) -> Result<()> {
                 assert_eq!(4, field_number);
-                self.d =
-                    deserializer
-                        .deserialize_as_variants(
-                            RepeatedFieldCollector::<Variant, Vec<Variant>>::new(),
-                        )?
-                        .into_iter()
-                        .map(|v| v.to_i32())
-                        .collect::<Result<Vec<_>>>()?;
+                self.d = deserializer
+                    .deserialize_as_variants()
+                    .map(|r| r.and_then(|v| v.to_i32()))
+                    .collect::<Result<Vec<_>>>()?;
                 Ok(())
             }
         }

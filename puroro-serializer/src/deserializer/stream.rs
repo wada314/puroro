@@ -29,24 +29,14 @@ pub trait LengthDelimitedDeserializer<'a>: Sized {
         handler: H,
     ) -> Result<<H as MessageHandler>::Target>;
 
-    fn deserialize_as_string<H>(self, handler: H) -> Result<H::Output>
-    where
-        H: RepeatedFieldHandler<Item = char>;
-    fn deserialize_as_bytes<H>(self, handler: H) -> Result<H::Output>
-    where
-        H: RepeatedFieldHandler<Item = u8>;
-    fn deserialize_as_variants<H>(self, handler: H) -> Result<H::Output>
-    where
-        H: RepeatedFieldHandler<Item = Variant>;
-
     type BytesIterator: Iterator<Item = Result<u8>>;
-    fn deserialize_as_bytes_iter(self) -> Self::BytesIterator;
+    fn deserialize_as_bytes(self) -> Self::BytesIterator;
 
     type CharsIterator: Iterator<Item = Result<char>>;
-    fn deserialize_as_chars_iter(self) -> Self::CharsIterator;
+    fn deserialize_as_chars(self) -> Self::CharsIterator;
 
     type VariantsIterator: Iterator<Item = Result<Variant>>;
-    fn deserialize_as_variants_iter(self) -> Self::VariantsIterator;
+    fn deserialize_as_variants(self) -> Self::VariantsIterator;
 
     // Delay the deserializing
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer>;
