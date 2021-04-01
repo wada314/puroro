@@ -113,7 +113,7 @@ impl MessageHandler for UnknownMessage {
         Ok(())
     }
 
-    fn deserialize_length_delimited_field<'a, D: LengthDelimitedDeserializer<'a>>(
+    fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
         &mut self,
         deserializer: D,
         field_number: usize,

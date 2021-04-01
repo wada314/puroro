@@ -1,4 +1,3 @@
-use ::either::Either;
 use ::num_traits::FromPrimitive;
 use std::io::Result as IoResult;
 
@@ -104,12 +103,7 @@ where
             assert_eq!(
                 expected_pos,
                 self.indexed_iter.index(),
-                concat!(
-                    "The previous field is not finished yet! ",
-                    "Since this deserializer uses an Iterator as input, ",
-                    "you need to make sure the previous field has read the ",
-                    "all its contents from the input Iterator."
-                )
+                "The previous field is not preccessed yet. i.e. The iterator is still in the previous field."
             );
         }
         self.indexed_iter.next()
@@ -120,7 +114,7 @@ where
     }
 }
 
-impl<'a, I> LengthDelimitedDeserializer<'a> for LengthDelimitedDeserializerImpl<'a, I>
+impl<'a, I> LengthDelimitedDeserializer for LengthDelimitedDeserializerImpl<'a, I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
@@ -287,7 +281,7 @@ mod tests {
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
             }
-            fn deserialize_length_delimited_field<'a, D: LengthDelimitedDeserializer<'a>>(
+            fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
                 &mut self,
                 deserializer: D,
                 field_number: usize,
@@ -347,7 +341,7 @@ mod tests {
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
             }
-            fn deserialize_length_delimited_field<'a, D: LengthDelimitedDeserializer<'a>>(
+            fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
                 &mut self,
                 deserializer: D,
                 field_number: usize,
@@ -382,7 +376,7 @@ mod tests {
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
             }
-            fn deserialize_length_delimited_field<'a, D: LengthDelimitedDeserializer<'a>>(
+            fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
                 &mut self,
                 deserializer: D,
                 field_number: usize,

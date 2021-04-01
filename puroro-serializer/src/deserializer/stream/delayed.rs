@@ -2,8 +2,7 @@ use std::io::Read;
 
 use super::impls;
 use super::iters::{BytesIterator, CharsIterator, VariantsIterator};
-use super::{LengthDelimitedDeserializer, MessageHandler, RepeatedFieldHandler};
-use crate::variant::Variant;
+use super::{LengthDelimitedDeserializer, MessageHandler};
 use crate::Result;
 
 #[derive(Debug, Clone)]
@@ -18,7 +17,7 @@ impl DelayedLengthDelimitedDeserializer {
         self.contents.bytes()
     }
 }
-impl<'a> LengthDelimitedDeserializer<'a> for &'a DelayedLengthDelimitedDeserializer {
+impl<'a> LengthDelimitedDeserializer for &'a DelayedLengthDelimitedDeserializer {
     fn deserialize_as_message<H: MessageHandler>(
         self,
         handler: H,

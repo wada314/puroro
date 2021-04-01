@@ -23,7 +23,7 @@ pub fn deserializer_from_bytes<I: Iterator<Item = std::io::Result<u8>>>(
     impls::DeserializerImpl::<I>::new(iter)
 }
 
-pub trait LengthDelimitedDeserializer<'a>: Sized {
+pub trait LengthDelimitedDeserializer: Sized {
     fn deserialize_as_message<H: MessageHandler>(
         self,
         handler: H,
@@ -40,6 +40,13 @@ pub trait LengthDelimitedDeserializer<'a>: Sized {
 
     // Delay the deserializing
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer>;
+}
+
+pub enum Field<T: LengthDelimitedDeserializer> {
+    Variant(Variant),
+    LengthDelimited(T),
+    Bytes32([u8; 4]),
+    Bytes64([u8; 4]),
 }
 
 pub trait MessageHandler {
@@ -65,7 +72,7 @@ pub trait MessageHandler {
     }
 
     #[allow(unused_variables)]
-    fn deserialize_length_delimited_field<'a, D: LengthDelimitedDeserializer<'a>>(
+    fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
         &mut self,
         deserializer: D,
         field_number: usize,
