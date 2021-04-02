@@ -7,7 +7,7 @@ use ::puroro_serializer::deserializer::stream::{
     DelayedLengthDelimitedDeserializer, Deserializer, Field, LengthDelimitedDeserializer,
     MessageHandler,
 };
-use ::puroro_serializer::tags::{Variant, VariantType};
+use ::puroro_serializer::variant::{Variant, VariantType};
 use std::collections::HashMap;
 
 type Result<T> = std::result::Result<T, PuroroError>;
@@ -208,7 +208,7 @@ impl Message for UnknownMessage {
 
     fn get_field_as_message<T>(&self, field_number: usize) -> Result<Option<T>>
     where
-        T: Mergeable<MergedType = T> + Deserializable,
+        T: Mergeable + Deserializable,
     {
         if let Some(fields) = self.fields.get(&field_number) {
             return fields
@@ -263,8 +263,7 @@ impl Deserializable for UnknownMessage {
     }
 }
 impl Mergeable for UnknownMessage {
-    type MergedType = UnknownMessage;
-    fn merge(&self, latter: &Self) -> Result<UnknownMessage> {
+    fn merge(&self, latter: &Self) -> Result<Self> {
         let mut new_message = self.clone();
         for (k, v) in &latter.fields {
             new_message

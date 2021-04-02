@@ -1,5 +1,5 @@
 pub mod deserializer;
 pub mod types;
-pub mod tags;
+pub mod variant;
 
 pub use ::puroro::{PuroroError, Result};

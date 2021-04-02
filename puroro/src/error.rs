@@ -16,6 +16,8 @@ pub enum PuroroError {
     UnexpectedFieldType,
     #[error("Unexpected field number. In protobuf standard, the deserializer should accept this though.")]
     UnexpectedFieldId,
+    #[error("Found a packed repeated field, but its length was zero.")]
+    ZeroLengthPackedField,
     #[error("The bytestream iterator returned an error: {0}")]
     IteratorError(#[from] std::io::Error),
     #[error("The string length is not correct.")]

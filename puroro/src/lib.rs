@@ -85,7 +85,7 @@ pub trait Message {
     ) -> Result<T>;
     fn get_field_as_message<T>(&self, field_number: usize) -> Result<Option<T>>
     where
-        T: Mergeable<MergedType = T> + Deserializable;
+        T: Mergeable + Deserializable;
     fn collect_field_as_repeated_message<T: Deserializable, U: FromIterator<T>>(
         &self,
         field_number: usize,
@@ -95,9 +95,8 @@ pub trait Message {
 pub trait Deserializable: Sized {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self>;
 }
-pub trait Mergeable {
-    type MergedType;
-    fn merge(&self, latter: &Self) -> Result<Self::MergedType>;
+pub trait Mergeable: Sized {
+    fn merge(&self, latter: &Self) -> Result<Self>;
 }
 
 pub trait RepeatedFieldHandler {

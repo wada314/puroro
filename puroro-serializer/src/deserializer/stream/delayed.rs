@@ -1,4 +1,4 @@
-use std::io::Read;
+use std::io::{Bytes, Read, Result as IoResult};
 
 use super::impls;
 use super::iters::{BytesIterator, CharsIterator, VariantsIterator};
@@ -14,6 +14,13 @@ impl DelayedLengthDelimitedDeserializer {
         Self { contents }
     }
     pub fn bytes(&self) -> std::io::Bytes<&[u8]> {
+        self.contents.bytes()
+    }
+}
+impl<'a> IntoIterator for &'a DelayedLengthDelimitedDeserializer {
+    type Item = IoResult<u8>;
+    type IntoIter = Bytes<&'a [u8]>;
+    fn into_iter(self) -> Self::IntoIter {
         self.contents.bytes()
     }
 }

@@ -1,11 +1,11 @@
-use crate::types::*;
-use std::io::Read;
-
 mod delayed;
 mod impls;
 mod iters;
 
-pub use crate::tags::Variant;
+use crate::types::*;
+use std::io::{Read, Result as IoResult};
+
+pub use crate::variant::Variant;
 pub use ::puroro::{PuroroError, Result};
 pub use ::puroro::{RepeatedFieldCollector, RepeatedFieldHandler};
 
@@ -23,7 +23,7 @@ pub fn deserializer_from_bytes<I: Iterator<Item = std::io::Result<u8>>>(
     impls::DeserializerImpl::<I>::new(iter)
 }
 
-pub trait LengthDelimitedDeserializer: Sized {
+pub trait LengthDelimitedDeserializer: Sized + IntoIterator<Item = IoResult<u8>> {
     fn deserialize_as_message<H: MessageHandler>(
         self,
         handler: H,
