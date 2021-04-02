@@ -2,10 +2,24 @@ use std::iter::FromIterator;
 use std::marker::PhantomData;
 
 pub mod error;
+pub mod tags;
+
 pub use error::PuroroError;
+use tags::FieldTypeTag;
 pub type Result<T> = std::result::Result<T, PuroroError>;
 
 pub trait Message {
+    // Returns by value.
+    fn get_singular_field_or_else<T: FieldTypeTag, F: FnOnce() -> T::SingularRustType>(
+        &self,
+        field_number: usize,
+        f_default: F,
+    ) -> Result<T::SingularRustType>;
+    fn get_repeated_field<T: FieldTypeTag>(
+        &self,
+        field_number: usize,
+    ) -> Result<T::RepeatedRustType>;
+
     fn get_field_as_i32(&self, field_number: usize) -> Result<i32>;
     fn get_field_as_i64(&self, field_number: usize) -> Result<i64>;
     fn get_field_as_si32(&self, field_number: usize) -> Result<i32>;

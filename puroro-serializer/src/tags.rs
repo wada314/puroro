@@ -1,4 +1,5 @@
 use crate::{PuroroError, Result};
+use ::puroro::tags::{Bool, Int32, Int64, SInt32, SInt64, UInt32, UInt64};
 use std::convert::TryFrom;
 use std::io::Result as IoResult;
 
@@ -88,14 +89,6 @@ pub trait VariantType {
     fn from_variant(var: &Variant) -> Result<Self::NativeType>;
     fn to_variant(val: Self::NativeType) -> Result<Variant>;
 }
-
-pub struct Int32();
-pub struct UInt32();
-pub struct SInt32();
-pub struct Int64();
-pub struct UInt64();
-pub struct SInt64();
-pub struct Bool();
 
 pub struct RustUsize();
 

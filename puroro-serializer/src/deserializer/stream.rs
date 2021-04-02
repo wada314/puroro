@@ -5,7 +5,7 @@ mod delayed;
 mod impls;
 mod iters;
 
-pub use crate::variant::Variant;
+pub use crate::tags::Variant;
 pub use ::puroro::{PuroroError, Result};
 pub use ::puroro::{RepeatedFieldCollector, RepeatedFieldHandler};
 

@@ -1,11 +1,13 @@
+mod from_field;
+
 use ::itertools::Either;
+use ::puroro::tags;
 use ::puroro::{Deserializable, Mergeable, Message, PuroroError, RepeatedFieldHandler};
 use ::puroro_serializer::deserializer::stream::{
     DelayedLengthDelimitedDeserializer, Deserializer, Field, LengthDelimitedDeserializer,
     MessageHandler,
 };
-use ::puroro_serializer::variant;
-use ::puroro_serializer::variant::{Variant, VariantType};
+use ::puroro_serializer::tags::{Variant, VariantType};
 use std::collections::HashMap;
 
 type Result<T> = std::result::Result<T, PuroroError>;
@@ -115,41 +117,21 @@ macro_rules! define_variant_methods {
 }
 
 impl Message for UnknownMessage {
+    define_variant_methods!(tags::Int32, get_field_as_i32, handle_field_as_repeated_i32);
+    define_variant_methods!(tags::Int64, get_field_as_i64, handle_field_as_repeated_i64);
+    define_variant_methods!(tags::UInt32, get_field_as_u32, handle_field_as_repeated_u32);
+    define_variant_methods!(tags::UInt64, get_field_as_u64, handle_field_as_repeated_u64);
     define_variant_methods!(
-        variant::Int32,
-        get_field_as_i32,
-        handle_field_as_repeated_i32
-    );
-    define_variant_methods!(
-        variant::Int64,
-        get_field_as_i64,
-        handle_field_as_repeated_i64
-    );
-    define_variant_methods!(
-        variant::UInt32,
-        get_field_as_u32,
-        handle_field_as_repeated_u32
-    );
-    define_variant_methods!(
-        variant::UInt64,
-        get_field_as_u64,
-        handle_field_as_repeated_u64
-    );
-    define_variant_methods!(
-        variant::SInt32,
+        tags::SInt32,
         get_field_as_si32,
         handle_field_as_repeated_si32
     );
     define_variant_methods!(
-        variant::SInt64,
+        tags::SInt64,
         get_field_as_si64,
         handle_field_as_repeated_si64
     );
-    define_variant_methods!(
-        variant::Bool,
-        get_field_as_bool,
-        handle_field_as_repeated_bool
-    );
+    define_variant_methods!(tags::Bool, get_field_as_bool, handle_field_as_repeated_bool);
 
     fn handle_field_as_str<H: RepeatedFieldHandler<Item = char>>(
         &self,
@@ -257,6 +239,21 @@ impl Message for UnknownMessage {
                 .collect::<Result<U>>();
         }
         Ok(std::iter::empty().collect::<U>())
+    }
+
+    fn get_singular_field_or_else<T: tags::FieldTypeTag, F: FnOnce() -> T::SingularRustType>(
+        &self,
+        field_number: usize,
+        f_default: F,
+    ) -> puroro::Result<T::SingularRustType> {
+        todo!()
+    }
+
+    fn get_repeated_field<T: tags::FieldTypeTag>(
+        &self,
+        field_number: usize,
+    ) -> puroro::Result<T::RepeatedRustType> {
+        todo!()
     }
 }
 impl Deserializable for UnknownMessage {

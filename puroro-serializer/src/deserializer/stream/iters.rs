@@ -1,6 +1,6 @@
 use super::{impls::LengthDelimitedDeserializerImpl, Field, LengthDelimitedDeserializer};
 use crate::types::WireType;
-use crate::variant::Variant;
+use crate::tags::Variant;
 use crate::{PuroroError, Result};
 use ::num_traits::FromPrimitive;
 use std::io::Result as IoResult;
