@@ -240,21 +240,6 @@ impl Message for UnknownMessage {
         }
         Ok(std::iter::empty().collect::<U>())
     }
-
-    fn get_singular_field_or_else<T: tags::FieldTypeTag, F: FnOnce() -> T::SingularRustType>(
-        &self,
-        field_number: usize,
-        f_default: F,
-    ) -> puroro::Result<T::SingularRustType> {
-        todo!()
-    }
-
-    fn get_repeated_field<T: tags::FieldTypeTag>(
-        &self,
-        field_number: usize,
-    ) -> puroro::Result<T::RepeatedRustType> {
-        todo!()
-    }
 }
 impl Deserializable for UnknownMessage {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self> {
