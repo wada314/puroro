@@ -1,6 +1,9 @@
 use ::itertools::Either;
 use ::puroro::{Deserializable, Mergeable, Message, PuroroError, RepeatedFieldHandler};
-use ::puroro_serializer::deserializer::stream::*;
+use ::puroro_serializer::deserializer::stream::{
+    DelayedLengthDelimitedDeserializer, Deserializer, Field, LengthDelimitedDeserializer,
+    MessageHandler,
+};
 use ::puroro_serializer::variant;
 use ::puroro_serializer::variant::{Variant, VariantType};
 use std::collections::HashMap;
@@ -8,16 +11,8 @@ use std::collections::HashMap;
 type Result<T> = std::result::Result<T, PuroroError>;
 
 #[derive(Debug, Clone)]
-enum Field {
-    Variant(Variant),
-    Value32([u8; 4]),
-    Value64([u8; 8]),
-    LengthDelimited(DelayedLengthDelimitedDeserializer),
-}
-
-#[derive(Debug, Clone)]
 pub struct UnknownMessage {
-    fields: HashMap<usize, Vec<Field>>,
+    fields: HashMap<usize, Vec<Field<DelayedLengthDelimitedDeserializer>>>,
 }
 
 impl UnknownMessage {
@@ -54,16 +49,15 @@ impl UnknownMessage {
         &self,
         field_number: usize,
     ) -> impl Iterator<Item = Result<Variant>> + '_ {
-        let fields_iter = if let Some(fields) = self.fields.get(&field_number) {
-            Either::Left(fields.iter())
-        } else {
-            Either::Right(std::iter::empty::<&Field>())
-        };
-        fields_iter.flat_map(|field| match field {
-            Field::Variant(ref variant) => Either::Left(std::iter::once(Ok(variant.clone()))),
-            Field::LengthDelimited(ref dldd) => Either::Right(dldd.deserialize_as_variants()),
-            _ => Either::Left(std::iter::once(Err(PuroroError::UnexpectedWireType))),
-        })
+        self.fields
+            .get(&field_number)
+            .into_iter()
+            .flatten()
+            .flat_map(|field| match field {
+                Field::Variant(ref variant) => Either::Left(std::iter::once(Ok(variant.clone()))),
+                Field::LengthDelimited(ref dldd) => Either::Right(dldd.deserialize_as_variants()),
+                _ => Either::Left(std::iter::once(Err(PuroroError::UnexpectedWireType))),
+            })
     }
 
     fn handle_repeated_varient_field<T, H>(
@@ -89,39 +83,15 @@ impl MessageHandler for UnknownMessage {
         Ok(self)
     }
 
-    fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> Result<()> {
-        self.fields
-            .entry(field_number)
-            .or_insert(Vec::new())
-            .push(Field::Variant(variant));
-        Ok(())
-    }
-
-    fn deserialized_32bits(&mut self, field_number: usize, value: [u8; 4]) -> Result<()> {
-        self.fields
-            .entry(field_number)
-            .or_insert(Vec::new())
-            .push(Field::Value32(value));
-        Ok(())
-    }
-
-    fn deserialized_64bits(&mut self, field_number: usize, value: [u8; 8]) -> Result<()> {
-        self.fields
-            .entry(field_number)
-            .or_insert(Vec::new())
-            .push(Field::Value64(value));
-        Ok(())
-    }
-
-    fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+    fn met_field<T: LengthDelimitedDeserializer>(
         &mut self,
-        deserializer: D,
+        field: Field<T>,
         field_number: usize,
-    ) -> Result<()> {
+    ) -> puroro::Result<()> {
         self.fields
             .entry(field_number)
             .or_insert(Vec::new())
-            .push(Field::LengthDelimited(deserializer.leave_as_unknown()?));
+            .push(try_into_persistent_field(field)?);
         Ok(())
     }
 }
@@ -291,7 +261,8 @@ impl Message for UnknownMessage {
 }
 impl Deserializable for UnknownMessage {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self> {
-        deserializer_from_bytes(iter).deserialize(UnknownMessage::new())
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter)
+            .deserialize(UnknownMessage::new())
     }
 }
 impl Mergeable for UnknownMessage {
@@ -307,4 +278,15 @@ impl Mergeable for UnknownMessage {
         }
         Ok(new_message)
     }
+}
+
+fn try_into_persistent_field<T: LengthDelimitedDeserializer>(
+    from: Field<T>,
+) -> Result<Field<DelayedLengthDelimitedDeserializer>> {
+    Ok(match from {
+        Field::LengthDelimited(ldd) => Field::LengthDelimited(ldd.leave_as_unknown()?),
+        Field::Variant(v) => Field::Variant(v),
+        Field::Bytes32(v) => Field::Bytes32(v),
+        Field::Bytes64(v) => Field::Bytes64(v),
+    })
 }

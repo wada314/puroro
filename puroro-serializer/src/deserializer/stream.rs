@@ -42,42 +42,21 @@ pub trait LengthDelimitedDeserializer: Sized {
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer>;
 }
 
-pub enum Field<T: LengthDelimitedDeserializer> {
+#[derive(Debug, Clone)]
+pub enum Field<T> {
     Variant(Variant),
     LengthDelimited(T),
     Bytes32([u8; 4]),
-    Bytes64([u8; 4]),
+    Bytes64([u8; 8]),
 }
 
 pub trait MessageHandler {
     type Target;
     fn finish(self) -> Result<Self::Target>;
 
-    #[allow(unused_variables)]
-    fn deserialized_variant(&mut self, field_number: usize, variant: Variant) -> Result<()> {
-        // Providing a default implementation just for testing convenience.
-        panic!("Please provide the implementation for every handler method!");
-    }
-
-    #[allow(unused_variables)]
-    fn deserialized_32bits(&mut self, field_number: usize, value: [u8; 4]) -> Result<()> {
-        // Providing a default implementation just for testing convenience.
-        panic!("Please provide the implementation for every handler method!");
-    }
-
-    #[allow(unused_variables)]
-    fn deserialized_64bits(&mut self, field_number: usize, value: [u8; 8]) -> Result<()> {
-        // Providing a default implementation just for testing convenience.
-        panic!("Please provide the implementation for every handler method!");
-    }
-
-    #[allow(unused_variables)]
-    fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+    fn met_field<T: LengthDelimitedDeserializer>(
         &mut self,
-        deserializer: D,
+        field: Field<T>,
         field_number: usize,
-    ) -> Result<()> {
-        // Providing a default implementation just for testing convenience.
-        panic!("Please provide the implementation for every handler method!");
-    }
+    ) -> Result<()>;
 }

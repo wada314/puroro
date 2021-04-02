@@ -139,23 +139,22 @@ where
                 }
             };
 
-            match wire_type {
+            let field = match wire_type {
                 WireType::Variant => {
                     let variant = Variant::decode_bytes(&mut self.indexed_iter)?;
-                    handler.deserialized_variant(field_number, variant)?;
+                    Field::Variant(variant)
                 }
                 WireType::LengthDelimited => {
                     let field_length = Variant::decode_bytes(&mut self.indexed_iter)?.to_usize()?;
                     let deserializer_for_inner = self.make_sub_deserializer(field_length);
-                    handler
-                        .deserialize_length_delimited_field(deserializer_for_inner, field_number)?;
+                    Field::LengthDelimited(deserializer_for_inner)
                 }
                 WireType::Bytes32 => {
                     let v0 = self.eat_one_byte()?;
                     let v1 = self.eat_one_byte()?;
                     let v2 = self.eat_one_byte()?;
                     let v3 = self.eat_one_byte()?;
-                    handler.deserialized_32bits(field_number, [v0, v1, v2, v3])?;
+                    Field::Bytes32([v0, v1, v2, v3])
                 }
                 WireType::Bytes64 => {
                     let v0 = self.eat_one_byte()?;
@@ -166,12 +165,13 @@ where
                     let v5 = self.eat_one_byte()?;
                     let v6 = self.eat_one_byte()?;
                     let v7 = self.eat_one_byte()?;
-                    handler.deserialized_64bits(field_number, [v0, v1, v2, v3, v4, v5, v6, v7])?;
+                    Field::Bytes64([v0, v1, v2, v3, v4, v5, v6, v7])
                 }
                 _ => {
-                    unimplemented!("WIP for group support");
+                    return Err(PuroroError::UnexpectedWireType);
                 }
-            }
+            };
+            handler.met_field(field, field_number)?;
         }
 
         handler.finish()
@@ -246,13 +246,17 @@ mod tests {
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
             }
-            fn deserialized_variant(
+            fn met_field<T: LengthDelimitedDeserializer>(
                 &mut self,
+                field: Field<T>,
                 field_number: usize,
-                variant: Variant,
             ) -> Result<()> {
                 assert_eq!(1, field_number);
-                self.a = variant.to_i32()?;
+                if let Field::Variant(v) = field {
+                    self.a = v.to_i32()?;
+                } else {
+                    panic!();
+                }
                 Ok(())
             }
         }
@@ -281,15 +285,18 @@ mod tests {
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
             }
-            fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+
+            fn met_field<T: LengthDelimitedDeserializer>(
                 &mut self,
-                deserializer: D,
+                field: Field<T>,
                 field_number: usize,
             ) -> Result<()> {
                 assert_eq!(field_number, 2);
-                self.b = deserializer
-                    .deserialize_as_chars()
-                    .collect::<Result<String>>()?;
+                if let Field::LengthDelimited(ldd) = field {
+                    self.b = ldd.deserialize_as_chars().collect::<Result<String>>()?;
+                } else {
+                    panic!();
+                }
                 Ok(())
             }
         }
@@ -326,13 +333,17 @@ mod tests {
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
             }
-            fn deserialized_variant(
+            fn met_field<T: LengthDelimitedDeserializer>(
                 &mut self,
+                field: Field<T>,
                 field_number: usize,
-                variant: Variant,
             ) -> Result<()> {
                 assert_eq!(1, field_number);
-                self.a = variant.to_i32()?;
+                if let Field::Variant(v) = field {
+                    self.a = v.to_i32()?;
+                } else {
+                    panic!();
+                }
                 Ok(())
             }
         }
@@ -341,13 +352,17 @@ mod tests {
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
             }
-            fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+            fn met_field<T: LengthDelimitedDeserializer>(
                 &mut self,
-                deserializer: D,
+                field: Field<T>,
                 field_number: usize,
             ) -> Result<()> {
                 assert_eq!(3, field_number);
-                self.c = deserializer.deserialize_as_message(Test1::default())?;
+                if let Field::LengthDelimited(ldd) = field {
+                    self.c = ldd.deserialize_as_message(Test1::default())?
+                } else {
+                    panic!()
+                }
                 Ok(())
             }
         }
@@ -376,16 +391,20 @@ mod tests {
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
             }
-            fn deserialize_length_delimited_field<D: LengthDelimitedDeserializer>(
+            fn met_field<T: LengthDelimitedDeserializer>(
                 &mut self,
-                deserializer: D,
+                field: Field<T>,
                 field_number: usize,
             ) -> Result<()> {
                 assert_eq!(4, field_number);
-                self.d = deserializer
-                    .deserialize_as_variants()
-                    .map(|r| r.and_then(|v| v.to_i32()))
-                    .collect::<Result<Vec<_>>>()?;
+                if let Field::LengthDelimited(ldd) = field {
+                    self.d = ldd
+                        .deserialize_as_variants()
+                        .map(|rv| rv.and_then(|v| v.to_i32()))
+                        .collect::<Result<Vec<_>>>()?;
+                } else {
+                    panic!()
+                }
                 Ok(())
             }
         }
