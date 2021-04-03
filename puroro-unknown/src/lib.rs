@@ -1,5 +1,3 @@
-mod from_field;
-
 use ::itertools::Either;
 use ::puroro::tags;
 use ::puroro::{Deserializable, Mergeable, Message, PuroroError, RepeatedFieldHandler};
@@ -15,11 +13,6 @@ type Result<T> = std::result::Result<T, PuroroError>;
 #[derive(Debug, Clone)]
 pub struct UnknownMessage {
     fields: HashMap<usize, Vec<Field<DelayedLengthDelimitedDeserializer>>>,
-}
-
-pub struct FieldReference<'a>(&'a Field<DelayedLengthDelimitedDeserializer>);
-impl tags::FieldTypeTagHandler for FieldReference {
-    
 }
 
 impl UnknownMessage {

@@ -73,8 +73,7 @@ macro_rules! proto_struct {
             }
         }
         impl ::puroro::Mergeable for $strname {
-            type MergedType = Self;
-            fn merge(&self, latter: &Self) -> ::puroro::Result<Self::MergedType> {
+            fn merge(&self, latter: &Self) -> ::puroro::Result<Self> {
                 Ok(Self(self.0.merge(&latter.0)?))
             }
         }
