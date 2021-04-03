@@ -15,7 +15,7 @@ macro_rules! define_native_field_type_tag {
                 msg: &UnknownMessage,
                 field_number: usize,
             ) -> Result<Self::Output> {
-                msg.$get_method(field_number)
+                msg.$get_method(field_number, <$type as Default>::default())
             }
         }
         impl FieldTypeTag for Vec<$type> {
@@ -32,11 +32,11 @@ macro_rules! define_native_field_type_tag {
         }
     };
 }
-define_native_field_type_tag!(i32, get_field_as_i32, handle_field_as_repeated_i32);
-define_native_field_type_tag!(i64, get_field_as_i64, handle_field_as_repeated_i64);
-define_native_field_type_tag!(u32, get_field_as_u32, handle_field_as_repeated_u32);
-define_native_field_type_tag!(u64, get_field_as_u64, handle_field_as_repeated_u64);
-define_native_field_type_tag!(bool, get_field_as_bool, handle_field_as_repeated_bool);
+define_native_field_type_tag!(i32, get_field_as_i32_or, handle_field_as_repeated_i32);
+define_native_field_type_tag!(i64, get_field_as_i64_or, handle_field_as_repeated_i64);
+define_native_field_type_tag!(u32, get_field_as_u32_or, handle_field_as_repeated_u32);
+define_native_field_type_tag!(u64, get_field_as_u64_or, handle_field_as_repeated_u64);
+define_native_field_type_tag!(bool, get_field_as_bool_or, handle_field_as_repeated_bool);
 impl FieldTypeTag for String {
     type Output = String;
     fn get_from_unknown_message(msg: &UnknownMessage, field_number: usize) -> Result<Self::Output> {
@@ -111,7 +111,7 @@ macro_rules! proto_enum {
             fn get_from_unknown_message(msg: &::puroro_unknown::UnknownMessage, field_number: usize) -> ::puroro::Result<Self::Output> {
                 use ::puroro::Message;
                 use ::num_traits::FromPrimitive;
-                let raw = msg.get_field_as_i32(field_number)?;
+                let raw = msg.get_field_as_i32_or(field_number, <i32 as Default>::default())?;
                 match $enumname::from_i32(raw) {
                     Some(enumified) => Ok(Ok(enumified)),
                     None => Ok(Err(raw)),
