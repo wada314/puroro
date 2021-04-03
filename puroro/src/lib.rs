@@ -8,13 +8,13 @@ pub use error::PuroroError;
 pub type Result<T> = std::result::Result<T, PuroroError>;
 
 pub trait Message {
-    fn get_field_as_i32(&self, field_number: usize) -> Result<i32>;
-    fn get_field_as_i64(&self, field_number: usize) -> Result<i64>;
-    fn get_field_as_si32(&self, field_number: usize) -> Result<i32>;
-    fn get_field_as_si64(&self, field_number: usize) -> Result<i64>;
-    fn get_field_as_u32(&self, field_number: usize) -> Result<u32>;
-    fn get_field_as_u64(&self, field_number: usize) -> Result<u64>;
-    fn get_field_as_bool(&self, field_number: usize) -> Result<bool>;
+    fn get_field_as_i32_or(&self, field_number: usize, default: i32) -> Result<i32>;
+    fn get_field_as_i64_or(&self, field_number: usize, default: i64) -> Result<i64>;
+    fn get_field_as_si32_or(&self, field_number: usize, default: i32) -> Result<i32>;
+    fn get_field_as_si64_or(&self, field_number: usize, default: i64) -> Result<i64>;
+    fn get_field_as_u32_or(&self, field_number: usize, default: u32) -> Result<u32>;
+    fn get_field_as_u64_or(&self, field_number: usize, default: u64) -> Result<u64>;
+    fn get_field_as_bool_or(&self, field_number: usize, default: bool) -> Result<bool>;
     fn handle_field_as_repeated_i32<H: RepeatedFieldHandler<Item = i32>>(
         &self,
         field_number: usize,

@@ -22,27 +22,35 @@ impl UnknownMessage {
         }
     }
 
-    fn get_last_variant_field(&self, field_number: usize) -> Result<Variant> {
-        if let Some(fields) = self.fields.get(&field_number) {
-            if let Some(last_field) = fields.last() {
-                return match last_field {
-                    Field::Variant(ref variant) => Ok(variant.clone()),
+    fn get_last_variant_field(&self, field_number: usize) -> Result<Option<Variant>> {
+        self.fields
+            .get(&field_number)
+            .into_iter()
+            .flatten()
+            .last()
+            .map(|field| {
+                match field {
+                    Field::Variant(variant) => Ok(variant.clone()),
                     Field::LengthDelimited(ref dldd) => dldd
                         .deserialize_as_variants()
                         .last()
-                        .unwrap_or(Ok(Variant::default())),
+                        .unwrap_or(Err(PuroroError::ZeroLengthPackedField)),
                     _ => {
                         // found fixed32 or fixed64 field
                         Err(PuroroError::UnexpectedWireType)
                     }
-                };
-            }
-        }
-        Ok(Variant::default())
+                }
+            })
+            .transpose()
     }
 
-    fn get_variant_field_as<T: VariantType>(&self, field_number: usize) -> Result<T::NativeType> {
-        self.get_last_variant_field(field_number)?.to_native::<T>()
+    fn get_variant_field_as_or<T: VariantType>(
+        &self,
+        field_number: usize,
+        default: T::NativeType,
+    ) -> Result<T::NativeType> {
+        self.get_last_variant_field(field_number)
+            .and_then(|optv| optv.map_or(Ok(default), |variant| variant.to_native::<T>()))
     }
 
     fn get_variant_field_iterator(
@@ -97,12 +105,13 @@ impl MessageHandler for UnknownMessage {
 }
 
 macro_rules! define_variant_methods {
-    ($vtype:ty, $singular_get:ident, $repeated_handle:ident) => {
-        fn $singular_get(
+    ($vtype:ty, $singular_get_or:ident, $repeated_handle:ident) => {
+        fn $singular_get_or(
             &self,
             field_number: usize,
+            default: <$vtype as VariantType>::NativeType,
         ) -> Result<<$vtype as VariantType>::NativeType> {
-            self.get_variant_field_as::<$vtype>(field_number)
+            self.get_variant_field_as_or::<$vtype>(field_number, default)
         }
 
         fn $repeated_handle<H>(&self, field_number: usize, handler: H) -> Result<H::Output>
@@ -115,21 +124,41 @@ macro_rules! define_variant_methods {
 }
 
 impl Message for UnknownMessage {
-    define_variant_methods!(tags::Int32, get_field_as_i32, handle_field_as_repeated_i32);
-    define_variant_methods!(tags::Int64, get_field_as_i64, handle_field_as_repeated_i64);
-    define_variant_methods!(tags::UInt32, get_field_as_u32, handle_field_as_repeated_u32);
-    define_variant_methods!(tags::UInt64, get_field_as_u64, handle_field_as_repeated_u64);
+    define_variant_methods!(
+        tags::Int32,
+        get_field_as_i32_or,
+        handle_field_as_repeated_i32
+    );
+    define_variant_methods!(
+        tags::Int64,
+        get_field_as_i64_or,
+        handle_field_as_repeated_i64
+    );
+    define_variant_methods!(
+        tags::UInt32,
+        get_field_as_u32_or,
+        handle_field_as_repeated_u32
+    );
+    define_variant_methods!(
+        tags::UInt64,
+        get_field_as_u64_or,
+        handle_field_as_repeated_u64
+    );
     define_variant_methods!(
         tags::SInt32,
-        get_field_as_si32,
+        get_field_as_si32_or,
         handle_field_as_repeated_si32
     );
     define_variant_methods!(
         tags::SInt64,
-        get_field_as_si64,
+        get_field_as_si64_or,
         handle_field_as_repeated_si64
     );
-    define_variant_methods!(tags::Bool, get_field_as_bool, handle_field_as_repeated_bool);
+    define_variant_methods!(
+        tags::Bool,
+        get_field_as_bool_or,
+        handle_field_as_repeated_bool
+    );
 
     fn handle_field_as_str<H: RepeatedFieldHandler<Item = char>>(
         &self,
