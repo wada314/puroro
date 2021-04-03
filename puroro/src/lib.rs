@@ -1,3 +1,10 @@
+#![cfg_attr(feature = "nightly-gat", feature(generic_associated_types))]
+#![cfg_attr(
+    feature = "nightly-min-type-alias-impl-trait",
+    feature(min_type_alias_impl_trait)
+)]
+#![cfg_attr(feature = "nightly-specialization", feature(specialization))]
+
 use std::iter::FromIterator;
 use std::marker::PhantomData;
 

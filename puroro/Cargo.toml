@@ -8,3 +8,9 @@ edition = "2018"
 
 [dependencies]
 thiserror = "1.0.24"
+
+[features]
+nightly-specialization = []
+nightly-gat = []
+nightly-min-type-alias-impl-trait = []
+nightly = ["nightly-specialization", "nightly-gat", "nightly-min-type-alias-impl-trait"]
