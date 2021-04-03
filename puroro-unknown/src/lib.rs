@@ -17,6 +17,11 @@ pub struct UnknownMessage {
     fields: HashMap<usize, Vec<Field<DelayedLengthDelimitedDeserializer>>>,
 }
 
+pub struct FieldReference<'a>(&'a Field<DelayedLengthDelimitedDeserializer>);
+impl tags::FieldTypeTagHandler for FieldReference {
+    
+}
+
 impl UnknownMessage {
     fn new() -> Self {
         Self {

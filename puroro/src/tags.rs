@@ -1,22 +1,38 @@
 use std::{iter::FromIterator, marker::PhantomData};
 
-use crate::{Deserializable, Mergeable};
+use crate::{Deserializable, Mergeable, Result};
 
 pub trait FieldTypeTag {
     type SingularRustType;
     type RepeatedRustType: FromIterator<<Self as FieldTypeTag>::SingularRustType>;
+
+    fn handle<H>(handler: H)
+    where
+        H: FieldTypeTagHandler;
+}
+
+pub trait FieldTypeTagHandler {
+    type Int32Args;
+    type StringArgs;
+    type Int32Return;
+    type StringReturn;
+    fn handle_int32(self, args: Self::Int32Args) -> Self::Int32Return;
+    fn handle_string(self, args: Self::StringArgs) -> Self::StringReturn;
 }
 
 pub struct Int32();
+/*
 pub struct UInt32();
 pub struct SInt32();
 pub struct Int64();
 pub struct UInt64();
 pub struct SInt64();
 pub struct Bool();
+*/
 pub struct String<T>(PhantomData<T>)
 where
     T: FromIterator<char>;
+/*
 pub struct Message<T>(PhantomData<T>)
 where
     T: Deserializable + Mergeable;
@@ -24,11 +40,12 @@ pub struct WithRepeatedType<T, R>(PhantomData<(T, R)>)
 where
     T: FieldTypeTag,
     R: FromIterator<T::SingularRustType>;
-
+*/
 impl FieldTypeTag for Int32 {
     type SingularRustType = i32;
     type RepeatedRustType = Vec<i32>;
 }
+/*
 impl FieldTypeTag for Int64 {
     type SingularRustType = i64;
     type RepeatedRustType = Vec<i64>;
@@ -53,6 +70,7 @@ impl FieldTypeTag for Bool {
     type SingularRustType = bool;
     type RepeatedRustType = Vec<bool>;
 }
+*/
 impl<T> FieldTypeTag for String<T>
 where
     T: FromIterator<char>,
@@ -60,6 +78,7 @@ where
     type SingularRustType = T;
     type RepeatedRustType = Vec<T>;
 }
+/*
 impl<T> FieldTypeTag for Message<T>
 where
     T: Deserializable + Mergeable,
@@ -73,7 +92,7 @@ impl<T: FieldTypeTag, R: FromIterator<T::SingularRustType>> FieldTypeTag
     type SingularRustType = <T as FieldTypeTag>::SingularRustType;
     type RepeatedRustType = R;
 }
-
+*/
 pub trait WireTypeTag {}
 pub struct Variant();
 impl WireTypeTag for Variant {}
