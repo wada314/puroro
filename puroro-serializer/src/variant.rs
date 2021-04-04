@@ -2,6 +2,7 @@ use crate::{PuroroError, Result};
 use ::puroro::tags::{Bool, Int32, Int64, SInt32, SInt64, UInt32, UInt64};
 use std::convert::TryFrom;
 use std::io::Result as IoResult;
+use std::io::Write;
 
 #[derive(Debug, Default, Clone)]
 pub struct Variant([u8; 8]);
@@ -45,6 +46,30 @@ impl Variant {
             }
         }
     }
+    pub(crate) fn encode_bytes<W>(&self, write: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        let mut x = u64::from_le_bytes(self.0);
+        if x == 0 {
+            write.write_all(&[0])?;
+            return Ok(());
+        }
+        let mut length = 0;
+        let mut buf: [u8; 10] = Default::default();
+        for i in 0..10 {
+            if x == 0 {
+                length = i;
+                break;
+            }
+            buf[i] = ((x as u8) & 0x7F) | 0x80;
+            x = x >> 7;
+        }
+        buf[length - 1] = buf[length - 1] & 0x7F;
+        write.write_all(buf.split_at(length).0)?;
+        Ok(())
+    }
+
     pub fn to_native<T: VariantType>(&self) -> Result<T::NativeType> {
         T::from_variant(self)
     }

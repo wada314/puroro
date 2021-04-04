@@ -29,9 +29,62 @@ trait MessageSerializer: Drop {
 trait Serializable {
     fn serialize<T: MessageSerializer>(&self, serializer: &mut T) -> Result<()>;
 }
-struct MessageSerializerImpl<T>
+struct MessageSerializerImpl<W>
 where
-    T: std::io::Write,
+    W: std::io::Write,
 {
-    write: T,
+    write: W,
+}
+
+impl<W> MessageSerializerImpl<W>
+where
+    W: std::io::Write,
+{
+    fn new(write: W) -> Self {
+        Self { write }
+    }
+}
+impl<W> Drop for MessageSerializerImpl<W>
+where
+    W: std::io::Write,
+{
+    fn drop(&mut self) {
+        todo!()
+    }
+}
+impl<W> MessageSerializer for MessageSerializerImpl<W>
+where
+    W: std::io::Write,
+{
+    fn serialize_variant<T: VariantType>(
+        &mut self,
+        field_number: usize,
+        value: T::NativeType,
+    ) -> Result<()> {
+        todo!()
+    }
+
+    fn serialize_variants<T: VariantType, I: Iterator<Item = Result<T::NativeType>>>(
+        &mut self,
+        field_number: usize,
+        value: T::NativeType,
+    ) -> Result<()> {
+        todo!()
+    }
+
+    fn serialize_message<T: Serializable>(
+        &mut self,
+        field_number: usize,
+        message: &T,
+    ) -> Result<()> {
+        todo!()
+    }
+
+    fn serialize_messages<'a, T: 'a + Serializable, I: Iterator<Item = Result<&'a T>>>(
+        &mut self,
+        field_number: usize,
+        messages: I,
+    ) -> Result<()> {
+        todo!()
+    }
 }
