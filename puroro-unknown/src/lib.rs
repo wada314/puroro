@@ -165,18 +165,23 @@ impl Message for UnknownMessage {
         field_number: usize,
         handler: H,
     ) -> puroro::Result<H::Output> {
-        self.fields
+        let iter = self
+            .fields
             .get(&field_number)
-            .iter()
-            .map(|x| *x)
+            .into_iter()
             .flatten()
             .last()
             .map(|field| {
                 if let Field::LengthDelimited(ref dldd) = field {
-                    todo!()
+                    Ok(dldd.deserialize_as_chars())
+                } else {
+                    Err(PuroroError::UnexpectedWireType)
                 }
-            });
-        todo!()
+            })
+            .transpose()?
+            .into_iter()
+            .flatten();
+        handler.handle(iter)
     }
 
     fn handle_field_as_repeated_str<
@@ -189,48 +194,6 @@ impl Message for UnknownMessage {
         strings_handler: G,
     ) -> puroro::Result<G::Output> {
         todo!()
-    }
-
-    fn collect_field_as_str<S: std::iter::FromIterator<char>>(
-        &self,
-        field_number: usize,
-    ) -> Result<S> {
-        if let Some(fields) = self.fields.get(&field_number) {
-            if let Some(last_field) = fields.last() {
-                match last_field {
-                    Field::LengthDelimited(ref dldd) => {
-                        return Ok(dldd.deserialize_as_chars().collect::<Result<S>>()?);
-                    }
-                    _ => {
-                        return Err(PuroroError::InvalidWireType);
-                    }
-                }
-            }
-        }
-        Ok(std::iter::empty().collect::<S>())
-    }
-
-    fn collect_field_as_repeated_str<
-        S: std::iter::FromIterator<char>,
-        T: std::iter::FromIterator<S>,
-    >(
-        &self,
-        field_number: usize,
-    ) -> Result<T> {
-        if let Some(fields) = self.fields.get(&field_number) {
-            return fields
-                .iter()
-                .map(|field| match field {
-                    Field::LengthDelimited(ref dldd) => {
-                        return Ok(dldd.deserialize_as_chars().collect::<Result<S>>()?);
-                    }
-                    _ => {
-                        return Err(PuroroError::InvalidWireType);
-                    }
-                })
-                .collect::<Result<T>>();
-        }
-        Ok(std::iter::empty().collect::<T>())
     }
 
     fn get_field_as_message<T>(&self, field_number: usize) -> Result<Option<T>>

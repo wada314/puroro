@@ -1,9 +1,12 @@
-#![cfg_attr(feature = "nightly-gat", feature(generic_associated_types))]
+#![cfg_attr(
+    feature = "nightly-generic-associated-types",
+    feature(generic_associated_types)
+)]
 #![cfg_attr(
     feature = "nightly-min-type-alias-impl-trait",
     feature(min_type_alias_impl_trait)
 )]
-#![cfg_attr(feature = "nightly-specialization", feature(specialization))]
+#![cfg_attr(feature = "nightly-min-specialization", feature(min_specialization))]
 
 use std::iter::FromIterator;
 use std::marker::PhantomData;
@@ -73,11 +76,6 @@ pub trait Message {
         strings_handler: G,
     ) -> Result<G::Output>;
 
-    fn collect_field_as_str<S: FromIterator<char>>(&self, field_number: usize) -> Result<S>;
-    fn collect_field_as_repeated_str<S: FromIterator<char>, T: FromIterator<S>>(
-        &self,
-        field_number: usize,
-    ) -> Result<T>;
     fn get_field_as_message<T>(&self, field_number: usize) -> Result<Option<T>>
     where
         T: Mergeable + Deserializable;
