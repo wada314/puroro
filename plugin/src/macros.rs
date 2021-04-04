@@ -26,7 +26,7 @@ macro_rules! define_native_field_type_tag {
             ) -> Result<Self::Output> {
                 msg.$handle_repeated_method(
                     field_number,
-                    RepeatedFieldCollector::<$type, Vec<$type>>::new(),
+                    &RepeatedFieldCollector::<$type, Vec<$type>>::new(),
                 )
             }
         }
@@ -40,13 +40,17 @@ define_native_field_type_tag!(bool, get_field_as_bool_or, handle_field_as_repeat
 impl FieldTypeTag for String {
     type Output = String;
     fn get_from_unknown_message(msg: &UnknownMessage, field_number: usize) -> Result<Self::Output> {
-        msg.collect_field_as_str(field_number)
+        msg.handle_field_as_str(field_number, &RepeatedFieldCollector::<char, String>::new())
     }
 }
 impl FieldTypeTag for Vec<String> {
     type Output = Vec<String>;
     fn get_from_unknown_message(msg: &UnknownMessage, field_number: usize) -> Result<Self::Output> {
-        msg.collect_field_as_repeated_str(field_number)
+        msg.handle_field_as_repeated_str(
+            field_number,
+            &RepeatedFieldCollector::<char, String>::new(),
+            &RepeatedFieldCollector::<String, Vec<String>>::new(),
+        )
     }
 }
 

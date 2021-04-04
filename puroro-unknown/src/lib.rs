@@ -72,7 +72,7 @@ impl UnknownMessage {
     fn handle_repeated_varient_field<T, H>(
         &self,
         field_number: usize,
-        handler: H,
+        handler: &H,
     ) -> Result<H::Output>
     where
         T: variant::VariantType,
@@ -115,7 +115,7 @@ macro_rules! define_variant_methods {
             self.get_variant_field_as_or::<$vtype>(field_number, default)
         }
 
-        fn $repeated_handle<H>(&self, field_number: usize, handler: H) -> Result<H::Output>
+        fn $repeated_handle<H>(&self, field_number: usize, handler: &H) -> Result<H::Output>
         where
             H: puroro::RepeatedFieldHandler<Item = <$vtype as variant::VariantType>::NativeType>,
         {
@@ -164,7 +164,7 @@ impl Message for UnknownMessage {
     fn handle_field_as_str<H: RepeatedFieldHandler<Item = char>>(
         &self,
         field_number: usize,
-        handler: H,
+        handler: &H,
     ) -> puroro::Result<H::Output> {
         let iter = self
             .fields
@@ -191,10 +191,23 @@ impl Message for UnknownMessage {
     >(
         &self,
         field_number: usize,
-        string_handler: H,
-        strings_handler: G,
+        string_handler: &H,
+        strings_handler: &G,
     ) -> puroro::Result<G::Output> {
-        todo!()
+        let strings_iter = self
+            .fields
+            .get(&field_number)
+            .into_iter()
+            .flatten()
+            .map(|field| {
+                if let Field::LengthDelimited(dldd) = field {
+                    let chars_iter = dldd.deserialize_as_chars();
+                    string_handler.handle(chars_iter)
+                } else {
+                    Err(PuroroError::UnexpectedWireType)
+                }
+            });
+        strings_handler.handle(strings_iter)
     }
 
     fn get_field_as_message<T>(&self, field_number: usize) -> Result<Option<T>>

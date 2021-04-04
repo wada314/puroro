@@ -28,43 +28,43 @@ pub trait Message {
     fn handle_field_as_repeated_i32<H: RepeatedFieldHandler<Item = i32>>(
         &self,
         field_number: usize,
-        handler: H,
+        handler: &H,
     ) -> Result<H::Output>;
     fn handle_field_as_repeated_i64<H: RepeatedFieldHandler<Item = i64>>(
         &self,
         field_number: usize,
-        handler: H,
+        handler: &H,
     ) -> Result<H::Output>;
     fn handle_field_as_repeated_u32<H: RepeatedFieldHandler<Item = u32>>(
         &self,
         field_number: usize,
-        handler: H,
+        handler: &H,
     ) -> Result<H::Output>;
     fn handle_field_as_repeated_u64<H: RepeatedFieldHandler<Item = u64>>(
         &self,
         field_number: usize,
-        handler: H,
+        handler: &H,
     ) -> Result<H::Output>;
     fn handle_field_as_repeated_si32<H: RepeatedFieldHandler<Item = i32>>(
         &self,
         field_number: usize,
-        handler: H,
+        handler: &H,
     ) -> Result<H::Output>;
     fn handle_field_as_repeated_si64<H: RepeatedFieldHandler<Item = i64>>(
         &self,
         field_number: usize,
-        handler: H,
+        handler: &H,
     ) -> Result<H::Output>;
     fn handle_field_as_repeated_bool<H: RepeatedFieldHandler<Item = bool>>(
         &self,
         field_number: usize,
-        handler: H,
+        handler: &H,
     ) -> Result<H::Output>;
 
     fn handle_field_as_str<H: RepeatedFieldHandler<Item = char>>(
         &self,
         field_number: usize,
-        handler: H,
+        handler: &H,
     ) -> Result<H::Output>;
     fn handle_field_as_repeated_str<
         H: RepeatedFieldHandler<Item = char>,
@@ -72,8 +72,8 @@ pub trait Message {
     >(
         &self,
         field_number: usize,
-        string_handler: H,
-        strings_handler: G,
+        string_handler: &H,
+        strings_handler: &G,
     ) -> Result<G::Output>;
 
     fn get_field_as_message<T>(&self, field_number: usize) -> Result<Option<T>>
@@ -95,7 +95,7 @@ pub trait Mergeable: Sized {
 pub trait RepeatedFieldHandler {
     type Item;
     type Output;
-    fn handle<I: Iterator<Item = Result<Self::Item>>>(self, iter: I) -> Result<Self::Output>;
+    fn handle<I: Iterator<Item = Result<Self::Item>>>(&self, iter: I) -> Result<Self::Output>;
 }
 
 pub struct RepeatedFieldCollector<T, U>(PhantomData<(T, U)>)
@@ -117,7 +117,7 @@ where
     type Item = T;
     type Output = U;
 
-    fn handle<I: Iterator<Item = Result<Self::Item>>>(self, iter: I) -> Result<Self::Output> {
+    fn handle<I: Iterator<Item = Result<Self::Item>>>(&self, iter: I) -> Result<Self::Output> {
         iter.collect::<Result<U>>()
     }
 }
