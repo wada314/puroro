@@ -5,7 +5,8 @@ use ::puroro_serializer::deserializer::stream::{
     DelayedLengthDelimitedDeserializer, Deserializer, Field, LengthDelimitedDeserializer,
     MessageHandler,
 };
-use ::puroro_serializer::variant::{Variant, VariantType};
+use ::puroro_serializer::variant;
+use ::puroro_serializer::variant::Variant;
 use std::collections::HashMap;
 
 type Result<T> = std::result::Result<T, PuroroError>;
@@ -44,7 +45,7 @@ impl UnknownMessage {
             .transpose()
     }
 
-    fn get_variant_field_as_or<T: VariantType>(
+    fn get_variant_field_as_or<T: variant::VariantType>(
         &self,
         field_number: usize,
         default: T::NativeType,
@@ -74,7 +75,7 @@ impl UnknownMessage {
         handler: H,
     ) -> Result<H::Output>
     where
-        T: VariantType,
+        T: variant::VariantType,
         H: RepeatedFieldHandler<Item = T::NativeType>,
     {
         let iter = self
@@ -109,14 +110,14 @@ macro_rules! define_variant_methods {
         fn $singular_get_or(
             &self,
             field_number: usize,
-            default: <$vtype as VariantType>::NativeType,
-        ) -> Result<<$vtype as VariantType>::NativeType> {
+            default: <$vtype as variant::VariantType>::NativeType,
+        ) -> Result<<$vtype as variant::VariantType>::NativeType> {
             self.get_variant_field_as_or::<$vtype>(field_number, default)
         }
 
         fn $repeated_handle<H>(&self, field_number: usize, handler: H) -> Result<H::Output>
         where
-            H: puroro::RepeatedFieldHandler<Item = <$vtype as VariantType>::NativeType>,
+            H: puroro::RepeatedFieldHandler<Item = <$vtype as variant::VariantType>::NativeType>,
         {
             self.handle_repeated_varient_field::<$vtype, H>(field_number, handler)
         }
