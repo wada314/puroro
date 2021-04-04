@@ -2,7 +2,7 @@ use std::io::{Bytes, Read, Result as IoResult};
 
 use super::impls;
 use super::iters::{BytesIterator, CharsIterator, VariantsIterator};
-use super::{LengthDelimitedDeserializer, MessageHandler};
+use super::{LengthDelimitedDeserializer, MessageDeserializeEventHandler};
 use crate::Result;
 
 #[derive(Debug, Clone)]
@@ -25,10 +25,10 @@ impl<'a> IntoIterator for &'a DelayedLengthDelimitedDeserializer {
     }
 }
 impl<'a> LengthDelimitedDeserializer for &'a DelayedLengthDelimitedDeserializer {
-    fn deserialize_as_message<H: MessageHandler>(
+    fn deserialize_as_message<H: MessageDeserializeEventHandler>(
         self,
         handler: H,
-    ) -> Result<<H as MessageHandler>::Target> {
+    ) -> Result<<H as MessageDeserializeEventHandler>::Target> {
         let mut iter = impls::IndexedIterator::new(self.contents.bytes());
         let deser =
             impls::LengthDelimitedDeserializerImpl::new(&mut iter, Some(self.contents.len()));

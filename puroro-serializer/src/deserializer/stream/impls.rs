@@ -24,7 +24,7 @@ impl<I> Deserializer for DeserializerImpl<I>
 where
     I: Iterator<Item = IoResult<u8>>,
 {
-    fn deserialize<H: MessageHandler>(mut self, handler: H) -> Result<H::Target> {
+    fn deserialize<H: MessageDeserializeEventHandler>(mut self, handler: H) -> Result<H::Target> {
         LengthDelimitedDeserializerImpl::new(&mut self.indexed_iter, None)
             .deserialize_as_message(handler)
     }
@@ -118,7 +118,7 @@ impl<'a, I> LengthDelimitedDeserializer for LengthDelimitedDeserializerImpl<'a, 
 where
     I: Iterator<Item = IoResult<u8>>,
 {
-    fn deserialize_as_message<H: MessageHandler>(mut self, mut handler: H) -> Result<H::Target> {
+    fn deserialize_as_message<H: MessageDeserializeEventHandler>(mut self, mut handler: H) -> Result<H::Target> {
         let start_pos = self.indexed_iter.index();
         loop {
             // Check message length if possible
@@ -241,7 +241,7 @@ mod tests {
         struct Test1 {
             a: i32,
         }
-        impl MessageHandler for Test1 {
+        impl MessageDeserializeEventHandler for Test1 {
             type Target = Self;
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
@@ -280,7 +280,7 @@ mod tests {
         struct Test2 {
             b: String,
         }
-        impl MessageHandler for Test2 {
+        impl MessageDeserializeEventHandler for Test2 {
             type Target = Self;
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
@@ -328,7 +328,7 @@ mod tests {
             c: Test1,
         }
 
-        impl MessageHandler for Test1 {
+        impl MessageDeserializeEventHandler for Test1 {
             type Target = Self;
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
@@ -347,7 +347,7 @@ mod tests {
                 Ok(())
             }
         }
-        impl MessageHandler for Test3 {
+        impl MessageDeserializeEventHandler for Test3 {
             type Target = Self;
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)
@@ -386,7 +386,7 @@ mod tests {
         struct Test4 {
             d: Vec<i32>,
         }
-        impl MessageHandler for Test4 {
+        impl MessageDeserializeEventHandler for Test4 {
             type Target = Self;
             fn finish(self) -> Result<Self::Target> {
                 Ok(self)

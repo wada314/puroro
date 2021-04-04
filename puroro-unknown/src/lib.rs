@@ -3,7 +3,7 @@ use ::puroro::tags;
 use ::puroro::{Deserializable, Mergeable, Message, PuroroError, RepeatedFieldHandler};
 use ::puroro_serializer::deserializer::stream::{
     DelayedLengthDelimitedDeserializer, Deserializer, Field, LengthDelimitedDeserializer,
-    MessageHandler,
+    MessageDeserializeEventHandler,
 };
 use ::puroro_serializer::variant;
 use ::puroro_serializer::variant::Variant;
@@ -85,7 +85,7 @@ impl UnknownMessage {
     }
 }
 
-impl MessageHandler for UnknownMessage {
+impl MessageDeserializeEventHandler for UnknownMessage {
     type Target = Self;
 
     fn finish(self) -> Result<Self::Target> {

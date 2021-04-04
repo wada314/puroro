@@ -12,7 +12,7 @@ pub use ::puroro::{RepeatedFieldCollector, RepeatedFieldHandler};
 pub use delayed::DelayedLengthDelimitedDeserializer;
 
 pub trait Deserializer {
-    fn deserialize<H: MessageHandler>(self, handler: H) -> Result<H::Target>;
+    fn deserialize<H: MessageDeserializeEventHandler>(self, handler: H) -> Result<H::Target>;
 }
 pub fn deserializer_from_read<R: Read>(read: R) -> impl Deserializer {
     impls::DeserializerImpl::<std::io::Bytes<R>>::new(read.bytes())
@@ -24,10 +24,10 @@ pub fn deserializer_from_bytes<I: Iterator<Item = std::io::Result<u8>>>(
 }
 
 pub trait LengthDelimitedDeserializer: Sized + IntoIterator<Item = IoResult<u8>> {
-    fn deserialize_as_message<H: MessageHandler>(
+    fn deserialize_as_message<H: MessageDeserializeEventHandler>(
         self,
         handler: H,
-    ) -> Result<<H as MessageHandler>::Target>;
+    ) -> Result<<H as MessageDeserializeEventHandler>::Target>;
 
     type BytesIterator: Iterator<Item = Result<u8>>;
     fn deserialize_as_bytes(self) -> Self::BytesIterator;
@@ -50,7 +50,7 @@ pub enum Field<T> {
     Bytes64([u8; 8]),
 }
 
-pub trait MessageHandler {
+pub trait MessageDeserializeEventHandler {
     type Target;
     fn finish(self) -> Result<Self::Target>;
 
