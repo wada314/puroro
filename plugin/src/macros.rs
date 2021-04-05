@@ -55,48 +55,48 @@ impl FieldTypeTag for Vec<String> {
 }
 
 macro_rules! proto_struct {
-    ($(struct $strname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* })*) => {$(
+    ($(struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* })*) => {mod read{$(
         #[allow(non_camel_case_types)]
         #[derive(Debug)]
-        pub(crate) struct $strname(::puroro_unknown::UnknownMessage);
+        pub(crate) struct $structname(::puroro_unknown::UnknownMessage);
         #[allow(dead_code)]
-        impl $strname {
+        impl $structname {
             $(
                 fn $fname(&self) -> ::puroro::Result<<$ftype as $crate::macros::FieldTypeTag>::Output> {
                     <$ftype as $crate::macros::FieldTypeTag>::get_from_unknown_message(&self.0, $fid)
                 }
             )*
         }
-        impl std::ops::Deref for $strname {
+        impl std::ops::Deref for $structname {
             type Target = ::puroro_unknown::UnknownMessage;
             fn deref(&self) -> &Self::Target { &self.0 }
         }
-        impl ::puroro::Deserializable for $strname {
+        impl ::puroro::Deserializable for $structname {
             fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
                 Ok(Self(::puroro_unknown::UnknownMessage::from_bytes(iter)?))
             }
         }
-        impl ::puroro::Mergeable for $strname {
+        impl ::puroro::Mergeable for $structname {
             fn merge(&self, latter: &Self) -> ::puroro::Result<Self> {
                 Ok(Self(self.0.merge(&latter.0)?))
             }
         }
-        impl $crate::macros::FieldTypeTag for Option<$strname> {
-            type Output = Option<$strname>;
+        impl $crate::macros::FieldTypeTag for Option<$structname> {
+            type Output = Option<$structname>;
             fn get_from_unknown_message(msg: &::puroro_unknown::UnknownMessage, field_number: usize) -> ::puroro::Result<Self::Output> {
                 use ::puroro::Message;
-                msg.get_field_as_message::<$strname>(field_number)
+                msg.get_field_as_message::<$structname>(field_number)
             }
         }
-        impl $crate::macros::FieldTypeTag for Vec<$strname> {
-            type Output = Vec<$strname>;
+        impl $crate::macros::FieldTypeTag for Vec<$structname> {
+            type Output = Vec<$structname>;
             fn get_from_unknown_message(msg: &::puroro_unknown::UnknownMessage, field_number: usize) -> ::puroro::Result<Self::Output> {
                 use ::puroro::Message;
-                msg.collect_field_as_repeated_message::<$strname, Vec<$strname>>(
+                msg.collect_field_as_repeated_message::<$structname, Vec<$structname>>(
                     field_number)
             }
         }
-    )*};
+    )*}};
 }
 
 macro_rules! proto_enum {
