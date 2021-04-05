@@ -1,6 +1,5 @@
-// From plugin.proto
-
 proto_struct! {
+    // From plugin.proto
     struct Version {
         major: i32 = 1,
         minor: i32 = 2,
@@ -24,16 +23,12 @@ proto_struct! {
         content: String = 15,
         generated_code_info: Option<GeneratedCodeInfo> = 16,
     }
-}
-proto_enum! {
     enum Feature {
         FEATURE_NONE = 0,
         FEATURE_PROTO3_OPTIONAL = 1,
     }
-}
 
-// descriptor.proto
-proto_struct! {
+    // From descriptor.proto
     struct FileDescriptorProto {
         name: String = 1,
         package: String = 2,
@@ -150,8 +145,7 @@ proto_struct! {
         begin: i32 = 3,
         end: i32 = 4,
     }
-}
-proto_enum! {
+
     enum FieldDescriptorProto_Type {
         TYPE_DOUBLE = 1,
         TYPE_FLOAT = 2,

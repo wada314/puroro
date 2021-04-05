@@ -55,14 +55,17 @@ impl FieldTypeTag for Vec<String> {
 }
 
 macro_rules! proto_struct {
-    ($(struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* })*) => {$(
+    () => {};
+    (@read) => {};
+
+    (@read struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* } $($rest:tt)*) => {
         #[allow(non_camel_case_types)]
         #[derive(Debug)]
         pub(crate) struct $structname(::puroro_unknown::UnknownMessage);
         #[allow(dead_code)]
         impl $structname {
             $(
-                fn $fname(&self) -> ::puroro::Result<<$ftype as $crate::macros::FieldTypeTag>::Output> {
+                pub(crate) fn $fname(&self) -> ::puroro::Result<<$ftype as $crate::macros::FieldTypeTag>::Output> {
                     <$ftype as $crate::macros::FieldTypeTag>::get_from_unknown_message(&self.0, $fid)
                 }
             )*
@@ -96,15 +99,15 @@ macro_rules! proto_struct {
                     field_number)
             }
         }
-    )*};
-}
 
-macro_rules! proto_enum {
-    ($(enum $enumname:ident { $($ename:ident = $evalue:expr ,)* })*) => {$(
+        proto_struct!{@read $($rest)*}
+    };
+
+    (@read enum $enumname:ident { $($ename:ident = $evalue:expr ,)* } $($rest:tt)* ) => {
         #[allow(non_camel_case_types)]
         #[derive(::num_derive::FromPrimitive)]
         #[derive(Debug)]
-        enum $enumname {
+        pub(crate) enum $enumname {
             $(
                 #[allow(non_camel_case_types)]
                 $ename = $evalue
@@ -122,7 +125,15 @@ macro_rules! proto_enum {
                 }
             }
         }
-    )*};
+
+        proto_struct! { @read $($rest)* }
+    };
+
+    ($($tts:tt)+) => {
+        pub(crate) mod read {
+            proto_struct!{@read $($tts)*}
+        }
+    };
 }
 
 #[cfg(test)]
@@ -142,6 +153,7 @@ mod tests {
                 a: i32 = 1,
             }
         }
+        use read::Test1;
         let t1 = Test1::from_bytes(input.bytes()).unwrap();
         assert_eq!(150, t1.a().unwrap());
     }
@@ -159,6 +171,7 @@ mod tests {
                 b: String = 2,
             }
         }
+        use read::Test2;
         let t2 = Test2::from_bytes(input.bytes()).unwrap();
         assert_eq!("testing", t2.b().unwrap());
     }
@@ -182,6 +195,7 @@ mod tests {
                 c: Option<Test1> = 3,
             }
         }
+        use read::Test3;
         let t3 = Test3::from_bytes(input.bytes()).unwrap();
         let t1 = t3.c().unwrap().unwrap();
         assert_eq!(150, t1.a().unwrap());
@@ -200,6 +214,7 @@ mod tests {
                 d: Vec<i32> = 4,
             }
         }
+        use read::Test4;
         let t4 = Test4::from_bytes(input.bytes()).unwrap();
         assert_eq!(vec![3, 270, 86942], t4.d().unwrap());
     }
