@@ -3,7 +3,7 @@ use crate::{
     types::WireType,
     variant::{RustUsize, VariantType},
 };
-use std::io::Write;
+use std::io::{Result as IoResult, Write};
 
 trait MessageSerializer {
     #[must_use]
@@ -31,6 +31,17 @@ trait MessageSerializer {
     where
         T: 'a + Serializable,
         I: Iterator<Item = Result<&'a T>>;
+
+    #[must_use]
+    fn direct_write_field<I>(
+        &mut self,
+        field_number: usize,
+        wire_type: WireType,
+        length: usize,
+        input: I,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = IoResult<u8>>;
 }
 
 trait Serializable {
@@ -144,6 +155,24 @@ where
             message.serialize(self)?;
         }
 
+        Ok(())
+    }
+
+    fn direct_write_field<I>(
+        &mut self,
+        field_number: usize,
+        wire_type: WireType,
+        length: usize,
+        input: I,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = IoResult<u8>>,
+    {
+        self.write_field_number_and_wire_type(field_number, wire_type)?;
+        RustUsize::to_variant(length)?.encode_bytes(&mut self.write)?;
+        for rbyte in input {
+            self.write.write_all(std::slice::from_ref(&rbyte?))?;
+        }
         Ok(())
     }
 }
