@@ -1,32 +1,36 @@
+use crate::Result;
 use crate::{
     types::WireType,
-    variant::{Variant, VariantType},
+    variant::{RustUsize, VariantType},
 };
-use crate::{PuroroError, Result};
 use std::io::Write;
 
-trait MessageSerializer: Drop {
+trait MessageSerializer {
+    #[must_use]
     fn serialize_variant<T: VariantType>(
         &mut self,
         field_number: usize,
         value: T::NativeType,
     ) -> Result<()>;
-    fn serialize_variants<T: VariantType, I: Iterator<Item = Result<T::NativeType>>>(
-        &mut self,
-        field_number: usize,
-        iter: I,
-    ) -> Result<()>;
 
-    fn serialize_message<T: Serializable>(
+    #[must_use]
+    fn serialize_variants_twice<T, I>(&mut self, field_number: usize, iter: I) -> Result<()>
+    where
+        T: VariantType,
+        I: Clone + Iterator<Item = Result<T::NativeType>>;
+
+    #[must_use]
+    fn serialize_message_twice<T: Serializable>(
         &mut self,
         field_number: usize,
         message: &T,
     ) -> Result<()>;
-    fn serialize_messages<'a, T: 'a + Serializable, I: Iterator<Item = Result<&'a T>>>(
-        &mut self,
-        field_number: usize,
-        iter: I,
-    ) -> Result<()>;
+
+    #[must_use]
+    fn serialize_messages_twice<'a, T, I>(&mut self, field_number: usize, iter: I) -> Result<()>
+    where
+        T: 'a + Serializable,
+        I: Iterator<Item = Result<&'a T>>;
 }
 
 trait Serializable {
@@ -46,6 +50,10 @@ where
     fn new(write: W) -> Self {
         Self { write }
     }
+    fn get_write(&self) -> &W {
+        &self.write
+    }
+    #[must_use]
     fn write_field_number_and_wire_type(
         &mut self,
         field_number: usize,
@@ -80,30 +88,67 @@ where
         Ok(())
     }
 
-    fn serialize_variants<T: VariantType, I: Iterator<Item = Result<T::NativeType>>>(
-        &mut self,
-        field_number: usize,
-        iter: I,
-    ) -> Result<()> {
-        todo!()
+    fn serialize_variants_twice<T, I>(&mut self, field_number: usize, iter: I) -> Result<()>
+    where
+        T: VariantType,
+        I: Clone + Iterator<Item = Result<T::NativeType>>,
+    {
+        let iter2 = iter.clone();
+
+        // Count the bytes length using a fake `Write`
+        let mut length_counter = CounterWrite::new();
+        for rvalue in iter {
+            let variant = T::to_variant(rvalue?)?;
+            variant.encode_bytes(&mut length_counter)?;
+        }
+
+        self.write_field_number_and_wire_type(field_number, WireType::LengthDelimited)?;
+        RustUsize::to_variant(length_counter.count())?.encode_bytes(&mut self.write)?;
+        // Real write.
+        for rvalue in iter2 {
+            let variant = T::to_variant(rvalue?)?;
+            variant.encode_bytes(&mut self.write)?;
+        }
+
+        Ok(())
     }
 
-    fn serialize_message<T: Serializable>(
+    fn serialize_message_twice<T: Serializable>(
         &mut self,
         field_number: usize,
         message: &T,
     ) -> Result<()> {
-        todo!()
+        let mut length_counting_serializer = MessageSerializerImpl::new(CounterWrite::new());
+        message.serialize(&mut length_counting_serializer)?;
+
+        self.write_field_number_and_wire_type(field_number, WireType::LengthDelimited)?;
+        let length = length_counting_serializer.get_write().count();
+        RustUsize::to_variant(length)?.encode_bytes(&mut self.write)?;
+        message.serialize(self)?;
+
+        Ok(())
     }
 
-    fn serialize_messages<'a, T: 'a + Serializable, I: Iterator<Item = Result<&'a T>>>(
-        &mut self,
-        field_number: usize,
-        iter: I,
-    ) -> Result<()> {
-        todo!()
+    fn serialize_messages_twice<'a, T, I>(&mut self, field_number: usize, iter: I) -> Result<()>
+    where
+        T: 'a + Serializable,
+        I: Iterator<Item = Result<&'a T>>,
+    {
+        for rmessage in iter {
+            let mut length_counting_serializer = MessageSerializerImpl::new(CounterWrite::new());
+            let message = rmessage?;
+            message.serialize(&mut length_counting_serializer)?;
+            self.write_field_number_and_wire_type(field_number, WireType::LengthDelimited)?;
+            let length = length_counting_serializer.get_write().count();
+            RustUsize::to_variant(length)?.encode_bytes(&mut self.write)?;
+            message.serialize(self)?;
+        }
+
+        Ok(())
     }
 }
+
+// A fake implementation which is only for measuring the length of the serialized bytes.
 
 struct CounterWrite(usize);
 impl CounterWrite {
