@@ -1,8 +1,5 @@
-use super::{impls::LengthDelimitedDeserializerImpl, Field, LengthDelimitedDeserializer};
-use crate::types::WireType;
 use crate::variant::Variant;
-use crate::{PuroroError, Result};
-use ::num_traits::FromPrimitive;
+use crate::Result;
 use std::io::Result as IoResult;
 
 /// Converts `Result<u8, std::io::IoError>` into `Result<u8, PuroroError>`.
