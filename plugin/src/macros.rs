@@ -55,7 +55,7 @@ impl FieldTypeTag for Vec<String> {
 }
 
 macro_rules! proto_struct {
-    ($(struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* })*) => {mod read{$(
+    ($(struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* })*) => {$(
         #[allow(non_camel_case_types)]
         #[derive(Debug)]
         pub(crate) struct $structname(::puroro_unknown::UnknownMessage);
@@ -96,7 +96,7 @@ macro_rules! proto_struct {
                     field_number)
             }
         }
-    )*}};
+    )*};
 }
 
 macro_rules! proto_enum {
