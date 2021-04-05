@@ -57,6 +57,16 @@ impl FieldTypeTag for Vec<String> {
 macro_rules! proto_struct {
     () => {};
     (@read) => {};
+    (@write) => {};
+
+    (mod read_module = $readmodname:ident; mod write_module = $writemodname:ident; $($tts:tt)+) => {
+        pub(crate) mod $readmodname {
+            proto_struct!{@read $($tts)*}
+        }
+        pub(crate) mod $writemodname {
+            proto_struct!{@write $($tts)*}
+        }
+    };
 
     (@read struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* } $($rest:tt)*) => {
         #[allow(non_camel_case_types)]
@@ -129,10 +139,12 @@ macro_rules! proto_struct {
         proto_struct! { @read $($rest)* }
     };
 
-    ($($tts:tt)+) => {
-        pub(crate) mod read {
-            proto_struct!{@read $($tts)*}
-        }
+    (@write struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* } $($rest:tt)*) => {
+        proto_struct!{@write $($rest)*}
+    };
+
+    (@write enum $enumname:ident { $($ename:ident = $evalue:expr ,)* } $($rest:tt)* ) => {
+        proto_struct! { @write $($rest)* }
     };
 }
 
@@ -149,6 +161,8 @@ mod tests {
         // a = 150
         let input: &[u8] = &[0x08, 0x96, 0x01];
         proto_struct! {
+            mod read_module = read;
+            mod write_module = write;
             struct Test1 {
                 a: i32 = 1,
             }
@@ -167,6 +181,8 @@ mod tests {
         // b = "testing"
         let input: &[u8] = &[0x12, 0x07, 0x74, 0x65, 0x73, 0x74, 0x69, 0x6e, 0x67];
         proto_struct! {
+            mod read_module = read;
+            mod write_module = write;
             struct Test2 {
                 b: String = 2,
             }
@@ -188,6 +204,8 @@ mod tests {
         // a = 150
         let input: &[u8] = &[0x1a, 0x03, 0x08, 0x96, 0x01];
         proto_struct! {
+            mod read_module = read;
+            mod write_module = write;
             struct Test1 {
                 a: i32 = 1,
             }
@@ -210,6 +228,8 @@ mod tests {
         // d = [3, 270, 86942]
         let input: &[u8] = &[0x22, 0x06, 0x03, 0x8E, 0x02, 0x9E, 0xA7, 0x05];
         proto_struct! {
+            mod read_module = read;
+            mod write_module = write;
             struct Test4 {
                 d: Vec<i32> = 4,
             }

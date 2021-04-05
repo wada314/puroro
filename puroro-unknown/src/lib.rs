@@ -45,7 +45,7 @@ impl UnknownMessage {
             .transpose()
     }
 
-    fn get_variant_field_as_or<T: variant::VariantType>(
+    pub fn get_variant_field_as_or<T: variant::VariantType>(
         &self,
         field_number: usize,
         default: T::NativeType,
@@ -54,7 +54,7 @@ impl UnknownMessage {
             .and_then(|optv| optv.map_or(Ok(default), |variant| variant.to_native::<T>()))
     }
 
-    fn get_variant_field_iterator(
+    pub fn get_variant_field_iterator(
         &self,
         field_number: usize,
     ) -> impl Iterator<Item = Result<Variant>> + '_ {
