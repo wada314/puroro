@@ -1,7 +1,8 @@
 #[macro_use]
 mod macros;
+mod generators;
 mod plugin;
-mod traits_generator;
+mod utils;
 use ::puroro::{Deserializable, Serializable};
 use ::puroro::{PuroroError, Result};
 
@@ -15,7 +16,7 @@ fn main() -> Result<()> {
     let mut cgres = CodeGeneratorResponse::default();
     let mut file = CodeGeneratorResponse_File::default();
     file.name = "test.rs".to_string();
-    file.content = traits_generator::generate_traits(&cgreq).unwrap();
+    file.content = "".into();
     cgres.file.push(file);
     cgres.serialize(&mut stdout())?;
     Ok(())
