@@ -1,5 +1,8 @@
-pub trait VariantTypeTag {}
-pub trait FieldTypeTag: VariantTypeTag {}
+use std::marker::PhantomData;
+
+pub trait VariantTypeTag: FieldTypeTag {}
+pub trait FieldTypeTag {}
+pub trait SingularFieldTypeTag: FieldTypeTag {}
 
 pub struct Int32();
 pub struct UInt32();
@@ -8,6 +11,9 @@ pub struct Int64();
 pub struct UInt64();
 pub struct SInt64();
 pub struct Bool();
+pub struct String();
+pub struct Message<T>(PhantomData<T>);
+pub struct Repeated<T: SingularFieldTypeTag>(PhantomData<T>);
 
 impl VariantTypeTag for Int32 {}
 impl VariantTypeTag for Int64 {}
@@ -18,13 +24,15 @@ impl VariantTypeTag for SInt64 {}
 impl VariantTypeTag for Bool {}
 
 impl FieldTypeTag for Int32 {}
-
 impl FieldTypeTag for Int64 {}
 impl FieldTypeTag for UInt32 {}
 impl FieldTypeTag for UInt64 {}
 impl FieldTypeTag for SInt32 {}
 impl FieldTypeTag for SInt64 {}
 impl FieldTypeTag for Bool {}
+impl FieldTypeTag for String {}
+impl<T> FieldTypeTag for Message<T> {}
+impl<T: SingularFieldTypeTag> FieldTypeTag for Repeated<T> {}
 
 pub trait WireTypeTag {}
 pub struct Variant();
