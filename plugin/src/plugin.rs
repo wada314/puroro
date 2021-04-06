@@ -86,7 +86,7 @@ proto_struct! {
     }
     struct EnumDescriptorProto {
         name: String = 1,
-        value: Vec<EnumDescriptorProto> = 2,
+        value: Vec<EnumValueDescriptorProto> = 2,
         options: Option<EnumOptions> = 3,
     }
     struct EnumDescriptorProto_EnumReservedRange {

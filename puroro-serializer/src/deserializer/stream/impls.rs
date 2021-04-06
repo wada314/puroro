@@ -207,11 +207,16 @@ where
     }
 
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer> {
-        Ok(DelayedLengthDelimitedDeserializer::new(
-            self.indexed_iter
-                .collect::<IoResult<Vec<_>>>()
-                .map_err(|e| PuroroError::from(e))?,
-        ))
+        if let Some(length) = self.bytes_len {
+            Ok(DelayedLengthDelimitedDeserializer::new(
+                self.indexed_iter
+                    .take(length)
+                    .collect::<IoResult<Vec<_>>>()
+                    .map_err(|e| PuroroError::from(e))?,
+            ))
+        } else {
+            panic!("This case must have the length")
+        }
     }
 }
 

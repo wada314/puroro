@@ -203,7 +203,13 @@ macro_rules! proto_struct {
                     $($fid => {
                         self.$fname.merge_from_field(field)?;
                     })*
-                    _ => { /* ignore! lol */ }
+                    _ => {
+                        /* ignore! lol */
+                        if let ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) = field {
+                            // Eat the input iterator anyway
+                            ldd.leave_as_unknown()?;
+                        }
+                    }
                 };
                 Ok(())
             }
