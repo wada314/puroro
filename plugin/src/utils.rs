@@ -64,7 +64,10 @@ impl<'a> FullyQualifiedTypeName<'a> {
     pub(crate) fn new(package: Vec<&'a str>, name: &'a str) -> Self {
         Self { package, name }
     }
-    pub(crate) fn move_up(&mut self) -> bool {
+    pub(crate) fn push(&mut self, name: &'a str) {
+        self.package.push(name);
+    }
+    pub(crate) fn pop(&mut self) -> bool {
         self.package.pop().is_some()
     }
     pub(crate) fn to_typename_from_root(&self) -> String {
@@ -155,4 +158,8 @@ pub(crate) fn to_type_name(input: &str) -> String {
 
 pub(crate) fn to_var_name(input: &str) -> String {
     get_keyword_safe_ident(&camel_case_to_snake_case(input))
+}
+
+pub(crate) fn to_enum_value_name(input: &str) -> String {
+    get_keyword_safe_ident(&snake_case_to_camel_case(input))
 }

@@ -13,8 +13,6 @@ enum TypeOfIdent {
 struct Context<'a, 'b, W: Write> {
     write: Indentor<'a, W>,
     type_of_idents: HashMap<FullyQualifiedTypeName<'b>, TypeOfIdent>,
-
-    path_to_package_root: Option<String>,
     package: Vec<&'b str>,
 }
 impl<'a, 'b, W: Write> Context<'a, 'b, W> {
@@ -22,7 +20,6 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
         Self {
             write: Indentor::new(write),
             type_of_idents: HashMap::new(),
-            path_to_package_root: None,
             package: Vec::new(),
         }
     }
@@ -34,6 +31,15 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
         self.write.unindent()
     }
 
+    fn path_to_package_root(&self) -> Option<String> {
+        if self.package.is_empty() {
+            None
+        } else {
+            let supers = std::iter::repeat("super").take(self.package.len());
+            Some(Itertools::intersperse(supers, "::").collect::<String>())
+        }
+    }
+
     fn search_for_idents_type(&self, typename: &str) -> Option<TypeOfIdent> {
         if let Some(fqtn) = FullyQualifiedTypeName::from_typename(typename) {
             return self.type_of_idents.get(&fqtn).cloned();
@@ -43,7 +49,7 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
                 if let Some(found) = self.type_of_idents.get(&fqtn) {
                     return Some(found.clone());
                 }
-                if !fqtn.move_up() {
+                if !fqtn.pop() {
                     break;
                 }
             }
@@ -77,7 +83,7 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
             Ok(FieldDescriptorProto_Type::TYPE_MESSAGE)
             | Ok(FieldDescriptorProto_Type::TYPE_ENUM) => {
                 FullyQualifiedTypeName::from_typename(&field.type_name)
-                    .map(|fqtn| fqtn.to_qualified_typename(&self.path_to_package_root))
+                    .map(|fqtn| fqtn.to_qualified_typename(&self.path_to_package_root()))
                     .unwrap_or_else(|| field.type_name.clone())
             }
 
@@ -87,7 +93,7 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
                     return Err(PuroroError::UnexpectedFieldType);
                 } else {
                     FullyQualifiedTypeName::from_typename(&field.type_name)
-                        .map(|fqtn| fqtn.to_qualified_typename(&self.path_to_package_root))
+                        .map(|fqtn| fqtn.to_qualified_typename(&self.path_to_package_root()))
                         .unwrap_or_else(|| field.type_name.clone())
                 }
             }
@@ -142,6 +148,29 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
             FullyQualifiedTypeName::new(self.package.clone(), &message.name),
             TypeOfIdent::Message,
         );
+        // Check sub-messages and sub-enums first
+        if !message.nested_type.is_empty() || !message.enum_type.is_empty() {
+            writeln!(
+                self.write,
+                "mod {name} {{",
+                name = to_module_name(&message.name)
+            )?;
+            self.indent();
+            self.package.push(&message.name);
+            for submessage in &message.nested_type {
+                self.gen_message(submessage)?;
+            }
+            for enume in &message.enum_type {
+                self.gen_enum(enume)?;
+            }
+            self.package.pop();
+            self.unindent();
+            writeln!(
+                self.write,
+                "}} // mod {name} {{",
+                name = to_module_name(&message.name)
+            )?;
+        }
 
         writeln!(
             self.write,
@@ -169,6 +198,33 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
             TypeOfIdent::Enum,
         );
 
+        writeln!(
+            self.write,
+            "pub enum {name} {{",
+            name = to_type_name(&enume.name)
+        )?;
+        self.indent();
+
+        for value in &enume.value {
+            self.gen_enum_value(value)?;
+        }
+
+        self.unindent();
+        writeln!(
+            self.write,
+            "}} // enum {name} {{",
+            name = to_type_name(&enume.name)
+        )?;
+
+        Ok(())
+    }
+
+    fn gen_enum_value(&mut self, value: &'b EnumValueDescriptorProto) -> Result<()> {
+        writeln!(
+            self.write,
+            "{name},",
+            name = to_enum_value_name(&value.name)
+        )?;
         Ok(())
     }
 
@@ -176,17 +232,13 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
         let package_iter = fdp.package.split('.').filter(|s| !s.is_empty());
         self.package = package_iter.clone().collect();
 
-        self.path_to_package_root = match package_iter.clone().count() {
-            0 => None,
-            x => {
-                let supers = std::iter::repeat("super").take(x);
-                Some(Itertools::intersperse(supers, "::").collect::<String>())
-            }
-        };
         for package in package_iter.clone() {
             writeln!(self.write, "mod {name} {{", name = to_module_name(package))?;
         }
 
+        for enume in &fdp.enum_type {
+            self.gen_enum(enume)?;
+        }
         for desc in &fdp.message_type {
             self.gen_message(desc)?;
         }
