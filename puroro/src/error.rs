@@ -16,6 +16,8 @@ pub enum PuroroError {
     UnexpectedFieldType,
     #[error("Unexpected field number. In protobuf standard, the deserializer should accept this though.")]
     UnexpectedFieldId,
+    #[error("An internal error while converting enum from / into integer type.")]
+    EnumConvertError,
     #[error("Found a packed repeated field, but its length was zero.")]
     ZeroLengthPackedField,
     #[error("The bytestream iterator returned an error: {0}")]

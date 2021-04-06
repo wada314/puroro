@@ -1,7 +1,4 @@
 proto_struct! {
-    mod read_module = read;
-    mod write_module = write;
-
     // From plugin.proto
     struct Version {
         major: i32 = 1,

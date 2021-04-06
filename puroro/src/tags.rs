@@ -1,4 +1,4 @@
-use std::{convert::TryFrom, marker::PhantomData};
+use std::marker::PhantomData;
 
 pub trait FieldTypeTag {}
 pub trait SingularFieldTypeTag: FieldTypeTag {}

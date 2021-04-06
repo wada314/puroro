@@ -1,8 +1,6 @@
 use ::puroro::tags;
-use ::puroro::tags::FieldTypeTag;
-use ::puroro::{Message, PuroroError, RepeatedFieldCollector, Result};
+use ::puroro::{PuroroError, Result};
 use ::puroro_serializer::deserializer::stream::{Field, LengthDelimitedDeserializer};
-use ::puroro_unknown::UnknownMessage;
 
 // An (incomplete) transformation from a native type written in the macro to our `FieldTypeTag`.
 pub(crate) trait NativeTypeToFieldTypeTag {
@@ -21,6 +19,14 @@ where
 pub(crate) trait DeserializableFromField {
     fn merge_from_field<D: LengthDelimitedDeserializer>(&mut self, field: Field<D>) -> Result<()>;
 }
+pub(crate) trait SerializableField {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+        field_number: usize,
+    ) -> Result<()>;
+}
+
 // I need this for supporting `Default` for `Result` type...
 pub(crate) trait MyDefault {
     fn default() -> Self;
@@ -93,6 +99,24 @@ macro_rules! define_variant_fields {
                 Default::default()
             }
         }
+
+        impl SerializableField for $native {
+            fn serialize<T>(&self, serializer: &mut T, field_number: usize) -> ::puroro::Result<()>
+            where
+                T: ::puroro_serializer::serializer::MessageSerializer,
+            {
+                serializer.serialize_variant::<$tag>(field_number, *self)
+            }
+        }
+        impl SerializableField for Vec<$native> {
+            fn serialize<T>(&self, serializer: &mut T, field_number: usize) -> ::puroro::Result<()>
+            where
+                T: ::puroro_serializer::serializer::MessageSerializer,
+            {
+                serializer
+                    .serialize_variants_twice::<$tag, _>(field_number, self.iter().map(|&v| Ok(v)))
+            }
+        }
     };
 }
 define_variant_fields!(i32, tags::Int32);
@@ -125,19 +149,34 @@ impl MyDefault for String {
         Default::default()
     }
 }
+impl SerializableField for String {
+    fn serialize<T: puroro_serializer::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+        field_number: usize,
+    ) -> Result<()> {
+        serializer.serialize_bytes_twice(field_number, self.bytes().map(|b| Ok(b)))
+    }
+}
+impl SerializableField for Vec<String> {
+    fn serialize<T: puroro_serializer::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+        field_number: usize,
+    ) -> Result<()> {
+        for string in self {
+            serializer.serialize_bytes_twice(field_number, string.bytes().map(|b| Ok(b)))?;
+        }
+        Ok(())
+    }
+}
 
 macro_rules! proto_struct {
     () => {};
-    (@read) => {};
-    (@write) => {};
 
-    (mod read_module = $readmodname:ident; mod write_module = $writemodname:ident; $($tts:tt)+) => {
-        proto_struct!{@read $($tts)*}
-    };
-
-    (@read struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* } $($rest:tt)*) => {
+    (struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* } $($rest:tt)*) => {
         #[allow(non_camel_case_types)]
-        #[derive(Debug)]
+        #[derive(Debug, Clone)]
         pub(crate) struct $structname {$(
             $fname: $ftype,
         )*}
@@ -146,11 +185,13 @@ macro_rules! proto_struct {
             type Target = Self;
             fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
 
+            #[allow(unused_variables)]
             fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
                 &mut self,
                 field: ::puroro_serializer::deserializer::stream::Field<T>,
                 field_number: usize,
             ) -> ::puroro::Result<()> {
+                #[allow(unused)]
                 use $crate::macros::DeserializableFromField;
                 match field_number {
                     $($fid => {
@@ -208,6 +249,44 @@ macro_rules! proto_struct {
                 }
             }
         }
+        impl puroro_serializer::serializer::Serializable for $structname {
+            #[allow(unused_variables)]
+            fn serialize<T: puroro_serializer::serializer::MessageSerializer>(
+                &self,
+                serializer: &mut T,
+            ) -> ::puroro::Result<()> {
+                $(
+                    $crate::macros::SerializableField::serialize(
+                        &self.$fname, serializer, $fid
+                    )?;
+                )*
+                Ok(())
+            }
+        }
+        impl $crate::macros::SerializableField for Option<$structname> {
+            fn serialize<T: puroro_serializer::serializer::MessageSerializer>(
+                &self,
+                serializer: &mut T,
+                field_number: usize,
+            ) -> ::puroro::Result<()> {
+                if let Some(msg)= self {
+                    serializer.serialize_message_twice(field_number, msg)?;
+                }
+                Ok(())
+            }
+        }
+        impl $crate::macros::SerializableField for Vec<$structname> {
+            fn serialize<T: puroro_serializer::serializer::MessageSerializer>(
+                &self,
+                serializer: &mut T,
+                field_number: usize,
+            ) -> ::puroro::Result<()> {
+                for msg in self {
+                    serializer.serialize_message_twice(field_number, msg)?;
+                }
+                Ok(())
+            }
+        }
         impl Default for $structname {
             fn default() -> Self {
                 Self {$(
@@ -216,13 +295,13 @@ macro_rules! proto_struct {
             }
         }
 
-        proto_struct!{@read $($rest)*}
+        proto_struct!{$($rest)*}
     };
 
-    (@read enum $enumname:ident { $($ename:ident = $evalue:expr ,)* } $($rest:tt)* ) => {
+    (enum $enumname:ident { $($ename:ident = $evalue:expr ,)* } $($rest:tt)* ) => {
         #[allow(non_camel_case_types)]
         #[derive(::num_derive::FromPrimitive)]
-        #[derive(Debug)]
+        #[derive(Debug, Clone, Copy)]
         pub(crate) enum $enumname {
             $(
                 #[allow(non_camel_case_types)]
@@ -259,8 +338,38 @@ macro_rules! proto_struct {
                 Ok(())
             }
         }
-
-        proto_struct! { @read $($rest)* }
+        impl $crate::macros::SerializableField for Result<$enumname, i32> {
+            fn serialize<T: puroro_serializer::serializer::MessageSerializer>(
+                &self,
+                serializer: &mut T,
+                field_number: usize,
+            ) -> ::puroro::Result<()> {
+                let integer = match self {
+                    Ok(e) => (*e as i32),
+                    Err(i) => *i,
+                };
+                serializer.serialize_variant::<::puroro::tags::Int32>(field_number, integer)?;
+                Ok(())
+            }
+        }
+        impl $crate::macros::SerializableField for Vec<Result<$enumname, i32>> {
+            fn serialize<T: puroro_serializer::serializer::MessageSerializer>(
+                &self,
+                serializer: &mut T,
+                field_number: usize,
+            ) -> ::puroro::Result<()> {
+                let iter = self.iter().map(|rresult|{
+                    let integer = match rresult {
+                        Ok(e) => (*e as i32),
+                        Err(i) => *i,
+                    };
+                    Ok(integer)
+                });
+                serializer.serialize_variants_twice::<::puroro::tags::Int32, _>(field_number, iter)?;
+                Ok(())
+            }
+        }
+        proto_struct! { $($rest)* }
     };
 
 }
@@ -278,8 +387,6 @@ mod tests {
         // a = 150
         let input: &[u8] = &[0x08, 0x96, 0x01];
         proto_struct! {
-            mod read_module = read;
-            mod write_module = write;
             struct Test1 {
                 a: i32 = 1,
             }
@@ -297,8 +404,6 @@ mod tests {
         // b = "testing"
         let input: &[u8] = &[0x12, 0x07, 0x74, 0x65, 0x73, 0x74, 0x69, 0x6e, 0x67];
         proto_struct! {
-            mod read_module = read;
-            mod write_module = write;
             struct Test2 {
                 b: String = 2,
             }
@@ -319,8 +424,6 @@ mod tests {
         // a = 150
         let input: &[u8] = &[0x1a, 0x03, 0x08, 0x96, 0x01];
         proto_struct! {
-            mod read_module = read;
-            mod write_module = write;
             struct Test1 {
                 a: i32 = 1,
             }
@@ -342,8 +445,6 @@ mod tests {
         // d = [3, 270, 86942]
         let input: &[u8] = &[0x22, 0x06, 0x03, 0x8E, 0x02, 0x9E, 0xA7, 0x05];
         proto_struct! {
-            mod read_module = read;
-            mod write_module = write;
             struct Test4 {
                 d: Vec<i32> = 4,
             }

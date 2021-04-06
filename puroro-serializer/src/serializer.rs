@@ -5,7 +5,7 @@ use crate::{
 };
 use std::io::{Result as IoResult, Write};
 
-trait MessageSerializer {
+pub trait MessageSerializer {
     #[must_use]
     fn serialize_variant<T: VariantType>(
         &mut self,
@@ -20,17 +20,16 @@ trait MessageSerializer {
         I: Clone + Iterator<Item = Result<T::NativeType>>;
 
     #[must_use]
+    fn serialize_bytes_twice<I>(&mut self, field_number: usize, bytes: I) -> Result<()>
+    where
+        I: Clone + Iterator<Item = Result<u8>>;
+
+    #[must_use]
     fn serialize_message_twice<T: Serializable>(
         &mut self,
         field_number: usize,
         message: &T,
     ) -> Result<()>;
-
-    #[must_use]
-    fn serialize_messages_twice<'a, T, I>(&mut self, field_number: usize, iter: I) -> Result<()>
-    where
-        T: 'a + Serializable,
-        I: Iterator<Item = Result<&'a T>>;
 
     #[must_use]
     fn direct_write_field<I>(
@@ -44,7 +43,7 @@ trait MessageSerializer {
         I: Iterator<Item = IoResult<u8>>;
 }
 
-trait Serializable {
+pub trait Serializable {
     fn serialize<T: MessageSerializer>(&self, serializer: &mut T) -> Result<()>;
 }
 struct MessageSerializerImpl<W>
@@ -124,6 +123,19 @@ where
         Ok(())
     }
 
+    fn serialize_bytes_twice<I>(&mut self, field_number: usize, bytes: I) -> Result<()>
+    where
+        I: Clone + Iterator<Item = Result<u8>>,
+    {
+        self.write_field_number_and_wire_type(field_number, WireType::LengthDelimited)?;
+        let length = bytes.clone().count();
+        RustUsize::to_variant(length)?.encode_bytes(&mut self.write)?;
+        for byte in bytes {
+            self.write.write_all(std::slice::from_ref(&byte?))?;
+        }
+        Ok(())
+    }
+
     fn serialize_message_twice<T: Serializable>(
         &mut self,
         field_number: usize,
@@ -136,24 +148,6 @@ where
         let length = length_counting_serializer.get_write().count();
         RustUsize::to_variant(length)?.encode_bytes(&mut self.write)?;
         message.serialize(self)?;
-
-        Ok(())
-    }
-
-    fn serialize_messages_twice<'a, T, I>(&mut self, field_number: usize, iter: I) -> Result<()>
-    where
-        T: 'a + Serializable,
-        I: Iterator<Item = Result<&'a T>>,
-    {
-        for rmessage in iter {
-            let mut length_counting_serializer = MessageSerializerImpl::new(CounterWrite::new());
-            let message = rmessage?;
-            message.serialize(&mut length_counting_serializer)?;
-            self.write_field_number_and_wire_type(field_number, WireType::LengthDelimited)?;
-            let length = length_counting_serializer.get_write().count();
-            RustUsize::to_variant(length)?.encode_bytes(&mut self.write)?;
-            message.serialize(self)?;
-        }
 
         Ok(())
     }
