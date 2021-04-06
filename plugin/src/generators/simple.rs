@@ -2,7 +2,7 @@ use crate::plugin::*;
 use crate::utils::*;
 use crate::{PuroroError, Result};
 use itertools::Itertools;
-use std::{collections::HashMap, fmt::Write};
+use std::{borrow::Cow, collections::HashMap, fmt::Write};
 
 #[derive(Debug, Clone)]
 enum TypeOfIdent {
@@ -58,36 +58,37 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
     }
 
     fn gen_field(&mut self, field: &'b FieldDescriptorProto) -> Result<()> {
-        let native_original_type = match field.type_ {
-            Ok(FieldDescriptorProto_Type::TYPE_DOUBLE) => "f64".to_string(),
-            Ok(FieldDescriptorProto_Type::TYPE_FLOAT) => "f32".to_string(),
+        let native_original_type: Cow<'static, str> = match field.type_ {
+            Ok(FieldDescriptorProto_Type::TYPE_DOUBLE) => "f64".into(),
+            Ok(FieldDescriptorProto_Type::TYPE_FLOAT) => "f32".into(),
 
             Ok(FieldDescriptorProto_Type::TYPE_INT32)
             | Ok(FieldDescriptorProto_Type::TYPE_SINT32)
-            | Ok(FieldDescriptorProto_Type::TYPE_SFIXED32) => "i32".to_string(),
+            | Ok(FieldDescriptorProto_Type::TYPE_SFIXED32) => "i32".into(),
 
             Ok(FieldDescriptorProto_Type::TYPE_INT64)
             | Ok(FieldDescriptorProto_Type::TYPE_SINT64)
-            | Ok(FieldDescriptorProto_Type::TYPE_SFIXED64) => "i64".to_string(),
+            | Ok(FieldDescriptorProto_Type::TYPE_SFIXED64) => "i64".into(),
 
             Ok(FieldDescriptorProto_Type::TYPE_UINT64)
-            | Ok(FieldDescriptorProto_Type::TYPE_FIXED64) => "u64".to_string(),
+            | Ok(FieldDescriptorProto_Type::TYPE_FIXED64) => "u64".into(),
 
             Ok(FieldDescriptorProto_Type::TYPE_UINT32)
-            | Ok(FieldDescriptorProto_Type::TYPE_FIXED32) => "u32".to_string(),
+            | Ok(FieldDescriptorProto_Type::TYPE_FIXED32) => "u32".into(),
 
-            Ok(FieldDescriptorProto_Type::TYPE_BOOL) => "bool".to_string(),
+            Ok(FieldDescriptorProto_Type::TYPE_BOOL) => "bool".into(),
 
-            Ok(FieldDescriptorProto_Type::TYPE_STRING) => "String".to_string(),
+            Ok(FieldDescriptorProto_Type::TYPE_STRING) => "String".into(),
 
             Ok(FieldDescriptorProto_Type::TYPE_MESSAGE)
             | Ok(FieldDescriptorProto_Type::TYPE_ENUM) => {
                 FullyQualifiedTypeName::from_typename(&field.type_name)
                     .map(|fqtn| fqtn.to_qualified_typename(&self.path_to_package_root()))
                     .unwrap_or_else(|| field.type_name.clone())
+                    .into()
             }
 
-            Ok(FieldDescriptorProto_Type::TYPE_BYTES) => "Vec<u8>".to_string(),
+            Ok(FieldDescriptorProto_Type::TYPE_BYTES) => "Vec<u8>".into(),
             _ => {
                 if !field.type_name.is_empty() {
                     return Err(PuroroError::UnexpectedFieldType);
@@ -95,11 +96,12 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
                     FullyQualifiedTypeName::from_typename(&field.type_name)
                         .map(|fqtn| fqtn.to_qualified_typename(&self.path_to_package_root()))
                         .unwrap_or_else(|| field.type_name.clone())
+                        .into()
                 }
             }
         };
 
-        let typename = match field.label {
+        let typename: Cow<'static, str> = match field.label {
             Ok(FieldDescriptorProto_Label::LABEL_OPTIONAL) => {
                 if matches!(field.type_, Ok(FieldDescriptorProto_Type::TYPE_MESSAGE))
                     || matches!(
@@ -107,7 +109,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
                         Some(TypeOfIdent::Message)
                     )
                 {
-                    format!("Box<Option<{}>>", native_original_type)
+                    format!("Box<Option<{}>>", native_original_type).into()
                 } else {
                     native_original_type
                 }
@@ -119,13 +121,13 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
                         Some(TypeOfIdent::Message)
                     )
                 {
-                    format!("Box<{}>", native_original_type)
+                    format!("Box<{}>", native_original_type).into()
                 } else {
                     native_original_type
                 }
             }
             Ok(FieldDescriptorProto_Label::LABEL_REPEATED) => {
-                format!("Vec<{}>", native_original_type)
+                format!("Vec<{}>", native_original_type).into()
             }
             _ => {
                 return Err(PuroroError::InvalidFieldLabel);
@@ -204,7 +206,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
             )?;
             self.indent();
             {
-                
+                todo!()
             }
             self.unindent();
             writeln!(self.write, "}} // fn from_bytes() {{")?;
