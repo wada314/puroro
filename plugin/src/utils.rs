@@ -45,6 +45,31 @@ impl<'a, W: Write> Write for Indentor<'a, W> {
     }
 }
 
+pub(crate) struct FullyQualifiedTypeName<'a> {
+    path: Vec<&'a str>,
+    name: &'a str,
+}
+impl<'a> FullyQualifiedTypeName<'a> {
+    pub(crate) fn from_typename(input: &'a str) -> Option<Self> {
+        if input.chars().next() != Some('.') {
+            return None;
+        }
+        let mut path = input[1..].split('.').collect::<Vec<_>>();
+        Some(Self {
+            name: path.pop().unwrap(),
+            path,
+        })
+    }
+    pub(crate) fn to_typename_from_root(&self) -> String {
+        self.path
+            .iter()
+            .map(|s| camel_case_to_snake_case(*s))
+            .chain(std::iter::once(self.name.to_string()))
+            .fold1(|s1, s2| s1 + "::" + &s2)
+            .unwrap()
+    }
+}
+
 pub(crate) fn snake_case_to_camel_case(input: &str) -> String {
     input
         .chars()
@@ -62,6 +87,25 @@ pub(crate) fn snake_case_to_camel_case(input: &str) -> String {
             }
         })
         .collect()
+}
+
+pub(crate) fn camel_case_to_snake_case(input: &str) -> String {
+    let mut lowered = input
+        .chars()
+        .flat_map(|c| {
+            if c.is_ascii_uppercase() {
+                Some('_')
+            } else {
+                None
+            }
+            .into_iter()
+            .chain(std::iter::once(c.to_ascii_lowercase()))
+        })
+        .peekable();
+    if lowered.peek() == Some(&'_') {
+        lowered.next();
+    }
+    lowered.collect::<String>()
 }
 
 lazy_static! {

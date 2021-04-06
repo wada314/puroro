@@ -30,42 +30,41 @@ impl<'a, W: Write> Context<'a, W> {
     fn gen_field(&mut self, field: &FieldDescriptorProto) -> Result<()> {
         let native_original_type = match field.type_ {
             Ok(FieldDescriptorProto_Type::TYPE_DOUBLE) => "f64".to_string(),
-
             Ok(FieldDescriptorProto_Type::TYPE_FLOAT) => "f32".to_string(),
 
-            Ok(FieldDescriptorProto_Type::TYPE_INT64) => "i64".to_string(),
+            Ok(FieldDescriptorProto_Type::TYPE_INT32)
+            | Ok(FieldDescriptorProto_Type::TYPE_SINT32)
+            | Ok(FieldDescriptorProto_Type::TYPE_SFIXED32) => "i32".to_string(),
 
-            Ok(FieldDescriptorProto_Type::TYPE_UINT64) => "u64".to_string(),
+            Ok(FieldDescriptorProto_Type::TYPE_INT64)
+            | Ok(FieldDescriptorProto_Type::TYPE_SINT64)
+            | Ok(FieldDescriptorProto_Type::TYPE_SFIXED64) => "i64".to_string(),
 
-            Ok(FieldDescriptorProto_Type::TYPE_INT32) => "i32".to_string(),
+            Ok(FieldDescriptorProto_Type::TYPE_UINT64)
+            | Ok(FieldDescriptorProto_Type::TYPE_FIXED64) => "u64".to_string(),
 
-            Ok(FieldDescriptorProto_Type::TYPE_FIXED64) => "u64".to_string(),
-
-            Ok(FieldDescriptorProto_Type::TYPE_FIXED32) => "u32".to_string(),
+            Ok(FieldDescriptorProto_Type::TYPE_UINT32)
+            | Ok(FieldDescriptorProto_Type::TYPE_FIXED32) => "u32".to_string(),
 
             Ok(FieldDescriptorProto_Type::TYPE_BOOL) => "bool".to_string(),
 
             Ok(FieldDescriptorProto_Type::TYPE_STRING) => "String".to_string(),
 
-            Ok(FieldDescriptorProto_Type::TYPE_MESSAGE) => {
-                snake_case_to_camel_case(&field.type_name)
+            Ok(FieldDescriptorProto_Type::TYPE_MESSAGE)
+            | Ok(FieldDescriptorProto_Type::TYPE_ENUM) => {
+                FullyQualifiedTypeName::from_typename(&field.type_name)
+                    .map(|fqtn| fqtn.to_typename_from_root())
+                    .unwrap_or_else(|| field.type_name.clone())
             }
 
             Ok(FieldDescriptorProto_Type::TYPE_BYTES) => "Vec<u8>".to_string(),
-            Ok(FieldDescriptorProto_Type::TYPE_UINT32) => "u32".to_string(),
-            Ok(FieldDescriptorProto_Type::TYPE_ENUM) => snake_case_to_camel_case(&field.type_name),
-            Ok(FieldDescriptorProto_Type::TYPE_SFIXED32) => "i32".to_string(),
-
-            Ok(FieldDescriptorProto_Type::TYPE_SFIXED64) => "i64".to_string(),
-
-            Ok(FieldDescriptorProto_Type::TYPE_SINT32) => "i32".to_string(),
-
-            Ok(FieldDescriptorProto_Type::TYPE_SINT64) => "i64".to_string(),
             _ => {
                 if !field.type_name.is_empty() {
                     return Err(PuroroError::UnexpectedFieldType);
                 } else {
-                    snake_case_to_camel_case(&field.type_name)
+                    FullyQualifiedTypeName::from_typename(&field.type_name)
+                        .map(|fqtn| fqtn.to_typename_from_root())
+                        .unwrap_or_else(|| field.type_name.clone())
                 }
             }
         };
