@@ -63,10 +63,18 @@ impl<'a> FullyQualifiedTypeName<'a> {
     pub(crate) fn to_typename_from_root(&self) -> String {
         self.path
             .iter()
-            .map(|s| camel_case_to_snake_case(*s))
-            .chain(std::iter::once(self.name.to_string()))
+            .map(|s| to_module_name(*s))
+            .chain(std::iter::once(to_type_name(self.name)))
             .fold1(|s1, s2| s1 + "::" + &s2)
             .unwrap()
+    }
+    pub(crate) fn to_qualified_typename(&self, path_to_package_root: &Option<String>) -> String {
+        let from_root = self.to_typename_from_root();
+        if let Some(to_root) = path_to_package_root {
+            to_root.clone() + "::" + &from_root
+        } else {
+            from_root
+        }
     }
 }
 
@@ -122,10 +130,22 @@ lazy_static! {
     .collect::<HashSet<&'static str>>();
 }
 
-pub(crate) fn get_keywoard_safe_ident(input: &str) -> String {
+pub(crate) fn get_keyword_safe_ident(input: &str) -> String {
     let mut s = input.to_string();
     while KEYWORDS.contains(s.as_str()) {
         s.push('_');
     }
     s
+}
+
+pub(crate) fn to_module_name(input: &str) -> String {
+    get_keyword_safe_ident(&camel_case_to_snake_case(input))
+}
+
+pub(crate) fn to_type_name(input: &str) -> String {
+    get_keyword_safe_ident(&snake_case_to_camel_case(input))
+}
+
+pub(crate) fn to_var_name(input: &str) -> String {
+    get_keyword_safe_ident(&camel_case_to_snake_case(input))
 }

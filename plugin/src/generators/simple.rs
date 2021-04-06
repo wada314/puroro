@@ -1,6 +1,7 @@
 use crate::plugin::*;
 use crate::utils::*;
 use crate::{PuroroError, Result};
+use itertools::Itertools;
 use std::{collections::HashMap, fmt::Write};
 
 enum TypeOfIdent {
@@ -11,12 +12,14 @@ enum TypeOfIdent {
 struct Context<'a, W: Write> {
     write: Indentor<'a, W>,
     type_of_idents: HashMap<String, TypeOfIdent>,
+    path_to_package_root: Option<String>,
 }
 impl<'a, W: Write> Context<'a, W> {
     fn new(write: &'a mut W) -> Self {
         Self {
             write: Indentor::new(write),
             type_of_idents: HashMap::new(),
+            path_to_package_root: None,
         }
     }
 
@@ -53,7 +56,7 @@ impl<'a, W: Write> Context<'a, W> {
             Ok(FieldDescriptorProto_Type::TYPE_MESSAGE)
             | Ok(FieldDescriptorProto_Type::TYPE_ENUM) => {
                 FullyQualifiedTypeName::from_typename(&field.type_name)
-                    .map(|fqtn| fqtn.to_typename_from_root())
+                    .map(|fqtn| fqtn.to_qualified_typename(&self.path_to_package_root))
                     .unwrap_or_else(|| field.type_name.clone())
             }
 
@@ -63,7 +66,7 @@ impl<'a, W: Write> Context<'a, W> {
                     return Err(PuroroError::UnexpectedFieldType);
                 } else {
                     FullyQualifiedTypeName::from_typename(&field.type_name)
-                        .map(|fqtn| fqtn.to_typename_from_root())
+                        .map(|fqtn| fqtn.to_qualified_typename(&self.path_to_package_root))
                         .unwrap_or_else(|| field.type_name.clone())
                 }
             }
@@ -101,11 +104,11 @@ impl<'a, W: Write> Context<'a, W> {
                 return Err(PuroroError::InvalidFieldLabel);
             }
         };
-        let name = get_keywoard_safe_ident(&field.name);
+        let name = to_var_name(&field.name);
 
         writeln!(
             self.write,
-            "{name}: {typename},",
+            "pub {name}: {typename},",
             name = name,
             typename = typename
         )?;
@@ -120,7 +123,7 @@ impl<'a, W: Write> Context<'a, W> {
         writeln!(
             self.write,
             "pub struct {name} {{",
-            name = snake_case_to_camel_case(&message.name)
+            name = to_type_name(&message.name)
         )?;
         self.indent();
 
@@ -128,22 +131,41 @@ impl<'a, W: Write> Context<'a, W> {
             self.gen_field(field)?;
         }
 
-        writeln!(self.write, "}}")?; // struct {
         self.unindent();
+        writeln!(self.write, "}}")?; // struct {
+        Ok(())
+    }
+
+    fn gen_file(&mut self, fdp: &FileDescriptorProto) -> Result<()> {
+        let package_iter = fdp.package.split('.');
+        self.path_to_package_root = match package_iter.clone().count() {
+            0 => None,
+            x => {
+                let supers = std::iter::repeat("super").take(x);
+                Some(Itertools::intersperse(supers, "::").collect::<String>())
+            }
+        };
+        for package in package_iter.clone() {
+            writeln!(self.write, "mod {name} {{", name = to_module_name(package))?;
+        }
+
+        for desc in &fdp.message_type {
+            self.gen_message(desc)?;
+        }
+
+        for _package in package_iter.clone() {
+            writeln!(self.write, "}}")?; // mod ... {
+        }
+
         Ok(())
     }
 }
 
 pub(crate) fn generate_simple(cgreq: &CodeGeneratorRequest) -> Result<String> {
-    let descriptors = cgreq
-        .proto_file
-        .iter()
-        .map(|fdp| &fdp.message_type)
-        .flatten();
     let mut output = String::new();
     let mut context = Context::new(&mut output);
-    for desc in descriptors {
-        context.gen_message(desc)?;
+    for fdp in &cgreq.proto_file {
+        context.gen_file(fdp)?;
     }
     Ok(output)
 }
