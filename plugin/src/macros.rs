@@ -184,7 +184,7 @@ macro_rules! proto_struct {
         #[allow(non_camel_case_types)]
         #[derive(Debug, Clone)]
         pub(crate) struct $structname {$(
-            $fname: $ftype,
+            pub(crate) $fname: $ftype,
         )*}
         // Impl for creating a new message instance
         impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for $structname {
@@ -255,7 +255,7 @@ macro_rules! proto_struct {
                 }
             }
         }
-        impl puroro_serializer::serializer::Serializable for $structname {
+        impl ::puroro_serializer::serializer::Serializable for $structname {
             #[allow(unused_variables)]
             fn serialize<T: puroro_serializer::serializer::MessageSerializer>(
                 &self,
@@ -267,6 +267,14 @@ macro_rules! proto_struct {
                     )?;
                 )*
                 Ok(())
+            }
+        }
+        impl ::puroro::Serializable for $structname {
+            fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
+                ::puroro_serializer::serializer::Serializable::serialize(
+                    self,
+                    &mut ::puroro_serializer::serializer::default_serializer(write)
+                )
             }
         }
         impl $crate::macros::SerializableField for Option<$structname> {

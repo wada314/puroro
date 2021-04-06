@@ -42,22 +42,28 @@ pub trait MessageSerializer {
     where
         I: Iterator<Item = IoResult<u8>>;
 }
+pub fn default_serializer<'a, W>(write: &'a mut W) -> impl MessageSerializer + 'a
+where
+    W: std::io::Write,
+{
+    MessageSerializerImpl::new(write)
+}
 
 pub trait Serializable {
     fn serialize<T: MessageSerializer>(&self, serializer: &mut T) -> Result<()>;
 }
-struct MessageSerializerImpl<W>
+struct MessageSerializerImpl<'a, W>
 where
     W: std::io::Write,
 {
-    write: W,
+    write: &'a mut W,
 }
 
-impl<W> MessageSerializerImpl<W>
+impl<'a, W> MessageSerializerImpl<'a, W>
 where
     W: std::io::Write,
 {
-    fn new(write: W) -> Self {
+    fn new(write: &'a mut W) -> Self {
         Self { write }
     }
     fn get_write(&self) -> &W {
@@ -75,15 +81,7 @@ where
         Ok(())
     }
 }
-impl<W> Drop for MessageSerializerImpl<W>
-where
-    W: std::io::Write,
-{
-    fn drop(&mut self) {
-        todo!()
-    }
-}
-impl<W> MessageSerializer for MessageSerializerImpl<W>
+impl<'a, W> MessageSerializer for MessageSerializerImpl<'a, W>
 where
     W: std::io::Write,
 {
@@ -141,7 +139,8 @@ where
         field_number: usize,
         message: &T,
     ) -> Result<()> {
-        let mut length_counting_serializer = MessageSerializerImpl::new(CounterWrite::new());
+        let mut counter = CounterWrite::new();
+        let mut length_counting_serializer = MessageSerializerImpl::new(&mut counter);
         message.serialize(&mut length_counting_serializer)?;
 
         self.write_field_number_and_wire_type(field_number, WireType::LengthDelimited)?;
