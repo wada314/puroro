@@ -155,24 +155,6 @@ fn generate_traits_for_descriptor<W: Write>(
     {
         write!(o, "type BytesIterator: Iterator<Item=Result<u8>>;\n")?;
     }
-    // For all kinds of messages
-    desc.field
-        .iter()
-        .filter_map(|field| {
-            if matches!(field.type_, Ok(FieldDescriptorProto_Type::TYPE_MESSAGE)) {
-                Some(&field.type_name)
-            } else {
-                None
-            }
-        })
-        .unique()
-        .try_for_each(|msgname| {
-            todo!()
-            /*write!(
-                o,
-                "type {name}Iterator: Iterator<Item=Result<Option<&'a {camel_name}>>>;",
-            )*/
-        })?;
 
     for field in &desc.field {
         generate_field(o, field)?;
