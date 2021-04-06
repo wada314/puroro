@@ -21,6 +21,28 @@ where
 pub(crate) trait DeserializableFromField {
     fn merge_from_field<D: LengthDelimitedDeserializer>(&mut self, field: Field<D>) -> Result<()>;
 }
+// I need this for supporting `Default` for `Result` type...
+pub(crate) trait MyDefault {
+    fn default() -> Self;
+}
+impl<T> MyDefault for Option<T> {
+    fn default() -> Self {
+        None
+    }
+}
+impl<T> MyDefault for Vec<T> {
+    fn default() -> Self {
+        Vec::new()
+    }
+}
+impl<T> MyDefault for std::result::Result<T, i32>
+where
+    T: ::num_traits::FromPrimitive,
+{
+    fn default() -> Self {
+        T::from_i32(<i32 as Default>::default()).ok_or(<i32 as Default>::default())
+    }
+}
 
 macro_rules! define_variant_fields {
     ($native:ty, $tag:ty) => {
@@ -65,6 +87,12 @@ macro_rules! define_variant_fields {
                 }
             }
         }
+
+        impl MyDefault for $native {
+            fn default() -> Self {
+                Default::default()
+            }
+        }
     };
 }
 define_variant_fields!(i32, tags::Int32);
@@ -92,6 +120,11 @@ impl DeserializableFromField for Vec<String> {
         }
     }
 }
+impl MyDefault for String {
+    fn default() -> Self {
+        Default::default()
+    }
+}
 
 macro_rules! proto_struct {
     () => {};
@@ -104,7 +137,7 @@ macro_rules! proto_struct {
 
     (@read struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* } $($rest:tt)*) => {
         #[allow(non_camel_case_types)]
-        #[derive(Debug, Default)]
+        #[derive(Debug)]
         pub(crate) struct $structname {$(
             $fname: $ftype,
         )*}
@@ -175,6 +208,13 @@ macro_rules! proto_struct {
                 }
             }
         }
+        impl Default for $structname {
+            fn default() -> Self {
+                Self {$(
+                    $fname: $crate::macros::MyDefault::default(),
+                )*}
+            }
+        }
 
         proto_struct!{@read $($rest)*}
     };
@@ -195,20 +235,28 @@ macro_rules! proto_struct {
                 ( $($enumname::$ename),* ).0
             }
         }
-        impl $crate::macros::DeserializableFromField for $enumname {
+        impl $crate::macros::DeserializableFromField for Result<$enumname, i32> {
             fn merge_from_field<D>(&mut self, field: ::puroro_serializer::deserializer::stream::Field<D>) -> ::puroro::Result<()>
             where
                 D: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer
             {
-                todo!()
+                use ::num_traits::FromPrimitive;
+                let mut integer: i32 = 0;
+                integer.merge_from_field(field)?;
+                *self = $enumname::from_i32(integer).ok_or(integer);
+                Ok(())
             }
         }
-        impl $crate::macros::DeserializableFromField for Vec<$enumname> {
+        impl $crate::macros::DeserializableFromField for Vec<Result<$enumname, i32>> {
             fn merge_from_field<D>(&mut self, field: ::puroro_serializer::deserializer::stream::Field<D>) -> ::puroro::Result<()>
             where
                 D: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer
             {
-                todo!()
+                use ::num_traits::FromPrimitive;
+                let mut integers: Vec<i32> = Vec::new();
+                integers.merge_from_field(field)?;
+                self.append(&mut integers.into_iter().map(|i| $enumname::from_i32(i).ok_or(i)).collect::<Vec<_>>());
+                Ok(())
             }
         }
 

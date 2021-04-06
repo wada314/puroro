@@ -73,8 +73,8 @@ proto_struct! {
     struct FieldDescriptorProto {
         name: String = 1,
         number: i32 = 3,
-        label: FieldDescriptorProto_Label = 4,
-        type_: FieldDescriptorProto_Type = 5,
+        label: Result<FieldDescriptorProto_Label, i32> = 4,
+        type_: Result<FieldDescriptorProto_Type, i32> = 5,
         type_name: String = 6,
         extendee: String = 2,
         default_value: String = 7,
