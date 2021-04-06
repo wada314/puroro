@@ -16,7 +16,7 @@ fn main() -> Result<()> {
     let mut cgres = CodeGeneratorResponse::default();
     let mut file = CodeGeneratorResponse_File::default();
     file.name = "test.rs".to_string();
-    file.content = "".into();
+    file.content = generators::simple::generate_simple(&cgreq)?;
     cgres.file.push(file);
     cgres.serialize(&mut stdout())?;
     Ok(())

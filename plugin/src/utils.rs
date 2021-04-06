@@ -1,6 +1,6 @@
+use ::lazy_static::lazy_static;
 use itertools::Itertools;
-use std::fmt::Write;
-
+use std::{collections::HashSet, fmt::Write};
 pub(crate) struct Indentor<'a, W: Write> {
     write: &'a mut W,
     indent_next: bool,
@@ -62,4 +62,26 @@ pub(crate) fn snake_case_to_camel_case(input: &str) -> String {
             }
         })
         .collect()
+}
+
+lazy_static! {
+    static ref KEYWORDS: HashSet<&'static str> = [
+        "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn",
+        "for", "if", "impl", "in", "let", "loop", "match", "mod", "move", "mut", "pub", "ref",
+        "return", "self", "Self", "static", "struct", "super", "trait", "true", "type", "unsafe",
+        "use", "where", "while", "async", "await", "dyn", "abstract", "become", "box", "do",
+        "final", "macro", "override", "priv", "typeof", "unsized", "virtual", "yield", "try",
+        "union", "'static",
+    ]
+    .iter()
+    .copied()
+    .collect::<HashSet<&'static str>>();
+}
+
+pub(crate) fn get_keywoard_safe_ident(input: &str) -> String {
+    let mut s = input.to_string();
+    while KEYWORDS.contains(s.as_str()) {
+        s.push('_');
+    }
+    s
 }

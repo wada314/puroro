@@ -6,6 +6,8 @@ pub enum PuroroError {
     IntegerOverflow(#[from] std::num::TryFromIntError),
     #[error("A boolean value is nither 0 or 1.")]
     InvalidBooleanValue,
+    #[error("Unknown field label [optional, repeated, required]")]
+    InvalidFieldLabel,
     #[error("A variant integer type is longer than 10 bytes.")]
     TooLargeVariant,
     #[error("Invalid wire type.")]
