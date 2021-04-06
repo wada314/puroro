@@ -22,6 +22,8 @@ pub enum PuroroError {
     ZeroLengthPackedField,
     #[error("The bytestream iterator returned an error: {0}")]
     IteratorError(#[from] std::io::Error),
+    #[error("The formatter returned an error: {0}")]
+    FormatterError(#[from] std::fmt::Error),
     #[error("The string length is not correct.")]
     InvalidFieldLength,
     #[error("Other error: {0}")]

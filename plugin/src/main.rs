@@ -2,8 +2,8 @@
 mod macros;
 mod plugin;
 mod traits_generator;
-use ::puroro::Result;
 use ::puroro::{Deserializable, Serializable};
+use ::puroro::{PuroroError, Result};
 
 use std::io::Read;
 use std::io::{stdin, stdout};
