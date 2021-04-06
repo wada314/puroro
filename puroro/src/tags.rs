@@ -1,8 +1,8 @@
-use std::marker::PhantomData;
+use std::{convert::TryFrom, marker::PhantomData};
 
-pub trait VariantTypeTag: FieldTypeTag {}
 pub trait FieldTypeTag {}
 pub trait SingularFieldTypeTag: FieldTypeTag {}
+pub trait VariantTypeTag: FieldTypeTag {}
 
 pub struct Int32();
 pub struct UInt32();
@@ -15,14 +15,6 @@ pub struct String();
 pub struct Message<T>(PhantomData<T>);
 pub struct Repeated<T: SingularFieldTypeTag>(PhantomData<T>);
 
-impl VariantTypeTag for Int32 {}
-impl VariantTypeTag for Int64 {}
-impl VariantTypeTag for UInt32 {}
-impl VariantTypeTag for UInt64 {}
-impl VariantTypeTag for SInt32 {}
-impl VariantTypeTag for SInt64 {}
-impl VariantTypeTag for Bool {}
-
 impl FieldTypeTag for Int32 {}
 impl FieldTypeTag for Int64 {}
 impl FieldTypeTag for UInt32 {}
@@ -33,6 +25,24 @@ impl FieldTypeTag for Bool {}
 impl FieldTypeTag for String {}
 impl<T> FieldTypeTag for Message<T> {}
 impl<T: SingularFieldTypeTag> FieldTypeTag for Repeated<T> {}
+
+impl SingularFieldTypeTag for Int32 {}
+impl SingularFieldTypeTag for Int64 {}
+impl SingularFieldTypeTag for UInt32 {}
+impl SingularFieldTypeTag for UInt64 {}
+impl SingularFieldTypeTag for SInt32 {}
+impl SingularFieldTypeTag for SInt64 {}
+impl SingularFieldTypeTag for Bool {}
+impl SingularFieldTypeTag for String {}
+impl<T> SingularFieldTypeTag for Message<T> {}
+
+impl VariantTypeTag for Int32 {}
+impl VariantTypeTag for Int64 {}
+impl VariantTypeTag for UInt32 {}
+impl VariantTypeTag for UInt64 {}
+impl VariantTypeTag for SInt32 {}
+impl VariantTypeTag for SInt64 {}
+impl VariantTypeTag for Bool {}
 
 pub trait WireTypeTag {}
 pub struct Variant();

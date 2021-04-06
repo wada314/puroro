@@ -1,5 +1,6 @@
 use crate::{PuroroError, Result};
 use ::puroro::tags::{Bool, Int32, Int64, SInt32, SInt64, UInt32, UInt64};
+use puroro::tags;
 use std::convert::TryFrom;
 use std::io::Result as IoResult;
 use std::io::Write;

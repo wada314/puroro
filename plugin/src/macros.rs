@@ -1,6 +1,6 @@
 use ::puroro::tags;
 use ::puroro::tags::FieldTypeTag;
-use ::puroro::{Message, RepeatedFieldCollector, Result};
+use ::puroro::{Message, PuroroError, RepeatedFieldCollector, Result};
 use ::puroro_serializer::deserializer::stream::{Field, LengthDelimitedDeserializer};
 use ::puroro_unknown::UnknownMessage;
 
@@ -8,85 +8,88 @@ use ::puroro_unknown::UnknownMessage;
 pub(crate) trait NativeTypeToFieldTypeTag {
     type Tag: ::puroro::tags::FieldTypeTag;
 }
-
-pub(crate) trait FieldTypeTag2 {
-    type Output;
-    fn get_from_unknown_message(msg: &UnknownMessage, field_number: usize) -> Result<Self::Output>;
+impl NativeTypeToFieldTypeTag for String {
+    type Tag = ::puroro::tags::String;
 }
-trait RepeatableFieldTypeTag: FieldTypeTag2 {}
+impl<T> NativeTypeToFieldTypeTag for Vec<T>
+where
+    T: NativeTypeToFieldTypeTag,
+    T::Tag: tags::SingularFieldTypeTag,
+{
+    type Tag = ::puroro::tags::Repeated<T::Tag>;
+}
+pub(crate) trait DeserializableFromField {
+    fn merge_from_field<D: LengthDelimitedDeserializer>(&mut self, field: Field<D>) -> Result<()>;
+}
 
-macro_rules! define_native_field_type_tag {
-    ($type:ty, $tag:ty, $get_method:ident, $handle_repeated_method:ident) => {
-        impl NativeTypeToFieldTypeTag for $type {
-            type Tag = $tag;
-        }
-        impl FieldTypeTag2 for $type {
-            type Output = $type;
-            fn get_from_unknown_message(
-                msg: &UnknownMessage,
-                field_number: usize,
-            ) -> Result<Self::Output> {
-                msg.$get_method(field_number, <$type as Default>::default())
+macro_rules! define_variant_fields {
+    ($native:ty, $tag:ty) => {
+        impl DeserializableFromField for $native {
+            fn merge_from_field<D: LengthDelimitedDeserializer>(
+                &mut self,
+                field: Field<D>,
+            ) -> Result<()> {
+                match field {
+                    Field::Variant(variant) => {
+                        *self = variant.to_native::<$tag>()?;
+                    }
+                    Field::LengthDelimited(ldd) => {
+                        *self = ldd
+                            .deserialize_as_variants()
+                            .last()
+                            .unwrap_or(Err(PuroroError::ZeroLengthPackedField))?
+                            .to_native::<$tag>()?;
+                    }
+                    _ => {
+                        Err(PuroroError::UnexpectedWireType)?;
+                    }
+                }
+                Ok(())
             }
         }
-        impl FieldTypeTag2 for Vec<$type> {
-            type Output = Vec<$type>;
-            fn get_from_unknown_message(
-                msg: &UnknownMessage,
-                field_number: usize,
-            ) -> Result<Self::Output> {
-                msg.$handle_repeated_method(
-                    field_number,
-                    &RepeatedFieldCollector::<$type, Vec<$type>>::new(),
-                )
+
+        impl DeserializableFromField for Vec<$native> {
+            fn merge_from_field<D: LengthDelimitedDeserializer>(
+                &mut self,
+                field: Field<D>,
+            ) -> Result<()> {
+                if let Field::LengthDelimited(ldd) = field {
+                    let mut vec = ldd
+                        .deserialize_as_variants()
+                        .map(|rv| rv.and_then(|v| v.to_native::<$tag>()))
+                        .collect::<Result<Vec<_>>>()?;
+                    self.append(&mut vec);
+                    Ok(())
+                } else {
+                    Err(PuroroError::UnexpectedWireType)
+                }
             }
         }
     };
 }
-define_native_field_type_tag!(
-    i32,
-    tags::Int32,
-    get_field_as_i32_or,
-    handle_field_as_repeated_i32
-);
-define_native_field_type_tag!(
-    i64,
-    tags::Int64,
-    get_field_as_i64_or,
-    handle_field_as_repeated_i64
-);
-define_native_field_type_tag!(
-    u32,
-    tags::UInt32,
-    get_field_as_u32_or,
-    handle_field_as_repeated_u32
-);
-define_native_field_type_tag!(
-    u64,
-    tags::UInt32,
-    get_field_as_u64_or,
-    handle_field_as_repeated_u64
-);
-define_native_field_type_tag!(
-    bool,
-    tags::Bool,
-    get_field_as_bool_or,
-    handle_field_as_repeated_bool
-);
-impl FieldTypeTag2 for String {
-    type Output = String;
-    fn get_from_unknown_message(msg: &UnknownMessage, field_number: usize) -> Result<Self::Output> {
-        msg.handle_field_as_str(field_number, &RepeatedFieldCollector::<char, String>::new())
+define_variant_fields!(i32, tags::Int32);
+define_variant_fields!(i64, tags::Int64);
+define_variant_fields!(u32, tags::UInt32);
+define_variant_fields!(u64, tags::UInt64);
+define_variant_fields!(bool, tags::Bool);
+impl DeserializableFromField for String {
+    fn merge_from_field<D: LengthDelimitedDeserializer>(&mut self, field: Field<D>) -> Result<()> {
+        if let Field::LengthDelimited(ldd) = field {
+            *self = ldd.deserialize_as_chars().collect::<Result<String>>()?;
+            Ok(())
+        } else {
+            Err(PuroroError::UnexpectedWireType)
+        }
     }
 }
-impl FieldTypeTag2 for Vec<String> {
-    type Output = Vec<String>;
-    fn get_from_unknown_message(msg: &UnknownMessage, field_number: usize) -> Result<Self::Output> {
-        msg.handle_field_as_repeated_str(
-            field_number,
-            &RepeatedFieldCollector::<char, String>::new(),
-            &RepeatedFieldCollector::<String, Vec<String>>::new(),
-        )
+impl DeserializableFromField for Vec<String> {
+    fn merge_from_field<D: LengthDelimitedDeserializer>(&mut self, field: Field<D>) -> Result<()> {
+        if let Field::LengthDelimited(ldd) = field {
+            self.push(ldd.deserialize_as_chars().collect::<Result<String>>()?);
+            Ok(())
+        } else {
+            Err(PuroroError::UnexpectedWireType)
+        }
     }
 }
 
@@ -96,53 +99,62 @@ macro_rules! proto_struct {
     (@write) => {};
 
     (mod read_module = $readmodname:ident; mod write_module = $writemodname:ident; $($tts:tt)+) => {
-        pub(crate) mod $readmodname {
-            proto_struct!{@read $($tts)*}
-        }
-        pub(crate) mod $writemodname {
-            proto_struct!{@write $($tts)*}
-        }
+        proto_struct!{@read $($tts)*}
     };
 
     (@read struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* } $($rest:tt)*) => {
         #[allow(non_camel_case_types)]
-        #[derive(Debug)]
-        pub(crate) struct $structname(::puroro_unknown::UnknownMessage);
-        #[allow(dead_code)]
-        impl $structname {
-            $(
-                pub(crate) fn $fname(&self) -> ::puroro::Result<<$ftype as $crate::macros::FieldTypeTag2>::Output> {
-                    <$ftype as $crate::macros::FieldTypeTag2>::get_from_unknown_message(&self.0, $fid)
-                }
-            )*
-        }
-        impl std::ops::Deref for $structname {
-            type Target = ::puroro_unknown::UnknownMessage;
-            fn deref(&self) -> &Self::Target { &self.0 }
+        #[derive(Debug, Default)]
+        pub(crate) struct $structname {$(
+            $fname: $ftype,
+        )*}
+        impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for $structname {
+            type Target = Self;
+            fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+
+            fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+                &mut self,
+                field: ::puroro_serializer::deserializer::stream::Field<T>,
+                field_number: usize,
+            ) -> ::puroro::Result<()> {
+                use $crate::macros::DeserializableFromField;
+                match field_number {
+                    $($fid => {
+                        self.$fname.merge_from_field(field)?;
+                    })*
+                    _ => { /* ignore! lol */ }
+                };
+                Ok(())
+            }
         }
         impl ::puroro::Deserializable for $structname {
             fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-                Ok(Self(::puroro_unknown::UnknownMessage::from_bytes(iter)?))
+                use ::puroro_serializer::deserializer::stream::Deserializer;
+                let deserializer = ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter);
+                let value = $structname::default();
+                deserializer.deserialize(value)
             }
         }
-        impl ::puroro::Mergeable for $structname {
-            fn merge(&self, latter: &Self) -> ::puroro::Result<Self> {
-                Ok(Self(self.0.merge(&latter.0)?))
+        impl $crate::macros::DeserializableFromField for Option<$structname> {
+            fn merge_from_field<D>(&mut self, field: ::puroro_serializer::deserializer::stream::Field<D>) -> ::puroro::Result<()>
+            where
+                D: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer
+            {
+                if let ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) = field {
+                    let msg = self.get_or_insert_with($structname::default);
+                    *msg = ldd.deserialize_as_message(*msg)?;
+                    Ok(())
+                } else {
+                    Err(::puroro::PuroroError::UnexpectedWireType)
+                }
             }
         }
-        impl $crate::macros::FieldTypeTag2 for Option<$structname> {
-            type Output = Option<$structname>;
-            fn get_from_unknown_message(msg: &::puroro_unknown::UnknownMessage, field_number: usize) -> ::puroro::Result<Self::Output> {
-                use ::puroro::Message;
-                msg.get_field_as_message::<$structname>(field_number)
-            }
-        }
-        impl $crate::macros::FieldTypeTag2 for Vec<$structname> {
-            type Output = Vec<$structname>;
-            fn get_from_unknown_message(msg: &::puroro_unknown::UnknownMessage, field_number: usize) -> ::puroro::Result<Self::Output> {
-                use ::puroro::Message;
-                msg.collect_field_as_repeated_message::<$structname, Vec<$structname>>(
-                    field_number)
+        impl $crate::macros::DeserializableFromField for Vec<$structname> {
+            fn merge_from_field<D>(&mut self, field: ::puroro_serializer::deserializer::stream::Field<D>) -> ::puroro::Result<()>
+            where
+                D: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer
+            {
+                todo!()
             }
         }
 
@@ -159,39 +171,32 @@ macro_rules! proto_struct {
                 $ename = $evalue
             ),*,
         }
-        impl $crate::macros::FieldTypeTag2 for std::result::Result<$enumname, i32> {
-            type Output = std::result::Result<$enumname, i32>;
-            fn get_from_unknown_message(msg: &::puroro_unknown::UnknownMessage, field_number: usize) -> ::puroro::Result<Self::Output> {
-                use ::puroro::Message;
-                use ::num_traits::FromPrimitive;
-                let raw = msg.get_field_as_i32_or(field_number, <i32 as Default>::default())?;
-                match $enumname::from_i32(raw) {
-                    Some(enumified) => Ok(Ok(enumified)),
-                    None => Ok(Err(raw)),
-                }
+        impl Default for $enumname {
+            fn default() -> Self {
+                // 0th of the all-element tuple
+                ( $($enumname::$ename),* ).0
+            }
+        }
+        impl $crate::macros::DeserializableFromField for $enumname {
+            fn merge_from_field<D>(&mut self, field: ::puroro_serializer::deserializer::stream::Field<D>) -> ::puroro::Result<()>
+            where
+                D: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer
+            {
+                todo!()
+            }
+        }
+        impl $crate::macros::DeserializableFromField for Vec<$enumname> {
+            fn merge_from_field<D>(&mut self, field: ::puroro_serializer::deserializer::stream::Field<D>) -> ::puroro::Result<()>
+            where
+                D: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer
+            {
+                todo!()
             }
         }
 
         proto_struct! { @read $($rest)* }
     };
 
-    (@write struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* } $($rest:tt)*) => {
-        #[allow(non_camel_case_types)]
-        #[derive(Debug)]
-        pub(crate) struct $structname {
-            $(pub(crate) $fname: $ftype, )*
-        }
-        impl ::puroro::Serializable for $structname {
-            fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<Self> {
-                todo!()
-            }
-        }
-        proto_struct!{@write $($rest)*}
-    };
-
-    (@write enum $enumname:ident { $($ename:ident = $evalue:expr ,)* } $($rest:tt)* ) => {
-        proto_struct! { @write $($rest)* }
-    };
 }
 
 #[cfg(test)]
@@ -213,9 +218,8 @@ mod tests {
                 a: i32 = 1,
             }
         }
-        use read::Test1;
         let t1 = Test1::from_bytes(input.bytes()).unwrap();
-        assert_eq!(150, t1.a().unwrap());
+        assert_eq!(150, t1.a);
     }
 
     #[test]
@@ -233,9 +237,8 @@ mod tests {
                 b: String = 2,
             }
         }
-        use read::Test2;
         let t2 = Test2::from_bytes(input.bytes()).unwrap();
-        assert_eq!("testing", t2.b().unwrap());
+        assert_eq!("testing", t2.b);
     }
 
     #[test]
@@ -259,10 +262,9 @@ mod tests {
                 c: Option<Test1> = 3,
             }
         }
-        use read::Test3;
         let t3 = Test3::from_bytes(input.bytes()).unwrap();
-        let t1 = t3.c().unwrap().unwrap();
-        assert_eq!(150, t1.a().unwrap());
+        let t1 = t3.c.unwrap();
+        assert_eq!(150, t1.a);
     }
 
     #[test]
@@ -280,8 +282,7 @@ mod tests {
                 d: Vec<i32> = 4,
             }
         }
-        use read::Test4;
         let t4 = Test4::from_bytes(input.bytes()).unwrap();
-        assert_eq!(vec![3, 270, 86942], t4.d().unwrap());
+        assert_eq!(vec![3, 270, 86942], t4.d);
     }
 }
