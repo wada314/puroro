@@ -10,12 +10,12 @@ enum TypeOfIdent {
     Enum,
 }
 
-struct Context<'a, 'b, W: Write> {
+struct StructGenerator<'a, 'b, W: Write> {
     write: Indentor<'a, W>,
     type_of_idents: HashMap<FullyQualifiedTypeName<'b>, TypeOfIdent>,
     package: Vec<&'b str>,
 }
-impl<'a, 'b, W: Write> Context<'a, 'b, W> {
+impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
     fn new(write: &'a mut W) -> Self {
         Self {
             write: Indentor::new(write),
@@ -144,6 +144,8 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
     }
 
     fn gen_message(&mut self, message: &'b DescriptorProto) -> Result<()> {
+        let native_type_name = to_type_name(&message.name);
+
         self.type_of_idents.insert(
             FullyQualifiedTypeName::new(self.package.clone(), &message.name),
             TypeOfIdent::Message,
@@ -164,6 +166,7 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
                 self.gen_enum(enume)?;
             }
             self.package.pop();
+
             self.unindent();
             writeln!(
                 self.write,
@@ -172,11 +175,8 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
             )?;
         }
 
-        writeln!(
-            self.write,
-            "pub struct {name} {{",
-            name = to_type_name(&message.name)
-        )?;
+        // Struct body
+        writeln!(self.write, "pub struct {name} {{", name = native_type_name)?;
         self.indent();
 
         for field in &message.field {
@@ -187,8 +187,35 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
         writeln!(
             self.write,
             "}} // struct {name} {{",
-            name = to_type_name(&message.name)
+            name = native_type_name
         )?;
+
+        // Deserialize
+        writeln!(
+            self.write,
+            "impl ::puroro::Deserializable for {name} {{",
+            name = native_type_name
+        )?;
+        self.indent();
+        {
+            writeln!(
+                self.write,
+                "fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self> {{"
+            )?;
+            self.indent();
+            {
+                
+            }
+            self.unindent();
+            writeln!(self.write, "}} // fn from_bytes() {{")?;
+        }
+        self.unindent();
+        writeln!(
+            self.write,
+            "}} // impl ::puroro::Deserializable for {name} {{",
+            name = native_type_name
+        )?;
+
         Ok(())
     }
 
@@ -257,7 +284,7 @@ impl<'a, 'b, W: Write> Context<'a, 'b, W> {
 
 pub(crate) fn generate_simple(cgreq: &CodeGeneratorRequest) -> Result<String> {
     let mut output = String::new();
-    let mut context = Context::new(&mut output);
+    let mut context = StructGenerator::new(&mut output);
     for fdp in &cgreq.proto_file {
         context.gen_file(fdp)?;
     }
