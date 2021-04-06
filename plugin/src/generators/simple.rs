@@ -4,22 +4,26 @@ use crate::{PuroroError, Result};
 use itertools::Itertools;
 use std::{collections::HashMap, fmt::Write};
 
+#[derive(Debug, Clone)]
 enum TypeOfIdent {
     Message,
     Enum,
 }
 
-struct Context<'a, W: Write> {
+struct Context<'a, 'b, W: Write> {
     write: Indentor<'a, W>,
-    type_of_idents: HashMap<String, TypeOfIdent>,
+    type_of_idents: HashMap<FullyQualifiedTypeName<'b>, TypeOfIdent>,
+
     path_to_package_root: Option<String>,
+    package: Vec<&'b str>,
 }
-impl<'a, W: Write> Context<'a, W> {
+impl<'a, 'b, W: Write> Context<'a, 'b, W> {
     fn new(write: &'a mut W) -> Self {
         Self {
             write: Indentor::new(write),
             type_of_idents: HashMap::new(),
             path_to_package_root: None,
+            package: Vec::new(),
         }
     }
 
@@ -30,7 +34,24 @@ impl<'a, W: Write> Context<'a, W> {
         self.write.unindent()
     }
 
-    fn gen_field(&mut self, field: &FieldDescriptorProto) -> Result<()> {
+    fn search_for_idents_type(&self, typename: &str) -> Option<TypeOfIdent> {
+        if let Some(fqtn) = FullyQualifiedTypeName::from_typename(typename) {
+            return self.type_of_idents.get(&fqtn).cloned();
+        } else {
+            let mut fqtn = FullyQualifiedTypeName::new(self.package.clone(), typename);
+            loop {
+                if let Some(found) = self.type_of_idents.get(&fqtn) {
+                    return Some(found.clone());
+                }
+                if !fqtn.move_up() {
+                    break;
+                }
+            }
+        }
+        None
+    }
+
+    fn gen_field(&mut self, field: &'b FieldDescriptorProto) -> Result<()> {
         let native_original_type = match field.type_ {
             Ok(FieldDescriptorProto_Type::TYPE_DOUBLE) => "f64".to_string(),
             Ok(FieldDescriptorProto_Type::TYPE_FLOAT) => "f32".to_string(),
@@ -76,7 +97,7 @@ impl<'a, W: Write> Context<'a, W> {
             Ok(FieldDescriptorProto_Label::LABEL_OPTIONAL) => {
                 if matches!(field.type_, Ok(FieldDescriptorProto_Type::TYPE_MESSAGE))
                     || matches!(
-                        self.type_of_idents.get(&field.name),
+                        self.search_for_idents_type(&field.name),
                         Some(TypeOfIdent::Message)
                     )
                 {
@@ -88,7 +109,7 @@ impl<'a, W: Write> Context<'a, W> {
             Ok(FieldDescriptorProto_Label::LABEL_REQUIRED) => {
                 if matches!(field.type_, Ok(FieldDescriptorProto_Type::TYPE_MESSAGE))
                     || matches!(
-                        self.type_of_idents.get(&field.name),
+                        self.search_for_idents_type(&field.name),
                         Some(TypeOfIdent::Message)
                     )
                 {
@@ -116,9 +137,11 @@ impl<'a, W: Write> Context<'a, W> {
         Ok(())
     }
 
-    fn gen_message(&mut self, message: &DescriptorProto) -> Result<()> {
-        self.type_of_idents
-            .insert(message.name.clone(), TypeOfIdent::Message);
+    fn gen_message(&mut self, message: &'b DescriptorProto) -> Result<()> {
+        self.type_of_idents.insert(
+            FullyQualifiedTypeName::new(self.package.clone(), &message.name),
+            TypeOfIdent::Message,
+        );
 
         writeln!(
             self.write,
@@ -132,12 +155,26 @@ impl<'a, W: Write> Context<'a, W> {
         }
 
         self.unindent();
-        writeln!(self.write, "}}")?; // struct {
+        writeln!(
+            self.write,
+            "}} // struct {name} {{",
+            name = to_type_name(&message.name)
+        )?;
         Ok(())
     }
 
-    fn gen_file(&mut self, fdp: &FileDescriptorProto) -> Result<()> {
+    fn gen_enum(&mut self, enume: &'b EnumDescriptorProto) -> Result<()> {
+        self.type_of_idents.insert(
+            FullyQualifiedTypeName::new(self.package.clone(), &enume.name),
+            TypeOfIdent::Enum,
+        );
+
+        Ok(())
+    }
+
+    fn gen_file(&mut self, fdp: &'b FileDescriptorProto) -> Result<()> {
         let package_iter = fdp.package.split('.').filter(|s| !s.is_empty());
+        self.package = package_iter.clone().collect();
 
         self.path_to_package_root = match package_iter.clone().count() {
             0 => None,
@@ -154,8 +191,12 @@ impl<'a, W: Write> Context<'a, W> {
             self.gen_message(desc)?;
         }
 
-        for _package in package_iter.clone() {
-            writeln!(self.write, "}}")?; // mod ... {
+        for package in package_iter.clone() {
+            writeln!(
+                self.write,
+                "}} // mod {name} {{",
+                name = to_module_name(package)
+            )?;
         }
 
         Ok(())

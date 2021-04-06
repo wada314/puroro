@@ -45,8 +45,9 @@ impl<'a, W: Write> Write for Indentor<'a, W> {
     }
 }
 
+#[derive(Debug, Hash, PartialEq, Eq)]
 pub(crate) struct FullyQualifiedTypeName<'a> {
-    path: Vec<&'a str>,
+    package: Vec<&'a str>,
     name: &'a str,
 }
 impl<'a> FullyQualifiedTypeName<'a> {
@@ -54,14 +55,20 @@ impl<'a> FullyQualifiedTypeName<'a> {
         if input.chars().next() != Some('.') {
             return None;
         }
-        let mut path = input[1..].split('.').collect::<Vec<_>>();
+        let mut package = input[1..].split('.').collect::<Vec<_>>();
         Some(Self {
-            name: path.pop().unwrap(),
-            path,
+            name: package.pop().unwrap(),
+            package,
         })
     }
+    pub(crate) fn new(package: Vec<&'a str>, name: &'a str) -> Self {
+        Self { package, name }
+    }
+    pub(crate) fn move_up(&mut self) -> bool {
+        self.package.pop().is_some()
+    }
     pub(crate) fn to_typename_from_root(&self) -> String {
-        self.path
+        self.package
             .iter()
             .map(|s| to_module_name(*s))
             .chain(std::iter::once(to_type_name(self.name)))
