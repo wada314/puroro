@@ -137,7 +137,8 @@ impl<'a, W: Write> Context<'a, W> {
     }
 
     fn gen_file(&mut self, fdp: &FileDescriptorProto) -> Result<()> {
-        let package_iter = fdp.package.split('.');
+        let package_iter = fdp.package.split('.').filter(|s| !s.is_empty());
+
         self.path_to_package_root = match package_iter.clone().count() {
             0 => None,
             x => {

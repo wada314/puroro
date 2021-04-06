@@ -1,4 +1,6 @@
 syntax = "proto3";
+package hoge;
+
 message Msg {
     int64 ival = 1;
     repeated int64 rival = 2;
@@ -8,7 +10,12 @@ message Msg {
     message SubMsg {
         SubMsg recursive_msg = 1;
         repeated SubMsg recursive_rmsg = 2;
+
+        message SubSubMsg {
+            int64 ival = 1;
+        }
     }
-    SubMsg msg = 5;
-    repeated SubMsg rmsg = 6;
+    SubMsg submsg = 5;
+    repeated SubMsg rsubmsg = 6;
+    SubMsg.SubSubMsg subsubmsg = 7;
 }
