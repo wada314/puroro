@@ -105,7 +105,10 @@ macro_rules! define_variant_fields {
             where
                 T: ::puroro_serializer::serializer::MessageSerializer,
             {
-                serializer.serialize_variant::<$tag>(field_number, *self)
+                if *self != <$native as Default>::default() {
+                    serializer.serialize_variant::<$tag>(field_number, *self)?;
+                }
+                Ok(())
             }
         }
         impl SerializableField for Vec<$native> {
@@ -155,7 +158,10 @@ impl SerializableField for String {
         serializer: &mut T,
         field_number: usize,
     ) -> Result<()> {
-        serializer.serialize_bytes_twice(field_number, self.bytes().map(|b| Ok(b)))
+        if *self != <String as Default>::default() {
+            serializer.serialize_bytes_twice(field_number, self.bytes().map(|b| Ok(b)))?;
+        }
+        Ok(())
     }
 }
 impl SerializableField for Vec<String> {
