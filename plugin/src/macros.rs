@@ -108,6 +108,7 @@ macro_rules! proto_struct {
         pub(crate) struct $structname {$(
             $fname: $ftype,
         )*}
+        // Impl for creating a new message instance
         impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for $structname {
             type Target = Self;
             fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
@@ -127,6 +128,18 @@ macro_rules! proto_struct {
                 Ok(())
             }
         }
+        // impl for merging a message into existing instance
+        impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &mut $structname {
+            type Target = Self;
+            fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+            fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+                &mut self,
+                field: ::puroro_serializer::deserializer::stream::Field<T>,
+                field_number: usize,
+            ) -> ::puroro::Result<()> {
+                <$structname>::met_field(*self, field, field_number)
+            }
+        }
         impl ::puroro::Deserializable for $structname {
             fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
                 use ::puroro_serializer::deserializer::stream::Deserializer;
@@ -142,7 +155,7 @@ macro_rules! proto_struct {
             {
                 if let ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) = field {
                     let msg = self.get_or_insert_with($structname::default);
-                    *msg = ldd.deserialize_as_message(*msg)?;
+                    ldd.deserialize_as_message(msg)?;
                     Ok(())
                 } else {
                     Err(::puroro::PuroroError::UnexpectedWireType)
@@ -154,7 +167,12 @@ macro_rules! proto_struct {
             where
                 D: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer
             {
-                todo!()
+                if let ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) = field {
+                    self.push(ldd.deserialize_as_message($structname::default())?);
+                    Ok(())
+                } else {
+                    Err(::puroro::PuroroError::UnexpectedWireType)
+                }
             }
         }
 

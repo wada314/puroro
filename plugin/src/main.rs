@@ -9,6 +9,6 @@ use std::io::Read;
 use plugin::*;
 
 fn main() {
-    let cgr = read::CodeGeneratorRequest::from_bytes(stdin().bytes()).unwrap();
+    let cgr = CodeGeneratorRequest::from_bytes(stdin().bytes()).unwrap();
     eprintln!("{:?}", cgr);
 }
