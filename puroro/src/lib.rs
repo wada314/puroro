@@ -88,6 +88,9 @@ pub trait Message {
 pub trait Deserializable: Sized {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self>;
 }
+pub trait Serializable: Sized {
+    fn serialize<W: std::io::Write>(&self, write: &mut W) -> Result<Self>;
+}
 pub trait Mergeable: Sized {
     fn merge(&self, latter: &Self) -> Result<Self>;
 }

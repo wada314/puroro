@@ -1,15 +1,19 @@
 use ::puroro::{Message, RepeatedFieldCollector, Result};
 use ::puroro_unknown::UnknownMessage;
 
-pub(crate) trait FieldTypeTag {
+pub(crate) trait DeserializableFieldTypeTag {
     type Output;
     fn get_from_unknown_message(msg: &UnknownMessage, field_number: usize) -> Result<Self::Output>;
 }
-trait RepeatableFieldTypeTag: FieldTypeTag {}
+pub(crate) trait SerializableFieldTypeTag {
+    type Native;
+    fn serialize<W: std::io::Write>(self_: &Self::Native, write: &mut W) -> Result<Self::Native>;
+}
+trait RepeatableFieldTypeTag: DeserializableFieldTypeTag {}
 
 macro_rules! define_native_field_type_tag {
     ($type:ty, $get_method:ident, $handle_repeated_method:ident) => {
-        impl FieldTypeTag for $type {
+        impl DeserializableFieldTypeTag for $type {
             type Output = $type;
             fn get_from_unknown_message(
                 msg: &UnknownMessage,
@@ -18,7 +22,7 @@ macro_rules! define_native_field_type_tag {
                 msg.$get_method(field_number, <$type as Default>::default())
             }
         }
-        impl FieldTypeTag for Vec<$type> {
+        impl DeserializableFieldTypeTag for Vec<$type> {
             type Output = Vec<$type>;
             fn get_from_unknown_message(
                 msg: &UnknownMessage,
@@ -37,13 +41,13 @@ define_native_field_type_tag!(i64, get_field_as_i64_or, handle_field_as_repeated
 define_native_field_type_tag!(u32, get_field_as_u32_or, handle_field_as_repeated_u32);
 define_native_field_type_tag!(u64, get_field_as_u64_or, handle_field_as_repeated_u64);
 define_native_field_type_tag!(bool, get_field_as_bool_or, handle_field_as_repeated_bool);
-impl FieldTypeTag for String {
+impl DeserializableFieldTypeTag for String {
     type Output = String;
     fn get_from_unknown_message(msg: &UnknownMessage, field_number: usize) -> Result<Self::Output> {
         msg.handle_field_as_str(field_number, &RepeatedFieldCollector::<char, String>::new())
     }
 }
-impl FieldTypeTag for Vec<String> {
+impl DeserializableFieldTypeTag for Vec<String> {
     type Output = Vec<String>;
     fn get_from_unknown_message(msg: &UnknownMessage, field_number: usize) -> Result<Self::Output> {
         msg.handle_field_as_repeated_str(
@@ -75,8 +79,8 @@ macro_rules! proto_struct {
         #[allow(dead_code)]
         impl $structname {
             $(
-                pub(crate) fn $fname(&self) -> ::puroro::Result<<$ftype as $crate::macros::FieldTypeTag>::Output> {
-                    <$ftype as $crate::macros::FieldTypeTag>::get_from_unknown_message(&self.0, $fid)
+                pub(crate) fn $fname(&self) -> ::puroro::Result<<$ftype as $crate::macros::DeserializableFieldTypeTag>::Output> {
+                    <$ftype as $crate::macros::DeserializableFieldTypeTag>::get_from_unknown_message(&self.0, $fid)
                 }
             )*
         }
@@ -94,14 +98,14 @@ macro_rules! proto_struct {
                 Ok(Self(self.0.merge(&latter.0)?))
             }
         }
-        impl $crate::macros::FieldTypeTag for Option<$structname> {
+        impl $crate::macros::DeserializableFieldTypeTag for Option<$structname> {
             type Output = Option<$structname>;
             fn get_from_unknown_message(msg: &::puroro_unknown::UnknownMessage, field_number: usize) -> ::puroro::Result<Self::Output> {
                 use ::puroro::Message;
                 msg.get_field_as_message::<$structname>(field_number)
             }
         }
-        impl $crate::macros::FieldTypeTag for Vec<$structname> {
+        impl $crate::macros::DeserializableFieldTypeTag for Vec<$structname> {
             type Output = Vec<$structname>;
             fn get_from_unknown_message(msg: &::puroro_unknown::UnknownMessage, field_number: usize) -> ::puroro::Result<Self::Output> {
                 use ::puroro::Message;
@@ -123,7 +127,7 @@ macro_rules! proto_struct {
                 $ename = $evalue
             ),*,
         }
-        impl $crate::macros::FieldTypeTag for std::result::Result<$enumname, i32> {
+        impl $crate::macros::DeserializableFieldTypeTag for std::result::Result<$enumname, i32> {
             type Output = std::result::Result<$enumname, i32>;
             fn get_from_unknown_message(msg: &::puroro_unknown::UnknownMessage, field_number: usize) -> ::puroro::Result<Self::Output> {
                 use ::puroro::Message;
@@ -140,6 +144,16 @@ macro_rules! proto_struct {
     };
 
     (@write struct $structname:ident { $($fname:ident: $ftype:ty = $fid:expr ,)* } $($rest:tt)*) => {
+        #[allow(non_camel_case_types)]
+        #[derive(Debug)]
+        pub(crate) struct $structname {
+            $(pub(crate) $fname: $ftype, )*
+        }
+        impl ::puroro::Serializable for $structname {
+            fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<Self> {
+                todo!()
+            }
+        }
         proto_struct!{@write $($rest)*}
     };
 
