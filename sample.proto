@@ -1,4 +1,4 @@
-
+syntax = "proto3";
 message Msg {
     int64 ival = 1;
     repeated int64 rival = 2;
@@ -7,7 +7,7 @@ message Msg {
     
     message SubMsg {
         SubMsg recursive_msg = 1;
-        repeated SubMsg recursive_rmsg = 1;
+        repeated SubMsg recursive_rmsg = 2;
     }
     SubMsg msg = 5;
     repeated SubMsg rmsg = 6;

@@ -12,7 +12,6 @@ use plugin::*;
 
 fn main() -> Result<()> {
     let cgreq = CodeGeneratorRequest::from_bytes(stdin().bytes()).unwrap();
-    dbg!(&cgreq);
     let mut cgres = CodeGeneratorResponse::default();
     let mut file = CodeGeneratorResponse_File::default();
     file.name = "test.rs".to_string();

@@ -72,7 +72,7 @@ where
 
     // May expectedly fail if reached to the eof
     fn try_get_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, usize)>> {
-        let mut peekable = self.indexed_iter.by_ref().peekable();
+        let mut peekable = self.by_ref().peekable();
         if let None = peekable.peek() {
             // Found EOF at first byte. Successfull failure.
             return Ok(None);
@@ -85,8 +85,7 @@ where
     }
 
     fn eat_one_byte(&mut self) -> Result<u8> {
-        self.indexed_iter
-            .next()
+        self.next()
             .ok_or(PuroroError::UnexpectedInputTermination)
             .and_then(|r| r.map_err(|e| e.into()))
     }
@@ -118,7 +117,10 @@ impl<'a, I> LengthDelimitedDeserializer for LengthDelimitedDeserializerImpl<'a, 
 where
     I: Iterator<Item = IoResult<u8>>,
 {
-    fn deserialize_as_message<H: MessageDeserializeEventHandler>(mut self, mut handler: H) -> Result<H::Target> {
+    fn deserialize_as_message<H: MessageDeserializeEventHandler>(
+        mut self,
+        mut handler: H,
+    ) -> Result<H::Target> {
         let start_pos = self.indexed_iter.index();
         loop {
             // Check message length if possible
@@ -141,11 +143,11 @@ where
 
             let field = match wire_type {
                 WireType::Variant => {
-                    let variant = Variant::decode_bytes(&mut self.indexed_iter)?;
+                    let variant = Variant::decode_bytes(&mut self)?;
                     Field::Variant(variant)
                 }
                 WireType::LengthDelimited => {
-                    let field_length = Variant::decode_bytes(&mut self.indexed_iter)?.to_usize()?;
+                    let field_length = Variant::decode_bytes(&mut self)?.to_usize()?;
                     let deserializer_for_inner = self.make_sub_deserializer(field_length);
                     Field::LengthDelimited(deserializer_for_inner)
                 }
@@ -177,19 +179,31 @@ where
         handler.finish()
     }
 
-    type BytesIterator = BytesIterator<Self>;
+    type BytesIterator = BytesIterator<std::iter::Take<Self>>;
     fn deserialize_as_bytes(self) -> Self::BytesIterator {
-        BytesIterator::new(self)
+        if let Some(length) = self.bytes_len {
+            BytesIterator::new(self.take(length))
+        } else {
+            panic!("This case must have the length")
+        }
     }
 
-    type CharsIterator = CharsIterator<Self>;
+    type CharsIterator = CharsIterator<std::iter::Take<Self>>;
     fn deserialize_as_chars(self) -> Self::CharsIterator {
-        CharsIterator::new(self)
+        if let Some(length) = self.bytes_len {
+            CharsIterator::new(self.take(length))
+        } else {
+            panic!("This case must have the length")
+        }
     }
 
-    type VariantsIterator = VariantsIterator<Self>;
+    type VariantsIterator = VariantsIterator<std::iter::Take<Self>>;
     fn deserialize_as_variants(self) -> Self::VariantsIterator {
-        VariantsIterator::new(self)
+        if let Some(length) = self.bytes_len {
+            VariantsIterator::new(self.take(length))
+        } else {
+            panic!("This case must have the length")
+        }
     }
 
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer> {
