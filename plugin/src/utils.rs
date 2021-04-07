@@ -66,21 +66,21 @@ impl<'a> MaybeFullyQualifiedTypeName<'a> {
         }
     }
     pub(crate) fn try_to_absolute(&self) -> Option<FullyQualifiedTypeName<'a>> {
-        if let Some(package) = self.package {
+        if let Some(package) = &self.package {
             Some(FullyQualifiedTypeName::new(package.clone(), self.name))
         } else {
             None
         }
     }
     pub(crate) fn with_package(&self, package: Vec<&'a str>) -> FullyQualifiedTypeName<'a> {
-        if let Some(vec) = self.package {
+        if let Some(vec) = &self.package {
             FullyQualifiedTypeName::new(vec.clone(), self.name)
         } else {
             FullyQualifiedTypeName::new(package, self.name)
         }
     }
     pub(crate) fn to_native_maybe_qualified_typename(&self, path_to_package_root: &str) -> String {
-        if let Some(package) = self.package {
+        if let Some(package) = &self.package {
             let from_root = package
                 .iter()
                 .map(|s| to_module_name(*s))
