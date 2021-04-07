@@ -20,6 +20,8 @@ pub enum PuroroError {
     UnexpectedFieldId,
     #[error("An internal error while converting enum from / into integer type.")]
     EnumConvertError,
+    #[error("Failed to parse a boolean value.")]
+    BoolParseError,
     #[error("Found a packed repeated field, but its length was zero.")]
     ZeroLengthPackedField,
     #[error("The bytestream iterator returned an error: {0}")]

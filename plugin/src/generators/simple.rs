@@ -56,6 +56,14 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
         }
         None
     }
+    fn check_is_struct_or_enum(&self, field: &FieldDescriptorProto) -> Option<TypeOfIdent> {
+        match field.type_ {
+            Ok(FieldDescriptorProto_Type::TYPE_ENUM) => Some(TypeOfIdent::Enum),
+            Ok(FieldDescriptorProto_Type::TYPE_MESSAGE) => Some(TypeOfIdent::Message),
+            Err(0) => self.search_for_idents_type(&field.type_name),
+            _ => None,
+        }
+    }
 
     fn gen_field(&mut self, field: &'b FieldDescriptorProto) -> Result<()> {
         let native_original_type: Cow<'static, str> = match field.type_ {
@@ -192,6 +200,48 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
             name = native_type_name
         )?;
 
+        // Default
+        writeln!(
+            self.write,
+            "impl Default for {name} {{",
+            name = native_type_name
+        )?;
+        self.indent();
+        {
+            writeln!(self.write, "fn default() -> Self {{")?;
+            self.indent();
+            {
+                writeln!(self.write, "Self {{")?;
+                self.indent();
+                {
+                    for field in &message.field {
+                        let default_value: Cow<'static, str> =
+                            if let Some(TypeOfIdent::Enum) = self.check_is_struct_or_enum(field) {
+                                "std::convert::TryFrom::try_from(0i32)".into()
+                            } else {
+                                "Default::default()".into()
+                            };
+                        writeln!(
+                            self.write,
+                            "{name}: {value},",
+                            name = to_var_name(&field.name),
+                            value = default_value
+                        )?;
+                    }
+                }
+                self.unindent();
+                writeln!(self.write, "}} // Self {{")?;
+            }
+            self.unindent();
+            writeln!(self.write, "}} // fn default() -> Self {{")?;
+        }
+        self.unindent();
+        writeln!(
+            self.write,
+            "}} // impl Default for {name} {{",
+            name = native_type_name
+        )?;
+
         // Deserialize
         writeln!(
             self.write,
@@ -202,11 +252,11 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
         {
             writeln!(
                 self.write,
-                "fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self> {{"
+                "fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {{"
             )?;
             self.indent();
             {
-                todo!()
+                writeln!(self.write, "todo!()")?;
             }
             self.unindent();
             writeln!(self.write, "}} // fn from_bytes() {{")?;

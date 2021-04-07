@@ -2,7 +2,10 @@
 mod macros;
 mod generators;
 mod plugin;
+#[cfg(test)]
+mod test;
 mod utils;
+
 use ::puroro::{Deserializable, Serializable};
 use ::puroro::{PuroroError, Result};
 
@@ -20,4 +23,10 @@ fn main() -> Result<()> {
     cgres.file.push(file);
     cgres.serialize(&mut stdout())?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test() {}
 }

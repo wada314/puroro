@@ -1,6 +1,6 @@
 use ::lazy_static::lazy_static;
 use itertools::Itertools;
-use std::{collections::HashSet, fmt::Write};
+use std::{borrow::Cow, collections::HashSet, fmt::Write};
 pub(crate) struct Indentor<'a, W: Write> {
     write: &'a mut W,
     indent_next: bool,
@@ -162,4 +162,25 @@ pub(crate) fn to_var_name(input: &str) -> String {
 
 pub(crate) fn to_enum_value_name(input: &str) -> String {
     get_keyword_safe_ident(&snake_case_to_camel_case(input))
+}
+
+pub(crate) fn to_string_literal(input: &str) -> String {
+    let mut max_consecutive_hash = 0usize;
+    let mut cur_consecutive_hash = 0usize;
+    for char in input.chars() {
+        if char == '#' {
+            cur_consecutive_hash += 1;
+            max_consecutive_hash = max_consecutive_hash.max(cur_consecutive_hash);
+        } else {
+            cur_consecutive_hash = 0;
+        }
+    }
+    let hashes = std::iter::repeat('#')
+        .take(max_consecutive_hash)
+        .collect::<String>();
+    format!(
+        "r{hashes}\"{content}\"{hashes}",
+        hashes = hashes,
+        content = input
+    )
 }
