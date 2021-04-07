@@ -35,8 +35,12 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
 
     fn update_package(&mut self, package: Vec<&'b str>) {
         self.package = package;
-        let supers = std::iter::repeat("super").take(self.package.len());
-        self.path_to_package_root = Itertools::intersperse(supers, "::").collect::<String>();
+        if self.package.is_empty() {
+            self.path_to_package_root = "self".into();
+        } else {
+            let supers = std::iter::repeat("super").take(self.package.len());
+            self.path_to_package_root = Itertools::intersperse(supers, "::").collect::<String>();
+        }
     }
 
     fn path_to_package_root(&self) -> &str {
@@ -44,7 +48,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
     }
 
     fn search_for_idents_type(&self, typename: &str) -> Option<TypeOfIdent> {
-        let mut mfqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename);
+        let mfqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename);
         if let Some(fqtn) = mfqtn.try_to_absolute() {
             return self.type_of_idents.get(&fqtn).cloned();
         }
@@ -312,7 +316,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
 
     fn gen_file(&mut self, fdp: &'b FileDescriptorProto) -> Result<()> {
         let package_iter = fdp.package.split('.').filter(|s| !s.is_empty());
-        self.package = package_iter.clone().collect();
+        self.update_package(package_iter.clone().collect());
 
         for package in package_iter.clone() {
             writeln!(self.write, "mod {name} {{", name = to_module_name(package))?;
