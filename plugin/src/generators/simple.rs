@@ -12,8 +12,9 @@ enum TypeOfIdent {
 
 struct StructGenerator<'a, 'b, W: Write> {
     write: Indentor<'a, W>,
-    type_of_idents: HashMap<MaybeFullyQualifiedTypeName<'b>, TypeOfIdent>,
+    type_of_idents: HashMap<FullyQualifiedTypeName<'b>, TypeOfIdent>,
     package: Vec<&'b str>,
+    path_to_package_root: String,
 }
 impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
     fn new(write: &'a mut W) -> Self {
@@ -21,6 +22,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
             write: Indentor::new(write),
             type_of_idents: HashMap::new(),
             package: Vec::new(),
+            path_to_package_root: "".into(),
         }
     }
 
@@ -31,29 +33,32 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
         self.write.unindent()
     }
 
-    fn path_to_package_root(&self) -> Option<String> {
-        if self.package.is_empty() {
-            None
-        } else {
-            let supers = std::iter::repeat("super").take(self.package.len());
-            Some(Itertools::intersperse(supers, "::").collect::<String>())
-        }
+    fn update_package(&mut self, package: Vec<&'b str>) {
+        self.package = package;
+        let supers = std::iter::repeat("super").take(self.package.len());
+        self.path_to_package_root = Itertools::intersperse(supers, "::").collect::<String>();
+    }
+
+    fn path_to_package_root(&self) -> &str {
+        &self.path_to_package_root
     }
 
     fn search_for_idents_type(&self, typename: &str) -> Option<TypeOfIdent> {
-        let fqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename);
-
-        let mut fqtn = MaybeFullyQualifiedTypeName::new(self.package.clone(), typename);
+        let mut mfqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename);
+        if let Some(fqtn) = mfqtn.try_to_absolute() {
+            return self.type_of_idents.get(&fqtn).cloned();
+        }
+        let mut package = self.package.clone();
         loop {
+            let fqtn = mfqtn.with_package(package.clone());
             if let Some(found) = self.type_of_idents.get(&fqtn) {
                 return Some(found.clone());
             }
-            if !fqtn.pop() {
+            if package.pop().is_none() {
                 break;
             }
         }
-        None;
-        todo!()
+        None
     }
     fn check_is_struct_or_enum(&self, field: &FieldDescriptorProto) -> Option<TypeOfIdent> {
         match field.type_ {
@@ -90,19 +95,18 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
             Ok(FieldDescriptorProto_Type::TYPE_MESSAGE)
             | Ok(FieldDescriptorProto_Type::TYPE_ENUM) => {
                 MaybeFullyQualifiedTypeName::from_maybe_fq_typename(&field.type_name)
-                    .map(|fqtn| fqtn.to_qualified_typename(&self.path_to_package_root()))
-                    .unwrap_or_else(|| field.type_name.clone())
+                    .to_native_maybe_qualified_typename(&self.path_to_package_root())
                     .into()
             }
 
             Ok(FieldDescriptorProto_Type::TYPE_BYTES) => "Vec<u8>".into(),
+
             _ => {
                 if !field.type_name.is_empty() {
                     return Err(PuroroError::UnexpectedFieldType);
                 } else {
                     MaybeFullyQualifiedTypeName::from_maybe_fq_typename(&field.type_name)
-                        .map(|fqtn| fqtn.to_qualified_typename(&self.path_to_package_root()))
-                        .unwrap_or_else(|| field.type_name.clone())
+                        .to_native_maybe_qualified_typename(&self.path_to_package_root())
                         .into()
                 }
             }
@@ -156,7 +160,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
         let native_type_name = to_type_name(&message.name);
 
         self.type_of_idents.insert(
-            MaybeFullyQualifiedTypeName::new(self.package.clone(), &message.name),
+            FullyQualifiedTypeName::new(self.package.clone(), &message.name),
             TypeOfIdent::Message,
         );
         // Check sub-messages and sub-enums first
@@ -272,7 +276,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
 
     fn gen_enum(&mut self, enume: &'b EnumDescriptorProto) -> Result<()> {
         self.type_of_idents.insert(
-            MaybeFullyQualifiedTypeName::new(self.package.clone(), &enume.name),
+            FullyQualifiedTypeName::new(self.package.clone(), &enume.name),
             TypeOfIdent::Enum,
         );
 

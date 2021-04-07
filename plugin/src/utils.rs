@@ -65,8 +65,12 @@ impl<'a> MaybeFullyQualifiedTypeName<'a> {
             }
         }
     }
-    pub(crate) fn is_absolute(&self) -> bool {
-        self.package.is_some()
+    pub(crate) fn try_to_absolute(&self) -> Option<FullyQualifiedTypeName<'a>> {
+        if let Some(package) = self.package {
+            Some(FullyQualifiedTypeName::new(package.clone(), self.name))
+        } else {
+            None
+        }
     }
     pub(crate) fn with_package(&self, package: Vec<&'a str>) -> FullyQualifiedTypeName<'a> {
         if let Some(vec) = self.package {
@@ -75,27 +79,17 @@ impl<'a> MaybeFullyQualifiedTypeName<'a> {
             FullyQualifiedTypeName::new(package, self.name)
         }
     }
-    pub(crate) fn to_native_typename_from_root(&self) -> String {
-        if self.is_absolute() {
-            self.package
-                .unwrap()
+    pub(crate) fn to_native_maybe_qualified_typename(&self, path_to_package_root: &str) -> String {
+        if let Some(package) = self.package {
+            let from_root = package
+                .iter()
                 .map(|s| to_module_name(*s))
                 .chain(std::iter::once(to_type_name(self.name)))
                 .fold1(|s1, s2| s1 + "::" + &s2)
-                .unwrap()
+                .unwrap();
+            path_to_package_root.to_string() + "::" + &from_root
         } else {
-            self.name
-        }
-    }
-    pub(crate) fn to_native_qualified_typename(
-        &self,
-        path_to_package_root: &Option<String>,
-    ) -> String {
-        let from_root = self.to_native_typename_from_root();
-        if let Some(to_root) = path_to_package_root {
-            to_root.clone() + "::" + &from_root
-        } else {
-            from_root
+            self.name.to_string()
         }
     }
 }
@@ -113,21 +107,15 @@ impl<'a> FullyQualifiedTypeName<'a> {
     }
     pub(crate) fn to_native_typename_from_root(&self) -> String {
         self.package
+            .iter()
             .map(|s| to_module_name(*s))
             .chain(std::iter::once(to_type_name(self.name)))
             .fold1(|s1, s2| s1 + "::" + &s2)
             .unwrap()
     }
-    pub(crate) fn to_native_qualified_typename(
-        &self,
-        path_to_package_root: &Option<String>,
-    ) -> String {
+    pub(crate) fn to_native_qualified_typename(&self, path_to_package_root: &str) -> String {
         let from_root = self.to_native_typename_from_root();
-        if let Some(to_root) = path_to_package_root {
-            to_root.clone() + "::" + &from_root
-        } else {
-            from_root
-        }
+        path_to_package_root.to_string() + "::" + &from_root
     }
 }
 
