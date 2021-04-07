@@ -187,7 +187,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
         if !message.nested_type.is_empty() || !message.enum_type.is_empty() {
             writeln!(
                 self.write,
-                "mod {name} {{",
+                "pub mod {name} {{",
                 name = to_module_name(&message.name)
             )?;
             self.indent();
@@ -203,7 +203,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
             self.unindent();
             writeln!(
                 self.write,
-                "}} // mod {name} {{",
+                "}} // pub mod {name} {{",
                 name = to_module_name(&message.name)
             )?;
         }
@@ -377,7 +377,11 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
         self.update_package(package_iter.clone().collect());
 
         for package in package_iter.clone() {
-            writeln!(self.write, "mod {name} {{", name = to_module_name(package))?;
+            writeln!(
+                self.write,
+                "pub mod {name} {{",
+                name = to_module_name(package)
+            )?;
         }
 
         for enume in &fdp.enum_type {
@@ -390,7 +394,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
         for package in package_iter.clone() {
             writeln!(
                 self.write,
-                "}} // mod {name} {{",
+                "}} // pub mod {name} {{",
                 name = to_module_name(package)
             )?;
         }
