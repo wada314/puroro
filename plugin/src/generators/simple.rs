@@ -33,14 +33,25 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
         self.write.unindent()
     }
 
-    fn update_package(&mut self, package: Vec<&'b str>) {
-        self.package = package;
+    fn post_update_package(&mut self) {
         if self.package.is_empty() {
             self.path_to_package_root = "self".into();
         } else {
             let supers = std::iter::repeat("super").take(self.package.len());
             self.path_to_package_root = Itertools::intersperse(supers, "::").collect::<String>();
         }
+    }
+    fn update_package(&mut self, package: Vec<&'b str>) {
+        self.package = package;
+        self.post_update_package();
+    }
+    fn push_package(&mut self, p: &'b str) {
+        self.package.push(p);
+        self.post_update_package();
+    }
+    fn pop_package(&mut self) {
+        self.package.pop();
+        self.post_update_package();
     }
 
     fn path_to_package_root(&self) -> &str {
@@ -96,11 +107,16 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
 
             Ok(FieldDescriptorProto_Type::TYPE_STRING) => "String".into(),
 
-            Ok(FieldDescriptorProto_Type::TYPE_MESSAGE)
-            | Ok(FieldDescriptorProto_Type::TYPE_ENUM) => {
+            Ok(FieldDescriptorProto_Type::TYPE_MESSAGE) => {
                 MaybeFullyQualifiedTypeName::from_maybe_fq_typename(&field.type_name)
                     .to_native_maybe_qualified_typename(&self.path_to_package_root())
                     .into()
+            }
+
+            Ok(FieldDescriptorProto_Type::TYPE_ENUM) => {
+                let name = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(&field.type_name)
+                    .to_native_maybe_qualified_typename(&self.path_to_package_root());
+                format!("Result<{name}, i32>", name = name).into()
             }
 
             Ok(FieldDescriptorProto_Type::TYPE_BYTES) => "Vec<u8>".into(),
@@ -175,14 +191,14 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
                 name = to_module_name(&message.name)
             )?;
             self.indent();
-            self.package.push(&message.name);
+            self.push_package(&message.name);
             for submessage in &message.nested_type {
                 self.gen_message(submessage)?;
             }
             for enume in &message.enum_type {
                 self.gen_enum(enume)?;
             }
-            self.package.pop();
+            self.pop_package();
 
             self.unindent();
             writeln!(
@@ -222,12 +238,22 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
                 self.indent();
                 {
                     for field in &message.field {
-                        let default_value: Cow<'static, str> =
-                            if let Some(TypeOfIdent::Enum) = self.check_is_struct_or_enum(field) {
-                                "std::convert::TryFrom::try_from(0i32)".into()
-                            } else {
-                                "Default::default()".into()
-                            };
+                        let default_value: Cow<'static, str> = if let Some(TypeOfIdent::Enum) =
+                            self.check_is_struct_or_enum(field)
+                        {
+                            let native_enum_name =
+                                MaybeFullyQualifiedTypeName::from_maybe_fq_typename(
+                                    &field.type_name,
+                                )
+                                .to_native_maybe_qualified_typename(self.path_to_package_root());
+                            format!(
+                                "<{name} as std::convert::TryFrom<i32>>::try_from(0i32)",
+                                name = native_enum_name
+                            )
+                            .into()
+                        } else {
+                            "Default::default()".into()
+                        };
                         writeln!(
                             self.write,
                             "{name}: {value},",
@@ -283,34 +309,66 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
             FullyQualifiedTypeName::new(self.package.clone(), &enume.name),
             TypeOfIdent::Enum,
         );
+        let native_type_name = to_type_name(&enume.name);
 
+        // enum body
+        writeln!(self.write, "pub enum {name} {{", name = native_type_name,)?;
+        self.indent();
+        {
+            for value in &enume.value {
+                writeln!(
+                    self.write,
+                    "{name} = {number},",
+                    name = to_enum_value_name(&value.name),
+                    number = value.number,
+                )?;
+            }
+        }
+        self.unindent();
+        writeln!(self.write, "}} // enum {name} {{", name = native_type_name,)?;
+
+        // TryFrom<i32>
         writeln!(
             self.write,
-            "pub enum {name} {{",
-            name = to_type_name(&enume.name)
+            "impl std::convert::TryFrom<i32> for {name} {{",
+            name = native_type_name,
         )?;
         self.indent();
-
-        for value in &enume.value {
-            self.gen_enum_value(value)?;
+        {
+            writeln!(
+                self.write,
+                "type Error = i32;\n\
+                 fn try_from(value: i32) -> Result<Self, Self::Error> {{"
+            )?;
+            self.indent();
+            {
+                writeln!(self.write, "match value {{")?;
+                self.indent();
+                for value in &enume.value {
+                    writeln!(
+                        self.write,
+                        "{number} => Ok(Self::{name}),",
+                        name = to_enum_value_name(&value.name),
+                        number = value.number
+                    )?;
+                }
+                writeln!(self.write, "x => Err(x),")?;
+                self.unindent();
+                writeln!(self.write, "}} // match value {{")?;
+            }
+            self.unindent();
+            writeln!(
+                self.write,
+                "}} // fn try_from(value: T) -> Result<Self, Self::Error> {{"
+            )?;
         }
-
         self.unindent();
         writeln!(
             self.write,
-            "}} // enum {name} {{",
-            name = to_type_name(&enume.name)
+            "}} // impl std::convert::TryFrom<i32> for {name} {{",
+            name = native_type_name,
         )?;
 
-        Ok(())
-    }
-
-    fn gen_enum_value(&mut self, value: &'b EnumValueDescriptorProto) -> Result<()> {
-        writeln!(
-            self.write,
-            "{name},",
-            name = to_enum_value_name(&value.name)
-        )?;
         Ok(())
     }
 

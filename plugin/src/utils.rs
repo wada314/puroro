@@ -120,25 +120,26 @@ impl<'a> FullyQualifiedTypeName<'a> {
 }
 
 pub(crate) fn snake_case_to_camel_case(input: &str) -> String {
+    let mut capitalize_next = true;
     input
         .chars()
-        .scan(true, |capitalize_next, c| {
+        .filter_map(|c| {
             if c == '_' {
-                *capitalize_next = true;
-                Some(c)
+                capitalize_next = true;
+                None
             } else {
-                if *capitalize_next {
-                    *capitalize_next = false;
+                if capitalize_next {
+                    capitalize_next = false;
                     Some(c.to_ascii_uppercase())
                 } else {
-                    Some(c)
+                    Some(c.to_ascii_lowercase())
                 }
             }
         })
         .collect()
 }
 
-pub(crate) fn camel_case_to_snake_case(input: &str) -> String {
+pub(crate) fn camel_case_to_lower_snake_case(input: &str) -> String {
     let mut lowered = input
         .chars()
         .flat_map(|c| {
@@ -180,15 +181,15 @@ pub(crate) fn get_keyword_safe_ident(input: &str) -> String {
 }
 
 pub(crate) fn to_module_name(input: &str) -> String {
-    get_keyword_safe_ident(&camel_case_to_snake_case(input))
+    get_keyword_safe_ident(&camel_case_to_lower_snake_case(input))
 }
 
 pub(crate) fn to_type_name(input: &str) -> String {
-    get_keyword_safe_ident(&snake_case_to_camel_case(input))
+    get_keyword_safe_ident(&input)
 }
 
 pub(crate) fn to_var_name(input: &str) -> String {
-    get_keyword_safe_ident(&camel_case_to_snake_case(input))
+    get_keyword_safe_ident(&camel_case_to_lower_snake_case(input))
 }
 
 pub(crate) fn to_enum_value_name(input: &str) -> String {
