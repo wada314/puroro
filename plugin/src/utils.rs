@@ -46,40 +46,83 @@ impl<'a, W: Write> Write for Indentor<'a, W> {
 }
 
 #[derive(Debug, Hash, PartialEq, Eq)]
+pub(crate) struct MaybeFullyQualifiedTypeName<'a> {
+    package: Option<Vec<&'a str>>,
+    name: &'a str,
+}
+impl<'a> MaybeFullyQualifiedTypeName<'a> {
+    pub(crate) fn from_maybe_fq_typename(input: &'a str) -> Self {
+        if input.chars().next() != Some('.') {
+            Self {
+                name: input,
+                package: None,
+            }
+        } else {
+            let mut package = input[1..].split('.').collect::<Vec<_>>();
+            Self {
+                name: package.pop().unwrap(),
+                package: Some(package),
+            }
+        }
+    }
+    pub(crate) fn is_absolute(&self) -> bool {
+        self.package.is_some()
+    }
+    pub(crate) fn with_package(&self, package: Vec<&'a str>) -> FullyQualifiedTypeName<'a> {
+        if let Some(vec) = self.package {
+            FullyQualifiedTypeName::new(vec.clone(), self.name)
+        } else {
+            FullyQualifiedTypeName::new(package, self.name)
+        }
+    }
+    pub(crate) fn to_native_typename_from_root(&self) -> String {
+        if self.is_absolute() {
+            self.package
+                .unwrap()
+                .map(|s| to_module_name(*s))
+                .chain(std::iter::once(to_type_name(self.name)))
+                .fold1(|s1, s2| s1 + "::" + &s2)
+                .unwrap()
+        } else {
+            self.name
+        }
+    }
+    pub(crate) fn to_native_qualified_typename(
+        &self,
+        path_to_package_root: &Option<String>,
+    ) -> String {
+        let from_root = self.to_native_typename_from_root();
+        if let Some(to_root) = path_to_package_root {
+            to_root.clone() + "::" + &from_root
+        } else {
+            from_root
+        }
+    }
+}
+#[derive(Debug, Hash, PartialEq, Eq)]
 pub(crate) struct FullyQualifiedTypeName<'a> {
     package: Vec<&'a str>,
     name: &'a str,
 }
 impl<'a> FullyQualifiedTypeName<'a> {
-    pub(crate) fn from_typename(input: &'a str) -> Option<Self> {
-        if input.chars().next() != Some('.') {
-            return None;
-        }
-        let mut package = input[1..].split('.').collect::<Vec<_>>();
-        Some(Self {
-            name: package.pop().unwrap(),
-            package,
-        })
-    }
     pub(crate) fn new(package: Vec<&'a str>, name: &'a str) -> Self {
-        Self { package, name }
+        Self {
+            package: package,
+            name,
+        }
     }
-    pub(crate) fn push(&mut self, name: &'a str) {
-        self.package.push(name);
-    }
-    pub(crate) fn pop(&mut self) -> bool {
-        self.package.pop().is_some()
-    }
-    pub(crate) fn to_typename_from_root(&self) -> String {
+    pub(crate) fn to_native_typename_from_root(&self) -> String {
         self.package
-            .iter()
             .map(|s| to_module_name(*s))
             .chain(std::iter::once(to_type_name(self.name)))
             .fold1(|s1, s2| s1 + "::" + &s2)
             .unwrap()
     }
-    pub(crate) fn to_qualified_typename(&self, path_to_package_root: &Option<String>) -> String {
-        let from_root = self.to_typename_from_root();
+    pub(crate) fn to_native_qualified_typename(
+        &self,
+        path_to_package_root: &Option<String>,
+    ) -> String {
+        let from_root = self.to_native_typename_from_root();
         if let Some(to_root) = path_to_package_root {
             to_root.clone() + "::" + &from_root
         } else {

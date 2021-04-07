@@ -12,7 +12,7 @@ enum TypeOfIdent {
 
 struct StructGenerator<'a, 'b, W: Write> {
     write: Indentor<'a, W>,
-    type_of_idents: HashMap<FullyQualifiedTypeName<'b>, TypeOfIdent>,
+    type_of_idents: HashMap<MaybeFullyQualifiedTypeName<'b>, TypeOfIdent>,
     package: Vec<&'b str>,
 }
 impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
@@ -41,20 +41,19 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
     }
 
     fn search_for_idents_type(&self, typename: &str) -> Option<TypeOfIdent> {
-        if let Some(fqtn) = FullyQualifiedTypeName::from_typename(typename) {
-            return self.type_of_idents.get(&fqtn).cloned();
-        } else {
-            let mut fqtn = FullyQualifiedTypeName::new(self.package.clone(), typename);
-            loop {
-                if let Some(found) = self.type_of_idents.get(&fqtn) {
-                    return Some(found.clone());
-                }
-                if !fqtn.pop() {
-                    break;
-                }
+        let fqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename);
+
+        let mut fqtn = MaybeFullyQualifiedTypeName::new(self.package.clone(), typename);
+        loop {
+            if let Some(found) = self.type_of_idents.get(&fqtn) {
+                return Some(found.clone());
+            }
+            if !fqtn.pop() {
+                break;
             }
         }
-        None
+        None;
+        todo!()
     }
     fn check_is_struct_or_enum(&self, field: &FieldDescriptorProto) -> Option<TypeOfIdent> {
         match field.type_ {
@@ -90,7 +89,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
 
             Ok(FieldDescriptorProto_Type::TYPE_MESSAGE)
             | Ok(FieldDescriptorProto_Type::TYPE_ENUM) => {
-                FullyQualifiedTypeName::from_typename(&field.type_name)
+                MaybeFullyQualifiedTypeName::from_maybe_fq_typename(&field.type_name)
                     .map(|fqtn| fqtn.to_qualified_typename(&self.path_to_package_root()))
                     .unwrap_or_else(|| field.type_name.clone())
                     .into()
@@ -101,7 +100,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
                 if !field.type_name.is_empty() {
                     return Err(PuroroError::UnexpectedFieldType);
                 } else {
-                    FullyQualifiedTypeName::from_typename(&field.type_name)
+                    MaybeFullyQualifiedTypeName::from_maybe_fq_typename(&field.type_name)
                         .map(|fqtn| fqtn.to_qualified_typename(&self.path_to_package_root()))
                         .unwrap_or_else(|| field.type_name.clone())
                         .into()
@@ -157,7 +156,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
         let native_type_name = to_type_name(&message.name);
 
         self.type_of_idents.insert(
-            FullyQualifiedTypeName::new(self.package.clone(), &message.name),
+            MaybeFullyQualifiedTypeName::new(self.package.clone(), &message.name),
             TypeOfIdent::Message,
         );
         // Check sub-messages and sub-enums first
@@ -273,7 +272,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
 
     fn gen_enum(&mut self, enume: &'b EnumDescriptorProto) -> Result<()> {
         self.type_of_idents.insert(
-            FullyQualifiedTypeName::new(self.package.clone(), &enume.name),
+            MaybeFullyQualifiedTypeName::new(self.package.clone(), &enume.name),
             TypeOfIdent::Enum,
         );
 
