@@ -174,7 +174,7 @@ impl<'p> EnumGenerator<'p> {
             }
             Ok(())
         })?;
-        writeln!(file.writer(), "")?;
+        writeln!(file.writer(), "}}")?;
         Ok(())
     }
 }

@@ -1,6 +1,6 @@
 pub struct FileDescriptorSet {
     file: ::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto>,
-} // pub struct FileDescriptorSet {
+}
 pub struct FileDescriptorProto {
     name: String,
     package: String,
@@ -14,18 +14,18 @@ pub struct FileDescriptorProto {
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FileOptions>>,
     source_code_info: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::SourceCodeInfo>>,
     syntax: String,
-} // pub struct FileDescriptorProto {
+}
 mod descriptor_proto {
     pub struct ExtensionRange {
         start: i32,
         end: i32,
         options: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>>,
-    } // pub struct ExtensionRange {
+    }
     pub struct ReservedRange {
         start: i32,
         end: i32,
-    } // pub struct ReservedRange {
-} // mod descriptor_proto {
+    }
+}
 pub struct DescriptorProto {
     name: String,
     field: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
@@ -37,10 +37,10 @@ pub struct DescriptorProto {
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MessageOptions>>,
     reserved_range: ::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ReservedRange>,
     reserved_name: ::std::vec::Vec<String>,
-} // pub struct DescriptorProto {
+}
 pub struct ExtensionRangeOptions {
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
-} // pub struct ExtensionRangeOptions {
+}
 mod field_descriptor_proto {
     pub enum Type {
         TypeDouble = 1,
@@ -61,13 +61,13 @@ mod field_descriptor_proto {
         TypeSfixed64 = 16,
         TypeSint32 = 17,
         TypeSint64 = 18,
-    } // pub enum Type {
+    }
     pub enum Label {
         LabelOptional = 1,
         LabelRequired = 2,
         LabelRepeated = 3,
-    } // pub enum Label {
-} // mod field_descriptor_proto {
+    }
+}
 pub struct FieldDescriptorProto {
     name: String,
     number: i32,
@@ -80,34 +80,34 @@ pub struct FieldDescriptorProto {
     json_name: String,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FieldOptions>>,
     proto3_optional: bool,
-} // pub struct FieldDescriptorProto {
+}
 pub struct OneofDescriptorProto {
     name: String,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>>,
-} // pub struct OneofDescriptorProto {
+}
 mod enum_descriptor_proto {
     pub struct EnumReservedRange {
         start: i32,
         end: i32,
-    } // pub struct EnumReservedRange {
-} // mod enum_descriptor_proto {
+    }
+}
 pub struct EnumDescriptorProto {
     name: String,
     value: ::std::vec::Vec<super::super::google::protobuf::EnumValueDescriptorProto>,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>>,
     reserved_range: ::std::vec::Vec<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>,
     reserved_name: ::std::vec::Vec<String>,
-} // pub struct EnumDescriptorProto {
+}
 pub struct EnumValueDescriptorProto {
     name: String,
     number: i32,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>>,
-} // pub struct EnumValueDescriptorProto {
+}
 pub struct ServiceDescriptorProto {
     name: String,
     method: ::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto>,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>>,
-} // pub struct ServiceDescriptorProto {
+}
 pub struct MethodDescriptorProto {
     name: String,
     input_type: String,
@@ -115,14 +115,14 @@ pub struct MethodDescriptorProto {
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MethodOptions>>,
     client_streaming: bool,
     server_streaming: bool,
-} // pub struct MethodDescriptorProto {
+}
 mod file_options {
     pub enum OptimizeMode {
         Speed = 1,
         CodeSize = 2,
         LiteRuntime = 3,
-    } // pub enum OptimizeMode {
-} // mod file_options {
+    }
+}
 pub struct FileOptions {
     java_package: String,
     java_outer_classname: String,
@@ -145,26 +145,26 @@ pub struct FileOptions {
     php_metadata_namespace: String,
     ruby_package: String,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
-} // pub struct FileOptions {
+}
 pub struct MessageOptions {
     message_set_wire_format: bool,
     no_standard_descriptor_accessor: bool,
     deprecated: bool,
     map_entry: bool,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
-} // pub struct MessageOptions {
+}
 mod field_options {
     pub enum CType {
         String = 0,
         Cord = 1,
         StringPiece = 2,
-    } // pub enum CType {
+    }
     pub enum JSType {
         JsNormal = 0,
         JsString = 1,
         JsNumber = 2,
-    } // pub enum JSType {
-} // mod field_options {
+    }
+}
 pub struct FieldOptions {
     ctype: ::std::result::Result<super::super::google::protobuf::field_options::CType, i32>,
     packed: bool,
@@ -173,41 +173,41 @@ pub struct FieldOptions {
     deprecated: bool,
     weak: bool,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
-} // pub struct FieldOptions {
+}
 pub struct OneofOptions {
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
-} // pub struct OneofOptions {
+}
 pub struct EnumOptions {
     allow_alias: bool,
     deprecated: bool,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
-} // pub struct EnumOptions {
+}
 pub struct EnumValueOptions {
     deprecated: bool,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
-} // pub struct EnumValueOptions {
+}
 pub struct ServiceOptions {
     deprecated: bool,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
-} // pub struct ServiceOptions {
+}
 mod method_options {
     pub enum IdempotencyLevel {
         IdempotencyUnknown = 0,
         NoSideEffects = 1,
         Idempotent = 2,
-    } // pub enum IdempotencyLevel {
-} // mod method_options {
+    }
+}
 pub struct MethodOptions {
     deprecated: bool,
     idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
-} // pub struct MethodOptions {
+}
 mod uninterpreted_option {
     pub struct NamePart {
         name_part: String,
         is_extension: bool,
-    } // pub struct NamePart {
-} // mod uninterpreted_option {
+    }
+}
 pub struct UninterpretedOption {
     name: ::std::vec::Vec<super::super::google::protobuf::uninterpreted_option::NamePart>,
     identifier_value: String,
@@ -216,7 +216,7 @@ pub struct UninterpretedOption {
     double_value: f64,
     string_value: ::std::vec::Vec<u8>,
     aggregate_value: String,
-} // pub struct UninterpretedOption {
+}
 mod source_code_info {
     pub struct Location {
         path: ::std::vec::Vec<i32>,
@@ -224,19 +224,19 @@ mod source_code_info {
         leading_comments: String,
         trailing_comments: String,
         leading_detached_comments: ::std::vec::Vec<String>,
-    } // pub struct Location {
-} // mod source_code_info {
+    }
+}
 pub struct SourceCodeInfo {
     location: ::std::vec::Vec<super::super::google::protobuf::source_code_info::Location>,
-} // pub struct SourceCodeInfo {
+}
 mod generated_code_info {
     pub struct Annotation {
         path: ::std::vec::Vec<i32>,
         source_file: String,
         begin: i32,
         end: i32,
-    } // pub struct Annotation {
-} // mod generated_code_info {
+    }
+}
 pub struct GeneratedCodeInfo {
     annotation: ::std::vec::Vec<super::super::google::protobuf::generated_code_info::Annotation>,
-} // pub struct GeneratedCodeInfo {
+}
