@@ -1,6 +1,6 @@
 use crate::generators::utils::*;
 use crate::plugin::*;
-use crate::Result;
+use crate::{ErrorKind, Result};
 use itertools::Itertools;
 use std::{collections::HashMap, fmt::Write};
 
@@ -15,29 +15,38 @@ pub(crate) struct InvocationContext<'p> {
 }
 
 impl<'p> InvocationContext<'p> {
-    pub(crate) fn new(cgreq: &'p CodeGeneratorRequest) -> Self {
-        Self {
+    pub(crate) fn new(cgreq: &'p CodeGeneratorRequest) -> Result<Self> {
+        Ok(Self {
             type_of_ident_map: HashMap::new(),
-        }
+        })
     }
     fn generate_type_of_ident_map(
         cgreq: &'p CodeGeneratorRequest,
-    ) -> HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent> {
+    ) -> Result<HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>> {
         let mut map = HashMap::new();
         let mut package = Vec::new();
         fn for_msg<'p>(
             msg: &'p DescriptorProto,
             map: &mut HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
             package: &mut Vec<&'p str>,
-        ) {
-            todo!()
+        ) -> Result<()> {
+            package.push(&msg.name);
+
+            package.pop();
+            let fqtn = FullyQualifiedTypeName::new(package.clone(), &msg.name);
+            if let None = map.insert(fqtn.clone(), TypeOfIdent::Message) {
+                Err(ErrorKind::ConflictedName {
+                    name: format!("{}", fqtn),
+                })?;
+            }
+            Ok(())
         }
 
         for file in &cgreq.proto_file {
             package = file.package.split('.').collect();
             for msg in &file.message_type {}
         }
-        map
+        Ok(map)
     }
 }
 

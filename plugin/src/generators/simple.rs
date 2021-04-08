@@ -1,7 +1,7 @@
 use crate::generators::shared::*;
 use crate::generators::utils::*;
 use crate::plugin::*;
-use crate::{PuroroError, Result};
+use crate::{ErrorKind, Result};
 use itertools::Itertools;
 use std::{borrow::Cow, collections::HashMap, fmt::Write};
 
@@ -187,9 +187,12 @@ impl<'w, 'p, W: Write> StructGeneratorContext<'w, 'p, W> {
 
             Ok(FieldDescriptorProto_Type::TYPE_BYTES) => "Vec<u8>".into(),
 
-            _ => {
+            Ok(field_type) => Err(ErrorKind::UnknownFieldTypeId {
+                id: field_type as i32,
+            })?,
+            Err(id) => {
                 if !field.type_name.is_empty() {
-                    return Err(PuroroError::UnexpectedFieldType);
+                    Err(ErrorKind::UnknownFieldTypeId { id })?
                 } else {
                     MaybeFullyQualifiedTypeName::from_maybe_fq_typename(&field.type_name)
                         .to_native_maybe_qualified_typename(&self.path_to_package_root())
@@ -226,9 +229,7 @@ impl<'w, 'p, W: Write> StructGeneratorContext<'w, 'p, W> {
             Ok(FieldDescriptorProto_Label::LABEL_REPEATED) => {
                 format!("Vec<{}>", native_original_type).into()
             }
-            _ => {
-                return Err(PuroroError::InvalidFieldLabel);
-            }
+            Err(id) => Err(ErrorKind::UnknownLabelId { id })?,
         };
         let name = to_var_name(&field.name);
 

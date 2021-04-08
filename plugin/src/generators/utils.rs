@@ -1,6 +1,6 @@
 use ::lazy_static::lazy_static;
 use itertools::Itertools;
-use std::{borrow::Cow, collections::HashSet, fmt::Write, path::Path};
+use std::{collections::HashSet, fmt::Write};
 pub(crate) struct Indentor<'w, W: Write> {
     write: &'w mut W,
     indent_next: bool,
@@ -45,7 +45,7 @@ impl<'w, W: Write> Write for Indentor<'w, W> {
     }
 }
 
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub(crate) struct MaybeFullyQualifiedTypeName<'p> {
     package: Option<Vec<&'p str>>,
     name: &'p str,
@@ -93,7 +93,7 @@ impl<'p> MaybeFullyQualifiedTypeName<'p> {
         }
     }
 }
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub(crate) struct FullyQualifiedTypeName<'p> {
     package: Vec<&'p str>,
     name: &'p str,
@@ -116,6 +116,16 @@ impl<'p> FullyQualifiedTypeName<'p> {
     pub(crate) fn to_native_qualified_typename(&self, path_to_package_root: &str) -> String {
         let from_root = self.to_native_typename_from_root();
         path_to_package_root.to_string() + "::" + &from_root
+    }
+}
+impl<'a> std::fmt::Display for FullyQualifiedTypeName<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for p in &self.package {
+            f.write_str(*p)?;
+            f.write_str(".")?;
+        }
+        f.write_str(self.name)?;
+        Ok(())
     }
 }
 

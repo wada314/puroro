@@ -2,25 +2,16 @@
 
 #[macro_use]
 mod macros;
+mod error;
 mod generators;
 mod plugin;
 #[cfg(test)]
 mod test;
 
 use ::puroro::{Deserializable, Serializable};
-use ::puroro::{PuroroError, Result};
 
-#[derive(::thiserror::Error, Debug)]
-#[error("Compiler error! ErrorKind: {kind:?}")]
-pub(crate) struct CompilerError {
-    kind: ErrorKind,
-    #[cfg(feature = "nightly")]
-    backtrace: std::backtrace::Backtrace,
-}
-#[derive(Debug)]
-pub(crate) enum ErrorKind {
-    ConflictedName(String),
-}
+use error::{ErrorKind, GeneratorError};
+type Result<T> = std::result::Result<T, GeneratorError>;
 
 use std::io::Read;
 use std::io::{stdin, stdout};
