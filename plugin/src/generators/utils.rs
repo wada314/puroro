@@ -1,6 +1,6 @@
 use ::lazy_static::lazy_static;
 use itertools::Itertools;
-use std::{borrow::Cow, collections::HashSet, fmt::Write};
+use std::{borrow::Cow, collections::HashSet, fmt::Write, path::Path};
 pub(crate) struct Indentor<'a, W: Write> {
     write: &'a mut W,
     indent_next: bool,
@@ -194,6 +194,12 @@ pub(crate) fn to_var_name(input: &str) -> String {
 
 pub(crate) fn to_enum_value_name(input: &str) -> String {
     get_keyword_safe_ident(&snake_case_to_camel_case(input))
+}
+
+// Note that we cannot use `std::path::Path` because protobuf compiler requires
+// a slash-delimited path regardless of the OS they are running on.
+pub(crate) fn package_to_file_path<'a>(package: &Vec<&'a str>) -> Vec<String> {
+    package.iter().map(|p| to_module_name(*p)).collect()
 }
 
 pub(crate) fn to_string_literal(input: &str) -> String {

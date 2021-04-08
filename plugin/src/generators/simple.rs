@@ -1,5 +1,6 @@
+use crate::generators::shared::*;
+use crate::generators::utils::*;
 use crate::plugin::*;
-use crate::utils::*;
 use crate::{PuroroError, Result};
 use itertools::Itertools;
 use std::{borrow::Cow, collections::HashMap, fmt::Write};
@@ -10,13 +11,30 @@ enum TypeOfIdent {
     Enum,
 }
 
-struct StructGenerator<'a, 'b, W: Write> {
+struct MessageGenerator<'a> {
+    desc_proto: &'a DescriptorProto,
+}
+impl<'a> MessageGenerator<'a> {
+    fn new(desc_proto: &'a DescriptorProto) -> Self {
+        Self { desc_proto }
+    }
+
+    fn gen_struct<'b, W: Write>(
+        &mut self,
+        file: &mut FileGeneratorContext<'b, 'a, W>,
+    ) -> Result<()> {
+        todo!()
+    }
+}
+
+struct StructGeneratorContext<'a, 'b, W: Write> {
     write: Indentor<'a, W>,
     type_of_idents: HashMap<FullyQualifiedTypeName<'b>, TypeOfIdent>,
+
     package: Vec<&'b str>,
     path_to_package_root: String,
 }
-impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
+impl<'a, 'b, W: Write> StructGeneratorContext<'a, 'b, W> {
     fn new(write: &'a mut W) -> Self {
         Self {
             write: Indentor::new(write),
@@ -405,7 +423,7 @@ impl<'a, 'b, W: Write> StructGenerator<'a, 'b, W> {
 
 pub(crate) fn generate_simple(cgreq: &CodeGeneratorRequest) -> Result<String> {
     let mut output = String::new();
-    let mut context = StructGenerator::new(&mut output);
+    let mut context = StructGeneratorContext::new(&mut output);
     for fdp in &cgreq.proto_file {
         context.gen_file(fdp)?;
     }

@@ -4,7 +4,6 @@ mod generators;
 mod plugin;
 #[cfg(test)]
 mod test;
-mod utils;
 
 use ::puroro::{Deserializable, Serializable};
 use ::puroro::{PuroroError, Result};
