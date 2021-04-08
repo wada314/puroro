@@ -11,31 +11,79 @@ enum TypeOfIdent {
     Enum,
 }
 
-struct MessageGenerator<'a> {
-    desc_proto: &'a DescriptorProto,
+struct MessageGenerator<'p /* 'p: Lifetime for the input protobuf */> {
+    desc_proto: &'p DescriptorProto,
+    sub_msg_generators: Vec<MessageGenerator<'p>>,
+    sub_enum_generators: Vec<EnumGenerator<'p>>,
 }
-impl<'a> MessageGenerator<'a> {
-    fn new(desc_proto: &'a DescriptorProto) -> Self {
-        Self { desc_proto }
+impl<'p> MessageGenerator<'p> {
+    fn new(desc_proto: &'p DescriptorProto) -> Self {
+        let sub_msg_generators = desc_proto
+            .nested_type
+            .iter()
+            .map(|msg| MessageGenerator::new(msg))
+            .collect::<Vec<_>>();
+        let sub_enum_generators = desc_proto
+            .enum_type
+            .iter()
+            .map(|enume| EnumGenerator::new(enume))
+            .collect::<Vec<_>>();
+        Self {
+            desc_proto,
+            sub_msg_generators,
+            sub_enum_generators,
+        }
     }
 
-    fn gen_struct<'b, W: Write>(
+    fn gen_struct<'w, W: Write>(
         &mut self,
-        file: &mut FileGeneratorContext<'b, 'a, W>,
+        file: &mut FileGeneratorContext<'w, 'p, W>,
     ) -> Result<()> {
         todo!()
     }
 }
 
-struct StructGeneratorContext<'a, 'b, W: Write> {
-    write: Indentor<'a, W>,
-    type_of_idents: HashMap<FullyQualifiedTypeName<'b>, TypeOfIdent>,
+struct EnumGenerator<'p /* 'p: Lifetime for the input protobuf */> {
+    enume: &'p EnumDescriptorProto,
+}
+impl<'p> EnumGenerator<'p> {
+    fn new(enume_proto: &'p EnumDescriptorProto) -> Self {
+        Self { enume: enume_proto }
+    }
 
-    package: Vec<&'b str>,
+    fn gen_enum<'w, W: Write>(&mut self, file: &mut FileGeneratorContext<'w, 'p, W>) -> Result<()> {
+        let native_type_name = to_type_name(&self.enume.name);
+        writeln!(file.writer(), "pub enum {name} {{", name = native_type_name,)?;
+        file.indent(|file| {
+            for value in &self.enume.value {
+                let name = to_enum_value_name(&value.name);
+                writeln!(
+                    file.writer(),
+                    "{name} = {number}",
+                    name = name,
+                    number = value.number
+                )?;
+            }
+            Ok(())
+        })?;
+        writeln!(
+            file.writer(),
+            "}} // pub enum {name} {{",
+            name = native_type_name,
+        )?;
+        Ok(())
+    }
+}
+
+struct StructGeneratorContext<'w, 'p, W: Write> {
+    write: Indentor<'w, W>,
+    type_of_idents: HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
+
+    package: Vec<&'p str>,
     path_to_package_root: String,
 }
-impl<'a, 'b, W: Write> StructGeneratorContext<'a, 'b, W> {
-    fn new(write: &'a mut W) -> Self {
+impl<'w, 'p, W: Write> StructGeneratorContext<'w, 'p, W> {
+    fn new(write: &'w mut W) -> Self {
         Self {
             write: Indentor::new(write),
             type_of_idents: HashMap::new(),
@@ -59,11 +107,11 @@ impl<'a, 'b, W: Write> StructGeneratorContext<'a, 'b, W> {
             self.path_to_package_root = Itertools::intersperse(supers, "::").collect::<String>();
         }
     }
-    fn update_package(&mut self, package: Vec<&'b str>) {
+    fn update_package(&mut self, package: Vec<&'p str>) {
         self.package = package;
         self.post_update_package();
     }
-    fn push_package(&mut self, p: &'b str) {
+    fn push_package(&mut self, p: &'p str) {
         self.package.push(p);
         self.post_update_package();
     }
@@ -102,7 +150,7 @@ impl<'a, 'b, W: Write> StructGeneratorContext<'a, 'b, W> {
         }
     }
 
-    fn gen_field(&mut self, field: &'b FieldDescriptorProto) -> Result<()> {
+    fn gen_field(&mut self, field: &'p FieldDescriptorProto) -> Result<()> {
         let native_original_type: Cow<'static, str> = match field.type_ {
             Ok(FieldDescriptorProto_Type::TYPE_DOUBLE) => "f64".into(),
             Ok(FieldDescriptorProto_Type::TYPE_FLOAT) => "f32".into(),
@@ -194,7 +242,7 @@ impl<'a, 'b, W: Write> StructGeneratorContext<'a, 'b, W> {
         Ok(())
     }
 
-    fn gen_message(&mut self, message: &'b DescriptorProto) -> Result<()> {
+    fn gen_message(&mut self, message: &'p DescriptorProto) -> Result<()> {
         let native_type_name = to_type_name(&message.name);
 
         self.type_of_idents.insert(
@@ -322,7 +370,7 @@ impl<'a, 'b, W: Write> StructGeneratorContext<'a, 'b, W> {
         Ok(())
     }
 
-    fn gen_enum(&mut self, enume: &'b EnumDescriptorProto) -> Result<()> {
+    fn gen_enum(&mut self, enume: &'p EnumDescriptorProto) -> Result<()> {
         self.type_of_idents.insert(
             FullyQualifiedTypeName::new(self.package.clone(), &enume.name),
             TypeOfIdent::Enum,
@@ -390,7 +438,7 @@ impl<'a, 'b, W: Write> StructGeneratorContext<'a, 'b, W> {
         Ok(())
     }
 
-    fn gen_file(&mut self, fdp: &'b FileDescriptorProto) -> Result<()> {
+    fn gen_file(&mut self, fdp: &'p FileDescriptorProto) -> Result<()> {
         let package_iter = fdp.package.split('.').filter(|s| !s.is_empty());
         self.update_package(package_iter.clone().collect());
 

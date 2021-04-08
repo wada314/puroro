@@ -1,13 +1,13 @@
 use ::lazy_static::lazy_static;
 use itertools::Itertools;
 use std::{borrow::Cow, collections::HashSet, fmt::Write, path::Path};
-pub(crate) struct Indentor<'a, W: Write> {
-    write: &'a mut W,
+pub(crate) struct Indentor<'w, W: Write> {
+    write: &'w mut W,
     indent_next: bool,
     level: usize,
 }
-impl<'a, W: Write> Indentor<'a, W> {
-    pub(crate) fn new(write: &'a mut W) -> Self {
+impl<'w, W: Write> Indentor<'w, W> {
+    pub(crate) fn new(write: &'w mut W) -> Self {
         Self {
             write,
             indent_next: false,
@@ -22,7 +22,7 @@ impl<'a, W: Write> Indentor<'a, W> {
         self.level -= 1;
     }
 }
-impl<'a, W: Write> Write for Indentor<'a, W> {
+impl<'w, W: Write> Write for Indentor<'w, W> {
     fn write_str(&mut self, s: &str) -> std::fmt::Result {
         for c in s.chars() {
             self.write_char(c)?;
@@ -46,12 +46,12 @@ impl<'a, W: Write> Write for Indentor<'a, W> {
 }
 
 #[derive(Debug, Hash, PartialEq, Eq)]
-pub(crate) struct MaybeFullyQualifiedTypeName<'a> {
-    package: Option<Vec<&'a str>>,
-    name: &'a str,
+pub(crate) struct MaybeFullyQualifiedTypeName<'p> {
+    package: Option<Vec<&'p str>>,
+    name: &'p str,
 }
-impl<'a> MaybeFullyQualifiedTypeName<'a> {
-    pub(crate) fn from_maybe_fq_typename(input: &'a str) -> Self {
+impl<'p> MaybeFullyQualifiedTypeName<'p> {
+    pub(crate) fn from_maybe_fq_typename(input: &'p str) -> Self {
         if input.chars().next() != Some('.') {
             Self {
                 name: input,
@@ -65,14 +65,14 @@ impl<'a> MaybeFullyQualifiedTypeName<'a> {
             }
         }
     }
-    pub(crate) fn try_to_absolute(&self) -> Option<FullyQualifiedTypeName<'a>> {
+    pub(crate) fn try_to_absolute(&self) -> Option<FullyQualifiedTypeName<'p>> {
         if let Some(package) = &self.package {
             Some(FullyQualifiedTypeName::new(package.clone(), self.name))
         } else {
             None
         }
     }
-    pub(crate) fn with_package(&self, package: Vec<&'a str>) -> FullyQualifiedTypeName<'a> {
+    pub(crate) fn with_package(&self, package: Vec<&'p str>) -> FullyQualifiedTypeName<'p> {
         if let Some(vec) = &self.package {
             FullyQualifiedTypeName::new(vec.clone(), self.name)
         } else {
@@ -94,12 +94,12 @@ impl<'a> MaybeFullyQualifiedTypeName<'a> {
     }
 }
 #[derive(Debug, Hash, PartialEq, Eq)]
-pub(crate) struct FullyQualifiedTypeName<'a> {
-    package: Vec<&'a str>,
-    name: &'a str,
+pub(crate) struct FullyQualifiedTypeName<'p> {
+    package: Vec<&'p str>,
+    name: &'p str,
 }
-impl<'a> FullyQualifiedTypeName<'a> {
-    pub(crate) fn new(package: Vec<&'a str>, name: &'a str) -> Self {
+impl<'p> FullyQualifiedTypeName<'p> {
+    pub(crate) fn new(package: Vec<&'p str>, name: &'p str) -> Self {
         Self {
             package: package,
             name,

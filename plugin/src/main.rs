@@ -1,3 +1,5 @@
+#![cfg_attr(feature = "nightly", feature(backtrace))]
+
 #[macro_use]
 mod macros;
 mod generators;
@@ -7,6 +9,16 @@ mod test;
 
 use ::puroro::{Deserializable, Serializable};
 use ::puroro::{PuroroError, Result};
+
+#[derive(::thiserror::Error, Debug)]
+#[error("Compiler error! ErrorKind: {kind:?}")]
+pub(crate) struct CompilerError {
+    kind: ErrorKind,
+    #[cfg(feature = "nightly")]
+    backtrace: std::backtrace::Backtrace,
+}
+#[derive(Debug)]
+pub(crate) enum ErrorKind {}
 
 use std::io::Read;
 use std::io::{stdin, stdout};
