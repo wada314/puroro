@@ -29,7 +29,6 @@ impl<'p> MessageGenerator<'p> {
         }
     }
 
-    #[must_use]
     fn gen_struct<W: Write>(
         &self,
         context: &InvocationContext,
@@ -78,7 +77,6 @@ impl<'p> MessageGenerator<'p> {
     // Message -> the message type itself (no Option).
     // Enum -> the enum type itself (no Result).
     // repeated -> not considered.
-    #[must_use]
     fn gen_field_bare_type(
         &self,
         field_type: std::result::Result<FieldDescriptorProto_Type, i32>,
@@ -113,7 +111,6 @@ impl<'p> MessageGenerator<'p> {
         }
     }
 
-    #[must_use]
     fn gen_field_type<W: Write>(
         &self,
         field: &FieldDescriptorProto,
