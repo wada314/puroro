@@ -14,12 +14,12 @@ impl FileGeneratorHandler for Generator {
         msg: &'p DescriptorProto,
     ) -> Result<()> {
         let native_type_name = to_type_name(&msg.name);
-        writeln!(fc.writer(), "pub struct {name} {{", name = native_type_name)?;
-        fc.indent_with(|file| {
+        write!(fc.writer(), "pub struct {name} ", name = native_type_name)?;
+        fc.indent_with_braces(|fc| {
             for field in &msg.field {
-                let field_native_type = self.gen_field_type(field, context, file)?;
+                let field_native_type = self.gen_field_type(field, context, fc)?;
                 writeln!(
-                    file.writer(),
+                    fc.writer(),
                     "{name}: {type_},",
                     name = to_var_name(&field.name),
                     type_ = field_native_type
@@ -27,23 +27,22 @@ impl FileGeneratorHandler for Generator {
             }
             Ok(())
         })?;
-        writeln!(fc.writer(), "}}")?;
         Ok(())
     }
 
     fn handle_enum<'p, W: Write>(
         &mut self,
-        context: &InvocationContext,
+        _context: &InvocationContext,
         fc: &mut FileGeneratorContext<'p, W>,
         enume: &'p EnumDescriptorProto,
     ) -> Result<()> {
         let native_type_name = to_type_name(&enume.name);
-        writeln!(fc.writer(), "pub enum {name} {{", name = native_type_name,)?;
-        fc.indent_with(|file| {
+        write!(fc.writer(), "pub enum {name} ", name = native_type_name,)?;
+        fc.indent_with_braces(|fc| {
             for value in &enume.value {
                 let name = to_enum_value_name(&value.name);
                 writeln!(
-                    file.writer(),
+                    fc.writer(),
                     "{name} = {number},",
                     name = name,
                     number = value.number
@@ -51,7 +50,6 @@ impl FileGeneratorHandler for Generator {
             }
             Ok(())
         })?;
-        writeln!(fc.writer(), "}}")?;
         Ok(())
     }
 

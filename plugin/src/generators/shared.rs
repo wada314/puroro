@@ -134,13 +134,22 @@ impl<'p, W: Write> FileGeneratorContext<'p, W> {
         }
     }
 
-    pub(crate) fn indent_with<F: FnOnce(&mut FileGeneratorContext<'p, W>) -> Result<()>>(
-        &mut self,
-        f: F,
-    ) -> Result<()> {
+    pub(crate) fn indent_with<F, R>(&mut self, f: F) -> Result<R>
+    where
+        F: FnOnce(&mut FileGeneratorContext<'p, W>) -> Result<R>,
+    {
         self.writer.indent();
         let ret = (f)(self);
         self.writer.unindent();
+        ret
+    }
+    pub(crate) fn indent_with_braces<F, R>(&mut self, f: F) -> Result<R>
+    where
+        F: FnOnce(&mut FileGeneratorContext<'p, W>) -> Result<R>,
+    {
+        writeln!(self.writer(), "{{")?;
+        let ret = self.indent_with(f);
+        writeln!(self.writer(), "}}")?;
         ret
     }
     pub(crate) fn indent(&mut self) {
