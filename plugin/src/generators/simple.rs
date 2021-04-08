@@ -3,7 +3,7 @@ use crate::generators::utils::*;
 use crate::plugin::*;
 use crate::{ErrorKind, Result};
 use itertools::Itertools;
-use std::{borrow::Cow, collections::HashMap, fmt::Write};
+use std::{borrow::Cow, fmt::Write};
 
 struct MessageGenerator<'p /* 'p: Lifetime for the input protobuf */> {
     desc_proto: &'p DescriptorProto,
@@ -35,15 +35,23 @@ impl<'p> MessageGenerator<'p> {
         context: &InvocationContext,
         file: &mut FileGeneratorContext<'w, 'p, W>,
     ) -> Result<()> {
-        file.enter_submessage_namespace(&self.desc_proto.name, |file| {
-            for subenum in &self.sub_enum_generators {
-                subenum.gen_enum(context, file)?;
-            }
-            for submsg in &self.sub_msg_generators {
-                submsg.gen_struct(context, file)?;
-            }
-            Ok(())
-        })?;
+        if !self.desc_proto.nested_type.is_empty() || !self.desc_proto.enum_type.is_empty() {
+            file.enter_submessage_namespace(&self.desc_proto.name, |file| {
+                let module_name = to_module_name(&self.desc_proto.name);
+                writeln!(file.writer(), "mod {name} {{", name = module_name)?;
+                file.indent(|file| {
+                    for subenum in &self.sub_enum_generators {
+                        subenum.gen_enum(context, file)?;
+                    }
+                    for submsg in &self.sub_msg_generators {
+                        submsg.gen_struct(context, file)?;
+                    }
+                    Ok(())
+                })?;
+                writeln!(file.writer(), "}} // mod {name} {{", name = module_name)?;
+                Ok(())
+            })?;
+        }
 
         let native_type_name = to_type_name(&self.desc_proto.name);
         writeln!(
@@ -56,8 +64,8 @@ impl<'p> MessageGenerator<'p> {
                 let field_native_type = self.gen_field_type(field, context, file)?;
                 writeln!(
                     file.writer(),
-                    "{name}: {type_}",
-                    name = &field.name,
+                    "{name}: {type_},",
+                    name = to_var_name(&field.name),
                     type_ = field_native_type
                 )?;
             }
@@ -68,8 +76,7 @@ impl<'p> MessageGenerator<'p> {
             "}} // pub struct {name} {{",
             name = native_type_name
         )?;
-
-        todo!()
+        Ok(())
     }
 
     // Message -> the message type itself (no Option).
@@ -98,7 +105,7 @@ impl<'p> MessageGenerator<'p> {
                 | FieldDescriptorProto_Type::TYPE_SFIXED32 => "i32".into(),
                 FieldDescriptorProto_Type::TYPE_BOOL => "bool".into(),
                 FieldDescriptorProto_Type::TYPE_STRING => "String".into(),
-                FieldDescriptorProto_Type::TYPE_BYTES => "Vec<u8>".into(),
+                FieldDescriptorProto_Type::TYPE_BYTES => "::std::vec::Vec<u8>".into(),
                 FieldDescriptorProto_Type::TYPE_MESSAGE | FieldDescriptorProto_Type::TYPE_ENUM => {
                     MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename)
                         .to_native_maybe_qualified_typename(path_to_package_root)
@@ -122,21 +129,21 @@ impl<'p> MessageGenerator<'p> {
         let type_of_ident = context.type_of_ident(file.package().clone(), &field.type_name);
         Ok(match field.label {
             Ok(label_body) => match label_body {
-                FieldDescriptorProto_Label::LABEL_OPTIONAL => match type_of_ident {
+                FieldDescriptorProto_Label::LABEL_OPTIONAL
+                | FieldDescriptorProto_Label::LABEL_REQUIRED => match type_of_ident {
                     Some(TypeOfIdent::Enum) => {
-                        format!("std::result::Result<{}, i32>", bare_type).into()
+                        format!("::std::result::Result<{}, i32>", bare_type).into()
                     }
                     Some(TypeOfIdent::Message) => {
-                        format!("std::option::Option<std::box::Box<{}>>", bare_type).into()
+                        format!("::std::option::Option<::std::boxed::Box<{}>>", bare_type).into()
                     }
                     _ => bare_type.into(),
                 },
-                FieldDescriptorProto_Label::LABEL_REQUIRED => Err(ErrorKind::Proto2NotSupported)?,
                 FieldDescriptorProto_Label::LABEL_REPEATED => match type_of_ident {
                     Some(TypeOfIdent::Enum) => {
-                        format!("std::vec::Vec<std::result::Result<{}, i32>>", bare_type).into()
+                        format!("::std::vec::Vec<std::result::Result<{}, i32>>", bare_type).into()
                     }
-                    _ => format!("std::vec::Vec<{}>", bare_type).into(),
+                    _ => format!("::std::vec::Vec<{}>", bare_type).into(),
                 },
             },
             Err(id) => Err(ErrorKind::UnknownLabelId { id })?,
@@ -164,7 +171,7 @@ impl<'p> EnumGenerator<'p> {
                 let name = to_enum_value_name(&value.name);
                 writeln!(
                     file.writer(),
-                    "{name} = {number}",
+                    "{name} = {number},",
                     name = name,
                     number = value.number
                 )?;

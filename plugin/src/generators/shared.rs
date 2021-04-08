@@ -66,7 +66,7 @@ impl<'p> InvocationContext<'p> {
             package.pop();
             // Work for msg itself
             let fqtn = FullyQualifiedTypeName::new(package.clone(), &msg.name);
-            if let None = map.insert(fqtn.clone(), TypeOfIdent::Message) {
+            if let Some(_) = map.insert(fqtn.clone(), TypeOfIdent::Message) {
                 Err(ErrorKind::ConflictedName {
                     name: format!("{}", fqtn),
                 })?;
@@ -79,7 +79,7 @@ impl<'p> InvocationContext<'p> {
             package: &mut Vec<&'p str>,
         ) -> Result<()> {
             let fqtn = FullyQualifiedTypeName::new(package.clone(), &enume.name);
-            if let None = map.insert(fqtn.clone(), TypeOfIdent::Enum) {
+            if let Some(_) = map.insert(fqtn.clone(), TypeOfIdent::Enum) {
                 Err(ErrorKind::ConflictedName {
                     name: format!("{}", fqtn),
                 })?;
