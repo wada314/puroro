@@ -264,7 +264,8 @@ where
             self.handler.handle_enum(self.context, self.fc, enume)
         }
         fn enter_submodule(&mut self, name: &'q str) -> Result<()> {
-            writeln!(self.fc.writer(), "mod {name} {{", name = name)?;
+            let module_name = to_module_name(name);
+            writeln!(self.fc.writer(), "mod {name} {{", name = module_name)?;
             self.fc.indent();
             Ok(())
         }

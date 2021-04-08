@@ -5,61 +5,18 @@ use crate::{ErrorKind, Result};
 use itertools::Itertools;
 use std::{borrow::Cow, fmt::Write};
 
-struct MessageGenerator<'p /* 'p: Lifetime for the input protobuf */> {
-    desc_proto: &'p DescriptorProto,
-    sub_msg_generators: Vec<MessageGenerator<'p>>,
-    sub_enum_generators: Vec<EnumGenerator<'p>>,
-}
-impl<'p> MessageGenerator<'p> {
-    fn new(desc_proto: &'p DescriptorProto) -> Self {
-        let sub_msg_generators = desc_proto
-            .nested_type
-            .iter()
-            .map(|msg| MessageGenerator::new(msg))
-            .collect::<Vec<_>>();
-        let sub_enum_generators = desc_proto
-            .enum_type
-            .iter()
-            .map(|enume| EnumGenerator::new(enume))
-            .collect::<Vec<_>>();
-        Self {
-            desc_proto,
-            sub_msg_generators,
-            sub_enum_generators,
-        }
-    }
-
-    fn gen_struct<W: Write>(
-        &self,
+struct Generator {}
+impl FileGeneratorHandler for Generator {
+    fn handle_msg<'p, W: Write>(
+        &mut self,
         context: &InvocationContext,
-        file: &mut FileGeneratorContext<'p, W>,
+        fc: &mut FileGeneratorContext<'p, W>,
+        msg: &'p DescriptorProto,
     ) -> Result<()> {
-        if !self.desc_proto.nested_type.is_empty() || !self.desc_proto.enum_type.is_empty() {
-            file.enter_submessage_namespace(&self.desc_proto.name, |file| {
-                let module_name = to_module_name(&self.desc_proto.name);
-                writeln!(file.writer(), "mod {name} {{", name = module_name)?;
-                file.indent_with(|file| {
-                    for subenum in &self.sub_enum_generators {
-                        subenum.gen_enum(context, file)?;
-                    }
-                    for submsg in &self.sub_msg_generators {
-                        submsg.gen_struct(context, file)?;
-                    }
-                    Ok(())
-                })?;
-                writeln!(file.writer(), "}}")?;
-                Ok(())
-            })?;
-        }
-
-        let native_type_name = to_type_name(&self.desc_proto.name);
-        writeln!(
-            file.writer(),
-            "pub struct {name} {{",
-            name = native_type_name
-        )?;
-        file.indent_with(|file| {
-            for field in &self.desc_proto.field {
+        let native_type_name = to_type_name(&msg.name);
+        writeln!(fc.writer(), "pub struct {name} {{", name = native_type_name)?;
+        fc.indent_with(|file| {
+            for field in &msg.field {
                 let field_native_type = self.gen_field_type(field, context, file)?;
                 writeln!(
                     file.writer(),
@@ -70,10 +27,52 @@ impl<'p> MessageGenerator<'p> {
             }
             Ok(())
         })?;
-        writeln!(file.writer(), "}}")?;
+        writeln!(fc.writer(), "}}")?;
         Ok(())
     }
 
+    fn handle_enum<'p, W: Write>(
+        &mut self,
+        context: &InvocationContext,
+        fc: &mut FileGeneratorContext<'p, W>,
+        enume: &'p EnumDescriptorProto,
+    ) -> Result<()> {
+        let native_type_name = to_type_name(&enume.name);
+        writeln!(fc.writer(), "pub enum {name} {{", name = native_type_name,)?;
+        fc.indent_with(|file| {
+            for value in &enume.value {
+                let name = to_enum_value_name(&value.name);
+                writeln!(
+                    file.writer(),
+                    "{name} = {number},",
+                    name = name,
+                    number = value.number
+                )?;
+            }
+            Ok(())
+        })?;
+        writeln!(fc.writer(), "}}")?;
+        Ok(())
+    }
+
+    fn generate_filename<'p>(
+        &mut self,
+        _context: &InvocationContext,
+        file: &'p FileDescriptorProto,
+    ) -> Result<String> {
+        if file.package.is_empty() {
+            Ok("mod.rs".into())
+        } else {
+            Ok(Itertools::intersperse(
+                file.package.split('.').map(|p| to_module_name(p)),
+                "/".to_string(),
+            )
+            .collect::<String>()
+                + ".rs")
+        }
+    }
+}
+impl Generator {
     // Message -> the message type itself (no Option).
     // Enum -> the enum type itself (no Result).
     // repeated -> not considered.
@@ -111,15 +110,15 @@ impl<'p> MessageGenerator<'p> {
         }
     }
 
-    fn gen_field_type<W: Write>(
+    fn gen_field_type<'p, W: Write>(
         &self,
-        field: &FieldDescriptorProto,
+        field: &'p FieldDescriptorProto,
         context: &InvocationContext,
-        file: &FileGeneratorContext<'p, W>,
+        fc: &FileGeneratorContext<'p, W>,
     ) -> Result<Cow<'static, str>> {
         let bare_type =
-            self.gen_field_bare_type(field.type_, &field.type_name, file.path_to_package_root())?;
-        let type_of_ident = context.type_of_ident(file.package().clone(), &field.type_name);
+            self.gen_field_bare_type(field.type_, &field.type_name, fc.path_to_package_root())?;
+        let type_of_ident = context.type_of_ident(fc.package().clone(), &field.type_name);
         Ok(match field.label {
             Ok(label_body) => match label_body {
                 FieldDescriptorProto_Label::LABEL_OPTIONAL
@@ -144,59 +143,15 @@ impl<'p> MessageGenerator<'p> {
     }
 }
 
-struct EnumGenerator<'p /* 'p: Lifetime for the input protobuf */> {
-    enume: &'p EnumDescriptorProto,
-}
-impl<'p> EnumGenerator<'p> {
-    fn new(enume_proto: &'p EnumDescriptorProto) -> Self {
-        Self { enume: enume_proto }
-    }
-
-    fn gen_enum<W: Write>(
-        &self,
-        _context: &InvocationContext,
-        file: &mut FileGeneratorContext<'p, W>,
-    ) -> Result<()> {
-        let native_type_name = to_type_name(&self.enume.name);
-        writeln!(file.writer(), "pub enum {name} {{", name = native_type_name,)?;
-        file.indent_with(|file| {
-            for value in &self.enume.value {
-                let name = to_enum_value_name(&value.name);
-                writeln!(
-                    file.writer(),
-                    "{name} = {number},",
-                    name = name,
-                    number = value.number
-                )?;
-            }
-            Ok(())
-        })?;
-        writeln!(file.writer(), "}}")?;
-        Ok(())
-    }
-}
-
 pub(crate) fn generate_simple(context: &InvocationContext) -> Result<Vec<(String, String)>> {
     let mut filename_and_content = Vec::new();
+    let mut generator = Generator {};
     for proto_file in &context.cgreq().proto_file {
-        let package = proto_file.package.split('.').collect::<Vec<_>>();
-        let mut file_context = FileGeneratorContext::new(String::new(), package.clone());
-        for enume in &proto_file.enum_type {
-            let generator = EnumGenerator::new(enume);
-            generator.gen_enum(context, &mut file_context)?;
-        }
-        for msg in &proto_file.message_type {
-            let generator = MessageGenerator::new(msg);
-            generator.gen_struct(context, &mut file_context)?;
-        }
-
-        let output_filename = Itertools::intersperse(
-            package.iter().map(|package| to_module_name(*package)),
-            "/".to_string(), // This always need to be "/" even for Windows OS
-        )
-        .collect::<String>()
-            + ".rs";
-        filename_and_content.push((output_filename, file_context.into_inner()));
+        filename_and_content.push(generate_file_with_handler(
+            context,
+            proto_file,
+            &mut generator,
+        )?);
     }
     Ok(filename_and_content)
 }
