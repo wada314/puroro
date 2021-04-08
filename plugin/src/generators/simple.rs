@@ -48,7 +48,7 @@ impl<'p> MessageGenerator<'p> {
                     }
                     Ok(())
                 })?;
-                writeln!(file.writer(), "}} // mod {name} {{", name = module_name)?;
+                writeln!(file.writer(), "}}")?;
                 Ok(())
             })?;
         }
@@ -71,11 +71,7 @@ impl<'p> MessageGenerator<'p> {
             }
             Ok(())
         })?;
-        writeln!(
-            file.writer(),
-            "}} // pub struct {name} {{",
-            name = native_type_name
-        )?;
+        writeln!(file.writer(), "}}")?;
         Ok(())
     }
 
@@ -178,11 +174,7 @@ impl<'p> EnumGenerator<'p> {
             }
             Ok(())
         })?;
-        writeln!(
-            file.writer(),
-            "}} // pub enum {name} {{",
-            name = native_type_name,
-        )?;
+        writeln!(file.writer(), "")?;
         Ok(())
     }
 }
