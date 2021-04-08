@@ -46,69 +46,65 @@ impl<'p> InvocationContext<'p> {
             None
         }
     }
-
     fn generate_type_of_ident_map(
         cgreq: &'p CodeGeneratorRequest,
     ) -> Result<HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>> {
-        fn for_msg<'p>(
-            msg: &'p DescriptorProto,
-            map: &mut HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
-            package: &mut Vec<&'p str>,
-        ) -> Result<()> {
-            // Work for sub-msg and sub-enum
-            package.push(&msg.name);
-            for submsg in &msg.nested_type {
-                for_msg(submsg, map, package)?;
-            }
-            for subenum in &msg.enum_type {
-                for_enum(subenum, map, package)?;
-            }
-            package.pop();
-            // Work for msg itself
-            let fqtn = FullyQualifiedTypeName::new(package.clone(), &msg.name);
-            if let Some(_) = map.insert(fqtn.clone(), TypeOfIdent::Message) {
-                Err(ErrorKind::ConflictedName {
-                    name: format!("{}", fqtn),
-                })?;
-            }
-            Ok(())
+        struct Visitor<'a, 'p> {
+            map: &'a mut HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
+            package: Vec<&'p str>,
         }
-        fn for_enum<'p>(
-            enume: &'p EnumDescriptorProto,
-            map: &mut HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
-            package: &mut Vec<&'p str>,
-        ) -> Result<()> {
-            let fqtn = FullyQualifiedTypeName::new(package.clone(), &enume.name);
-            if let Some(_) = map.insert(fqtn.clone(), TypeOfIdent::Enum) {
-                Err(ErrorKind::ConflictedName {
-                    name: format!("{}", fqtn),
-                })?;
+        impl<'a, 'p> DescriptorVisitor<'p> for Visitor<'a, 'p> {
+            fn handle_msg(&mut self, msg: &'p DescriptorProto) -> Result<()> {
+                let fqtn = FullyQualifiedTypeName::new(self.package.clone(), &msg.name);
+                if let Some(_) = self.map.insert(fqtn.clone(), TypeOfIdent::Message) {
+                    Err(ErrorKind::ConflictedName {
+                        name: fqtn.to_string(),
+                    })?
+                }
+                Ok(())
             }
-            Ok(())
+
+            fn handle_enum(&mut self, enume: &'p EnumDescriptorProto) -> Result<()> {
+                let fqtn = FullyQualifiedTypeName::new(self.package.clone(), &enume.name);
+                if let Some(_) = self.map.insert(fqtn.clone(), TypeOfIdent::Enum) {
+                    Err(ErrorKind::ConflictedName {
+                        name: fqtn.to_string(),
+                    })?
+                }
+                Ok(())
+            }
+
+            fn enter_submodule(&mut self, name: &'p str) -> Result<()> {
+                self.package.push(name);
+                Ok(())
+            }
+
+            fn exit_submodule(&mut self, _name: &'p str) -> Result<()> {
+                self.package.pop().unwrap();
+                Ok(())
+            }
         }
 
         let mut map = HashMap::new();
-        let mut package;
         for file in &cgreq.proto_file {
-            package = file.package.split('.').collect();
-            for enume in &file.enum_type {
-                for_enum(enume, &mut map, &mut package)?;
-            }
-            for msg in &file.message_type {
-                for_msg(msg, &mut map, &mut package)?;
-            }
+            let package = file.package.split('.').collect();
+            let mut visitor = Visitor {
+                map: &mut map,
+                package,
+            };
+            visit_file(file, &mut visitor)?;
         }
         Ok(map)
     }
 }
 
-pub(crate) struct FileGeneratorContext<'w, 'p, W: Write> {
-    writer: Indentor<'w, W>,
+pub(crate) struct FileGeneratorContext<'p, W: Write> {
+    writer: Indentor<W>,
     package: Vec<&'p str>,
     path_to_package_root: String,
 }
-impl<'w, 'p, W: Write> FileGeneratorContext<'w, 'p, W> {
-    pub(crate) fn new(writer: &'w mut W, package: Vec<&'p str>) -> Self {
+impl<'p, W: Write> FileGeneratorContext<'p, W> {
+    pub(crate) fn new(writer: W, package: Vec<&'p str>) -> Self {
         let path_to_package_root = Self::generate_path_to_package_root(&package);
         Self {
             writer: Indentor::new(writer),
@@ -116,8 +112,11 @@ impl<'w, 'p, W: Write> FileGeneratorContext<'w, 'p, W> {
             path_to_package_root,
         }
     }
-    pub(crate) fn writer(&mut self) -> &mut Indentor<'w, W> {
+    pub(crate) fn writer(&mut self) -> &mut Indentor<W> {
         &mut self.writer
+    }
+    pub(crate) fn into_inner(self) -> W {
+        self.writer.into_inner()
     }
     pub(crate) fn package(&self) -> &Vec<&'p str> {
         &self.package
@@ -135,8 +134,7 @@ impl<'w, 'p, W: Write> FileGeneratorContext<'w, 'p, W> {
         }
     }
 
-    #[must_use]
-    pub(crate) fn indent<F: FnOnce(&mut FileGeneratorContext<'w, 'p, W>) -> Result<()>>(
+    pub(crate) fn indent<F: FnOnce(&mut FileGeneratorContext<'p, W>) -> Result<()>>(
         &mut self,
         f: F,
     ) -> Result<()> {
@@ -146,9 +144,8 @@ impl<'w, 'p, W: Write> FileGeneratorContext<'w, 'p, W> {
         ret
     }
 
-    #[must_use]
     pub(crate) fn enter_submessage_namespace<
-        F: FnOnce(&mut FileGeneratorContext<'w, 'p, W>) -> Result<()>,
+        F: FnOnce(&mut FileGeneratorContext<'p, W>) -> Result<()>,
     >(
         &mut self,
         message_name: &'p str,
@@ -163,86 +160,52 @@ impl<'w, 'p, W: Write> FileGeneratorContext<'w, 'p, W> {
     }
 }
 
-pub(crate) trait DescriptorVisitor {
-    fn handle_msg(&mut self, msg: &DescriptorProto) -> Result<()>;
-    fn handle_enum(&mut self, enume: &EnumDescriptorProto) -> Result<()>;
-    fn handle_file(&mut self, file: &FileDescriptorProto) -> Result<()>;
-    fn enter_submodule(&mut self, name: &str) -> Result<()>;
-    fn exit_submodule(&mut self, name: &str) -> Result<()>;
+pub(crate) trait DescriptorVisitor<'p> {
+    fn handle_msg(&mut self, msg: &'p DescriptorProto) -> Result<()>;
+    fn handle_enum(&mut self, enume: &'p EnumDescriptorProto) -> Result<()>;
+    fn enter_submodule(&mut self, name: &'p str) -> Result<()>;
+    fn exit_submodule(&mut self, name: &'p str) -> Result<()>;
 }
 
-pub(crate) fn visit_for_descriptor<T: DescriptorVisitor>(
-    cgreq: &CodeGeneratorRequest,
+pub(crate) fn visit_file<'p, T: DescriptorVisitor<'p>>(
+    file: &'p FileDescriptorProto,
     visitor: &mut T,
 ) -> Result<()> {
-    enum Task<'p> {
-        HandleMsg(&'p DescriptorProto),
-        HandleEnum(&'p EnumDescriptorProto),
-        EnterSubmodule(&'p str),
-        ExitSubmodule(&'p str),
+    enum Task<'q> {
+        HandleMsg(&'q DescriptorProto),
+        HandleEnum(&'q EnumDescriptorProto),
+        EnterSubmodule(&'q str),
+        ExitSubmodule(&'q str),
     }
-    for file in &cgreq.proto_file {
-        visitor.handle_file(file)?;
-        let mut tasks = file
-            .message_type
-            .iter()
-            .map(|msg| Task::HandleMsg(msg))
-            .chain(file.enum_type.iter().map(|enume| Task::HandleEnum(enume)))
-            .collect::<Vec<_>>();
+    let mut tasks = file
+        .message_type
+        .iter()
+        .map(|msg| Task::HandleMsg(msg))
+        .chain(file.enum_type.iter().map(|enume| Task::HandleEnum(enume)))
+        .collect::<Vec<_>>();
 
-        while let Some(task) = tasks.pop() {
-            match task {
-                Task::HandleMsg(msg) => {
-                    visitor.handle_msg(msg)?;
-                    if !msg.nested_type.is_empty() || !msg.enum_type.is_empty() {
-                        tasks.push(Task::ExitSubmodule(&msg.name));
-                        tasks.extend(msg.nested_type.iter().map(|submsg| Task::HandleMsg(submsg)));
-                        tasks.extend(msg.enum_type.iter().map(|enume| Task::HandleEnum(enume)));
-                        tasks.push(Task::EnterSubmodule(&msg.name));
-                    }
+    while let Some(task) = tasks.pop() {
+        match task {
+            Task::HandleMsg(msg) => {
+                visitor.handle_msg(msg)?;
+                if !msg.nested_type.is_empty() || !msg.enum_type.is_empty() {
+                    tasks.push(Task::ExitSubmodule(&msg.name));
+                    tasks.extend(msg.nested_type.iter().map(|submsg| Task::HandleMsg(submsg)));
+                    tasks.extend(msg.enum_type.iter().map(|enume| Task::HandleEnum(enume)));
+                    tasks.push(Task::EnterSubmodule(&msg.name));
                 }
-                Task::HandleEnum(enume) => {
-                    visitor.handle_enum(enume)?;
-                }
-                Task::EnterSubmodule(name) => {
-                    visitor.enter_submodule(name)?;
-                }
-                Task::ExitSubmodule(name) => {
-                    visitor.exit_submodule(name)?;
-                }
+            }
+            Task::HandleEnum(enume) => {
+                visitor.handle_enum(enume)?;
+            }
+            Task::EnterSubmodule(name) => {
+                visitor.enter_submodule(name)?;
+            }
+            Task::ExitSubmodule(name) => {
+                visitor.exit_submodule(name)?;
             }
         }
     }
+
     Ok(())
-}
-
-pub(crate) trait FileGeneratingDescriptorVisitor {
-    fn handle_msg<'w, 'p, W: Write>(
-        &mut self,
-        fc: &mut FileGeneratorContext<'w, 'p, W>,
-        msg: &'p DescriptorProto,
-    ) -> Result<()>;
-    fn handle_enum<'w, 'p, W: Write>(
-        &mut self,
-        fc: &mut FileGeneratorContext<'w, 'p, W>,
-        enume: &'p EnumDescriptorProto,
-    ) -> Result<()>;
-    fn generate_file_name(&mut self, file: &FileDescriptorProto) -> Result<String>;
-}
-
-pub(crate) struct FileGeneratorImpl<V: DescriptorVisitor> {
-    visitor: V,
-
-}
-
-pub(crate) fn generate_files<'p, I, T>(files: I, visitor: &mut T) -> Result<Vec<(String, String)>>
-where
-    I: Iterator<Item = &'p FileDescriptorProto>,
-    T: FileGeneratingDescriptorVisitor,
-{
-    let mut filenames_and_contents = Vec::new();
-    for file in files {
-        let file_name = visitor.generate_file_name(file)?;
-    }
-    Ok(filenames_and_contents)
 }

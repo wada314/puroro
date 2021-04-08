@@ -1,15 +1,15 @@
 use ::lazy_static::lazy_static;
 use itertools::Itertools;
 use std::{collections::HashSet, fmt::Write};
-pub(crate) struct Indentor<'w, W: Write> {
-    write: &'w mut W,
+pub(crate) struct Indentor<W: Write> {
+    writer: W,
     indent_next: bool,
     level: usize,
 }
-impl<'w, W: Write> Indentor<'w, W> {
-    pub(crate) fn new(write: &'w mut W) -> Self {
+impl<W: Write> Indentor<W> {
+    pub(crate) fn new(writer: W) -> Self {
         Self {
-            write,
+            writer,
             indent_next: false,
             level: 0,
         }
@@ -21,8 +21,11 @@ impl<'w, W: Write> Indentor<'w, W> {
         assert_ne!(0, self.level, "unindenting too much");
         self.level -= 1;
     }
+    pub(crate) fn into_inner(self) -> W {
+        self.writer
+    }
 }
-impl<'w, W: Write> Write for Indentor<'w, W> {
+impl<W: Write> Write for Indentor<W> {
     fn write_str(&mut self, s: &str) -> std::fmt::Result {
         for c in s.chars() {
             self.write_char(c)?;
@@ -32,7 +35,7 @@ impl<'w, W: Write> Write for Indentor<'w, W> {
     fn write_char(&mut self, c: char) -> std::fmt::Result {
         if self.indent_next {
             self.indent_next = false;
-            self.write.write_str(
+            self.writer.write_str(
                 &std::iter::repeat(' ')
                     .take(4 * self.level)
                     .collect::<String>(),
@@ -41,7 +44,7 @@ impl<'w, W: Write> Write for Indentor<'w, W> {
         if c == '\n' {
             self.indent_next = true;
         }
-        self.write.write_char(c)
+        self.writer.write_char(c)
     }
 }
 
