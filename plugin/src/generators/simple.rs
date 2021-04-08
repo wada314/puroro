@@ -100,8 +100,7 @@ impl FileGeneratorHandler for Generator {
         fc.indent_with_braces(|fc| {
             write!(
                 fc.writer(),
-                "\
-                type Error = i32; \
+                "type Error = i32; \
                 fn try_from(val: i32) -> std::result::Result<Self, i32> "
             )?;
             fc.indent_with_braces(|fc| {
