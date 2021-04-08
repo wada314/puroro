@@ -92,7 +92,7 @@ impl<'p> InvocationContext<'p> {
                 map: &mut map,
                 package,
             };
-            visit_file(file, &mut visitor)?;
+            visit_in_file(file, &mut visitor)?;
         }
         Ok(map)
     }
@@ -134,7 +134,7 @@ impl<'p, W: Write> FileGeneratorContext<'p, W> {
         }
     }
 
-    pub(crate) fn indent<F: FnOnce(&mut FileGeneratorContext<'p, W>) -> Result<()>>(
+    pub(crate) fn indent_with<F: FnOnce(&mut FileGeneratorContext<'p, W>) -> Result<()>>(
         &mut self,
         f: F,
     ) -> Result<()> {
@@ -142,6 +142,12 @@ impl<'p, W: Write> FileGeneratorContext<'p, W> {
         let ret = (f)(self);
         self.writer.unindent();
         ret
+    }
+    pub(crate) fn indent(&mut self) {
+        self.writer.indent();
+    }
+    pub(crate) fn unindent(&mut self) {
+        self.writer.unindent();
     }
 
     pub(crate) fn enter_submessage_namespace<
@@ -167,7 +173,7 @@ pub(crate) trait DescriptorVisitor<'p> {
     fn exit_submodule(&mut self, name: &'p str) -> Result<()>;
 }
 
-pub(crate) fn visit_file<'p, T: DescriptorVisitor<'p>>(
+pub(crate) fn visit_in_file<'p, T: DescriptorVisitor<'p>>(
     file: &'p FileDescriptorProto,
     visitor: &mut T,
 ) -> Result<()> {
@@ -208,4 +214,73 @@ pub(crate) fn visit_file<'p, T: DescriptorVisitor<'p>>(
     }
 
     Ok(())
+}
+
+pub(crate) trait FileGeneratorHandler {
+    fn handle_msg<'p, W: std::fmt::Write>(
+        &mut self,
+        context: &InvocationContext,
+        fc: &mut FileGeneratorContext<'p, W>,
+        msg: &'p DescriptorProto,
+    ) -> Result<()>;
+    fn handle_enum<'p, W: std::fmt::Write>(
+        &mut self,
+        context: &InvocationContext,
+        fc: &mut FileGeneratorContext<'p, W>,
+        enume: &'p EnumDescriptorProto,
+    ) -> Result<()>;
+    fn generate_filename<'p>(
+        &mut self,
+        context: &InvocationContext,
+        file: &'p FileDescriptorProto,
+    ) -> Result<String>;
+}
+
+pub(crate) fn generate_file_with_handler<'p, H>(
+    context: &InvocationContext,
+    input_file: &'p FileDescriptorProto,
+    handler: &mut H,
+) -> Result<(String, String)>
+where
+    H: FileGeneratorHandler,
+{
+    let package = input_file.package.split('.').collect::<Vec<_>>();
+    let mut fc = FileGeneratorContext::new(String::new(), package);
+    let filename = handler.generate_filename(context, input_file)?;
+
+    struct InnerVisitor<'a, 'q, H: FileGeneratorHandler> {
+        context: &'a InvocationContext<'q>,
+        fc: &'a mut FileGeneratorContext<'q, String>,
+        handler: &'a mut H,
+    }
+    impl<'a, 'q, H> DescriptorVisitor<'q> for InnerVisitor<'a, 'q, H>
+    where
+        H: FileGeneratorHandler,
+    {
+        fn handle_msg(&mut self, msg: &'q DescriptorProto) -> Result<()> {
+            self.handler.handle_msg(self.context, self.fc, msg)
+        }
+        fn handle_enum(&mut self, enume: &'q EnumDescriptorProto) -> Result<()> {
+            self.handler.handle_enum(self.context, self.fc, enume)
+        }
+        fn enter_submodule(&mut self, name: &'q str) -> Result<()> {
+            writeln!(self.fc.writer(), "mod {name} {{", name = name)?;
+            self.fc.indent();
+            Ok(())
+        }
+        fn exit_submodule(&mut self, _name: &'q str) -> Result<()> {
+            self.fc.unindent();
+            writeln!(self.fc.writer(), "}}")?;
+            Ok(())
+        }
+    }
+
+    let mut inner_visitor = InnerVisitor {
+        context,
+        fc: &mut fc,
+        handler,
+    };
+    visit_in_file(&input_file, &mut inner_visitor)?;
+
+    Ok((filename, fc.into_inner()))
 }

@@ -38,7 +38,7 @@ impl<'p> MessageGenerator<'p> {
             file.enter_submessage_namespace(&self.desc_proto.name, |file| {
                 let module_name = to_module_name(&self.desc_proto.name);
                 writeln!(file.writer(), "mod {name} {{", name = module_name)?;
-                file.indent(|file| {
+                file.indent_with(|file| {
                     for subenum in &self.sub_enum_generators {
                         subenum.gen_enum(context, file)?;
                     }
@@ -58,7 +58,7 @@ impl<'p> MessageGenerator<'p> {
             "pub struct {name} {{",
             name = native_type_name
         )?;
-        file.indent(|file| {
+        file.indent_with(|file| {
             for field in &self.desc_proto.field {
                 let field_native_type = self.gen_field_type(field, context, file)?;
                 writeln!(
@@ -159,7 +159,7 @@ impl<'p> EnumGenerator<'p> {
     ) -> Result<()> {
         let native_type_name = to_type_name(&self.enume.name);
         writeln!(file.writer(), "pub enum {name} {{", name = native_type_name,)?;
-        file.indent(|file| {
+        file.indent_with(|file| {
             for value in &self.enume.value {
                 let name = to_enum_value_name(&value.name);
                 writeln!(
