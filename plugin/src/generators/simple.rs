@@ -5,57 +5,25 @@ use crate::{ErrorKind, Result};
 use itertools::Itertools;
 use std::{borrow::Cow, fmt::Write};
 
-trait DescriptorVisitor {
-    fn handle_msg(&mut self, msg: &DescriptorProto) -> Result<()>;
-    fn handle_enum(&mut self, enume: &EnumDescriptorProto) -> Result<()>;
-    fn handle_file(&mut self, file: &FileDescriptorProto) -> Result<()>;
-    fn enter_submodule(&mut self, name: &str) -> Result<()>;
-    fn exit_submodule(&mut self, name: &str) -> Result<()>;
+struct SimpleGenerator<'p> {
+    cur_content: String,
+    cur_filename: String,
+    cur_package: Vec<&'p str>,
+    cur_native_path_to_root_mod: String,
+    filename_and_contents: Vec<(String, String)>,
+    context: &'p InvocationContext<'p>,
 }
-
-fn visit_for_descriptor<T: DescriptorVisitor>(
-    cgreq: &CodeGeneratorRequest,
-    visitor: &mut T,
-) -> Result<()> {
-    enum Task<'p> {
-        HandleMsg(&'p DescriptorProto),
-        HandleEnum(&'p EnumDescriptorProto),
-        EnterSubmodule(&'p str),
-        ExitSubmodule(&'p str),
-    }
-    for file in &cgreq.proto_file {
-        visitor.handle_file(file)?;
-        let mut tasks = file
-            .message_type
-            .iter()
-            .map(|msg| Task::HandleMsg(msg))
-            .chain(file.enum_type.iter().map(|enume| Task::HandleEnum(enume)))
-            .collect::<Vec<_>>();
-
-        while let Some(task) = tasks.pop() {
-            match task {
-                Task::HandleMsg(msg) => {
-                    visitor.handle_msg(msg)?;
-                    if !msg.nested_type.is_empty() || !msg.enum_type.is_empty() {
-                        tasks.push(Task::ExitSubmodule(&msg.name));
-                        tasks.extend(msg.nested_type.iter().map(|submsg| Task::HandleMsg(submsg)));
-                        tasks.extend(msg.enum_type.iter().map(|enume| Task::HandleEnum(enume)));
-                        tasks.push(Task::EnterSubmodule(&msg.name));
-                    }
-                }
-                Task::HandleEnum(enume) => {
-                    visitor.handle_enum(enume)?;
-                }
-                Task::EnterSubmodule(name) => {
-                    visitor.enter_submodule(name)?;
-                }
-                Task::ExitSubmodule(name) => {
-                    visitor.exit_submodule(name)?;
-                }
-            }
+impl<'p> SimpleGenerator<'p> {
+    fn new(context: &'p InvocationContext<'p>) -> Self {
+        Self {
+            cur_content: "".into(),
+            cur_filename: "".into(),
+            cur_package: Vec::new(),
+            cur_native_path_to_root_mod: "".into(),
+            filename_and_contents: Vec::new(),
+            context,
         }
     }
-    Ok(())
 }
 
 struct MessageGenerator<'p /* 'p: Lifetime for the input protobuf */> {
