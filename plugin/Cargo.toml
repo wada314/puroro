@@ -9,7 +9,6 @@ edition = "2018"
 [dependencies]
 puroro-serializer = { path = "../puroro-serializer" }
 puroro = { path = "../puroro" }
-puroro-unknown = { path = "../puroro-unknown" }
 num-derive = "0.3.3"
 num-traits = "0.2.14"
 itertools = "0.10.0"

@@ -17,6 +17,9 @@ use std::io::{stdin, stdout};
 
 use plugin::*;
 
+#[cfg(test)]
+mod google;
+
 fn main() -> Result<()> {
     let cgreq = CodeGeneratorRequest::from_bytes(stdin().bytes()).unwrap();
     let context = InvocationContext::new(&cgreq)?;

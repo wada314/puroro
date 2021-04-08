@@ -8,6 +8,22 @@ impl ::std::default::Default for GeneratedCodeInfo {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for GeneratedCodeInfo {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 mod generated_code_info {
     pub struct Annotation {
         path: ::std::vec::Vec<i32>,
@@ -25,6 +41,31 @@ mod generated_code_info {
             }
         }
     }
+    impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for Annotation {
+        type Target = Self;
+        fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+            &mut self,
+            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field_number: usize,
+        ) -> ::puroro::Result<()> {
+            match field {
+                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                    1 => {
+                        self.path.push(variant.to_native::<::puroro::tags::Int32>()?);
+                    }
+                    3 => {
+                        self.begin = variant.to_native::<::puroro::tags::Int32>()?;
+                    }
+                    4 => {
+                        self.end = variant.to_native::<::puroro::tags::Int32>()?;
+                    }
+                    _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+                }
+            }
+            Ok(())
+        }
+    }
 }
 pub struct SourceCodeInfo {
     location: ::std::vec::Vec<super::super::google::protobuf::source_code_info::Location>,
@@ -34,6 +75,22 @@ impl ::std::default::Default for SourceCodeInfo {
         Self {
             location: std::default::Default::default(),
         }
+    }
+}
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for SourceCodeInfo {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
     }
 }
 mod source_code_info {
@@ -53,6 +110,28 @@ mod source_code_info {
                 trailing_comments: std::default::Default::default(),
                 leading_detached_comments: std::default::Default::default(),
             }
+        }
+    }
+    impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for Location {
+        type Target = Self;
+        fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+            &mut self,
+            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field_number: usize,
+        ) -> ::puroro::Result<()> {
+            match field {
+                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                    1 => {
+                        self.path.push(variant.to_native::<::puroro::tags::Int32>()?);
+                    }
+                    2 => {
+                        self.span.push(variant.to_native::<::puroro::tags::Int32>()?);
+                    }
+                    _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+                }
+            }
+            Ok(())
         }
     }
 }
@@ -78,6 +157,28 @@ impl ::std::default::Default for UninterpretedOption {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for UninterpretedOption {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                4 => {
+                    self.positive_int_value = variant.to_native::<::puroro::tags::UInt64>()?;
+                }
+                5 => {
+                    self.negative_int_value = variant.to_native::<::puroro::tags::Int64>()?;
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 mod uninterpreted_option {
     pub struct NamePart {
         name_part: String,
@@ -89,6 +190,25 @@ mod uninterpreted_option {
                 name_part: std::default::Default::default(),
                 is_extension: std::default::Default::default(),
             }
+        }
+    }
+    impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for NamePart {
+        type Target = Self;
+        fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+            &mut self,
+            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field_number: usize,
+        ) -> ::puroro::Result<()> {
+            match field {
+                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                    2 => {
+                        self.is_extension = variant.to_native::<::puroro::tags::Bool>()?;
+                    }
+                    _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+                }
+            }
+            Ok(())
         }
     }
 }
@@ -104,6 +224,28 @@ impl ::std::default::Default for MethodOptions {
             idempotency_level: 0i32.try_into(),
             uninterpreted_option: std::default::Default::default(),
         }
+    }
+}
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for MethodOptions {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                33 => {
+                    self.deprecated = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                34 => {
+                    self.idempotency_level = variant.to_native::<::puroro::tags::Int32>()?.try_into();
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
     }
 }
 mod method_options {
@@ -135,6 +277,25 @@ impl ::std::default::Default for ServiceOptions {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for ServiceOptions {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                33 => {
+                    self.deprecated = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 pub struct EnumValueOptions {
     deprecated: bool,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
@@ -145,6 +306,25 @@ impl ::std::default::Default for EnumValueOptions {
             deprecated: std::default::Default::default(),
             uninterpreted_option: std::default::Default::default(),
         }
+    }
+}
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for EnumValueOptions {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                1 => {
+                    self.deprecated = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
     }
 }
 pub struct EnumOptions {
@@ -161,6 +341,28 @@ impl ::std::default::Default for EnumOptions {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for EnumOptions {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                2 => {
+                    self.allow_alias = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                3 => {
+                    self.deprecated = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 pub struct OneofOptions {
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
@@ -169,6 +371,22 @@ impl ::std::default::Default for OneofOptions {
         Self {
             uninterpreted_option: std::default::Default::default(),
         }
+    }
+}
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for OneofOptions {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
     }
 }
 pub struct FieldOptions {
@@ -191,6 +409,40 @@ impl ::std::default::Default for FieldOptions {
             weak: std::default::Default::default(),
             uninterpreted_option: std::default::Default::default(),
         }
+    }
+}
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for FieldOptions {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                1 => {
+                    self.ctype = variant.to_native::<::puroro::tags::Int32>()?.try_into();
+                }
+                2 => {
+                    self.packed = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                6 => {
+                    self.jstype = variant.to_native::<::puroro::tags::Int32>()?.try_into();
+                }
+                5 => {
+                    self.lazy = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                3 => {
+                    self.deprecated = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                10 => {
+                    self.weak = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
     }
 }
 mod field_options {
@@ -243,6 +495,34 @@ impl ::std::default::Default for MessageOptions {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for MessageOptions {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                1 => {
+                    self.message_set_wire_format = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                2 => {
+                    self.no_standard_descriptor_accessor = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                3 => {
+                    self.deprecated = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                7 => {
+                    self.map_entry = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 pub struct FileOptions {
     java_package: String,
     java_outer_classname: String,
@@ -293,6 +573,52 @@ impl ::std::default::Default for FileOptions {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for FileOptions {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                10 => {
+                    self.java_multiple_files = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                20 => {
+                    self.java_generate_equals_and_hash = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                27 => {
+                    self.java_string_check_utf8 = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                9 => {
+                    self.optimize_for = variant.to_native::<::puroro::tags::Int32>()?.try_into();
+                }
+                16 => {
+                    self.cc_generic_services = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                17 => {
+                    self.java_generic_services = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                18 => {
+                    self.py_generic_services = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                42 => {
+                    self.php_generic_services = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                23 => {
+                    self.deprecated = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                31 => {
+                    self.cc_enable_arenas = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 mod file_options {
     pub enum OptimizeMode {
         Speed = 1,
@@ -330,6 +656,28 @@ impl ::std::default::Default for MethodDescriptorProto {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for MethodDescriptorProto {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                5 => {
+                    self.client_streaming = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                6 => {
+                    self.server_streaming = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 pub struct ServiceDescriptorProto {
     name: String,
     method: ::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto>,
@@ -344,6 +692,22 @@ impl ::std::default::Default for ServiceDescriptorProto {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for ServiceDescriptorProto {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 pub struct EnumValueDescriptorProto {
     name: String,
     number: i32,
@@ -356,6 +720,25 @@ impl ::std::default::Default for EnumValueDescriptorProto {
             number: std::default::Default::default(),
             options: std::default::Default::default(),
         }
+    }
+}
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for EnumValueDescriptorProto {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                2 => {
+                    self.number = variant.to_native::<::puroro::tags::Int32>()?;
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
     }
 }
 pub struct EnumDescriptorProto {
@@ -376,6 +759,22 @@ impl ::std::default::Default for EnumDescriptorProto {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for EnumDescriptorProto {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 mod enum_descriptor_proto {
     pub struct EnumReservedRange {
         start: i32,
@@ -389,6 +788,28 @@ mod enum_descriptor_proto {
             }
         }
     }
+    impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for EnumReservedRange {
+        type Target = Self;
+        fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+            &mut self,
+            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field_number: usize,
+        ) -> ::puroro::Result<()> {
+            match field {
+                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                    1 => {
+                        self.start = variant.to_native::<::puroro::tags::Int32>()?;
+                    }
+                    2 => {
+                        self.end = variant.to_native::<::puroro::tags::Int32>()?;
+                    }
+                    _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+                }
+            }
+            Ok(())
+        }
+    }
 }
 pub struct OneofDescriptorProto {
     name: String,
@@ -400,6 +821,22 @@ impl ::std::default::Default for OneofDescriptorProto {
             name: std::default::Default::default(),
             options: std::default::Default::default(),
         }
+    }
+}
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for OneofDescriptorProto {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
     }
 }
 pub struct FieldDescriptorProto {
@@ -430,6 +867,37 @@ impl ::std::default::Default for FieldDescriptorProto {
             options: std::default::Default::default(),
             proto3_optional: std::default::Default::default(),
         }
+    }
+}
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for FieldDescriptorProto {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                3 => {
+                    self.number = variant.to_native::<::puroro::tags::Int32>()?;
+                }
+                4 => {
+                    self.label = variant.to_native::<::puroro::tags::Int32>()?.try_into();
+                }
+                5 => {
+                    self.type_ = variant.to_native::<::puroro::tags::Int32>()?.try_into();
+                }
+                9 => {
+                    self.oneof_index = variant.to_native::<::puroro::tags::Int32>()?;
+                }
+                17 => {
+                    self.proto3_optional = variant.to_native::<::puroro::tags::Bool>()?;
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
     }
 }
 mod field_descriptor_proto {
@@ -504,6 +972,22 @@ impl ::std::default::Default for ExtensionRangeOptions {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for ExtensionRangeOptions {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 pub struct DescriptorProto {
     name: String,
     field: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
@@ -532,6 +1016,22 @@ impl ::std::default::Default for DescriptorProto {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for DescriptorProto {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 mod descriptor_proto {
     pub struct ReservedRange {
         start: i32,
@@ -543,6 +1043,28 @@ mod descriptor_proto {
                 start: std::default::Default::default(),
                 end: std::default::Default::default(),
             }
+        }
+    }
+    impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for ReservedRange {
+        type Target = Self;
+        fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+            &mut self,
+            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field_number: usize,
+        ) -> ::puroro::Result<()> {
+            match field {
+                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                    1 => {
+                        self.start = variant.to_native::<::puroro::tags::Int32>()?;
+                    }
+                    2 => {
+                        self.end = variant.to_native::<::puroro::tags::Int32>()?;
+                    }
+                    _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+                }
+            }
+            Ok(())
         }
     }
     pub struct ExtensionRange {
@@ -557,6 +1079,28 @@ mod descriptor_proto {
                 end: std::default::Default::default(),
                 options: std::default::Default::default(),
             }
+        }
+    }
+    impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for ExtensionRange {
+        type Target = Self;
+        fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+            &mut self,
+            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field_number: usize,
+        ) -> ::puroro::Result<()> {
+            match field {
+                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                    1 => {
+                        self.start = variant.to_native::<::puroro::tags::Int32>()?;
+                    }
+                    2 => {
+                        self.end = variant.to_native::<::puroro::tags::Int32>()?;
+                    }
+                    _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+                }
+            }
+            Ok(())
         }
     }
 }
@@ -592,6 +1136,28 @@ impl ::std::default::Default for FileDescriptorProto {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for FileDescriptorProto {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                10 => {
+                    self.public_dependency.push(variant.to_native::<::puroro::tags::Int32>()?);
+                }
+                11 => {
+                    self.weak_dependency.push(variant.to_native::<::puroro::tags::Int32>()?);
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 pub struct FileDescriptorSet {
     file: ::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto>,
 }
@@ -600,5 +1166,21 @@ impl ::std::default::Default for FileDescriptorSet {
         Self {
             file: std::default::Default::default(),
         }
+    }
+}
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for FileDescriptorSet {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
     }
 }

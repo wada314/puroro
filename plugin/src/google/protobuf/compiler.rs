@@ -12,6 +12,25 @@ impl ::std::default::Default for CodeGeneratorResponse {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for CodeGeneratorResponse {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                2 => {
+                    self.supported_features = variant.to_native::<::puroro::tags::UInt64>()?;
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 mod code_generator_response {
     pub enum Feature {
         FeatureNone = 0,
@@ -42,6 +61,22 @@ mod code_generator_response {
             }
         }
     }
+    impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for File {
+        type Target = Self;
+        fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+            &mut self,
+            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field_number: usize,
+        ) -> ::puroro::Result<()> {
+            match field {
+                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                    _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+                }
+            }
+            Ok(())
+        }
+    }
 }
 pub struct CodeGeneratorRequest {
     file_to_generate: ::std::vec::Vec<String>,
@@ -59,6 +94,22 @@ impl ::std::default::Default for CodeGeneratorRequest {
         }
     }
 }
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for CodeGeneratorRequest {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
+    }
+}
 pub struct Version {
     major: i32,
     minor: i32,
@@ -73,5 +124,30 @@ impl ::std::default::Default for Version {
             patch: std::default::Default::default(),
             suffix: std::default::Default::default(),
         }
+    }
+}
+impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for Version {
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> { Ok(self) }
+    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        &mut self,
+        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {
+        match field {
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                1 => {
+                    self.major = variant.to_native::<::puroro::tags::Int32>()?;
+                }
+                2 => {
+                    self.minor = variant.to_native::<::puroro::tags::Int32>()?;
+                }
+                3 => {
+                    self.patch = variant.to_native::<::puroro::tags::Int32>()?;
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedWireType)?
+            }
+        }
+        Ok(())
     }
 }
