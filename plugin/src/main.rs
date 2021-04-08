@@ -5,8 +5,6 @@ mod macros;
 mod error;
 mod generators;
 mod plugin;
-#[cfg(test)]
-mod test;
 
 use ::puroro::{Deserializable, Serializable};
 use generators::shared::InvocationContext;
