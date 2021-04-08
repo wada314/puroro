@@ -9,6 +9,7 @@ mod plugin;
 mod test;
 
 use ::puroro::{Deserializable, Serializable};
+use generators::shared::InvocationContext;
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
@@ -20,11 +21,18 @@ use plugin::*;
 
 fn main() -> Result<()> {
     let cgreq = CodeGeneratorRequest::from_bytes(stdin().bytes()).unwrap();
+    let context = InvocationContext::new(&cgreq)?;
+    let filename_and_content = generators::simple::generate_simple(&context)?;
     let mut cgres = CodeGeneratorResponse::default();
-    let mut file = CodeGeneratorResponse_File::default();
-    file.name = "test.rs".to_string();
-    file.content = generators::simple::generate_simple(&cgreq)?;
-    cgres.file.push(file);
+    cgres.file = filename_and_content
+        .into_iter()
+        .map(|(filename, content)| {
+            let mut file = CodeGeneratorResponse_File::default();
+            file.name = filename;
+            file.content = content;
+            file
+        })
+        .collect();
     cgres.serialize(&mut stdout())?;
     Ok(())
 }

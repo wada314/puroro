@@ -26,6 +26,8 @@ pub(crate) enum ErrorKind {
     ConflictedName { name: String },
     UnknownFieldTypeId { id: i32 },
     UnknownLabelId { id: i32 },
+    GroupNotSupported {},
+    Proto2NotSupported,
     WriteError { source: std::fmt::Error },
     PuroroError { source: ::puroro::PuroroError },
 }

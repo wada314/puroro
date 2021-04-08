@@ -11,15 +11,42 @@ pub(crate) enum TypeOfIdent {
 }
 
 pub(crate) struct InvocationContext<'p> {
+    cgreq: &'p CodeGeneratorRequest,
     type_of_ident_map: HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
 }
 
 impl<'p> InvocationContext<'p> {
     pub(crate) fn new(cgreq: &'p CodeGeneratorRequest) -> Result<Self> {
         Ok(Self {
+            cgreq,
             type_of_ident_map: Self::generate_type_of_ident_map(cgreq)?,
         })
     }
+    pub(crate) fn cgreq(&self) -> &CodeGeneratorRequest {
+        self.cgreq
+    }
+    pub(crate) fn type_of_ident(
+        &self,
+        mut package: Vec<&'p str>,
+        typename: &'p str,
+    ) -> Option<TypeOfIdent> {
+        let mfqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename);
+        if let Some(fqtn) = mfqtn.try_to_absolute() {
+            return self.type_of_ident_map.get(&fqtn).cloned();
+        } else {
+            loop {
+                let fqtn = mfqtn.with_package(package.clone());
+                if let Some(found) = self.type_of_ident_map.get(&fqtn) {
+                    return Some(found.clone());
+                }
+                if package.pop().is_none() {
+                    break;
+                }
+            }
+            None
+        }
+    }
+
     fn generate_type_of_ident_map(
         cgreq: &'p CodeGeneratorRequest,
     ) -> Result<HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>> {
@@ -92,6 +119,13 @@ impl<'w, 'p, W: Write> FileGeneratorContext<'w, 'p, W> {
     pub(crate) fn writer(&mut self) -> &mut Indentor<'w, W> {
         &mut self.writer
     }
+    pub(crate) fn package(&self) -> &Vec<&'p str> {
+        &self.package
+    }
+    pub(crate) fn path_to_package_root(&self) -> &str {
+        &self.path_to_package_root
+    }
+
     fn generate_path_to_package_root(package: &Vec<&str>) -> String {
         if package.is_empty() {
             "self".into()
@@ -101,6 +135,7 @@ impl<'w, 'p, W: Write> FileGeneratorContext<'w, 'p, W> {
         }
     }
 
+    #[must_use]
     pub(crate) fn indent<F: FnOnce(&mut FileGeneratorContext<'w, 'p, W>) -> Result<()>>(
         &mut self,
         f: F,
@@ -111,6 +146,7 @@ impl<'w, 'p, W: Write> FileGeneratorContext<'w, 'p, W> {
         ret
     }
 
+    #[must_use]
     pub(crate) fn enter_submessage_namespace<
         F: FnOnce(&mut FileGeneratorContext<'w, 'p, W>) -> Result<()>,
     >(
