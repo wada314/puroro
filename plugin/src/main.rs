@@ -18,7 +18,9 @@ pub(crate) struct CompilerError {
     backtrace: std::backtrace::Backtrace,
 }
 #[derive(Debug)]
-pub(crate) enum ErrorKind {}
+pub(crate) enum ErrorKind {
+    ConflictedName(String),
+}
 
 use std::io::Read;
 use std::io::{stdin, stdout};
