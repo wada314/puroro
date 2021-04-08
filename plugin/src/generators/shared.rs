@@ -17,22 +17,27 @@ pub(crate) struct InvocationContext<'p> {
 impl<'p> InvocationContext<'p> {
     pub(crate) fn new(cgreq: &'p CodeGeneratorRequest) -> Result<Self> {
         Ok(Self {
-            type_of_ident_map: HashMap::new(),
+            type_of_ident_map: Self::generate_type_of_ident_map(cgreq)?,
         })
     }
     fn generate_type_of_ident_map(
         cgreq: &'p CodeGeneratorRequest,
     ) -> Result<HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>> {
-        let mut map = HashMap::new();
-        let mut package = Vec::new();
         fn for_msg<'p>(
             msg: &'p DescriptorProto,
             map: &mut HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
             package: &mut Vec<&'p str>,
         ) -> Result<()> {
+            // Work for sub-msg and sub-enum
             package.push(&msg.name);
-
+            for submsg in &msg.nested_type {
+                for_msg(submsg, map, package)?;
+            }
+            for subenum in &msg.enum_type {
+                for_enum(subenum, map, package)?;
+            }
             package.pop();
+            // Work for msg itself
             let fqtn = FullyQualifiedTypeName::new(package.clone(), &msg.name);
             if let None = map.insert(fqtn.clone(), TypeOfIdent::Message) {
                 Err(ErrorKind::ConflictedName {
@@ -41,10 +46,30 @@ impl<'p> InvocationContext<'p> {
             }
             Ok(())
         }
+        fn for_enum<'p>(
+            enume: &'p EnumDescriptorProto,
+            map: &mut HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
+            package: &mut Vec<&'p str>,
+        ) -> Result<()> {
+            let fqtn = FullyQualifiedTypeName::new(package.clone(), &enume.name);
+            if let None = map.insert(fqtn.clone(), TypeOfIdent::Enum) {
+                Err(ErrorKind::ConflictedName {
+                    name: format!("{}", fqtn),
+                })?;
+            }
+            Ok(())
+        }
 
+        let mut map = HashMap::new();
+        let mut package;
         for file in &cgreq.proto_file {
             package = file.package.split('.').collect();
-            for msg in &file.message_type {}
+            for enume in &file.enum_type {
+                for_enum(enume, &mut map, &mut package)?;
+            }
+            for msg in &file.message_type {
+                for_msg(msg, &mut map, &mut package)?;
+            }
         }
         Ok(map)
     }
