@@ -37,7 +37,9 @@ impl FileGeneratorHandler for Generator {
         enume: &'p EnumDescriptorProto,
     ) -> Result<()> {
         let native_type_name = to_type_name(&enume.name);
-        write!(fc.writer(), "pub enum {name} ", name = native_type_name,)?;
+
+        // enum body
+        write!(fc.writer(), "pub enum {name} ", name = native_type_name)?;
         fc.indent_with_braces(|fc| {
             for value in &enume.value {
                 let name = to_enum_value_name(&value.name);
@@ -50,6 +52,40 @@ impl FileGeneratorHandler for Generator {
             }
             Ok(())
         })?;
+
+        // TryFrom<i32>
+        write!(
+            fc.writer(),
+            "impl std::convert::TryFrom<i32> for {name} ",
+            name = native_type_name
+        )?;
+        fc.indent_with_braces(|fc| {
+            write!(
+                fc.writer(),
+                "\
+                type Error = i32; \
+                fn try_from(val: i32) -> std::result::Result<Self, i32> "
+            )?;
+            fc.indent_with_braces(|fc| {
+                write!(fc.writer(), "match val ")?;
+                fc.indent_with_braces(|fc| {
+                    for value in &enume.value {
+                        let value_name = to_enum_value_name(&value.name);
+                        writeln!(
+                            fc.writer(),
+                            "{number} => Ok(Self::{name}),",
+                            number = value.number,
+                            name = value_name
+                        )?;
+                    }
+                    writeln!(fc.writer(), "x => Err(x),")?;
+                    Ok(())
+                })?;
+                Ok(())
+            })?;
+            Ok(())
+        })?;
+
         Ok(())
     }
 
@@ -122,6 +158,9 @@ impl Generator {
                 FieldDescriptorProto_Label::LABEL_OPTIONAL
                 | FieldDescriptorProto_Label::LABEL_REQUIRED => match type_of_ident {
                     Some(TypeOfIdent::Enum) => {
+                        // The proto enum may have an unknown value.
+                        // In rust enum undefined value causes an undefined behavior...
+                        // https://doc.rust-lang.org/reference/behavior-considered-undefined.html
                         format!("::std::result::Result<{}, i32>", bare_type).into()
                     }
                     Some(TypeOfIdent::Message) => {
