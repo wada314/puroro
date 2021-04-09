@@ -36,9 +36,9 @@ pub(crate) enum Fragment<'w, W: 'w> {
     Str(&'static str),
     String(String),
     Cow(Cow<'static, str>),
-    Iter(Box<dyn 'w + Iterator<Item = Fragment<'w, W>>>),
+    Iter(Box<dyn 'w + Iterator<Item = Result<Fragment<'w, W>>>>),
     Functor(Box<dyn 'w + FnOnce(&mut Indentor<W>) -> Result<()>>),
-    Indent(Box<dyn 'w + Iterator<Item = Fragment<'w, W>>>),
+    Indent(Box<dyn 'w + Iterator<Item = Result<Fragment<'w, W>>>>),
 }
 impl<'w, W> From<&'static str> for Fragment<'w, W> {
     fn from(s: &'static str) -> Self {
@@ -60,7 +60,8 @@ where
     T: TupleOfIntoFragments<'w, W>,
     <T as TupleOfIntoFragments<'w, W>>::Iter: 'w,
 {
-    Fragment::Indent(Box::new(tuple.into_frag_iter()) as Box<dyn Iterator<Item = Fragment<'w, W>>>)
+    Fragment::Indent(Box::new(tuple.into_frag_iter().map(|v| Ok(v)))
+        as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>)
 }
 pub(crate) fn fr<'w, T, W>(from: T) -> Fragment<'w, W>
 where
@@ -68,13 +69,15 @@ where
 {
     from.into()
 }
-pub(crate) fn iter<'w, W, I>(iter: I) -> Fragment<'w, W>
+pub(crate) fn iter<'w, W, I, F>(iter: I) -> Fragment<'w, W>
 where
-    I: 'w + Iterator,
-    Fragment<'w, W>: From<<I as Iterator>::Item>,
+    I: 'w + Iterator<Item = Result<F>>,
+    F: Into<Fragment<'w, W>>,
 {
-    Fragment::Iter(Box::new(iter.map(|v| Fragment::<'w, W>::from(v)))
-        as Box<dyn Iterator<Item = Fragment<'w, W>>>)
+    Fragment::Iter(
+        Box::new(iter.map(|rv| rv.map(|v| <F as Into<Fragment<'w, W>>>::into(v))))
+            as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>,
+    )
 }
 pub(crate) fn func<'w, W, F>(f: F) -> Fragment<'w, W>
 where
@@ -88,7 +91,8 @@ where
     <T as TupleOfIntoFragments<'w, W>>::Iter: 'w,
     W: 'w,
 {
-    Fragment::Iter(Box::new(tuple.into_frag_iter()) as Box<dyn Iterator<Item = Fragment<'w, W>>>)
+    Fragment::Iter(Box::new(tuple.into_frag_iter().map(|v| Ok(v)))
+        as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>)
 }
 pub(crate) fn write<'w, T, W>(w: &'w mut Indentor<W>, tuple: T) -> Result<()>
 where
@@ -97,7 +101,7 @@ where
 {
     enum Task<'w, W: 'w + std::fmt::Write> {
         WriteFragment(Fragment<'w, W>),
-        ProgressIterator(Box<dyn 'w + Iterator<Item = Fragment<'w, W>>>),
+        ProgressIterator(Box<dyn 'w + Iterator<Item = Result<Fragment<'w, W>>>>),
         CallFunctor(Box<dyn 'w + FnOnce(&mut Indentor<W>) -> Result<()>>),
         Indent(),
         Unindent(),
@@ -133,7 +137,7 @@ where
             Task::ProgressIterator(mut iter) => {
                 if let Some(fr) = iter.next() {
                     tasks.push_front(Task::ProgressIterator(iter));
-                    tasks.push_front(Task::WriteFragment(fr));
+                    tasks.push_front(Task::WriteFragment(fr?));
                 }
             }
             Task::CallFunctor(f) => {

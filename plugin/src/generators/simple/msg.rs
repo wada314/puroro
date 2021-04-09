@@ -26,12 +26,12 @@ fn write_body<'p, W: Write>(
         (
             format!("pub struct {name} {{\n", name = native_type_name),
             indent((iter(msg.field.iter().map(|field| {
-                let field_native_type = gen_field_type(field, context, fc).unwrap();
-                format!(
+                let field_native_type = gen_field_type(field, context, fc)?;
+                Ok(format!(
                     "{name}: {type_},\n",
                     name = to_var_name(&field.name),
                     type_ = field_native_type
-                )
+                ))
             })),)),
             "}}\n",
         ),
