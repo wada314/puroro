@@ -10,9 +10,8 @@ pub(crate) enum Fragment<'a> {
     String(String),
     Cow(Cow<'static, str>),
     FormatArguments(std::fmt::Arguments<'a>),
-    SubFragments(&'a [Fragment<'a>]),
-    Iter(Box<dyn Iterator<Item = &'a Fragment<'a>> + 'a>),
-    Indent(Fragment<'a>),
+    Iter(Box<dyn Iterator<Item = Result<Fragment<'a>>> + 'a>),
+    Indent(Box<Fragment<'a>>),
 }
 impl<'a> From<&'static str> for Fragment<'a> {
     fn from(s: &'static str) -> Self {
@@ -34,13 +33,8 @@ impl<'a> From<std::fmt::Arguments<'a>> for Fragment<'a> {
         Self::FormatArguments(s)
     }
 }
-impl<'a> From<&'a [Fragment<'a>]> for Fragment<'a> {
-    fn from(s: &'a [Fragment<'a>]) -> Self {
-        Self::SubFragments(s)
-    }
-}
-impl<'a> From<Box<dyn Iterator<Item = &'a Fragment<'a>> + 'a>> for Fragment<'a> {
-    fn from(iter: Box<dyn Iterator<Item = &'a Fragment<'a>> + 'a>) -> Self {
+impl<'a> From<Box<dyn Iterator<Item = Result<Fragment<'a>>> + 'a>> for Fragment<'a> {
+    fn from(iter: Box<dyn Iterator<Item = Result<Fragment<'a>>> + 'a>) -> Self {
         Self::Iter(iter)
     }
 }
@@ -48,7 +42,7 @@ pub(crate) fn indent<'a, T>(from: T) -> Fragment<'a>
 where
     Fragment<'a>: From<T>,
 {
-    Fragment::Indent(from.into())
+    Fragment::Indent(Box::new(from.into()))
 }
 pub(crate) fn fr<'a, T>(from: T) -> Fragment<'a>
 where
@@ -56,14 +50,14 @@ where
 {
     from.into()
 }
-pub(crate) fn write<'a, W, I>(w: Indentor<W>, iter: I) -> std::fmt::Result
+pub(crate) fn write<'a, W, I>(w: &mut Indentor<W>, iter: I) -> Result<()>
 where
     W: Write,
-    I: Iterator<Item = &'a Fragment<'a>>,
+    I: Iterator<Item = Fragment<'a>>,
 {
     enum Task<'a> {
         WriteFragment(Fragment<'a>),
-        ProgressIterator(Box<dyn Iterator<Item = &'a Fragment<'a>> + 'a>),
+        ProgressIterator(Box<dyn Iterator<Item = Result<Fragment<'a>>> + 'a>),
         Indent(),
         Unindent(),
     }
@@ -73,7 +67,7 @@ where
     while let Some(task) = tasks.pop_front() {
         match task {
             Task::WriteFragment(fragment) => match fragment {
-                Fragment::Str(&s) => {
+                Fragment::Str(s) => {
                     w.write_str(s)?;
                 }
                 Fragment::String(s) => {
@@ -85,27 +79,19 @@ where
                 Fragment::FormatArguments(a) => {
                     w.write_fmt(a)?;
                 }
-                Fragment::SubFragments(v) => {
-                    let mut subtasks = v
-                        .into_iter()
-                        .map(|fr| Task::WriteFragment(fr))
-                        .collect::<VecDeque<_>>();
-                    subtasks.append(&mut tasks);
-                    tasks = subtasks;
-                }
                 Fragment::Iter(iter) => {
                     tasks.push_front(Task::ProgressIterator(iter));
                 }
                 Fragment::Indent(fr) => {
                     tasks.push_front(Task::Unindent());
-                    tasks.push_front(Task::WriteFragment(fr));
+                    tasks.push_front(Task::WriteFragment(*fr));
                     tasks.push_front(Task::Indent());
                 }
             },
             Task::ProgressIterator(mut iter) => {
                 if let Some(fr) = iter.next() {
                     tasks.push_front(Task::ProgressIterator(iter));
-                    tasks.push_front(Task::WriteFragment(fr));
+                    tasks.push_front(Task::WriteFragment(fr?));
                 }
             }
             Task::Indent() => {
