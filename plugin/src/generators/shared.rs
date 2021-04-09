@@ -70,9 +70,11 @@ where
 }
 pub(crate) fn iter<'w, W, I>(iter: I) -> Fragment<'w, W>
 where
-    I: 'w + Iterator<Item = Fragment<'w, W>>,
+    I: 'w + Iterator,
+    Fragment<'w, W>: From<<I as Iterator>::Item>,
 {
-    Fragment::Iter(Box::new(iter) as Box<dyn Iterator<Item = Fragment<'w, W>>>)
+    Fragment::Iter(Box::new(iter.map(|v| Fragment::<'w, W>::from(v)))
+        as Box<dyn Iterator<Item = Fragment<'w, W>>>)
 }
 pub(crate) fn func<'w, W, F>(f: F) -> Fragment<'w, W>
 where

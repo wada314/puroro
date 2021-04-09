@@ -27,11 +27,7 @@ fn write_body<'p, W: Write>(
             format!("pub enum {name} {{\n", name = native_type_name),
             indent((iter(enume.value.iter().map(|value| {
                 let name = to_enum_value_name(&value.name);
-                fr(format!(
-                    "{name} = {number},\n",
-                    name = name,
-                    number = value.number
-                ))
+                format!("{name} = {number},\n", name = name, number = value.number)
             })),)),
             "}}\n",
         ),
