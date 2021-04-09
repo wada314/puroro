@@ -47,6 +47,49 @@ impl<W: Write> Write for Indentor<W> {
         self.writer.write_char(c)
     }
 }
+pub(crate) struct RefIndentor<'a, W: Write> {
+    writer: &'a mut W,
+    indent_next: bool,
+    level: usize,
+}
+impl<'a, W: Write> RefIndentor<'a, W> {
+    pub(crate) fn new(writer: &'a mut W) -> Self {
+        Self {
+            writer,
+            indent_next: false,
+            level: 0,
+        }
+    }
+    pub(crate) fn indent(&mut self) {
+        self.level += 1;
+    }
+    pub(crate) fn unindent(&mut self) {
+        assert_ne!(0, self.level, "unindenting too much");
+        self.level -= 1;
+    }
+}
+impl<'a, W: Write> Write for RefIndentor<'a, W> {
+    fn write_str(&mut self, s: &str) -> std::fmt::Result {
+        for c in s.chars() {
+            self.write_char(c)?;
+        }
+        Ok(())
+    }
+    fn write_char(&mut self, c: char) -> std::fmt::Result {
+        if self.indent_next {
+            self.indent_next = false;
+            self.writer.write_str(
+                &std::iter::repeat(' ')
+                    .take(4 * self.level)
+                    .collect::<String>(),
+            )?;
+        }
+        if c == '\n' {
+            self.indent_next = true;
+        }
+        self.writer.write_char(c)
+    }
+}
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub(crate) struct MaybeFullyQualifiedTypeName<'p> {

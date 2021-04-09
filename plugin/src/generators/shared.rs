@@ -2,7 +2,122 @@ use crate::generators::utils::*;
 use crate::plugin::*;
 use crate::{ErrorKind, Result};
 use itertools::Itertools;
-use std::{collections::HashMap, fmt::Write};
+use std::collections::VecDeque;
+use std::{borrow::Cow, collections::HashMap, fmt::Write};
+
+pub(crate) enum Fragment<'a> {
+    Str(&'static str),
+    String(String),
+    Cow(Cow<'static, str>),
+    FormatArguments(std::fmt::Arguments<'a>),
+    SubFragments(&'a [Fragment<'a>]),
+    Iter(Box<dyn Iterator<Item = &'a Fragment<'a>> + 'a>),
+    Indent(Fragment<'a>),
+}
+impl<'a> From<&'static str> for Fragment<'a> {
+    fn from(s: &'static str) -> Self {
+        Self::Str(s)
+    }
+}
+impl<'a> From<String> for Fragment<'a> {
+    fn from(s: String) -> Self {
+        Self::String(s)
+    }
+}
+impl<'a> From<Cow<'static, str>> for Fragment<'a> {
+    fn from(s: Cow<'static, str>) -> Self {
+        Self::Cow(s)
+    }
+}
+impl<'a> From<std::fmt::Arguments<'a>> for Fragment<'a> {
+    fn from(s: std::fmt::Arguments<'a>) -> Self {
+        Self::FormatArguments(s)
+    }
+}
+impl<'a> From<&'a [Fragment<'a>]> for Fragment<'a> {
+    fn from(s: &'a [Fragment<'a>]) -> Self {
+        Self::SubFragments(s)
+    }
+}
+impl<'a> From<Box<dyn Iterator<Item = &'a Fragment<'a>> + 'a>> for Fragment<'a> {
+    fn from(iter: Box<dyn Iterator<Item = &'a Fragment<'a>> + 'a>) -> Self {
+        Self::Iter(iter)
+    }
+}
+pub(crate) fn indent<'a, T>(from: T) -> Fragment<'a>
+where
+    Fragment<'a>: From<T>,
+{
+    Fragment::Indent(from.into())
+}
+pub(crate) fn fr<'a, T>(from: T) -> Fragment<'a>
+where
+    Fragment<'a>: From<T>,
+{
+    from.into()
+}
+pub(crate) fn write<'a, W, I>(w: Indentor<W>, iter: I) -> std::fmt::Result
+where
+    W: Write,
+    I: Iterator<Item = &'a Fragment<'a>>,
+{
+    enum Task<'a> {
+        WriteFragment(Fragment<'a>),
+        ProgressIterator(Box<dyn Iterator<Item = &'a Fragment<'a>> + 'a>),
+        Indent(),
+        Unindent(),
+    }
+    let mut tasks = iter
+        .map(|fr| Task::WriteFragment(fr))
+        .collect::<VecDeque<_>>();
+    while let Some(task) = tasks.pop_front() {
+        match task {
+            Task::WriteFragment(fragment) => match fragment {
+                Fragment::Str(&s) => {
+                    w.write_str(s)?;
+                }
+                Fragment::String(s) => {
+                    w.write_str(&s)?;
+                }
+                Fragment::Cow(s) => {
+                    w.write_str(&s)?;
+                }
+                Fragment::FormatArguments(a) => {
+                    w.write_fmt(a)?;
+                }
+                Fragment::SubFragments(v) => {
+                    let mut subtasks = v
+                        .into_iter()
+                        .map(|fr| Task::WriteFragment(fr))
+                        .collect::<VecDeque<_>>();
+                    subtasks.append(&mut tasks);
+                    tasks = subtasks;
+                }
+                Fragment::Iter(iter) => {
+                    tasks.push_front(Task::ProgressIterator(iter));
+                }
+                Fragment::Indent(fr) => {
+                    tasks.push_front(Task::Unindent());
+                    tasks.push_front(Task::WriteFragment(fr));
+                    tasks.push_front(Task::Indent());
+                }
+            },
+            Task::ProgressIterator(mut iter) => {
+                if let Some(fr) = iter.next() {
+                    tasks.push_front(Task::ProgressIterator(iter));
+                    tasks.push_front(Task::WriteFragment(fr));
+                }
+            }
+            Task::Indent() => {
+                w.indent();
+            }
+            Task::Unindent() => {
+                w.unindent();
+            }
+        }
+    }
+    Ok(())
+}
 
 #[derive(Debug, Clone)]
 pub(crate) enum TypeOfIdent {
