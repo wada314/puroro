@@ -75,6 +75,45 @@ fn write_default<'p, W: Write>(
     })
 }
 
+fn write_deser_stream_handler2<W: Write>(
+    context: &InvocationContext,
+    out: &mut Indentor<W>,
+    msg: &DescriptorProto,
+) -> Result<()> {
+    let native_type_name = to_type_name(&msg.name);
+    const DESER_MOD: &'static str = "::puroro_serializer::deserializer::stream";
+    write(
+        out,
+        fr([
+            fr(format_args!(
+                "impl {d}::MessageDeserializeEventHandler for {name} {{\n",
+                d = DESER_MOD,
+                name = native_type_name
+            )),
+            indent([
+                fr(format_args!(
+                    "\
+type Target = Self;
+fn finish(self) -> ::puroro::Result<Self::Target> {{ Ok(self) }}
+fn met_field<T: {d}::LengthDelimitedDeserializer>(
+    &mut self,
+    field: {d}::Field<T>,
+    field_number: usize,
+) -> ::puroro::Result<()> {{\n",
+                    d = DESER_MOD
+                )),
+                indent([
+                    fr("match field {{\n"),
+                    indent([fr("{d}::Field::Variant(variant) => ")]),
+                    fr("}}\n"),
+                ]),
+                fr("}}\n"),
+            ]),
+            fr("}}\n"),
+        ]),
+    )
+}
+
 fn write_deser_stream_handler<'p, W: Write>(
     context: &InvocationContext,
     fc: &mut FileGeneratorContext<'p, W>,

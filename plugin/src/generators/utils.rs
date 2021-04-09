@@ -1,12 +1,12 @@
 use ::lazy_static::lazy_static;
 use itertools::Itertools;
 use std::{collections::HashSet, fmt::Write};
-pub(crate) struct Indentor<W: Write> {
+pub(crate) struct Indentor<W> {
     writer: W,
     indent_next: bool,
     level: usize,
 }
-impl<W: Write> Indentor<W> {
+impl<W> Indentor<W> {
     pub(crate) fn new(writer: W) -> Self {
         Self {
             writer,
