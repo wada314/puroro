@@ -6,13 +6,13 @@ pub(crate) fn handle_msg<'p, W: Write>(
     fc: &mut FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
+    write_body(output, context, fc, msg)?;
     /*
-    write_body(context, fc, msg)?;
-    write_default(context, fc, msg)?;
-    write_deser_stream_handler(context, fc, msg)?;*/
+    write_default(output, context, fc, msg)?;
+    write_deser_stream_handler(output, context, fc, msg)?;*/
     Ok(())
 }
-/*
+
 // struct body
 fn write_body<'p, W: Write>(
     output: &mut Indentor<W>,
@@ -21,21 +21,23 @@ fn write_body<'p, W: Write>(
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
-    write!(fc.writer(), "pub struct {name} ", name = native_type_name)?;
-    fc.indent_with_braces(|fc| {
-        for field in &msg.field {
-            let field_native_type = gen_field_type(field, context, fc)?;
-            writeln!(
-                fc.writer(),
-                "{name}: {type_},",
-                name = to_var_name(&field.name),
-                type_ = field_native_type
-            )?;
-        }
-        Ok(())
-    })
+    write(
+        output,
+        (
+            format!("pub struct {name} {{\n", name = native_type_name),
+            indent((iter(msg.field.iter().map(|field| {
+                let field_native_type = gen_field_type(field, context, fc).unwrap();
+                format!(
+                    "{name}: {type_},\n",
+                    name = to_var_name(&field.name),
+                    type_ = field_native_type
+                )
+            })),)),
+            "}}\n",
+        ),
+    )
 }
-
+/*
 // impl Default
 // Because enum is Result<enum, i32>, we need a special treatment for it.
 fn write_default<'p, W: Write>(
