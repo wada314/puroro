@@ -7,7 +7,7 @@ pub(crate) fn handle_enum<'p, W: Write>(
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
     write_body(output, context, fc, enume)?;
-    //write_tryfrom(output, context, fc, enume)?;
+    write_tryfrom(output, context, fc, enume)?;
     Ok(())
 }
 
@@ -33,7 +33,7 @@ fn write_body<'p, W: Write>(
         ),
     )
 }
-/*
+
 // TryFrom<i32>
 fn write_tryfrom<'p, W: Write>(
     output: &mut Indentor<W>,
@@ -42,33 +42,34 @@ fn write_tryfrom<'p, W: Write>(
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&enume.name);
-    write!(
-        fc.writer(),
-        "impl std::convert::TryFrom<i32> for {name} ",
-        name = native_type_name
-    )?;
-    fc.indent_with_braces(|fc| {
-        write!(
-            fc.writer(),
-            "type Error = i32; \
-             fn try_from(val: i32) -> std::result::Result<Self, i32> "
-        )?;
-        fc.indent_with_braces(|fc| {
-            write!(fc.writer(), "match val ")?;
-            fc.indent_with_braces(|fc| {
-                for value in &enume.value {
-                    let value_name = to_enum_value_name(&value.name);
-                    writeln!(
-                        fc.writer(),
-                        "{number} => Ok(Self::{name}),",
-                        number = value.number,
-                        name = value_name
-                    )?;
-                }
-                writeln!(fc.writer(), "x => Err(x),")?;
-                Ok(())
-            })
-        })
-    })
+    write(
+        output,
+        (
+            format!(
+                "impl std::convert::TryFrom<i32> for {name} {{\n",
+                name = native_type_name
+            ),
+            indent((
+                ("type Error = i32; \n\
+                fn try_from(val: i32) -> std::result::Result<Self, i32> {{\n"),
+                indent((
+                    "match val {{\n",
+                    indent((
+                        iter(enume.value.iter().map(|value| {
+                            let value_name = to_enum_value_name(&value.name);
+                            format!(
+                                "{number} => Ok(Self::{name}),\n",
+                                number = value.number,
+                                name = value_name
+                            )
+                        })),
+                        "x => Err(x),\n",
+                    )),
+                    "}}\n",
+                )),
+                "}}\n",
+            )),
+            "}}\n",
+        ),
+    )
 }
-*/

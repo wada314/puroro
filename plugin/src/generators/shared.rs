@@ -32,7 +32,7 @@ macro_rules! impl_tuple_into_fragments {
 }
 impl_tuple_into_fragments!(8, A, B, C, D, E, F, G, H);
 
-pub(crate) enum Fragment<'w, W> {
+pub(crate) enum Fragment<'w, W: 'w> {
     Str(&'static str),
     String(String),
     Cow(Cow<'static, str>),
@@ -82,6 +82,14 @@ where
 {
     Fragment::Functor(Box::new(f) as Box<dyn FnOnce(&mut Indentor<W>) -> Result<()>>)
 }
+pub(crate) fn seq<'w, W, T>(tuple: T) -> Fragment<'w, W>
+where
+    T: TupleOfIntoFragments<'w, W>,
+    <T as TupleOfIntoFragments<'w, W>>::Iter: 'w,
+    W: 'w,
+{
+    Fragment::Iter(Box::new(tuple.into_frag_iter()) as Box<dyn Iterator<Item = Fragment<'w, W>>>)
+}
 pub(crate) fn write<'w, T, W>(w: &'w mut Indentor<W>, tuple: T) -> Result<()>
 where
     W: Write,
@@ -102,13 +110,13 @@ where
         match task {
             Task::WriteFragment(fragment) => match fragment {
                 Fragment::Str(s) => {
-                    w.write_str(&s.replace("}}", "}").replace("}}", "}"))?;
+                    w.write_str(&s.replace("}}", "}").replace("{{", "{"))?;
                 }
                 Fragment::String(s) => {
-                    w.write_str(&s.replace("}}", "}").replace("}}", "}"))?;
+                    w.write_str(&s.replace("}}", "}").replace("{{", "{"))?;
                 }
                 Fragment::Cow(s) => {
-                    w.write_str(&s.replace("}}", "}").replace("}}", "}"))?;
+                    w.write_str(&s.replace("}}", "}").replace("{{", "{"))?;
                 }
                 Fragment::Iter(iter) => {
                     tasks.push_front(Task::ProgressIterator(iter));
