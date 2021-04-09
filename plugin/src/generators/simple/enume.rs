@@ -24,16 +24,16 @@ fn write_body<'p, W: Write>(
     write(
         output,
         (
-            fr(format!("pub enum {name} {{", name = native_type_name)),
+            format!("pub enum {name} {{\n", name = native_type_name),
             indent((iter(enume.value.iter().map(|value| {
                 let name = to_enum_value_name(&value.name);
                 fr(format!(
-                    "{name} = {number},",
+                    "{name} = {number},\n",
                     name = name,
                     number = value.number
                 ))
             })),)),
-            fr("}}"),
+            "}}\n",
         ),
     )
 }
