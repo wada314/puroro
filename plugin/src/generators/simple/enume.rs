@@ -1,43 +1,48 @@
 use super::*;
 
 pub(crate) fn handle_enum<'p, W: Write>(
+    output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p, W>,
+    fc: &mut FileGeneratorContext<'p>,
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
-    write_body(context, fc, enume)?;
-    write_tryfrom(context, fc, enume)?;
+    write_body(output, context, fc, enume)?;
+    //write_tryfrom(output, context, fc, enume)?;
     Ok(())
 }
 
 // enum body
 fn write_body<'p, W: Write>(
+    output: &mut Indentor<W>,
     _context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p, W>,
+    fc: &mut FileGeneratorContext<'p>,
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&enume.name);
 
     // enum body
-    write!(fc.writer(), "pub enum {name} ", name = native_type_name)?;
-    fc.indent_with_braces(|fc| {
-        for value in &enume.value {
-            let name = to_enum_value_name(&value.name);
-            writeln!(
-                fc.writer(),
-                "{name} = {number},",
-                name = name,
-                number = value.number
-            )?;
-        }
-        Ok(())
-    })
+    write(
+        output,
+        (
+            fr(format!("pub enum {name} {{", name = native_type_name)),
+            indent((iter(enume.value.iter().map(|value| {
+                let name = to_enum_value_name(&value.name);
+                fr(format!(
+                    "{name} = {number},",
+                    name = name,
+                    number = value.number
+                ))
+            })),)),
+            fr("}}"),
+        ),
+    )
 }
-
+/*
 // TryFrom<i32>
 fn write_tryfrom<'p, W: Write>(
+    output: &mut Indentor<W>,
     _context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p, W>,
+    fc: &mut FileGeneratorContext<'p>,
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&enume.name);
@@ -70,3 +75,4 @@ fn write_tryfrom<'p, W: Write>(
         })
     })
 }
+*/

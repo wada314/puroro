@@ -59,10 +59,10 @@ fn gen_field_bare_type(
     }
 }
 
-fn gen_field_type<'p, W: Write>(
+fn gen_field_type<'p>(
     field: &'p FieldDescriptorProto,
     context: &InvocationContext,
-    fc: &FileGeneratorContext<'p, W>,
+    fc: &FileGeneratorContext<'p>,
 ) -> Result<Cow<'static, str>> {
     let bare_type = gen_field_bare_type(field.type_, &field.type_name, fc.path_to_package_root())?;
     let type_of_ident = context.type_of_ident(fc.package().clone(), &field.type_name);
@@ -96,20 +96,22 @@ struct Generator {}
 impl FileGeneratorHandler for Generator {
     fn handle_msg<'p, W: Write>(
         &mut self,
+        output: &mut Indentor<W>,
         context: &InvocationContext,
-        fc: &mut FileGeneratorContext<'p, W>,
+        fc: &mut FileGeneratorContext<'p>,
         msg: &'p DescriptorProto,
     ) -> Result<()> {
-        msg::handle_msg(context, fc, msg)
+        msg::handle_msg(output, context, fc, msg)
     }
 
     fn handle_enum<'p, W: Write>(
         &mut self,
+        output: &mut Indentor<W>,
         context: &InvocationContext,
-        fc: &mut FileGeneratorContext<'p, W>,
+        fc: &mut FileGeneratorContext<'p>,
         enume: &'p EnumDescriptorProto,
     ) -> Result<()> {
-        enume::handle_enum(context, fc, enume)
+        enume::handle_enum(output, context, fc, enume)
     }
 
     fn generate_filename<'p>(

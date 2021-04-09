@@ -1,20 +1,23 @@
 use super::*;
 
 pub(crate) fn handle_msg<'p, W: Write>(
+    output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p, W>,
+    fc: &mut FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
+    /*
     write_body(context, fc, msg)?;
     write_default(context, fc, msg)?;
-    write_deser_stream_handler(context, fc, msg)?;
+    write_deser_stream_handler(context, fc, msg)?;*/
     Ok(())
 }
-
+/*
 // struct body
 fn write_body<'p, W: Write>(
+    output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p, W>,
+    fc: &mut FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -36,8 +39,9 @@ fn write_body<'p, W: Write>(
 // impl Default
 // Because enum is Result<enum, i32>, we need a special treatment for it.
 fn write_default<'p, W: Write>(
+    output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p, W>,
+    fc: &mut FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -115,8 +119,9 @@ fn met_field<T: {d}::LengthDelimitedDeserializer>(
 }
 
 fn write_deser_stream_handler<'p, W: Write>(
+    output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p, W>,
+    fc: &mut FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -168,8 +173,9 @@ fn met_field<T: {d}::LengthDelimitedDeserializer>(
 }
 
 fn write_deser_stream_handler_variant<'p, W: Write>(
+    output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p, W>,
+    fc: &mut FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     write!(fc.writer(), "match field_number ")?;
@@ -217,24 +223,27 @@ fn write_deser_stream_handler_variant<'p, W: Write>(
 }
 
 fn write_deser_stream_handler_length_delimited<'p, W: Write>(
+    output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p, W>,
+    fc: &mut FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     todo!()
 }
 
 fn write_deser_stream_handler_bytes32<'p, W: Write>(
+    output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p, W>,
+    fc: &mut FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     todo!()
 }
 
 fn write_deser_stream_handler_bytes64<'p, W: Write>(
+    output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p, W>,
+    fc: &mut FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     todo!()
@@ -257,3 +266,4 @@ fn variant_field_type(field: &FieldDescriptorProto) -> Option<&'static str> {
         None
     }
 }
+*/

@@ -5,75 +5,97 @@ use itertools::Itertools;
 use std::collections::VecDeque;
 use std::{borrow::Cow, collections::HashMap, fmt::Write};
 
-pub(crate) enum Fragment<'a, W> {
+pub(crate) trait TupleOfIntoFragments<'w, W: 'w> {
+    type Iter: Iterator<Item = Fragment<'w, W>>;
+    fn into_frag_iter(self) -> Self::Iter;
+}
+
+macro_rules! impl_tuple_into_fragments {
+    ($len:expr) => {};
+    ($len:expr, $a:ident $(, $rest:ident)*) => {
+        #[allow(non_snake_case)]
+        impl<'w, W: 'w, $a $(, $rest)*> TupleOfIntoFragments<'w, W> for ($a, $($rest),*)
+        where
+            Fragment<'w, W>: From<$a> $(+ From<$rest>)*,
+        {
+            type Iter = core::array::IntoIter<Fragment<'w, W>, {{$len}}>;
+            fn into_frag_iter(self) -> Self::Iter {
+                let ($a, $($rest),*) = self;
+                Self::Iter::new([
+                    <Fragment<'w, W> as From::<$a>>::from($a)
+                    $(, <Fragment<'w, W> as From::<$rest>>::from($rest))*
+                ])
+            }
+        }
+        impl_tuple_into_fragments!($len-1 $(, $rest)*);
+    }
+}
+impl_tuple_into_fragments!(8, A, B, C, D, E, F, G, H);
+
+pub(crate) enum Fragment<'w, W> {
     Str(&'static str),
     String(String),
     Cow(Cow<'static, str>),
-    FormatArguments(std::fmt::Arguments<'a>),
-    Iter(Box<dyn Iterator<Item = Result<Fragment<'a, W>>> + 'a>),
-    Functor(Box<dyn FnOnce(&mut Indentor<W>) -> Result<()>>),
-    Indent(Box<Fragment<'a, W>>),
+    Iter(Box<dyn 'w + Iterator<Item = Fragment<'w, W>>>),
+    Functor(Box<dyn 'w + FnOnce(&mut Indentor<W>) -> Result<()>>),
+    Indent(Box<dyn 'w + Iterator<Item = Fragment<'w, W>>>),
 }
-impl<'a, W> From<&'static str> for Fragment<'a, W> {
+impl<'w, W> From<&'static str> for Fragment<'w, W> {
     fn from(s: &'static str) -> Self {
         Self::Str(s)
     }
 }
-impl<'a, W> From<String> for Fragment<'a, W> {
+impl<'w, W> From<String> for Fragment<'w, W> {
     fn from(s: String) -> Self {
         Self::String(s)
     }
 }
-impl<'a, W> From<Cow<'static, str>> for Fragment<'a, W> {
+impl<'w, W> From<Cow<'static, str>> for Fragment<'w, W> {
     fn from(s: Cow<'static, str>) -> Self {
         Self::Cow(s)
     }
 }
-impl<'a, W> From<std::fmt::Arguments<'a>> for Fragment<'a, W> {
-    fn from(s: std::fmt::Arguments<'a>) -> Self {
-        Self::FormatArguments(s)
-    }
-}
-impl<'a, W: 'a, const N: usize> From<[Result<Fragment<'a, W>>; N]> for Fragment<'a, W> {
-    fn from(array: [Result<Fragment<'a, W>>; N]) -> Self {
-        Self::Iter(Box::new(core::array::IntoIter::new(array)))
-    }
-}
-impl<'a, W> From<Box<dyn Iterator<Item = Result<Fragment<'a, W>>> + 'a>> for Fragment<'a, W> {
-    fn from(iter: Box<dyn Iterator<Item = Result<Fragment<'a, W>>> + 'a>) -> Self {
-        Self::Iter(iter)
-    }
-}
-impl<'a, W> From<Box<dyn FnOnce(&mut Indentor<W>) -> Result<()>>> for Fragment<'a, W> {
-    fn from(f: Box<dyn FnOnce(&mut Indentor<W>) -> Result<()>>) -> Self {
-        Self::Functor(f)
-    }
-}
-pub(crate) fn indent<'a, T, W>(from: T) -> Result<Fragment<'a, W>>
+pub(crate) fn indent<'w, T, W: 'w>(tuple: T) -> Fragment<'w, W>
 where
-    Fragment<'a, W>: From<T>,
+    T: TupleOfIntoFragments<'w, W>,
+    <T as TupleOfIntoFragments<'w, W>>::Iter: 'w,
 {
-    Ok(Fragment::Indent(Box::new(from.into())))
+    Fragment::Indent(Box::new(tuple.into_frag_iter()) as Box<dyn Iterator<Item = Fragment<'w, W>>>)
 }
-pub(crate) fn fr<'a, T, W>(from: T) -> Result<Fragment<'a, W>>
+pub(crate) fn fr<'w, T, W>(from: T) -> Fragment<'w, W>
 where
-    Fragment<'a, W>: From<T>,
+    Fragment<'w, W>: From<T>,
 {
-    Ok(from.into())
+    from.into()
 }
-pub(crate) fn write<'a, W>(w: &mut Indentor<W>, frag: Result<Fragment<'a, W>>) -> Result<()>
+pub(crate) fn iter<'w, W, I>(iter: I) -> Fragment<'w, W>
+where
+    I: 'w + Iterator<Item = Fragment<'w, W>>,
+{
+    Fragment::Iter(Box::new(iter) as Box<dyn Iterator<Item = Fragment<'w, W>>>)
+}
+pub(crate) fn func<'w, W, F>(f: F) -> Fragment<'w, W>
+where
+    F: 'w + FnOnce(&mut Indentor<W>) -> Result<()>,
+{
+    Fragment::Functor(Box::new(f) as Box<dyn FnOnce(&mut Indentor<W>) -> Result<()>>)
+}
+pub(crate) fn write<'w, T, W>(w: &'w mut Indentor<W>, tuple: T) -> Result<()>
 where
     W: Write,
+    T: TupleOfIntoFragments<'w, W>,
 {
-    enum Task<'a, W: std::fmt::Write> {
-        WriteFragment(Fragment<'a, W>),
-        ProgressIterator(Box<dyn Iterator<Item = Result<Fragment<'a, W>>> + 'a>),
-        CallFunctor(Box<dyn FnOnce(&mut Indentor<W>) -> Result<()>>),
+    enum Task<'w, W: 'w + std::fmt::Write> {
+        WriteFragment(Fragment<'w, W>),
+        ProgressIterator(Box<dyn 'w + Iterator<Item = Fragment<'w, W>>>),
+        CallFunctor(Box<dyn 'w + FnOnce(&mut Indentor<W>) -> Result<()>>),
         Indent(),
         Unindent(),
     }
-    let mut tasks = VecDeque::new();
-    tasks.push_front(Task::WriteFragment(frag?));
+    let mut tasks = tuple
+        .into_frag_iter()
+        .map(|frag| Task::WriteFragment(frag))
+        .collect::<VecDeque<_>>();
     while let Some(task) = tasks.pop_front() {
         match task {
             Task::WriteFragment(fragment) => match fragment {
@@ -86,25 +108,22 @@ where
                 Fragment::Cow(s) => {
                     w.write_str(&s.replace("}}", "}").replace("}}", "}"))?;
                 }
-                Fragment::FormatArguments(a) => {
-                    w.write_fmt(a)?;
-                }
                 Fragment::Iter(iter) => {
                     tasks.push_front(Task::ProgressIterator(iter));
                 }
                 Fragment::Functor(f) => {
                     tasks.push_front(Task::CallFunctor(f));
                 }
-                Fragment::Indent(fr) => {
+                Fragment::Indent(iter) => {
                     tasks.push_front(Task::Unindent());
-                    tasks.push_front(Task::WriteFragment(*fr));
+                    tasks.push_front(Task::ProgressIterator(iter));
                     tasks.push_front(Task::Indent());
                 }
             },
             Task::ProgressIterator(mut iter) => {
                 if let Some(fr) = iter.next() {
                     tasks.push_front(Task::ProgressIterator(iter));
-                    tasks.push_front(Task::WriteFragment(fr?));
+                    tasks.push_front(Task::WriteFragment(fr));
                 }
             }
             Task::CallFunctor(f) => {
@@ -215,25 +234,17 @@ impl<'p> InvocationContext<'p> {
     }
 }
 
-pub(crate) struct FileGeneratorContext<'p, W: Write> {
-    writer: Indentor<W>,
+pub(crate) struct FileGeneratorContext<'p> {
     package: Vec<&'p str>,
     path_to_package_root: String,
 }
-impl<'p, W: Write> FileGeneratorContext<'p, W> {
-    pub(crate) fn new(writer: W, package: Vec<&'p str>) -> Self {
+impl<'p> FileGeneratorContext<'p> {
+    pub(crate) fn new(package: Vec<&'p str>) -> Self {
         let path_to_package_root = Self::generate_path_to_package_root(&package);
         Self {
-            writer: Indentor::new(writer),
             package,
             path_to_package_root,
         }
-    }
-    pub(crate) fn writer(&mut self) -> &mut Indentor<W> {
-        &mut self.writer
-    }
-    pub(crate) fn into_inner(self) -> W {
-        self.writer.into_inner()
     }
     pub(crate) fn package(&self) -> &Vec<&'p str> {
         &self.package
@@ -251,33 +262,8 @@ impl<'p, W: Write> FileGeneratorContext<'p, W> {
         }
     }
 
-    pub(crate) fn indent_with<F, R>(&mut self, f: F) -> Result<R>
-    where
-        F: FnOnce(&mut FileGeneratorContext<'p, W>) -> Result<R>,
-    {
-        self.writer.indent();
-        let ret = (f)(self);
-        self.writer.unindent();
-        ret
-    }
-    pub(crate) fn indent_with_braces<F, R>(&mut self, f: F) -> Result<R>
-    where
-        F: FnOnce(&mut FileGeneratorContext<'p, W>) -> Result<R>,
-    {
-        writeln!(self.writer(), "{{")?;
-        let ret = self.indent_with(f);
-        writeln!(self.writer(), "}}")?;
-        ret
-    }
-    pub(crate) fn indent(&mut self) {
-        self.writer.indent();
-    }
-    pub(crate) fn unindent(&mut self) {
-        self.writer.unindent();
-    }
-
     pub(crate) fn enter_submessage_namespace<
-        F: FnOnce(&mut FileGeneratorContext<'p, W>) -> Result<()>,
+        F: FnOnce(&mut FileGeneratorContext<'p>) -> Result<()>,
     >(
         &mut self,
         message_name: &'p str,
@@ -345,14 +331,16 @@ pub(crate) fn visit_in_file<'p, T: DescriptorVisitor<'p>>(
 pub(crate) trait FileGeneratorHandler {
     fn handle_msg<'p, W: std::fmt::Write>(
         &mut self,
+        out: &mut Indentor<W>,
         context: &InvocationContext,
-        fc: &mut FileGeneratorContext<'p, W>,
+        fc: &mut FileGeneratorContext<'p>,
         msg: &'p DescriptorProto,
     ) -> Result<()>;
     fn handle_enum<'p, W: std::fmt::Write>(
         &mut self,
+        out: &mut Indentor<W>,
         context: &InvocationContext,
-        fc: &mut FileGeneratorContext<'p, W>,
+        fc: &mut FileGeneratorContext<'p>,
         enume: &'p EnumDescriptorProto,
     ) -> Result<()>;
     fn generate_filename<'p>(
@@ -371,12 +359,13 @@ where
     H: FileGeneratorHandler,
 {
     let package = input_file.package.split('.').collect::<Vec<_>>();
-    let mut fc = FileGeneratorContext::new(String::new(), package);
+    let mut fc = FileGeneratorContext::new(package);
     let filename = handler.generate_filename(context, input_file)?;
 
     struct InnerVisitor<'a, 'q, H: FileGeneratorHandler> {
+        output: Indentor<String>,
         context: &'a InvocationContext<'q>,
-        fc: &'a mut FileGeneratorContext<'q, String>,
+        fc: &'a mut FileGeneratorContext<'q>,
         handler: &'a mut H,
     }
     impl<'a, 'q, H> DescriptorVisitor<'q> for InnerVisitor<'a, 'q, H>
@@ -384,30 +373,33 @@ where
         H: FileGeneratorHandler,
     {
         fn handle_msg(&mut self, msg: &'q DescriptorProto) -> Result<()> {
-            self.handler.handle_msg(self.context, self.fc, msg)
+            self.handler
+                .handle_msg(&mut self.output, self.context, self.fc, msg)
         }
         fn handle_enum(&mut self, enume: &'q EnumDescriptorProto) -> Result<()> {
-            self.handler.handle_enum(self.context, self.fc, enume)
+            self.handler
+                .handle_enum(&mut self.output, self.context, self.fc, enume)
         }
         fn enter_submodule(&mut self, name: &'q str) -> Result<()> {
             let module_name = to_module_name(name);
-            writeln!(self.fc.writer(), "mod {name} {{", name = module_name)?;
-            self.fc.indent();
+            writeln!(&mut self.output, "mod {name} {{", name = module_name)?;
+            self.output.indent();
             Ok(())
         }
         fn exit_submodule(&mut self, _name: &'q str) -> Result<()> {
-            self.fc.unindent();
-            writeln!(self.fc.writer(), "}}")?;
+            self.output.unindent();
+            writeln!(self.output, "}}")?;
             Ok(())
         }
     }
 
     let mut inner_visitor = InnerVisitor {
+        output: Indentor::new(String::new()),
         context,
         fc: &mut fc,
         handler,
     };
     visit_in_file(&input_file, &mut inner_visitor)?;
 
-    Ok((filename, fc.into_inner()))
+    Ok((filename, inner_visitor.output.into_inner()))
 }
