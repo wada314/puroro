@@ -7,7 +7,7 @@ mod generators;
 mod plugin;
 
 use ::puroro::{Deserializable, Serializable};
-use generators::shared::InvocationContext;
+use generators::shared::Context;
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
@@ -22,8 +22,8 @@ mod google;
 
 fn main() -> Result<()> {
     let cgreq = CodeGeneratorRequest::from_bytes(stdin().bytes()).unwrap();
-    let context = InvocationContext::new(&cgreq)?;
-    let filename_and_content = generators::simple::generate_simple(&context)?;
+    let mut context = Context::new(&cgreq)?;
+    let filename_and_content = generators::simple::generate_simple(&mut context)?;
     let mut cgres = CodeGeneratorResponse::default();
     cgres.file = filename_and_content
         .into_iter()

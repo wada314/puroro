@@ -2,20 +2,18 @@ use super::*;
 
 pub(crate) fn handle_enum<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &InvocationContext,
-    fc: &FileGeneratorContext<'p>,
+    context: &Context<'p>,
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
-    write_body(output, context, fc, enume)?;
-    write_tryfrom(output, context, fc, enume)?;
+    write_body(output, context, enume)?;
+    write_tryfrom(output, context, enume)?;
     Ok(())
 }
 
 // enum body
 fn write_body<'p, W: Write>(
     output: &mut Indentor<W>,
-    _context: &InvocationContext,
-    fc: &FileGeneratorContext<'p>,
+    _context: &Context<'p>,
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&enume.name);
@@ -39,8 +37,7 @@ fn write_body<'p, W: Write>(
 // TryFrom<i32>
 fn write_tryfrom<'p, W: Write>(
     output: &mut Indentor<W>,
-    _context: &InvocationContext,
-    fc: &FileGeneratorContext<'p>,
+    _context: &Context<'p>,
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&enume.name);

@@ -12,21 +12,57 @@ pub(crate) enum TypeOfIdent {
     Enum,
 }
 
-pub(crate) struct InvocationContext<'p> {
+pub(crate) struct Context<'p> {
     cgreq: &'p CodeGeneratorRequest,
     type_of_ident_map: HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
+    package: Vec<&'p str>,
+    path_to_package_root: String,
 }
 
-impl<'p> InvocationContext<'p> {
+impl<'p> Context<'p> {
     pub(crate) fn new(cgreq: &'p CodeGeneratorRequest) -> Result<Self> {
         Ok(Self {
             cgreq,
             type_of_ident_map: Self::generate_type_of_ident_map(cgreq)?,
+            package: Vec::new(),
+            path_to_package_root: "".into(),
         })
     }
-    pub(crate) fn cgreq(&self) -> &CodeGeneratorRequest {
+    pub(crate) fn cgreq(&self) -> &'p CodeGeneratorRequest {
         self.cgreq
     }
+    pub(crate) fn package(&self) -> &Vec<&'p str> {
+        &self.package
+    }
+    pub(crate) fn set_package(&mut self, package: &Vec<&'p str>) {
+        self.package = package.clone();
+        self.path_to_package_root = Self::generate_path_to_package_root(&self.package);
+    }
+    pub(crate) fn path_to_package_root(&self) -> &str {
+        &self.path_to_package_root
+    }
+
+    pub(crate) fn enter_submessage_namespace(&mut self, message_name: &'p str) {
+        self.package.push(message_name);
+        self.path_to_package_root = Self::generate_path_to_package_root(&self.package);
+    }
+
+    pub(crate) fn leave_submessage_namespace(&mut self, message_name: &'p str) {
+        if let Some(popped) = self.package.pop() {
+            debug_assert_eq!(message_name, popped);
+        }
+        self.path_to_package_root = Self::generate_path_to_package_root(&self.package);
+    }
+
+    fn generate_path_to_package_root(package: &Vec<&str>) -> String {
+        if package.is_empty() {
+            "self".into()
+        } else {
+            let supers = std::iter::repeat("super").take(package.len());
+            Itertools::intersperse(supers, "::").collect::<String>()
+        }
+    }
+
     pub(crate) fn type_of_ident(
         &self,
         mut package: Vec<&'p str>,
@@ -48,6 +84,7 @@ impl<'p> InvocationContext<'p> {
             None
         }
     }
+
     fn generate_type_of_ident_map(
         cgreq: &'p CodeGeneratorRequest,
     ) -> Result<HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>> {
@@ -97,46 +134,6 @@ impl<'p> InvocationContext<'p> {
             visit_in_file(file, &mut visitor)?;
         }
         Ok(map)
-    }
-}
-
-pub(crate) struct FileGeneratorContext<'p> {
-    package: Vec<&'p str>,
-    path_to_package_root: String,
-}
-impl<'p> FileGeneratorContext<'p> {
-    pub(crate) fn new(package: Vec<&'p str>) -> Self {
-        let path_to_package_root = Self::generate_path_to_package_root(&package);
-        Self {
-            package,
-            path_to_package_root,
-        }
-    }
-    pub(crate) fn package(&self) -> &Vec<&'p str> {
-        &self.package
-    }
-    pub(crate) fn path_to_package_root(&self) -> &str {
-        &self.path_to_package_root
-    }
-
-    fn generate_path_to_package_root(package: &Vec<&str>) -> String {
-        if package.is_empty() {
-            "self".into()
-        } else {
-            let supers = std::iter::repeat("super").take(package.len());
-            Itertools::intersperse(supers, "::").collect::<String>()
-        }
-    }
-
-    pub(crate) fn enter_submessage_namespace(&mut self, message_name: &'p str) {
-        self.package.push(message_name);
-        self.path_to_package_root = Self::generate_path_to_package_root(&self.package);
-    }
-    pub(crate) fn leave_submessage_namespace(&mut self, message_name: &'p str) {
-        if let Some(popped) = self.package.pop() {
-            debug_assert_eq!(message_name, popped);
-        }
-        self.path_to_package_root = Self::generate_path_to_package_root(&self.package);
     }
 }
 
@@ -194,26 +191,24 @@ pub(crate) trait FileGeneratorHandler {
     fn handle_msg<'p, W: std::fmt::Write>(
         &mut self,
         out: &mut Indentor<W>,
-        context: &InvocationContext,
-        fc: &mut FileGeneratorContext<'p>,
+        context: &Context,
         msg: &'p DescriptorProto,
     ) -> Result<()>;
     fn handle_enum<'p, W: std::fmt::Write>(
         &mut self,
         out: &mut Indentor<W>,
-        context: &InvocationContext,
-        fc: &mut FileGeneratorContext<'p>,
+        context: &Context,
         enume: &'p EnumDescriptorProto,
     ) -> Result<()>;
     fn generate_filename<'p>(
         &mut self,
-        context: &InvocationContext,
+        context: &Context,
         file: &'p FileDescriptorProto,
     ) -> Result<String>;
 }
 
 pub(crate) fn generate_file_with_handler<'p, H>(
-    context: &InvocationContext,
+    context: &mut Context<'p>,
     input_file: &'p FileDescriptorProto,
     handler: &mut H,
 ) -> Result<(String, String)>
@@ -221,13 +216,12 @@ where
     H: FileGeneratorHandler,
 {
     let package = input_file.package.split('.').collect::<Vec<_>>();
-    let mut fc = FileGeneratorContext::new(package);
+    context.set_package(&package);
     let filename = handler.generate_filename(context, input_file)?;
 
     struct InnerVisitor<'a, 'q, H: FileGeneratorHandler> {
         output: Indentor<String>,
-        context: &'a InvocationContext<'q>,
-        fc: &'a mut FileGeneratorContext<'q>,
+        context: &'a mut Context<'q>,
         handler: &'a mut H,
     }
     impl<'a, 'q, H> DescriptorVisitor<'q> for InnerVisitor<'a, 'q, H>
@@ -235,22 +229,21 @@ where
         H: FileGeneratorHandler,
     {
         fn handle_msg(&mut self, msg: &'q DescriptorProto) -> Result<()> {
-            self.handler
-                .handle_msg(&mut self.output, self.context, self.fc, msg)
+            self.handler.handle_msg(&mut self.output, self.context, msg)
         }
         fn handle_enum(&mut self, enume: &'q EnumDescriptorProto) -> Result<()> {
             self.handler
-                .handle_enum(&mut self.output, self.context, self.fc, enume)
+                .handle_enum(&mut self.output, self.context, enume)
         }
         fn enter_submodule(&mut self, name: &'q str) -> Result<()> {
             let module_name = to_module_name(name);
             writeln!(&mut self.output, "mod {name} {{", name = module_name)?;
-            self.fc.enter_submessage_namespace(name);
+            self.context.enter_submessage_namespace(name);
             self.output.indent();
             Ok(())
         }
         fn exit_submodule(&mut self, name: &'q str) -> Result<()> {
-            self.fc.leave_submessage_namespace(name);
+            self.context.leave_submessage_namespace(name);
             self.output.unindent();
             writeln!(self.output, "}}")?;
             Ok(())
@@ -260,7 +253,6 @@ where
     let mut inner_visitor = InnerVisitor {
         output: Indentor::new(String::new()),
         context,
-        fc: &mut fc,
         handler,
     };
     visit_in_file(&input_file, &mut inner_visitor)?;

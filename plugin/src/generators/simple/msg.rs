@@ -5,28 +5,26 @@ const DESER_MOD: &'static str = "::puroro_serializer::deserializer::stream";
 
 pub(crate) fn handle_msg<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &InvocationContext,
-    fc: &FileGeneratorContext<'p>,
+    context: &Context<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
-    write_body(output, context, fc, msg)?;
-    write_default(output, context, fc, msg)?;
-    write_deser_stream_handler2(output, context, fc, msg)?;
+    write_body(output, context, msg)?;
+    write_default(output, context, msg)?;
+    write_deser_stream_handler2(output, context, msg)?;
     Ok(())
 }
 
 // struct body
 fn write_body<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &InvocationContext,
-    fc: &FileGeneratorContext<'p>,
+    context: &Context<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
     (
         format!("pub struct {name} {{\n", name = native_type_name),
         indent((iter(msg.field.iter().map(|field| {
-            let field_native_type = gen_field_type(field, context, fc)?;
+            let field_native_type = gen_field_type(field, context)?;
             Ok(format!(
                 "{name}: {type_},\n",
                 name = to_var_name(&field.name),
@@ -42,8 +40,7 @@ fn write_body<'p, W: Write>(
 // Because enum is Result<enum, i32>, we need a special treatment for it.
 fn write_default<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &InvocationContext,
-    fc: &FileGeneratorContext<'p>,
+    context: &Context<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -60,7 +57,7 @@ impl ::std::default::Default for {name} {{
             (iter(msg.field.iter().map(|field| {
                 let native_field_name = to_var_name(&field.name);
                 let is_repeated = is_field_repeated(field);
-                let is_enum = is_field_enum(field, context, fc);
+                let is_enum = is_field_enum(field, context);
 
                 match (is_repeated, is_enum) {
                     (false, true) => Ok(format!(
@@ -84,8 +81,7 @@ impl ::std::default::Default for {name} {{
 
 fn write_deser_stream_handler2<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &InvocationContext,
-    fc: &FileGeneratorContext<'p>,
+    context: &Context<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -106,7 +102,7 @@ impl {d}::MessageDeserializeEventHandler for {name} {{
             d = DESER_MOD,
             name = native_type_name
         ),
-        func(|output| write_deser_stream_handler_variant_arm(output, context, fc, msg)),
+        func(|output| write_deser_stream_handler_variant_arm(output, context, msg)),
         "       \
         }}
     }}
@@ -117,8 +113,7 @@ impl {d}::MessageDeserializeEventHandler for {name} {{
 
 fn write_deser_stream_handler_variant_arm<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &InvocationContext,
-    fc: &FileGeneratorContext<'p>,
+    context: &Context<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     (
@@ -136,7 +131,7 @@ fn write_deser_stream_handler_variant_arm<'p, W: Write>(
                     )))
                 }
                 Some(tag_type) => {
-                    let is_enum = is_field_enum(field, context, fc);
+                    let is_enum = is_field_enum(field, context);
 
                     Ok(fr("hoge"))
                 }
@@ -149,8 +144,7 @@ fn write_deser_stream_handler_variant_arm<'p, W: Write>(
 
 fn write_deser_stream_handler_ld_arm<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &InvocationContext,
-    fc: &FileGeneratorContext<'p>,
+    context: &Context<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     todo!()

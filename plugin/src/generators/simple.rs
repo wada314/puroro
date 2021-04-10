@@ -9,7 +9,7 @@ use std::{borrow::Cow, fmt::Write};
 mod enume;
 mod msg;
 
-pub(crate) fn generate_simple(context: &InvocationContext) -> Result<Vec<(String, String)>> {
+pub(crate) fn generate_simple(context: &mut Context) -> Result<Vec<(String, String)>> {
     let mut filename_and_content = Vec::new();
     let mut generator = Generator {};
     for proto_file in &context.cgreq().proto_file {
@@ -22,13 +22,9 @@ pub(crate) fn generate_simple(context: &InvocationContext) -> Result<Vec<(String
     Ok(filename_and_content)
 }
 
-fn is_field_enum(
-    field: &FieldDescriptorProto,
-    context: &InvocationContext,
-    fc: &FileGeneratorContext,
-) -> bool {
+fn is_field_enum(field: &FieldDescriptorProto, context: &Context) -> bool {
     matches!(
-        context.type_of_ident(fc.package().clone(), &field.type_name),
+        context.type_of_ident(context.package().clone(), &field.type_name),
         Some(TypeOfIdent::Enum)
     )
 }
@@ -77,11 +73,14 @@ fn gen_field_bare_type(
 
 fn gen_field_type<'p>(
     field: &'p FieldDescriptorProto,
-    context: &InvocationContext,
-    fc: &FileGeneratorContext<'p>,
+    context: &Context<'p>,
 ) -> Result<Cow<'static, str>> {
-    let bare_type = gen_field_bare_type(field.type_, &field.type_name, fc.path_to_package_root())?;
-    let type_of_ident = context.type_of_ident(fc.package().clone(), &field.type_name);
+    let bare_type = gen_field_bare_type(
+        field.type_,
+        &field.type_name,
+        context.path_to_package_root(),
+    )?;
+    let type_of_ident = context.type_of_ident(context.package().clone(), &field.type_name);
     Ok(match field.label {
         Ok(label_body) => match label_body {
             FieldDescriptorProto_Label::LABEL_OPTIONAL
@@ -113,26 +112,24 @@ impl FileGeneratorHandler for Generator {
     fn handle_msg<'p, W: Write>(
         &mut self,
         output: &mut Indentor<W>,
-        context: &InvocationContext,
-        fc: &mut FileGeneratorContext<'p>,
+        context: &Context<'p>,
         msg: &'p DescriptorProto,
     ) -> Result<()> {
-        msg::handle_msg(output, context, fc, msg)
+        msg::handle_msg(output, context, msg)
     }
 
     fn handle_enum<'p, W: Write>(
         &mut self,
         output: &mut Indentor<W>,
-        context: &InvocationContext,
-        fc: &mut FileGeneratorContext<'p>,
+        context: &Context<'p>,
         enume: &'p EnumDescriptorProto,
     ) -> Result<()> {
-        enume::handle_enum(output, context, fc, enume)
+        enume::handle_enum(output, context, enume)
     }
 
     fn generate_filename<'p>(
         &mut self,
-        _context: &InvocationContext,
+        _context: &Context<'p>,
         file: &'p FileDescriptorProto,
     ) -> Result<String> {
         if file.package.is_empty() {
