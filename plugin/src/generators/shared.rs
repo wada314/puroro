@@ -5,9 +5,16 @@ use itertools::Itertools;
 use std::collections::VecDeque;
 use std::{borrow::Cow, collections::HashMap, fmt::Write};
 
-pub(crate) trait TupleOfIntoFragments<'p, 'w, W: 'w> {
+pub(crate) trait TupleOfIntoFragments<'p, 'w, W: 'w>: Sized {
     type Iter: Iterator<Item = Fragment<'p, 'w, W>>;
     fn into_frag_iter(self) -> Self::Iter;
+
+    fn write_into(self, output: &'w mut Indentor<W>, fc: &FileGeneratorContext<'p>) -> Result<()>
+    where
+        W: std::fmt::Write,
+    {
+        tuple_write_impl(output, fc, self)
+    }
 }
 
 macro_rules! impl_tuple_into_fragments {
@@ -37,7 +44,7 @@ pub(crate) enum Fragment<'p, 'w, W: 'w> {
     String(String),
     Cow(Cow<'static, str>),
     Iter(Box<dyn 'w + Iterator<Item = Result<Fragment<'p, 'w, W>>>>),
-    Functor(Box<dyn 'w + FnOnce(&mut Indentor<W>, &mut FileGeneratorContext<'p>) -> Result<()>>),
+    Functor(Box<dyn 'w + FnOnce(&mut Indentor<W>, &FileGeneratorContext<'p>) -> Result<()>>),
     Indent(
         usize,
         Box<dyn 'w + Iterator<Item = Result<Fragment<'p, 'w, W>>>>,
@@ -98,11 +105,11 @@ where
 }
 pub(crate) fn func<'w, 'p, W, F>(f: F) -> Fragment<'p, 'w, W>
 where
-    F: 'w + FnOnce(&mut Indentor<W>, &mut FileGeneratorContext<'p>) -> Result<()>,
+    F: 'w + FnOnce(&mut Indentor<W>, &FileGeneratorContext<'p>) -> Result<()>,
 {
     Fragment::Functor(Box::new(f)
         as Box<
-            dyn FnOnce(&mut Indentor<W>, &mut FileGeneratorContext<'p>) -> Result<()>,
+            dyn FnOnce(&mut Indentor<W>, &FileGeneratorContext<'p>) -> Result<()>,
         >)
 }
 pub(crate) fn seq<'p, 'w, W, T>(tuple: T) -> Fragment<'p, 'w, W>
@@ -114,9 +121,10 @@ where
     Fragment::Iter(Box::new(tuple.into_frag_iter().map(|v| Ok(v)))
         as Box<dyn Iterator<Item = Result<Fragment<'p, 'w, W>>>>)
 }
-pub(crate) fn write<'p, 'w, T, W>(
+
+fn tuple_write_impl<'p, 'w, T, W>(
     w: &'w mut Indentor<W>,
-    fc: &mut FileGeneratorContext<'p>,
+    fc: &FileGeneratorContext<'p>,
     tuple: T,
 ) -> Result<()>
 where
@@ -127,7 +135,7 @@ where
         WriteFragment(Fragment<'p, 'w, W>),
         ProgressIterator(Box<dyn 'w + Iterator<Item = Result<Fragment<'p, 'w, W>>>>),
         CallFunctor(
-            Box<dyn 'w + FnOnce(&mut Indentor<W>, &mut FileGeneratorContext<'p>) -> Result<()>>,
+            Box<dyn 'w + FnOnce(&mut Indentor<W>, &FileGeneratorContext<'p>) -> Result<()>>,
         ),
         Indent(),
         Unindent(),

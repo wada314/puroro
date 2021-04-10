@@ -3,7 +3,7 @@ use super::*;
 pub(crate) fn handle_enum<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p>,
+    fc: &FileGeneratorContext<'p>,
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
     write_body(output, context, fc, enume)?;
@@ -15,67 +15,61 @@ pub(crate) fn handle_enum<'p, W: Write>(
 fn write_body<'p, W: Write>(
     output: &mut Indentor<W>,
     _context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p>,
+    fc: &FileGeneratorContext<'p>,
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&enume.name);
 
     // enum body
-    write(
-        output,
-        fc,
-        (
-            format!("pub enum {name} {{\n", name = native_type_name),
-            indent((iter(enume.value.iter().map(|value| {
-                let name = to_enum_value_name(&value.name);
-                Ok(format!(
-                    "{name} = {number},\n",
-                    name = name,
-                    number = value.number
-                ))
-            })),)),
-            "}}\n",
-        ),
+    (
+        format!("pub enum {name} {{\n", name = native_type_name),
+        indent((iter(enume.value.iter().map(|value| {
+            let name = to_enum_value_name(&value.name);
+            Ok(format!(
+                "{name} = {number},\n",
+                name = name,
+                number = value.number
+            ))
+        })),)),
+        "}}\n",
     )
+        .write_into(output, fc)
 }
 
 // TryFrom<i32>
 fn write_tryfrom<'p, W: Write>(
     output: &mut Indentor<W>,
     _context: &InvocationContext,
-    fc: &mut FileGeneratorContext<'p>,
+    fc: &FileGeneratorContext<'p>,
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&enume.name);
-    write(
-        output,
-        fc,
-        (
-            format!(
-                "impl std::convert::TryFrom<i32> for {name} {{\n",
-                name = native_type_name
-            ),
-            indent((
-                ("type Error = i32; \n\
+    (
+        format!(
+            "impl std::convert::TryFrom<i32> for {name} {{\n",
+            name = native_type_name
+        ),
+        indent((
+            ("type Error = i32; \n\
                 fn try_from(val: i32) -> std::result::Result<Self, i32> {{\n"),
+            indent((
+                "match val {{\n",
                 indent((
-                    "match val {{\n",
-                    indent((
-                        iter(enume.value.iter().map(|value| {
-                            let value_name = to_enum_value_name(&value.name);
-                            Ok(format!(
-                                "{number} => Ok(Self::{name}),\n",
-                                number = value.number,
-                                name = value_name
-                            ))
-                        })),
-                        "x => Err(x),\n",
-                    )),
-                    "}}\n",
+                    iter(enume.value.iter().map(|value| {
+                        let value_name = to_enum_value_name(&value.name);
+                        Ok(format!(
+                            "{number} => Ok(Self::{name}),\n",
+                            number = value.number,
+                            name = value_name
+                        ))
+                    })),
+                    "x => Err(x),\n",
                 )),
                 "}}\n",
             )),
             "}}\n",
-        ),
+        )),
+        "}}\n",
     )
+        .write_into(output, fc)
 }
