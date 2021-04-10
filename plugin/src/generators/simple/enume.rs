@@ -33,7 +33,7 @@ fn write_body<'p, W: Write>(
         })),)),
         "}}\n",
     )
-        .write_into(output, fc)
+        .write_into(output)
 }
 
 // TryFrom<i32>
@@ -71,5 +71,5 @@ fn write_tryfrom<'p, W: Write>(
         )),
         "}}\n",
     )
-        .write_into(output, fc)
+        .write_into(output)
 }

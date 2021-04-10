@@ -3,7 +3,7 @@ use super::*;
 pub(crate) fn handle_msg<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: & FileGeneratorContext<'p>,
+    fc: &FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     write_body(output, context, fc, msg)?;
@@ -16,7 +16,7 @@ pub(crate) fn handle_msg<'p, W: Write>(
 fn write_body<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: & FileGeneratorContext<'p>,
+    fc: &FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -32,7 +32,7 @@ fn write_body<'p, W: Write>(
         })),)),
         "}}\n",
     )
-        .write_into(output, fc)
+        .write_into(output)
 }
 
 // impl Default
@@ -40,7 +40,7 @@ fn write_body<'p, W: Write>(
 fn write_default<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: & FileGeneratorContext<'p>,
+    fc: &FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -79,13 +79,13 @@ impl ::std::default::Default for {name} {{
     }}
 }}\n",
     )
-        .write_into(output, fc)
+        .write_into(output)
 }
 
 fn write_deser_stream_handler2<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: & FileGeneratorContext<'p>,
+    fc: &FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -108,20 +108,19 @@ impl {d}::MessageDeserializeEventHandler for {name} {{
             d = DESER_MOD,
             name = native_type_name
         ),
-        func(|output, fc| write_deser_stream_handler_variant_arm(output, context, fc, msg)),
-        func(|output, fc| write_deser_stream_handler_ld_arm(output, context, fc, msg)),
+        func(|output| write_deser_stream_handler_variant_arm(output, context, fc, msg)),
         "       \
         }}
     }}
 }}\n",
     )
-        .write_into(output, fc)
+        .write_into(output)
 }
 
 fn write_deser_stream_handler_variant_arm<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: & FileGeneratorContext<'p>,
+    fc: &FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     todo!()
@@ -130,7 +129,7 @@ fn write_deser_stream_handler_variant_arm<'p, W: Write>(
 fn write_deser_stream_handler_ld_arm<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &InvocationContext,
-    fc: & FileGeneratorContext<'p>,
+    fc: &FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     todo!()

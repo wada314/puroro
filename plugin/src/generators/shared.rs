@@ -9,11 +9,11 @@ pub(crate) trait TupleOfIntoFragments<'p, 'w, W: 'w>: Sized {
     type Iter: Iterator<Item = Fragment<'p, 'w, W>>;
     fn into_frag_iter(self) -> Self::Iter;
 
-    fn write_into(self, output: &'w mut Indentor<W>, fc: &FileGeneratorContext<'p>) -> Result<()>
+    fn write_into(self, output: &'w mut Indentor<W>) -> Result<()>
     where
         W: std::fmt::Write,
     {
-        tuple_write_impl(output, fc, self)
+        tuple_write_impl(output, self)
     }
 }
 
@@ -44,7 +44,7 @@ pub(crate) enum Fragment<'p, 'w, W: 'w> {
     String(String),
     Cow(Cow<'static, str>),
     Iter(Box<dyn 'w + Iterator<Item = Result<Fragment<'p, 'w, W>>>>),
-    Functor(Box<dyn 'w + FnOnce(&mut Indentor<W>, &FileGeneratorContext<'p>) -> Result<()>>),
+    Functor(Box<dyn 'w + FnOnce(&mut Indentor<W>) -> Result<()>>),
     Indent(
         usize,
         Box<dyn 'w + Iterator<Item = Result<Fragment<'p, 'w, W>>>>,
@@ -105,12 +105,9 @@ where
 }
 pub(crate) fn func<'w, 'p, W, F>(f: F) -> Fragment<'p, 'w, W>
 where
-    F: 'w + FnOnce(&mut Indentor<W>, &FileGeneratorContext<'p>) -> Result<()>,
+    F: 'w + FnOnce(&mut Indentor<W>) -> Result<()>,
 {
-    Fragment::Functor(Box::new(f)
-        as Box<
-            dyn FnOnce(&mut Indentor<W>, &FileGeneratorContext<'p>) -> Result<()>,
-        >)
+    Fragment::Functor(Box::new(f) as Box<dyn FnOnce(&mut Indentor<W>) -> Result<()>>)
 }
 pub(crate) fn seq<'p, 'w, W, T>(tuple: T) -> Fragment<'p, 'w, W>
 where
@@ -122,11 +119,7 @@ where
         as Box<dyn Iterator<Item = Result<Fragment<'p, 'w, W>>>>)
 }
 
-fn tuple_write_impl<'p, 'w, T, W>(
-    w: &'w mut Indentor<W>,
-    fc: &FileGeneratorContext<'p>,
-    tuple: T,
-) -> Result<()>
+fn tuple_write_impl<'p, 'w, T, W>(w: &'w mut Indentor<W>, tuple: T) -> Result<()>
 where
     W: Write,
     T: TupleOfIntoFragments<'p, 'w, W>,
@@ -134,9 +127,7 @@ where
     enum Task<'p, 'w, W: 'w + std::fmt::Write> {
         WriteFragment(Fragment<'p, 'w, W>),
         ProgressIterator(Box<dyn 'w + Iterator<Item = Result<Fragment<'p, 'w, W>>>>),
-        CallFunctor(
-            Box<dyn 'w + FnOnce(&mut Indentor<W>, &FileGeneratorContext<'p>) -> Result<()>>,
-        ),
+        CallFunctor(Box<dyn 'w + FnOnce(&mut Indentor<W>) -> Result<()>>),
         Indent(),
         Unindent(),
     }
@@ -179,7 +170,7 @@ where
                 }
             }
             Task::CallFunctor(f) => {
-                (f)(w, fc)?;
+                (f)(w)?;
             }
             Task::Indent() => {
                 w.indent();
