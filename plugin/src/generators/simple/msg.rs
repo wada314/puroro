@@ -11,6 +11,7 @@ pub(crate) fn handle_msg<'p, W: Write>(
     write_body(output, context, msg)?;
     write_default(output, context, msg)?;
     write_deser_stream_handler(output, context, msg)?;
+    write_deserializable(output, context, msg)?;
     Ok(())
 }
 
@@ -195,7 +196,11 @@ fn write_deser_stream_handler_ld_arm<'p, W: Write>(
                 Ok(
                     if let Some(TypeOfIdent::Message) = context.type_of_ident(&field.type_name) {
                         // Message
-                        let field_native_type = gen_field_type(field, context)?;
+                        let field_native_type = gen_field_bare_type(
+                            field.type_,
+                            &field.type_name,
+                            context.path_to_package_root(),
+                        )?;
                         if is_repeated {
                             format!(
                                 "\
@@ -412,4 +417,25 @@ fn bits64_field_native_type(field: &FieldDescriptorProto) -> Option<&'static str
     } else {
         None
     }
+}
+
+// Deserializable trait
+fn write_deserializable<'p, W: Write>(
+    output: &mut Indentor<W>,
+    context: &Context<'p>,
+    msg: &'p DescriptorProto,
+) -> Result<()> {
+    let native_type_name = to_type_name(&msg.name);
+    (format!(
+        "\
+impl ::puroro::Deserializable for {name} {{
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {{
+        {d}::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }}
+}}",
+        name = native_type_name,
+        d = DESER_MOD,
+    ),)
+        .write_into(output)
 }

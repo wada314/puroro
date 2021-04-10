@@ -26,7 +26,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
             ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
                     self.annotation.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::generated_code_info::Annotation> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::generated_code_info::Annotation as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -44,7 +44,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-mod generated_code_info {
+impl ::puroro::Deserializable for GeneratedCodeInfo {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}mod generated_code_info {
     pub struct Annotation {
         path: ::std::vec::Vec<i32>,
         source_file: String,
@@ -127,7 +132,12 @@ mod generated_code_info {
             Ok(())
         }
     }
-}
+    impl ::puroro::Deserializable for Annotation {
+        fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+                <Self as ::std::default::Default>::default())
+        }
+    }}
 pub struct SourceCodeInfo {
     location: ::std::vec::Vec<super::super::google::protobuf::source_code_info::Location>,
 }
@@ -156,7 +166,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
             ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
                     self.location.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::source_code_info::Location> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::source_code_info::Location as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -174,7 +184,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-mod source_code_info {
+impl ::puroro::Deserializable for SourceCodeInfo {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}mod source_code_info {
     pub struct Location {
         path: ::std::vec::Vec<i32>,
         span: ::std::vec::Vec<i32>,
@@ -259,7 +274,12 @@ mod source_code_info {
             Ok(())
         }
     }
-}
+    impl ::puroro::Deserializable for Location {
+        fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+                <Self as ::std::default::Default>::default())
+        }
+    }}
 pub struct UninterpretedOption {
     name: ::std::vec::Vec<super::super::google::protobuf::uninterpreted_option::NamePart>,
     identifier_value: String,
@@ -310,7 +330,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
             ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 2 => {
                     self.name.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::uninterpreted_option::NamePart> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::uninterpreted_option::NamePart as ::std::default::Default>::default())?
                     );
                 }
                 3 => {
@@ -364,7 +384,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-mod uninterpreted_option {
+impl ::puroro::Deserializable for UninterpretedOption {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}mod uninterpreted_option {
     pub struct NamePart {
         name_part: String,
         is_extension: bool,
@@ -422,7 +447,12 @@ mod uninterpreted_option {
             Ok(())
         }
     }
-}
+    impl ::puroro::Deserializable for NamePart {
+        fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+                <Self as ::std::default::Default>::default())
+        }
+    }}
 pub struct MethodOptions {
     deprecated: bool,
     idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
@@ -473,7 +503,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 999 => {
                     self.uninterpreted_option.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::UninterpretedOption as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -495,7 +525,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-mod method_options {
+impl ::puroro::Deserializable for MethodOptions {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}mod method_options {
     pub enum IdempotencyLevel {
         IdempotencyUnknown = 0,
         NoSideEffects = 1,
@@ -552,7 +587,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 999 => {
                     self.uninterpreted_option.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::UninterpretedOption as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -572,7 +607,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-pub struct EnumValueOptions {
+impl ::puroro::Deserializable for ServiceOptions {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}pub struct EnumValueOptions {
     deprecated: bool,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
@@ -611,7 +651,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 999 => {
                     self.uninterpreted_option.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::UninterpretedOption as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -631,7 +671,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-pub struct EnumOptions {
+impl ::puroro::Deserializable for EnumValueOptions {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}pub struct EnumOptions {
     allow_alias: bool,
     deprecated: bool,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
@@ -681,7 +726,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 999 => {
                     self.uninterpreted_option.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::UninterpretedOption as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -703,7 +748,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-pub struct OneofOptions {
+impl ::puroro::Deserializable for EnumOptions {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}pub struct OneofOptions {
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for OneofOptions {
@@ -731,7 +781,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
             ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 999 => {
                     self.uninterpreted_option.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::UninterpretedOption as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -749,7 +799,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-pub struct FieldOptions {
+impl ::puroro::Deserializable for OneofOptions {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}pub struct FieldOptions {
     ctype: ::std::result::Result<super::super::google::protobuf::field_options::CType, i32>,
     packed: bool,
     jstype: ::std::result::Result<super::super::google::protobuf::field_options::JSType, i32>,
@@ -843,7 +898,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 999 => {
                     self.uninterpreted_option.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::UninterpretedOption as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -873,7 +928,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-mod field_options {
+impl ::puroro::Deserializable for FieldOptions {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}mod field_options {
     pub enum JSType {
         JsNormal = 0,
         JsString = 1,
@@ -979,7 +1039,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 999 => {
                     self.uninterpreted_option.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::UninterpretedOption as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -1005,7 +1065,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-pub struct FileOptions {
+impl ::puroro::Deserializable for MessageOptions {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}pub struct FileOptions {
     java_package: String,
     java_outer_classname: String,
     java_multiple_files: bool,
@@ -1203,7 +1268,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 999 => {
                     self.uninterpreted_option.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::UninterpretedOption as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -1261,7 +1326,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-mod file_options {
+impl ::puroro::Deserializable for FileOptions {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}mod file_options {
     pub enum OptimizeMode {
         Speed = 1,
         CodeSize = 2,
@@ -1334,7 +1404,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                     self.output_type = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 4 => {
-                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MethodOptions>> as ::std::default::Default>::default);
+                    let msg = self.options.get_or_insert_with(<super::super::google::protobuf::MethodOptions as ::std::default::Default>::default);
                     self.options = Some(ldd.deserialize_as_message(msg)?);
                 }
                 5 => {
@@ -1374,7 +1444,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-pub struct ServiceDescriptorProto {
+impl ::puroro::Deserializable for MethodDescriptorProto {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}pub struct ServiceDescriptorProto {
     name: String,
     method: ::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto>,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>>,
@@ -1411,11 +1486,11 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 2 => {
                     self.method.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::MethodDescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 3 => {
-                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>> as ::std::default::Default>::default);
+                    let msg = self.options.get_or_insert_with(<super::super::google::protobuf::ServiceOptions as ::std::default::Default>::default);
                     self.options = Some(ldd.deserialize_as_message(msg)?);
                 }
                 _ => todo!("Unknown filed number"),
@@ -1437,7 +1512,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-pub struct EnumValueDescriptorProto {
+impl ::puroro::Deserializable for ServiceDescriptorProto {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}pub struct EnumValueDescriptorProto {
     name: String,
     number: i32,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>>,
@@ -1481,7 +1561,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                 }
                 3 => {
-                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>> as ::std::default::Default>::default);
+                    let msg = self.options.get_or_insert_with(<super::super::google::protobuf::EnumValueOptions as ::std::default::Default>::default);
                     self.options = Some(ldd.deserialize_as_message(msg)?);
                 }
                 _ => todo!("Unknown filed number"),
@@ -1503,7 +1583,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-pub struct EnumDescriptorProto {
+impl ::puroro::Deserializable for EnumValueDescriptorProto {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}pub struct EnumDescriptorProto {
     name: String,
     value: ::std::vec::Vec<super::super::google::protobuf::EnumValueDescriptorProto>,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>>,
@@ -1546,16 +1631,16 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 2 => {
                     self.value.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::EnumValueDescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::EnumValueDescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 3 => {
-                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>> as ::std::default::Default>::default);
+                    let msg = self.options.get_or_insert_with(<super::super::google::protobuf::EnumOptions as ::std::default::Default>::default);
                     self.options = Some(ldd.deserialize_as_message(msg)?);
                 }
                 4 => {
                     self.reserved_range.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange as ::std::default::Default>::default())?
                     );
                 }
                 5 => {
@@ -1584,7 +1669,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-mod enum_descriptor_proto {
+impl ::puroro::Deserializable for EnumDescriptorProto {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}mod enum_descriptor_proto {
     pub struct EnumReservedRange {
         start: i32,
         end: i32,
@@ -1647,7 +1737,12 @@ mod enum_descriptor_proto {
             Ok(())
         }
     }
-}
+    impl ::puroro::Deserializable for EnumReservedRange {
+        fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+                <Self as ::std::default::Default>::default())
+        }
+    }}
 pub struct OneofDescriptorProto {
     name: String,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>>,
@@ -1681,7 +1776,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                     self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>> as ::std::default::Default>::default);
+                    let msg = self.options.get_or_insert_with(<super::super::google::protobuf::OneofOptions as ::std::default::Default>::default);
                     self.options = Some(ldd.deserialize_as_message(msg)?);
                 }
                 _ => todo!("Unknown filed number"),
@@ -1701,7 +1796,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-pub struct FieldDescriptorProto {
+impl ::puroro::Deserializable for OneofDescriptorProto {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}pub struct FieldDescriptorProto {
     name: String,
     number: i32,
     label: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>,
@@ -1807,7 +1907,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                     self.json_name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 8 => {
-                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FieldOptions>> as ::std::default::Default>::default);
+                    let msg = self.options.get_or_insert_with(<super::super::google::protobuf::FieldOptions as ::std::default::Default>::default);
                     self.options = Some(ldd.deserialize_as_message(msg)?);
                 }
                 17 => {
@@ -1851,7 +1951,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-mod field_descriptor_proto {
+impl ::puroro::Deserializable for FieldDescriptorProto {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}mod field_descriptor_proto {
     pub enum Label {
         LabelOptional = 1,
         LabelRequired = 2,
@@ -1943,7 +2048,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
             ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 999 => {
                     self.uninterpreted_option.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::UninterpretedOption as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -1961,7 +2066,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-pub struct DescriptorProto {
+impl ::puroro::Deserializable for ExtensionRangeOptions {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}pub struct DescriptorProto {
     name: String,
     field: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
     extension: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
@@ -2019,41 +2129,41 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 2 => {
                     self.field.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::FieldDescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 6 => {
                     self.extension.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::FieldDescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 3 => {
                     self.nested_type.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::DescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::DescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 4 => {
                     self.enum_type.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::EnumDescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::EnumDescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 5 => {
                     self.extension_range.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ExtensionRange> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::descriptor_proto::ExtensionRange as ::std::default::Default>::default())?
                     );
                 }
                 8 => {
                     self.oneof_decl.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::OneofDescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::OneofDescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 7 => {
-                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MessageOptions>> as ::std::default::Default>::default);
+                    let msg = self.options.get_or_insert_with(<super::super::google::protobuf::MessageOptions as ::std::default::Default>::default);
                     self.options = Some(ldd.deserialize_as_message(msg)?);
                 }
                 9 => {
                     self.reserved_range.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ReservedRange> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::descriptor_proto::ReservedRange as ::std::default::Default>::default())?
                     );
                 }
                 10 => {
@@ -2092,7 +2202,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-mod descriptor_proto {
+impl ::puroro::Deserializable for DescriptorProto {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}mod descriptor_proto {
     pub struct ReservedRange {
         start: i32,
         end: i32,
@@ -2155,7 +2270,12 @@ mod descriptor_proto {
             Ok(())
         }
     }
-    pub struct ExtensionRange {
+    impl ::puroro::Deserializable for ReservedRange {
+        fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+                <Self as ::std::default::Default>::default())
+        }
+    }pub struct ExtensionRange {
         start: i32,
         end: i32,
         options: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>>,
@@ -2204,7 +2324,7 @@ mod descriptor_proto {
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     3 => {
-                        let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>> as ::std::default::Default>::default);
+                        let msg = self.options.get_or_insert_with(<super::super::super::google::protobuf::ExtensionRangeOptions as ::std::default::Default>::default);
                         self.options = Some(ldd.deserialize_as_message(msg)?);
                     }
                     _ => todo!("Unknown filed number"),
@@ -2226,7 +2346,12 @@ mod descriptor_proto {
             Ok(())
         }
     }
-}
+    impl ::puroro::Deserializable for ExtensionRange {
+        fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+                <Self as ::std::default::Default>::default())
+        }
+    }}
 pub struct FileDescriptorProto {
     name: String,
     package: String,
@@ -2311,30 +2436,30 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 4 => {
                     self.message_type.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::DescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::DescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 5 => {
                     self.enum_type.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::EnumDescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::EnumDescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 6 => {
                     self.service.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::ServiceDescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::ServiceDescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 7 => {
                     self.extension.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::FieldDescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 8 => {
-                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FileOptions>> as ::std::default::Default>::default);
+                    let msg = self.options.get_or_insert_with(<super::super::google::protobuf::FileOptions as ::std::default::Default>::default);
                     self.options = Some(ldd.deserialize_as_message(msg)?);
                 }
                 9 => {
-                    let msg = self.source_code_info.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::SourceCodeInfo>> as ::std::default::Default>::default);
+                    let msg = self.source_code_info.get_or_insert_with(<super::super::google::protobuf::SourceCodeInfo as ::std::default::Default>::default);
                     self.source_code_info = Some(ldd.deserialize_as_message(msg)?);
                 }
                 12 => {
@@ -2377,7 +2502,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-pub struct FileDescriptorSet {
+impl ::puroro::Deserializable for FileDescriptorProto {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}pub struct FileDescriptorSet {
     file: ::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto>,
 }
 impl ::std::default::Default for FileDescriptorSet {
@@ -2405,7 +2535,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
             ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
                     self.file.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::google::protobuf::FileDescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -2421,5 +2551,11 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
+    }
+}
+impl ::puroro::Deserializable for FileDescriptorSet {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
     }
 }

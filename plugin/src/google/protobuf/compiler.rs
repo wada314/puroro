@@ -43,7 +43,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 15 => {
                     self.file.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::super::google::protobuf::compiler::code_generator_response::File> as ::std::default::Default>::default())?
+                        <super::super::super::google::protobuf::compiler::code_generator_response::File as ::std::default::Default>::default())?
                     );
                 }
                 _ => todo!("Unknown filed number"),
@@ -65,7 +65,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-mod code_generator_response {
+impl ::puroro::Deserializable for CodeGeneratorResponse {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}mod code_generator_response {
     pub enum Feature {
         FeatureNone = 0,
         FeatureProto3Optional = 1,
@@ -125,7 +130,7 @@ mod code_generator_response {
                         self.content = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                     }
                     16 => {
-                        let msg = self.generated_code_info.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::super::super::google::protobuf::GeneratedCodeInfo>> as ::std::default::Default>::default);
+                        let msg = self.generated_code_info.get_or_insert_with(<super::super::super::super::google::protobuf::GeneratedCodeInfo as ::std::default::Default>::default);
                         self.generated_code_info = Some(ldd.deserialize_as_message(msg)?);
                     }
                     _ => todo!("Unknown filed number"),
@@ -149,7 +154,12 @@ mod code_generator_response {
             Ok(())
         }
     }
-}
+    impl ::puroro::Deserializable for File {
+        fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+                <Self as ::std::default::Default>::default())
+        }
+    }}
 pub struct CodeGeneratorRequest {
     file_to_generate: ::std::vec::Vec<String>,
     parameter: String,
@@ -193,11 +203,11 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 15 => {
                     self.proto_file.push(ldd.deserialize_as_message(
-                        <::std::vec::Vec<super::super::super::google::protobuf::FileDescriptorProto> as ::std::default::Default>::default())?
+                        <super::super::super::google::protobuf::FileDescriptorProto as ::std::default::Default>::default())?
                     );
                 }
                 3 => {
-                    let msg = self.compiler_version.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::compiler::Version>> as ::std::default::Default>::default);
+                    let msg = self.compiler_version.get_or_insert_with(<super::super::super::google::protobuf::compiler::Version as ::std::default::Default>::default);
                     self.compiler_version = Some(ldd.deserialize_as_message(msg)?);
                 }
                 _ => todo!("Unknown filed number"),
@@ -221,7 +231,12 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         Ok(())
     }
 }
-pub struct Version {
+impl ::puroro::Deserializable for CodeGeneratorRequest {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
+    }
+}pub struct Version {
     major: i32,
     minor: i32,
     patch: i32,
@@ -302,5 +317,11 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
+    }
+}
+impl ::puroro::Deserializable for Version {
+    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
+            <Self as ::std::default::Default>::default())
     }
 }
