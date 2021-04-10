@@ -15,7 +15,7 @@ impl ::std::default::Default for CodeGeneratorResponse {
 impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for CodeGeneratorResponse {
     type Target = Self;
     fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(Self)
+        Ok(self)
     }
     fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
@@ -23,7 +23,16 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-::puroro_serializer::deserializer::stream::Field::Variant(variant) => match variant {1 => Err(::puroro::PuroroError::UnexpectedWireType)?,hoge15 => Err(::puroro::PuroroError::UnexpectedWireType)?,}       }
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                2 => {
+                    self.supported_features = variant.to_native::<::puroro::tags::UInt64>()?;
+                }
+                15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                _ => todo!("Unknown field number"),
+            }
+            _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
+       }
     }
 }
 mod code_generator_response {
@@ -60,7 +69,7 @@ mod code_generator_response {
     impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for File {
         type Target = Self;
         fn finish(self) -> ::puroro::Result<Self::Target> {
-            Ok(Self)
+            Ok(self)
         }
         fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
             &mut self,
@@ -68,7 +77,15 @@ mod code_generator_response {
             field_number: usize,
         ) -> ::puroro::Result<()> {
             match field {
-    ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match variant {1 => Err(::puroro::PuroroError::UnexpectedWireType)?,2 => Err(::puroro::PuroroError::UnexpectedWireType)?,15 => Err(::puroro::PuroroError::UnexpectedWireType)?,16 => Err(::puroro::PuroroError::UnexpectedWireType)?,}       }
+                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                    1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    16 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    _ => todo!("Unknown field number"),
+                }
+                _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
+           }
         }
     }
 }
@@ -91,7 +108,7 @@ impl ::std::default::Default for CodeGeneratorRequest {
 impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for CodeGeneratorRequest {
     type Target = Self;
     fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(Self)
+        Ok(self)
     }
     fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
@@ -99,7 +116,15 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-::puroro_serializer::deserializer::stream::Field::Variant(variant) => match variant {1 => Err(::puroro::PuroroError::UnexpectedWireType)?,2 => Err(::puroro::PuroroError::UnexpectedWireType)?,15 => Err(::puroro::PuroroError::UnexpectedWireType)?,3 => Err(::puroro::PuroroError::UnexpectedWireType)?,}       }
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                _ => todo!("Unknown field number"),
+            }
+            _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
+       }
     }
 }
 pub struct Version {
@@ -121,7 +146,7 @@ impl ::std::default::Default for Version {
 impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for Version {
     type Target = Self;
     fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(Self)
+        Ok(self)
     }
     fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
@@ -129,6 +154,20 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-::puroro_serializer::deserializer::stream::Field::Variant(variant) => match variant {hogehogehoge4 => Err(::puroro::PuroroError::UnexpectedWireType)?,}       }
+            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                1 => {
+                    self.major = variant.to_native::<::puroro::tags::Int32>()?;
+                }
+                2 => {
+                    self.minor = variant.to_native::<::puroro::tags::Int32>()?;
+                }
+                3 => {
+                    self.patch = variant.to_native::<::puroro::tags::Int32>()?;
+                }
+                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                _ => todo!("Unknown field number"),
+            }
+            _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
+       }
     }
 }

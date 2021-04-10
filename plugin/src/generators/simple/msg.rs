@@ -91,7 +91,7 @@ fn write_deser_stream_handler2<'p, W: Write>(
 impl {d}::MessageDeserializeEventHandler for {name} {{
     type Target = Self;
     fn finish(self) -> ::puroro::Result<Self::Target> {{
-        Ok(Self)
+        Ok(self)
     }}
     fn met_field<T: {d}::LengthDelimitedDeserializer>(
         &mut self,
@@ -102,7 +102,13 @@ impl {d}::MessageDeserializeEventHandler for {name} {{
             d = DESER_MOD,
             name = native_type_name
         ),
-        func(|output| write_deser_stream_handler_variant_arm(output, context, msg)),
+        indent_n(
+            3,
+            (
+                func(|output| write_deser_stream_handler_variant_arm(output, context, msg)),
+                "_ => Err(::puroro::PuroroError::UnexpectedFieldType)?,\n",
+            ),
+        ),
         "       \
         }}
     }}
@@ -118,26 +124,52 @@ fn write_deser_stream_handler_variant_arm<'p, W: Write>(
 ) -> Result<()> {
     (
         format!(
-            "{d}::Field::Variant(variant) => match variant {{",
+            "{d}::Field::Variant(variant) => match field_number {{\n",
             d = DESER_MOD
         ),
-        indent((iter(msg.field.iter().map(
-            |field| match variant_field_type(field) {
-                None => {
-                    // This is not a variant field, so the output's match-case should fail.
-                    Ok(fr(format!(
-                        "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,",
-                        number = field.number
-                    )))
-                }
-                Some(tag_type) => {
-                    let is_enum = is_field_enum(field, context);
-
-                    Ok(fr("hoge"))
-                }
-            },
-        )),)),
-        "}}",
+        indent((
+            iter(msg.field.iter().map(|field| {
+                Ok(match variant_field_type(field) {
+                    None => {
+                        // This is not a variant field, so the output's match-case should fail.
+                        format!(
+                            "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
+                            number = field.number
+                        )
+                    }
+                    Some(tag_type) => {
+                        let is_enum = is_field_enum(field, context);
+                        let is_repeated = is_field_repeated(field);
+                        let maybe_try_into = if is_enum { ".try_into()" } else { "" };
+                        if is_repeated {
+                            format!(
+                                "\
+{number} => {{
+    self.{name}.push(variant.to_native::<{tag}>()?{maybe_try_into});
+}}\n",
+                                number = field.number,
+                                name = to_var_name(&field.name),
+                                tag = tag_type,
+                                maybe_try_into = maybe_try_into,
+                            )
+                        } else {
+                            format!(
+                                "\
+{number} => {{
+    self.{name} = variant.to_native::<{tag}>()?{maybe_try_into};
+}}\n",
+                                number = field.number,
+                                name = to_var_name(&field.name),
+                                tag = tag_type,
+                                maybe_try_into = maybe_try_into,
+                            )
+                        }
+                    }
+                })
+            })),
+            "_ => todo!(\"Unknown field number\"),\n",
+        )),
+        "}}\n",
     )
         .write_into(output)
 }
@@ -231,14 +263,14 @@ fn write_deser_stream_handler_bytes64<'p, W: Write>(
 fn variant_field_type(field: &FieldDescriptorProto) -> Option<&'static str> {
     if let Ok(t) = field.type_ {
         match t {
-            FieldDescriptorProto_Type::TYPE_INT64 => Some("Int64"),
-            FieldDescriptorProto_Type::TYPE_SINT64 => Some("SInt64"),
-            FieldDescriptorProto_Type::TYPE_UINT64 => Some("UInt64"),
-            FieldDescriptorProto_Type::TYPE_INT32 => Some("Int32"),
-            FieldDescriptorProto_Type::TYPE_SINT32 => Some("SInt32"),
-            FieldDescriptorProto_Type::TYPE_ENUM => Some("Int32"),
-            FieldDescriptorProto_Type::TYPE_BOOL => Some("Bool"),
-            FieldDescriptorProto_Type::TYPE_UINT32 => Some("UInt32"),
+            FieldDescriptorProto_Type::TYPE_INT64 => Some("::puroro::tags::Int64"),
+            FieldDescriptorProto_Type::TYPE_SINT64 => Some("::puroro::tags::SInt64"),
+            FieldDescriptorProto_Type::TYPE_UINT64 => Some("::puroro::tags::UInt64"),
+            FieldDescriptorProto_Type::TYPE_INT32 => Some("::puroro::tags::Int32"),
+            FieldDescriptorProto_Type::TYPE_SINT32 => Some("::puroro::tags::SInt32"),
+            FieldDescriptorProto_Type::TYPE_ENUM => Some("::puroro::tags::Int32"),
+            FieldDescriptorProto_Type::TYPE_BOOL => Some("::puroro::tags::Bool"),
+            FieldDescriptorProto_Type::TYPE_UINT32 => Some("::puroro::tags::UInt32"),
             _ => None,
         }
     } else {
