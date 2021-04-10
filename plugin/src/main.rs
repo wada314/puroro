@@ -1,10 +1,8 @@
 #![cfg_attr(feature = "nightly", feature(backtrace))]
 
-#[macro_use]
-mod macros;
 mod error;
 mod generators;
-mod plugin;
+mod stage1;
 
 use ::puroro::{Deserializable, Serializable};
 use generators::shared::Context;
@@ -15,10 +13,7 @@ type Result<T> = std::result::Result<T, GeneratorError>;
 use std::io::Read;
 use std::io::{stdin, stdout};
 
-use plugin::*;
-
-#[cfg(test)]
-mod google;
+use stage1::*;
 
 fn main() -> Result<()> {
     let cgreq = CodeGeneratorRequest::from_bytes(stdin().bytes()).unwrap();

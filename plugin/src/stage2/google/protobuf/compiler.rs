@@ -89,7 +89,7 @@ impl ::puroro::Serializable for CodeGeneratorResponse {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    mod code_generator_response {
+mod code_generator_response {
     pub enum Feature {
         FeatureNone = 0,
         FeatureProto3Optional = 1,
@@ -199,7 +199,7 @@ impl ::puroro::Serializable for CodeGeneratorResponse {
             <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
         }
     }
-        }
+}
 pub struct CodeGeneratorRequest {
     file_to_generate: ::std::vec::Vec<String>,
     parameter: String,
@@ -301,7 +301,7 @@ impl ::puroro::Serializable for CodeGeneratorRequest {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    pub struct Version {
+pub struct Version {
     major: i32,
     minor: i32,
     patch: i32,
@@ -405,4 +405,3 @@ impl ::puroro::Serializable for Version {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    

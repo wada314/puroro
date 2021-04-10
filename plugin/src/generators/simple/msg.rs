@@ -581,8 +581,7 @@ impl ::puroro::Serializable for {name} {{
         let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }}
-}}
-    ",
+}}\n",
         name = native_type_name
     ),)
         .write_into(output)

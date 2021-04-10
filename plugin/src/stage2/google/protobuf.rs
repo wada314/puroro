@@ -67,7 +67,7 @@ impl ::puroro::Serializable for GeneratedCodeInfo {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    mod generated_code_info {
+mod generated_code_info {
     pub struct Annotation {
         path: ::std::vec::Vec<i32>,
         source_file: String,
@@ -171,7 +171,7 @@ impl ::puroro::Serializable for GeneratedCodeInfo {
             <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
         }
     }
-        }
+}
 pub struct SourceCodeInfo {
     location: ::std::vec::Vec<super::super::google::protobuf::source_code_info::Location>,
 }
@@ -241,7 +241,7 @@ impl ::puroro::Serializable for SourceCodeInfo {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    mod source_code_info {
+mod source_code_info {
     pub struct Location {
         path: ::std::vec::Vec<i32>,
         span: ::std::vec::Vec<i32>,
@@ -351,7 +351,7 @@ impl ::puroro::Serializable for SourceCodeInfo {
             <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
         }
     }
-        }
+}
 pub struct UninterpretedOption {
     name: ::std::vec::Vec<super::super::google::protobuf::uninterpreted_option::NamePart>,
     identifier_value: String,
@@ -482,7 +482,7 @@ impl ::puroro::Serializable for UninterpretedOption {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    mod uninterpreted_option {
+mod uninterpreted_option {
     pub struct NamePart {
         name_part: String,
         is_extension: bool,
@@ -561,7 +561,7 @@ impl ::puroro::Serializable for UninterpretedOption {
             <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
         }
     }
-        }
+}
 pub struct MethodOptions {
     deprecated: bool,
     idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
@@ -658,7 +658,7 @@ impl ::puroro::Serializable for MethodOptions {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    mod method_options {
+mod method_options {
     pub enum IdempotencyLevel {
         IdempotencyUnknown = 0,
         NoSideEffects = 1,
@@ -758,7 +758,7 @@ impl ::puroro::Serializable for ServiceOptions {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    pub struct EnumValueOptions {
+pub struct EnumValueOptions {
     deprecated: bool,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
@@ -840,7 +840,7 @@ impl ::puroro::Serializable for EnumValueOptions {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    pub struct EnumOptions {
+pub struct EnumOptions {
     allow_alias: bool,
     deprecated: bool,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
@@ -935,7 +935,7 @@ impl ::puroro::Serializable for EnumOptions {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    pub struct OneofOptions {
+pub struct OneofOptions {
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for OneofOptions {
@@ -1004,7 +1004,7 @@ impl ::puroro::Serializable for OneofOptions {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    pub struct FieldOptions {
+pub struct FieldOptions {
     ctype: ::std::result::Result<super::super::google::protobuf::field_options::CType, i32>,
     packed: bool,
     jstype: ::std::result::Result<super::super::google::protobuf::field_options::JSType, i32>,
@@ -1153,7 +1153,7 @@ impl ::puroro::Serializable for FieldOptions {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    mod field_options {
+mod field_options {
     pub enum JSType {
         JsNormal = 0,
         JsString = 1,
@@ -1308,7 +1308,7 @@ impl ::puroro::Serializable for MessageOptions {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    pub struct FileOptions {
+pub struct FileOptions {
     java_package: String,
     java_outer_classname: String,
     java_multiple_files: bool,
@@ -1598,7 +1598,7 @@ impl ::puroro::Serializable for FileOptions {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    mod file_options {
+mod file_options {
     pub enum OptimizeMode {
         Speed = 1,
         CodeSize = 2,
@@ -1737,7 +1737,7 @@ impl ::puroro::Serializable for MethodDescriptorProto {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    pub struct ServiceDescriptorProto {
+pub struct ServiceDescriptorProto {
     name: String,
     method: ::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto>,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>>,
@@ -1827,7 +1827,7 @@ impl ::puroro::Serializable for ServiceDescriptorProto {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    pub struct EnumValueDescriptorProto {
+pub struct EnumValueDescriptorProto {
     name: String,
     number: i32,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>>,
@@ -1917,7 +1917,7 @@ impl ::puroro::Serializable for EnumValueDescriptorProto {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    pub struct EnumDescriptorProto {
+pub struct EnumDescriptorProto {
     name: String,
     value: ::std::vec::Vec<super::super::google::protobuf::EnumValueDescriptorProto>,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>>,
@@ -2031,7 +2031,7 @@ impl ::puroro::Serializable for EnumDescriptorProto {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    mod enum_descriptor_proto {
+mod enum_descriptor_proto {
     pub struct EnumReservedRange {
         start: i32,
         end: i32,
@@ -2114,7 +2114,7 @@ impl ::puroro::Serializable for EnumDescriptorProto {
             <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
         }
     }
-        }
+}
 pub struct OneofDescriptorProto {
     name: String,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>>,
@@ -2192,7 +2192,7 @@ impl ::puroro::Serializable for OneofDescriptorProto {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    pub struct FieldDescriptorProto {
+pub struct FieldDescriptorProto {
     name: String,
     number: i32,
     label: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>,
@@ -2372,7 +2372,7 @@ impl ::puroro::Serializable for FieldDescriptorProto {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    mod field_descriptor_proto {
+mod field_descriptor_proto {
     pub enum Label {
         LabelOptional = 1,
         LabelRequired = 2,
@@ -2505,7 +2505,7 @@ impl ::puroro::Serializable for ExtensionRangeOptions {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    pub struct DescriptorProto {
+pub struct DescriptorProto {
     name: String,
     field: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
     extension: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
@@ -2684,7 +2684,7 @@ impl ::puroro::Serializable for DescriptorProto {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    mod descriptor_proto {
+mod descriptor_proto {
     pub struct ReservedRange {
         start: i32,
         end: i32,
@@ -2767,7 +2767,7 @@ impl ::puroro::Serializable for DescriptorProto {
             <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
         }
     }
-        pub struct ExtensionRange {
+    pub struct ExtensionRange {
         start: i32,
         end: i32,
         options: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>>,
@@ -2861,7 +2861,7 @@ impl ::puroro::Serializable for DescriptorProto {
             <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
         }
     }
-        }
+}
 pub struct FileDescriptorProto {
     name: String,
     package: String,
@@ -3056,7 +3056,7 @@ impl ::puroro::Serializable for FileDescriptorProto {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    pub struct FileDescriptorSet {
+pub struct FileDescriptorSet {
     file: ::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto>,
 }
 impl ::std::default::Default for FileDescriptorSet {
@@ -3125,4 +3125,3 @@ impl ::puroro::Serializable for FileDescriptorSet {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
     }
 }
-    

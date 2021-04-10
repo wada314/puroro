@@ -198,7 +198,7 @@ macro_rules! proto_struct {
                 field_number: usize,
             ) -> ::puroro::Result<()> {
                 #[allow(unused)]
-                use $crate::macros::DeserializableFromField;
+                use $crate::stage1::macros::DeserializableFromField;
                 match field_number {
                     $($fid => {
                         self.$fname.merge_from_field(field)?;
@@ -234,7 +234,7 @@ macro_rules! proto_struct {
                 deserializer.deserialize(value)
             }
         }
-        impl $crate::macros::DeserializableFromField for Option<$structname> {
+        impl $crate::stage1::macros::DeserializableFromField for Option<$structname> {
             fn merge_from_field<D>(&mut self, field: ::puroro_serializer::deserializer::stream::Field<D>) -> ::puroro::Result<()>
             where
                 D: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer
@@ -248,7 +248,7 @@ macro_rules! proto_struct {
                 }
             }
         }
-        impl $crate::macros::DeserializableFromField for Vec<$structname> {
+        impl $crate::stage1::macros::DeserializableFromField for Vec<$structname> {
             fn merge_from_field<D>(&mut self, field: ::puroro_serializer::deserializer::stream::Field<D>) -> ::puroro::Result<()>
             where
                 D: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer
@@ -268,7 +268,7 @@ macro_rules! proto_struct {
                 serializer: &mut T,
             ) -> ::puroro::Result<()> {
                 $(
-                    $crate::macros::SerializableField::serialize(
+                    $crate::stage1::macros::SerializableField::serialize(
                         &self.$fname, serializer, $fid
                     )?;
                 )*
@@ -283,7 +283,7 @@ macro_rules! proto_struct {
                 )
             }
         }
-        impl $crate::macros::SerializableField for Option<$structname> {
+        impl $crate::stage1::macros::SerializableField for Option<$structname> {
             fn serialize<T: puroro_serializer::serializer::MessageSerializer>(
                 &self,
                 serializer: &mut T,
@@ -295,7 +295,7 @@ macro_rules! proto_struct {
                 Ok(())
             }
         }
-        impl $crate::macros::SerializableField for Vec<$structname> {
+        impl $crate::stage1::macros::SerializableField for Vec<$structname> {
             fn serialize<T: puroro_serializer::serializer::MessageSerializer>(
                 &self,
                 serializer: &mut T,
@@ -310,7 +310,7 @@ macro_rules! proto_struct {
         impl Default for $structname {
             fn default() -> Self {
                 Self {$(
-                    $fname: $crate::macros::MyDefault::default(),
+                    $fname: $crate::stage1::macros::MyDefault::default(),
                 )*}
             }
         }
@@ -334,7 +334,7 @@ macro_rules! proto_struct {
                 ( $($enumname::$ename),* ).0
             }
         }
-        impl $crate::macros::DeserializableFromField for Result<$enumname, i32> {
+        impl $crate::stage1::macros::DeserializableFromField for Result<$enumname, i32> {
             fn merge_from_field<D>(&mut self, field: ::puroro_serializer::deserializer::stream::Field<D>) -> ::puroro::Result<()>
             where
                 D: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer
@@ -346,7 +346,7 @@ macro_rules! proto_struct {
                 Ok(())
             }
         }
-        impl $crate::macros::DeserializableFromField for Vec<Result<$enumname, i32>> {
+        impl $crate::stage1::macros::DeserializableFromField for Vec<Result<$enumname, i32>> {
             fn merge_from_field<D>(&mut self, field: ::puroro_serializer::deserializer::stream::Field<D>) -> ::puroro::Result<()>
             where
                 D: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer
@@ -358,7 +358,7 @@ macro_rules! proto_struct {
                 Ok(())
             }
         }
-        impl $crate::macros::SerializableField for Result<$enumname, i32> {
+        impl $crate::stage1::macros::SerializableField for Result<$enumname, i32> {
             fn serialize<T: puroro_serializer::serializer::MessageSerializer>(
                 &self,
                 serializer: &mut T,
@@ -372,7 +372,7 @@ macro_rules! proto_struct {
                 Ok(())
             }
         }
-        impl $crate::macros::SerializableField for Vec<Result<$enumname, i32>> {
+        impl $crate::stage1::macros::SerializableField for Vec<Result<$enumname, i32>> {
             fn serialize<T: puroro_serializer::serializer::MessageSerializer>(
                 &self,
                 serializer: &mut T,

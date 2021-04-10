@@ -1,7 +1,7 @@
 use crate::generators::shared::writers::*;
 use crate::generators::shared::*;
 use crate::generators::utils::*;
-use crate::plugin::*;
+use crate::stage1::*;
 use crate::{ErrorKind, Result};
 use itertools::Itertools;
 use std::{borrow::Cow, fmt::Write};
