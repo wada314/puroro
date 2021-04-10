@@ -67,10 +67,23 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for CodeGeneratorResponse {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}mod code_generator_response {
+}
+impl ::puroro_serializer::serializer::Serializable for CodeGeneratorResponse {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_bytes_twice(1, self.error.bytes().map(|b| Ok(b)))?;
+        unimplemented!("Serializer for something else");for msg in &self.file {
+            serializer.serialize_message_twice::<super::super::super::google::protobuf::compiler::code_generator_response::File>(15, msg)?;
+        }
+        Ok(())
+    }
+}
+mod code_generator_response {
     pub enum Feature {
         FeatureNone = 0,
         FeatureProto3Optional = 1,
@@ -156,10 +169,23 @@ impl ::puroro::Deserializable for CodeGeneratorResponse {
     }
     impl ::puroro::Deserializable for File {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            use ::puroro_serializer::deserializer::stream::Deserializer;
             ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
                 <Self as ::std::default::Default>::default())
         }
-    }}
+    }
+    impl ::puroro_serializer::serializer::Serializable for File {
+        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+            &self, serializer: &mut T) -> ::puroro::Result<()>
+        {
+            serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
+            serializer.serialize_bytes_twice(2, self.insertion_point.bytes().map(|b| Ok(b)))?;
+            serializer.serialize_bytes_twice(15, self.content.bytes().map(|b| Ok(b)))?;
+            serializer.serialize_message_twice::<super::super::super::super::google::protobuf::GeneratedCodeInfo>(16, &self.generated_code_info)?;
+            Ok(())
+        }
+    }
+}
 pub struct CodeGeneratorRequest {
     file_to_generate: ::std::vec::Vec<String>,
     parameter: String,
@@ -233,10 +259,27 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for CodeGeneratorRequest {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}pub struct Version {
+}
+impl ::puroro_serializer::serializer::Serializable for CodeGeneratorRequest {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        for string in &self.file_to_generate {
+            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
+        }
+        serializer.serialize_bytes_twice(2, self.parameter.bytes().map(|b| Ok(b)))?;
+        for msg in &self.proto_file {
+            serializer.serialize_message_twice::<super::super::super::google::protobuf::FileDescriptorProto>(15, msg)?;
+        }
+        serializer.serialize_message_twice::<super::super::super::google::protobuf::compiler::Version>(3, &self.compiler_version)?;
+        Ok(())
+    }
+}
+pub struct Version {
     major: i32,
     minor: i32,
     patch: i32,
@@ -321,7 +364,16 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for Version {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
+    }
+}
+impl ::puroro_serializer::serializer::Serializable for Version {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");serializer.serialize_bytes_twice(4, self.suffix.bytes().map(|b| Ok(b)))?;
+        Ok(())
     }
 }

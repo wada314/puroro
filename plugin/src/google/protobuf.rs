@@ -46,10 +46,22 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for GeneratedCodeInfo {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}mod generated_code_info {
+}
+impl ::puroro_serializer::serializer::Serializable for GeneratedCodeInfo {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        for msg in &self.annotation {
+            serializer.serialize_message_twice::<super::super::google::protobuf::generated_code_info::Annotation>(1, msg)?;
+        }
+        Ok(())
+    }
+}
+mod generated_code_info {
     pub struct Annotation {
         path: ::std::vec::Vec<i32>,
         source_file: String,
@@ -134,10 +146,20 @@ impl ::puroro::Deserializable for GeneratedCodeInfo {
     }
     impl ::puroro::Deserializable for Annotation {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            use ::puroro_serializer::deserializer::stream::Deserializer;
             ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
                 <Self as ::std::default::Default>::default())
         }
-    }}
+    }
+    impl ::puroro_serializer::serializer::Serializable for Annotation {
+        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+            &self, serializer: &mut T) -> ::puroro::Result<()>
+        {
+            unimplemented!("Serializer for something else");serializer.serialize_bytes_twice(2, self.source_file.bytes().map(|b| Ok(b)))?;
+            unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");        Ok(())
+        }
+    }
+}
 pub struct SourceCodeInfo {
     location: ::std::vec::Vec<super::super::google::protobuf::source_code_info::Location>,
 }
@@ -186,10 +208,22 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for SourceCodeInfo {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}mod source_code_info {
+}
+impl ::puroro_serializer::serializer::Serializable for SourceCodeInfo {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        for msg in &self.location {
+            serializer.serialize_message_twice::<super::super::google::protobuf::source_code_info::Location>(1, msg)?;
+        }
+        Ok(())
+    }
+}
+mod source_code_info {
     pub struct Location {
         path: ::std::vec::Vec<i32>,
         span: ::std::vec::Vec<i32>,
@@ -276,10 +310,24 @@ impl ::puroro::Deserializable for SourceCodeInfo {
     }
     impl ::puroro::Deserializable for Location {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            use ::puroro_serializer::deserializer::stream::Deserializer;
             ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
                 <Self as ::std::default::Default>::default())
         }
-    }}
+    }
+    impl ::puroro_serializer::serializer::Serializable for Location {
+        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+            &self, serializer: &mut T) -> ::puroro::Result<()>
+        {
+            unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");serializer.serialize_bytes_twice(3, self.leading_comments.bytes().map(|b| Ok(b)))?;
+            serializer.serialize_bytes_twice(4, self.trailing_comments.bytes().map(|b| Ok(b)))?;
+            for string in &self.leading_detached_comments {
+                serializer.serialize_bytes_twice(6, string.bytes().map(|b| Ok(b)))?;
+            }
+            Ok(())
+        }
+    }
+}
 pub struct UninterpretedOption {
     name: ::std::vec::Vec<super::super::google::protobuf::uninterpreted_option::NamePart>,
     identifier_value: String,
@@ -386,10 +434,25 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for UninterpretedOption {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}mod uninterpreted_option {
+}
+impl ::puroro_serializer::serializer::Serializable for UninterpretedOption {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        for msg in &self.name {
+            serializer.serialize_message_twice::<super::super::google::protobuf::uninterpreted_option::NamePart>(2, msg)?;
+        }
+        serializer.serialize_bytes_twice(3, self.identifier_value.bytes().map(|b| Ok(b)))?;
+        unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");unimplemented!("Serializer for bits64");serializer.serialize_bytes_twice(7, self.string_value.iter().map(|b| Ok(*b)))?;
+        serializer.serialize_bytes_twice(8, self.aggregate_value.bytes().map(|b| Ok(b)))?;
+        Ok(())
+    }
+}
+mod uninterpreted_option {
     pub struct NamePart {
         name_part: String,
         is_extension: bool,
@@ -449,10 +512,20 @@ impl ::puroro::Deserializable for UninterpretedOption {
     }
     impl ::puroro::Deserializable for NamePart {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            use ::puroro_serializer::deserializer::stream::Deserializer;
             ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
                 <Self as ::std::default::Default>::default())
         }
-    }}
+    }
+    impl ::puroro_serializer::serializer::Serializable for NamePart {
+        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+            &self, serializer: &mut T) -> ::puroro::Result<()>
+        {
+            serializer.serialize_bytes_twice(1, self.name_part.bytes().map(|b| Ok(b)))?;
+            unimplemented!("Serializer for something else");        Ok(())
+        }
+    }
+}
 pub struct MethodOptions {
     deprecated: bool,
     idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
@@ -527,10 +600,23 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for MethodOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}mod method_options {
+}
+impl ::puroro_serializer::serializer::Serializable for MethodOptions {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        unimplemented!("Serializer for something else");serializer.serialize_variants::<::puroro::tags::Int32>(34, self.idempotency_level)?;
+        for msg in &self.uninterpreted_option {
+            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+        }
+        Ok(())
+    }
+}
+mod method_options {
     pub enum IdempotencyLevel {
         IdempotencyUnknown = 0,
         NoSideEffects = 1,
@@ -609,10 +695,22 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for ServiceOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}pub struct EnumValueOptions {
+}
+impl ::puroro_serializer::serializer::Serializable for ServiceOptions {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        unimplemented!("Serializer for something else");for msg in &self.uninterpreted_option {
+            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+        }
+        Ok(())
+    }
+}
+pub struct EnumValueOptions {
     deprecated: bool,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
@@ -673,10 +771,22 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for EnumValueOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}pub struct EnumOptions {
+}
+impl ::puroro_serializer::serializer::Serializable for EnumValueOptions {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        unimplemented!("Serializer for something else");for msg in &self.uninterpreted_option {
+            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+        }
+        Ok(())
+    }
+}
+pub struct EnumOptions {
     allow_alias: bool,
     deprecated: bool,
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
@@ -750,10 +860,22 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for EnumOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}pub struct OneofOptions {
+}
+impl ::puroro_serializer::serializer::Serializable for EnumOptions {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");for msg in &self.uninterpreted_option {
+            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+        }
+        Ok(())
+    }
+}
+pub struct OneofOptions {
     uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for OneofOptions {
@@ -801,10 +923,22 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for OneofOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}pub struct FieldOptions {
+}
+impl ::puroro_serializer::serializer::Serializable for OneofOptions {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        for msg in &self.uninterpreted_option {
+            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+        }
+        Ok(())
+    }
+}
+pub struct FieldOptions {
     ctype: ::std::result::Result<super::super::google::protobuf::field_options::CType, i32>,
     packed: bool,
     jstype: ::std::result::Result<super::super::google::protobuf::field_options::JSType, i32>,
@@ -930,10 +1064,24 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for FieldOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}mod field_options {
+}
+impl ::puroro_serializer::serializer::Serializable for FieldOptions {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_variants::<::puroro::tags::Int32>(1, self.ctype)?;
+        unimplemented!("Serializer for something else");serializer.serialize_variants::<::puroro::tags::Int32>(6, self.jstype)?;
+        unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");for msg in &self.uninterpreted_option {
+            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+        }
+        Ok(())
+    }
+}
+mod field_options {
     pub enum JSType {
         JsNormal = 0,
         JsString = 1,
@@ -1067,10 +1215,22 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for MessageOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}pub struct FileOptions {
+}
+impl ::puroro_serializer::serializer::Serializable for MessageOptions {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");for msg in &self.uninterpreted_option {
+            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+        }
+        Ok(())
+    }
+}
+pub struct FileOptions {
     java_package: String,
     java_outer_classname: String,
     java_multiple_files: bool,
@@ -1328,10 +1488,33 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for FileOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}mod file_options {
+}
+impl ::puroro_serializer::serializer::Serializable for FileOptions {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_bytes_twice(1, self.java_package.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_bytes_twice(8, self.java_outer_classname.bytes().map(|b| Ok(b)))?;
+        unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");serializer.serialize_variants::<::puroro::tags::Int32>(9, self.optimize_for)?;
+        serializer.serialize_bytes_twice(11, self.go_package.bytes().map(|b| Ok(b)))?;
+        unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");serializer.serialize_bytes_twice(36, self.objc_class_prefix.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_bytes_twice(37, self.csharp_namespace.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_bytes_twice(39, self.swift_prefix.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_bytes_twice(40, self.php_class_prefix.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_bytes_twice(41, self.php_namespace.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_bytes_twice(44, self.php_metadata_namespace.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_bytes_twice(45, self.ruby_package.bytes().map(|b| Ok(b)))?;
+        for msg in &self.uninterpreted_option {
+            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+        }
+        Ok(())
+    }
+}
+mod file_options {
     pub enum OptimizeMode {
         Speed = 1,
         CodeSize = 2,
@@ -1446,10 +1629,23 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for MethodDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}pub struct ServiceDescriptorProto {
+}
+impl ::puroro_serializer::serializer::Serializable for MethodDescriptorProto {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_bytes_twice(2, self.input_type.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_bytes_twice(3, self.output_type.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_message_twice::<super::super::google::protobuf::MethodOptions>(4, &self.options)?;
+        unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");        Ok(())
+    }
+}
+pub struct ServiceDescriptorProto {
     name: String,
     method: ::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto>,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>>,
@@ -1514,10 +1710,24 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for ServiceDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}pub struct EnumValueDescriptorProto {
+}
+impl ::puroro_serializer::serializer::Serializable for ServiceDescriptorProto {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
+        for msg in &self.method {
+            serializer.serialize_message_twice::<super::super::google::protobuf::MethodDescriptorProto>(2, msg)?;
+        }
+        serializer.serialize_message_twice::<super::super::google::protobuf::ServiceOptions>(3, &self.options)?;
+        Ok(())
+    }
+}
+pub struct EnumValueDescriptorProto {
     name: String,
     number: i32,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>>,
@@ -1585,10 +1795,21 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for EnumValueDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}pub struct EnumDescriptorProto {
+}
+impl ::puroro_serializer::serializer::Serializable for EnumValueDescriptorProto {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
+        unimplemented!("Serializer for something else");serializer.serialize_message_twice::<super::super::google::protobuf::EnumValueOptions>(3, &self.options)?;
+        Ok(())
+    }
+}
+pub struct EnumDescriptorProto {
     name: String,
     value: ::std::vec::Vec<super::super::google::protobuf::EnumValueDescriptorProto>,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>>,
@@ -1671,10 +1892,30 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for EnumDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}mod enum_descriptor_proto {
+}
+impl ::puroro_serializer::serializer::Serializable for EnumDescriptorProto {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
+        for msg in &self.value {
+            serializer.serialize_message_twice::<super::super::google::protobuf::EnumValueDescriptorProto>(2, msg)?;
+        }
+        serializer.serialize_message_twice::<super::super::google::protobuf::EnumOptions>(3, &self.options)?;
+        for msg in &self.reserved_range {
+            serializer.serialize_message_twice::<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>(4, msg)?;
+        }
+        for string in &self.reserved_name {
+            serializer.serialize_bytes_twice(5, string.bytes().map(|b| Ok(b)))?;
+        }
+        Ok(())
+    }
+}
+mod enum_descriptor_proto {
     pub struct EnumReservedRange {
         start: i32,
         end: i32,
@@ -1739,10 +1980,19 @@ impl ::puroro::Deserializable for EnumDescriptorProto {
     }
     impl ::puroro::Deserializable for EnumReservedRange {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            use ::puroro_serializer::deserializer::stream::Deserializer;
             ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
                 <Self as ::std::default::Default>::default())
         }
-    }}
+    }
+    impl ::puroro_serializer::serializer::Serializable for EnumReservedRange {
+        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+            &self, serializer: &mut T) -> ::puroro::Result<()>
+        {
+            unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");        Ok(())
+        }
+    }
+}
 pub struct OneofDescriptorProto {
     name: String,
     options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>>,
@@ -1798,10 +2048,21 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for OneofDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}pub struct FieldDescriptorProto {
+}
+impl ::puroro_serializer::serializer::Serializable for OneofDescriptorProto {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_message_twice::<super::super::google::protobuf::OneofOptions>(2, &self.options)?;
+        Ok(())
+    }
+}
+pub struct FieldDescriptorProto {
     name: String,
     number: i32,
     label: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>,
@@ -1953,10 +2214,27 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for FieldDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}mod field_descriptor_proto {
+}
+impl ::puroro_serializer::serializer::Serializable for FieldDescriptorProto {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
+        unimplemented!("Serializer for something else");serializer.serialize_variants::<::puroro::tags::Int32>(4, self.label)?;
+        serializer.serialize_variants::<::puroro::tags::Int32>(5, self.type_)?;
+        serializer.serialize_bytes_twice(6, self.type_name.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_bytes_twice(2, self.extendee.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_bytes_twice(7, self.default_value.bytes().map(|b| Ok(b)))?;
+        unimplemented!("Serializer for something else");serializer.serialize_bytes_twice(10, self.json_name.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_message_twice::<super::super::google::protobuf::FieldOptions>(8, &self.options)?;
+        unimplemented!("Serializer for something else");        Ok(())
+    }
+}
+mod field_descriptor_proto {
     pub enum Label {
         LabelOptional = 1,
         LabelRequired = 2,
@@ -2068,10 +2346,22 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for ExtensionRangeOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}pub struct DescriptorProto {
+}
+impl ::puroro_serializer::serializer::Serializable for ExtensionRangeOptions {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        for msg in &self.uninterpreted_option {
+            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+        }
+        Ok(())
+    }
+}
+pub struct DescriptorProto {
     name: String,
     field: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
     extension: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
@@ -2204,10 +2494,45 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for DescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}mod descriptor_proto {
+}
+impl ::puroro_serializer::serializer::Serializable for DescriptorProto {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
+        for msg in &self.field {
+            serializer.serialize_message_twice::<super::super::google::protobuf::FieldDescriptorProto>(2, msg)?;
+        }
+        for msg in &self.extension {
+            serializer.serialize_message_twice::<super::super::google::protobuf::FieldDescriptorProto>(6, msg)?;
+        }
+        for msg in &self.nested_type {
+            serializer.serialize_message_twice::<super::super::google::protobuf::DescriptorProto>(3, msg)?;
+        }
+        for msg in &self.enum_type {
+            serializer.serialize_message_twice::<super::super::google::protobuf::EnumDescriptorProto>(4, msg)?;
+        }
+        for msg in &self.extension_range {
+            serializer.serialize_message_twice::<super::super::google::protobuf::descriptor_proto::ExtensionRange>(5, msg)?;
+        }
+        for msg in &self.oneof_decl {
+            serializer.serialize_message_twice::<super::super::google::protobuf::OneofDescriptorProto>(8, msg)?;
+        }
+        serializer.serialize_message_twice::<super::super::google::protobuf::MessageOptions>(7, &self.options)?;
+        for msg in &self.reserved_range {
+            serializer.serialize_message_twice::<super::super::google::protobuf::descriptor_proto::ReservedRange>(9, msg)?;
+        }
+        for string in &self.reserved_name {
+            serializer.serialize_bytes_twice(10, string.bytes().map(|b| Ok(b)))?;
+        }
+        Ok(())
+    }
+}
+mod descriptor_proto {
     pub struct ReservedRange {
         start: i32,
         end: i32,
@@ -2272,10 +2597,19 @@ impl ::puroro::Deserializable for DescriptorProto {
     }
     impl ::puroro::Deserializable for ReservedRange {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            use ::puroro_serializer::deserializer::stream::Deserializer;
             ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
                 <Self as ::std::default::Default>::default())
         }
-    }pub struct ExtensionRange {
+    }
+    impl ::puroro_serializer::serializer::Serializable for ReservedRange {
+        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+            &self, serializer: &mut T) -> ::puroro::Result<()>
+        {
+            unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");        Ok(())
+        }
+    }
+    pub struct ExtensionRange {
         start: i32,
         end: i32,
         options: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>>,
@@ -2348,10 +2682,20 @@ impl ::puroro::Deserializable for DescriptorProto {
     }
     impl ::puroro::Deserializable for ExtensionRange {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+            use ::puroro_serializer::deserializer::stream::Deserializer;
             ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
                 <Self as ::std::default::Default>::default())
         }
-    }}
+    }
+    impl ::puroro_serializer::serializer::Serializable for ExtensionRange {
+        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+            &self, serializer: &mut T) -> ::puroro::Result<()>
+        {
+            unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");serializer.serialize_message_twice::<super::super::super::google::protobuf::ExtensionRangeOptions>(3, &self.options)?;
+            Ok(())
+        }
+    }
+}
 pub struct FileDescriptorProto {
     name: String,
     package: String,
@@ -2504,10 +2848,39 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for FileDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }
-}pub struct FileDescriptorSet {
+}
+impl ::puroro_serializer::serializer::Serializable for FileDescriptorProto {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
+        serializer.serialize_bytes_twice(2, self.package.bytes().map(|b| Ok(b)))?;
+        for string in &self.dependency {
+            serializer.serialize_bytes_twice(3, string.bytes().map(|b| Ok(b)))?;
+        }
+        unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");for msg in &self.message_type {
+            serializer.serialize_message_twice::<super::super::google::protobuf::DescriptorProto>(4, msg)?;
+        }
+        for msg in &self.enum_type {
+            serializer.serialize_message_twice::<super::super::google::protobuf::EnumDescriptorProto>(5, msg)?;
+        }
+        for msg in &self.service {
+            serializer.serialize_message_twice::<super::super::google::protobuf::ServiceDescriptorProto>(6, msg)?;
+        }
+        for msg in &self.extension {
+            serializer.serialize_message_twice::<super::super::google::protobuf::FieldDescriptorProto>(7, msg)?;
+        }
+        serializer.serialize_message_twice::<super::super::google::protobuf::FileOptions>(8, &self.options)?;
+        serializer.serialize_message_twice::<super::super::google::protobuf::SourceCodeInfo>(9, &self.source_code_info)?;
+        serializer.serialize_bytes_twice(12, self.syntax.bytes().map(|b| Ok(b)))?;
+        Ok(())
+    }
+}
+pub struct FileDescriptorSet {
     file: ::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto>,
 }
 impl ::std::default::Default for FileDescriptorSet {
@@ -2555,7 +2928,18 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
 }
 impl ::puroro::Deserializable for FileDescriptorSet {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
+        use ::puroro_serializer::deserializer::stream::Deserializer;
         ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
+    }
+}
+impl ::puroro_serializer::serializer::Serializable for FileDescriptorSet {
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        for msg in &self.file {
+            serializer.serialize_message_twice::<super::super::google::protobuf::FileDescriptorProto>(1, msg)?;
+        }
+        Ok(())
     }
 }

@@ -6,32 +6,27 @@ use crate::{
 use std::io::{Result as IoResult, Write};
 
 pub trait MessageSerializer {
-    #[must_use]
     fn serialize_variant<T: VariantType>(
         &mut self,
         field_number: usize,
         value: T::NativeType,
     ) -> Result<()>;
 
-    #[must_use]
     fn serialize_variants_twice<T, I>(&mut self, field_number: usize, iter: I) -> Result<()>
     where
         T: VariantType,
         I: Clone + Iterator<Item = Result<T::NativeType>>;
 
-    #[must_use]
     fn serialize_bytes_twice<I>(&mut self, field_number: usize, bytes: I) -> Result<()>
     where
         I: Clone + Iterator<Item = Result<u8>>;
 
-    #[must_use]
     fn serialize_message_twice<T: Serializable>(
         &mut self,
         field_number: usize,
         message: &T,
     ) -> Result<()>;
 
-    #[must_use]
     fn direct_write_field<I>(
         &mut self,
         field_number: usize,
@@ -69,7 +64,6 @@ where
     fn get_write(&self) -> &W {
         &self.write
     }
-    #[must_use]
     fn write_field_number_and_wire_type(
         &mut self,
         field_number: usize,

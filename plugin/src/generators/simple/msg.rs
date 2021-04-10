@@ -12,6 +12,7 @@ pub(crate) fn handle_msg<'p, W: Write>(
     write_default(output, context, msg)?;
     write_deser_stream_handler(output, context, msg)?;
     write_deserializable(output, context, msg)?;
+    write_ser_serializer(output, context, msg)?;
     Ok(())
 }
 
@@ -322,7 +323,7 @@ fn write_deser_stream_handler_ld_arm<'p, W: Write>(
 fn write_deser_stream_handler_bitsxx_arm<'p, W: Write>(
     bits: usize,
     output: &mut Indentor<W>,
-    context: &Context<'p>,
+    _context: &Context<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     (
@@ -422,7 +423,7 @@ fn bits64_field_native_type(field: &FieldDescriptorProto) -> Option<&'static str
 // Deserializable trait
 fn write_deserializable<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &Context<'p>,
+    _context: &Context<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -430,12 +431,136 @@ fn write_deserializable<'p, W: Write>(
         "\
 impl ::puroro::Deserializable for {name} {{
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {{
+        use {d}::Deserializer;
         {d}::deserializer_from_bytes(iter).deserialize(
             <Self as ::std::default::Default>::default())
     }}
-}}",
+}}\n",
         name = native_type_name,
         d = DESER_MOD,
     ),)
+        .write_into(output)
+}
+
+// ::puroro_serialize::Seriazilazble trait
+
+fn write_ser_serializer<'p, W: Write>(
+    output: &mut Indentor<W>,
+    context: &Context<'p>,
+    msg: &'p DescriptorProto,
+) -> Result<()> {
+    let native_type_name = to_type_name(&msg.name);
+    (
+        format!(
+            "\
+impl ::puroro_serializer::serializer::Serializable for {name} {{
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {{\n",
+            name = native_type_name
+        ),
+        indent_n(
+            2,
+            (iter(msg.field.iter().map(|field| {
+                let native_field_name = to_var_name(&field.name);
+                let is_repeated = is_field_repeated(field);
+                Ok(if is_field_enum(field, context) {
+                    // Enum
+                    if is_repeated {
+                        format!(
+                            "\
+serializer.serialize_variants_twice::<::puroro::tags::Int32>(
+    {number},
+    self.{name}.iter().map(|rv| Ok(rv.map_or(rv.unwrap_err(), |v| v as i32)))
+)?;\n",
+                            number = field.number,
+                            name = native_field_name,
+                        )
+                    } else {
+                        format!(
+                            "\
+serializer.serialize_variants::<::puroro::tags::Int32>({number}, self.{name})?;\n",
+                            number = field.number,
+                            name = native_field_name,
+                        )
+                    }
+                } else if is_field_msg(field, context) {
+                    // Message
+                    let field_native_type = gen_field_bare_type(
+                        field.type_,
+                        &field.type_name,
+                        context.path_to_package_root(),
+                    )?;
+                    if is_repeated {
+                        format!(
+                            "\
+for msg in &self.{name} {{
+    serializer.serialize_message_twice::<{type_}>({number}, msg)?;
+}}\n",
+                            number = field.number,
+                            name = native_field_name,
+                            type_ = field_native_type,
+                        )
+                    } else {
+                        format!(
+                            "\
+serializer.serialize_message_twice::<{type_}>({number}, &self.{name})?;\n",
+                            number = field.number,
+                            name = native_field_name,
+                            type_ = field_native_type,
+                        )
+                    }
+                } else if let Ok(FieldDescriptorProto_Type::TYPE_STRING) = field.type_ {
+                    // String
+                    if is_repeated {
+                        format!(
+                            "\
+for string in &self.{name} {{
+    serializer.serialize_bytes_twice({number}, string.bytes().map(|b| Ok(b)))?;
+}}\n",
+                            number = field.number,
+                            name = native_field_name,
+                        )
+                    } else {
+                        format!(
+                            "\
+serializer.serialize_bytes_twice({number}, self.{name}.bytes().map(|b| Ok(b)))?;\n",
+                            number = field.number,
+                            name = native_field_name,
+                        )
+                    }
+                } else if let Ok(FieldDescriptorProto_Type::TYPE_BYTES) = field.type_ {
+                    // Bytes
+                    if is_repeated {
+                        format!(
+                            "\
+for bytes in &self.{name} {{
+    serializer.serialize_bytes_twice({number}, bytes.iter().map(|b| Ok(*b)))?;
+}}\n",
+                            number = field.number,
+                            name = native_field_name,
+                        )
+                    } else {
+                        format!(
+                            "\
+serializer.serialize_bytes_twice({number}, self.{name}.iter().map(|b| Ok(*b)))?;\n",
+                            number = field.number,
+                            name = native_field_name,
+                        )
+                    }
+                } else if let Some(_) = bits32_field_native_type(field) {
+                    format!("unimplemented!(\"Serializer for bits32\");")
+                } else if let Some(_) = bits64_field_native_type(field) {
+                    format!("unimplemented!(\"Serializer for bits64\");")
+                } else {
+                    format!("unimplemented!(\"Serializer for something else\");")
+                })
+            })),),
+        ),
+        "        \
+        Ok(())
+    }}
+}}\n",
+    )
         .write_into(output)
 }

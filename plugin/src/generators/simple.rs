@@ -27,6 +27,13 @@ pub(crate) fn generate_simple(context: &mut Context) -> Result<Vec<(String, Stri
     Ok(filenames_and_contents)
 }
 
+fn is_field_msg(field: &FieldDescriptorProto, context: &Context) -> bool {
+    matches!(
+        context.type_of_ident(&field.type_name),
+        Some(TypeOfIdent::Message)
+    )
+}
+
 fn is_field_enum(field: &FieldDescriptorProto, context: &Context) -> bool {
     matches!(
         context.type_of_ident(&field.type_name),
