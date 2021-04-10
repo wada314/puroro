@@ -10,7 +10,7 @@ pub(crate) fn handle_msg<'p, W: Write>(
 ) -> Result<()> {
     write_body(output, context, msg)?;
     write_default(output, context, msg)?;
-    write_deser_stream_handler2(output, context, msg)?;
+    write_deser_stream_handler(output, context, msg)?;
     Ok(())
 }
 
@@ -79,7 +79,7 @@ impl ::std::default::Default for {name} {{
         .write_into(output)
 }
 
-fn write_deser_stream_handler2<'p, W: Write>(
+fn write_deser_stream_handler<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &Context<'p>,
     msg: &'p DescriptorProto,
@@ -179,87 +179,42 @@ fn write_deser_stream_handler_ld_arm<'p, W: Write>(
     context: &Context<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
-    todo!()
-}
-
-/*
-fn write_deser_stream_handler_variant<'p, W: Write>(
-    output: &mut Indentor<W>,
-    context: &InvocationContext,
-    fc: & FileGeneratorContext<'p>,
-    msg: &'p DescriptorProto,
-) -> Result<()> {
-    write!(fc.writer(), "match field_number ")?;
-    fc.indent_with_braces(|fc| {
-        for field in &msg.field {
-            if let Some(tag_type) = variant_field_type(field) {
-                let is_enum = matches!(
-                    context.type_of_ident(fc.package().clone(), &field.type_name),
-                    Some(TypeOfIdent::Enum)
-                );
-                write!(fc.writer(), "{number} => ", number = field.number)?;
-                fc.indent_with_braces(|fc| {
-                    let maybe_try_into = if is_enum { ".try_into()" } else { "" };
-                    if let Ok(FieldDescriptorProto_Label::LABEL_REPEATED) = field.label {
-                        writeln!(
-                            fc.writer(),
-                            "self.{name}.push(\
-                                variant.to_native::<::puroro::tags::{tag}>()?\
-                                {maybe_try_into});",
-                            name = to_var_name(&field.name),
-                            tag = tag_type,
-                            maybe_try_into = maybe_try_into,
-                        )?;
-                    } else {
-                        writeln!(
-                            fc.writer(),
-                            "self.{name} = \
-                                variant.to_native::<::puroro::tags::{tag}>()?\
-                                {maybe_try_into};",
-                            name = to_var_name(&field.name),
-                            tag = tag_type,
-                            maybe_try_into = maybe_try_into,
-                        )?;
+    (
+        format!(
+            "{d}::Field::LengthDelimited(ldd) => match field_number {{\n",
+            d = DESER_MOD
+        ),
+        iter(msg.field.iter().map(|field| {
+            Ok(
+                if let Some(TypeOfIdent::Message) = context.type_of_ident(&field.type_name) {
+                    // Message
+                    todo!()
+                } else if let Some(tag_type) = variant_field_type(field) {
+                    // packed variant
+                    todo!()
+                } else {
+                    match field.type_ {
+                        Ok(FieldDescriptorProto_Type::TYPE_STRING) => {
+                            // string
+                            todo!()
+                        }
+                        Ok(FieldDescriptorProto_Type::TYPE_BYTES) => {
+                            // bytes
+                            todo!()
+                        }
+                        _ => {
+                            // else
+                            todo!()
+                        }
                     }
-                    Ok(())
-                })?;
-            }
-        }
-        writeln!(
-            fc.writer(),
-            "_ => Err(::puroro::PuroroError::UnexpectedWireType)?"
-        )?;
-        Ok(())
-    })
+                },
+            )
+        })),
+        "}}",
+    )
+        .write_into(output)
 }
 
-fn write_deser_stream_handler_length_delimited<'p, W: Write>(
-    output: &mut Indentor<W>,
-    context: &InvocationContext,
-    fc: & FileGeneratorContext<'p>,
-    msg: &'p DescriptorProto,
-) -> Result<()> {
-    todo!()
-}
-
-fn write_deser_stream_handler_bytes32<'p, W: Write>(
-    output: &mut Indentor<W>,
-    context: &InvocationContext,
-    fc: & FileGeneratorContext<'p>,
-    msg: &'p DescriptorProto,
-) -> Result<()> {
-    todo!()
-}
-
-fn write_deser_stream_handler_bytes64<'p, W: Write>(
-    output: &mut Indentor<W>,
-    context: &InvocationContext,
-    fc: & FileGeneratorContext<'p>,
-    msg: &'p DescriptorProto,
-) -> Result<()> {
-    todo!()
-}
-*/
 fn variant_field_type(field: &FieldDescriptorProto) -> Option<&'static str> {
     if let Ok(t) = field.type_ {
         match t {
