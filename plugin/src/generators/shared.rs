@@ -2,10 +2,8 @@ use crate::generators::utils::*;
 use crate::plugin::*;
 use crate::{ErrorKind, Result};
 use itertools::Itertools;
-use std::{
-    collections::{BTreeMap, HashMap, VecDeque},
-    fmt::Write,
-};
+use std::collections::{BTreeMap, HashMap};
+use std::fmt::Write;
 
 pub(crate) mod writers;
 
@@ -15,15 +13,9 @@ pub(crate) enum TypeOfIdent {
     Enum,
 }
 
-#[derive(Default, Debug)]
-pub(crate) struct PackageTreeNode<'p> {
-    children: BTreeMap<&'p str, PackageTreeNode<'p>>,
-}
-
 pub(crate) struct Context<'p> {
     cgreq: &'p CodeGeneratorRequest,
     type_of_ident_map: HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
-    package_tree: PackageTreeNode<'p>,
 
     package: Vec<&'p str>,
     path_to_package_root: String,
@@ -34,7 +26,6 @@ impl<'p> Context<'p> {
         Ok(Self {
             cgreq,
             type_of_ident_map: Self::generate_type_of_ident_map(cgreq)?,
-            package_tree: Self::generate_package_tree(cgreq),
             package: Vec::new(),
             path_to_package_root: "".into(),
         })
@@ -142,85 +133,6 @@ impl<'p> Context<'p> {
             visit_in_file(file, &mut visitor)?;
         }
         Ok(map)
-    }
-
-    pub(crate) fn package_tree(&self) -> &PackageTreeNode<'p> {
-        &self.package_tree
-    }
-    pub(crate) fn subpackages_of(&self, mut package: &[&'p str]) -> impl Iterator<Item = &str> {
-        package
-            .iter()
-            .try_fold(self.package_tree(), |node, package| {
-                node.children.get(package)
-            })
-            .map(|node| node.children.keys().cloned())
-            .into_iter()
-            .flatten()
-    }
-    pub(crate) fn iter_package_which_has_subpackage(
-        &self,
-    ) -> PackageWithSubpackagesIterator<'_, 'p> {
-        todo!()
-    }
-
-    fn generate_package_tree(cgreq: &'p CodeGeneratorRequest) -> PackageTreeNode<'p> {
-        let mut root = PackageTreeNode {
-            children: BTreeMap::new(),
-        };
-        for file in &cgreq.proto_file {
-            if file.package.is_empty() {
-                continue;
-            }
-            let mut full_package = file.package.split('.').collect::<VecDeque<_>>();
-            let mut cur_package = &mut root;
-            while let Some(next_package_name) = full_package.pop_front() {
-                cur_package = cur_package.children.entry(next_package_name).or_default();
-            }
-        }
-        root
-    }
-}
-
-// 'p: A lifetime of the &str-s where the origin is
-// the input CodeGenerationRequest proto structure.
-// 'c: A lifetime of the context, which owns a reference
-// to the input proto structure ('p). Thus, 'p must
-// outlive 'c.
-pub(crate) struct PackageWithSubpackagesIterator<'c, 'p>
-where
-    'p: 'c,
-{
-    name: Vec<&'p str>,
-    iters: Vec<std::collections::btree_map::Iter<'c, &'p str, PackageTreeNode<'p>>>,
-}
-impl<'c, 'p> Iterator for PackageWithSubpackagesIterator<'c, 'p>
-where
-    'p: 'c,
-{
-    // returns a package name (separated into Vec) and a iterator over
-    // subpackage name &str-s. i.e. `Keys` iterator over the tree node's
-    // children `BTreeMap` type, which is wrapped by `Cloned` for dereferencing.
-    type Item = (
-        Vec<&'p str>,
-        std::iter::Cloned<std::collections::btree_map::Keys<'c, &'p str, PackageTreeNode<'p>>>,
-    );
-
-    fn next(&mut self) -> Option<Self::Item> {
-        while let Some(iter) = self.iters.last_mut() {
-            match iter.next() {
-                Some((name, node)) => {
-                    if !node.children.is_empty() {
-                        self.name.push(name);
-                        self.iters.push(node.children.iter());
-                        return Some((self.name.clone(), node.children.keys().cloned()));
-                    } else {
-                        continue;
-                    }
-                }
-                None => {}
-            }
-        }
-        None
     }
 }
 
