@@ -10,16 +10,21 @@ mod enume;
 mod msg;
 
 pub(crate) fn generate_simple(context: &mut Context) -> Result<Vec<(String, String)>> {
-    let mut filename_and_content = Vec::new();
+    let mut filenames_and_contents = Vec::new();
     let mut generator = Generator {};
     for proto_file in &context.cgreq().proto_file {
-        filename_and_content.push(generate_file_with_handler(
+        filenames_and_contents.push(generate_file_with_handler(
             context,
             proto_file,
             &mut generator,
         )?);
     }
-    Ok(filename_and_content)
+    // We need to generate files for rust module / proto package structuring.
+    // i.e. Files for module declaration `mod <package-name>;`.
+    // Sometimes this is written into an existing file, and sometimes we
+    // need to create a new file.
+
+    Ok(filenames_and_contents)
 }
 
 fn is_field_enum(field: &FieldDescriptorProto, context: &Context) -> bool {

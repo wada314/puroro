@@ -157,6 +157,11 @@ impl<'p> Context<'p> {
             .into_iter()
             .flatten()
     }
+    pub(crate) fn iter_package_which_has_subpackage(
+        &self,
+    ) -> PackageWithSubpackagesIterator<'_, 'p> {
+        todo!()
+    }
 
     fn generate_package_tree(cgreq: &'p CodeGeneratorRequest) -> PackageTreeNode<'p> {
         let mut root = PackageTreeNode {
@@ -173,6 +178,49 @@ impl<'p> Context<'p> {
             }
         }
         root
+    }
+}
+
+// 'p: A lifetime of the &str-s where the origin is
+// the input CodeGenerationRequest proto structure.
+// 'c: A lifetime of the context, which owns a reference
+// to the input proto structure ('p). Thus, 'p must
+// outlive 'c.
+pub(crate) struct PackageWithSubpackagesIterator<'c, 'p>
+where
+    'p: 'c,
+{
+    name: Vec<&'p str>,
+    iters: Vec<std::collections::btree_map::Iter<'c, &'p str, PackageTreeNode<'p>>>,
+}
+impl<'c, 'p> Iterator for PackageWithSubpackagesIterator<'c, 'p>
+where
+    'p: 'c,
+{
+    // returns a package name (separated into Vec) and a iterator over
+    // subpackage name &str-s. i.e. `Keys` iterator over the tree node's
+    // children `BTreeMap` type, which is wrapped by `Cloned` for dereferencing.
+    type Item = (
+        Vec<&'p str>,
+        std::iter::Cloned<std::collections::btree_map::Keys<'c, &'p str, PackageTreeNode<'p>>>,
+    );
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some(iter) = self.iters.last_mut() {
+            match iter.next() {
+                Some((name, node)) => {
+                    if !node.children.is_empty() {
+                        self.name.push(name);
+                        self.iters.push(node.children.iter());
+                        return Some((self.name.clone(), node.children.keys().cloned()));
+                    } else {
+                        continue;
+                    }
+                }
+                None => {}
+            }
+        }
+        None
     }
 }
 
