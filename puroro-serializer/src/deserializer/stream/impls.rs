@@ -151,14 +151,14 @@ where
                     let deserializer_for_inner = self.make_sub_deserializer(field_length);
                     Field::LengthDelimited(deserializer_for_inner)
                 }
-                WireType::Bytes32 => {
+                WireType::Bits32 => {
                     let v0 = self.eat_one_byte()?;
                     let v1 = self.eat_one_byte()?;
                     let v2 = self.eat_one_byte()?;
                     let v3 = self.eat_one_byte()?;
-                    Field::Bytes32([v0, v1, v2, v3])
+                    Field::Bits32([v0, v1, v2, v3])
                 }
-                WireType::Bytes64 => {
+                WireType::Bits64 => {
                     let v0 = self.eat_one_byte()?;
                     let v1 = self.eat_one_byte()?;
                     let v2 = self.eat_one_byte()?;
@@ -167,7 +167,7 @@ where
                     let v5 = self.eat_one_byte()?;
                     let v6 = self.eat_one_byte()?;
                     let v7 = self.eat_one_byte()?;
-                    Field::Bytes64([v0, v1, v2, v3, v4, v5, v6, v7])
+                    Field::Bits64([v0, v1, v2, v3, v4, v5, v6, v7])
                 }
                 _ => {
                     return Err(PuroroError::UnexpectedWireType);

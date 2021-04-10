@@ -46,8 +46,8 @@ pub trait LengthDelimitedDeserializer: Sized + IntoIterator<Item = IoResult<u8>>
 pub enum Field<T> {
     Variant(Variant),
     LengthDelimited(T),
-    Bytes32([u8; 4]),
-    Bytes64([u8; 8]),
+    Bits32([u8; 4]),
+    Bits64([u8; 8]),
 }
 
 pub trait MessageDeserializeEventHandler {

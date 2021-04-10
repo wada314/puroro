@@ -271,7 +271,7 @@ fn try_into_persistent_field<T: LengthDelimitedDeserializer>(
     Ok(match from {
         Field::LengthDelimited(ldd) => Field::LengthDelimited(ldd.leave_as_unknown()?),
         Field::Variant(v) => Field::Variant(v),
-        Field::Bytes32(v) => Field::Bytes32(v),
-        Field::Bytes64(v) => Field::Bytes64(v),
+        Field::Bits32(v) => Field::Bits32(v),
+        Field::Bits64(v) => Field::Bits64(v),
     })
 }
