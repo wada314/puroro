@@ -114,13 +114,13 @@ mod generated_code_info {
                     3 => {
                         self.begin = ldd.deserialize_as_variants()
                             .last()
-                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     4 => {
                         self.end = ldd.deserialize_as_variants()
                             .last()
-                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     _ => todo!("Unknown filed number"),
@@ -387,13 +387,13 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 4 => {
                     self.positive_int_value = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::UInt64>())?;
                 }
                 5 => {
                     self.negative_int_value = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int64>())?;
                 }
                 6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -490,7 +490,7 @@ mod uninterpreted_option {
                     2 => {
                         self.is_extension = ldd.deserialize_as_variants()
                             .last()
-                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                     }
                     _ => todo!("Unknown filed number"),
@@ -565,13 +565,13 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 33 => {
                     self.deprecated = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 34 => {
                     self.idempotency_level = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                 }
                 999 => {
@@ -668,7 +668,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 33 => {
                     self.deprecated = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 999 => {
@@ -744,7 +744,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 1 => {
                     self.deprecated = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 999 => {
@@ -825,13 +825,13 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 2 => {
                     self.allow_alias = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 3 => {
                     self.deprecated = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 999 => {
@@ -997,37 +997,37 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 1 => {
                     self.ctype = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                 }
                 2 => {
                     self.packed = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 6 => {
                     self.jstype = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                 }
                 5 => {
                     self.lazy = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 3 => {
                     self.deprecated = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 10 => {
                     self.weak = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 999 => {
@@ -1164,25 +1164,25 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 1 => {
                     self.message_set_wire_format = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 2 => {
                     self.no_standard_descriptor_accessor = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 3 => {
                     self.deprecated = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 7 => {
                     self.map_entry = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 999 => {
@@ -1345,25 +1345,25 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 10 => {
                     self.java_multiple_files = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 20 => {
                     self.java_generate_equals_and_hash = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 27 => {
                     self.java_string_check_utf8 = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 9 => {
                     self.optimize_for = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                 }
                 11 => {
@@ -1372,37 +1372,37 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 16 => {
                     self.cc_generic_services = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 17 => {
                     self.java_generic_services = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 18 => {
                     self.py_generic_services = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 42 => {
                     self.php_generic_services = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 23 => {
                     self.deprecated = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 31 => {
                     self.cc_enable_arenas = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 36 => {
@@ -1593,13 +1593,13 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 5 => {
                     self.client_streaming = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 6 => {
                     self.server_streaming = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 _ => todo!("Unknown filed number"),
@@ -1641,7 +1641,9 @@ impl ::puroro_serializer::serializer::Serializable for MethodDescriptorProto {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(2, self.input_type.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(3, self.output_type.bytes().map(|b| Ok(b)))?;
-        serializer.serialize_message_twice::<super::super::google::protobuf::MethodOptions>(4, &self.options)?;
+        if let Some(msg) = &self.options {
+            serializer.serialize_message_twice::<super::super::google::protobuf::MethodOptions>(4, msg)?;
+        }
         unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");        Ok(())
     }
 }
@@ -1723,7 +1725,9 @@ impl ::puroro_serializer::serializer::Serializable for ServiceDescriptorProto {
         for msg in &self.method {
             serializer.serialize_message_twice::<super::super::google::protobuf::MethodDescriptorProto>(2, msg)?;
         }
-        serializer.serialize_message_twice::<super::super::google::protobuf::ServiceOptions>(3, &self.options)?;
+        if let Some(msg) = &self.options {
+            serializer.serialize_message_twice::<super::super::google::protobuf::ServiceOptions>(3, msg)?;
+        }
         Ok(())
     }
 }
@@ -1767,7 +1771,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 2 => {
                     self.number = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                 }
                 3 => {
@@ -1805,7 +1809,9 @@ impl ::puroro_serializer::serializer::Serializable for EnumValueDescriptorProto 
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
-        unimplemented!("Serializer for something else");serializer.serialize_message_twice::<super::super::google::protobuf::EnumValueOptions>(3, &self.options)?;
+        unimplemented!("Serializer for something else");if let Some(msg) = &self.options {
+            serializer.serialize_message_twice::<super::super::google::protobuf::EnumValueOptions>(3, msg)?;
+        }
         Ok(())
     }
 }
@@ -1905,7 +1911,9 @@ impl ::puroro_serializer::serializer::Serializable for EnumDescriptorProto {
         for msg in &self.value {
             serializer.serialize_message_twice::<super::super::google::protobuf::EnumValueDescriptorProto>(2, msg)?;
         }
-        serializer.serialize_message_twice::<super::super::google::protobuf::EnumOptions>(3, &self.options)?;
+        if let Some(msg) = &self.options {
+            serializer.serialize_message_twice::<super::super::google::protobuf::EnumOptions>(3, msg)?;
+        }
         for msg in &self.reserved_range {
             serializer.serialize_message_twice::<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>(4, msg)?;
         }
@@ -1952,13 +1960,13 @@ mod enum_descriptor_proto {
                     1 => {
                         self.start = ldd.deserialize_as_variants()
                             .last()
-                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     2 => {
                         self.end = ldd.deserialize_as_variants()
                             .last()
-                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     _ => todo!("Unknown filed number"),
@@ -2058,7 +2066,9 @@ impl ::puroro_serializer::serializer::Serializable for OneofDescriptorProto {
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
-        serializer.serialize_message_twice::<super::super::google::protobuf::OneofOptions>(2, &self.options)?;
+        if let Some(msg) = &self.options {
+            serializer.serialize_message_twice::<super::super::google::protobuf::OneofOptions>(2, msg)?;
+        }
         Ok(())
     }
 }
@@ -2134,19 +2144,19 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 3 => {
                     self.number = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                 }
                 4 => {
                     self.label = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                 }
                 5 => {
                     self.type_ = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                 }
                 6 => {
@@ -2161,7 +2171,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 9 => {
                     self.oneof_index = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                 }
                 10 => {
@@ -2174,7 +2184,7 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 17 => {
                     self.proto3_optional = ldd.deserialize_as_variants()
                         .last()
-                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 _ => todo!("Unknown filed number"),
@@ -2230,7 +2240,9 @@ impl ::puroro_serializer::serializer::Serializable for FieldDescriptorProto {
         serializer.serialize_bytes_twice(2, self.extendee.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(7, self.default_value.bytes().map(|b| Ok(b)))?;
         unimplemented!("Serializer for something else");serializer.serialize_bytes_twice(10, self.json_name.bytes().map(|b| Ok(b)))?;
-        serializer.serialize_message_twice::<super::super::google::protobuf::FieldOptions>(8, &self.options)?;
+        if let Some(msg) = &self.options {
+            serializer.serialize_message_twice::<super::super::google::protobuf::FieldOptions>(8, msg)?;
+        }
         unimplemented!("Serializer for something else");        Ok(())
     }
 }
@@ -2522,7 +2534,9 @@ impl ::puroro_serializer::serializer::Serializable for DescriptorProto {
         for msg in &self.oneof_decl {
             serializer.serialize_message_twice::<super::super::google::protobuf::OneofDescriptorProto>(8, msg)?;
         }
-        serializer.serialize_message_twice::<super::super::google::protobuf::MessageOptions>(7, &self.options)?;
+        if let Some(msg) = &self.options {
+            serializer.serialize_message_twice::<super::super::google::protobuf::MessageOptions>(7, msg)?;
+        }
         for msg in &self.reserved_range {
             serializer.serialize_message_twice::<super::super::google::protobuf::descriptor_proto::ReservedRange>(9, msg)?;
         }
@@ -2569,13 +2583,13 @@ mod descriptor_proto {
                     1 => {
                         self.start = ldd.deserialize_as_variants()
                             .last()
-                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     2 => {
                         self.end = ldd.deserialize_as_variants()
                             .last()
-                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     _ => todo!("Unknown filed number"),
@@ -2648,13 +2662,13 @@ mod descriptor_proto {
                     1 => {
                         self.start = ldd.deserialize_as_variants()
                             .last()
-                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     2 => {
                         self.end = ldd.deserialize_as_variants()
                             .last()
-                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     3 => {
@@ -2691,7 +2705,9 @@ mod descriptor_proto {
         fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
             &self, serializer: &mut T) -> ::puroro::Result<()>
         {
-            unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");serializer.serialize_message_twice::<super::super::super::google::protobuf::ExtensionRangeOptions>(3, &self.options)?;
+            unimplemented!("Serializer for something else");unimplemented!("Serializer for something else");if let Some(msg) = &self.options {
+                serializer.serialize_message_twice::<super::super::super::google::protobuf::ExtensionRangeOptions>(3, msg)?;
+            }
             Ok(())
         }
     }
@@ -2874,8 +2890,12 @@ impl ::puroro_serializer::serializer::Serializable for FileDescriptorProto {
         for msg in &self.extension {
             serializer.serialize_message_twice::<super::super::google::protobuf::FieldDescriptorProto>(7, msg)?;
         }
-        serializer.serialize_message_twice::<super::super::google::protobuf::FileOptions>(8, &self.options)?;
-        serializer.serialize_message_twice::<super::super::google::protobuf::SourceCodeInfo>(9, &self.source_code_info)?;
+        if let Some(msg) = &self.options {
+            serializer.serialize_message_twice::<super::super::google::protobuf::FileOptions>(8, msg)?;
+        }
+        if let Some(msg) = &self.source_code_info {
+            serializer.serialize_message_twice::<super::super::google::protobuf::SourceCodeInfo>(9, msg)?;
+        }
         serializer.serialize_bytes_twice(12, self.syntax.bytes().map(|b| Ok(b)))?;
         Ok(())
     }

@@ -248,7 +248,7 @@ fn write_deser_stream_handler_ld_arm<'p, W: Write>(
 {number} => {{
     self.{name} = ldd.deserialize_as_variants()
         .last()
-        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+        .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
         .and_then(|variant| variant.to_native::<{tag}>())?;
 }}\n",
                                 number = field.number,
@@ -504,7 +504,9 @@ for msg in &self.{name} {{
                     } else {
                         format!(
                             "\
-serializer.serialize_message_twice::<{type_}>({number}, &self.{name})?;\n",
+if let Some(msg) = &self.{name} {{
+    serializer.serialize_message_twice::<{type_}>({number}, msg)?;
+}}\n",
                             number = field.number,
                             name = native_field_name,
                             type_ = field_native_type,
