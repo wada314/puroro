@@ -1,3 +1,4 @@
+use crate::generators::shared::writers::*;
 use crate::generators::shared::*;
 use crate::generators::utils::*;
 use crate::plugin::*;
@@ -19,6 +20,21 @@ pub(crate) fn generate_simple(context: &InvocationContext) -> Result<Vec<(String
         )?);
     }
     Ok(filename_and_content)
+}
+
+fn is_field_enum(
+    field: &FieldDescriptorProto,
+    context: &InvocationContext,
+    fc: &FileGeneratorContext,
+) -> bool {
+    matches!(
+        context.type_of_ident(fc.package().clone(), &field.type_name),
+        Some(TypeOfIdent::Enum)
+    )
+}
+
+fn is_field_repeated(field: &FieldDescriptorProto) -> bool {
+    matches!(field.label, Ok(FieldDescriptorProto_Label::LABEL_REPEATED))
 }
 
 // Message -> the message type itself (no Option).

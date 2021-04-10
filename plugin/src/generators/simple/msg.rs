@@ -251,18 +251,3 @@ fn variant_field_type(field: &FieldDescriptorProto) -> Option<&'static str> {
         None
     }
 }
-
-fn is_field_enum(
-    field: &FieldDescriptorProto,
-    context: &InvocationContext,
-    fc: &FileGeneratorContext,
-) -> bool {
-    matches!(
-        context.type_of_ident(fc.package().clone(), &field.type_name),
-        Some(TypeOfIdent::Enum)
-    )
-}
-
-fn is_field_repeated(field: &FieldDescriptorProto) -> bool {
-    matches!(field.label, Ok(FieldDescriptorProto_Label::LABEL_REPEATED))
-}
