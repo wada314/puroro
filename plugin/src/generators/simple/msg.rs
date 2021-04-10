@@ -1,5 +1,8 @@
 use super::*;
 
+// Too long! lol
+const DESER_MOD: &'static str = "::puroro_serializer::deserializer::stream";
+
 pub(crate) fn handle_msg<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &InvocationContext,
@@ -56,12 +59,9 @@ impl ::std::default::Default for {name} {{
             3,
             (iter(msg.field.iter().map(|field| {
                 let native_field_name = to_var_name(&field.name);
-                let is_repeated =
-                    matches!(field.label, Ok(FieldDescriptorProto_Label::LABEL_REPEATED));
-                let is_enum = matches!(
-                    context.type_of_ident(fc.package().clone(), &field.type_name),
-                    Some(TypeOfIdent::Enum)
-                );
+                let is_repeated = is_field_repeated(field);
+                let is_enum = is_field_enum(field, context, fc);
+
                 match (is_repeated, is_enum) {
                     (false, true) => Ok(format!(
                         "{name}: 0i32.try_into(),\n",
@@ -89,8 +89,6 @@ fn write_deser_stream_handler2<'p, W: Write>(
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
-    const DESER_MOD: &'static str = "::puroro_serializer::deserializer::stream";
-
     (
         format!(
             "\
@@ -123,7 +121,30 @@ fn write_deser_stream_handler_variant_arm<'p, W: Write>(
     fc: &FileGeneratorContext<'p>,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
-    todo!()
+    (
+        format!(
+            "{d}::Field::Variant(variant) => match variant {{",
+            d = DESER_MOD
+        ),
+        indent((iter(msg.field.iter().map(
+            |field| match variant_field_type(field) {
+                None => {
+                    // This is not a variant field, so the output's match-case should fail.
+                    Ok(fr(format!(
+                        "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,",
+                        number = field.number
+                    )))
+                }
+                Some(tag_type) => {
+                    let is_enum = is_field_enum(field, context, fc);
+
+                    Ok(fr("hoge"))
+                }
+            },
+        )),)),
+        "}}",
+    )
+        .write_into(output)
 }
 
 fn write_deser_stream_handler_ld_arm<'p, W: Write>(
@@ -212,7 +233,7 @@ fn write_deser_stream_handler_bytes64<'p, W: Write>(
 ) -> Result<()> {
     todo!()
 }
-
+*/
 fn variant_field_type(field: &FieldDescriptorProto) -> Option<&'static str> {
     if let Ok(t) = field.type_ {
         match t {
@@ -230,4 +251,18 @@ fn variant_field_type(field: &FieldDescriptorProto) -> Option<&'static str> {
         None
     }
 }
-*/
+
+fn is_field_enum(
+    field: &FieldDescriptorProto,
+    context: &InvocationContext,
+    fc: &FileGeneratorContext,
+) -> bool {
+    matches!(
+        context.type_of_ident(fc.package().clone(), &field.type_name),
+        Some(TypeOfIdent::Enum)
+    )
+}
+
+fn is_field_repeated(field: &FieldDescriptorProto) -> bool {
+    matches!(field.label, Ok(FieldDescriptorProto_Label::LABEL_REPEATED))
+}
