@@ -297,19 +297,15 @@ impl<'p> FileGeneratorContext<'p> {
         }
     }
 
-    pub(crate) fn enter_submessage_namespace<
-        F: FnOnce(&mut FileGeneratorContext<'p>) -> Result<()>,
-    >(
-        &mut self,
-        message_name: &'p str,
-        f: F,
-    ) -> Result<()> {
+    pub(crate) fn enter_submessage_namespace(&mut self, message_name: &'p str) {
         self.package.push(message_name);
         self.path_to_package_root = Self::generate_path_to_package_root(&self.package);
-        let ret = (f)(self);
-        self.package.pop();
+    }
+    pub(crate) fn leave_submessage_namespace(&mut self, message_name: &'p str) {
+        if let Some(popped) = self.package.pop() {
+            debug_assert_eq!(message_name, popped);
+        }
         self.path_to_package_root = Self::generate_path_to_package_root(&self.package);
-        ret
     }
 }
 
@@ -418,10 +414,12 @@ where
         fn enter_submodule(&mut self, name: &'q str) -> Result<()> {
             let module_name = to_module_name(name);
             writeln!(&mut self.output, "mod {name} {{", name = module_name)?;
+            self.fc.enter_submessage_namespace(name);
             self.output.indent();
             Ok(())
         }
-        fn exit_submodule(&mut self, _name: &'q str) -> Result<()> {
+        fn exit_submodule(&mut self, name: &'q str) -> Result<()> {
+            self.fc.leave_submessage_namespace(name);
             self.output.unindent();
             writeln!(self.output, "}}")?;
             Ok(())
