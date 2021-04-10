@@ -24,7 +24,7 @@ pub(crate) fn generate_simple(context: &mut Context) -> Result<Vec<(String, Stri
 
 fn is_field_enum(field: &FieldDescriptorProto, context: &Context) -> bool {
     matches!(
-        context.type_of_ident(context.package().clone(), &field.type_name),
+        context.type_of_ident(&field.type_name),
         Some(TypeOfIdent::Enum)
     )
 }
@@ -80,7 +80,7 @@ fn gen_field_type<'p>(
         &field.type_name,
         context.path_to_package_root(),
     )?;
-    let type_of_ident = context.type_of_ident(context.package().clone(), &field.type_name);
+    let type_of_ident = context.type_of_ident(&field.type_name);
     Ok(match field.label {
         Ok(label_body) => match label_body {
             FieldDescriptorProto_Label::LABEL_OPTIONAL

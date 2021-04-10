@@ -63,11 +63,8 @@ impl<'p> Context<'p> {
         }
     }
 
-    pub(crate) fn type_of_ident(
-        &self,
-        mut package: Vec<&'p str>,
-        typename: &'p str,
-    ) -> Option<TypeOfIdent> {
+    pub(crate) fn type_of_ident(&self, typename: &'p str) -> Option<TypeOfIdent> {
+        let mut package = self.package().clone();
         let mfqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename);
         if let Some(fqtn) = mfqtn.try_to_absolute() {
             return self.type_of_ident_map.get(&fqtn).cloned();
