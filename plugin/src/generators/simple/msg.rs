@@ -13,6 +13,7 @@ pub(crate) fn handle_msg<'p, W: Write>(
     write_deser_stream_handler(output, context, msg)?;
     write_deserializable(output, context, msg)?;
     write_ser_serializer(output, context, msg)?;
+    write_puroro_serializable(output, context, msg)?;
     Ok(())
 }
 
@@ -443,7 +444,6 @@ impl ::puroro::Deserializable for {name} {{
 }
 
 // ::puroro_serialize::Seriazilazble trait
-
 fn write_ser_serializer<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &Context<'p>,
@@ -564,5 +564,26 @@ serializer.serialize_bytes_twice({number}, self.{name}.iter().map(|b| Ok(*b)))?;
     }}
 }}\n",
     )
+        .write_into(output)
+}
+
+// ::puroro::Serializable
+fn write_puroro_serializable<'p, W: Write>(
+    output: &mut Indentor<W>,
+    context: &Context<'p>,
+    msg: &'p DescriptorProto,
+) -> Result<()> {
+    let native_type_name = to_type_name(&msg.name);
+    (format!(
+        "\
+impl ::puroro::Serializable for {name} {{
+    fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {{
+        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
+        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
+    }}
+}}
+    ",
+        name = native_type_name
+    ),)
         .write_into(output)
 }

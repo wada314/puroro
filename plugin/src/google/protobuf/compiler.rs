@@ -83,7 +83,13 @@ impl ::puroro_serializer::serializer::Serializable for CodeGeneratorResponse {
         Ok(())
     }
 }
-mod code_generator_response {
+impl ::puroro::Serializable for CodeGeneratorResponse {
+    fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
+        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
+        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
+    }
+}
+    mod code_generator_response {
     pub enum Feature {
         FeatureNone = 0,
         FeatureProto3Optional = 1,
@@ -187,7 +193,13 @@ mod code_generator_response {
             Ok(())
         }
     }
-}
+    impl ::puroro::Serializable for File {
+        fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
+            let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
+            <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
+        }
+    }
+        }
 pub struct CodeGeneratorRequest {
     file_to_generate: ::std::vec::Vec<String>,
     parameter: String,
@@ -283,7 +295,13 @@ impl ::puroro_serializer::serializer::Serializable for CodeGeneratorRequest {
         Ok(())
     }
 }
-pub struct Version {
+impl ::puroro::Serializable for CodeGeneratorRequest {
+    fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
+        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
+        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
+    }
+}
+    pub struct Version {
     major: i32,
     minor: i32,
     patch: i32,
@@ -381,3 +399,10 @@ impl ::puroro_serializer::serializer::Serializable for Version {
         Ok(())
     }
 }
+impl ::puroro::Serializable for Version {
+    fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
+        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
+        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)?;
+    }
+}
+    
