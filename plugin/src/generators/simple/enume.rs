@@ -23,6 +23,7 @@ fn write_body<'p, W: Write>(
     // enum body
     write(
         output,
+        fc,
         (
             format!("pub enum {name} {{\n", name = native_type_name),
             indent((iter(enume.value.iter().map(|value| {
@@ -48,6 +49,7 @@ fn write_tryfrom<'p, W: Write>(
     let native_type_name = to_type_name(&enume.name);
     write(
         output,
+        fc,
         (
             format!(
                 "impl std::convert::TryFrom<i32> for {name} {{\n",

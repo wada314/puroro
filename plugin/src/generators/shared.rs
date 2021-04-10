@@ -5,8 +5,8 @@ use itertools::Itertools;
 use std::collections::VecDeque;
 use std::{borrow::Cow, collections::HashMap, fmt::Write};
 
-pub(crate) trait TupleOfIntoFragments<'w, W: 'w> {
-    type Iter: Iterator<Item = Fragment<'w, W>>;
+pub(crate) trait TupleOfIntoFragments<'p, 'w, W: 'w> {
+    type Iter: Iterator<Item = Fragment<'p, 'w, W>>;
     fn into_frag_iter(self) -> Self::Iter;
 }
 
@@ -14,16 +14,16 @@ macro_rules! impl_tuple_into_fragments {
     ($len:expr) => {};
     ($len:expr, $a:ident $(, $rest:ident)*) => {
         #[allow(non_snake_case)]
-        impl<'w, W: 'w, $a $(, $rest)*> TupleOfIntoFragments<'w, W> for ($a, $($rest),*)
+        impl<'p, 'w, W: 'w, $a $(, $rest)*> TupleOfIntoFragments<'p, 'w, W> for ($a, $($rest),*)
         where
-            Fragment<'w, W>: From<$a> $(+ From<$rest>)*,
+            Fragment<'p, 'w, W>: From<$a> $(+ From<$rest>)*,
         {
-            type Iter = core::array::IntoIter<Fragment<'w, W>, {{$len}}>;
+            type Iter = core::array::IntoIter<Fragment<'p, 'w, W>, {{$len}}>;
             fn into_frag_iter(self) -> Self::Iter {
                 let ($a, $($rest),*) = self;
                 Self::Iter::new([
-                    <Fragment<'w, W> as From::<$a>>::from($a)
-                    $(, <Fragment<'w, W> as From::<$rest>>::from($rest))*
+                    <Fragment<'p, 'w, W> as From::<$a>>::from($a)
+                    $(, <Fragment<'p, 'w, W> as From::<$rest>>::from($rest))*
                 ])
             }
         }
@@ -32,94 +32,103 @@ macro_rules! impl_tuple_into_fragments {
 }
 impl_tuple_into_fragments!(8, A, B, C, D, E, F, G, H);
 
-pub(crate) enum Fragment<'w, W: 'w> {
+pub(crate) enum Fragment<'p, 'w, W: 'w> {
     Str(&'static str),
     String(String),
     Cow(Cow<'static, str>),
-    Iter(Box<dyn 'w + Iterator<Item = Result<Fragment<'w, W>>>>),
-    Functor(Box<dyn 'w + FnOnce(&mut Indentor<W>) -> Result<()>>),
+    Iter(Box<dyn 'w + Iterator<Item = Result<Fragment<'p, 'w, W>>>>),
+    Functor(Box<dyn 'w + FnOnce(&mut Indentor<W>, &mut FileGeneratorContext<'p>) -> Result<()>>),
     Indent(
         usize,
-        Box<dyn 'w + Iterator<Item = Result<Fragment<'w, W>>>>,
+        Box<dyn 'w + Iterator<Item = Result<Fragment<'p, 'w, W>>>>,
     ),
 }
-impl<'w, W> From<&'static str> for Fragment<'w, W> {
+impl<'p, 'w, W> From<&'static str> for Fragment<'p, 'w, W> {
     fn from(s: &'static str) -> Self {
         Self::Str(s)
     }
 }
-impl<'w, W> From<String> for Fragment<'w, W> {
+impl<'p, 'w, W> From<String> for Fragment<'p, 'w, W> {
     fn from(s: String) -> Self {
         Self::String(s)
     }
 }
-impl<'w, W> From<Cow<'static, str>> for Fragment<'w, W> {
+impl<'p, 'w, W> From<Cow<'static, str>> for Fragment<'p, 'w, W> {
     fn from(s: Cow<'static, str>) -> Self {
         Self::Cow(s)
     }
 }
-pub(crate) fn indent<'w, T, W: 'w>(tuple: T) -> Fragment<'w, W>
+pub(crate) fn indent<'p, 'w, T, W: 'w>(tuple: T) -> Fragment<'p, 'w, W>
 where
-    T: TupleOfIntoFragments<'w, W>,
-    <T as TupleOfIntoFragments<'w, W>>::Iter: 'w,
+    T: TupleOfIntoFragments<'p, 'w, W>,
+    <T as TupleOfIntoFragments<'p, 'w, W>>::Iter: 'w,
 {
     Fragment::Indent(
         1,
         Box::new(tuple.into_frag_iter().map(|v| Ok(v)))
-            as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>,
+            as Box<dyn Iterator<Item = Result<Fragment<'p, 'w, W>>>>,
     )
 }
-pub(crate) fn indent_n<'w, T, W: 'w>(n: usize, tuple: T) -> Fragment<'w, W>
+pub(crate) fn indent_n<'p, 'w, T, W: 'w>(n: usize, tuple: T) -> Fragment<'p, 'w, W>
 where
-    T: TupleOfIntoFragments<'w, W>,
-    <T as TupleOfIntoFragments<'w, W>>::Iter: 'w,
+    T: TupleOfIntoFragments<'p, 'w, W>,
+    <T as TupleOfIntoFragments<'p, 'w, W>>::Iter: 'w,
 {
     Fragment::Indent(
         n,
         Box::new(tuple.into_frag_iter().map(|v| Ok(v)))
-            as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>,
+            as Box<dyn Iterator<Item = Result<Fragment<'p, 'w, W>>>>,
     )
 }
-pub(crate) fn fr<'w, T, W>(from: T) -> Fragment<'w, W>
+pub(crate) fn fr<'p, 'w, T, W>(from: T) -> Fragment<'p, 'w, W>
 where
-    Fragment<'w, W>: From<T>,
+    Fragment<'p, 'w, W>: From<T>,
 {
     from.into()
 }
-pub(crate) fn iter<'w, W, I, F>(iter: I) -> Fragment<'w, W>
+pub(crate) fn iter<'p, 'w, W, I, F>(iter: I) -> Fragment<'p, 'w, W>
 where
     I: 'w + Iterator<Item = Result<F>>,
-    F: Into<Fragment<'w, W>>,
+    F: Into<Fragment<'p, 'w, W>>,
 {
     Fragment::Iter(
-        Box::new(iter.map(|rv| rv.map(|v| <F as Into<Fragment<'w, W>>>::into(v))))
-            as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>,
+        Box::new(iter.map(|rv| rv.map(|v| <F as Into<Fragment<'p, 'w, W>>>::into(v))))
+            as Box<dyn Iterator<Item = Result<Fragment<'p, 'w, W>>>>,
     )
 }
-pub(crate) fn func<'w, W, F>(f: F) -> Fragment<'w, W>
+pub(crate) fn func<'w, 'p, W, F>(f: F) -> Fragment<'p, 'w, W>
 where
-    F: 'w + FnOnce(&mut Indentor<W>) -> Result<()>,
+    F: 'w + FnOnce(&mut Indentor<W>, &mut FileGeneratorContext<'p>) -> Result<()>,
 {
-    Fragment::Functor(Box::new(f) as Box<dyn FnOnce(&mut Indentor<W>) -> Result<()>>)
+    Fragment::Functor(Box::new(f)
+        as Box<
+            dyn FnOnce(&mut Indentor<W>, &mut FileGeneratorContext<'p>) -> Result<()>,
+        >)
 }
-pub(crate) fn seq<'w, W, T>(tuple: T) -> Fragment<'w, W>
+pub(crate) fn seq<'p, 'w, W, T>(tuple: T) -> Fragment<'p, 'w, W>
 where
-    T: TupleOfIntoFragments<'w, W>,
-    <T as TupleOfIntoFragments<'w, W>>::Iter: 'w,
+    T: TupleOfIntoFragments<'p, 'w, W>,
+    <T as TupleOfIntoFragments<'p, 'w, W>>::Iter: 'w,
     W: 'w,
 {
     Fragment::Iter(Box::new(tuple.into_frag_iter().map(|v| Ok(v)))
-        as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>)
+        as Box<dyn Iterator<Item = Result<Fragment<'p, 'w, W>>>>)
 }
-pub(crate) fn write<'w, T, W>(w: &'w mut Indentor<W>, tuple: T) -> Result<()>
+pub(crate) fn write<'p, 'w, T, W>(
+    w: &'w mut Indentor<W>,
+    fc: &mut FileGeneratorContext<'p>,
+    tuple: T,
+) -> Result<()>
 where
     W: Write,
-    T: TupleOfIntoFragments<'w, W>,
+    T: TupleOfIntoFragments<'p, 'w, W>,
 {
-    enum Task<'w, W: 'w + std::fmt::Write> {
-        WriteFragment(Fragment<'w, W>),
-        ProgressIterator(Box<dyn 'w + Iterator<Item = Result<Fragment<'w, W>>>>),
-        CallFunctor(Box<dyn 'w + FnOnce(&mut Indentor<W>) -> Result<()>>),
+    enum Task<'p, 'w, W: 'w + std::fmt::Write> {
+        WriteFragment(Fragment<'p, 'w, W>),
+        ProgressIterator(Box<dyn 'w + Iterator<Item = Result<Fragment<'p, 'w, W>>>>),
+        CallFunctor(
+            Box<dyn 'w + FnOnce(&mut Indentor<W>, &mut FileGeneratorContext<'p>) -> Result<()>>,
+        ),
         Indent(),
         Unindent(),
     }
@@ -162,7 +171,7 @@ where
                 }
             }
             Task::CallFunctor(f) => {
-                (f)(w)?;
+                (f)(w, fc)?;
             }
             Task::Indent() => {
                 w.indent();

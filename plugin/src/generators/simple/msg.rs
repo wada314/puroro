@@ -7,9 +7,8 @@ pub(crate) fn handle_msg<'p, W: Write>(
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     write_body(output, context, fc, msg)?;
-
     write_default(output, context, fc, msg)?;
-    //write_deser_stream_handler(output, context, fc, msg)?;
+    write_deser_stream_handler2(output, context, fc, msg)?;
     Ok(())
 }
 
@@ -23,6 +22,7 @@ fn write_body<'p, W: Write>(
     let native_type_name = to_type_name(&msg.name);
     write(
         output,
+        fc,
         (
             format!("pub struct {name} {{\n", name = native_type_name),
             indent((iter(msg.field.iter().map(|field| {
@@ -49,6 +49,7 @@ fn write_default<'p, W: Write>(
     let native_type_name = to_type_name(&msg.name);
     write(
         output,
+        fc,
         (
             format!(
                 "\
@@ -61,69 +62,33 @@ impl ::std::default::Default for {name} {{
                 3,
                 (iter(msg.field.iter().map(|field| {
                     let native_field_name = to_var_name(&field.name);
-                    if let Some(TypeOfIdent::Enum) =
-                        context.type_of_ident(fc.package().clone(), &field.type_name)
-                    {
-                        Ok(format!(
+                    let is_repeated =
+                        matches!(field.label, Ok(FieldDescriptorProto_Label::LABEL_REPEATED));
+                    let is_enum = matches!(
+                        context.type_of_ident(fc.package().clone(), &field.type_name),
+                        Some(TypeOfIdent::Enum)
+                    );
+                    match (is_repeated, is_enum) {
+                        (false, true) => Ok(format!(
                             "{name}: 0i32.try_into(),\n",
                             name = native_field_name
-                        ))
-                    } else {
-                        Ok(format!(
+                        )),
+                        (_, _) => Ok(format!(
                             "{name}: ::std::default::Default::default(),\n",
                             name = native_field_name
-                        ))
+                        )),
                     }
                 })),),
             ),
-            "        }}
+            "        \
+        }}
     }}
 }}\n",
         ),
     )
 }
 
-/*
-fn write_deser_stream_handler2<W: Write>(
-    context: &InvocationContext,
-    out: &mut Indentor<W>,
-    msg: &DescriptorProto,
-) -> Result<()> {
-    let native_type_name = to_type_name(&msg.name);
-    const DESER_MOD: &'static str = "::puroro_serializer::deserializer::stream";
-    write(
-        out,
-        fr([
-            fr(format_args!(
-                "impl {d}::MessageDeserializeEventHandler for {name} {{\n",
-                d = DESER_MOD,
-                name = native_type_name
-            )),
-            indent([
-                fr(format_args!(
-                    "\
-type Target = Self;
-fn finish(self) -> ::puroro::Result<Self::Target> {{ Ok(self) }}
-fn met_field<T: {d}::LengthDelimitedDeserializer>(
-    &mut self,
-    field: {d}::Field<T>,
-    field_number: usize,
-) -> ::puroro::Result<()> {{\n",
-                    d = DESER_MOD
-                )),
-                indent([
-                    fr("match field {{\n"),
-                    indent([fr("{d}::Field::Variant(variant) => ")]),
-                    fr("}}\n"),
-                ]),
-                fr("}}\n"),
-            ]),
-            fr("}}\n"),
-        ]),
-    )
-}
-
-fn write_deser_stream_handler<'p, W: Write>(
+fn write_deser_stream_handler2<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &InvocationContext,
     fc: &mut FileGeneratorContext<'p>,
@@ -131,52 +96,55 @@ fn write_deser_stream_handler<'p, W: Write>(
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
     const DESER_MOD: &'static str = "::puroro_serializer::deserializer::stream";
-    write!(
-        fc.writer(),
-        "impl {d}::MessageDeserializeEventHandler for {name} ",
-        d = DESER_MOD,
-        name = native_type_name
-    )?;
-    fc.indent_with_braces(|fc| {
-        write!(
-            fc.writer(),
-            "\
-type Target = Self;
-fn finish(self) -> ::puroro::Result<Self::Target> {{ Ok(self) }}
-fn met_field<T: {d}::LengthDelimitedDeserializer>(
-    &mut self,
-    field: {d}::Field<T>,
-    field_number: usize,
-) -> ::puroro::Result<()> ",
-            d = DESER_MOD
-        )?;
-        fc.indent_with_braces(|fc| {
-            write!(fc.writer(), "match field ")?;
-            fc.indent_with_braces(|fc| {
-                write!(
-                    fc.writer(),
-                    "{d}::Field::Variant(variant) => ", // Go to the next episode...
-                    d = DESER_MOD
-                )?;
-                write_deser_stream_handler_variant(context, fc, msg)?;
-                write!(
-                    fc.writer(),
-                    "{d}::Field::LengthDelimeted(ldd) => ",
-                    d = DESER_MOD
-                )?;
-                write_deser_stream_handler_length_delimited(context, fc, msg)?;
-                write!(fc.writer(), "{d}::Field::Bytes32(array) => ", d = DESER_MOD)?;
-                write_deser_stream_handler_bytes32(context, fc, msg)?;
-                write!(fc.writer(), "{d}::Field::Bytes64(array) => ", d = DESER_MOD)?;
-                write_deser_stream_handler_bytes64(context, fc, msg)?;
-                Ok(())
-            })?;
-            writeln!(fc.writer(), "Ok(())")?;
-            Ok(())
-        })
-    })
+    write(
+        output,
+        fc,
+        (
+            format!(
+                "\
+impl {d}::MessageDeserializeEventHandler for {name} {{
+    type Target = Self;
+    fn finish(self) -> ::puroro::Result<Self::Target> {{
+        Ok(Self)
+    }}
+    fn met_field<T: {d}::LengthDelimitedDeserializer>(
+        &mut self,
+        field: {d}::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {{
+        match field {{\n",
+                d = DESER_MOD,
+                name = native_type_name
+            ),
+            func(|output, fc| write_deser_stream_handler_variant_arm(output, context, fc, msg)),
+            func(|output, fc| write_deser_stream_handler_ld_arm(output, context, fc, msg)),
+            "       \
+        }}
+    }}
+}}\n",
+        ),
+    )
 }
 
+fn write_deser_stream_handler_variant_arm<'p, W: Write>(
+    output: &mut Indentor<W>,
+    context: &InvocationContext,
+    fc: &mut FileGeneratorContext<'p>,
+    msg: &'p DescriptorProto,
+) -> Result<()> {
+    todo!()
+}
+
+fn write_deser_stream_handler_ld_arm<'p, W: Write>(
+    output: &mut Indentor<W>,
+    context: &InvocationContext,
+    fc: &mut FileGeneratorContext<'p>,
+    msg: &'p DescriptorProto,
+) -> Result<()> {
+    todo!()
+}
+
+/*
 fn write_deser_stream_handler_variant<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &InvocationContext,
