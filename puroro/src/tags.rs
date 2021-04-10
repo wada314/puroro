@@ -13,6 +13,12 @@ pub struct SInt64();
 pub struct Bool();
 pub struct String();
 pub struct Message<T>(PhantomData<T>);
+pub struct Float();
+pub struct Double();
+pub struct SFixed32();
+pub struct SFixed64();
+pub struct Fixed32();
+pub struct Fixed64();
 pub struct Repeated<T: SingularFieldTypeTag>(PhantomData<T>);
 
 impl FieldTypeTag for Int32 {}

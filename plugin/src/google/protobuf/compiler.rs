@@ -48,6 +48,18 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 _ => todo!("Unknown filed number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                _ => todo!("Unknown filed number"),
+            }
+            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -118,6 +130,20 @@ mod code_generator_response {
                     }
                     _ => todo!("Unknown filed number"),
                 }
+                ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+                    1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    16 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    _ => todo!("Unknown filed number"),
+                }
+                ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+                    1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    16 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    _ => todo!("Unknown filed number"),
+                }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
             }
             Ok(())
@@ -174,6 +200,20 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                     let msg = self.compiler_version.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::compiler::Version>> as ::std::default::Default>::default);
                     self.compiler_version = Some(ldd.deserialize_as_message(msg)?);
                 }
+                _ => todo!("Unknown filed number"),
+            }
+            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                _ => todo!("Unknown filed number"),
+            }
+            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
             }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
@@ -243,6 +283,20 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 4 => {
                     self.suffix = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
+                _ => todo!("Unknown filed number"),
+            }
+            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                _ => todo!("Unknown filed number"),
+            }
+            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
             }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,

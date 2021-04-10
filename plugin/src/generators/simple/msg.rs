@@ -107,6 +107,8 @@ impl {d}::MessageDeserializeEventHandler for {name} {{
             (
                 func(|output| write_deser_stream_handler_variant_arm(output, context, msg)),
                 func(|output| write_deser_stream_handler_ld_arm(output, context, msg)),
+                func(|output| write_deser_stream_handler_bitsxx_arm(32, output, context, msg)),
+                func(|output| write_deser_stream_handler_bitsxx_arm(64, output, context, msg)),
                 "_ => Err(::puroro::PuroroError::UnexpectedFieldType)?,\n",
             ),
         ),
@@ -131,7 +133,7 @@ fn write_deser_stream_handler_variant_arm<'p, W: Write>(
         ),
         indent((
             iter(msg.field.iter().map(|field| {
-                Ok(match variant_field_type(field) {
+                Ok(match variant_field_type_tag(field) {
                     None => {
                         // This is not a variant field, so the output's match-case should fail.
                         format!(
@@ -218,7 +220,7 @@ fn write_deser_stream_handler_ld_arm<'p, W: Write>(
                                 native_type = field_native_type,
                             )
                         }
-                    } else if let Some(tag_type) = variant_field_type(field) {
+                    } else if let Some(tag_type) = variant_field_type_tag(field) {
                         // packed variant
                         if is_repeated {
                             format!(
@@ -312,7 +314,63 @@ fn write_deser_stream_handler_ld_arm<'p, W: Write>(
         .write_into(output)
 }
 
-fn variant_field_type(field: &FieldDescriptorProto) -> Option<&'static str> {
+fn write_deser_stream_handler_bitsxx_arm<'p, W: Write>(
+    bits: usize,
+    output: &mut Indentor<W>,
+    context: &Context<'p>,
+    msg: &'p DescriptorProto,
+) -> Result<()> {
+    (
+        format!(
+            "{d}::Field::Bits{bits}(bytes) => match field_number {{\n",
+            bits = bits,
+            d = DESER_MOD
+        ),
+        indent((
+            iter(msg.field.iter().map(|field| {
+                let opt_native_type = if bits == 32 {
+                    bits32_field_native_type(field)
+                } else {
+                    bits64_field_native_type(field)
+                };
+                Ok(if let Some(native_type) = opt_native_type {
+                    let native_field_name = to_var_name(&field.name);
+                    if is_field_repeated(field) {
+                        format!(
+                            "\
+{number} => {{
+    self.{name}.push({type_}::from_le_bytes(bytes));
+}}\n",
+                            number = field.number,
+                            name = native_field_name,
+                            type_ = native_type
+                        )
+                    } else {
+                        format!(
+                            "\
+{number} => {{
+    self.{name} = {type_}::from_le_bytes(bytes);
+}}\n",
+                            number = field.number,
+                            name = native_field_name,
+                            type_ = native_type
+                        )
+                    }
+                } else {
+                    format!(
+                        "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
+                        number = field.number
+                    )
+                })
+            })),
+            "_ => todo!(\"Unknown filed number\"),\n",
+        )),
+        "}}\n",
+    )
+        .write_into(output)
+}
+
+fn variant_field_type_tag(field: &FieldDescriptorProto) -> Option<&'static str> {
     if let Ok(t) = field.type_ {
         match t {
             FieldDescriptorProto_Type::TYPE_INT64 => Some("::puroro::tags::Int64"),
@@ -323,6 +381,32 @@ fn variant_field_type(field: &FieldDescriptorProto) -> Option<&'static str> {
             FieldDescriptorProto_Type::TYPE_ENUM => Some("::puroro::tags::Int32"),
             FieldDescriptorProto_Type::TYPE_BOOL => Some("::puroro::tags::Bool"),
             FieldDescriptorProto_Type::TYPE_UINT32 => Some("::puroro::tags::UInt32"),
+            _ => None,
+        }
+    } else {
+        None
+    }
+}
+
+fn bits32_field_native_type(field: &FieldDescriptorProto) -> Option<&'static str> {
+    if let Ok(t) = field.type_ {
+        match t {
+            FieldDescriptorProto_Type::TYPE_FLOAT => Some("f32"),
+            FieldDescriptorProto_Type::TYPE_FIXED32 => Some("u32"),
+            FieldDescriptorProto_Type::TYPE_SFIXED32 => Some("i32"),
+            _ => None,
+        }
+    } else {
+        None
+    }
+}
+
+fn bits64_field_native_type(field: &FieldDescriptorProto) -> Option<&'static str> {
+    if let Ok(t) = field.type_ {
+        match t {
+            FieldDescriptorProto_Type::TYPE_DOUBLE => Some("f64"),
+            FieldDescriptorProto_Type::TYPE_FIXED64 => Some("u64"),
+            FieldDescriptorProto_Type::TYPE_SFIXED64 => Some("i64"),
             _ => None,
         }
     } else {
