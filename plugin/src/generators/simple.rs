@@ -66,6 +66,7 @@ fn gen_field_bare_type(
                 FieldDescriptorProto_Type::TYPE_BYTES => "::std::vec::Vec<u8>".into(),
                 FieldDescriptorProto_Type::TYPE_MESSAGE | FieldDescriptorProto_Type::TYPE_ENUM => {
                     MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename)
+                        .unwrap()
                         .to_native_maybe_qualified_typename(path_to_package_root)
                         .into()
                 }

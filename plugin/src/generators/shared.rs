@@ -17,7 +17,7 @@ pub(crate) struct Context<'p> {
     cgreq: &'p CodeGeneratorRequest,
     type_of_ident_map: HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
 
-    package: Vec<&'p str>,
+    package: PackagePath<'p>,
     path_to_package_root: String,
 }
 
@@ -26,17 +26,17 @@ impl<'p> Context<'p> {
         Ok(Self {
             cgreq,
             type_of_ident_map: Self::generate_type_of_ident_map(cgreq)?,
-            package: Vec::new(),
+            package: PackagePath::new(""),
             path_to_package_root: "".into(),
         })
     }
     pub(crate) fn cgreq(&self) -> &'p CodeGeneratorRequest {
         self.cgreq
     }
-    pub(crate) fn package(&self) -> &Vec<&'p str> {
+    pub(crate) fn package(&self) -> &PackagePath<'p> {
         &self.package
     }
-    pub(crate) fn set_package(&mut self, package: &Vec<&'p str>) {
+    pub(crate) fn set_package(&mut self, package: &PackagePath<'p>) {
         self.package = package.clone();
         self.path_to_package_root = Self::generate_path_to_package_root(&self.package);
     }
@@ -56,23 +56,23 @@ impl<'p> Context<'p> {
         self.path_to_package_root = Self::generate_path_to_package_root(&self.package);
     }
 
-    fn generate_path_to_package_root(package: &Vec<&str>) -> String {
+    fn generate_path_to_package_root(package: &PackagePath<'p>) -> String {
         if package.is_empty() {
             "self".into()
         } else {
-            let supers = std::iter::repeat("super").take(package.len());
+            let supers = std::iter::repeat("super").take(package.iter().count());
             Itertools::intersperse(supers, "::").collect::<String>()
         }
     }
 
     pub(crate) fn type_of_ident(&self, typename: &'p str) -> Option<TypeOfIdent> {
         let mut package = self.package().clone();
-        let mfqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename);
+        let mfqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename)?;
         if let Some(fqtn) = mfqtn.try_to_absolute() {
             return self.type_of_ident_map.get(&fqtn).cloned();
         } else {
             loop {
-                let fqtn = mfqtn.with_package(package.clone());
+                let fqtn = mfqtn.with_package(&package);
                 if let Some(found) = self.type_of_ident_map.get(&fqtn) {
                     return Some(found.clone());
                 }
@@ -89,7 +89,7 @@ impl<'p> Context<'p> {
     ) -> Result<HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>> {
         struct Visitor<'a, 'p> {
             map: &'a mut HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
-            package: Vec<&'p str>,
+            package: PackagePath<'p>,
         }
         impl<'a, 'p> DescriptorVisitor<'p> for Visitor<'a, 'p> {
             fn handle_msg(&mut self, msg: &'p DescriptorProto) -> Result<()> {
@@ -125,7 +125,7 @@ impl<'p> Context<'p> {
 
         let mut map = HashMap::new();
         for file in &cgreq.proto_file {
-            let package = file.package.split('.').collect();
+            let package = PackagePath::new(&file.package);
             let mut visitor = Visitor {
                 map: &mut map,
                 package,
@@ -214,8 +214,7 @@ pub(crate) fn generate_file_with_handler<'p, H>(
 where
     H: FileGeneratorHandler,
 {
-    let package = input_file.package.split('.').collect::<Vec<_>>();
-    context.set_package(&package);
+    context.set_package(&PackagePath::new(&input_file.package));
     let filename = handler.generate_filename(context, input_file)?;
 
     struct InnerVisitor<'a, 'q, H: FileGeneratorHandler> {

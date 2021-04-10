@@ -60,47 +60,66 @@ impl<'p> PackagePath<'p> {
     pub(crate) fn pop(&mut self) -> Option<&'p str> {
         Rc::make_mut(&mut self.0).pop()
     }
+    pub(crate) fn from_origin(&self, origin_package: &PackagePath<'p>) -> PackagePath<'p> {
+        let mut new_package = origin_package.0.clone();
+        Rc::make_mut(&mut new_package).append(Rc::make_mut(&mut self.0.clone()));
+        PackagePath(new_package)
+    }
+    pub(crate) fn iter(&self) -> impl '_ + Iterator<Item = &'p str> {
+        self.0.iter().cloned()
+    }
+    pub(crate) fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
 }
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub(crate) struct MaybeFullyQualifiedTypeName<'p> {
-    package: Option<Vec<&'p str>>,
+    is_absolute: bool,
+    package: PackagePath<'p>,
     name: &'p str,
 }
 impl<'p> MaybeFullyQualifiedTypeName<'p> {
-    pub(crate) fn from_maybe_fq_typename(input: &'p str) -> Self {
-        if input.chars().next() != Some('.') {
-            Self {
-                name: input,
-                package: None,
-            }
-        } else {
-            let mut package = input[1..].split('.').collect::<Vec<_>>();
-            Self {
-                name: package.pop().unwrap(),
-                package: Some(package),
-            }
+    pub(crate) fn from_maybe_fq_typename(mut input: &'p str) -> Option<Self> {
+        let mut is_absolute = false;
+        if let Some(input_body) = input.strip_prefix('.') {
+            input = input_body;
+            is_absolute = true;
         }
-    }
-    pub(crate) fn try_to_absolute(&self) -> Option<FullyQualifiedTypeName<'p>> {
-        if let Some(package) = &self.package {
-            Some(FullyQualifiedTypeName::new(package.clone(), self.name))
+        let mut package_and_name = PackagePath::new(input);
+        if let Some(name) = package_and_name.pop() {
+            Some(Self {
+                is_absolute,
+                package: package_and_name,
+                name,
+            })
         } else {
             None
         }
     }
-    pub(crate) fn with_package(&self, package: Vec<&'p str>) -> FullyQualifiedTypeName<'p> {
-        if let Some(vec) = &self.package {
-            FullyQualifiedTypeName::new(vec.clone(), self.name)
+    pub(crate) fn try_to_absolute(&self) -> Option<FullyQualifiedTypeName<'p>> {
+        if self.is_absolute {
+            Some(FullyQualifiedTypeName::new(self.package.clone(), self.name))
         } else {
-            FullyQualifiedTypeName::new(package, self.name)
+            None
+        }
+    }
+    pub(crate) fn with_package(
+        &self,
+        given_package: &PackagePath<'p>,
+    ) -> FullyQualifiedTypeName<'p> {
+        if self.is_absolute {
+            FullyQualifiedTypeName::new(self.package.clone(), self.name)
+        } else {
+            FullyQualifiedTypeName::new(self.package.from_origin(given_package), self.name)
         }
     }
     pub(crate) fn to_native_maybe_qualified_typename(&self, path_to_package_root: &str) -> String {
-        if let Some(package) = &self.package {
-            let from_root = package
+        if self.is_absolute {
+            let from_root = self
+                .package
                 .iter()
-                .map(|s| to_module_name(*s))
+                .map(|s| to_module_name(s))
                 .chain(std::iter::once(to_type_name(self.name)))
                 .fold1(|s1, s2| s1 + "::" + &s2)
                 .unwrap();
@@ -112,20 +131,17 @@ impl<'p> MaybeFullyQualifiedTypeName<'p> {
 }
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub(crate) struct FullyQualifiedTypeName<'p> {
-    package: Vec<&'p str>,
+    package: PackagePath<'p>,
     name: &'p str,
 }
 impl<'p> FullyQualifiedTypeName<'p> {
-    pub(crate) fn new(package: Vec<&'p str>, name: &'p str) -> Self {
-        Self {
-            package: package,
-            name,
-        }
+    pub(crate) fn new(package: PackagePath<'p>, name: &'p str) -> Self {
+        Self { package, name }
     }
     pub(crate) fn to_native_typename_from_root(&self) -> String {
         self.package
             .iter()
-            .map(|s| to_module_name(*s))
+            .map(|s| to_module_name(s))
             .chain(std::iter::once(to_type_name(self.name)))
             .fold1(|s1, s2| s1 + "::" + &s2)
             .unwrap()
@@ -137,8 +153,8 @@ impl<'p> FullyQualifiedTypeName<'p> {
 }
 impl<'a> std::fmt::Display for FullyQualifiedTypeName<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for p in &self.package {
-            f.write_str(*p)?;
+        for p in self.package.iter() {
+            f.write_str(p)?;
             f.write_str(".")?;
         }
         f.write_str(self.name)?;
