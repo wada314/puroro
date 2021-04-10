@@ -38,7 +38,10 @@ pub(crate) enum Fragment<'w, W: 'w> {
     Cow(Cow<'static, str>),
     Iter(Box<dyn 'w + Iterator<Item = Result<Fragment<'w, W>>>>),
     Functor(Box<dyn 'w + FnOnce(&mut Indentor<W>) -> Result<()>>),
-    Indent(Box<dyn 'w + Iterator<Item = Result<Fragment<'w, W>>>>),
+    Indent(
+        usize,
+        Box<dyn 'w + Iterator<Item = Result<Fragment<'w, W>>>>,
+    ),
 }
 impl<'w, W> From<&'static str> for Fragment<'w, W> {
     fn from(s: &'static str) -> Self {
@@ -60,8 +63,22 @@ where
     T: TupleOfIntoFragments<'w, W>,
     <T as TupleOfIntoFragments<'w, W>>::Iter: 'w,
 {
-    Fragment::Indent(Box::new(tuple.into_frag_iter().map(|v| Ok(v)))
-        as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>)
+    Fragment::Indent(
+        1,
+        Box::new(tuple.into_frag_iter().map(|v| Ok(v)))
+            as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>,
+    )
+}
+pub(crate) fn indent_n<'w, T, W: 'w>(n: usize, tuple: T) -> Fragment<'w, W>
+where
+    T: TupleOfIntoFragments<'w, W>,
+    <T as TupleOfIntoFragments<'w, W>>::Iter: 'w,
+{
+    Fragment::Indent(
+        n,
+        Box::new(tuple.into_frag_iter().map(|v| Ok(v)))
+            as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>,
+    )
 }
 pub(crate) fn fr<'w, T, W>(from: T) -> Fragment<'w, W>
 where
@@ -128,10 +145,14 @@ where
                 Fragment::Functor(f) => {
                     tasks.push_front(Task::CallFunctor(f));
                 }
-                Fragment::Indent(iter) => {
-                    tasks.push_front(Task::Unindent());
+                Fragment::Indent(n, iter) => {
+                    for _ in 0..n {
+                        tasks.push_front(Task::Unindent());
+                    }
                     tasks.push_front(Task::ProgressIterator(iter));
-                    tasks.push_front(Task::Indent());
+                    for _ in 0..n {
+                        tasks.push_front(Task::Indent());
+                    }
                 }
             },
             Task::ProgressIterator(mut iter) => {

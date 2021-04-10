@@ -7,9 +7,9 @@ pub(crate) fn handle_msg<'p, W: Write>(
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     write_body(output, context, fc, msg)?;
-    /*
+
     write_default(output, context, fc, msg)?;
-    write_deser_stream_handler(output, context, fc, msg)?;*/
+    //write_deser_stream_handler(output, context, fc, msg)?;
     Ok(())
 }
 
@@ -37,7 +37,7 @@ fn write_body<'p, W: Write>(
         ),
     )
 }
-/*
+
 // impl Default
 // Because enum is Result<enum, i32>, we need a special treatment for it.
 fn write_default<'p, W: Write>(
@@ -47,40 +47,43 @@ fn write_default<'p, W: Write>(
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
-    write!(
-        fc.writer(),
-        "impl ::std::default::Default for {name} ",
-        name = native_type_name
-    )?;
-    fc.indent_with_braces(|fc| {
-        write!(fc.writer(), "fn default() -> Self ")?;
-        fc.indent_with_braces(|fc| {
-            write!(fc.writer(), "Self ")?;
-            fc.indent_with_braces(|fc| {
-                for field in &msg.field {
+    write(
+        output,
+        (
+            format!(
+                "\
+impl ::std::default::Default for {name} {{
+    fn default() -> Self {{
+        Self {{\n",
+                name = native_type_name
+            ),
+            indent_n(
+                3,
+                (iter(msg.field.iter().map(|field| {
                     let native_field_name = to_var_name(&field.name);
                     if let Some(TypeOfIdent::Enum) =
                         context.type_of_ident(fc.package().clone(), &field.type_name)
                     {
-                        writeln!(
-                            fc.writer(),
-                            "{name}: 0i32.try_into(),",
+                        Ok(format!(
+                            "{name}: 0i32.try_into(),\n",
                             name = native_field_name
-                        )?;
+                        ))
                     } else {
-                        writeln!(
-                            fc.writer(),
-                            "{name}: std::default::Default::default(),",
+                        Ok(format!(
+                            "{name}: ::std::default::Default::default(),\n",
                             name = native_field_name
-                        )?;
+                        ))
                     }
-                }
-                Ok(())
-            })
-        })
-    })
+                })),),
+            ),
+            "        }}
+    }}
+}}\n",
+        ),
+    )
 }
 
+/*
 fn write_deser_stream_handler2<W: Write>(
     context: &InvocationContext,
     out: &mut Indentor<W>,
