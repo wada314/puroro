@@ -1,6 +1,6 @@
 use ::lazy_static::lazy_static;
 use itertools::Itertools;
-use std::{collections::HashSet, fmt::Write};
+use std::{borrow::Cow, collections::HashSet, fmt::Write, rc::Rc};
 pub(crate) struct Indentor<W> {
     writer: W,
     indent_next: bool,
@@ -45,6 +45,20 @@ impl<W: Write> Write for Indentor<W> {
             self.indent_next = true;
         }
         self.writer.write_char(c)
+    }
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub(crate) struct PackagePath<'p>(Rc<Vec<&'p str>>);
+impl<'p> PackagePath<'p> {
+    pub(crate) fn new(package_str: &'p str) -> Self {
+        Self(Rc::new(package_str.split('.').collect::<Vec<_>>()))
+    }
+    pub(crate) fn push(&mut self, subpackage: &'p str) {
+        Rc::make_mut(&mut self.0).push(subpackage);
+    }
+    pub(crate) fn pop(&mut self) -> Option<&'p str> {
+        Rc::make_mut(&mut self.0).pop()
     }
 }
 
