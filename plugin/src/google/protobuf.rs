@@ -23,8 +23,17 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.annotation.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::generated_code_info::Annotation> as ::std::default::Default>::default())?
+                    );
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 mod generated_code_info {
@@ -68,8 +77,32 @@ mod generated_code_info {
                     }
                     _ => todo!("Unknown field number"),
                 }
+                ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                    1 => {
+                        self.path.append(&mut ldd.deserialize_as_variants().map(|rv| {
+                            rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
+                        }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);
+                    }
+                    2 => {
+                        self.source_file = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    }
+                    3 => {
+                        self.begin = ldd.deserialize_as_variants()
+                            .last()
+                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                    }
+                    4 => {
+                        self.end = ldd.deserialize_as_variants()
+                            .last()
+                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                    }
+                    _ => todo!("Unknown filed number"),
+                }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-           }
+            }
+            Ok(())
         }
     }
 }
@@ -98,8 +131,17 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.location.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::source_code_info::Location> as ::std::default::Default>::default())?
+                    );
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 mod source_code_info {
@@ -144,8 +186,31 @@ mod source_code_info {
                     6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown field number"),
                 }
+                ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                    1 => {
+                        self.path.append(&mut ldd.deserialize_as_variants().map(|rv| {
+                            rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
+                        }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);
+                    }
+                    2 => {
+                        self.span.append(&mut ldd.deserialize_as_variants().map(|rv| {
+                            rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
+                        }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);
+                    }
+                    3 => {
+                        self.leading_comments = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    }
+                    4 => {
+                        self.trailing_comments = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    }
+                    6 => {
+                        self.leading_detached_comments.push(ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?);
+                    }
+                    _ => todo!("Unknown filed number"),
+                }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-           }
+            }
+            Ok(())
         }
     }
 }
@@ -196,8 +261,39 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                2 => {
+                    self.name.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::uninterpreted_option::NamePart> as ::std::default::Default>::default())?
+                    );
+                }
+                3 => {
+                    self.identifier_value = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                4 => {
+                    self.positive_int_value = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::UInt64>())?;
+                }
+                5 => {
+                    self.negative_int_value = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int64>())?;
+                }
+                6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                7 => {
+                    self.string_value = ldd.deserialize_as_bytes().collect::<::puroro::Result<_>>()?;
+                }
+                8 => {
+                    self.aggregate_value = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 mod uninterpreted_option {
@@ -231,8 +327,21 @@ mod uninterpreted_option {
                     }
                     _ => todo!("Unknown field number"),
                 }
+                ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                    1 => {
+                        self.name_part = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    }
+                    2 => {
+                        self.is_extension = ldd.deserialize_as_variants()
+                            .last()
+                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                    }
+                    _ => todo!("Unknown filed number"),
+                }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-           }
+            }
+            Ok(())
         }
     }
 }
@@ -271,8 +380,29 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                33 => {
+                    self.deprecated = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                34 => {
+                    self.idempotency_level = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                }
+                999 => {
+                    self.uninterpreted_option.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                    );
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 mod method_options {
@@ -323,8 +453,23 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                33 => {
+                    self.deprecated = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                999 => {
+                    self.uninterpreted_option.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                    );
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 pub struct EnumValueOptions {
@@ -357,8 +502,23 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.deprecated = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                999 => {
+                    self.uninterpreted_option.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                    );
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 pub struct EnumOptions {
@@ -396,8 +556,29 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                2 => {
+                    self.allow_alias = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                3 => {
+                    self.deprecated = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                999 => {
+                    self.uninterpreted_option.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                    );
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 pub struct OneofOptions {
@@ -425,8 +606,17 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                999 => {
+                    self.uninterpreted_option.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                    );
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 pub struct FieldOptions {
@@ -484,8 +674,53 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.ctype = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                }
+                2 => {
+                    self.packed = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                6 => {
+                    self.jstype = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                }
+                5 => {
+                    self.lazy = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                3 => {
+                    self.deprecated = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                10 => {
+                    self.weak = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                999 => {
+                    self.uninterpreted_option.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                    );
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 mod field_options {
@@ -567,8 +802,41 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.message_set_wire_format = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                2 => {
+                    self.no_standard_descriptor_accessor = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                3 => {
+                    self.deprecated = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                7 => {
+                    self.map_entry = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                999 => {
+                    self.uninterpreted_option.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                    );
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 pub struct FileOptions {
@@ -676,8 +944,107 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.java_package = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                8 => {
+                    self.java_outer_classname = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                10 => {
+                    self.java_multiple_files = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                20 => {
+                    self.java_generate_equals_and_hash = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                27 => {
+                    self.java_string_check_utf8 = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                9 => {
+                    self.optimize_for = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                }
+                11 => {
+                    self.go_package = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                16 => {
+                    self.cc_generic_services = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                17 => {
+                    self.java_generic_services = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                18 => {
+                    self.py_generic_services = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                42 => {
+                    self.php_generic_services = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                23 => {
+                    self.deprecated = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                31 => {
+                    self.cc_enable_arenas = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                36 => {
+                    self.objc_class_prefix = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                37 => {
+                    self.csharp_namespace = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                39 => {
+                    self.swift_prefix = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                40 => {
+                    self.php_class_prefix = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                41 => {
+                    self.php_namespace = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                44 => {
+                    self.php_metadata_namespace = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                45 => {
+                    self.ruby_package = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                999 => {
+                    self.uninterpreted_option.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                    );
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 mod file_options {
@@ -742,8 +1109,37 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                2 => {
+                    self.input_type = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                3 => {
+                    self.output_type = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                4 => {
+                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MethodOptions>> as ::std::default::Default>::default);
+                    self.options = Some(ldd.deserialize_as_message(msg)?);
+                }
+                5 => {
+                    self.client_streaming = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                6 => {
+                    self.server_streaming = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 pub struct ServiceDescriptorProto {
@@ -777,8 +1173,24 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                2 => {
+                    self.method.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto> as ::std::default::Default>::default())?
+                    );
+                }
+                3 => {
+                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>> as ::std::default::Default>::default);
+                    self.options = Some(ldd.deserialize_as_message(msg)?);
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 pub struct EnumValueDescriptorProto {
@@ -814,8 +1226,25 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                2 => {
+                    self.number = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                }
+                3 => {
+                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>> as ::std::default::Default>::default);
+                    self.options = Some(ldd.deserialize_as_message(msg)?);
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 pub struct EnumDescriptorProto {
@@ -855,8 +1284,32 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                2 => {
+                    self.value.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::EnumValueDescriptorProto> as ::std::default::Default>::default())?
+                    );
+                }
+                3 => {
+                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>> as ::std::default::Default>::default);
+                    self.options = Some(ldd.deserialize_as_message(msg)?);
+                }
+                4 => {
+                    self.reserved_range.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange> as ::std::default::Default>::default())?
+                    );
+                }
+                5 => {
+                    self.reserved_name.push(ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?);
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 mod enum_descriptor_proto {
@@ -892,8 +1345,24 @@ mod enum_descriptor_proto {
                     }
                     _ => todo!("Unknown field number"),
                 }
+                ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                    1 => {
+                        self.start = ldd.deserialize_as_variants()
+                            .last()
+                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                    }
+                    2 => {
+                        self.end = ldd.deserialize_as_variants()
+                            .last()
+                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                    }
+                    _ => todo!("Unknown filed number"),
+                }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-           }
+            }
+            Ok(())
         }
     }
 }
@@ -925,8 +1394,19 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                2 => {
+                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>> as ::std::default::Default>::default);
+                    self.options = Some(ldd.deserialize_as_message(msg)?);
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 pub struct FieldDescriptorProto {
@@ -994,8 +1474,61 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 }
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                3 => {
+                    self.number = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                }
+                4 => {
+                    self.label = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                }
+                5 => {
+                    self.type_ = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                }
+                6 => {
+                    self.type_name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                2 => {
+                    self.extendee = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                7 => {
+                    self.default_value = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                9 => {
+                    self.oneof_index = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                }
+                10 => {
+                    self.json_name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                8 => {
+                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FieldOptions>> as ::std::default::Default>::default);
+                    self.options = Some(ldd.deserialize_as_message(msg)?);
+                }
+                17 => {
+                    self.proto3_optional = ldd.deserialize_as_variants()
+                        .last()
+                        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 mod field_descriptor_proto {
@@ -1087,8 +1620,17 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                999 => {
+                    self.uninterpreted_option.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::UninterpretedOption> as ::std::default::Default>::default())?
+                    );
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 pub struct DescriptorProto {
@@ -1143,8 +1685,57 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                2 => {
+                    self.field.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto> as ::std::default::Default>::default())?
+                    );
+                }
+                6 => {
+                    self.extension.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto> as ::std::default::Default>::default())?
+                    );
+                }
+                3 => {
+                    self.nested_type.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::DescriptorProto> as ::std::default::Default>::default())?
+                    );
+                }
+                4 => {
+                    self.enum_type.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::EnumDescriptorProto> as ::std::default::Default>::default())?
+                    );
+                }
+                5 => {
+                    self.extension_range.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ExtensionRange> as ::std::default::Default>::default())?
+                    );
+                }
+                8 => {
+                    self.oneof_decl.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::OneofDescriptorProto> as ::std::default::Default>::default())?
+                    );
+                }
+                7 => {
+                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MessageOptions>> as ::std::default::Default>::default);
+                    self.options = Some(ldd.deserialize_as_message(msg)?);
+                }
+                9 => {
+                    self.reserved_range.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ReservedRange> as ::std::default::Default>::default())?
+                    );
+                }
+                10 => {
+                    self.reserved_name.push(ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?);
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 mod descriptor_proto {
@@ -1180,8 +1771,24 @@ mod descriptor_proto {
                     }
                     _ => todo!("Unknown field number"),
                 }
+                ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                    1 => {
+                        self.start = ldd.deserialize_as_variants()
+                            .last()
+                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                    }
+                    2 => {
+                        self.end = ldd.deserialize_as_variants()
+                            .last()
+                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                    }
+                    _ => todo!("Unknown filed number"),
+                }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-           }
+            }
+            Ok(())
         }
     }
     pub struct ExtensionRange {
@@ -1219,8 +1826,28 @@ mod descriptor_proto {
                     3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown field number"),
                 }
+                ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                    1 => {
+                        self.start = ldd.deserialize_as_variants()
+                            .last()
+                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                    }
+                    2 => {
+                        self.end = ldd.deserialize_as_variants()
+                            .last()
+                            .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+                            .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
+                    }
+                    3 => {
+                        let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>> as ::std::default::Default>::default);
+                        self.options = Some(ldd.deserialize_as_message(msg)?);
+                    }
+                    _ => todo!("Unknown filed number"),
+                }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-           }
+            }
+            Ok(())
         }
     }
 }
@@ -1286,8 +1913,62 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 12 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                2 => {
+                    self.package = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                3 => {
+                    self.dependency.push(ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?);
+                }
+                10 => {
+                    self.public_dependency.append(&mut ldd.deserialize_as_variants().map(|rv| {
+                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
+                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);
+                }
+                11 => {
+                    self.weak_dependency.append(&mut ldd.deserialize_as_variants().map(|rv| {
+                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
+                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);
+                }
+                4 => {
+                    self.message_type.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::DescriptorProto> as ::std::default::Default>::default())?
+                    );
+                }
+                5 => {
+                    self.enum_type.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::EnumDescriptorProto> as ::std::default::Default>::default())?
+                    );
+                }
+                6 => {
+                    self.service.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::ServiceDescriptorProto> as ::std::default::Default>::default())?
+                    );
+                }
+                7 => {
+                    self.extension.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto> as ::std::default::Default>::default())?
+                    );
+                }
+                8 => {
+                    let msg = self.options.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FileOptions>> as ::std::default::Default>::default);
+                    self.options = Some(ldd.deserialize_as_message(msg)?);
+                }
+                9 => {
+                    let msg = self.source_code_info.get_or_insert_with(<::std::option::Option<::std::boxed::Box<super::super::google::protobuf::SourceCodeInfo>> as ::std::default::Default>::default);
+                    self.source_code_info = Some(ldd.deserialize_as_message(msg)?);
+                }
+                12 => {
+                    self.syntax = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }
 pub struct FileDescriptorSet {
@@ -1315,7 +1996,16 @@ impl ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler f
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
             }
+            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                1 => {
+                    self.file.push(ldd.deserialize_as_message(
+                        <::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto> as ::std::default::Default>::default())?
+                    );
+                }
+                _ => todo!("Unknown filed number"),
+            }
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
-       }
+        }
+        Ok(())
     }
 }

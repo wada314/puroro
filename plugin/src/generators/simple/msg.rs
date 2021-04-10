@@ -106,11 +106,13 @@ impl {d}::MessageDeserializeEventHandler for {name} {{
             3,
             (
                 func(|output| write_deser_stream_handler_variant_arm(output, context, msg)),
+                func(|output| write_deser_stream_handler_ld_arm(output, context, msg)),
                 "_ => Err(::puroro::PuroroError::UnexpectedFieldType)?,\n",
             ),
         ),
-        "       \
+        "        \
         }}
+        Ok(())
     }}
 }}\n",
     )
@@ -184,33 +186,128 @@ fn write_deser_stream_handler_ld_arm<'p, W: Write>(
             "{d}::Field::LengthDelimited(ldd) => match field_number {{\n",
             d = DESER_MOD
         ),
-        iter(msg.field.iter().map(|field| {
-            Ok(
-                if let Some(TypeOfIdent::Message) = context.type_of_ident(&field.type_name) {
-                    // Message
-                    todo!()
-                } else if let Some(tag_type) = variant_field_type(field) {
-                    // packed variant
-                    todo!()
-                } else {
-                    match field.type_ {
-                        Ok(FieldDescriptorProto_Type::TYPE_STRING) => {
-                            // string
-                            todo!()
+        indent((
+            iter(msg.field.iter().map(|field| {
+                let native_field_name = to_var_name(&field.name);
+                let is_repeated = is_field_repeated(field);
+                Ok(
+                    if let Some(TypeOfIdent::Message) = context.type_of_ident(&field.type_name) {
+                        // Message
+                        let field_native_type = gen_field_type(field, context)?;
+                        if is_repeated {
+                            format!(
+                                "\
+{number} => {{
+    self.{name}.push(ldd.deserialize_as_message(
+        <{native_type} as ::std::default::Default>::default())?
+    );
+}}\n",
+                                number = field.number,
+                                name = native_field_name,
+                                native_type = field_native_type,
+                            )
+                        } else {
+                            format!(
+                                "\
+{number} => {{
+    let msg = self.{name}.get_or_insert_with(<{native_type} as ::std::default::Default>::default);
+    self.{name} = Some(ldd.deserialize_as_message(msg)?);
+}}\n",
+                                number = field.number,
+                                name = native_field_name,
+                                native_type = field_native_type,
+                            )
                         }
-                        Ok(FieldDescriptorProto_Type::TYPE_BYTES) => {
-                            // bytes
-                            todo!()
+                    } else if let Some(tag_type) = variant_field_type(field) {
+                        // packed variant
+                        if is_repeated {
+                            format!(
+                                "\
+{number} => {{
+    self.{name}.append(&mut ldd.deserialize_as_variants().map(|rv| {{
+        rv.and_then(|variant| variant.to_native::<{tag}>())
+    }}).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);
+}}\n",
+                                number = field.number,
+                                name = native_field_name,
+                                tag = tag_type,
+                            )
+                        } else {
+                            // a packed variant is coming for singular field...??
+                            // It's soooo weird but I'm not sure if that is illegal...
+                            format!(
+                                "\
+{number} => {{
+    self.{name} = ldd.deserialize_as_variants()
+        .last()
+        .unwrap_or(::puroro::PuroroError::ZeroLengthPackedField)
+        .and_then(|variant| variant.to_native::<{tag}>())?;
+}}\n",
+                                number = field.number,
+                                name = native_field_name,
+                                tag = tag_type,
+                            )
                         }
-                        _ => {
-                            // else
-                            todo!()
+                    } else {
+                        match field.type_ {
+                            Ok(FieldDescriptorProto_Type::TYPE_STRING) => {
+                                // string
+                                if is_repeated {
+                                    format!(
+                                        "\
+{number} => {{
+    self.{name}.push(ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?);
+}}\n",
+                                        number = field.number,
+                                        name = native_field_name,
+                                    )
+                                } else {
+                                    format!(
+                                        "\
+{number} => {{
+    self.{name} = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+}}\n",
+                                        number = field.number,
+                                        name = native_field_name,
+                                    )
+                                }
+                            }
+                            Ok(FieldDescriptorProto_Type::TYPE_BYTES) => {
+                                // bytes
+                                if is_repeated {
+                                    format!(
+                                        "\
+{number} => {{
+    self.{name}.push(ldd.deserialize_as_bytes().collect::<::puroro::Result<_>>()?);
+}}\n",
+                                        number = field.number,
+                                        name = native_field_name,
+                                    )
+                                } else {
+                                    format!(
+                                        "\
+{number} => {{
+    self.{name} = ldd.deserialize_as_bytes().collect::<::puroro::Result<_>>()?;
+}}\n",
+                                        number = field.number,
+                                        name = native_field_name,
+                                    )
+                                }
+                            }
+                            _ => {
+                                // else
+                                format!(
+                                "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
+                                number = field.number
+                            )
+                            }
                         }
-                    }
-                },
-            )
-        })),
-        "}}",
+                    },
+                )
+            })),
+            "_ => todo!(\"Unknown filed number\"),\n",
+        )),
+        "}}\n",
     )
         .write_into(output)
 }
