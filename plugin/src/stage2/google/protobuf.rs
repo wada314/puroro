@@ -1,3 +1,4 @@
+pub mod compiler;
 pub struct GeneratedCodeInfo {
     annotation: ::std::vec::Vec<super::super::google::protobuf::generated_code_info::Annotation>,
 }

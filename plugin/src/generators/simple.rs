@@ -4,27 +4,41 @@ use crate::generators::utils::*;
 use crate::stage1::*;
 use crate::{ErrorKind, Result};
 use itertools::Itertools;
-use std::{borrow::Cow, fmt::Write};
+use std::{borrow::Cow, collections::HashMap, fmt::Write};
 
 mod enume;
 mod msg;
 
 pub(crate) fn generate_simple(context: &mut Context) -> Result<Vec<(String, String)>> {
-    let mut filenames_and_contents = Vec::new();
+    let mut filenames_and_contents = HashMap::new();
     let mut generator = Generator {};
     for proto_file in &context.cgreq().proto_file {
-        filenames_and_contents.push(generate_file_with_handler(
-            context,
-            proto_file,
-            &mut generator,
-        )?);
+        let (filename, content) = generate_file_with_handler(context, proto_file, &mut generator)?;
+        filenames_and_contents.insert(filename, content);
     }
     // We need to generate files for rust module / proto package structuring.
     // i.e. Files for module declaration `mod <package-name>;`.
     // Sometimes this is written into an existing file, and sometimes we
     // need to create a new file.
+    for (package, subpackages) in context.packages_subpackage_list() {
+        let filename = if package.is_empty() {
+            "mod.rs".to_string()
+        } else {
+            Itertools::intersperse(package.iter().map(|p| to_module_name(p)), "/".to_string())
+                .collect::<String>()
+                + ".rs"
+        };
+        let decls = subpackages
+            .iter()
+            .map(|subp| format!("pub mod {name};\n", name = to_module_name(&subp)))
+            .collect::<String>();
+        // Generate a new file, or insert it to the beggining of the existing file.
+        let entry = filenames_and_contents.entry(filename.clone());
+        let content = entry.or_default();
+        *content = decls + content;
+    }
 
-    Ok(filenames_and_contents)
+    Ok(filenames_and_contents.into_iter().collect::<Vec<_>>())
 }
 
 fn is_field_msg(field: &FieldDescriptorProto, context: &Context) -> bool {

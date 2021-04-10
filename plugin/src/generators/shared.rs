@@ -2,7 +2,7 @@ use crate::generators::utils::*;
 use crate::stage1::*;
 use crate::{ErrorKind, Result};
 use itertools::Itertools;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fmt::Write;
 
 pub(crate) mod writers;
@@ -16,6 +16,7 @@ pub(crate) enum TypeOfIdent {
 pub(crate) struct Context<'p> {
     cgreq: &'p CodeGeneratorRequest,
     type_of_ident_map: HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
+    packages_subpackage_list: HashMap<PackagePath<'p>, HashSet<&'p str>>,
 
     cur_package: PackagePath<'p>,
     path_to_package_root: String,
@@ -26,6 +27,7 @@ impl<'p> Context<'p> {
         Ok(Self {
             cgreq,
             type_of_ident_map: Self::generate_type_of_ident_map(cgreq)?,
+            packages_subpackage_list: Self::generate_packages_subpackage_list(cgreq),
             cur_package: PackagePath::new(""),
             path_to_package_root: "".into(),
         })
@@ -133,6 +135,30 @@ impl<'p> Context<'p> {
             visit_in_file(file, &mut visitor)?;
         }
         Ok(map)
+    }
+
+    pub(crate) fn packages_subpackage_list(&self) -> &HashMap<PackagePath<'p>, HashSet<&'p str>> {
+        &self.packages_subpackage_list
+    }
+
+    fn generate_packages_subpackage_list(
+        cgreq: &'p CodeGeneratorRequest,
+    ) -> HashMap<PackagePath<'p>, HashSet<&'p str>> {
+        let mut checked = HashSet::new();
+        let mut map: HashMap<PackagePath, HashSet<&'p str>> = HashMap::new();
+        for file in &cgreq.proto_file {
+            let mut package = PackagePath::new(&file.package);
+            if !checked.insert(package.clone()) {
+                // Already checked this package
+                continue;
+            }
+            while let Some(popped) = package.pop() {
+                map.entry(package.clone())
+                    .or_insert_with(Default::default)
+                    .insert(popped);
+            }
+        }
+        map
     }
 }
 
