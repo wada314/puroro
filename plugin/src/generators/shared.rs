@@ -17,7 +17,7 @@ pub(crate) struct Context<'p> {
     cgreq: &'p CodeGeneratorRequest,
     type_of_ident_map: HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
 
-    package: PackagePath<'p>,
+    cur_package: PackagePath<'p>,
     path_to_package_root: String,
 }
 
@@ -26,34 +26,34 @@ impl<'p> Context<'p> {
         Ok(Self {
             cgreq,
             type_of_ident_map: Self::generate_type_of_ident_map(cgreq)?,
-            package: PackagePath::new(""),
+            cur_package: PackagePath::new(""),
             path_to_package_root: "".into(),
         })
     }
     pub(crate) fn cgreq(&self) -> &'p CodeGeneratorRequest {
         self.cgreq
     }
-    pub(crate) fn package(&self) -> &PackagePath<'p> {
-        &self.package
+    pub(crate) fn cur_package(&self) -> &PackagePath<'p> {
+        &self.cur_package
     }
     pub(crate) fn set_package(&mut self, package: &PackagePath<'p>) {
-        self.package = package.clone();
-        self.path_to_package_root = Self::generate_path_to_package_root(&self.package);
+        self.cur_package = package.clone();
+        self.path_to_package_root = Self::generate_path_to_package_root(&self.cur_package);
     }
     pub(crate) fn path_to_package_root(&self) -> &str {
         &self.path_to_package_root
     }
 
     pub(crate) fn enter_submessage_namespace(&mut self, message_name: &'p str) {
-        self.package.push(message_name);
-        self.path_to_package_root = Self::generate_path_to_package_root(&self.package);
+        self.cur_package.push(message_name);
+        self.path_to_package_root = Self::generate_path_to_package_root(&self.cur_package);
     }
 
     pub(crate) fn leave_submessage_namespace(&mut self, message_name: &'p str) {
-        if let Some(popped) = self.package.pop() {
+        if let Some(popped) = self.cur_package.pop() {
             debug_assert_eq!(message_name, popped);
         }
-        self.path_to_package_root = Self::generate_path_to_package_root(&self.package);
+        self.path_to_package_root = Self::generate_path_to_package_root(&self.cur_package);
     }
 
     fn generate_path_to_package_root(package: &PackagePath<'p>) -> String {
@@ -66,7 +66,7 @@ impl<'p> Context<'p> {
     }
 
     pub(crate) fn type_of_ident(&self, typename: &'p str) -> Option<TypeOfIdent> {
-        let mut package = self.package().clone();
+        let mut package = self.cur_package().clone();
         let mfqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename)?;
         if let Some(fqtn) = mfqtn.try_to_absolute() {
             return self.type_of_ident_map.get(&fqtn).cloned();
