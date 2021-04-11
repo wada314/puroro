@@ -31,7 +31,7 @@ use crate::protos::*;
 fn main() -> Result<()> {
     let cgreq = CodeGeneratorRequest::from_bytes(stdin().bytes()).unwrap();
     let mut context = Context::new(cgreq.clone())?;
-    let filename_and_content = generators::simple::generate_simple(&mut context, &cgreq)?;
+    let filename_and_content = Vec::new(); //generators::simple::generate_simple(&mut context, &cgreq)?;
     let mut cgres = CodeGeneratorResponse::default();
     cgres.file = filename_and_content
         .into_iter()
