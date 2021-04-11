@@ -35,10 +35,10 @@ pub enum FieldLabel {
 
 pub struct FieldDescriptor<'c> {
     proto: &'c FieldDescriptorProto,
-    context: &'c Context,
+    context: &'c Context<'c>,
 }
 impl<'c> FieldDescriptor<'c> {
-    pub fn new(proto: &'c FieldDescriptorProto, context: &'c Context) -> Self {
+    pub fn new(proto: &'c FieldDescriptorProto, context: &'c Context<'c>) -> Self {
         Self { proto, context }
     }
     pub fn name(&self) -> &str {

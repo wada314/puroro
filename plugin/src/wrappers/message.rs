@@ -5,13 +5,13 @@ use super::{EnumDescriptor, FieldDescriptor};
 
 pub struct MessageDescriptor<'c> {
     proto: &'c DescriptorProto,
-    context: &'c Context,
+    context: &'c Context<'c>,
     fields: Vec<FieldDescriptor<'c>>,
     nested_messages: Vec<MessageDescriptor<'c>>,
     enums: Vec<EnumDescriptor<'c>>,
 }
 impl<'c> MessageDescriptor<'c> {
-    pub fn new(proto: &'c DescriptorProto, context: &'c Context) -> Self {
+    pub fn new(proto: &'c DescriptorProto, context: &'c Context<'c>) -> Self {
         Self {
             proto,
             context,

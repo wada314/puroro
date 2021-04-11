@@ -42,12 +42,12 @@ where
     context.set_package(&PackagePath::new(&input_file.package));
     let filename = handler.generate_filename(context, input_file)?;
 
-    struct InnerVisitor<'a, H: FileGeneratorHandler> {
+    struct InnerVisitor<'a, 'c, H: FileGeneratorHandler> {
         output: Indentor<String>,
-        context: &'a mut Context,
+        context: &'a mut Context<'c>,
         handler: &'a mut H,
     }
-    impl<'a, H> DescriptorVisitor for InnerVisitor<'a, H>
+    impl<'a, 'c, H> DescriptorVisitor for InnerVisitor<'a, 'c, H>
     where
         H: FileGeneratorHandler,
     {

@@ -7,14 +7,14 @@ use ::once_cell::unsync::OnceCell;
 
 pub struct EnumDescriptor<'c> {
     proto: &'c EnumDescriptorProto,
-    context: &'c Context,
+    context: &'c Context<'c>,
     values: Vec<EnumValueDescriptor<'c>>,
 
     lazy_fq_name: OnceCell<FullyQualifiedTypeName>,
     lazy_native_bare_typename: OnceCell<String>,
 }
 impl<'c> EnumDescriptor<'c> {
-    pub fn new(proto: &'c EnumDescriptorProto, context: &'c Context) -> Self {
+    pub fn new(proto: &'c EnumDescriptorProto, context: &'c Context<'c>) -> Self {
         Self {
             proto,
             context,
@@ -49,11 +49,11 @@ impl<'c> EnumDescriptor<'c> {
 
 pub struct EnumValueDescriptor<'c> {
     proto: &'c EnumValueDescriptorProto,
-    context: &'c Context,
+    context: &'c Context<'c>,
     lazy_native_name: OnceCell<String>,
 }
 impl<'c> EnumValueDescriptor<'c> {
-    pub fn new(proto: &'c EnumValueDescriptorProto, context: &'c Context) -> Self {
+    pub fn new(proto: &'c EnumValueDescriptorProto, context: &'c Context<'c>) -> Self {
         Self {
             proto,
             context,
