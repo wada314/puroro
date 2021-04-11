@@ -3,6 +3,7 @@
 mod error;
 mod generators;
 mod stage1;
+mod stage2;
 
 use ::puroro::{Deserializable, Serializable};
 use generators::shared::Context;

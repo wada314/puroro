@@ -20,7 +20,12 @@ fn write_body<'p, W: Write>(
 
     // enum body
     (
-        format!("pub enum {name} {{\n", name = native_type_name),
+        format!(
+            "\
+#[derive(Debug, Clone)]
+pub enum {name} {{\n",
+            name = native_type_name
+        ),
         indent((iter(enume.value.iter().map(|value| {
             let name = to_enum_value_name(&value.name);
             Ok(format!(
