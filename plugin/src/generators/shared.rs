@@ -2,7 +2,7 @@ use crate::generators::utils::*;
 use crate::protos::*;
 use crate::{ErrorKind, Result};
 use itertools::Itertools;
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{HashMap, HashSet};
 use std::fmt::Write;
 
 pub(crate) mod writers;
