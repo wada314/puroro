@@ -3,7 +3,7 @@ use super::*;
 
 pub fn handle_enum<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &Context<'p>,
+    context: &Context,
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
     write_body(output, context, enume)?;
@@ -14,7 +14,7 @@ pub fn handle_enum<'p, W: Write>(
 // enum body
 fn write_body<'p, W: Write>(
     output: &mut Indentor<W>,
-    _context: &Context<'p>,
+    _context: &Context,
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&enume.name);
@@ -43,7 +43,7 @@ pub enum {name} {{\n",
 // TryFrom<i32>
 fn write_tryfrom<'p, W: Write>(
     output: &mut Indentor<W>,
-    _context: &Context<'p>,
+    _context: &Context,
     enume: &'p EnumDescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&enume.name);

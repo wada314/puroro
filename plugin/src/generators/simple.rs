@@ -10,10 +10,13 @@ use std::{borrow::Cow, collections::HashMap, fmt::Write};
 mod enume;
 mod msg;
 
-pub fn generate_simple(context: &mut Context) -> Result<Vec<(String, String)>> {
+pub fn generate_simple(
+    context: &mut Context,
+    cgreq: &CodeGeneratorRequest,
+) -> Result<Vec<(String, String)>> {
     let mut filenames_and_contents = HashMap::new();
     let mut generator = Generator {};
-    for proto_file in &context.cgreq().proto_file {
+    for proto_file in &cgreq.proto_file {
         let (filename, content) = generate_file_with_handler(context, proto_file, &mut generator)?;
         filenames_and_contents.insert(filename, content);
     }
@@ -102,7 +105,7 @@ fn gen_field_bare_type(
 
 fn gen_field_type<'p>(
     field: &'p FieldDescriptorProto,
-    context: &Context<'p>,
+    context: &Context,
 ) -> Result<Cow<'static, str>> {
     let bare_type = gen_field_bare_type(
         field.type_.clone(),
@@ -141,7 +144,7 @@ impl FileGeneratorHandler for Generator {
     fn handle_msg<'p, W: Write>(
         &mut self,
         output: &mut Indentor<W>,
-        context: &Context<'p>,
+        context: &Context,
         msg: &'p DescriptorProto,
     ) -> Result<()> {
         msg::handle_msg(output, context, msg)
@@ -150,7 +153,7 @@ impl FileGeneratorHandler for Generator {
     fn handle_enum<'p, W: Write>(
         &mut self,
         output: &mut Indentor<W>,
-        context: &Context<'p>,
+        context: &Context,
         enume: &'p EnumDescriptorProto,
     ) -> Result<()> {
         enume::handle_enum(output, context, enume)
@@ -158,7 +161,7 @@ impl FileGeneratorHandler for Generator {
 
     fn generate_filename<'p>(
         &mut self,
-        _context: &Context<'p>,
+        _context: &Context,
         file: &'p FileDescriptorProto,
     ) -> Result<String> {
         if file.package.is_empty() {

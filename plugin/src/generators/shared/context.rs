@@ -11,32 +11,27 @@ pub enum TypeOfIdent {
     Enum,
 }
 
-pub struct Context<'p> {
-    cgreq: &'p CodeGeneratorRequest,
-    type_of_ident_map: HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
-    packages_subpackage_list: HashMap<PackagePath<'p>, HashSet<&'p str>>,
+pub struct Context {
+    type_of_ident_map: HashMap<FullyQualifiedTypeName, TypeOfIdent>,
+    packages_subpackage_list: HashMap<PackagePath, HashSet<String>>,
 
-    cur_package: PackagePath<'p>,
+    cur_package: PackagePath,
     path_to_package_root: String,
 }
 
-impl<'p> Context<'p> {
-    pub fn new(cgreq: &'p CodeGeneratorRequest) -> Result<Self> {
+impl Context {
+    pub fn new(cgreq: &CodeGeneratorRequest) -> Result<Self> {
         Ok(Self {
-            cgreq,
             type_of_ident_map: Self::generate_type_of_ident_map(cgreq)?,
             packages_subpackage_list: Self::generate_packages_subpackage_list(cgreq),
             cur_package: PackagePath::new(""),
             path_to_package_root: "".into(),
         })
     }
-    pub fn cgreq(&self) -> &'p CodeGeneratorRequest {
-        self.cgreq
-    }
-    pub fn cur_package(&self) -> &PackagePath<'p> {
+    pub fn cur_package(&self) -> &PackagePath {
         &self.cur_package
     }
-    pub fn set_package(&mut self, package: &PackagePath<'p>) {
+    pub fn set_package(&mut self, package: &PackagePath) {
         self.cur_package = package.clone();
         self.path_to_package_root = Self::generate_path_to_package_root(&self.cur_package);
     }
@@ -44,19 +39,19 @@ impl<'p> Context<'p> {
         &self.path_to_package_root
     }
 
-    pub fn enter_submessage_namespace(&mut self, message_name: &'p str) {
+    pub fn enter_submessage_namespace(&mut self, message_name: &str) {
         self.cur_package.push(message_name);
         self.path_to_package_root = Self::generate_path_to_package_root(&self.cur_package);
     }
 
-    pub fn leave_submessage_namespace(&mut self, message_name: &'p str) {
+    pub fn leave_submessage_namespace(&mut self, message_name: &str) {
         if let Some(popped) = self.cur_package.pop() {
             debug_assert_eq!(message_name, popped);
         }
         self.path_to_package_root = Self::generate_path_to_package_root(&self.cur_package);
     }
 
-    fn generate_path_to_package_root(package: &PackagePath<'p>) -> String {
+    fn generate_path_to_package_root(package: &PackagePath) -> String {
         if package.is_empty() {
             "self".into()
         } else {
@@ -65,14 +60,14 @@ impl<'p> Context<'p> {
         }
     }
 
-    pub fn type_of_ident(&self, typename: &'p str) -> Option<TypeOfIdent> {
+    pub fn type_of_ident(&self, typename: &str) -> Option<TypeOfIdent> {
         let mut package = self.cur_package().clone();
         let mfqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename)?;
         if let Some(fqtn) = mfqtn.try_to_absolute() {
             return self.type_of_ident_map.get(&fqtn).cloned();
         } else {
             loop {
-                let fqtn = mfqtn.with_package(&package);
+                let fqtn = mfqtn.with_package(package.clone());
                 if let Some(found) = self.type_of_ident_map.get(&fqtn) {
                     return Some(found.clone());
                 }
@@ -85,14 +80,14 @@ impl<'p> Context<'p> {
     }
 
     fn generate_type_of_ident_map(
-        cgreq: &'p CodeGeneratorRequest,
-    ) -> Result<HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>> {
-        struct Visitor<'a, 'p> {
-            map: &'a mut HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
-            package: PackagePath<'p>,
+        cgreq: &CodeGeneratorRequest,
+    ) -> Result<HashMap<FullyQualifiedTypeName, TypeOfIdent>> {
+        struct Visitor<'a> {
+            map: &'a mut HashMap<FullyQualifiedTypeName, TypeOfIdent>,
+            package: PackagePath,
         }
-        impl<'a, 'p> DescriptorVisitor<'p> for Visitor<'a, 'p> {
-            fn handle_msg(&mut self, msg: &'p DescriptorProto) -> Result<()> {
+        impl<'a> DescriptorVisitor for Visitor<'a> {
+            fn handle_msg(&mut self, msg: &DescriptorProto) -> Result<()> {
                 let fqtn = FullyQualifiedTypeName::new(self.package.clone(), &msg.name);
                 if let Some(_) = self.map.insert(fqtn.clone(), TypeOfIdent::Message) {
                     Err(ErrorKind::ConflictedName {
@@ -102,7 +97,7 @@ impl<'p> Context<'p> {
                 Ok(())
             }
 
-            fn handle_enum(&mut self, enume: &'p EnumDescriptorProto) -> Result<()> {
+            fn handle_enum(&mut self, enume: &EnumDescriptorProto) -> Result<()> {
                 let fqtn = FullyQualifiedTypeName::new(self.package.clone(), &enume.name);
                 if let Some(_) = self.map.insert(fqtn.clone(), TypeOfIdent::Enum) {
                     Err(ErrorKind::ConflictedName {
@@ -112,12 +107,12 @@ impl<'p> Context<'p> {
                 Ok(())
             }
 
-            fn enter_submodule(&mut self, name: &'p str) -> Result<()> {
+            fn enter_submodule(&mut self, name: &str) -> Result<()> {
                 self.package.push(name);
                 Ok(())
             }
 
-            fn exit_submodule(&mut self, _name: &'p str) -> Result<()> {
+            fn exit_submodule(&mut self, _name: &str) -> Result<()> {
                 self.package.pop().unwrap();
                 Ok(())
             }
@@ -135,15 +130,15 @@ impl<'p> Context<'p> {
         Ok(map)
     }
 
-    pub fn packages_subpackage_list(&self) -> &HashMap<PackagePath<'p>, HashSet<&'p str>> {
+    pub fn packages_subpackage_list(&self) -> &HashMap<PackagePath, HashSet<String>> {
         &self.packages_subpackage_list
     }
 
     fn generate_packages_subpackage_list(
-        cgreq: &'p CodeGeneratorRequest,
-    ) -> HashMap<PackagePath<'p>, HashSet<&'p str>> {
+        cgreq: &CodeGeneratorRequest,
+    ) -> HashMap<PackagePath, HashSet<String>> {
         let mut checked = HashSet::new();
-        let mut map: HashMap<PackagePath, HashSet<&'p str>> = HashMap::new();
+        let mut map: HashMap<PackagePath, HashSet<String>> = HashMap::new();
         for file in &cgreq.proto_file {
             let mut package = PackagePath::new(&file.package);
             if !checked.insert(package.clone()) {

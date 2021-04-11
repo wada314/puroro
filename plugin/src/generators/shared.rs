@@ -32,7 +32,7 @@ pub trait FileGeneratorHandler {
 }
 
 pub fn generate_file_with_handler<'p, H>(
-    context: &mut Context<'p>,
+    context: &mut Context,
     input_file: &'p FileDescriptorProto,
     handler: &mut H,
 ) -> Result<(String, String)>
@@ -42,30 +42,30 @@ where
     context.set_package(&PackagePath::new(&input_file.package));
     let filename = handler.generate_filename(context, input_file)?;
 
-    struct InnerVisitor<'a, 'q, H: FileGeneratorHandler> {
+    struct InnerVisitor<'a, H: FileGeneratorHandler> {
         output: Indentor<String>,
-        context: &'a mut Context<'q>,
+        context: &'a mut Context,
         handler: &'a mut H,
     }
-    impl<'a, 'q, H> DescriptorVisitor<'q> for InnerVisitor<'a, 'q, H>
+    impl<'a, H> DescriptorVisitor for InnerVisitor<'a, H>
     where
         H: FileGeneratorHandler,
     {
-        fn handle_msg(&mut self, msg: &'q DescriptorProto) -> Result<()> {
+        fn handle_msg(&mut self, msg: &DescriptorProto) -> Result<()> {
             self.handler.handle_msg(&mut self.output, self.context, msg)
         }
-        fn handle_enum(&mut self, enume: &'q EnumDescriptorProto) -> Result<()> {
+        fn handle_enum(&mut self, enume: &EnumDescriptorProto) -> Result<()> {
             self.handler
                 .handle_enum(&mut self.output, self.context, enume)
         }
-        fn enter_submodule(&mut self, name: &'q str) -> Result<()> {
+        fn enter_submodule(&mut self, name: &str) -> Result<()> {
             let module_name = utils::to_module_name(name);
             writeln!(&mut self.output, "pub mod {name} {{", name = module_name)?;
             self.context.enter_submessage_namespace(name);
             self.output.indent();
             Ok(())
         }
-        fn exit_submodule(&mut self, name: &'q str) -> Result<()> {
+        fn exit_submodule(&mut self, name: &str) -> Result<()> {
             self.context.leave_submessage_namespace(name);
             self.output.unindent();
             writeln!(self.output, "}}")?;

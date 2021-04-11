@@ -6,7 +6,7 @@ const DESER_MOD: &'static str = "::puroro_serializer::deserializer::stream";
 
 pub fn handle_msg<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &Context<'p>,
+    context: &Context,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     write_body(output, context, msg)?;
@@ -21,7 +21,7 @@ pub fn handle_msg<'p, W: Write>(
 // struct body
 fn write_body<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &Context<'p>,
+    context: &Context,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -49,7 +49,7 @@ pub struct {name} {{\n",
 // Because enum is Result<enum, i32>, we need a special treatment for it.
 fn write_default<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &Context<'p>,
+    context: &Context,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -92,7 +92,7 @@ impl ::std::default::Default for {name} {{
 
 fn write_deser_stream_handler<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &Context<'p>,
+    context: &Context,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -134,7 +134,7 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
 
 fn write_deser_stream_handler_variant_arm<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &Context<'p>,
+    context: &Context,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     (
@@ -195,7 +195,7 @@ fn write_deser_stream_handler_variant_arm<'p, W: Write>(
 
 fn write_deser_stream_handler_ld_arm<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &Context<'p>,
+    context: &Context,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     (
@@ -344,7 +344,7 @@ fn write_deser_stream_handler_ld_arm<'p, W: Write>(
 fn write_deser_stream_handler_bitsxx_arm<'p, W: Write>(
     bits: usize,
     output: &mut Indentor<W>,
-    _context: &Context<'p>,
+    _context: &Context,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     (
@@ -444,7 +444,7 @@ fn bits64_field_native_type(field: &FieldDescriptorProto) -> Option<&'static str
 // Deserializable trait
 fn write_deserializable<'p, W: Write>(
     output: &mut Indentor<W>,
-    _context: &Context<'p>,
+    _context: &Context,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -467,7 +467,7 @@ impl ::puroro::Deserializable for {name} {{
 // ::puroro_serialize::Seriazilazble trait
 fn write_ser_serializer<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &Context<'p>,
+    context: &Context,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);
@@ -594,7 +594,7 @@ serializer.serialize_bytes_twice({number}, self.{name}.iter().map(|b| Ok(*b)))?;
 // ::puroro::Serializable
 fn write_puroro_serializable<'p, W: Write>(
     output: &mut Indentor<W>,
-    context: &Context<'p>,
+    context: &Context,
     msg: &'p DescriptorProto,
 ) -> Result<()> {
     let native_type_name = to_type_name(&msg.name);

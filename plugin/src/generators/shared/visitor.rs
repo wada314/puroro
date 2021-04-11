@@ -1,15 +1,15 @@
 use crate::protos::*;
 use crate::Result;
 
-pub trait DescriptorVisitor<'p> {
-    fn handle_msg(&mut self, msg: &'p DescriptorProto) -> Result<()>;
-    fn handle_enum(&mut self, enume: &'p EnumDescriptorProto) -> Result<()>;
-    fn enter_submodule(&mut self, name: &'p str) -> Result<()>;
-    fn exit_submodule(&mut self, name: &'p str) -> Result<()>;
+pub trait DescriptorVisitor {
+    fn handle_msg(&mut self, msg: &DescriptorProto) -> Result<()>;
+    fn handle_enum(&mut self, enume: &EnumDescriptorProto) -> Result<()>;
+    fn enter_submodule(&mut self, name: &str) -> Result<()>;
+    fn exit_submodule(&mut self, name: &str) -> Result<()>;
 }
 
-pub fn visit_in_file<'p, T: DescriptorVisitor<'p>>(
-    file: &'p FileDescriptorProto,
+pub fn visit_in_file<'p, T: DescriptorVisitor>(
+    file: &FileDescriptorProto,
     visitor: &mut T,
 ) -> Result<()> {
     enum Task<'q> {

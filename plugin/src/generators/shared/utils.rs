@@ -49,24 +49,36 @@ impl<W: Write> Write for Indentor<W> {
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct PackagePath<'p>(Rc<Vec<&'p str>>);
-impl<'p> PackagePath<'p> {
-    pub fn new(package_str: &'p str) -> Self {
-        Self(Rc::new(package_str.split('.').collect::<Vec<_>>()))
+pub struct PackagePath(Rc<String>);
+impl PackagePath {
+    pub fn new(package_str: &str) -> Self {
+        Self(Rc::new(package_str.to_string()))
     }
-    pub fn push(&mut self, subpackage: &'p str) {
-        Rc::make_mut(&mut self.0).push(subpackage);
+    pub fn push(&mut self, subpackage: &str) {
+        let inner = Rc::make_mut(&mut self.0);
+        inner.push('.');
+        inner.push_str(subpackage);
     }
-    pub fn pop(&mut self) -> Option<&'p str> {
-        Rc::make_mut(&mut self.0).pop()
+    pub fn pop(&mut self) -> Option<String> {
+        let inner = Rc::make_mut(&mut self.0);
+        if inner.is_empty() {
+            None
+        } else if let Some((remain, popped)) = inner.rsplit_once('.') {
+            let popped_owned = popped.to_string();
+            *inner = remain.to_string();
+            Some(popped_owned)
+        } else {
+            let popped = inner.clone();
+            *inner = "".to_string();
+            Some(popped)
+        }
     }
-    pub fn from_origin(&self, origin_package: &PackagePath<'p>) -> PackagePath<'p> {
-        let mut new_package = origin_package.0.clone();
-        Rc::make_mut(&mut new_package).append(Rc::make_mut(&mut self.0.clone()));
-        PackagePath(new_package)
+    pub fn from_origin(&self, mut origin_package: PackagePath) -> PackagePath {
+        Rc::make_mut(&mut origin_package.0).push_str(&*self.0);
+        origin_package
     }
-    pub fn iter(&self) -> impl '_ + Iterator<Item = &'p str> {
-        self.0.iter().cloned()
+    pub fn iter(&self) -> impl '_ + Iterator<Item = &'_ str> {
+        self.0.split('.')
     }
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
@@ -74,13 +86,13 @@ impl<'p> PackagePath<'p> {
 }
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]
-pub struct MaybeFullyQualifiedTypeName<'p> {
+pub struct MaybeFullyQualifiedTypeName {
     is_absolute: bool,
-    package: PackagePath<'p>,
-    name: &'p str,
+    package: PackagePath,
+    name: String,
 }
-impl<'p> MaybeFullyQualifiedTypeName<'p> {
-    pub fn from_maybe_fq_typename(mut input: &'p str) -> Option<Self> {
+impl MaybeFullyQualifiedTypeName {
+    pub fn from_maybe_fq_typename(mut input: &str) -> Option<Self> {
         let mut is_absolute = false;
         if let Some(input_body) = input.strip_prefix('.') {
             input = input_body;
@@ -97,18 +109,21 @@ impl<'p> MaybeFullyQualifiedTypeName<'p> {
             None
         }
     }
-    pub fn try_to_absolute(&self) -> Option<FullyQualifiedTypeName<'p>> {
+    pub fn try_to_absolute(&self) -> Option<FullyQualifiedTypeName> {
         if self.is_absolute {
-            Some(FullyQualifiedTypeName::new(self.package.clone(), self.name))
+            Some(FullyQualifiedTypeName::new(
+                self.package.clone(),
+                &self.name,
+            ))
         } else {
             None
         }
     }
-    pub fn with_package(&self, given_package: &PackagePath<'p>) -> FullyQualifiedTypeName<'p> {
+    pub fn with_package(&self, given_package: PackagePath) -> FullyQualifiedTypeName {
         if self.is_absolute {
-            FullyQualifiedTypeName::new(self.package.clone(), self.name)
+            FullyQualifiedTypeName::new(self.package.clone(), &self.name)
         } else {
-            FullyQualifiedTypeName::new(self.package.from_origin(given_package), self.name)
+            FullyQualifiedTypeName::new(self.package.from_origin(given_package), &self.name)
         }
     }
     pub fn to_native_maybe_qualified_typename(&self, path_to_package_root: &str) -> String {
@@ -117,7 +132,7 @@ impl<'p> MaybeFullyQualifiedTypeName<'p> {
                 .package
                 .iter()
                 .map(|s| to_module_name(s))
-                .chain(std::iter::once(to_type_name(self.name)))
+                .chain(std::iter::once(to_type_name(&self.name)))
                 .fold1(|s1, s2| s1 + "::" + &s2)
                 .unwrap();
             path_to_package_root.to_string() + "::" + &from_root
@@ -127,19 +142,22 @@ impl<'p> MaybeFullyQualifiedTypeName<'p> {
     }
 }
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]
-pub struct FullyQualifiedTypeName<'p> {
-    package: PackagePath<'p>,
-    name: &'p str,
+pub struct FullyQualifiedTypeName {
+    package: PackagePath,
+    name: String,
 }
-impl<'p> FullyQualifiedTypeName<'p> {
-    pub fn new(package: PackagePath<'p>, name: &'p str) -> Self {
-        Self { package, name }
+impl FullyQualifiedTypeName {
+    pub fn new(package: PackagePath, name: &str) -> Self {
+        Self {
+            package,
+            name: name.to_string(),
+        }
     }
     pub fn to_native_typename_from_root(&self) -> String {
         self.package
             .iter()
             .map(|s| to_module_name(s))
-            .chain(std::iter::once(to_type_name(self.name)))
+            .chain(std::iter::once(to_type_name(&self.name)))
             .fold1(|s1, s2| s1 + "::" + &s2)
             .unwrap()
     }
@@ -148,13 +166,13 @@ impl<'p> FullyQualifiedTypeName<'p> {
         path_to_package_root.to_string() + "::" + &from_root
     }
 }
-impl<'a> std::fmt::Display for FullyQualifiedTypeName<'a> {
+impl std::fmt::Display for FullyQualifiedTypeName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for p in self.package.iter() {
             f.write_str(p)?;
             f.write_str(".")?;
         }
-        f.write_str(self.name)?;
+        f.write_str(&self.name)?;
         Ok(())
     }
 }
