@@ -1,3 +1,4 @@
+use super::super::shared::utils::{to_type_name, to_var_name};
 use super::*;
 
 // Too long! lol

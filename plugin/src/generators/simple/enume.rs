@@ -1,3 +1,4 @@
+use super::super::shared::utils::{to_enum_value_name, to_type_name};
 use super::*;
 
 pub(crate) fn handle_enum<'p, W: Write>(

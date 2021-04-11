@@ -8,7 +8,7 @@ mod stage1;
 mod stage2;
 
 use ::puroro::{Deserializable, Serializable};
-use generators::shared::Context;
+use generators::shared::context::Context;
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
