@@ -19,4 +19,4 @@ thiserror = "1.0.24"
 nightly = []
 stage1 = []
 stage2 = []
-default = ["nightly", "stage1"]
+default = ["nightly", "stage2"]

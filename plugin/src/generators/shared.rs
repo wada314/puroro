@@ -261,7 +261,7 @@ where
         }
         fn enter_submodule(&mut self, name: &'q str) -> Result<()> {
             let module_name = to_module_name(name);
-            writeln!(&mut self.output, "mod {name} {{", name = module_name)?;
+            writeln!(&mut self.output, "pub mod {name} {{", name = module_name)?;
             self.context.enter_submessage_namespace(name);
             self.output.indent();
             Ok(())

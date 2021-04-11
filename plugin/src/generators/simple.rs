@@ -104,12 +104,12 @@ fn gen_field_type<'p>(
     context: &Context<'p>,
 ) -> Result<Cow<'static, str>> {
     let bare_type = gen_field_bare_type(
-        field.type_,
+        field.type_.clone(),
         &field.type_name,
         context.path_to_package_root(),
     )?;
     let type_of_ident = context.type_of_ident(&field.type_name);
-    Ok(match field.label {
+    Ok(match &field.label {
         Ok(label_body) => match label_body {
             field_descriptor_proto::Label::LabelOptional
             | field_descriptor_proto::Label::LabelRequired => match type_of_ident {
@@ -131,7 +131,7 @@ fn gen_field_type<'p>(
                 _ => format!("::std::vec::Vec<{}>", bare_type).into(),
             },
         },
-        Err(id) => Err(ErrorKind::UnknownLabelId { id })?,
+        Err(id) => Err(ErrorKind::UnknownLabelId { id: *id })?,
     })
 }
 

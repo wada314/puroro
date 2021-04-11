@@ -72,7 +72,7 @@ impl ::puroro::Serializable for GeneratedCodeInfo {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
-mod generated_code_info {
+pub mod generated_code_info {
     #[derive(Debug, Clone)]
     pub struct Annotation {
         pub path: ::std::vec::Vec<i32>,
@@ -182,10 +182,7 @@ mod generated_code_info {
         fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
             &self, serializer: &mut T) -> ::puroro::Result<()>
         {
-            unimplemented!("Serializer for something else");
             serializer.serialize_bytes_twice(2, self.source_file.bytes().map(|b| Ok(b)))?;
-            unimplemented!("Serializer for something else");
-            unimplemented!("Serializer for something else");
             Ok(())
         }
     }
@@ -269,7 +266,7 @@ impl ::puroro::Serializable for SourceCodeInfo {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
-mod source_code_info {
+pub mod source_code_info {
     #[derive(Debug, Clone)]
     pub struct Location {
         pub path: ::std::vec::Vec<i32>,
@@ -377,8 +374,6 @@ mod source_code_info {
         fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
             &self, serializer: &mut T) -> ::puroro::Result<()>
         {
-            unimplemented!("Serializer for something else");
-            unimplemented!("Serializer for something else");
             serializer.serialize_bytes_twice(3, self.leading_comments.bytes().map(|b| Ok(b)))?;
             serializer.serialize_bytes_twice(4, self.trailing_comments.bytes().map(|b| Ok(b)))?;
             for string in &self.leading_detached_comments {
@@ -525,9 +520,6 @@ impl ::puroro_serializer::serializer::Serializable for UninterpretedOption {
             serializer.serialize_message_twice::<super::super::google::protobuf::uninterpreted_option::NamePart>(2, msg)?;
         }
         serializer.serialize_bytes_twice(3, self.identifier_value.bytes().map(|b| Ok(b)))?;
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for bits64");
         serializer.serialize_bytes_twice(7, self.string_value.iter().map(|b| Ok(*b)))?;
         serializer.serialize_bytes_twice(8, self.aggregate_value.bytes().map(|b| Ok(b)))?;
         Ok(())
@@ -539,7 +531,7 @@ impl ::puroro::Serializable for UninterpretedOption {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
-mod uninterpreted_option {
+pub mod uninterpreted_option {
     #[derive(Debug, Clone)]
     pub struct NamePart {
         pub name_part: String,
@@ -617,7 +609,6 @@ mod uninterpreted_option {
             &self, serializer: &mut T) -> ::puroro::Result<()>
         {
             serializer.serialize_bytes_twice(1, self.name_part.bytes().map(|b| Ok(b)))?;
-            unimplemented!("Serializer for something else");
             Ok(())
         }
     }
@@ -723,7 +714,6 @@ impl ::puroro_serializer::serializer::Serializable for MethodOptions {
     fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        unimplemented!("Serializer for something else");
         serializer.serialize_variant::<::puroro::tags::Int32>(
             34, 
             self.idempotency_level.clone().map_or_else(|e| e, |v| v as i32)
@@ -740,7 +730,7 @@ impl ::puroro::Serializable for MethodOptions {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
-mod method_options {
+pub mod method_options {
     #[derive(Debug, Clone)]
     pub enum IdempotencyLevel {
         IdempotencyUnknown = 0,
@@ -837,7 +827,6 @@ impl ::puroro_serializer::serializer::Serializable for ServiceOptions {
     fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        unimplemented!("Serializer for something else");
         for msg in &self.uninterpreted_option {
             serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
         }
@@ -928,7 +917,6 @@ impl ::puroro_serializer::serializer::Serializable for EnumValueOptions {
     fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        unimplemented!("Serializer for something else");
         for msg in &self.uninterpreted_option {
             serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
         }
@@ -1036,8 +1024,6 @@ impl ::puroro_serializer::serializer::Serializable for EnumOptions {
     fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
         for msg in &self.uninterpreted_option {
             serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
         }
@@ -1290,14 +1276,10 @@ impl ::puroro_serializer::serializer::Serializable for FieldOptions {
             1, 
             self.ctype.clone().map_or_else(|e| e, |v| v as i32)
         )?;
-        unimplemented!("Serializer for something else");
         serializer.serialize_variant::<::puroro::tags::Int32>(
             6, 
             self.jstype.clone().map_or_else(|e| e, |v| v as i32)
         )?;
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
         for msg in &self.uninterpreted_option {
             serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
         }
@@ -1310,7 +1292,7 @@ impl ::puroro::Serializable for FieldOptions {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
-mod field_options {
+pub mod field_options {
     #[derive(Debug, Clone)]
     pub enum JSType {
         JsNormal = 0,
@@ -1475,10 +1457,6 @@ impl ::puroro_serializer::serializer::Serializable for MessageOptions {
     fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
         for msg in &self.uninterpreted_option {
             serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
         }
@@ -1804,20 +1782,11 @@ impl ::puroro_serializer::serializer::Serializable for FileOptions {
     {
         serializer.serialize_bytes_twice(1, self.java_package.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(8, self.java_outer_classname.bytes().map(|b| Ok(b)))?;
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
         serializer.serialize_variant::<::puroro::tags::Int32>(
             9, 
             self.optimize_for.clone().map_or_else(|e| e, |v| v as i32)
         )?;
         serializer.serialize_bytes_twice(11, self.go_package.bytes().map(|b| Ok(b)))?;
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
         serializer.serialize_bytes_twice(36, self.objc_class_prefix.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(37, self.csharp_namespace.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(39, self.swift_prefix.bytes().map(|b| Ok(b)))?;
@@ -1837,7 +1806,7 @@ impl ::puroro::Serializable for FileOptions {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
-mod file_options {
+pub mod file_options {
     #[derive(Debug, Clone)]
     pub enum OptimizeMode {
         Speed = 1,
@@ -1981,8 +1950,6 @@ impl ::puroro_serializer::serializer::Serializable for MethodDescriptorProto {
         if let Some(msg) = &self.options {
             serializer.serialize_message_twice::<super::super::google::protobuf::MethodOptions>(4, msg)?;
         }
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
         Ok(())
     }
 }
@@ -2174,7 +2141,6 @@ impl ::puroro_serializer::serializer::Serializable for EnumValueDescriptorProto 
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
-        unimplemented!("Serializer for something else");
         if let Some(msg) = &self.options {
             serializer.serialize_message_twice::<super::super::google::protobuf::EnumValueOptions>(3, msg)?;
         }
@@ -2306,7 +2272,7 @@ impl ::puroro::Serializable for EnumDescriptorProto {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
-mod enum_descriptor_proto {
+pub mod enum_descriptor_proto {
     #[derive(Debug, Clone)]
     pub struct EnumReservedRange {
         pub start: i32,
@@ -2392,8 +2358,6 @@ mod enum_descriptor_proto {
         fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
             &self, serializer: &mut T) -> ::puroro::Result<()>
         {
-            unimplemented!("Serializer for something else");
-            unimplemented!("Serializer for something else");
             Ok(())
         }
     }
@@ -2673,7 +2637,6 @@ impl ::puroro_serializer::serializer::Serializable for FieldDescriptorProto {
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
-        unimplemented!("Serializer for something else");
         serializer.serialize_variant::<::puroro::tags::Int32>(
             4, 
             self.label.clone().map_or_else(|e| e, |v| v as i32)
@@ -2685,12 +2648,10 @@ impl ::puroro_serializer::serializer::Serializable for FieldDescriptorProto {
         serializer.serialize_bytes_twice(6, self.type_name.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(2, self.extendee.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(7, self.default_value.bytes().map(|b| Ok(b)))?;
-        unimplemented!("Serializer for something else");
         serializer.serialize_bytes_twice(10, self.json_name.bytes().map(|b| Ok(b)))?;
         if let Some(msg) = &self.options {
             serializer.serialize_message_twice::<super::super::google::protobuf::FieldOptions>(8, msg)?;
         }
-        unimplemented!("Serializer for something else");
         Ok(())
     }
 }
@@ -2700,7 +2661,7 @@ impl ::puroro::Serializable for FieldDescriptorProto {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
-mod field_descriptor_proto {
+pub mod field_descriptor_proto {
     #[derive(Debug, Clone)]
     pub enum Label {
         LabelOptional = 1,
@@ -3023,7 +2984,7 @@ impl ::puroro::Serializable for DescriptorProto {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
-mod descriptor_proto {
+pub mod descriptor_proto {
     #[derive(Debug, Clone)]
     pub struct ReservedRange {
         pub start: i32,
@@ -3109,8 +3070,6 @@ mod descriptor_proto {
         fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
             &self, serializer: &mut T) -> ::puroro::Result<()>
         {
-            unimplemented!("Serializer for something else");
-            unimplemented!("Serializer for something else");
             Ok(())
         }
     }
@@ -3215,8 +3174,6 @@ mod descriptor_proto {
         fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
             &self, serializer: &mut T) -> ::puroro::Result<()>
         {
-            unimplemented!("Serializer for something else");
-            unimplemented!("Serializer for something else");
             if let Some(msg) = &self.options {
                 serializer.serialize_message_twice::<super::super::super::google::protobuf::ExtensionRangeOptions>(3, msg)?;
             }
@@ -3410,8 +3367,6 @@ impl ::puroro_serializer::serializer::Serializable for FileDescriptorProto {
         for string in &self.dependency {
             serializer.serialize_bytes_twice(3, string.bytes().map(|b| Ok(b)))?;
         }
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
         for msg in &self.message_type {
             serializer.serialize_message_twice::<super::super::google::protobuf::DescriptorProto>(4, msg)?;
         }

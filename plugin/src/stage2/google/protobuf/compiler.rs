@@ -85,7 +85,6 @@ impl ::puroro_serializer::serializer::Serializable for CodeGeneratorResponse {
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         serializer.serialize_bytes_twice(1, self.error.bytes().map(|b| Ok(b)))?;
-        unimplemented!("Serializer for something else");
         for msg in &self.file {
             serializer.serialize_message_twice::<super::super::super::google::protobuf::compiler::code_generator_response::File>(15, msg)?;
         }
@@ -98,7 +97,7 @@ impl ::puroro::Serializable for CodeGeneratorResponse {
         <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
-mod code_generator_response {
+pub mod code_generator_response {
     #[derive(Debug, Clone)]
     pub enum Feature {
         FeatureNone = 0,
@@ -431,9 +430,6 @@ impl ::puroro_serializer::serializer::Serializable for Version {
     fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
-        unimplemented!("Serializer for something else");
         serializer.serialize_bytes_twice(4, self.suffix.bytes().map(|b| Ok(b)))?;
         Ok(())
     }

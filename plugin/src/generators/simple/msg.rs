@@ -209,7 +209,7 @@ fn write_deser_stream_handler_ld_arm<'p, W: Write>(
                 Ok(if is_field_msg(field, context) {
                     // Message
                     let field_native_type = gen_field_bare_type(
-                        field.type_,
+                        field.type_.clone(),
                         &field.type_name,
                         context.path_to_package_root(),
                     )?;
@@ -397,7 +397,7 @@ fn write_deser_stream_handler_bitsxx_arm<'p, W: Write>(
 }
 
 fn variant_field_type_tag(field: &FieldDescriptorProto) -> Option<&'static str> {
-    if let Ok(t) = field.type_ {
+    if let Ok(t) = &field.type_ {
         match t {
             field_descriptor_proto::Type::TypeInt64 => Some("::puroro::tags::Int64"),
             field_descriptor_proto::Type::TypeSint64 => Some("::puroro::tags::SInt64"),
@@ -415,7 +415,7 @@ fn variant_field_type_tag(field: &FieldDescriptorProto) -> Option<&'static str> 
 }
 
 fn bits32_field_native_type(field: &FieldDescriptorProto) -> Option<&'static str> {
-    if let Ok(t) = field.type_ {
+    if let Ok(t) = &field.type_ {
         match t {
             field_descriptor_proto::Type::TypeFloat => Some("f32"),
             field_descriptor_proto::Type::TypeFixed32 => Some("u32"),
@@ -428,7 +428,7 @@ fn bits32_field_native_type(field: &FieldDescriptorProto) -> Option<&'static str
 }
 
 fn bits64_field_native_type(field: &FieldDescriptorProto) -> Option<&'static str> {
-    if let Ok(t) = field.type_ {
+    if let Ok(t) = &field.type_ {
         match t {
             field_descriptor_proto::Type::TypeDouble => Some("f64"),
             field_descriptor_proto::Type::TypeFixed64 => Some("u64"),
@@ -510,7 +510,7 @@ serializer.serialize_variant::<::puroro::tags::Int32>(
                 } else if is_field_msg(field, context) {
                     // Message
                     let field_native_type = gen_field_bare_type(
-                        field.type_,
+                        field.type_.clone(),
                         &field.type_name,
                         context.path_to_package_root(),
                     )?;
@@ -574,11 +574,11 @@ serializer.serialize_bytes_twice({number}, self.{name}.iter().map(|b| Ok(*b)))?;
                         )
                     }
                 } else if let Some(_) = bits32_field_native_type(field) {
-                    format!("unimplemented!(\"Serializer for bits32\");\n")
+                    "".to_string() //format!("unimplemented!(\"Serializer for bits32\");\n")
                 } else if let Some(_) = bits64_field_native_type(field) {
-                    format!("unimplemented!(\"Serializer for bits64\");\n")
+                    "".to_string() //format!("unimplemented!(\"Serializer for bits64\");\n")
                 } else {
-                    format!("unimplemented!(\"Serializer for something else\");\n")
+                    "".to_string() //format!("unimplemented!(\"Serializer for something else\");\n")
                 })
             })),),
         ),
