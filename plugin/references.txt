@@ -1,0 +1,6 @@
+
+Unsafe Code Guidelines Reference > Layout of Rust enum types
+https://rust-lang.github.io/unsafe-code-guidelines/layout/enums.html
+
+The Rust Reference > Behavior considered undefined
+https://doc.rust-lang.org/reference/behavior-considered-undefined.html

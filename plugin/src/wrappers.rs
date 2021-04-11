@@ -1,2 +1,3 @@
 pub mod r#enum;
-pub use r#enum::EnumDescriptor;
+pub mod field;
+pub use r#enum::{EnumDescriptor, EnumValueDescriptor};
