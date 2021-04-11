@@ -6,6 +6,7 @@ mod generators;
 mod stage1;
 #[cfg(feature = "stage2")]
 mod stage2;
+mod wrappers;
 
 use ::puroro::{Deserializable, Serializable};
 use generators::shared::context::Context;
@@ -18,11 +19,11 @@ use std::io::{stdin, stdout};
 
 mod protos {
     #[cfg(feature = "stage1")]
-    pub(crate) use crate::stage1::*;
+    pub use crate::stage1::*;
     #[cfg(feature = "stage2")]
-    pub(crate) use crate::stage2::google::protobuf::compiler::*;
+    pub use crate::stage2::google::protobuf::compiler::*;
     #[cfg(feature = "stage2")]
-    pub(crate) use crate::stage2::google::protobuf::*;
+    pub use crate::stage2::google::protobuf::*;
 }
 use crate::protos::*;
 

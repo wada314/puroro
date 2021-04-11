@@ -1,5 +1,5 @@
 #[derive(Debug)]
-pub(crate) struct GeneratorError {
+pub struct GeneratorError {
     kind: ErrorKind,
     #[cfg(feature = "nightly")]
     backtrace: std::backtrace::Backtrace,
@@ -22,7 +22,7 @@ impl std::fmt::Display for GeneratorError {
     }
 }
 #[derive(Debug)]
-pub(crate) enum ErrorKind {
+pub enum ErrorKind {
     ConflictedName { name: String },
     UnknownFieldTypeId { id: i32 },
     UnknownLabelId { id: i32 },

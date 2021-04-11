@@ -1,14 +1,14 @@
 use crate::protos::*;
 use crate::Result;
 
-pub(crate) trait DescriptorVisitor<'p> {
+pub trait DescriptorVisitor<'p> {
     fn handle_msg(&mut self, msg: &'p DescriptorProto) -> Result<()>;
     fn handle_enum(&mut self, enume: &'p EnumDescriptorProto) -> Result<()>;
     fn enter_submodule(&mut self, name: &'p str) -> Result<()>;
     fn exit_submodule(&mut self, name: &'p str) -> Result<()>;
 }
 
-pub(crate) fn visit_in_file<'p, T: DescriptorVisitor<'p>>(
+pub fn visit_in_file<'p, T: DescriptorVisitor<'p>>(
     file: &'p FileDescriptorProto,
     visitor: &mut T,
 ) -> Result<()> {

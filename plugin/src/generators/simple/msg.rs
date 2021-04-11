@@ -4,7 +4,7 @@ use super::*;
 // Too long! lol
 const DESER_MOD: &'static str = "::puroro_serializer::deserializer::stream";
 
-pub(crate) fn handle_msg<'p, W: Write>(
+pub fn handle_msg<'p, W: Write>(
     output: &mut Indentor<W>,
     context: &Context<'p>,
     msg: &'p DescriptorProto,

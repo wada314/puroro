@@ -10,7 +10,7 @@ use std::{borrow::Cow, collections::HashMap, fmt::Write};
 mod enume;
 mod msg;
 
-pub(crate) fn generate_simple(context: &mut Context) -> Result<Vec<(String, String)>> {
+pub fn generate_simple(context: &mut Context) -> Result<Vec<(String, String)>> {
     let mut filenames_and_contents = HashMap::new();
     let mut generator = Generator {};
     for proto_file in &context.cgreq().proto_file {

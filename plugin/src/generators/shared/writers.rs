@@ -3,7 +3,7 @@ use crate::Result;
 use std::collections::VecDeque;
 use std::{borrow::Cow, fmt::Write};
 
-pub(crate) trait TupleOfIntoFragments<'w, W: 'w>: Sized {
+pub trait TupleOfIntoFragments<'w, W: 'w>: Sized {
     type Iter: Iterator<Item = Fragment<'w, W>>;
     fn into_frag_iter(self) -> Self::Iter;
 
@@ -37,7 +37,7 @@ macro_rules! impl_tuple_into_fragments {
 }
 impl_tuple_into_fragments!(8, A, B, C, D, E, F, G, H);
 
-pub(crate) enum Fragment<'w, W: 'w> {
+pub enum Fragment<'w, W: 'w> {
     Str(&'static str),
     String(String),
     Cow(Cow<'static, str>),
@@ -63,7 +63,7 @@ impl<'w, W> From<Cow<'static, str>> for Fragment<'w, W> {
         Self::Cow(s)
     }
 }
-pub(crate) fn indent<'w, T, W: 'w>(tuple: T) -> Fragment<'w, W>
+pub fn indent<'w, T, W: 'w>(tuple: T) -> Fragment<'w, W>
 where
     T: TupleOfIntoFragments<'w, W>,
     <T as TupleOfIntoFragments<'w, W>>::Iter: 'w,
@@ -74,7 +74,7 @@ where
             as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>,
     )
 }
-pub(crate) fn indent_n<'w, T, W: 'w>(n: usize, tuple: T) -> Fragment<'w, W>
+pub fn indent_n<'w, T, W: 'w>(n: usize, tuple: T) -> Fragment<'w, W>
 where
     T: TupleOfIntoFragments<'w, W>,
     <T as TupleOfIntoFragments<'w, W>>::Iter: 'w,
@@ -85,13 +85,13 @@ where
             as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>,
     )
 }
-pub(crate) fn fr<'w, T, W>(from: T) -> Fragment<'w, W>
+pub fn fr<'w, T, W>(from: T) -> Fragment<'w, W>
 where
     Fragment<'w, W>: From<T>,
 {
     from.into()
 }
-pub(crate) fn iter<'w, W, I, F>(iter: I) -> Fragment<'w, W>
+pub fn iter<'w, W, I, F>(iter: I) -> Fragment<'w, W>
 where
     I: 'w + Iterator<Item = Result<F>>,
     F: Into<Fragment<'w, W>>,
@@ -101,13 +101,13 @@ where
             as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>,
     )
 }
-pub(crate) fn func<'w, 'p, W, F>(f: F) -> Fragment<'w, W>
+pub fn func<'w, 'p, W, F>(f: F) -> Fragment<'w, W>
 where
     F: 'w + FnOnce(&mut Indentor<W>) -> Result<()>,
 {
     Fragment::Functor(Box::new(f) as Box<dyn FnOnce(&mut Indentor<W>) -> Result<()>>)
 }
-pub(crate) fn seq<'w, W, T>(tuple: T) -> Fragment<'w, W>
+pub fn seq<'w, W, T>(tuple: T) -> Fragment<'w, W>
 where
     T: TupleOfIntoFragments<'w, W>,
     <T as TupleOfIntoFragments<'w, W>>::Iter: 'w,

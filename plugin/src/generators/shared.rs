@@ -1,7 +1,7 @@
-pub(crate) mod context;
-pub(crate) mod utils;
-pub(crate) mod visitor;
-pub(crate) mod writers;
+pub mod context;
+pub mod utils;
+pub mod visitor;
+pub mod writers;
 
 use crate::protos::*;
 use crate::Result;
@@ -11,7 +11,7 @@ use utils::{Indentor, PackagePath};
 use context::Context;
 use visitor::{visit_in_file, DescriptorVisitor};
 
-pub(crate) trait FileGeneratorHandler {
+pub trait FileGeneratorHandler {
     fn handle_msg<'p, W: std::fmt::Write>(
         &mut self,
         out: &mut Indentor<W>,
@@ -31,7 +31,7 @@ pub(crate) trait FileGeneratorHandler {
     ) -> Result<String>;
 }
 
-pub(crate) fn generate_file_with_handler<'p, H>(
+pub fn generate_file_with_handler<'p, H>(
     context: &mut Context<'p>,
     input_file: &'p FileDescriptorProto,
     handler: &mut H,

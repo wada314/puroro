@@ -6,12 +6,12 @@ use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone)]
-pub(crate) enum TypeOfIdent {
+pub enum TypeOfIdent {
     Message,
     Enum,
 }
 
-pub(crate) struct Context<'p> {
+pub struct Context<'p> {
     cgreq: &'p CodeGeneratorRequest,
     type_of_ident_map: HashMap<FullyQualifiedTypeName<'p>, TypeOfIdent>,
     packages_subpackage_list: HashMap<PackagePath<'p>, HashSet<&'p str>>,
@@ -21,7 +21,7 @@ pub(crate) struct Context<'p> {
 }
 
 impl<'p> Context<'p> {
-    pub(crate) fn new(cgreq: &'p CodeGeneratorRequest) -> Result<Self> {
+    pub fn new(cgreq: &'p CodeGeneratorRequest) -> Result<Self> {
         Ok(Self {
             cgreq,
             type_of_ident_map: Self::generate_type_of_ident_map(cgreq)?,
@@ -30,26 +30,26 @@ impl<'p> Context<'p> {
             path_to_package_root: "".into(),
         })
     }
-    pub(crate) fn cgreq(&self) -> &'p CodeGeneratorRequest {
+    pub fn cgreq(&self) -> &'p CodeGeneratorRequest {
         self.cgreq
     }
-    pub(crate) fn cur_package(&self) -> &PackagePath<'p> {
+    pub fn cur_package(&self) -> &PackagePath<'p> {
         &self.cur_package
     }
-    pub(crate) fn set_package(&mut self, package: &PackagePath<'p>) {
+    pub fn set_package(&mut self, package: &PackagePath<'p>) {
         self.cur_package = package.clone();
         self.path_to_package_root = Self::generate_path_to_package_root(&self.cur_package);
     }
-    pub(crate) fn path_to_package_root(&self) -> &str {
+    pub fn path_to_package_root(&self) -> &str {
         &self.path_to_package_root
     }
 
-    pub(crate) fn enter_submessage_namespace(&mut self, message_name: &'p str) {
+    pub fn enter_submessage_namespace(&mut self, message_name: &'p str) {
         self.cur_package.push(message_name);
         self.path_to_package_root = Self::generate_path_to_package_root(&self.cur_package);
     }
 
-    pub(crate) fn leave_submessage_namespace(&mut self, message_name: &'p str) {
+    pub fn leave_submessage_namespace(&mut self, message_name: &'p str) {
         if let Some(popped) = self.cur_package.pop() {
             debug_assert_eq!(message_name, popped);
         }
@@ -65,7 +65,7 @@ impl<'p> Context<'p> {
         }
     }
 
-    pub(crate) fn type_of_ident(&self, typename: &'p str) -> Option<TypeOfIdent> {
+    pub fn type_of_ident(&self, typename: &'p str) -> Option<TypeOfIdent> {
         let mut package = self.cur_package().clone();
         let mfqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename)?;
         if let Some(fqtn) = mfqtn.try_to_absolute() {
@@ -135,7 +135,7 @@ impl<'p> Context<'p> {
         Ok(map)
     }
 
-    pub(crate) fn packages_subpackage_list(&self) -> &HashMap<PackagePath<'p>, HashSet<&'p str>> {
+    pub fn packages_subpackage_list(&self) -> &HashMap<PackagePath<'p>, HashSet<&'p str>> {
         &self.packages_subpackage_list
     }
 
