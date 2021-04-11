@@ -56,44 +56,45 @@ fn is_field_enum(field: &FieldDescriptorProto, context: &Context) -> bool {
 }
 
 fn is_field_repeated(field: &FieldDescriptorProto) -> bool {
-    matches!(field.label, Ok(FieldDescriptorProto_Label::LABEL_REPEATED))
+    matches!(
+        field.label,
+        Ok(field_descriptor_proto::Label::LabelRepeated)
+    )
 }
 
 // Message -> the message type itself (no Option).
 // Enum -> the enum type itself (no Result).
 // repeated -> not considered.
 fn gen_field_bare_type(
-    field_type: std::result::Result<FieldDescriptorProto_Type, i32>,
+    field_type: std::result::Result<field_descriptor_proto::Type, i32>,
     typename: &str,
     path_to_package_root: &str,
 ) -> Result<Cow<'static, str>> {
     match field_type {
-        Ok(body) => {
-            Ok(match body {
-                FieldDescriptorProto_Type::TYPE_DOUBLE => "f64".into(),
-                FieldDescriptorProto_Type::TYPE_FLOAT => "f32".into(),
-                FieldDescriptorProto_Type::TYPE_UINT64
-                | FieldDescriptorProto_Type::TYPE_FIXED64 => "u64".into(),
-                FieldDescriptorProto_Type::TYPE_UINT32
-                | FieldDescriptorProto_Type::TYPE_FIXED32 => "u32".into(),
-                FieldDescriptorProto_Type::TYPE_INT64
-                | FieldDescriptorProto_Type::TYPE_SINT64
-                | FieldDescriptorProto_Type::TYPE_SFIXED64 => "i64".into(),
-                FieldDescriptorProto_Type::TYPE_INT32
-                | FieldDescriptorProto_Type::TYPE_SINT32
-                | FieldDescriptorProto_Type::TYPE_SFIXED32 => "i32".into(),
-                FieldDescriptorProto_Type::TYPE_BOOL => "bool".into(),
-                FieldDescriptorProto_Type::TYPE_STRING => "String".into(),
-                FieldDescriptorProto_Type::TYPE_BYTES => "::std::vec::Vec<u8>".into(),
-                FieldDescriptorProto_Type::TYPE_MESSAGE | FieldDescriptorProto_Type::TYPE_ENUM => {
-                    MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename)
-                        .unwrap()
-                        .to_native_maybe_qualified_typename(path_to_package_root)
-                        .into()
-                }
-                FieldDescriptorProto_Type::TYPE_GROUP => Err(ErrorKind::GroupNotSupported {})?,
-            })
-        }
+        Ok(body) => Ok(match body {
+            field_descriptor_proto::Type::TypeDouble => "f64".into(),
+            field_descriptor_proto::Type::TypeFloat => "f32".into(),
+            field_descriptor_proto::Type::TypeUint64
+            | field_descriptor_proto::Type::TypeFixed64 => "u64".into(),
+            field_descriptor_proto::Type::TypeUint32
+            | field_descriptor_proto::Type::TypeFixed32 => "u32".into(),
+            field_descriptor_proto::Type::TypeInt64
+            | field_descriptor_proto::Type::TypeSint64
+            | field_descriptor_proto::Type::TypeSfixed64 => "i64".into(),
+            field_descriptor_proto::Type::TypeInt32
+            | field_descriptor_proto::Type::TypeSint32
+            | field_descriptor_proto::Type::TypeSfixed32 => "i32".into(),
+            field_descriptor_proto::Type::TypeBool => "bool".into(),
+            field_descriptor_proto::Type::TypeString => "String".into(),
+            field_descriptor_proto::Type::TypeBytes => "::std::vec::Vec<u8>".into(),
+            field_descriptor_proto::Type::TypeMessage | field_descriptor_proto::Type::TypeEnum => {
+                MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename)
+                    .unwrap()
+                    .to_native_maybe_qualified_typename(path_to_package_root)
+                    .into()
+            }
+            field_descriptor_proto::Type::TypeGroup => Err(ErrorKind::GroupNotSupported {})?,
+        }),
         Err(id) => Err(ErrorKind::UnknownFieldTypeId { id })?,
     }
 }
@@ -110,8 +111,8 @@ fn gen_field_type<'p>(
     let type_of_ident = context.type_of_ident(&field.type_name);
     Ok(match field.label {
         Ok(label_body) => match label_body {
-            FieldDescriptorProto_Label::LABEL_OPTIONAL
-            | FieldDescriptorProto_Label::LABEL_REQUIRED => match type_of_ident {
+            field_descriptor_proto::Label::LabelOptional
+            | field_descriptor_proto::Label::LabelRequired => match type_of_ident {
                 Some(TypeOfIdent::Enum) => {
                     // The proto enum may have an unknown value.
                     // In rust enum undefined value causes an undefined behavior...
@@ -123,7 +124,7 @@ fn gen_field_type<'p>(
                 }
                 _ => bare_type.into(),
             },
-            FieldDescriptorProto_Label::LABEL_REPEATED => match type_of_ident {
+            field_descriptor_proto::Label::LabelRepeated => match type_of_ident {
                 Some(TypeOfIdent::Enum) => {
                     format!("::std::vec::Vec<std::result::Result<{}, i32>>", bare_type).into()
                 }

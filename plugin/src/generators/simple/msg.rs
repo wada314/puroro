@@ -279,7 +279,7 @@ fn write_deser_stream_handler_ld_arm<'p, W: Write>(
                     }
                 } else {
                     match field.type_ {
-                        Ok(FieldDescriptorProto_Type::TYPE_STRING) => {
+                        Ok(field_descriptor_proto::Type::TypeString) => {
                             // string
                             if is_repeated {
                                 format!(
@@ -301,7 +301,7 @@ fn write_deser_stream_handler_ld_arm<'p, W: Write>(
                                 )
                             }
                         }
-                        Ok(FieldDescriptorProto_Type::TYPE_BYTES) => {
+                        Ok(field_descriptor_proto::Type::TypeBytes) => {
                             // bytes
                             if is_repeated {
                                 format!(
@@ -399,14 +399,14 @@ fn write_deser_stream_handler_bitsxx_arm<'p, W: Write>(
 fn variant_field_type_tag(field: &FieldDescriptorProto) -> Option<&'static str> {
     if let Ok(t) = field.type_ {
         match t {
-            FieldDescriptorProto_Type::TYPE_INT64 => Some("::puroro::tags::Int64"),
-            FieldDescriptorProto_Type::TYPE_SINT64 => Some("::puroro::tags::SInt64"),
-            FieldDescriptorProto_Type::TYPE_UINT64 => Some("::puroro::tags::UInt64"),
-            FieldDescriptorProto_Type::TYPE_INT32 => Some("::puroro::tags::Int32"),
-            FieldDescriptorProto_Type::TYPE_SINT32 => Some("::puroro::tags::SInt32"),
-            FieldDescriptorProto_Type::TYPE_ENUM => Some("::puroro::tags::Int32"),
-            FieldDescriptorProto_Type::TYPE_BOOL => Some("::puroro::tags::Bool"),
-            FieldDescriptorProto_Type::TYPE_UINT32 => Some("::puroro::tags::UInt32"),
+            field_descriptor_proto::Type::TypeInt64 => Some("::puroro::tags::Int64"),
+            field_descriptor_proto::Type::TypeSint64 => Some("::puroro::tags::SInt64"),
+            field_descriptor_proto::Type::TypeUint64 => Some("::puroro::tags::UInt64"),
+            field_descriptor_proto::Type::TypeInt32 => Some("::puroro::tags::Int32"),
+            field_descriptor_proto::Type::TypeSint32 => Some("::puroro::tags::SInt32"),
+            field_descriptor_proto::Type::TypeEnum => Some("::puroro::tags::Int32"),
+            field_descriptor_proto::Type::TypeBool => Some("::puroro::tags::Bool"),
+            field_descriptor_proto::Type::TypeUint32 => Some("::puroro::tags::UInt32"),
             _ => None,
         }
     } else {
@@ -417,9 +417,9 @@ fn variant_field_type_tag(field: &FieldDescriptorProto) -> Option<&'static str> 
 fn bits32_field_native_type(field: &FieldDescriptorProto) -> Option<&'static str> {
     if let Ok(t) = field.type_ {
         match t {
-            FieldDescriptorProto_Type::TYPE_FLOAT => Some("f32"),
-            FieldDescriptorProto_Type::TYPE_FIXED32 => Some("u32"),
-            FieldDescriptorProto_Type::TYPE_SFIXED32 => Some("i32"),
+            field_descriptor_proto::Type::TypeFloat => Some("f32"),
+            field_descriptor_proto::Type::TypeFixed32 => Some("u32"),
+            field_descriptor_proto::Type::TypeSfixed32 => Some("i32"),
             _ => None,
         }
     } else {
@@ -430,9 +430,9 @@ fn bits32_field_native_type(field: &FieldDescriptorProto) -> Option<&'static str
 fn bits64_field_native_type(field: &FieldDescriptorProto) -> Option<&'static str> {
     if let Ok(t) = field.type_ {
         match t {
-            FieldDescriptorProto_Type::TYPE_DOUBLE => Some("f64"),
-            FieldDescriptorProto_Type::TYPE_FIXED64 => Some("u64"),
-            FieldDescriptorProto_Type::TYPE_SFIXED64 => Some("i64"),
+            field_descriptor_proto::Type::TypeDouble => Some("f64"),
+            field_descriptor_proto::Type::TypeFixed64 => Some("u64"),
+            field_descriptor_proto::Type::TypeSfixed64 => Some("i64"),
             _ => None,
         }
     } else {
@@ -535,7 +535,7 @@ if let Some(msg) = &self.{name} {{
                             type_ = field_native_type,
                         )
                     }
-                } else if let Ok(FieldDescriptorProto_Type::TYPE_STRING) = field.type_ {
+                } else if let Ok(field_descriptor_proto::Type::TypeString) = field.type_ {
                     // String
                     if is_repeated {
                         format!(
@@ -554,7 +554,7 @@ serializer.serialize_bytes_twice({number}, self.{name}.bytes().map(|b| Ok(b)))?;
                             name = native_field_name,
                         )
                     }
-                } else if let Ok(FieldDescriptorProto_Type::TYPE_BYTES) = field.type_ {
+                } else if let Ok(field_descriptor_proto::Type::TypeBytes) = field.type_ {
                     // Bytes
                     if is_repeated {
                         format!(

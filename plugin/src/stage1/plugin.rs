@@ -8,6 +8,35 @@ pub(crate) mod code_generator_response {
         }
     }
 }
+pub(crate) mod field_descriptor_proto {
+    proto_struct! {
+    enum Type {
+        TypeDouble = 1,
+        TypeFloat = 2,
+        TypeInt64 = 3,
+        TypeUint64 = 4,
+        TypeInt32 = 5,
+        TypeFixed64 = 6,
+        TypeFixed32 = 7,
+        TypeBool = 8,
+        TypeString = 9,
+        TypeGroup = 10,
+        TypeMessage = 11,
+        TypeBytes = 12,
+        TypeUint32 = 13,
+        TypeEnum = 14,
+        TypeSfixed32 = 15,
+        TypeSfixed64 = 16,
+        TypeSint32 = 17,
+        TypeSint64 = 18,
+    }
+    enum Label {
+        LabelOptional = 1,
+        LabelRequired = 2,
+        LabelRepeated = 3,
+    }
+    }
+}
 proto_struct! {
     // From plugin.proto
     struct Version {
@@ -52,20 +81,9 @@ proto_struct! {
         extension: Vec<FieldDescriptorProto> = 6,
         nested_type: Vec<DescriptorProto> = 3,
         enum_type: Vec<EnumDescriptorProto> = 4,
-        extension_range: Vec<DescriptorProto_ExtensionRange> = 5,
         oneof_decl: Vec<OneofDescriptorProto> = 8,
         options: Option<MessageOptions> = 7,
-        reserved_range: Vec<DescriptorProto_ReservedRange> = 9,
         reserved_name: Vec<String> = 10,
-    }
-    struct DescriptorProto_ExtensionRange {
-        start: i32 = 1,
-        end: i32 = 2,
-        options: Option<ExtensionRangeOptions> = 3,
-    }
-    struct DescriptorProto_ReservedRange {
-        start: i32 = 1,
-        end: i32 = 2,
     }
     struct ExtensionRangeOptions {
         uninterpreted_option: Vec<UninterpretedOption> = 999,
@@ -74,8 +92,8 @@ proto_struct! {
     struct FieldDescriptorProto {
         name: String = 1,
         number: i32 = 3,
-        label: Result<FieldDescriptorProto_Label, i32> = 4,
-        type_: Result<FieldDescriptorProto_Type, i32> = 5,
+        label: Result<field_descriptor_proto::Label, i32> = 4,
+        type_: Result<field_descriptor_proto::Type, i32> = 5,
         type_name: String = 6,
         extendee: String = 2,
         default_value: String = 7,
@@ -148,31 +166,5 @@ proto_struct! {
         source_file: String = 2,
         begin: i32 = 3,
         end: i32 = 4,
-    }
-
-    enum FieldDescriptorProto_Type {
-        TYPE_DOUBLE = 1,
-        TYPE_FLOAT = 2,
-        TYPE_INT64 = 3,
-        TYPE_UINT64 = 4,
-        TYPE_INT32 = 5,
-        TYPE_FIXED64 = 6,
-        TYPE_FIXED32 = 7,
-        TYPE_BOOL = 8,
-        TYPE_STRING = 9,
-        TYPE_GROUP = 10,
-        TYPE_MESSAGE = 11,
-        TYPE_BYTES = 12,
-        TYPE_UINT32 = 13,
-        TYPE_ENUM = 14,
-        TYPE_SFIXED32 = 15,
-        TYPE_SFIXED64 = 16,
-        TYPE_SINT32 = 17,
-        TYPE_SINT64 = 18,
-    }
-    enum FieldDescriptorProto_Label {
-        LABEL_OPTIONAL = 1,
-        LABEL_REQUIRED = 2,
-        LABEL_REPEATED = 3,
     }
 }
