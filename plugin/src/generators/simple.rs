@@ -47,14 +47,14 @@ pub fn generate_simple(
 
 fn is_field_msg(field: &FieldDescriptorProto, context: &Context) -> bool {
     matches!(
-        context.type_of_ident(&field.type_name),
+        context.type_of_ident(&field.type_name).unwrap(),
         Some(TypeOfIdent::Message)
     )
 }
 
 fn is_field_enum(field: &FieldDescriptorProto, context: &Context) -> bool {
     matches!(
-        context.type_of_ident(&field.type_name),
+        context.type_of_ident(&field.type_name).unwrap(),
         Some(TypeOfIdent::Enum)
     )
 }
@@ -112,7 +112,7 @@ fn gen_field_type<'p>(
         &field.type_name,
         context.path_to_package_root(),
     )?;
-    let type_of_ident = context.type_of_ident(&field.type_name);
+    let type_of_ident = context.type_of_ident(&field.type_name)?;
     Ok(match &field.label {
         Ok(label_body) => match label_body {
             field_descriptor_proto::Label::LabelOptional

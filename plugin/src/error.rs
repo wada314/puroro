@@ -30,6 +30,7 @@ pub enum ErrorKind {
     Proto2NotSupported,
     WriteError { source: std::fmt::Error },
     PuroroError { source: ::puroro::PuroroError },
+    EmptyTypename,
 }
 impl From<ErrorKind> for GeneratorError {
     fn from(kind: ErrorKind) -> Self {

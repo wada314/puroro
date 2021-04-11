@@ -2,6 +2,7 @@ use super::utils::{FullyQualifiedTypeName, MaybeFullyQualifiedTypeName, PackageP
 use super::visitor::{visit_in_file, DescriptorVisitor};
 use crate::protos::*;
 use crate::{ErrorKind, Result};
+use ::once_cell::unsync::OnceCell;
 use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 
@@ -13,7 +14,7 @@ pub enum TypeOfIdent {
 
 pub struct Context {
     proto: CodeGeneratorRequest,
-    type_of_ident_map: HashMap<FullyQualifiedTypeName, TypeOfIdent>,
+    type_of_ident_map: OnceCell<HashMap<FullyQualifiedTypeName, TypeOfIdent>>,
     packages_subpackage_list: HashMap<PackagePath, HashSet<String>>,
 
     cur_package: PackagePath,
@@ -23,8 +24,8 @@ pub struct Context {
 impl Context {
     pub fn new(cgreq: CodeGeneratorRequest) -> Result<Self> {
         Ok(Self {
-            proto: cgreq,
-            type_of_ident_map: Self::generate_type_of_ident_map(&cgreq)?,
+            proto: cgreq.clone(), // for now...
+            type_of_ident_map: Default::default(),
             packages_subpackage_list: Self::generate_packages_subpackage_list(&cgreq),
             cur_package: PackagePath::new(""),
             path_to_package_root: "".into(),
@@ -62,28 +63,29 @@ impl Context {
         }
     }
 
-    pub fn type_of_ident(&self, typename: &str) -> Option<TypeOfIdent> {
+    pub fn type_of_ident(&self, typename: &str) -> Result<Option<TypeOfIdent>> {
+        let map = self
+            .type_of_ident_map
+            .get_or_try_init(|| self.generate_type_of_ident_map())?;
         let mut package = self.cur_package().clone();
         let mfqtn = MaybeFullyQualifiedTypeName::from_maybe_fq_typename(typename)?;
         if let Some(fqtn) = mfqtn.try_to_absolute() {
-            return self.type_of_ident_map.get(&fqtn).cloned();
+            return Ok(map.get(&fqtn).cloned());
         } else {
             loop {
                 let fqtn = mfqtn.with_package(package.clone());
-                if let Some(found) = self.type_of_ident_map.get(&fqtn) {
-                    return Some(found.clone());
+                if let Some(found) = map.get(&fqtn) {
+                    return Ok(Some(found.clone()));
                 }
                 if package.pop().is_none() {
                     break;
                 }
             }
-            None
+            Ok(None)
         }
     }
 
-    fn generate_type_of_ident_map(
-        cgreq: &CodeGeneratorRequest,
-    ) -> Result<HashMap<FullyQualifiedTypeName, TypeOfIdent>> {
+    fn generate_type_of_ident_map(&self) -> Result<HashMap<FullyQualifiedTypeName, TypeOfIdent>> {
         struct Visitor<'a> {
             map: &'a mut HashMap<FullyQualifiedTypeName, TypeOfIdent>,
             package: PackagePath,
@@ -121,7 +123,7 @@ impl Context {
         }
 
         let mut map = HashMap::new();
-        for file in &cgreq.proto_file {
+        for file in &self.proto.proto_file {
             let package = PackagePath::new(&file.package);
             let mut visitor = Visitor {
                 map: &mut map,

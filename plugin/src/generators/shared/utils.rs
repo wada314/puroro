@@ -1,6 +1,8 @@
+use crate::{ErrorKind, Result};
 use ::lazy_static::lazy_static;
 use itertools::Itertools;
-use std::{borrow::Cow, collections::HashSet, fmt::Write, rc::Rc};
+use std::{collections::HashSet, fmt::Write, rc::Rc};
+
 pub struct Indentor<W> {
     writer: W,
     indent_next: bool,
@@ -92,7 +94,7 @@ pub struct MaybeFullyQualifiedTypeName {
     name: String,
 }
 impl MaybeFullyQualifiedTypeName {
-    pub fn from_maybe_fq_typename(mut input: &str) -> Option<Self> {
+    pub fn from_maybe_fq_typename(mut input: &str) -> Result<Self> {
         let mut is_absolute = false;
         if let Some(input_body) = input.strip_prefix('.') {
             input = input_body;
@@ -100,13 +102,13 @@ impl MaybeFullyQualifiedTypeName {
         }
         let mut package_and_name = PackagePath::new(input);
         if let Some(name) = package_and_name.pop() {
-            Some(Self {
+            Ok(Self {
                 is_absolute,
                 package: package_and_name,
                 name,
             })
         } else {
-            None
+            Err(ErrorKind::EmptyTypename)?
         }
     }
     pub fn try_to_absolute(&self) -> Option<FullyQualifiedTypeName> {
