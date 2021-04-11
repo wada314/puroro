@@ -12,6 +12,7 @@ pub enum TypeOfIdent {
 }
 
 pub struct Context {
+    proto: CodeGeneratorRequest,
     type_of_ident_map: HashMap<FullyQualifiedTypeName, TypeOfIdent>,
     packages_subpackage_list: HashMap<PackagePath, HashSet<String>>,
 
@@ -20,10 +21,11 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(cgreq: &CodeGeneratorRequest) -> Result<Self> {
+    pub fn new(cgreq: CodeGeneratorRequest) -> Result<Self> {
         Ok(Self {
-            type_of_ident_map: Self::generate_type_of_ident_map(cgreq)?,
-            packages_subpackage_list: Self::generate_packages_subpackage_list(cgreq),
+            proto: cgreq,
+            type_of_ident_map: Self::generate_type_of_ident_map(&cgreq)?,
+            packages_subpackage_list: Self::generate_packages_subpackage_list(&cgreq),
             cur_package: PackagePath::new(""),
             path_to_package_root: "".into(),
         })

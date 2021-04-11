@@ -1,13 +1,14 @@
-use crate::generators::shared::context::Context;
+use crate::generators::shared::context::{Context, TypeOfIdent};
 use crate::generators::shared::utils::{
     get_keyword_safe_ident, snake_case_to_camel_case, FullyQualifiedTypeName,
     MaybeFullyQualifiedTypeName, PackagePath,
 };
 use crate::protos::field_descriptor_proto::Label;
 use crate::protos::FieldDescriptorProto;
+use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 
-enum FieldType {
+pub enum FieldType<'c> {
     Double,
     Float,
     Int32,
@@ -22,20 +23,39 @@ enum FieldType {
     SFixed64,
     Bool,
     Group,
-    Enum(MaybeFullyQualifiedTypeName),
-    /*super::message::MessageDescriptor<'p, 'c>*/
-    Message(),
+    Enum(&'c super::EnumDescriptor<'c>),
+    //Message(super::MessageDescriptor<'c>),
 }
 
-struct FieldDescriptor<'p, 'c> {
-    proto: &'p FieldDescriptorProto,
+pub enum FieldLabel {
+    Optional,
+    Required,
+    Repeated,
+}
+
+pub struct FieldDescriptor<'c> {
+    proto: &'c FieldDescriptorProto,
     context: &'c Context,
 }
-impl<'p, 'c> FieldDescriptor<'p, 'c> {
-    fn new(proto: &'p FieldDescriptorProto, context: &'c Context) -> Self {
+impl<'c> FieldDescriptor<'c> {
+    pub fn new(proto: &'c FieldDescriptorProto, context: &'c Context) -> Self {
         Self { proto, context }
     }
-    fn name(&self) -> &str {
+    pub fn name(&self) -> &str {
         &self.proto.name
+    }
+    pub fn number(&self) -> i32 {
+        self.proto.number
+    }
+    pub fn label(&self) -> Result<FieldLabel> {
+        match self.proto.label {
+            Ok(Label::LabelOptional) => Ok(FieldLabel::Optional),
+            Ok(Label::LabelRepeated) => Ok(FieldLabel::Repeated),
+            Ok(Label::LabelRequired) => Ok(FieldLabel::Required),
+            Err(id) => Err(ErrorKind::UnknownLabelId { id })?,
+        }
+    }
+    pub fn r#type(&self) -> Result<FieldType<'c>> {
+        todo!()
     }
 }

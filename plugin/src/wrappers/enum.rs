@@ -5,46 +5,38 @@ use crate::generators::shared::utils::{
 use crate::protos::{EnumDescriptorProto, EnumValueDescriptorProto};
 use ::once_cell::unsync::OnceCell;
 
-pub struct EnumDescriptor<'p, 'c> {
-    proto: &'p EnumDescriptorProto,
+pub struct EnumDescriptor<'c> {
+    proto: &'c EnumDescriptorProto,
     context: &'c Context,
-    package: PackagePath,
+    values: Vec<EnumValueDescriptor<'c>>,
 
     lazy_fq_name: OnceCell<FullyQualifiedTypeName>,
     lazy_native_bare_typename: OnceCell<String>,
-    lazy_values: OnceCell<Vec<EnumValueDescriptor<'p>>>,
 }
-impl<'p, 'c> EnumDescriptor<'p, 'c> {
-    pub fn new(proto: &'p EnumDescriptorProto, context: &'c Context, package: PackagePath) -> Self {
+impl<'c> EnumDescriptor<'c> {
+    pub fn new(proto: &'c EnumDescriptorProto, context: &'c Context) -> Self {
         Self {
             proto,
             context,
-            package,
+            values: proto
+                .value
+                .iter()
+                .map(|v| EnumValueDescriptor::new(v, context))
+                .collect(),
             lazy_fq_name: Default::default(),
             lazy_native_bare_typename: Default::default(),
-            lazy_values: Default::default(),
         }
     }
     pub fn name(&self) -> &str {
         &self.proto.name
     }
-    pub fn package(&self) -> &PackagePath {
-        &self.package
-    }
     pub fn fq_name(&self) -> &FullyQualifiedTypeName {
-        self.lazy_fq_name
-            .get_or_init(|| FullyQualifiedTypeName::new(self.package().clone(), self.name()))
+        todo!()
+        //self.lazy_fq_name
+        //    .get_or_init(|| FullyQualifiedTypeName::new(self.package().clone(), self.name()))
     }
-    pub fn values(&self) -> impl Iterator<Item = &EnumValueDescriptor<'p>> {
-        self.lazy_values
-            .get_or_init(|| {
-                self.proto
-                    .value
-                    .iter()
-                    .map(|value| EnumValueDescriptor::new(value))
-                    .collect::<Vec<_>>()
-            })
-            .iter()
+    pub fn values(&self) -> impl Iterator<Item = &EnumValueDescriptor<'c>> {
+        self.values.iter()
     }
 
     /// Returns a Rust typename without mod path, without wrapped by Result<>,
@@ -55,14 +47,16 @@ impl<'p, 'c> EnumDescriptor<'p, 'c> {
     }
 }
 
-pub struct EnumValueDescriptor<'p> {
-    proto: &'p EnumValueDescriptorProto,
+pub struct EnumValueDescriptor<'c> {
+    proto: &'c EnumValueDescriptorProto,
+    context: &'c Context,
     lazy_native_name: OnceCell<String>,
 }
-impl<'p> EnumValueDescriptor<'p> {
-    pub fn new(proto: &'p EnumValueDescriptorProto) -> Self {
+impl<'c> EnumValueDescriptor<'c> {
+    pub fn new(proto: &'c EnumValueDescriptorProto, context: &'c Context) -> Self {
         Self {
             proto,
+            context,
             lazy_native_name: Default::default(),
         }
     }
