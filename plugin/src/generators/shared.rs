@@ -1,4 +1,3 @@
-pub mod context;
 pub mod utils;
 pub mod visitor;
 pub mod writers;
@@ -8,7 +7,7 @@ use crate::Result;
 use std::fmt::Write;
 use utils::{Indentor, PackagePath};
 
-use context::Context;
+use crate::Context;
 use visitor::{visit_in_file, DescriptorVisitor};
 
 pub trait FileGeneratorHandler {

@@ -1,5 +1,7 @@
-use super::utils::{FullyQualifiedTypeName, MaybeFullyQualifiedTypeName, PackagePath};
-use super::visitor::{visit_in_file, DescriptorVisitor};
+use crate::generators::shared::utils::{
+    FullyQualifiedTypeName, MaybeFullyQualifiedTypeName, PackagePath,
+};
+use crate::generators::shared::visitor::{visit_in_file, DescriptorVisitor};
 use crate::protos::*;
 use crate::wrappers::FileDescriptor;
 use crate::{ErrorKind, Result};

@@ -1,10 +1,11 @@
-use crate::generators::shared::context::{Context, TypeOfIdent};
+use crate::context::TypeOfIdent;
 use crate::generators::shared::utils::{
     get_keyword_safe_ident, snake_case_to_camel_case, FullyQualifiedTypeName,
     MaybeFullyQualifiedTypeName, PackagePath,
 };
 use crate::protos::field_descriptor_proto::Label;
 use crate::protos::FieldDescriptorProto;
+use crate::Context;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 

@@ -1,5 +1,5 @@
-use crate::generators::shared::context::Context;
 use crate::protos::FileDescriptorProto;
+use crate::Context;
 
 use super::EnumDescriptor;
 use super::MessageDescriptor;

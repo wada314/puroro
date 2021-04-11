@@ -1,5 +1,5 @@
-use crate::generators::shared::context::{Context, TypeOfIdent};
 use crate::protos::DescriptorProto;
+use crate::Context;
 
 use super::{EnumDescriptor, FieldDescriptor};
 

@@ -1,8 +1,9 @@
-use super::shared::context::{Context, TypeOfIdent};
 use super::shared::utils::{to_module_name, Indentor, MaybeFullyQualifiedTypeName};
 use super::shared::writers::*;
 use super::shared::{generate_file_with_handler, FileGeneratorHandler};
+use crate::context::TypeOfIdent;
 use crate::protos::*;
+use crate::Context;
 use crate::{ErrorKind, Result};
 use itertools::Itertools;
 use std::{borrow::Cow, collections::HashMap, fmt::Write};

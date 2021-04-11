@@ -1,8 +1,8 @@
-use crate::generators::shared::context::Context;
 use crate::generators::shared::utils::{
     get_keyword_safe_ident, snake_case_to_camel_case, FullyQualifiedTypeName, PackagePath,
 };
 use crate::protos::{EnumDescriptorProto, EnumValueDescriptorProto};
+use crate::Context;
 use ::once_cell::unsync::OnceCell;
 
 pub struct EnumDescriptor<'c> {

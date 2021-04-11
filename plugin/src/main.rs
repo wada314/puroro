@@ -1,5 +1,6 @@
 #![cfg_attr(feature = "nightly", feature(backtrace))]
 
+mod context;
 mod error;
 mod generators;
 #[cfg(feature = "stage1")]
@@ -9,7 +10,7 @@ mod stage2;
 mod wrappers;
 
 use ::puroro::{Deserializable, Serializable};
-use generators::shared::context::Context;
+use context::Context;
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
