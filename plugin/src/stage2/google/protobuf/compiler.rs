@@ -1,8 +1,8 @@
 #[derive(Debug, Clone)]
 pub struct CodeGeneratorResponse {
-    error: String,
-    supported_features: u64,
-    file: ::std::vec::Vec<super::super::super::google::protobuf::compiler::code_generator_response::File>,
+    pub error: String,
+    pub supported_features: u64,
+    pub file: ::std::vec::Vec<super::super::super::google::protobuf::compiler::code_generator_response::File>,
 }
 impl ::std::default::Default for CodeGeneratorResponse {
     fn default() -> Self {
@@ -116,10 +116,10 @@ mod code_generator_response {
     }
     #[derive(Debug, Clone)]
     pub struct File {
-        name: String,
-        insertion_point: String,
-        content: String,
-        generated_code_info: ::std::option::Option<::std::boxed::Box<super::super::super::super::google::protobuf::GeneratedCodeInfo>>,
+        pub name: String,
+        pub insertion_point: String,
+        pub content: String,
+        pub generated_code_info: ::std::option::Option<::std::boxed::Box<super::super::super::super::google::protobuf::GeneratedCodeInfo>>,
     }
     impl ::std::default::Default for File {
         fn default() -> Self {
@@ -217,10 +217,10 @@ mod code_generator_response {
 }
 #[derive(Debug, Clone)]
 pub struct CodeGeneratorRequest {
-    file_to_generate: ::std::vec::Vec<String>,
-    parameter: String,
-    proto_file: ::std::vec::Vec<super::super::super::google::protobuf::FileDescriptorProto>,
-    compiler_version: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::compiler::Version>>,
+    pub file_to_generate: ::std::vec::Vec<String>,
+    pub parameter: String,
+    pub proto_file: ::std::vec::Vec<super::super::super::google::protobuf::FileDescriptorProto>,
+    pub compiler_version: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::compiler::Version>>,
 }
 impl ::std::default::Default for CodeGeneratorRequest {
     fn default() -> Self {
@@ -323,10 +323,10 @@ impl ::puroro::Serializable for CodeGeneratorRequest {
 }
 #[derive(Debug, Clone)]
 pub struct Version {
-    major: i32,
-    minor: i32,
-    patch: i32,
-    suffix: String,
+    pub major: i32,
+    pub minor: i32,
+    pub patch: i32,
+    pub suffix: String,
 }
 impl ::std::default::Default for Version {
     fn default() -> Self {

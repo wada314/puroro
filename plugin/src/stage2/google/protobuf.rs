@@ -1,7 +1,7 @@
 pub mod compiler;
 #[derive(Debug, Clone)]
 pub struct GeneratedCodeInfo {
-    annotation: ::std::vec::Vec<super::super::google::protobuf::generated_code_info::Annotation>,
+    pub annotation: ::std::vec::Vec<super::super::google::protobuf::generated_code_info::Annotation>,
 }
 impl ::std::default::Default for GeneratedCodeInfo {
     fn default() -> Self {
@@ -75,10 +75,10 @@ impl ::puroro::Serializable for GeneratedCodeInfo {
 mod generated_code_info {
     #[derive(Debug, Clone)]
     pub struct Annotation {
-        path: ::std::vec::Vec<i32>,
-        source_file: String,
-        begin: i32,
-        end: i32,
+        pub path: ::std::vec::Vec<i32>,
+        pub source_file: String,
+        pub begin: i32,
+        pub end: i32,
     }
     impl ::std::default::Default for Annotation {
         fn default() -> Self {
@@ -198,7 +198,7 @@ mod generated_code_info {
 }
 #[derive(Debug, Clone)]
 pub struct SourceCodeInfo {
-    location: ::std::vec::Vec<super::super::google::protobuf::source_code_info::Location>,
+    pub location: ::std::vec::Vec<super::super::google::protobuf::source_code_info::Location>,
 }
 impl ::std::default::Default for SourceCodeInfo {
     fn default() -> Self {
@@ -272,11 +272,11 @@ impl ::puroro::Serializable for SourceCodeInfo {
 mod source_code_info {
     #[derive(Debug, Clone)]
     pub struct Location {
-        path: ::std::vec::Vec<i32>,
-        span: ::std::vec::Vec<i32>,
-        leading_comments: String,
-        trailing_comments: String,
-        leading_detached_comments: ::std::vec::Vec<String>,
+        pub path: ::std::vec::Vec<i32>,
+        pub span: ::std::vec::Vec<i32>,
+        pub leading_comments: String,
+        pub trailing_comments: String,
+        pub leading_detached_comments: ::std::vec::Vec<String>,
     }
     impl ::std::default::Default for Location {
         fn default() -> Self {
@@ -396,13 +396,13 @@ mod source_code_info {
 }
 #[derive(Debug, Clone)]
 pub struct UninterpretedOption {
-    name: ::std::vec::Vec<super::super::google::protobuf::uninterpreted_option::NamePart>,
-    identifier_value: String,
-    positive_int_value: u64,
-    negative_int_value: i64,
-    double_value: f64,
-    string_value: ::std::vec::Vec<u8>,
-    aggregate_value: String,
+    pub name: ::std::vec::Vec<super::super::google::protobuf::uninterpreted_option::NamePart>,
+    pub identifier_value: String,
+    pub positive_int_value: u64,
+    pub negative_int_value: i64,
+    pub double_value: f64,
+    pub string_value: ::std::vec::Vec<u8>,
+    pub aggregate_value: String,
 }
 impl ::std::default::Default for UninterpretedOption {
     fn default() -> Self {
@@ -542,8 +542,8 @@ impl ::puroro::Serializable for UninterpretedOption {
 mod uninterpreted_option {
     #[derive(Debug, Clone)]
     pub struct NamePart {
-        name_part: String,
-        is_extension: bool,
+        pub name_part: String,
+        pub is_extension: bool,
     }
     impl ::std::default::Default for NamePart {
         fn default() -> Self {
@@ -630,9 +630,9 @@ mod uninterpreted_option {
 }
 #[derive(Debug, Clone)]
 pub struct MethodOptions {
-    deprecated: bool,
-    idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
-    uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub deprecated: bool,
+    pub idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
+    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for MethodOptions {
     fn default() -> Self {
@@ -761,8 +761,8 @@ mod method_options {
 }
 #[derive(Debug, Clone)]
 pub struct ServiceOptions {
-    deprecated: bool,
-    uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub deprecated: bool,
+    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for ServiceOptions {
     fn default() -> Self {
@@ -852,8 +852,8 @@ impl ::puroro::Serializable for ServiceOptions {
 }
 #[derive(Debug, Clone)]
 pub struct EnumValueOptions {
-    deprecated: bool,
-    uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub deprecated: bool,
+    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for EnumValueOptions {
     fn default() -> Self {
@@ -943,9 +943,9 @@ impl ::puroro::Serializable for EnumValueOptions {
 }
 #[derive(Debug, Clone)]
 pub struct EnumOptions {
-    allow_alias: bool,
-    deprecated: bool,
-    uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub allow_alias: bool,
+    pub deprecated: bool,
+    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for EnumOptions {
     fn default() -> Self {
@@ -1052,7 +1052,7 @@ impl ::puroro::Serializable for EnumOptions {
 }
 #[derive(Debug, Clone)]
 pub struct OneofOptions {
-    uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for OneofOptions {
     fn default() -> Self {
@@ -1125,13 +1125,13 @@ impl ::puroro::Serializable for OneofOptions {
 }
 #[derive(Debug, Clone)]
 pub struct FieldOptions {
-    ctype: ::std::result::Result<super::super::google::protobuf::field_options::CType, i32>,
-    packed: bool,
-    jstype: ::std::result::Result<super::super::google::protobuf::field_options::JSType, i32>,
-    lazy: bool,
-    deprecated: bool,
-    weak: bool,
-    uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub ctype: ::std::result::Result<super::super::google::protobuf::field_options::CType, i32>,
+    pub packed: bool,
+    pub jstype: ::std::result::Result<super::super::google::protobuf::field_options::JSType, i32>,
+    pub lazy: bool,
+    pub deprecated: bool,
+    pub weak: bool,
+    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for FieldOptions {
     fn default() -> Self {
@@ -1348,11 +1348,11 @@ mod field_options {
 }
 #[derive(Debug, Clone)]
 pub struct MessageOptions {
-    message_set_wire_format: bool,
-    no_standard_descriptor_accessor: bool,
-    deprecated: bool,
-    map_entry: bool,
-    uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub message_set_wire_format: bool,
+    pub no_standard_descriptor_accessor: bool,
+    pub deprecated: bool,
+    pub map_entry: bool,
+    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for MessageOptions {
     fn default() -> Self {
@@ -1493,27 +1493,27 @@ impl ::puroro::Serializable for MessageOptions {
 }
 #[derive(Debug, Clone)]
 pub struct FileOptions {
-    java_package: String,
-    java_outer_classname: String,
-    java_multiple_files: bool,
-    java_generate_equals_and_hash: bool,
-    java_string_check_utf8: bool,
-    optimize_for: ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>,
-    go_package: String,
-    cc_generic_services: bool,
-    java_generic_services: bool,
-    py_generic_services: bool,
-    php_generic_services: bool,
-    deprecated: bool,
-    cc_enable_arenas: bool,
-    objc_class_prefix: String,
-    csharp_namespace: String,
-    swift_prefix: String,
-    php_class_prefix: String,
-    php_namespace: String,
-    php_metadata_namespace: String,
-    ruby_package: String,
-    uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub java_package: String,
+    pub java_outer_classname: String,
+    pub java_multiple_files: bool,
+    pub java_generate_equals_and_hash: bool,
+    pub java_string_check_utf8: bool,
+    pub optimize_for: ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>,
+    pub go_package: String,
+    pub cc_generic_services: bool,
+    pub java_generic_services: bool,
+    pub py_generic_services: bool,
+    pub php_generic_services: bool,
+    pub deprecated: bool,
+    pub cc_enable_arenas: bool,
+    pub objc_class_prefix: String,
+    pub csharp_namespace: String,
+    pub swift_prefix: String,
+    pub php_class_prefix: String,
+    pub php_namespace: String,
+    pub php_metadata_namespace: String,
+    pub ruby_package: String,
+    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for FileOptions {
     fn default() -> Self {
@@ -1858,12 +1858,12 @@ mod file_options {
 }
 #[derive(Debug, Clone)]
 pub struct MethodDescriptorProto {
-    name: String,
-    input_type: String,
-    output_type: String,
-    options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MethodOptions>>,
-    client_streaming: bool,
-    server_streaming: bool,
+    pub name: String,
+    pub input_type: String,
+    pub output_type: String,
+    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MethodOptions>>,
+    pub client_streaming: bool,
+    pub server_streaming: bool,
 }
 impl ::std::default::Default for MethodDescriptorProto {
     fn default() -> Self {
@@ -1994,9 +1994,9 @@ impl ::puroro::Serializable for MethodDescriptorProto {
 }
 #[derive(Debug, Clone)]
 pub struct ServiceDescriptorProto {
-    name: String,
-    method: ::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto>,
-    options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>>,
+    pub name: String,
+    pub method: ::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto>,
+    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>>,
 }
 impl ::std::default::Default for ServiceDescriptorProto {
     fn default() -> Self {
@@ -2089,9 +2089,9 @@ impl ::puroro::Serializable for ServiceDescriptorProto {
 }
 #[derive(Debug, Clone)]
 pub struct EnumValueDescriptorProto {
-    name: String,
-    number: i32,
-    options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>>,
+    pub name: String,
+    pub number: i32,
+    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>>,
 }
 impl ::std::default::Default for EnumValueDescriptorProto {
     fn default() -> Self {
@@ -2189,11 +2189,11 @@ impl ::puroro::Serializable for EnumValueDescriptorProto {
 }
 #[derive(Debug, Clone)]
 pub struct EnumDescriptorProto {
-    name: String,
-    value: ::std::vec::Vec<super::super::google::protobuf::EnumValueDescriptorProto>,
-    options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>>,
-    reserved_range: ::std::vec::Vec<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>,
-    reserved_name: ::std::vec::Vec<String>,
+    pub name: String,
+    pub value: ::std::vec::Vec<super::super::google::protobuf::EnumValueDescriptorProto>,
+    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>>,
+    pub reserved_range: ::std::vec::Vec<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>,
+    pub reserved_name: ::std::vec::Vec<String>,
 }
 impl ::std::default::Default for EnumDescriptorProto {
     fn default() -> Self {
@@ -2309,8 +2309,8 @@ impl ::puroro::Serializable for EnumDescriptorProto {
 mod enum_descriptor_proto {
     #[derive(Debug, Clone)]
     pub struct EnumReservedRange {
-        start: i32,
-        end: i32,
+        pub start: i32,
+        pub end: i32,
     }
     impl ::std::default::Default for EnumReservedRange {
         fn default() -> Self {
@@ -2406,8 +2406,8 @@ mod enum_descriptor_proto {
 }
 #[derive(Debug, Clone)]
 pub struct OneofDescriptorProto {
-    name: String,
-    options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>>,
+    pub name: String,
+    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>>,
 }
 impl ::std::default::Default for OneofDescriptorProto {
     fn default() -> Self {
@@ -2488,17 +2488,17 @@ impl ::puroro::Serializable for OneofDescriptorProto {
 }
 #[derive(Debug, Clone)]
 pub struct FieldDescriptorProto {
-    name: String,
-    number: i32,
-    label: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>,
-    type_: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>,
-    type_name: String,
-    extendee: String,
-    default_value: String,
-    oneof_index: i32,
-    json_name: String,
-    options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FieldOptions>>,
-    proto3_optional: bool,
+    pub name: String,
+    pub number: i32,
+    pub label: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>,
+    pub type_: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>,
+    pub type_name: String,
+    pub extendee: String,
+    pub default_value: String,
+    pub oneof_index: i32,
+    pub json_name: String,
+    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FieldOptions>>,
+    pub proto3_optional: bool,
 }
 impl ::std::default::Default for FieldDescriptorProto {
     fn default() -> Self {
@@ -2768,7 +2768,7 @@ mod field_descriptor_proto {
 }
 #[derive(Debug, Clone)]
 pub struct ExtensionRangeOptions {
-    uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for ExtensionRangeOptions {
     fn default() -> Self {
@@ -2841,16 +2841,16 @@ impl ::puroro::Serializable for ExtensionRangeOptions {
 }
 #[derive(Debug, Clone)]
 pub struct DescriptorProto {
-    name: String,
-    field: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
-    extension: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
-    nested_type: ::std::vec::Vec<super::super::google::protobuf::DescriptorProto>,
-    enum_type: ::std::vec::Vec<super::super::google::protobuf::EnumDescriptorProto>,
-    extension_range: ::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ExtensionRange>,
-    oneof_decl: ::std::vec::Vec<super::super::google::protobuf::OneofDescriptorProto>,
-    options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MessageOptions>>,
-    reserved_range: ::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ReservedRange>,
-    reserved_name: ::std::vec::Vec<String>,
+    pub name: String,
+    pub field: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
+    pub extension: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
+    pub nested_type: ::std::vec::Vec<super::super::google::protobuf::DescriptorProto>,
+    pub enum_type: ::std::vec::Vec<super::super::google::protobuf::EnumDescriptorProto>,
+    pub extension_range: ::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ExtensionRange>,
+    pub oneof_decl: ::std::vec::Vec<super::super::google::protobuf::OneofDescriptorProto>,
+    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MessageOptions>>,
+    pub reserved_range: ::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ReservedRange>,
+    pub reserved_name: ::std::vec::Vec<String>,
 }
 impl ::std::default::Default for DescriptorProto {
     fn default() -> Self {
@@ -3026,8 +3026,8 @@ impl ::puroro::Serializable for DescriptorProto {
 mod descriptor_proto {
     #[derive(Debug, Clone)]
     pub struct ReservedRange {
-        start: i32,
-        end: i32,
+        pub start: i32,
+        pub end: i32,
     }
     impl ::std::default::Default for ReservedRange {
         fn default() -> Self {
@@ -3122,9 +3122,9 @@ mod descriptor_proto {
     }
     #[derive(Debug, Clone)]
     pub struct ExtensionRange {
-        start: i32,
-        end: i32,
-        options: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>>,
+        pub start: i32,
+        pub end: i32,
+        pub options: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>>,
     }
     impl ::std::default::Default for ExtensionRange {
         fn default() -> Self {
@@ -3232,18 +3232,18 @@ mod descriptor_proto {
 }
 #[derive(Debug, Clone)]
 pub struct FileDescriptorProto {
-    name: String,
-    package: String,
-    dependency: ::std::vec::Vec<String>,
-    public_dependency: ::std::vec::Vec<i32>,
-    weak_dependency: ::std::vec::Vec<i32>,
-    message_type: ::std::vec::Vec<super::super::google::protobuf::DescriptorProto>,
-    enum_type: ::std::vec::Vec<super::super::google::protobuf::EnumDescriptorProto>,
-    service: ::std::vec::Vec<super::super::google::protobuf::ServiceDescriptorProto>,
-    extension: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
-    options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FileOptions>>,
-    source_code_info: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::SourceCodeInfo>>,
-    syntax: String,
+    pub name: String,
+    pub package: String,
+    pub dependency: ::std::vec::Vec<String>,
+    pub public_dependency: ::std::vec::Vec<i32>,
+    pub weak_dependency: ::std::vec::Vec<i32>,
+    pub message_type: ::std::vec::Vec<super::super::google::protobuf::DescriptorProto>,
+    pub enum_type: ::std::vec::Vec<super::super::google::protobuf::EnumDescriptorProto>,
+    pub service: ::std::vec::Vec<super::super::google::protobuf::ServiceDescriptorProto>,
+    pub extension: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
+    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FileOptions>>,
+    pub source_code_info: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::SourceCodeInfo>>,
+    pub syntax: String,
 }
 impl ::std::default::Default for FileDescriptorProto {
     fn default() -> Self {
@@ -3442,7 +3442,7 @@ impl ::puroro::Serializable for FileDescriptorProto {
 }
 #[derive(Debug, Clone)]
 pub struct FileDescriptorSet {
-    file: ::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto>,
+    pub file: ::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto>,
 }
 impl ::std::default::Default for FileDescriptorSet {
     fn default() -> Self {

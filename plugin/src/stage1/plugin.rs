@@ -1,3 +1,13 @@
+pub(crate) mod code_generator_response {
+    proto_struct! {
+        struct File {
+            name: String = 1,
+            insertion_point: String = 2,
+            content: String = 15,
+            generated_code_info: Option<super::GeneratedCodeInfo> = 16,
+        }
+    }
+}
 proto_struct! {
     // From plugin.proto
     struct Version {
@@ -15,13 +25,7 @@ proto_struct! {
     struct CodeGeneratorResponse {
         error: String = 1,
         supported_features: u64 = 2,
-        file: Vec<CodeGeneratorResponse_File> = 15,
-    }
-    struct CodeGeneratorResponse_File {
-        name: String = 1,
-        insertion_point: String = 2,
-        content: String = 15,
-        generated_code_info: Option<GeneratedCodeInfo> = 16,
+        file: Vec<code_generator_response::File> = 15,
     }
     enum Feature {
         FEATURE_NONE = 0,

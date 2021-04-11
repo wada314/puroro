@@ -34,7 +34,7 @@ pub struct {name} {{\n",
         indent((iter(msg.field.iter().map(|field| {
             let field_native_type = gen_field_type(field, context)?;
             Ok(format!(
-                "{name}: {type_},\n",
+                "pub {name}: {type_},\n",
                 name = to_var_name(&field.name),
                 type_ = field_native_type
             ))

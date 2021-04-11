@@ -1,5 +1,5 @@
 use crate::generators::utils::*;
-use crate::stage1::*;
+use crate::protos::*;
 use crate::{ErrorKind, Result};
 use itertools::Itertools;
 use std::collections::{BTreeMap, HashMap, HashSet};

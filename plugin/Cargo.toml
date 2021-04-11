@@ -17,4 +17,6 @@ thiserror = "1.0.24"
 
 [features]
 nightly = []
-default = ["nightly"]
+stage1 = []
+stage2 = []
+default = ["nightly", "stage1"]
