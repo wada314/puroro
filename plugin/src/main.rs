@@ -31,8 +31,8 @@ pub use protos::google;
 
 fn main() -> Result<()> {
     let cgreq = CodeGeneratorRequest::from_bytes(stdin().bytes()).unwrap();
-    let mut context = Context::new(cgreq.clone())?;
-    let filename_and_content = Vec::new(); //generators::simple::generate_simple(&mut context, &cgreq)?;
+    let context = Context::new(cgreq.clone())?;
+    let filename_and_content = generators::do_generate(&context);
     let mut cgres = CodeGeneratorResponse::default();
     cgres.file = filename_and_content
         .into_iter()

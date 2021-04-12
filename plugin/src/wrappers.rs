@@ -19,6 +19,6 @@ mod field;
 mod file;
 mod message;
 pub use field::FieldDescriptor;
-pub use file::FileDescriptor;
+pub use file::{DescriptorVisitor, FileDescriptor};
 pub use message::MessageDescriptor;
 pub use r#enum::{EnumDescriptor, EnumValueDescriptor};
