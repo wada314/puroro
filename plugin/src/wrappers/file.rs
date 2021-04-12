@@ -11,19 +11,32 @@ pub struct FileDescriptor<'c> {
 
     lazy_messages: OnceCell<Vec<MessageDescriptor<'c>>>,
     lazy_enums: OnceCell<Vec<EnumDescriptor<'c>>>,
+    lazy_output_file_path_from_root: OnceCell<String>,
 }
 impl<'c> FileDescriptor<'c> {
     pub fn new(proto: &'c FileDescriptorProto, context: &'c Context<'c>) -> Self {
         Self {
             proto,
             context,
+
             lazy_messages: Default::default(),
             lazy_enums: Default::default(),
+            lazy_output_file_path_from_root: Default::default(),
         }
     }
-    pub fn file_path_from_root(&self) -> &str {
+    pub fn file_path_from_root(&'c self) -> &str {
         &self.proto.name
     }
+    pub fn output_file_path_from_root(&'c self) -> &str {
+        self.lazy_output_file_path_from_root.get_or_init(|| {
+            if let Some((file_path_without_ext, _)) = self.file_path_from_root().rsplit_once('.') {
+                file_path_without_ext.to_string() + ".rs"
+            } else {
+                self.file_path_from_root().to_string() + ".rs"
+            }
+        })
+    }
+
     pub fn messages(&'c self) -> impl Iterator<Item = &MessageDescriptor<'c>> {
         self.lazy_messages
             .get_or_init(|| {
