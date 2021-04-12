@@ -56,7 +56,7 @@ impl<'c> EnumDescriptor<'c> {
     /// without distinguishing between repeated / optional labels.
     pub fn native_bare_typename(&self) -> &str {
         self.lazy_native_bare_typename
-            .get_or_init(|| get_keyword_safe_ident(&snake_case_to_camel_case(self.name())))
+            .get_or_init(|| get_keyword_safe_ident(&to_camel_case(self.name())))
     }
 
     /// Returns a Rust typename qualified with a mod path from the output's rood mod,
