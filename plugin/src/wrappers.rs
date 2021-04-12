@@ -22,3 +22,17 @@ pub use field::FieldDescriptor;
 pub use file::{DescriptorVisitor, FileDescriptor};
 pub use message::MessageDescriptor;
 pub use r#enum::{EnumDescriptor, EnumValueDescriptor};
+
+// Used for the `parent` type for messages and enums.
+pub enum FileOrMessageRef<'c> {
+    File(&'c FileDescriptor<'c>),
+    Message(&'c MessageDescriptor<'c>),
+}
+impl<'c> FileOrMessageRef<'c> {
+    pub fn package_for_child(&self) -> String {
+        match self {
+            &FileOrMessageRef::File(file) => file.package().to_string(),
+            &FileOrMessageRef::Message(message) => message.package().to_string() + message.name(),
+        }
+    }
+}

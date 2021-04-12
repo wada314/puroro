@@ -2,8 +2,7 @@ use crate::google::protobuf::FileDescriptorProto;
 use crate::Context;
 use crate::Result;
 
-use super::{message, r#enum};
-use super::{EnumDescriptor, MessageDescriptor};
+use super::{EnumDescriptor, FileOrMessageRef, MessageDescriptor};
 use ::once_cell::unsync::OnceCell;
 
 pub struct FileDescriptor<'c> {
@@ -22,7 +21,7 @@ impl<'c> FileDescriptor<'c> {
             lazy_enums: Default::default(),
         }
     }
-    pub fn path_from_root(&self) -> &str {
+    pub fn file_path_from_root(&self) -> &str {
         &self.proto.name
     }
     pub fn messages(&'c self) -> impl Iterator<Item = &MessageDescriptor<'c>> {
@@ -31,7 +30,7 @@ impl<'c> FileDescriptor<'c> {
                 self.proto
                     .message_type
                     .iter()
-                    .map(|m| MessageDescriptor::new(m, self.context, message::Parent::File(self)))
+                    .map(|m| MessageDescriptor::new(m, self.context, FileOrMessageRef::File(self)))
                     .collect()
             })
             .iter()
@@ -42,13 +41,16 @@ impl<'c> FileDescriptor<'c> {
                 self.proto
                     .enum_type
                     .iter()
-                    .map(|e| EnumDescriptor::new(e, self.context, r#enum::Parent::File(self)))
+                    .map(|e| EnumDescriptor::new(e, self.context, FileOrMessageRef::File(self)))
                     .collect()
             })
             .iter()
     }
+    pub fn package(&'c self) -> &str {
+        &self.proto.package
+    }
 
-    /// Visit all `MessageDescriptor` and `EnumDescriptor` containted in this
+    /// Visit all `MessageDescriptor` and `EnumDescriptor` in this
     /// file, including the nested messages and enums.
     pub fn visit_messages_and_enums_in_file<T: DescriptorVisitor>(
         &'c self,

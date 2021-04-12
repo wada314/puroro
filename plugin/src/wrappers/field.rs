@@ -4,6 +4,8 @@ use crate::Context;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 
+use super::MessageDescriptor;
+
 pub enum FieldType<'c> {
     Double,
     Float,
@@ -32,10 +34,19 @@ pub enum FieldLabel {
 pub struct FieldDescriptor<'c> {
     proto: &'c FieldDescriptorProto,
     context: &'c Context<'c>,
+    parent: &'c MessageDescriptor<'c>,
 }
 impl<'c> FieldDescriptor<'c> {
-    pub fn new(proto: &'c FieldDescriptorProto, context: &'c Context<'c>) -> Self {
-        Self { proto, context }
+    pub fn new(
+        proto: &'c FieldDescriptorProto,
+        context: &'c Context<'c>,
+        parent: &'c MessageDescriptor<'c>,
+    ) -> Self {
+        Self {
+            proto,
+            context,
+            parent,
+        }
     }
     pub fn name(&self) -> &str {
         &self.proto.name

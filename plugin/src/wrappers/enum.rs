@@ -1,4 +1,4 @@
-use super::{FileDescriptor, MessageDescriptor};
+use super::{FileDescriptor, FileOrMessageRef, MessageDescriptor};
 use crate::generators::shared::utils::{
     get_keyword_safe_ident, snake_case_to_camel_case, FullyQualifiedTypeName, PackagePath,
 };
@@ -6,15 +6,10 @@ use crate::google::protobuf::{EnumDescriptorProto, EnumValueDescriptorProto};
 use crate::Context;
 use ::once_cell::unsync::OnceCell;
 
-pub enum Parent<'c> {
-    File(&'c FileDescriptor<'c>),
-    Message(&'c MessageDescriptor<'c>),
-}
-
 pub struct EnumDescriptor<'c> {
     proto: &'c EnumDescriptorProto,
     context: &'c Context<'c>,
-    parent: Parent<'c>,
+    parent: FileOrMessageRef<'c>,
 
     values: Vec<EnumValueDescriptor<'c>>,
 
@@ -25,7 +20,7 @@ impl<'c> EnumDescriptor<'c> {
     pub fn new(
         proto: &'c EnumDescriptorProto,
         context: &'c Context<'c>,
-        parent: Parent<'c>,
+        parent: FileOrMessageRef<'c>,
     ) -> Self {
         Self {
             proto,
