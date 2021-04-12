@@ -98,25 +98,6 @@ pub fn to_camel_case(input: &str) -> String {
     convert_cases(input, false, WordCase::CamelCase)
 }
 
-pub fn camel_case_to_lower_snake_case(input: &str) -> String {
-    let mut lowered = input
-        .chars()
-        .flat_map(|c| {
-            if c.is_ascii_uppercase() {
-                Some('_')
-            } else {
-                None
-            }
-            .into_iter()
-            .chain(std::iter::once(c.to_ascii_lowercase()))
-        })
-        .peekable();
-    if lowered.peek() == Some(&'_') {
-        lowered.next();
-    }
-    lowered.collect::<String>()
-}
-
 lazy_static! {
     static ref KEYWORDS: HashSet<&'static str> = [
         "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn",
