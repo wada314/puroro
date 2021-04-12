@@ -1,7 +1,3 @@
-use crate::generators::shared::utils::{
-    get_keyword_safe_ident, snake_case_to_camel_case, FullyQualifiedTypeName,
-    MaybeFullyQualifiedTypeName, PackagePath,
-};
 use crate::google::protobuf::field_descriptor_proto::Label;
 use crate::google::protobuf::FieldDescriptorProto;
 use crate::Context;
@@ -24,7 +20,7 @@ pub enum FieldType<'c> {
     Bool,
     Group,
     Enum(&'c super::EnumDescriptor<'c>),
-    //Message(super::MessageDescriptor<'c>),
+    Message(&'c super::MessageDescriptor<'c>),
 }
 
 pub enum FieldLabel {

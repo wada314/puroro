@@ -3,14 +3,17 @@
 //! # Implementation strategy
 //! The wrappers implement the methods to get the values of protos,
 //! and maybe do a little more work like converting the proto type name to
-//! Rust-styled type name. We do not consider about modifying the data.
+//! Rust-styled type name.
 //! Those little-more-work results may be cached into `OnceCell<T>` field for
 //! performance, and for allowing us to forget about the field initialization
 //! order problem. So most of the field of the wrappers should be wrapped into
 //! the `OnceCell<T>` wrapper. The exceptions are, the reference to the source
-//! proto structure, the reference to the context class, and the children
-//! wrappers.
-//!
+//! proto structure, the parent and the context class (i.e. root).
+//! Because we do not need to modify the data, we can make these wrappers
+//! connected tightly: The parents own the children, and the children refers
+//! their parent (this is normally not possible if anything of the structure
+//! is needed to be mutable).
+
 mod r#enum;
 mod field;
 mod file;

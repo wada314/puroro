@@ -2,46 +2,56 @@ use crate::google::protobuf::FileDescriptorProto;
 use crate::Context;
 use crate::Result;
 
-use super::EnumDescriptor;
-use super::MessageDescriptor;
+use super::{message, r#enum};
+use super::{EnumDescriptor, MessageDescriptor};
+use ::once_cell::unsync::OnceCell;
 
 pub struct FileDescriptor<'c> {
     proto: &'c FileDescriptorProto,
     context: &'c Context<'c>,
-    messages: Vec<MessageDescriptor<'c>>,
-    enums: Vec<EnumDescriptor<'c>>,
+
+    lazy_messages: OnceCell<Vec<MessageDescriptor<'c>>>,
+    lazy_enums: OnceCell<Vec<EnumDescriptor<'c>>>,
 }
 impl<'c> FileDescriptor<'c> {
     pub fn new(proto: &'c FileDescriptorProto, context: &'c Context<'c>) -> Self {
         Self {
             proto,
             context,
-            messages: proto
-                .message_type
-                .iter()
-                .map(|m| MessageDescriptor::new(m, context))
-                .collect(),
-            enums: proto
-                .enum_type
-                .iter()
-                .map(|e| EnumDescriptor::new(e, context))
-                .collect(),
+            lazy_messages: Default::default(),
+            lazy_enums: Default::default(),
         }
     }
     pub fn path_from_root(&self) -> &str {
         &self.proto.name
     }
-    pub fn messages(&self) -> impl Iterator<Item = &MessageDescriptor<'c>> {
-        self.messages.iter()
+    pub fn messages(&'c self) -> impl Iterator<Item = &MessageDescriptor<'c>> {
+        self.lazy_messages
+            .get_or_init(|| {
+                self.proto
+                    .message_type
+                    .iter()
+                    .map(|m| MessageDescriptor::new(m, self.context, message::Parent::File(self)))
+                    .collect()
+            })
+            .iter()
     }
-    pub fn enums(&self) -> impl Iterator<Item = &EnumDescriptor<'c>> {
-        self.enums.iter()
+    pub fn enums(&'c self) -> impl Iterator<Item = &EnumDescriptor<'c>> {
+        self.lazy_enums
+            .get_or_init(|| {
+                self.proto
+                    .enum_type
+                    .iter()
+                    .map(|e| EnumDescriptor::new(e, self.context, r#enum::Parent::File(self)))
+                    .collect()
+            })
+            .iter()
     }
 
     /// Visit all `MessageDescriptor` and `EnumDescriptor` containted in this
     /// file, including the nested messages and enums.
     pub fn visit_messages_and_enums_in_file<T: DescriptorVisitor>(
-        &self,
+        &'c self,
         visitor: &mut T,
     ) -> Result<()> {
         /// Lifetime `'a` is for this descriptor's lifetime, and `'d` is for
