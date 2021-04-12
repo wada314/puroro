@@ -17,7 +17,7 @@ impl<'c> wrappers::DescriptorVisitor<'c> for Visitor {
 
     fn handle_enum(&mut self, enume: &'c wrappers::EnumDescriptor<'c>) -> crate::Result<()> {
         (
-            format!("pub enum {name} {{\n", name = enume.name()),
+            format!("pub enum {name} {{\n", name = enume.native_bare_typename()),
             indent((iter(enume.values().map(|value| {
                 Ok(format!(
                     "{name} = {value},\n",
