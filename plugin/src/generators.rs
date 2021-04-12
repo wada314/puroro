@@ -17,7 +17,12 @@ impl<'c> wrappers::DescriptorVisitor<'c> for Visitor {
 
     fn handle_enum(&mut self, enume: &'c wrappers::EnumDescriptor<'c>) -> crate::Result<()> {
         (
-            format!("pub enum {name} {{\n", name = enume.native_bare_typename()),
+            format!(
+                "\
+#[derive(Debug, Clone)]
+pub enum {name} {{\n",
+                name = enume.native_bare_typename()
+            ),
             indent((iter(enume.values().map(|value| {
                 Ok(format!(
                     "{name} = {value},\n",
@@ -25,7 +30,33 @@ impl<'c> wrappers::DescriptorVisitor<'c> for Visitor {
                     value = value.number()
                 ))
             })),)),
-            "}}\n",
+            "\
+}}\n",
+            format!(
+                "\
+impl std::convert::TryFrom<i32> for {name} {{
+    type Error = i32;
+    fn try_from(val: i32) -> ::std::result::Result<Self, i32> {{
+        match val {{\n",
+                name = enume.native_bare_typename()
+            ),
+            indent_n(
+                3,
+                (
+                    iter(enume.values().map(|value| {
+                        Ok(format!(
+                            "{number} => Ok(Self::{name}),\n",
+                            number = value.number(),
+                            name = value.native_name(),
+                        ))
+                    })),
+                    "x => Err(x),\n",
+                ),
+            ),
+            "        \
+        }}
+    }}
+}}\n",
         )
             .write_into(&mut self.output)
     }
