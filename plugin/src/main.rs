@@ -22,11 +22,12 @@ mod protos {
     #[cfg(feature = "stage1")]
     pub use crate::stage1::*;
     #[cfg(feature = "stage2")]
-    pub use crate::stage2::google::protobuf::compiler::*;
-    #[cfg(feature = "stage2")]
-    pub use crate::stage2::google::protobuf::*;
+    pub use crate::stage2::google;
 }
-use crate::protos::*;
+use google::protobuf::compiler::{
+    code_generator_response, CodeGeneratorRequest, CodeGeneratorResponse,
+};
+pub use protos::google;
 
 fn main() -> Result<()> {
     let cgreq = CodeGeneratorRequest::from_bytes(stdin().bytes()).unwrap();

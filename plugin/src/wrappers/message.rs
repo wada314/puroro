@@ -1,4 +1,4 @@
-use crate::protos::DescriptorProto;
+use crate::google::protobuf::DescriptorProto;
 use crate::Context;
 
 use super::{EnumDescriptor, FieldDescriptor};
@@ -40,5 +40,9 @@ impl<'c> MessageDescriptor<'c> {
     }
     pub fn enums(&self) -> impl Iterator<Item = &EnumDescriptor<'c>> {
         self.enums.iter()
+    }
+
+    pub fn name(&self) -> &str {
+        &self.proto.name
     }
 }
