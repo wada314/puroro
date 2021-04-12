@@ -59,7 +59,7 @@ fn convert_cases(input: &str, generate_snake_case: bool, out_word_case: WordCase
     let mut word_begins_next = true;
     let mut last_was_lower_case = true;
     let mut out = String::new();
-    for c in input.chars() {
+    for (i, c) in input.chars().enumerate() {
         if c == '_' {
             word_begins_next = true;
             last_was_lower_case = false;
@@ -69,7 +69,7 @@ fn convert_cases(input: &str, generate_snake_case: bool, out_word_case: WordCase
             last_was_lower_case = c.is_ascii_lowercase();
             word_begins_next = false;
             if word_begins {
-                if generate_snake_case {
+                if generate_snake_case && i != 0 {
                     out.push('_');
                 }
                 if let WordCase::LowerCase = out_word_case {

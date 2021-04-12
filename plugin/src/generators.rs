@@ -1,7 +1,9 @@
 pub mod shared;
 //pub mod simple;
 
-use crate::utils::Indentor;
+use std::fmt::Write;
+
+use crate::utils::{get_keyword_safe_ident, to_lower_snake_case, Indentor};
 use crate::wrappers;
 use crate::Result;
 use shared::writers::{indent, indent_n, iter, TupleOfIntoFragments};
@@ -62,11 +64,14 @@ impl std::convert::TryFrom<i32> for {name} {{
     }
 
     fn enter_submodule(&mut self, name: &str) -> crate::Result<()> {
-        let mod_name = 
+        let mod_name = get_keyword_safe_ident(&to_lower_snake_case(name));
+        self.output
+            .write_fmt(format_args!("pub mod {name} {{\n", name = mod_name))?;
         Ok(())
     }
 
-    fn exit_submodule(&mut self, name: &str) -> crate::Result<()> {
+    fn exit_submodule(&mut self, _name: &str) -> crate::Result<()> {
+        self.output.write_str("}\n")?;
         Ok(())
     }
 }
