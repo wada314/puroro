@@ -1,9 +1,5 @@
 use std::collections::HashMap;
 
-use crate::generators::shared::utils::{
-    FullyQualifiedTypeName, MaybeFullyQualifiedTypeName, PackagePath,
-};
-
 use crate::google::protobuf::compiler::CodeGeneratorRequest;
 use crate::wrappers::{
     DescriptorVisitor, EnumDescriptor, EnumOrMessageRef, FileDescriptor, MessageDescriptor,
@@ -66,7 +62,7 @@ impl<'c> Context<'c> {
                     }
                 }
                 let mut map = HashMap::new();
-                let visitor = Visitor(&mut map);
+                let mut visitor = Visitor(&mut map);
                 for file in self.file_descriptors() {
                     file.visit_messages_and_enums_in_file(&mut visitor)?;
                 }

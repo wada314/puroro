@@ -97,7 +97,7 @@ impl<'c> FieldDescriptor<'c> {
         }
     }
     pub fn r#type(&'c self) -> Result<FieldType<'c>> {
-        Ok(match self.proto.type_ {
+        Ok(match &self.proto.type_ {
             Ok(type_) => {
                 use crate::protos::google::protobuf::field_descriptor_proto::Type;
                 match type_ {
@@ -152,7 +152,7 @@ impl<'c> FieldDescriptor<'c> {
                     name: self.proto.type_name.clone(),
                 })?,
             },
-            Err(id) => Err(ErrorKind::UnknownFieldTypeId { id })?,
+            Err(id) => Err(ErrorKind::UnknownFieldTypeId { id: *id })?,
         })
     }
 

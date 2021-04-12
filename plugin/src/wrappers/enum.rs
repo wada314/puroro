@@ -1,8 +1,6 @@
-use super::{FileDescriptor, FileOrMessageRef, MessageDescriptor};
-use crate::generators::shared::utils::{
-    get_keyword_safe_ident, snake_case_to_camel_case, FullyQualifiedTypeName, PackagePath,
-};
+use super::FileOrMessageRef;
 use crate::google::protobuf::{EnumDescriptorProto, EnumValueDescriptorProto};
+use crate::utils::{get_keyword_safe_ident, snake_case_to_camel_case};
 use crate::Context;
 use ::once_cell::unsync::OnceCell;
 

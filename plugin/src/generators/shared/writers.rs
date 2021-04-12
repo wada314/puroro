@@ -1,4 +1,4 @@
-use super::utils::Indentor;
+use crate::utils::Indentor;
 use crate::Result;
 use std::collections::VecDeque;
 use std::{borrow::Cow, fmt::Write};

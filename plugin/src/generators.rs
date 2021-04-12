@@ -5,20 +5,12 @@ use crate::wrappers;
 
 use super::Context;
 struct Visitor {}
-impl wrappers::DescriptorVisitor for Visitor {
-    fn handle_msg(&mut self, msg: &wrappers::MessageDescriptor) -> crate::Result<()> {
+impl<'c> wrappers::DescriptorVisitor<'c> for Visitor {
+    fn handle_msg(&mut self, msg: &'c wrappers::MessageDescriptor<'c>) -> crate::Result<()> {
         Ok(())
     }
 
-    fn handle_enum(&mut self, enume: &wrappers::EnumDescriptor) -> crate::Result<()> {
-        Ok(())
-    }
-
-    fn enter_submodule(&mut self, name: &str) -> crate::Result<()> {
-        Ok(())
-    }
-
-    fn exit_submodule(&mut self, name: &str) -> crate::Result<()> {
+    fn handle_enum(&mut self, enume: &'c wrappers::EnumDescriptor<'c>) -> crate::Result<()> {
         Ok(())
     }
 }

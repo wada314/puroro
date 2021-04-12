@@ -7,6 +7,7 @@ mod generators;
 mod stage1;
 #[cfg(feature = "stage2")]
 mod stage2;
+mod utils;
 mod wrappers;
 
 use ::puroro::{Deserializable, Serializable};
