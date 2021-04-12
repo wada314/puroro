@@ -4,7 +4,7 @@ use crate::Context;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 
-use super::MessageDescriptor;
+use super::{EnumOrMessageRef, MessageDescriptor};
 
 pub enum FieldType<'c> {
     Double,
@@ -21,6 +21,8 @@ pub enum FieldType<'c> {
     SFixed64,
     Bool,
     Group,
+    String,
+    Bytes,
     Enum(&'c super::EnumDescriptor<'c>),
     Message(&'c super::MessageDescriptor<'c>),
 }
@@ -35,6 +37,9 @@ pub struct FieldDescriptor<'c> {
     proto: &'c FieldDescriptorProto,
     context: &'c Context<'c>,
     parent: &'c MessageDescriptor<'c>,
+
+    lazy_type: OnceCell<FieldType<'c>>,
+    lazy_fq_type_name: OnceCell<String>,
 }
 impl<'c> FieldDescriptor<'c> {
     pub fn new(
@@ -46,6 +51,8 @@ impl<'c> FieldDescriptor<'c> {
             proto,
             context,
             parent,
+            lazy_type: Default::default(),
+            lazy_fq_type_name: Default::default(),
         }
     }
     pub fn name(&self) -> &str {
@@ -62,7 +69,100 @@ impl<'c> FieldDescriptor<'c> {
             Err(id) => Err(ErrorKind::UnknownLabelId { id })?,
         }
     }
-    pub fn r#type(&self) -> Result<FieldType<'c>> {
-        todo!()
+    pub fn r#type(&'c self) -> Result<FieldType<'c>> {
+        Ok(match self.proto.type_ {
+            Ok(type_) => {
+                use crate::protos::google::protobuf::field_descriptor_proto::Type;
+                match type_ {
+                    Type::TypeDouble => FieldType::Double,
+                    Type::TypeFloat => FieldType::Float,
+                    Type::TypeInt64 => FieldType::Int64,
+                    Type::TypeUint64 => FieldType::UInt64,
+                    Type::TypeInt32 => FieldType::Int32,
+                    Type::TypeFixed64 => FieldType::Fixed64,
+                    Type::TypeFixed32 => FieldType::Fixed32,
+                    Type::TypeBool => FieldType::Bool,
+                    Type::TypeString => FieldType::String,
+                    Type::TypeGroup => FieldType::Group,
+                    Type::TypeMessage => {
+                        match self.context.fq_name_to_desc(self.fq_type_name()?)? {
+                            Some(EnumOrMessageRef::Message(m)) => FieldType::Message(m),
+                            _ => Err(ErrorKind::InternalError {
+                                detail: format!(
+                                    "The field desc for {}::{} says its `type` is `TYPE_MESSAGE`, \
+                                    but we couldn't find the message named \"{}\" in the inputs.",
+                                    self.parent.fq_name(),
+                                    self.name(),
+                                    self.proto.type_name
+                                ),
+                            })?,
+                        }
+                    }
+                    Type::TypeBytes => FieldType::Bytes,
+                    Type::TypeUint32 => FieldType::UInt32,
+                    Type::TypeEnum => match self.context.fq_name_to_desc(self.fq_type_name()?)? {
+                        Some(EnumOrMessageRef::Enum(e)) => FieldType::Enum(e),
+                        _ => Err(ErrorKind::InternalError {
+                            detail: format!(
+                                "The field desc for {}::{} says its `type` is `TYPE_ENUM`, \
+                                    but we couldn't find the enum named \"{}\" in the inputs.",
+                                self.parent.fq_name(),
+                                self.name(),
+                                self.proto.type_name
+                            ),
+                        })?,
+                    },
+                    Type::TypeSfixed32 => FieldType::SFixed32,
+                    Type::TypeSfixed64 => FieldType::SFixed64,
+                    Type::TypeSint32 => FieldType::SInt32,
+                    Type::TypeSint64 => FieldType::SInt64,
+                }
+            }
+            Err(0) => match self.context.fq_name_to_desc(self.fq_type_name()?)? {
+                Some(EnumOrMessageRef::Enum(e)) => FieldType::Enum(e),
+                Some(EnumOrMessageRef::Message(m)) => FieldType::Message(m),
+                _ => Err(ErrorKind::UnknownTypeName {
+                    name: self.proto.type_name.clone(),
+                })?,
+            },
+            Err(id) => Err(ErrorKind::UnknownFieldTypeId { id })?,
+        })
     }
+
+    pub fn fq_type_name(&'c self) -> Result<&str> {
+        Ok(self.lazy_fq_type_name.get_or_try_init(|| -> Result<_> {
+            // If the type name starts with ".", then just return the remaining part.
+            if let Some(fq_name) = self.proto.type_name.strip_prefix('.') {
+                return Ok(fq_name.to_string());
+            }
+            // If the type name is not fully-qualified, search the known types
+            // with climbing up the package to the root package.
+            for package in self::iter_package_to_root(self.parent.package()) {
+                let fq_name_candidate = package.to_string() + "." + &self.proto.type_name;
+                if let Some(_) = self.context.fq_name_to_desc(&fq_name_candidate)? {
+                    return Ok(fq_name_candidate);
+                }
+            }
+            Err(ErrorKind::InternalError {
+                detail: format!(
+                    "The type \"{}.{}\" was not found in the Context's type list. \
+                    Maybe it is not an enum or a message?",
+                    self.parent.package(),
+                    &self.proto.type_name
+                ),
+            })?
+        })?)
+    }
+}
+
+fn iter_package_to_root(package: &str) -> impl Iterator<Item = &str> {
+    std::iter::successors(Some(package), |package| {
+        if package.is_empty() {
+            None
+        } else if let Some((remain, _)) = package.rsplit_once('.') {
+            Some(remain)
+        } else {
+            Some("")
+        }
+    })
 }

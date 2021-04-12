@@ -36,3 +36,9 @@ impl<'c> FileOrMessageRef<'c> {
         }
     }
 }
+
+#[derive(Clone)]
+pub enum EnumOrMessageRef<'c> {
+    Enum(&'c EnumDescriptor<'c>),
+    Message(&'c MessageDescriptor<'c>),
+}

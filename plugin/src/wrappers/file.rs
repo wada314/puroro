@@ -52,7 +52,7 @@ impl<'c> FileDescriptor<'c> {
 
     /// Visit all `MessageDescriptor` and `EnumDescriptor` in this
     /// file, including the nested messages and enums.
-    pub fn visit_messages_and_enums_in_file<T: DescriptorVisitor>(
+    pub fn visit_messages_and_enums_in_file<T: DescriptorVisitor<'c>>(
         &'c self,
         visitor: &mut T,
     ) -> Result<()> {
@@ -96,11 +96,11 @@ impl<'c> FileDescriptor<'c> {
         Ok(())
     }
 }
-pub trait DescriptorVisitor {
-    fn handle_msg(&mut self, msg: &MessageDescriptor) -> Result<()> {
+pub trait DescriptorVisitor<'c> {
+    fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
         Ok(())
     }
-    fn handle_enum(&mut self, enume: &EnumDescriptor) -> Result<()> {
+    fn handle_enum(&mut self, enume: &'c EnumDescriptor<'c>) -> Result<()> {
         Ok(())
     }
     fn enter_submodule(&mut self, name: &str) -> Result<()> {

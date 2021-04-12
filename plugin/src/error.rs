@@ -26,11 +26,13 @@ pub enum ErrorKind {
     ConflictedName { name: String },
     UnknownFieldTypeId { id: i32 },
     UnknownLabelId { id: i32 },
+    UnknownTypeName { name: String },
     GroupNotSupported {},
     Proto2NotSupported,
     WriteError { source: std::fmt::Error },
     PuroroError { source: ::puroro::PuroroError },
     EmptyTypename,
+    InternalError { detail: String }
 }
 impl From<ErrorKind> for GeneratorError {
     fn from(kind: ErrorKind) -> Self {

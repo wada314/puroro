@@ -5,15 +5,11 @@ use crate::generators::shared::utils::{
 };
 
 use crate::google::protobuf::compiler::CodeGeneratorRequest;
-use crate::wrappers::{DescriptorVisitor, EnumDescriptor, FileDescriptor, MessageDescriptor};
+use crate::wrappers::{
+    DescriptorVisitor, EnumDescriptor, EnumOrMessageRef, FileDescriptor, MessageDescriptor,
+};
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
-
-#[derive(Clone)]
-enum EnumOrMessageRef<'c> {
-    Enum(&'c EnumDescriptor<'c>),
-    Message(&'c MessageDescriptor<'c>),
-}
 
 pub struct Context<'c> {
     proto: CodeGeneratorRequest,
@@ -40,19 +36,42 @@ impl<'c> Context<'c> {
             })
             .iter()
     }
-    fn fq_name_to_desc(&'c self, fq_name: &str) -> Option<EnumOrMessageRef<'c>> {
-        let map = self.lazy_fq_name_to_desc_map.get_or_init(|| {
-            struct Visitor();
-            impl DescriptorVisitor for Visitor {
-                fn handle_msg(&mut self, msg: &MessageDescriptor) -> Result<()> {
-                    Ok(())
-                }
+    pub fn fq_name_to_desc(&'c self, fq_name: &str) -> Result<Option<EnumOrMessageRef<'c>>> {
+        let map = self
+            .lazy_fq_name_to_desc_map
+            .get_or_try_init(|| -> Result<_> {
+                struct Visitor<'a, 'd>(&'a mut HashMap<&'d str, EnumOrMessageRef<'d>>);
+                impl<'a, 'd> DescriptorVisitor<'d> for Visitor<'a, 'd> {
+                    fn handle_msg(&mut self, msg: &'d MessageDescriptor<'d>) -> Result<()> {
+                        if let Some(_) =
+                            self.0.insert(msg.fq_name(), EnumOrMessageRef::Message(msg))
+                        {
+                            Err(ErrorKind::ConflictedName {
+                                name: msg.fq_name().to_string(),
+                            })?
+                        }
+                        Ok(())
+                    }
 
-                fn handle_enum(&mut self, enume: &EnumDescriptor) -> Result<()> {
-                    Ok(())
+                    fn handle_enum(&mut self, enume: &'d EnumDescriptor<'d>) -> Result<()> {
+                        if let Some(_) = self
+                            .0
+                            .insert(enume.fq_name(), EnumOrMessageRef::Enum(enume))
+                        {
+                            Err(ErrorKind::ConflictedName {
+                                name: enume.fq_name().to_string(),
+                            })?
+                        }
+                        Ok(())
+                    }
                 }
-            }
-            for file in self.file_descriptors() {}
-        });
+                let mut map = HashMap::new();
+                let visitor = Visitor(&mut map);
+                for file in self.file_descriptors() {
+                    file.visit_messages_and_enums_in_file(&mut visitor)?;
+                }
+                Ok(map)
+            })?;
+        Ok(map.get(fq_name).cloned())
     }
 }
