@@ -26,6 +26,33 @@ pub enum FieldType<'c> {
     Enum(&'c super::EnumDescriptor<'c>),
     Message(&'c super::MessageDescriptor<'c>),
 }
+impl<'c> FieldType<'c> {
+    pub fn native_type_for_numerical_types(
+        &self,
+    ) -> std::result::Result<&str, NonnumericalFieldType<'c>> {
+        match self {
+            FieldType::Double => Ok("f64"),
+            FieldType::Float => Ok("f32"),
+            FieldType::Int32 | FieldType::SInt32 | FieldType::SFixed32 => Ok("i32"),
+            FieldType::Int64 | FieldType::SInt64 | FieldType::SFixed64 => Ok("i64"),
+            FieldType::UInt32 | FieldType::Fixed32 => Ok("u32"),
+            FieldType::UInt64 | FieldType::Fixed64 => Ok("u64"),
+            FieldType::Bool => Ok("bool"),
+            FieldType::Group => Err(NonnumericalFieldType::Group),
+            FieldType::String => Err(NonnumericalFieldType::String),
+            FieldType::Bytes => Err(NonnumericalFieldType::Bytes),
+            FieldType::Enum(e) => Err(NonnumericalFieldType::Enum(e)),
+            FieldType::Message(m) => Err(NonnumericalFieldType::Message(m)),
+        }
+    }
+}
+pub enum NonnumericalFieldType<'c> {
+    Group,
+    String,
+    Bytes,
+    Enum(&'c super::EnumDescriptor<'c>),
+    Message(&'c super::MessageDescriptor<'c>),
+}
 
 pub enum FieldLabel {
     Optional,
