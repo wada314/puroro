@@ -13,7 +13,8 @@ pub struct EnumDescriptor<'c> {
 
     values: Vec<EnumValueDescriptor<'c>>,
 
-    lazy_fq_name: OnceCell<FullyQualifiedTypeName>,
+    lazy_package: OnceCell<String>,
+    lazy_fq_name: OnceCell<String>,
     lazy_native_bare_typename: OnceCell<String>,
 }
 impl<'c> EnumDescriptor<'c> {
@@ -31,6 +32,7 @@ impl<'c> EnumDescriptor<'c> {
                 .iter()
                 .map(|v| EnumValueDescriptor::new(v, context))
                 .collect(),
+            lazy_package: Default::default(),
             lazy_fq_name: Default::default(),
             lazy_native_bare_typename: Default::default(),
         }
@@ -38,10 +40,13 @@ impl<'c> EnumDescriptor<'c> {
     pub fn name(&self) -> &str {
         &self.proto.name
     }
-    pub fn fq_name(&self) -> &FullyQualifiedTypeName {
-        todo!()
-        //self.lazy_fq_name
-        //    .get_or_init(|| FullyQualifiedTypeName::new(self.package().clone(), self.name()))
+    pub fn package(&'c self) -> &str {
+        self.lazy_package
+            .get_or_init(|| self.parent.package_for_child() + "." + self.name())
+    }
+    pub fn fq_name(&'c self) -> &str {
+        self.lazy_fq_name
+            .get_or_init(|| self.name().to_string() + "." + self.package())
     }
     pub fn values(&self) -> impl Iterator<Item = &EnumValueDescriptor<'c>> {
         self.values.iter()

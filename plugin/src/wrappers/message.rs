@@ -13,6 +13,7 @@ pub struct MessageDescriptor<'c> {
     lazy_enums: OnceCell<Vec<EnumDescriptor<'c>>>,
 
     lazy_package: OnceCell<String>,
+    lazy_fq_name: OnceCell<String>,
 }
 impl<'c> MessageDescriptor<'c> {
     pub fn new(
@@ -28,6 +29,7 @@ impl<'c> MessageDescriptor<'c> {
             lazy_nested_messages: Default::default(),
             lazy_enums: Default::default(),
             lazy_package: Default::default(),
+            lazy_fq_name: Default::default(),
         }
     }
     pub fn fields(&'c self) -> impl Iterator<Item = &FieldDescriptor<'c>> {
@@ -72,5 +74,9 @@ impl<'c> MessageDescriptor<'c> {
     pub fn package(&'c self) -> &str {
         self.lazy_package
             .get_or_init(|| self.parent.package_for_child())
+    }
+    pub fn fq_name(&'c self) -> &str {
+        self.lazy_fq_name
+            .get_or_init(|| self.name().to_string() + "." + self.package())
     }
 }

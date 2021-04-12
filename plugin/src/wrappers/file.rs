@@ -97,8 +97,16 @@ impl<'c> FileDescriptor<'c> {
     }
 }
 pub trait DescriptorVisitor {
-    fn handle_msg(&mut self, msg: &MessageDescriptor) -> Result<()>;
-    fn handle_enum(&mut self, enume: &EnumDescriptor) -> Result<()>;
-    fn enter_submodule(&mut self, name: &str) -> Result<()>;
-    fn exit_submodule(&mut self, name: &str) -> Result<()>;
+    fn handle_msg(&mut self, msg: &MessageDescriptor) -> Result<()> {
+        Ok(())
+    }
+    fn handle_enum(&mut self, enume: &EnumDescriptor) -> Result<()> {
+        Ok(())
+    }
+    fn enter_submodule(&mut self, name: &str) -> Result<()> {
+        Ok(())
+    }
+    fn exit_submodule(&mut self, name: &str) -> Result<()> {
+        Ok(())
+    }
 }
