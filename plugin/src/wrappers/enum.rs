@@ -1,8 +1,6 @@
 use super::FileOrMessageRef;
 use crate::google::protobuf::{EnumDescriptorProto, EnumValueDescriptorProto};
-use crate::utils::{
-    camel_case_to_lower_snake_case, get_keyword_safe_ident, snake_case_to_camel_case,
-};
+use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
 use crate::Context;
 use ::once_cell::unsync::OnceCell;
 
@@ -68,7 +66,7 @@ impl<'c> EnumDescriptor<'c> {
             let mod_path = self
                 .package()
                 .split('.')
-                .map(|p| get_keyword_safe_ident(&camel_case_to_lower_snake_case(p)))
+                .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p)))
                 .collect::<String>();
             mod_path + "::" + self.native_bare_typename()
         })
@@ -96,6 +94,6 @@ impl<'c> EnumValueDescriptor<'c> {
     }
     pub fn native_name(&self) -> &str {
         self.lazy_native_name
-            .get_or_init(|| get_keyword_safe_ident(&snake_case_to_camel_case(self.name())))
+            .get_or_init(|| get_keyword_safe_ident(&to_camel_case(self.name())))
     }
 }

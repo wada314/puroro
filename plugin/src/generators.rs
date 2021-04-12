@@ -62,6 +62,7 @@ impl std::convert::TryFrom<i32> for {name} {{
     }
 
     fn enter_submodule(&mut self, name: &str) -> crate::Result<()> {
+        let mod_name = 
         Ok(())
     }
 

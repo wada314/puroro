@@ -50,24 +50,52 @@ impl<W: Write> Write for Indentor<W> {
     }
 }
 
-pub fn snake_case_to_camel_case(input: &str) -> String {
-    let mut capitalize_next = true;
-    input
-        .chars()
-        .filter_map(|c| {
-            if c == '_' {
-                capitalize_next = true;
-                None
-            } else {
-                if capitalize_next {
-                    capitalize_next = false;
-                    Some(c.to_ascii_uppercase())
+enum WordCase {
+    CamelCase,
+    UpperCase,
+    LowerCase,
+}
+fn convert_cases(input: &str, generate_snake_case: bool, out_word_case: WordCase) -> String {
+    let mut word_begins_next = true;
+    let mut last_was_lower_case = true;
+    let mut out = String::new();
+    for c in input.chars() {
+        if c == '_' {
+            word_begins_next = true;
+            last_was_lower_case = false;
+            continue;
+        } else {
+            let word_begins = (last_was_lower_case && c.is_ascii_uppercase()) || word_begins_next;
+            last_was_lower_case = c.is_ascii_lowercase();
+            word_begins_next = false;
+            if word_begins {
+                if generate_snake_case {
+                    out.push('_');
+                }
+                if let WordCase::LowerCase = out_word_case {
+                    out.push(c.to_ascii_lowercase());
                 } else {
-                    Some(c.to_ascii_lowercase())
+                    out.push(c.to_ascii_uppercase());
+                }
+            } else {
+                if let WordCase::UpperCase = out_word_case {
+                    out.push(c.to_ascii_uppercase());
+                } else {
+                    out.push(c.to_ascii_lowercase());
                 }
             }
-        })
-        .collect()
+        }
+    }
+    out
+}
+pub fn to_lower_snake_case(input: &str) -> String {
+    convert_cases(input, true, WordCase::LowerCase)
+}
+pub fn to_upper_snake_case(input: &str) -> String {
+    convert_cases(input, true, WordCase::UpperCase)
+}
+pub fn to_camel_case(input: &str) -> String {
+    convert_cases(input, false, WordCase::CamelCase)
 }
 
 pub fn camel_case_to_lower_snake_case(input: &str) -> String {
