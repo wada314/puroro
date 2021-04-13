@@ -1,5 +1,8 @@
+use std::borrow::Cow;
+
 use crate::google::protobuf::field_descriptor_proto::Label;
 use crate::google::protobuf::FieldDescriptorProto;
+use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::Context;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -29,7 +32,7 @@ pub enum FieldType<'c> {
 impl<'c> FieldType<'c> {
     pub fn native_type_for_numerical_types(
         &self,
-    ) -> std::result::Result<&str, NonnumericalFieldType<'c>> {
+    ) -> std::result::Result<&'static str, NonnumericalFieldType<'c>> {
         match self {
             FieldType::Double => Ok("f64"),
             FieldType::Float => Ok("f32"),
@@ -67,6 +70,8 @@ pub struct FieldDescriptor<'c> {
 
     lazy_type: OnceCell<FieldType<'c>>,
     lazy_fq_type_name: OnceCell<String>,
+    lazy_native_owned_type_name: OnceCell<String>,
+    lazy_native_name: OnceCell<String>,
 }
 impl<'c> FieldDescriptor<'c> {
     pub fn new(
@@ -80,6 +85,8 @@ impl<'c> FieldDescriptor<'c> {
             parent,
             lazy_type: Default::default(),
             lazy_fq_type_name: Default::default(),
+            lazy_native_owned_type_name: Default::default(),
+            lazy_native_name: Default::default(),
         }
     }
     pub fn name(&self) -> &str {
@@ -112,13 +119,16 @@ impl<'c> FieldDescriptor<'c> {
                     Type::TypeString => FieldType::String,
                     Type::TypeGroup => FieldType::Group,
                     Type::TypeMessage => {
-                        match self.context.fq_name_to_desc(self.fq_type_name()?)? {
+                        match self
+                            .context
+                            .fq_name_to_desc(self.fully_qualified_type_name()?)?
+                        {
                             Some(EnumOrMessageRef::Message(m)) => FieldType::Message(m),
                             _ => Err(ErrorKind::InternalError {
                                 detail: format!(
-                                    "The field desc for {}::{} says its `type` is `TYPE_MESSAGE`, \
+                                    "The field desc for {}.{} says its `type` is `TYPE_MESSAGE`, \
                                     but we couldn't find the message named \"{}\" in the inputs.",
-                                    self.parent.fq_name(),
+                                    self.parent.fully_qualified_name(),
                                     self.name(),
                                     self.proto.type_name
                                 ),
@@ -127,13 +137,16 @@ impl<'c> FieldDescriptor<'c> {
                     }
                     Type::TypeBytes => FieldType::Bytes,
                     Type::TypeUint32 => FieldType::UInt32,
-                    Type::TypeEnum => match self.context.fq_name_to_desc(self.fq_type_name()?)? {
+                    Type::TypeEnum => match self
+                        .context
+                        .fq_name_to_desc(self.fully_qualified_type_name()?)?
+                    {
                         Some(EnumOrMessageRef::Enum(e)) => FieldType::Enum(e),
                         _ => Err(ErrorKind::InternalError {
                             detail: format!(
                                 "The field desc for {}::{} says its `type` is `TYPE_ENUM`, \
                                     but we couldn't find the enum named \"{}\" in the inputs.",
-                                self.parent.fq_name(),
+                                self.parent.fully_qualified_name(),
                                 self.name(),
                                 self.proto.type_name
                             ),
@@ -145,7 +158,10 @@ impl<'c> FieldDescriptor<'c> {
                     Type::TypeSint64 => FieldType::SInt64,
                 }
             }
-            Err(0) => match self.context.fq_name_to_desc(self.fq_type_name()?)? {
+            Err(0) => match self
+                .context
+                .fq_name_to_desc(self.fully_qualified_type_name()?)?
+            {
                 Some(EnumOrMessageRef::Enum(e)) => FieldType::Enum(e),
                 Some(EnumOrMessageRef::Message(m)) => FieldType::Message(m),
                 _ => Err(ErrorKind::UnknownTypeName {
@@ -156,7 +172,7 @@ impl<'c> FieldDescriptor<'c> {
         })
     }
 
-    pub fn fq_type_name(&'c self) -> Result<&str> {
+    pub fn fully_qualified_type_name(&'c self) -> Result<&str> {
         Ok(self.lazy_fq_type_name.get_or_try_init(|| -> Result<_> {
             // If the type name starts with ".", then just return the remaining part.
             if let Some(fq_name) = self.proto.type_name.strip_prefix('.') {
@@ -179,6 +195,55 @@ impl<'c> FieldDescriptor<'c> {
                 ),
             })?
         })?)
+    }
+
+    // Returns type name, which will suit for struct definition.
+    pub fn native_owned_type_name(&'c self) -> Result<&str> {
+        Ok(self
+            .lazy_native_owned_type_name
+            .get_or_try_init(|| -> Result<_> {
+                // enum: Result<xxx, i32>
+                // msg: xxx
+                let native_bare_fully_qualified_type: Cow<'static, str> =
+                    match self.r#type()?.native_type_for_numerical_types() {
+                        Ok(s) => s.into(),
+                        Err(t) => match t {
+                            NonnumericalFieldType::Group => Err(ErrorKind::Proto2NotSupported)?,
+                            NonnumericalFieldType::String => "::std::string::String".into(),
+                            NonnumericalFieldType::Bytes => "::std::vec::Vec<u8>".into(),
+                            NonnumericalFieldType::Enum(e) => e
+                                .native_fully_qualified_typename(self.parent.path_to_root_mod())
+                                .into(),
+                            NonnumericalFieldType::Message(m) => m
+                                .native_fully_qualified_typename(self.parent.path_to_root_mod())
+                                .into(),
+                        },
+                    };
+                Ok(match self.label()? {
+                    FieldLabel::Optional => {
+                        if let FieldType::Message(_) = self.r#type()? {
+                            format!(
+                                "::std::option::Optional<{name}>",
+                                name = native_bare_fully_qualified_type
+                            )
+                        } else {
+                            native_bare_fully_qualified_type.into_owned()
+                        }
+                    }
+                    FieldLabel::Required => Err(ErrorKind::Proto2NotSupported)?,
+                    FieldLabel::Repeated => {
+                        format!(
+                            "::std::vec::Vec<{name}",
+                            name = native_bare_fully_qualified_type
+                        )
+                    }
+                })
+            })?)
+    }
+
+    pub fn native_name(&'c self) -> &str {
+        self.lazy_native_name
+            .get_or_init(|| get_keyword_safe_ident(&to_lower_snake_case(self.name())))
     }
 }
 

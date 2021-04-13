@@ -1,6 +1,6 @@
 use super::{EnumDescriptor, FieldDescriptor, FileOrMessageRef};
 use crate::google::protobuf::DescriptorProto;
-use crate::utils::{get_keyword_safe_ident, to_camel_case};
+use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
 use crate::Context;
 use ::once_cell::unsync::OnceCell;
 
@@ -14,8 +14,10 @@ pub struct MessageDescriptor<'c> {
     lazy_enums: OnceCell<Vec<EnumDescriptor<'c>>>,
 
     lazy_package: OnceCell<String>,
+    lazy_path_to_root_mod: OnceCell<String>,
     lazy_fq_name: OnceCell<String>,
     lazy_native_bare_typename: OnceCell<String>,
+    lazy_native_type_name_from_root: OnceCell<String>,
 }
 impl<'c> MessageDescriptor<'c> {
     pub fn new(
@@ -31,8 +33,10 @@ impl<'c> MessageDescriptor<'c> {
             lazy_nested_messages: Default::default(),
             lazy_enums: Default::default(),
             lazy_package: Default::default(),
+            lazy_path_to_root_mod: Default::default(),
             lazy_fq_name: Default::default(),
             lazy_native_bare_typename: Default::default(),
+            lazy_native_type_name_from_root: Default::default(),
         }
     }
     pub fn fields(&'c self) -> impl Iterator<Item = &FieldDescriptor<'c>> {
@@ -78,9 +82,25 @@ impl<'c> MessageDescriptor<'c> {
         self.lazy_package
             .get_or_init(|| self.parent.package_for_child())
     }
-    pub fn fq_name(&'c self) -> &str {
-        self.lazy_fq_name
-            .get_or_init(|| self.name().to_string() + "." + self.package())
+    pub fn path_to_root_mod(&'c self) -> &str {
+        self.lazy_path_to_root_mod.get_or_init(|| {
+            let depth = self.package().split('.').count();
+            if depth != 0 {
+                itertools::Itertools::intersperse(std::iter::repeat("super").take(depth), "::")
+                    .collect::<String>()
+            } else {
+                "self".to_string()
+            }
+        })
+    }
+    pub fn fully_qualified_name(&'c self) -> &str {
+        self.lazy_fq_name.get_or_init(|| {
+            format!(
+                "{package}.{name}",
+                package = self.package(),
+                name = self.name()
+            )
+        })
     }
 
     /// Returns a Rust typename without mod path,
@@ -88,5 +108,25 @@ impl<'c> MessageDescriptor<'c> {
     pub fn native_bare_typename(&self) -> &str {
         self.lazy_native_bare_typename
             .get_or_init(|| get_keyword_safe_ident(&to_camel_case(self.name())))
+    }
+
+    pub fn native_fully_qualified_typename(&'c self, path_to_root_mod: &str) -> String {
+        let native_type_name_from_root = self.lazy_native_type_name_from_root.get_or_init(|| {
+            let mod_path = self
+                .package()
+                .split('.')
+                .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p)))
+                .collect::<String>();
+            format!(
+                "{mod_path}::{bare_type}",
+                mod_path = mod_path,
+                bare_type = self.native_bare_typename()
+            )
+        });
+        format!(
+            "{path_to_root_mod}::{type_name}",
+            path_to_root_mod = path_to_root_mod,
+            type_name = native_type_name_from_root
+        )
     }
 }

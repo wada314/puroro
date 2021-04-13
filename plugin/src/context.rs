@@ -40,10 +40,10 @@ impl<'c> Context<'c> {
                 impl<'a, 'd> DescriptorVisitor<'d> for Visitor<'a, 'd> {
                     fn handle_msg(&mut self, msg: &'d MessageDescriptor<'d>) -> Result<()> {
                         if let Some(_) =
-                            self.0.insert(msg.fq_name(), EnumOrMessageRef::Message(msg))
+                            self.0.insert(msg.fully_qualified_name(), EnumOrMessageRef::Message(msg))
                         {
                             Err(ErrorKind::ConflictedName {
-                                name: msg.fq_name().to_string(),
+                                name: msg.fully_qualified_name().to_string(),
                             })?
                         }
                         Ok(())

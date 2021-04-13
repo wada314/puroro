@@ -24,8 +24,8 @@ pub struct {name} {{\n",
             indent((iter(msg.fields().map(|field| {
                 Ok(format!(
                     "pub {name}: {type_},\n",
-                    name = "foo",   /*field.name()*/
-                    type_ = "hoge", /*field.type_()*/
+                    name = field.native_name(),
+                    type_ = field.native_owned_type_name()?,
                 ))
             })),)),
             "\
