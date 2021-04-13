@@ -1,9 +1,12 @@
+use std::fmt::Debug;
+
 use super::{EnumDescriptor, FieldDescriptor, FileOrMessageRef};
 use crate::google::protobuf::DescriptorProto;
 use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
 use crate::Context;
 use ::once_cell::unsync::OnceCell;
 
+#[derive(Clone)]
 pub struct MessageDescriptor<'c> {
     proto: &'c DescriptorProto,
     context: &'c Context<'c>,
@@ -112,11 +115,13 @@ impl<'c> MessageDescriptor<'c> {
 
     pub fn native_fully_qualified_typename(&'c self, path_to_root_mod: &str) -> String {
         let native_type_name_from_root = self.lazy_native_type_name_from_root.get_or_init(|| {
-            let mod_path = self
-                .package()
-                .split('.')
-                .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p)))
-                .collect::<String>();
+            let mod_path = itertools::Itertools::intersperse(
+                self.package()
+                    .split('.')
+                    .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
+                "::".to_string(),
+            )
+            .collect::<String>();
             format!(
                 "{mod_path}::{bare_type}",
                 mod_path = mod_path,
@@ -128,5 +133,11 @@ impl<'c> MessageDescriptor<'c> {
             path_to_root_mod = path_to_root_mod,
             type_name = native_type_name_from_root
         )
+    }
+}
+
+impl Debug for MessageDescriptor<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MessageDescriptor").finish()
     }
 }

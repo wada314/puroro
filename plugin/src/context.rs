@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt::Debug;
 
 use crate::google::protobuf::compiler::CodeGeneratorRequest;
 use crate::wrappers::{
@@ -7,6 +8,7 @@ use crate::wrappers::{
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 
+#[derive(Clone)]
 pub struct Context<'c> {
     proto: CodeGeneratorRequest,
     lazy_file_descriptors: OnceCell<Vec<FileDescriptor<'c>>>,
@@ -39,8 +41,9 @@ impl<'c> Context<'c> {
                 struct Visitor<'a, 'd>(&'a mut HashMap<&'d str, EnumOrMessageRef<'d>>);
                 impl<'a, 'd> DescriptorVisitor<'d> for Visitor<'a, 'd> {
                     fn handle_msg(&mut self, msg: &'d MessageDescriptor<'d>) -> Result<()> {
-                        if let Some(_) =
-                            self.0.insert(msg.fully_qualified_name(), EnumOrMessageRef::Message(msg))
+                        if let Some(_) = self
+                            .0
+                            .insert(msg.fully_qualified_name(), EnumOrMessageRef::Message(msg))
                         {
                             Err(ErrorKind::ConflictedName {
                                 name: msg.fully_qualified_name().to_string(),
@@ -52,10 +55,10 @@ impl<'c> Context<'c> {
                     fn handle_enum(&mut self, enume: &'d EnumDescriptor<'d>) -> Result<()> {
                         if let Some(_) = self
                             .0
-                            .insert(enume.fq_name(), EnumOrMessageRef::Enum(enume))
+                            .insert(enume.fully_qualified_name(), EnumOrMessageRef::Enum(enume))
                         {
                             Err(ErrorKind::ConflictedName {
-                                name: enume.fq_name().to_string(),
+                                name: enume.fully_qualified_name().to_string(),
                             })?
                         }
                         Ok(())
@@ -69,5 +72,11 @@ impl<'c> Context<'c> {
                 Ok(map)
             })?;
         Ok(map.get(fq_name).cloned())
+    }
+}
+
+impl Debug for Context<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Context").finish()
     }
 }

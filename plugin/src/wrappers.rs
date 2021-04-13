@@ -24,6 +24,7 @@ pub use message::MessageDescriptor;
 pub use r#enum::{EnumDescriptor, EnumValueDescriptor};
 
 // Used for the `parent` type for messages and enums.
+#[derive(Debug, Clone)]
 pub enum FileOrMessageRef<'c> {
     File(&'c FileDescriptor<'c>),
     Message(&'c MessageDescriptor<'c>),
@@ -32,12 +33,16 @@ impl<'c> FileOrMessageRef<'c> {
     pub fn package_for_child(&self) -> String {
         match self {
             &FileOrMessageRef::File(file) => file.package().to_string(),
-            &FileOrMessageRef::Message(message) => message.package().to_string() + message.name(),
+            &FileOrMessageRef::Message(message) => format!(
+                "{package}.{name}",
+                package = message.package().to_string(),
+                name = message.name()
+            ),
         }
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum EnumOrMessageRef<'c> {
     Enum(&'c EnumDescriptor<'c>),
     Message(&'c MessageDescriptor<'c>),

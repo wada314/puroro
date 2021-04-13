@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::fmt::Debug;
 
 use crate::google::protobuf::field_descriptor_proto::Label;
 use crate::google::protobuf::FieldDescriptorProto;
@@ -9,6 +10,7 @@ use ::once_cell::unsync::OnceCell;
 
 use super::{EnumOrMessageRef, MessageDescriptor};
 
+#[derive(Debug, Clone)]
 pub enum FieldType<'c> {
     Double,
     Float,
@@ -49,6 +51,8 @@ impl<'c> FieldType<'c> {
         }
     }
 }
+
+#[derive(Debug, Clone)]
 pub enum NonnumericalFieldType<'c> {
     Group,
     String,
@@ -57,12 +61,14 @@ pub enum NonnumericalFieldType<'c> {
     Message(&'c super::MessageDescriptor<'c>),
 }
 
+#[derive(Debug, Clone)]
 pub enum FieldLabel {
     Optional,
     Required,
     Repeated,
 }
 
+#[derive(Clone)]
 pub struct FieldDescriptor<'c> {
     proto: &'c FieldDescriptorProto,
     context: &'c Context<'c>,
@@ -130,7 +136,7 @@ impl<'c> FieldDescriptor<'c> {
                                     but we couldn't find the message named \"{}\" in the inputs.",
                                     self.parent.fully_qualified_name(),
                                     self.name(),
-                                    self.proto.type_name
+                                    self.fully_qualified_type_name()?
                                 ),
                             })?,
                         }
@@ -144,11 +150,11 @@ impl<'c> FieldDescriptor<'c> {
                         Some(EnumOrMessageRef::Enum(e)) => FieldType::Enum(e),
                         _ => Err(ErrorKind::InternalError {
                             detail: format!(
-                                "The field desc for {}::{} says its `type` is `TYPE_ENUM`, \
+                                "The field desc for {}.{} says its `type` is `TYPE_ENUM`, \
                                     but we couldn't find the enum named \"{}\" in the inputs.",
                                 self.parent.fully_qualified_name(),
                                 self.name(),
-                                self.proto.type_name
+                                self.fully_qualified_type_name()?
                             ),
                         })?,
                     },
@@ -223,17 +229,26 @@ impl<'c> FieldDescriptor<'c> {
                     FieldLabel::Optional => {
                         if let FieldType::Message(_) = self.r#type()? {
                             format!(
-                                "::std::option::Optional<{name}>",
+                                "::std::option::Optional<::std::boxed::Box<{name}>>",
                                 name = native_bare_fully_qualified_type
                             )
                         } else {
                             native_bare_fully_qualified_type.into_owned()
                         }
                     }
-                    FieldLabel::Required => Err(ErrorKind::Proto2NotSupported)?,
+                    FieldLabel::Required => {
+                        if let FieldType::Message(_) = self.r#type()? {
+                            format!(
+                                "::std::boxed::Box<{name}>",
+                                name = native_bare_fully_qualified_type
+                            )
+                        } else {
+                            native_bare_fully_qualified_type.into_owned()
+                        }
+                    }
                     FieldLabel::Repeated => {
                         format!(
-                            "::std::vec::Vec<{name}",
+                            "::std::vec::Vec<{name}>",
                             name = native_bare_fully_qualified_type
                         )
                     }
@@ -244,6 +259,12 @@ impl<'c> FieldDescriptor<'c> {
     pub fn native_name(&'c self) -> &str {
         self.lazy_native_name
             .get_or_init(|| get_keyword_safe_ident(&to_lower_snake_case(self.name())))
+    }
+}
+
+impl Debug for FieldDescriptor<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("FieldDescriptor").finish()
     }
 }
 

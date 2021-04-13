@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::google::protobuf::FileDescriptorProto;
 use crate::Context;
 use crate::Result;
@@ -5,6 +7,7 @@ use crate::Result;
 use super::{EnumDescriptor, FileOrMessageRef, MessageDescriptor};
 use ::once_cell::unsync::OnceCell;
 
+#[derive(Clone)]
 pub struct FileDescriptor<'c> {
     proto: &'c FileDescriptorProto,
     context: &'c Context<'c>,
@@ -109,6 +112,13 @@ impl<'c> FileDescriptor<'c> {
         Ok(())
     }
 }
+
+impl Debug for FileDescriptor<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("FileDescriptor").finish()
+    }
+}
+
 pub trait DescriptorVisitor<'c> {
     fn handle_msg(&mut self, #[allow(unused)] msg: &'c MessageDescriptor<'c>) -> Result<()> {
         Ok(())
