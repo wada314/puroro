@@ -14,7 +14,24 @@ struct Visitor {
 }
 impl<'c> wrappers::DescriptorVisitor<'c> for Visitor {
     fn handle_msg(&mut self, msg: &'c wrappers::MessageDescriptor<'c>) -> crate::Result<()> {
-        Ok(())
+        (
+            format!(
+                "\
+#[derive(Debug, Clone)]
+pub struct {name} {{\n",
+                name = msg.native_bare_typename(),
+            ),
+            indent((iter(msg.fields().map(|field| {
+                Ok(format!(
+                    "pub {name}: {type_},\n",
+                    name = "foo",   /*field.name()*/
+                    type_ = "hoge", /*field.type_()*/
+                ))
+            })),)),
+            "\
+}}\n",
+        )
+            .write_into(&mut self.output)
     }
 
     fn handle_enum(&mut self, enume: &'c wrappers::EnumDescriptor<'c>) -> crate::Result<()> {

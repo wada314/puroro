@@ -1,7 +1,5 @@
-use crate::{ErrorKind, Result};
 use ::lazy_static::lazy_static;
-use itertools::Itertools;
-use std::{collections::HashSet, fmt::Write, rc::Rc};
+use std::{collections::HashSet, fmt::Write};
 
 pub struct Indentor<W> {
     writer: W,
