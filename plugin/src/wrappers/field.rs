@@ -134,7 +134,7 @@ impl<'c> FieldDescriptor<'c> {
             FieldType::SInt64 => WireType::Variant(VariantFieldType::SInt64),
             FieldType::Enum(e) => WireType::Variant(VariantFieldType::Enum(e)),
             FieldType::Bool => WireType::Variant(VariantFieldType::Bool),
-            FieldType::Group => Err(ErrorKind::Proto2NotSupported)?,
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => WireType::LengthDelimited(LengthDelimitedFieldType::String),
             FieldType::Bytes => WireType::LengthDelimited(LengthDelimitedFieldType::Bytes),
             FieldType::Message(m) => {
