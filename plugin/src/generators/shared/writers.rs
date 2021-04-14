@@ -3,6 +3,8 @@ use crate::Result;
 use std::collections::VecDeque;
 use std::{borrow::Cow, fmt::Write};
 
+// TupleOfIntoFragments
+
 pub trait TupleOfIntoFragments<'w, W: 'w>: Sized {
     type Iter: Iterator<Item = Fragment<'w, W>>;
     fn into_frag_iter(self) -> Self::Iter;
@@ -37,6 +39,27 @@ macro_rules! impl_tuple_into_fragments {
 }
 impl_tuple_into_fragments!(8, A, B, C, D, E, F, G, H);
 
+impl<'w, W: 'w> TupleOfIntoFragments<'w, W> for &'static str {
+    type Iter = std::iter::Once<Fragment<'w, W>>;
+    fn into_frag_iter(self) -> Self::Iter {
+        std::iter::once(Fragment::Str(self))
+    }
+}
+impl<'w, W: 'w> TupleOfIntoFragments<'w, W> for String {
+    type Iter = std::iter::Once<Fragment<'w, W>>;
+    fn into_frag_iter(self) -> Self::Iter {
+        std::iter::once(Fragment::String(self))
+    }
+}
+impl<'w, W: 'w> TupleOfIntoFragments<'w, W> for Cow<'static, str> {
+    type Iter = std::iter::Once<Fragment<'w, W>>;
+    fn into_frag_iter(self) -> Self::Iter {
+        std::iter::once(Fragment::Cow(self))
+    }
+}
+
+// Fragment
+
 pub enum Fragment<'w, W: 'w> {
     Str(&'static str),
     String(String),
@@ -63,6 +86,7 @@ impl<'w, W> From<Cow<'static, str>> for Fragment<'w, W> {
         Self::Cow(s)
     }
 }
+
 pub fn indent<'w, T, W: 'w>(tuple: T) -> Fragment<'w, W>
 where
     T: TupleOfIntoFragments<'w, W>,

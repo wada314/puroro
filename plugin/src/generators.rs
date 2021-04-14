@@ -11,7 +11,7 @@ use crate::wrappers::{
     DescriptorVisitor, EnumDescriptor, FieldLabel, FieldType, MessageDescriptor,
 };
 use crate::Result;
-use shared::writers::{indent, indent_n, iter, TupleOfIntoFragments};
+use shared::writers::{func, indent, indent_n, iter, seq, Fragment, TupleOfIntoFragments};
 
 use super::Context;
 struct Visitor {
@@ -63,6 +63,7 @@ impl ::std::default::Default for {name} {{
         }}
     }}
 }}\n",
+            func(|output| print_msg_deserializable(output, msg)),
         )
             .write_into(&mut self.output)
     }
@@ -109,6 +110,15 @@ impl std::convert::TryFrom<i32> for {name} {{
         }}
     }}
 }}\n",
+            format!(
+                "\
+impl std::convert::Into<i32> for {name} {{
+    fn into(self) -> i32 {{
+        self as i32
+    }}
+}}\n",
+                name = enume.native_bare_type_name()
+            ),
         )
             .write_into(&mut self.output)
     }
@@ -120,8 +130,10 @@ impl std::convert::TryFrom<i32> for {name} {{
         Ok(())
     }
 
-    fn exit_submodule(&mut self, _name: &str) -> crate::Result<()> {
-        self.output.write_str("}\n")?;
+    fn exit_submodule(&mut self, name: &str) -> crate::Result<()> {
+        let mod_name = get_keyword_safe_ident(&to_lower_snake_case(name));
+        self.output
+            .write_fmt(format_args!("}} // mod {name}\n", name = mod_name))?;
         Ok(())
     }
 }
@@ -140,7 +152,6 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<Vec<(String, String)>
 
 pub fn print_msg_deserializable<'c>(
     output: &mut Indentor<String>,
-    context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (
@@ -167,39 +178,38 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
                     "{d}::Field::Variant(variant) => match field_number {{\n",
                     d = DESER_MOD
                 ),
-                indent((iter(msg.fields().map(|field| -> Result<_> {
+                indent((iter(msg.fields().map(|field| -> Result<Fragment<_>> {
                     Ok(
                         match field
                             .type_()?
                             .native_tag_type_for_variant_types(msg.path_to_root_mod())
                         {
-                            Ok(tag) => match field.label()? {
-                                FieldLabel::Optional | FieldLabel::Required => {
-                                    format!(
-                                        "\
-{number} => {{
-    self.{name} = variant.to_native::<{tag}>()?;
-}}\n",
-                                        number = field.number(),
-                                        name = field.native_name(),
-                                        tag = tag,
-                                    )
-                                }
-                                FieldLabel::Repeated => {
-                                    format!(
-                                        "\
-{number} => {{
-    self.{name}.push(variant.to_native::<{tag}>()?);
-}}\n",
-                                        number = field.number(),
-                                        name = field.native_name(),
-                                        tag = tag,
-                                    )
-                                }
-                            },
-                            Err(_) => {
-                                todo!()
-                            }
+                            Ok(tag) => seq((
+                                format!("{number} => {{\n", number = field.number()),
+                                indent((match field.label()? {
+                                    FieldLabel::Optional | FieldLabel::Required => {
+                                        format!(
+                                            "self.{name} = variant.to_native::<{tag}>()?;\n",
+                                            name = field.native_name(),
+                                            tag = tag,
+                                        )
+                                    }
+                                    FieldLabel::Repeated => {
+                                        format!(
+                                            "self.{name}.push(variant.to_native::<{tag}>()?);\n",
+                                            name = field.native_name(),
+                                            tag = tag,
+                                        )
+                                    }
+                                },)),
+                                "}}\n",
+                            ))
+                            .into(),
+                            Err(_) => format!(
+                                "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
+                                number = field.number()
+                            )
+                            .into(),
                         },
                     )
                 })),)),
