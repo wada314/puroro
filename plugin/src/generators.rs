@@ -24,7 +24,7 @@ impl<'c> DescriptorVisitor<'c> for Visitor {
                 "\
 #[derive(Debug, Clone)]
 pub struct {name} {{\n",
-                name = msg.native_bare_typename(),
+                name = msg.native_bare_type_name(),
             ),
             indent((iter(msg.fields().map(|field| {
                 Ok(format!(
@@ -42,7 +42,7 @@ impl ::std::default::Default for {name} {{
         #[allow(unused)]
         use ::std::convert::TryInto;
         Self {{\n",
-                name = msg.native_bare_typename(),
+                name = msg.native_bare_type_name(),
             ),
             indent_n(
                 3,
@@ -73,7 +73,7 @@ impl ::std::default::Default for {name} {{
                 "\
 #[derive(Debug, Clone)]
 pub enum {name} {{\n",
-                name = enume.native_bare_typename()
+                name = enume.native_bare_type_name()
             ),
             indent((iter(enume.values().map(|value| {
                 Ok(format!(
@@ -90,7 +90,7 @@ impl std::convert::TryFrom<i32> for {name} {{
     type Error = i32;
     fn try_from(val: i32) -> ::std::result::Result<Self, i32> {{
         match val {{\n",
-                name = enume.native_bare_typename()
+                name = enume.native_bare_type_name()
             ),
             indent_n(
                 3,
@@ -158,7 +158,7 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
     ) -> ::puroro::Result<()> {{
         match field {{\n",
             d = DESER_MOD,
-            name = msg.native_bare_typename(),
+            name = msg.native_bare_type_name(),
         ),
         indent_n(
             3,

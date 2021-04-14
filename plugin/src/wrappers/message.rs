@@ -19,7 +19,7 @@ pub struct MessageDescriptor<'c> {
     lazy_package: OnceCell<String>,
     lazy_path_to_root_mod: OnceCell<String>,
     lazy_fq_name: OnceCell<String>,
-    lazy_native_bare_typename: OnceCell<String>,
+    lazy_native_bare_type_name: OnceCell<String>,
     lazy_native_type_name_from_root: OnceCell<String>,
 }
 impl<'c> MessageDescriptor<'c> {
@@ -38,7 +38,7 @@ impl<'c> MessageDescriptor<'c> {
             lazy_package: Default::default(),
             lazy_path_to_root_mod: Default::default(),
             lazy_fq_name: Default::default(),
-            lazy_native_bare_typename: Default::default(),
+            lazy_native_bare_type_name: Default::default(),
             lazy_native_type_name_from_root: Default::default(),
         }
     }
@@ -106,14 +106,20 @@ impl<'c> MessageDescriptor<'c> {
         })
     }
 
+    /// Returns a Rust typename which can be used for struct definition:
+    /// ```
+    /// pub struct HERE {
+    ///     //...
+    /// }
+    /// ```
     /// Returns a Rust typename without mod path,
     /// without distinguishing between repeated / optional labels.
-    pub fn native_bare_typename(&self) -> &str {
-        self.lazy_native_bare_typename
+    pub fn native_bare_type_name(&self) -> &str {
+        self.lazy_native_bare_type_name
             .get_or_init(|| get_keyword_safe_ident(&to_camel_case(self.name())))
     }
 
-    pub fn native_fully_qualified_typename(&'c self, path_to_root_mod: &str) -> String {
+    pub fn native_fully_qualified_type_name(&'c self, path_to_root_mod: &str) -> String {
         let native_type_name_from_root = self.lazy_native_type_name_from_root.get_or_init(|| {
             let mod_path = itertools::Itertools::intersperse(
                 self.package()
@@ -125,7 +131,7 @@ impl<'c> MessageDescriptor<'c> {
             format!(
                 "{mod_path}::{bare_type}",
                 mod_path = mod_path,
-                bare_type = self.native_bare_typename()
+                bare_type = self.native_bare_type_name()
             )
         });
         format!(

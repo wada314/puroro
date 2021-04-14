@@ -160,10 +160,10 @@ impl<'c> FieldDescriptor<'c> {
                             NonnumericalFieldType::String => "::std::string::String".into(),
                             NonnumericalFieldType::Bytes => "::std::vec::Vec<u8>".into(),
                             NonnumericalFieldType::Enum(e) => e
-                                .native_fully_qualified_typename(self.parent.path_to_root_mod())
+                                .native_fully_qualified_type_name(self.parent.path_to_root_mod())
                                 .into(),
                             NonnumericalFieldType::Message(m) => m
-                                .native_fully_qualified_typename(self.parent.path_to_root_mod())
+                                .native_fully_qualified_type_name(self.parent.path_to_root_mod())
                                 .into(),
                         },
                     };
@@ -276,7 +276,7 @@ impl<'c> FieldType<'c> {
             FieldType::Bool => Ok("::puroro::tags::Bool".into()),
             FieldType::Enum(e) => Ok(format!(
                 "::puroro::tags::Enum<{name}>",
-                name = e.native_fully_qualified_typename(path_to_root_mod)
+                name = e.native_fully_qualified_type_name(path_to_root_mod)
             )
             .into()),
             FieldType::Double => Err(NonvariantFieldType::Double),
