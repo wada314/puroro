@@ -73,8 +73,8 @@ impl<'c> EnumDescriptor<'c> {
             .get_or_init(|| get_keyword_safe_ident(&to_camel_case(self.name())))
     }
 
-    /// Returns a Rust typename qualified with a mod path from the output's rood mod,
-    /// without wrapped by Result<>, without distinguishing between repeated / optional labels.
+    /// Returns a Rust typename qualified with a mod path from an arbitral mod location,
+    /// with wrapped by Result<>, without distinguishing between repeated / optional labels.
     pub fn native_fully_qualified_type_name(&'c self, path_to_root_mod: &str) -> String {
         let native_type_name_from_root = self.lazy_native_type_name_from_root.get_or_init(|| {
             let mod_path = itertools::Itertools::intersperse(

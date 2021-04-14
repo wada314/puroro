@@ -201,36 +201,31 @@ pub fn print_msg_deserializable_variant_arm<'c>(
             d = DESER_MOD
         ),
         indent((iter(msg.fields().map(|field| -> Result<Fragment<_>> {
-            Ok(
-                match field
-                    .type_()?
-                    .native_tag_type_for_variant_types(msg.path_to_root_mod())
-                {
-                    Ok(tag) => seq((
-                        format!("{number} => {{\n", number = field.number()),
-                        indent((if field.is_repeated()? {
-                            format!(
-                                "self.{name}.push(variant.to_native::<{tag}>()?);\n",
-                                name = field.native_name(),
-                                tag = tag,
-                            )
-                        } else {
-                            format!(
-                                "self.{name} = variant.to_native::<{tag}>()?;\n",
-                                name = field.native_name(),
-                                tag = tag,
-                            )
-                        },)),
-                        "}}\n",
-                    ))
-                    .into(),
-                    Err(_) => format!(
-                        "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
-                        number = field.number()
-                    )
-                    .into(),
-                },
-            )
+            Ok(match field.wire_type()? {
+                WireType::Variant(field_type) => seq((
+                    format!("{number} => {{\n", number = field.number()),
+                    indent((if field.is_repeated()? {
+                        format!(
+                            "self.{name}.push(variant.to_native::<{tag}>()?);\n",
+                            name = field.native_name(),
+                            tag = field_type.native_tag_type(msg.path_to_root_mod()),
+                        )
+                    } else {
+                        format!(
+                            "self.{name} = variant.to_native::<{tag}>()?;\n",
+                            name = field.native_name(),
+                            tag = field_type.native_tag_type(msg.path_to_root_mod()),
+                        )
+                    },)),
+                    "}}\n",
+                ))
+                .into(),
+                _ => format!(
+                    "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
+                    number = field.number()
+                )
+                .into(),
+            })
         })),)),
         "}}\n",
     )
@@ -250,64 +245,62 @@ pub fn print_msg_deserializable_length_delimited_arm<'c>(
             iter(msg.fields().map(|field| -> Result<Fragment<_>> {
                 Ok(seq((
                     format!("{number} => {{\n", number = field.number()),
-                    indent(
-                        match field
-                            .type_()?
-                            .native_tag_type_for_variant_types(msg.path_to_root_mod())
-                        {
-                            Ok(tag) => {
-                                if field.is_repeated()? {
-                                    format!(
-                                        "\
+                    indent((match field.wire_type()? {
+                        // Deserialize packed variant(s)
+                        WireType::Variant(field_type) => {
+                            if field.is_repeated()? {
+                                format!(
+                                    "\
 self.{name}.append(&mut ldd.deserialize_as_variants().map(|rv| {{
     rv.and_then(|variant| variant.to_native::<{tag}>())
 }}).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);\n",
-                                        name = field.native_name(),
-                                        tag = tag,
-                                    )
-                                } else {
-                                    format!(
-                                        "\
+                                    name = field.native_name(),
+                                    tag = field_type.native_tag_type(msg.path_to_root_mod()),
+                                )
+                            } else {
+                                format!(
+                                    "\
 self.{name} = ldd.deserialize_as_variants()
     .last()
     .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
     .and_then(|variant| variant.to_native::<{tag}>())?;\n",
-                                        name = field.native_name(),
-                                        tag = tag,
-                                    )
-                                }
+                                    name = field.native_name(),
+                                    tag = field_type.native_tag_type(msg.path_to_root_mod()),
+                                )
                             }
-                            Err(NonvariantFieldType::String) => {
+                        }
+                        WireType::LengthDelimited(field_type) => match field_type {
+                            LengthDelimitedFieldType::String => {
                                 if field.is_repeated()? {
                                     format!(
                                         "self.{name}.push(ldd.deserialize_as_chars()\
-                                        .collect::<::puroro::Result<_>>()?);\n",
+                                            .collect::<::puroro::Result<_>>()?);\n",
                                         name = field.native_name()
                                     )
                                 } else {
                                     format!(
                                         "self.{name} = ldd.deserialize_as_chars()\
-                                        .collect::<::puroro::Result<_>>()?;\n",
+                                            .collect::<::puroro::Result<_>>()?;\n",
                                         name = field.native_name()
                                     )
                                 }
                             }
-                            Err(NonvariantFieldType::Bytes) => {
+                            LengthDelimitedFieldType::Bytes => {
                                 if field.is_repeated()? {
                                     format!(
                                         "self.{name}.push(ldd.deserialize_as_bytes()\
-                                        .collect::<::puroro::Result<_>>()?);\n",
+                                            .collect::<::puroro::Result<_>>()?);\n",
                                         name = field.native_name()
                                     )
                                 } else {
                                     format!(
                                         "self.{name} = ldd.deserialize_as_bytes()\
-                                        .collect::<::puroro::Result<_>>()?;\n",
+                                            .collect::<::puroro::Result<_>>()?;\n",
                                         name = field.native_name()
                                     )
                                 }
                             }
-                            Err(NonvariantFieldType::Message(_)) => {
+                            LengthDelimitedFieldType::Message(_) => {
                                 if field.is_repeated()? {
                                     format!(
                                         "\
@@ -326,9 +319,9 @@ ldd.deserialize_as_message(boxed_msg.as_mut())?;",
                                     )
                                 }
                             }
-                            _ => "Err(::puroro::PuroroError::UnexpectedWireType)?\n".into(),
                         },
-                    ),
+                        _ => "Err(::puroro::PuroroError::UnexpectedWireType)?\n".into(),
+                    },)),
                     "}}\n",
                 )))
             })),

@@ -272,12 +272,55 @@ pub enum VariantFieldType<'c> {
     Bool,
     Enum(&'c super::EnumDescriptor<'c>),
 }
+impl<'c> VariantFieldType<'c> {
+    pub fn native_type(&self, path_to_root_mod: &str) -> Cow<'static, str> {
+        match self {
+            VariantFieldType::Int32 | VariantFieldType::SInt32 => "i32".into(),
+            VariantFieldType::Int64 | VariantFieldType::SInt64 => "i64".into(),
+            VariantFieldType::UInt32 => "u32".into(),
+            VariantFieldType::UInt64 => "u64".into(),
+            VariantFieldType::Bool => "bool".into(),
+            VariantFieldType::Enum(e) => format!(
+                "::std::result::Result<{name}, i32>",
+                name = e.native_fully_qualified_type_name(path_to_root_mod)
+            )
+            .into(),
+        }
+    }
+    pub fn native_tag_type(&self, path_to_root_mod: &str) -> Cow<'static, str> {
+        match self {
+            VariantFieldType::Int32 => "::puroro::tags::Int32".into(),
+            VariantFieldType::Int64 => "::puroro::tags::Int64".into(),
+            VariantFieldType::UInt32 => "::puroro::tags::UInt32".into(),
+            VariantFieldType::UInt64 => "::puroro::tags::UInt64".into(),
+            VariantFieldType::SInt32 => "::puroro::tags::SInt32".into(),
+            VariantFieldType::SInt64 => "::puroro::tags::UInt64".into(),
+            VariantFieldType::Bool => "::puroro::tags::Bool".into(),
+            VariantFieldType::Enum(e) => format!(
+                "::puroro::tags::Enum<{name}>",
+                name = e.native_fully_qualified_type_name(path_to_root_mod)
+            )
+            .into(),
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub enum LengthDelimitedFieldType<'c> {
     String,
     Bytes,
     Message(&'c super::MessageDescriptor<'c>),
+}
+impl<'c> LengthDelimitedFieldType<'c> {
+    pub fn native_owned_type(&self, path_to_root_mod: &str) -> Cow<'static, str> {
+        match self {
+            LengthDelimitedFieldType::String => "::std::string::String".into(),
+            LengthDelimitedFieldType::Bytes => "::std::vec::Vec<u8>".into(),
+            LengthDelimitedFieldType::Message(m) => {
+                m.native_fully_qualified_type_name(path_to_root_mod).into()
+            }
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -352,35 +395,6 @@ impl<'c> FieldType<'c> {
             FieldType::Message(m) => Err(NonnumericalFieldType::Message(m)),
         }
     }
-    pub fn native_tag_type_for_variant_types(
-        &self,
-        path_to_root_mod: &str,
-    ) -> std::result::Result<Cow<'static, str>, NonvariantFieldType<'c>> {
-        match self {
-            FieldType::Int32 => Ok("::puroro::tags::Int32".into()),
-            FieldType::Int64 => Ok("::puroro::tags::Int64".into()),
-            FieldType::UInt32 => Ok("::puroro::tags::UInt32".into()),
-            FieldType::UInt64 => Ok("::puroro::tags::UInt64".into()),
-            FieldType::SInt32 => Ok("::puroro::tags::SInt32".into()),
-            FieldType::SInt64 => Ok("::puroro::tags::SInt64".into()),
-            FieldType::Bool => Ok("::puroro::tags::Bool".into()),
-            FieldType::Enum(e) => Ok(format!(
-                "::puroro::tags::Enum<{name}>",
-                name = e.native_fully_qualified_type_name(path_to_root_mod)
-            )
-            .into()),
-            FieldType::Double => Err(NonvariantFieldType::Double),
-            FieldType::Float => Err(NonvariantFieldType::Float),
-            FieldType::Fixed32 => Err(NonvariantFieldType::Fixed32),
-            FieldType::Fixed64 => Err(NonvariantFieldType::Fixed64),
-            FieldType::SFixed32 => Err(NonvariantFieldType::SFixed32),
-            FieldType::SFixed64 => Err(NonvariantFieldType::SFixed64),
-            FieldType::Group => Err(NonvariantFieldType::Group),
-            FieldType::String => Err(NonvariantFieldType::String),
-            FieldType::Bytes => Err(NonvariantFieldType::Bytes),
-            FieldType::Message(m) => Err(NonvariantFieldType::Message(m)),
-        }
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -389,19 +403,6 @@ pub enum NonnumericalFieldType<'c> {
     String,
     Bytes,
     Enum(&'c super::EnumDescriptor<'c>),
-    Message(&'c super::MessageDescriptor<'c>),
-}
-#[derive(Debug, Clone)]
-pub enum NonvariantFieldType<'c> {
-    Double,
-    Float,
-    Fixed32,
-    Fixed64,
-    SFixed32,
-    SFixed64,
-    Group,
-    String,
-    Bytes,
     Message(&'c super::MessageDescriptor<'c>),
 }
 
