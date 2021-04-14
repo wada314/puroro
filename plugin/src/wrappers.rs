@@ -18,7 +18,7 @@ mod r#enum;
 mod field;
 mod file;
 mod message;
-pub use field::{FieldDescriptor, FieldLabel, FieldType};
+pub use field::{FieldDescriptor, FieldLabel, FieldType, NonvariantFieldType, NonnumericalFieldType};
 pub use file::{DescriptorVisitor, FileDescriptor};
 pub use message::MessageDescriptor;
 pub use r#enum::{EnumDescriptor, EnumValueDescriptor};

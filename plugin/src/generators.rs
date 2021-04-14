@@ -9,6 +9,7 @@ use std::fmt::Write;
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case, Indentor};
 use crate::wrappers::{
     DescriptorVisitor, EnumDescriptor, FieldLabel, FieldType, MessageDescriptor,
+    NonvariantFieldType,
 };
 use crate::Result;
 use shared::writers::{func, indent, indent_n, iter, seq, Fragment, TupleOfIntoFragments};
@@ -174,46 +175,8 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
         indent_n(
             3,
             (
-                format!(
-                    "{d}::Field::Variant(variant) => match field_number {{\n",
-                    d = DESER_MOD
-                ),
-                indent((iter(msg.fields().map(|field| -> Result<Fragment<_>> {
-                    Ok(
-                        match field
-                            .type_()?
-                            .native_tag_type_for_variant_types(msg.path_to_root_mod())
-                        {
-                            Ok(tag) => seq((
-                                format!("{number} => {{\n", number = field.number()),
-                                indent((match field.label()? {
-                                    FieldLabel::Optional | FieldLabel::Required => {
-                                        format!(
-                                            "self.{name} = variant.to_native::<{tag}>()?;\n",
-                                            name = field.native_name(),
-                                            tag = tag,
-                                        )
-                                    }
-                                    FieldLabel::Repeated => {
-                                        format!(
-                                            "self.{name}.push(variant.to_native::<{tag}>()?);\n",
-                                            name = field.native_name(),
-                                            tag = tag,
-                                        )
-                                    }
-                                },)),
-                                "}}\n",
-                            ))
-                            .into(),
-                            Err(_) => format!(
-                                "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
-                                number = field.number()
-                            )
-                            .into(),
-                        },
-                    )
-                })),)),
-                "}}\n",
+                func(|output| print_msg_deserializable_variant_arm(output, msg)),
+                func(|output| print_msg_deserializable_length_delimited_arm(output, msg)),
                 //func(|output| write_deser_stream_handler_variant_arm(output, context, msg)),
                 //func(|output| write_deser_stream_handler_ld_arm(output, context, msg)),
                 //func(|output| write_deser_stream_handler_bitsxx_arm(32, output, context, msg)),
@@ -226,6 +189,154 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
         Ok(())
     }}
 }}\n",
+    )
+        .write_into(output)
+}
+
+pub fn print_msg_deserializable_variant_arm<'c>(
+    output: &mut Indentor<String>,
+    msg: &'c MessageDescriptor<'c>,
+) -> Result<()> {
+    (
+        format!(
+            "{d}::Field::Variant(variant) => match field_number {{\n",
+            d = DESER_MOD
+        ),
+        indent((iter(msg.fields().map(|field| -> Result<Fragment<_>> {
+            Ok(
+                match field
+                    .type_()?
+                    .native_tag_type_for_variant_types(msg.path_to_root_mod())
+                {
+                    Ok(tag) => seq((
+                        format!("{number} => {{\n", number = field.number()),
+                        indent((if field.is_repeated()? {
+                            format!(
+                                "self.{name}.push(variant.to_native::<{tag}>()?);\n",
+                                name = field.native_name(),
+                                tag = tag,
+                            )
+                        } else {
+                            format!(
+                                "self.{name} = variant.to_native::<{tag}>()?;\n",
+                                name = field.native_name(),
+                                tag = tag,
+                            )
+                        },)),
+                        "}}\n",
+                    ))
+                    .into(),
+                    Err(_) => format!(
+                        "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?\n",
+                        number = field.number()
+                    )
+                    .into(),
+                },
+            )
+        })),)),
+        "}}\n",
+    )
+        .write_into(output)
+}
+
+pub fn print_msg_deserializable_length_delimited_arm<'c>(
+    output: &mut Indentor<String>,
+    msg: &'c MessageDescriptor<'c>,
+) -> Result<()> {
+    (
+        format!(
+            "{d}::Field::LengthDelimited(ldd) => match field_number {{\n",
+            d = DESER_MOD
+        ),
+        indent((
+            iter(msg.fields().map(|field| -> Result<Fragment<_>> {
+                Ok(seq((
+                    format!("{number} => {{\n", number = field.number()),
+                    indent(
+                        match field
+                            .type_()?
+                            .native_tag_type_for_variant_types(msg.path_to_root_mod())
+                        {
+                            Ok(tag) => {
+                                if field.is_repeated()? {
+                                    format!(
+                                        "\
+self.{name}.append(&mut ldd.deserialize_as_variants().map(|rv| {{
+    rv.and_then(|variant| variant.to_native::<{tag}>())
+}}).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);\n",
+                                        name = field.native_name(),
+                                        tag = tag,
+                                    )
+                                } else {
+                                    format!(
+                                        "\
+self.{name} = ldd.deserialize_as_variants()
+    .last()
+    .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
+    .and_then(|variant| variant.to_native::<{tag}>())?;\n",
+                                        name = field.native_name(),
+                                        tag = tag,
+                                    )
+                                }
+                            }
+                            Err(NonvariantFieldType::String) => {
+                                if field.is_repeated()? {
+                                    format!(
+                                        "self.{name}.push(ldd.deserialize_as_chars()\
+                                        .collect::<::puroro::Result<_>>()?);\n",
+                                        name = field.native_name()
+                                    )
+                                } else {
+                                    format!(
+                                        "self.{name} = ldd.deserialize_as_chars()\
+                                        .collect::<::puroro::Result<_>>()?;\n",
+                                        name = field.native_name()
+                                    )
+                                }
+                            }
+                            Err(NonvariantFieldType::Bytes) => {
+                                if field.is_repeated()? {
+                                    format!(
+                                        "self.{name}.push(ldd.deserialize_as_bytes()\
+                                        .collect::<::puroro::Result<_>>()?);\n",
+                                        name = field.native_name()
+                                    )
+                                } else {
+                                    format!(
+                                        "self.{name} = ldd.deserialize_as_bytes()\
+                                        .collect::<::puroro::Result<_>>()?;\n",
+                                        name = field.native_name()
+                                    )
+                                }
+                            }
+                            Err(NonvariantFieldType::Message(_)) => {
+                                if field.is_repeated()? {
+                                    format!(
+                                        "\
+let mut msg = ::std::default::Default::default();
+ldd.deserialize_as_message(&mut msg)?;
+self.{name}.push(msg);",
+                                        name = field.native_name()
+                                    )
+                                } else {
+                                    format!(
+                                        "\
+let boxed_msg = self.{name}.get_or_insert_with(
+    || ::std::boxed::Box::new(::std::default::Default::default()));
+ldd.deserialize_as_message(boxed_msg.as_mut())?;",
+                                        name = field.native_name()
+                                    )
+                                }
+                            }
+                            _ => "Err(::puroro::PuroroError::UnexpectedWireType)?,\n".into(),
+                        },
+                    ),
+                    "}}\n",
+                )))
+            })),
+            "_ => Err(::puroro::PuroroError::UnexpectedFieldId)?,\n",
+        )),
+        "}}\n",
     )
         .write_into(output)
 }
