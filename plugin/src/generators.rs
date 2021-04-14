@@ -8,8 +8,8 @@ use std::fmt::Write;
 
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case, Indentor};
 use crate::wrappers::{
-    Bits32FieldType, Bits64FieldType, DescriptorVisitor, EnumDescriptor, FieldLabel, FieldType,
-    LengthDelimitedFieldType, MessageDescriptor, NonvariantFieldType, VariantFieldType, WireType,
+    DescriptorVisitor, EnumDescriptor, FieldLabel, FieldType, LengthDelimitedFieldType,
+    MessageDescriptor, WireType,
 };
 use crate::Result;
 use shared::writers::{func, indent, indent_n, iter, seq, Fragment, TupleOfIntoFragments};

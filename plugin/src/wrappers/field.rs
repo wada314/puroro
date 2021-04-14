@@ -7,7 +7,6 @@ use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::Context;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
-use puroro::tags::Variant;
 
 use super::{EnumOrMessageRef, MessageDescriptor};
 
@@ -182,46 +181,41 @@ impl<'c> FieldDescriptor<'c> {
             .get_or_try_init(|| -> Result<_> {
                 // enum: Result<xxx, i32>
                 // msg: xxx
-                let native_bare_fully_qualified_type: Cow<'static, str> =
-                    match self.type_()?.native_type_for_numerical_types() {
-                        Ok(s) => s.into(),
-                        Err(t) => match t {
-                            NonnumericalFieldType::Group => Err(ErrorKind::Proto2NotSupported)?,
-                            NonnumericalFieldType::String => "::std::string::String".into(),
-                            NonnumericalFieldType::Bytes => "::std::vec::Vec<u8>".into(),
-                            NonnumericalFieldType::Enum(e) => e
-                                .native_fully_qualified_type_name(self.parent.path_to_root_mod())
-                                .into(),
-                            NonnumericalFieldType::Message(m) => m
-                                .native_fully_qualified_type_name(self.parent.path_to_root_mod())
-                                .into(),
-                        },
-                    };
+                let native_fully_qualified_type: Cow<'static, str> = match self.wire_type()? {
+                    WireType::Variant(field_type) => {
+                        field_type.native_type(self.parent.path_to_root_mod())
+                    }
+                    WireType::LengthDelimited(field_type) => {
+                        field_type.native_owned_type(self.parent.path_to_root_mod())
+                    }
+                    WireType::Bits32(field_type) => field_type.native_type().into(),
+                    WireType::Bits64(field_type) => field_type.native_type().into(),
+                };
                 Ok(match self.label()? {
                     FieldLabel::Optional => {
                         if let FieldType::Message(_) = self.type_()? {
                             format!(
                                 "::std::option::Optional<::std::boxed::Box<{name}>>",
-                                name = native_bare_fully_qualified_type
+                                name = native_fully_qualified_type
                             )
                         } else {
-                            native_bare_fully_qualified_type.into_owned()
+                            native_fully_qualified_type.into_owned()
                         }
                     }
                     FieldLabel::Required => {
                         if let FieldType::Message(_) = self.type_()? {
                             format!(
                                 "::std::boxed::Box<{name}>",
-                                name = native_bare_fully_qualified_type
+                                name = native_fully_qualified_type
                             )
                         } else {
-                            native_bare_fully_qualified_type.into_owned()
+                            native_fully_qualified_type.into_owned()
                         }
                     }
                     FieldLabel::Repeated => {
                         format!(
                             "::std::vec::Vec<{name}>",
-                            name = native_bare_fully_qualified_type
+                            name = native_fully_qualified_type
                         )
                     }
                 })
@@ -370,35 +364,6 @@ pub enum FieldType<'c> {
     SFixed32,
     SFixed64,
     Bool,
-    Group,
-    String,
-    Bytes,
-    Enum(&'c super::EnumDescriptor<'c>),
-    Message(&'c super::MessageDescriptor<'c>),
-}
-impl<'c> FieldType<'c> {
-    pub fn native_type_for_numerical_types(
-        &self,
-    ) -> std::result::Result<&'static str, NonnumericalFieldType<'c>> {
-        match self {
-            FieldType::Double => Ok("f64"),
-            FieldType::Float => Ok("f32"),
-            FieldType::Int32 | FieldType::SInt32 | FieldType::SFixed32 => Ok("i32"),
-            FieldType::Int64 | FieldType::SInt64 | FieldType::SFixed64 => Ok("i64"),
-            FieldType::UInt32 | FieldType::Fixed32 => Ok("u32"),
-            FieldType::UInt64 | FieldType::Fixed64 => Ok("u64"),
-            FieldType::Bool => Ok("bool"),
-            FieldType::Group => Err(NonnumericalFieldType::Group),
-            FieldType::String => Err(NonnumericalFieldType::String),
-            FieldType::Bytes => Err(NonnumericalFieldType::Bytes),
-            FieldType::Enum(e) => Err(NonnumericalFieldType::Enum(e)),
-            FieldType::Message(m) => Err(NonnumericalFieldType::Message(m)),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum NonnumericalFieldType<'c> {
     Group,
     String,
     Bytes,

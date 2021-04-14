@@ -109,12 +109,6 @@ where
             as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>,
     )
 }
-pub fn fr<'w, T, W>(from: T) -> Fragment<'w, W>
-where
-    Fragment<'w, W>: From<T>,
-{
-    from.into()
-}
 pub fn iter<'w, W, I, F>(iter: I) -> Fragment<'w, W>
 where
     I: 'w + Iterator<Item = Result<F>>,

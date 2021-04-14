@@ -20,8 +20,7 @@ mod file;
 mod message;
 pub use field::{
     Bits32FieldType, Bits64FieldType, FieldDescriptor, FieldLabel, FieldType,
-    LengthDelimitedFieldType, NonnumericalFieldType, NonvariantFieldType, VariantFieldType,
-    WireType,
+    LengthDelimitedFieldType, VariantFieldType, WireType,
 };
 pub use file::{DescriptorVisitor, FileDescriptor};
 pub use message::MessageDescriptor;
