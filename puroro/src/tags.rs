@@ -12,6 +12,7 @@ pub struct UInt64();
 pub struct SInt64();
 pub struct Bool();
 pub struct String();
+pub struct Enum<T>(PhantomData<T>);
 pub struct Message<T>(PhantomData<T>);
 pub struct Float();
 pub struct Double();
@@ -29,6 +30,7 @@ impl FieldTypeTag for SInt32 {}
 impl FieldTypeTag for SInt64 {}
 impl FieldTypeTag for Bool {}
 impl FieldTypeTag for String {}
+impl<T> FieldTypeTag for Enum<T> {}
 impl<T> FieldTypeTag for Message<T> {}
 impl<T: SingularFieldTypeTag> FieldTypeTag for Repeated<T> {}
 
@@ -40,6 +42,7 @@ impl SingularFieldTypeTag for SInt32 {}
 impl SingularFieldTypeTag for SInt64 {}
 impl SingularFieldTypeTag for Bool {}
 impl SingularFieldTypeTag for String {}
+impl<T> SingularFieldTypeTag for Enum<T> {}
 impl<T> SingularFieldTypeTag for Message<T> {}
 
 impl VariantTypeTag for Int32 {}

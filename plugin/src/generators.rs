@@ -1,10 +1,15 @@
 pub mod shared;
 //pub mod simple;
 
+// Too long!
+const DESER_MOD: &'static str = "::puroro_serializer::deserializer::stream";
+
 use std::fmt::Write;
 
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case, Indentor};
-use crate::wrappers;
+use crate::wrappers::{
+    DescriptorVisitor, EnumDescriptor, FieldLabel, FieldType, MessageDescriptor,
+};
 use crate::Result;
 use shared::writers::{indent, indent_n, iter, TupleOfIntoFragments};
 
@@ -12,8 +17,8 @@ use super::Context;
 struct Visitor {
     output: Indentor<String>,
 }
-impl<'c> wrappers::DescriptorVisitor<'c> for Visitor {
-    fn handle_msg(&mut self, msg: &'c wrappers::MessageDescriptor<'c>) -> crate::Result<()> {
+impl<'c> DescriptorVisitor<'c> for Visitor {
+    fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> crate::Result<()> {
         (
             format!(
                 "\
@@ -30,11 +35,39 @@ pub struct {name} {{\n",
             })),)),
             "\
 }}\n",
+            format!(
+                "\
+impl ::std::default::Default for {name} {{
+    fn default() -> Self {{
+        #[allow(unused)]
+        use ::std::convert::TryInto;
+        Self {{\n",
+                name = msg.native_bare_typename(),
+            ),
+            indent_n(
+                3,
+                (iter(msg.fields().map(|field| {
+                    match (field.label()?, field.type_()?) {
+                        (FieldLabel::Optional, FieldType::Enum(_)) => Ok(format!(
+                            "{name}: 0i32.try_into(),\n",
+                            name = field.native_name()
+                        )),
+                        (_, _) => Ok(format!(
+                            "{name}: ::std::default::Default::default(),\n",
+                            name = field.native_name(),
+                        )),
+                    }
+                })),),
+            ),
+            "        \
+        }}
+    }}
+}}\n",
         )
             .write_into(&mut self.output)
     }
 
-    fn handle_enum(&mut self, enume: &'c wrappers::EnumDescriptor<'c>) -> crate::Result<()> {
+    fn handle_enum(&mut self, enume: &'c EnumDescriptor<'c>) -> crate::Result<()> {
         (
             format!(
                 "\
@@ -103,4 +136,72 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<Vec<(String, String)>
         filenames_and_contents.push((file_name.clone(), visitor.output.into_inner()));
     }
     Ok(filenames_and_contents)
+}
+
+pub fn print_msg_deserializable<'c>(
+    output: &mut Indentor<String>,
+    context: &'c Context<'c>,
+    msg: &'c MessageDescriptor<'c>,
+) -> Result<()> {
+    (
+        format!(
+            "\
+impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
+    type Target = ();
+    fn finish(self) -> ::puroro::Result<Self::Target> {{
+        Ok(())
+    }}
+    fn met_field<T: {d}::LengthDelimitedDeserializer>(
+        &mut self,
+        field: {d}::Field<T>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {{
+        match field {{\n",
+            d = DESER_MOD,
+            name = msg.native_bare_typename(),
+        ),
+        indent_n(
+            3,
+            (
+                format!(
+                    "{d}::Field::Variant(variant) => match field_number {{\n",
+                    d = DESER_MOD
+                ),
+                indent((iter(msg.fields().map(|field| -> Result<_> {
+                    match field.type_()? {
+                        FieldType::Double => {}
+                        FieldType::Float => {}
+                        FieldType::Int32 => {}
+                        FieldType::Int64 => {}
+                        FieldType::UInt32 => {}
+                        FieldType::UInt64 => {}
+                        FieldType::SInt32 => {}
+                        FieldType::SInt64 => {}
+                        FieldType::Fixed32 => {}
+                        FieldType::Fixed64 => {}
+                        FieldType::SFixed32 => {}
+                        FieldType::SFixed64 => {}
+                        FieldType::Bool => {}
+                        FieldType::Group => {}
+                        FieldType::String => {}
+                        FieldType::Bytes => {}
+                        FieldType::Enum(_) => {}
+                        FieldType::Message(_) => {}
+                    };
+                    Ok("")
+                })),)),
+                //func(|output| write_deser_stream_handler_variant_arm(output, context, msg)),
+                //func(|output| write_deser_stream_handler_ld_arm(output, context, msg)),
+                //func(|output| write_deser_stream_handler_bitsxx_arm(32, output, context, msg)),
+                //func(|output| write_deser_stream_handler_bitsxx_arm(64, output, context, msg)),
+                "_ => Err(::puroro::PuroroError::UnexpectedFieldType)?,\n",
+            ),
+        ),
+        "        \
+        }}
+        Ok(())
+    }}
+}}\n",
+    )
+        .write_into(output)
 }

@@ -10,64 +10,6 @@ use ::once_cell::unsync::OnceCell;
 
 use super::{EnumOrMessageRef, MessageDescriptor};
 
-#[derive(Debug, Clone)]
-pub enum FieldType<'c> {
-    Double,
-    Float,
-    Int32,
-    Int64,
-    UInt32,
-    UInt64,
-    SInt32,
-    SInt64,
-    Fixed32,
-    Fixed64,
-    SFixed32,
-    SFixed64,
-    Bool,
-    Group,
-    String,
-    Bytes,
-    Enum(&'c super::EnumDescriptor<'c>),
-    Message(&'c super::MessageDescriptor<'c>),
-}
-impl<'c> FieldType<'c> {
-    pub fn native_type_for_numerical_types(
-        &self,
-    ) -> std::result::Result<&'static str, NonnumericalFieldType<'c>> {
-        match self {
-            FieldType::Double => Ok("f64"),
-            FieldType::Float => Ok("f32"),
-            FieldType::Int32 | FieldType::SInt32 | FieldType::SFixed32 => Ok("i32"),
-            FieldType::Int64 | FieldType::SInt64 | FieldType::SFixed64 => Ok("i64"),
-            FieldType::UInt32 | FieldType::Fixed32 => Ok("u32"),
-            FieldType::UInt64 | FieldType::Fixed64 => Ok("u64"),
-            FieldType::Bool => Ok("bool"),
-            FieldType::Group => Err(NonnumericalFieldType::Group),
-            FieldType::String => Err(NonnumericalFieldType::String),
-            FieldType::Bytes => Err(NonnumericalFieldType::Bytes),
-            FieldType::Enum(e) => Err(NonnumericalFieldType::Enum(e)),
-            FieldType::Message(m) => Err(NonnumericalFieldType::Message(m)),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum NonnumericalFieldType<'c> {
-    Group,
-    String,
-    Bytes,
-    Enum(&'c super::EnumDescriptor<'c>),
-    Message(&'c super::MessageDescriptor<'c>),
-}
-
-#[derive(Debug, Clone)]
-pub enum FieldLabel {
-    Optional,
-    Required,
-    Repeated,
-}
-
 #[derive(Clone)]
 pub struct FieldDescriptor<'c> {
     proto: &'c FieldDescriptorProto,
@@ -109,7 +51,7 @@ impl<'c> FieldDescriptor<'c> {
             Err(id) => Err(ErrorKind::UnknownLabelId { id })?,
         }
     }
-    pub fn r#type(&'c self) -> Result<FieldType<'c>> {
+    pub fn type_(&'c self) -> Result<FieldType<'c>> {
         Ok(match &self.proto.type_ {
             Ok(type_) => {
                 use crate::protos::google::protobuf::field_descriptor_proto::Type;
@@ -211,7 +153,7 @@ impl<'c> FieldDescriptor<'c> {
                 // enum: Result<xxx, i32>
                 // msg: xxx
                 let native_bare_fully_qualified_type: Cow<'static, str> =
-                    match self.r#type()?.native_type_for_numerical_types() {
+                    match self.type_()?.native_type_for_numerical_types() {
                         Ok(s) => s.into(),
                         Err(t) => match t {
                             NonnumericalFieldType::Group => Err(ErrorKind::Proto2NotSupported)?,
@@ -227,7 +169,7 @@ impl<'c> FieldDescriptor<'c> {
                     };
                 Ok(match self.label()? {
                     FieldLabel::Optional => {
-                        if let FieldType::Message(_) = self.r#type()? {
+                        if let FieldType::Message(_) = self.type_()? {
                             format!(
                                 "::std::option::Optional<::std::boxed::Box<{name}>>",
                                 name = native_bare_fully_qualified_type
@@ -237,7 +179,7 @@ impl<'c> FieldDescriptor<'c> {
                         }
                     }
                     FieldLabel::Required => {
-                        if let FieldType::Message(_) = self.r#type()? {
+                        if let FieldType::Message(_) = self.type_()? {
                             format!(
                                 "::std::boxed::Box<{name}>",
                                 name = native_bare_fully_qualified_type
@@ -278,4 +220,104 @@ fn iter_package_to_root(package: &str) -> impl Iterator<Item = &str> {
             Some("")
         }
     })
+}
+
+#[derive(Debug, Clone)]
+pub enum FieldType<'c> {
+    Double,
+    Float,
+    Int32,
+    Int64,
+    UInt32,
+    UInt64,
+    SInt32,
+    SInt64,
+    Fixed32,
+    Fixed64,
+    SFixed32,
+    SFixed64,
+    Bool,
+    Group,
+    String,
+    Bytes,
+    Enum(&'c super::EnumDescriptor<'c>),
+    Message(&'c super::MessageDescriptor<'c>),
+}
+impl<'c> FieldType<'c> {
+    pub fn native_type_for_numerical_types(
+        &self,
+    ) -> std::result::Result<&'static str, NonnumericalFieldType<'c>> {
+        match self {
+            FieldType::Double => Ok("f64"),
+            FieldType::Float => Ok("f32"),
+            FieldType::Int32 | FieldType::SInt32 | FieldType::SFixed32 => Ok("i32"),
+            FieldType::Int64 | FieldType::SInt64 | FieldType::SFixed64 => Ok("i64"),
+            FieldType::UInt32 | FieldType::Fixed32 => Ok("u32"),
+            FieldType::UInt64 | FieldType::Fixed64 => Ok("u64"),
+            FieldType::Bool => Ok("bool"),
+            FieldType::Group => Err(NonnumericalFieldType::Group),
+            FieldType::String => Err(NonnumericalFieldType::String),
+            FieldType::Bytes => Err(NonnumericalFieldType::Bytes),
+            FieldType::Enum(e) => Err(NonnumericalFieldType::Enum(e)),
+            FieldType::Message(m) => Err(NonnumericalFieldType::Message(m)),
+        }
+    }
+    pub fn native_tag_type_for_variant_types(
+        &self,
+        path_to_root_mod: &str,
+    ) -> std::result::Result<Cow<'static, str>, NonvariantFieldType<'c>> {
+        match self {
+            FieldType::Int32 => Ok("::puroro::tags::Int32".into()),
+            FieldType::Int64 => Ok("::puroro::tags::Int64".into()),
+            FieldType::UInt32 => Ok("::puroro::tags::UInt32".into()),
+            FieldType::UInt64 => Ok("::puroro::tags::UInt64".into()),
+            FieldType::SInt32 => Ok("::puroro::tags::SInt32".into()),
+            FieldType::SInt64 => Ok("::puroro::tags::SInt64".into()),
+            FieldType::Bool => Ok("::puroro::tags::Bool".into()),
+            FieldType::Enum(e) => Ok(format!(
+                "::puroro::tags::Enum<{name}>",
+                name = e.native_fully_qualified_typename(path_to_root_mod)
+            )
+            .into()),
+            FieldType::Double => Err(NonvariantFieldType::Double),
+            FieldType::Float => Err(NonvariantFieldType::Float),
+            FieldType::Fixed32 => Err(NonvariantFieldType::Fixed32),
+            FieldType::Fixed64 => Err(NonvariantFieldType::Fixed64),
+            FieldType::SFixed32 => Err(NonvariantFieldType::SFixed32),
+            FieldType::SFixed64 => Err(NonvariantFieldType::SFixed64),
+            FieldType::Group => Err(NonvariantFieldType::Group),
+            FieldType::String => Err(NonvariantFieldType::String),
+            FieldType::Bytes => Err(NonvariantFieldType::Bytes),
+            FieldType::Message(m) => Err(NonvariantFieldType::Message(m)),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum NonnumericalFieldType<'c> {
+    Group,
+    String,
+    Bytes,
+    Enum(&'c super::EnumDescriptor<'c>),
+    Message(&'c super::MessageDescriptor<'c>),
+}
+#[derive(Debug, Clone)]
+pub enum NonvariantFieldType<'c> {
+    Double,
+    Float,
+    Fixed32,
+    Fixed64,
+    SFixed32,
+    SFixed64,
+    Group,
+    String,
+    Bytes,
+    Message(&'c super::MessageDescriptor<'c>),
+}
+
+#[derive(Debug, Clone)]
+pub enum FieldLabel {
+    Optional,
+    Required,
+    Repeated,
 }
