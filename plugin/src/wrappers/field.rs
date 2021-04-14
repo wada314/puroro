@@ -7,6 +7,7 @@ use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::Context;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
+use puroro::tags::Variant;
 
 use super::{EnumOrMessageRef, MessageDescriptor};
 
@@ -124,6 +125,31 @@ impl<'c> FieldDescriptor<'c> {
         })
     }
 
+    pub fn wire_type(&'c self) -> Result<WireType<'c>> {
+        Ok(match self.type_()? {
+            FieldType::Int32 => WireType::Variant(VariantFieldType::Int32),
+            FieldType::Int64 => WireType::Variant(VariantFieldType::Int64),
+            FieldType::UInt32 => WireType::Variant(VariantFieldType::UInt32),
+            FieldType::UInt64 => WireType::Variant(VariantFieldType::UInt64),
+            FieldType::SInt32 => WireType::Variant(VariantFieldType::SInt32),
+            FieldType::SInt64 => WireType::Variant(VariantFieldType::SInt64),
+            FieldType::Enum(e) => WireType::Variant(VariantFieldType::Enum(e)),
+            FieldType::Bool => WireType::Variant(VariantFieldType::Bool),
+            FieldType::Group => Err(ErrorKind::Proto2NotSupported)?,
+            FieldType::String => WireType::LengthDelimited(LengthDelimitedFieldType::String),
+            FieldType::Bytes => WireType::LengthDelimited(LengthDelimitedFieldType::Bytes),
+            FieldType::Message(m) => {
+                WireType::LengthDelimited(LengthDelimitedFieldType::Message(m))
+            }
+            FieldType::Float => WireType::Bits32(Bits32FieldType::Float),
+            FieldType::Fixed32 => WireType::Bits32(Bits32FieldType::Fixed32),
+            FieldType::SFixed32 => WireType::Bits32(Bits32FieldType::SFixed32),
+            FieldType::Double => WireType::Bits64(Bits64FieldType::Double),
+            FieldType::Fixed64 => WireType::Bits64(Bits64FieldType::Fixed64),
+            FieldType::SFixed64 => WireType::Bits64(Bits64FieldType::SFixed64),
+        })
+    }
+
     pub fn fully_qualified_type_name(&'c self) -> Result<&str> {
         Ok(self.lazy_fq_type_name.get_or_try_init(|| -> Result<_> {
             // If the type name starts with ".", then just return the remaining part.
@@ -227,6 +253,66 @@ fn iter_package_to_root(package: &str) -> impl Iterator<Item = &str> {
 }
 
 #[derive(Debug, Clone)]
+pub enum WireType<'c> {
+    Variant(VariantFieldType<'c>),
+    LengthDelimited(LengthDelimitedFieldType<'c>),
+    Bits32(Bits32FieldType),
+    Bits64(Bits64FieldType),
+    //Group(GroupFieldType),
+}
+
+#[derive(Debug, Clone)]
+pub enum VariantFieldType<'c> {
+    Int32,
+    Int64,
+    UInt32,
+    UInt64,
+    SInt32,
+    SInt64,
+    Bool,
+    Enum(&'c super::EnumDescriptor<'c>),
+}
+
+#[derive(Debug, Clone)]
+pub enum LengthDelimitedFieldType<'c> {
+    String,
+    Bytes,
+    Message(&'c super::MessageDescriptor<'c>),
+}
+
+#[derive(Debug, Clone)]
+pub enum Bits32FieldType {
+    Float,
+    Fixed32,
+    SFixed32,
+}
+impl Bits32FieldType {
+    pub fn native_type(&self) -> &'static str {
+        match self {
+            Bits32FieldType::Float => "f32",
+            Bits32FieldType::Fixed32 => "u32",
+            Bits32FieldType::SFixed32 => "i32",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum Bits64FieldType {
+    Double,
+    Fixed64,
+    SFixed64,
+}
+impl Bits64FieldType {
+    pub fn native_type(&self) -> &'static str {
+        match self {
+            Bits64FieldType::Double => "f64",
+            Bits64FieldType::Fixed64 => "u64",
+            Bits64FieldType::SFixed64 => "i64",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub enum FieldType<'c> {
     Double,
     Float,
@@ -264,26 +350,6 @@ impl<'c> FieldType<'c> {
             FieldType::Bytes => Err(NonnumericalFieldType::Bytes),
             FieldType::Enum(e) => Err(NonnumericalFieldType::Enum(e)),
             FieldType::Message(m) => Err(NonnumericalFieldType::Message(m)),
-        }
-    }
-    pub fn native_type_for_bitsxx_types(
-        &self,
-        bits: usize,
-    ) -> std::result::Result<&'static str, ()> {
-        match bits {
-            32 => match self {
-                FieldType::Float => Ok("f32"),
-                FieldType::Fixed32 => Ok("i32"),
-                FieldType::SFixed32 => Ok("s32"),
-                _ => Err(()),
-            },
-            64 => match self {
-                FieldType::Double => Ok("f64"),
-                FieldType::Fixed64 => Ok("i64"),
-                FieldType::SFixed64 => Ok("s64"),
-                _ => Err(()),
-            },
-            _ => panic!("Wrong bits size!"),
         }
     }
     pub fn native_tag_type_for_variant_types(

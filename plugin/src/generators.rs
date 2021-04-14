@@ -8,8 +8,8 @@ use std::fmt::Write;
 
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case, Indentor};
 use crate::wrappers::{
-    DescriptorVisitor, EnumDescriptor, FieldLabel, FieldType, MessageDescriptor,
-    NonvariantFieldType,
+    Bits32FieldType, Bits64FieldType, DescriptorVisitor, EnumDescriptor, FieldLabel, FieldType,
+    LengthDelimitedFieldType, MessageDescriptor, NonvariantFieldType, VariantFieldType, WireType,
 };
 use crate::Result;
 use shared::writers::{func, indent, indent_n, iter, seq, Fragment, TupleOfIntoFragments};
@@ -354,8 +354,13 @@ pub fn print_msg_deserializable_bitsxx_arm<'c>(
             iter(msg.fields().map(|field| -> Result<Fragment<_>> {
                 Ok(seq((
                     format!("{number} => {{\n", number = field.number()),
-                    indent(match field.type_()?.native_type_for_bitsxx_types(bits) {
-                        Ok(native_type) => {
+                    indent(({
+                        let opt_native_type = match (bits, field.wire_type()?) {
+                            (32, WireType::Bits32(field_type)) => Some(field_type.native_type()),
+                            (64, WireType::Bits64(field_type)) => Some(field_type.native_type()),
+                            _ => None,
+                        };
+                        if let Some(native_type) = opt_native_type {
                             if field.is_repeated()? {
                                 format!(
                                     "self.{name}.push({type_}::from_le_bytes(bytes));\n",
@@ -369,15 +374,34 @@ pub fn print_msg_deserializable_bitsxx_arm<'c>(
                                     type_ = native_type
                                 )
                             }
+                        } else {
+                            "Err(::puroro::PuroroError::UnexpectedWireType)?\n".into()
                         }
-
-                        Err(_) => "Err(::puroro::PuroroError::UnexpectedWireType)?\n".into(),
-                    }),
+                    },)),
                     "}}\n",
                 )))
             })),
             "_ => Err(::puroro::PuroroError::UnexpectedFieldId)?,\n",
         )),
+        "}}\n",
+    )
+        .write_into(output)
+}
+
+pub fn print_msg_serializable<'c>(
+    output: &mut Indentor<String>,
+    msg: &'c MessageDescriptor<'c>,
+) -> Result<()> {
+    (
+        format!(
+            "\
+impl ::puroro_serializer::serializer::Serializable for {name} {{
+    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {{\n",
+            name = msg.native_bare_type_name()
+        ),
+        indent((iter(msg.fields().map(|field| -> Result<_> { Ok("") })),)),
         "}}\n",
     )
         .write_into(output)
