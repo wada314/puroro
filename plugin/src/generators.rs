@@ -177,10 +177,8 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
             (
                 func(|output| print_msg_deserializable_variant_arm(output, msg)),
                 func(|output| print_msg_deserializable_length_delimited_arm(output, msg)),
-                //func(|output| write_deser_stream_handler_variant_arm(output, context, msg)),
-                //func(|output| write_deser_stream_handler_ld_arm(output, context, msg)),
-                //func(|output| write_deser_stream_handler_bitsxx_arm(32, output, context, msg)),
-                //func(|output| write_deser_stream_handler_bitsxx_arm(64, output, context, msg)),
+                func(|output| print_msg_deserializable_bitsxx_arm(output, msg, 32)),
+                func(|output| print_msg_deserializable_bitsxx_arm(output, msg, 64)),
                 "_ => Err(::puroro::PuroroError::UnexpectedFieldType)?,\n",
             ),
         ),
@@ -227,7 +225,7 @@ pub fn print_msg_deserializable_variant_arm<'c>(
                     ))
                     .into(),
                     Err(_) => format!(
-                        "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?\n",
+                        "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
                         number = field.number()
                     )
                     .into(),
@@ -328,9 +326,53 @@ ldd.deserialize_as_message(boxed_msg.as_mut())?;",
                                     )
                                 }
                             }
-                            _ => "Err(::puroro::PuroroError::UnexpectedWireType)?,\n".into(),
+                            _ => "Err(::puroro::PuroroError::UnexpectedWireType)?\n".into(),
                         },
                     ),
+                    "}}\n",
+                )))
+            })),
+            "_ => Err(::puroro::PuroroError::UnexpectedFieldId)?,\n",
+        )),
+        "}}\n",
+    )
+        .write_into(output)
+}
+
+pub fn print_msg_deserializable_bitsxx_arm<'c>(
+    output: &mut Indentor<String>,
+    msg: &'c MessageDescriptor<'c>,
+    bits: usize,
+) -> Result<()> {
+    (
+        format!(
+            "{d}::Field::Bits{bits}(bytes) => match field_number {{\n",
+            bits = bits,
+            d = DESER_MOD
+        ),
+        indent((
+            iter(msg.fields().map(|field| -> Result<Fragment<_>> {
+                Ok(seq((
+                    format!("{number} => {{\n", number = field.number()),
+                    indent(match field.type_()?.native_type_for_bitsxx_types(bits) {
+                        Ok(native_type) => {
+                            if field.is_repeated()? {
+                                format!(
+                                    "self.{name}.push({type_}::from_le_bytes(bytes));\n",
+                                    name = field.native_name(),
+                                    type_ = native_type
+                                )
+                            } else {
+                                format!(
+                                    "self.{name} = {type_}::from_le_bytes(bytes);\n",
+                                    name = field.native_name(),
+                                    type_ = native_type
+                                )
+                            }
+                        }
+
+                        Err(_) => "Err(::puroro::PuroroError::UnexpectedWireType)?\n".into(),
+                    }),
                     "}}\n",
                 )))
             })),

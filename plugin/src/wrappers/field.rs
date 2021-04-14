@@ -266,6 +266,26 @@ impl<'c> FieldType<'c> {
             FieldType::Message(m) => Err(NonnumericalFieldType::Message(m)),
         }
     }
+    pub fn native_type_for_bitsxx_types(
+        &self,
+        bits: usize,
+    ) -> std::result::Result<&'static str, ()> {
+        match bits {
+            32 => match self {
+                FieldType::Float => Ok("f32"),
+                FieldType::Fixed32 => Ok("i32"),
+                FieldType::SFixed32 => Ok("s32"),
+                _ => Err(()),
+            },
+            64 => match self {
+                FieldType::Double => Ok("f64"),
+                FieldType::Fixed64 => Ok("i64"),
+                FieldType::SFixed64 => Ok("s64"),
+                _ => Err(()),
+            },
+            _ => panic!("Wrong bits size!"),
+        }
+    }
     pub fn native_tag_type_for_variant_types(
         &self,
         path_to_root_mod: &str,
