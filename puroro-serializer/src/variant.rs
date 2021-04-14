@@ -1,5 +1,5 @@
 use crate::{PuroroError, Result};
-use ::puroro::tags::{Bool, Int32, Int64, SInt32, SInt64, UInt32, UInt64};
+use ::puroro::tags::{Bool, Enum, Int32, Int64, SInt32, SInt64, UInt32, UInt64};
 use std::convert::TryFrom;
 use std::io::Result as IoResult;
 use std::io::Write;
@@ -183,6 +183,23 @@ impl VariantType for Bool {
     }
     fn to_variant(val: Self::NativeType) -> Result<Variant> {
         Ok(Variant::new(u64::to_le_bytes(if val { 1 } else { 0 })))
+    }
+}
+impl<T> VariantType for Enum<T>
+where
+    T: TryFrom<i32, Error = i32>,
+    i32: From<T>,
+{
+    type NativeType = std::result::Result<T, i32>;
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
+        Ok(T::try_from(i32::try_from(i64::from_le_bytes(var.0))?))
+    }
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+        let int_val = match val {
+            Ok(v) => <i32 as From<T>>::from(v),
+            Err(i) => i,
+        };
+        Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))
     }
 }
 impl VariantType for RustUsize {

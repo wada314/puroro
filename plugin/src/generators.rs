@@ -168,28 +168,42 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
                     d = DESER_MOD
                 ),
                 indent((iter(msg.fields().map(|field| -> Result<_> {
-                    match field.type_()? {
-                        FieldType::Double => {}
-                        FieldType::Float => {}
-                        FieldType::Int32 => {}
-                        FieldType::Int64 => {}
-                        FieldType::UInt32 => {}
-                        FieldType::UInt64 => {}
-                        FieldType::SInt32 => {}
-                        FieldType::SInt64 => {}
-                        FieldType::Fixed32 => {}
-                        FieldType::Fixed64 => {}
-                        FieldType::SFixed32 => {}
-                        FieldType::SFixed64 => {}
-                        FieldType::Bool => {}
-                        FieldType::Group => {}
-                        FieldType::String => {}
-                        FieldType::Bytes => {}
-                        FieldType::Enum(_) => {}
-                        FieldType::Message(_) => {}
-                    };
-                    Ok("")
+                    Ok(
+                        match field
+                            .type_()?
+                            .native_tag_type_for_variant_types(msg.path_to_root_mod())
+                        {
+                            Ok(tag) => match field.label()? {
+                                FieldLabel::Optional | FieldLabel::Required => {
+                                    format!(
+                                        "\
+{number} => {{
+    self.{name} = variant.to_native::<{tag}>()?;
+}}\n",
+                                        number = field.number(),
+                                        name = field.native_name(),
+                                        tag = tag,
+                                    )
+                                }
+                                FieldLabel::Repeated => {
+                                    format!(
+                                        "\
+{number} => {{
+    self.{name}.push(variant.to_native::<{tag}>()?);
+}}\n",
+                                        number = field.number(),
+                                        name = field.native_name(),
+                                        tag = tag,
+                                    )
+                                }
+                            },
+                            Err(_) => {
+                                todo!()
+                            }
+                        },
+                    )
                 })),)),
+                "}}\n",
                 //func(|output| write_deser_stream_handler_variant_arm(output, context, msg)),
                 //func(|output| write_deser_stream_handler_ld_arm(output, context, msg)),
                 //func(|output| write_deser_stream_handler_bitsxx_arm(32, output, context, msg)),
