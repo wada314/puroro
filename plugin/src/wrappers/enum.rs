@@ -74,7 +74,7 @@ impl<'c> EnumDescriptor<'c> {
     }
 
     /// Returns a Rust typename qualified with a mod path from an arbitral mod location,
-    /// with wrapped by Result<>, without distinguishing between repeated / optional labels.
+    /// without wrapped by Result<>, without distinguishing between repeated / optional labels.
     pub fn native_fully_qualified_type_name(&'c self, path_to_root_mod: &str) -> String {
         let native_type_name_from_root = self.lazy_native_type_name_from_root.get_or_init(|| {
             let mod_path = itertools::Itertools::intersperse(
@@ -91,7 +91,7 @@ impl<'c> EnumDescriptor<'c> {
             )
         });
         format!(
-            "::std::result::Result<{path_to_root_mod}::{type_name}, i32>",
+            "{path_to_root_mod}::{type_name}",
             path_to_root_mod = path_to_root_mod,
             type_name = native_type_name_from_root
         )

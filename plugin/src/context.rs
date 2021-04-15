@@ -2,6 +2,7 @@ use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 
 use crate::google::protobuf::compiler::CodeGeneratorRequest;
+use crate::utils::iter_package_to_root;
 use crate::wrappers::{
     DescriptorVisitor, EnumDescriptor, EnumOrMessageRef, FileDescriptor, MessageDescriptor,
 };
@@ -82,12 +83,15 @@ impl<'c> Context<'c> {
         let map = self.lazy_packages_with_subpackages_map.get_or_init(|| {
             let mut map: HashMap<&'c str, HashSet<&'c str>> = HashMap::new();
             for file in self.file_descriptors() {
-                if file.package().is_empty() {
-                    // Do nothing?
-                } else if let Some((package, subpackage)) = file.package().rsplit_once('.') {
-                    map.entry(package).or_default().insert(subpackage);
-                } else {
-                    map.entry("").or_default().insert(file.package());
+                for cur_package in iter_package_to_root(file.package()) {
+                    if cur_package.is_empty() {
+                        // Do nothing?
+                    } else if let Some((parent_package, subpackage)) = cur_package.rsplit_once('.')
+                    {
+                        map.entry(parent_package).or_default().insert(subpackage);
+                    } else {
+                        map.entry("").or_default().insert(cur_package);
+                    }
                 }
             }
             map

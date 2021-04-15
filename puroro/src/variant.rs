@@ -187,8 +187,7 @@ impl VariantType for Bool {
 }
 impl<T> VariantType for Enum<T>
 where
-    T: TryFrom<i32, Error = i32>,
-    i32: From<T>,
+    T: TryFrom<i32, Error = i32> + Into<i32>,
 {
     type NativeType = std::result::Result<T, i32>;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
@@ -196,7 +195,7 @@ where
     }
     fn to_variant(val: Self::NativeType) -> Result<Variant> {
         let int_val = match val {
-            Ok(v) => <i32 as From<T>>::from(v),
+            Ok(v) => T::into(v),
             Err(i) => i,
         };
         Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))

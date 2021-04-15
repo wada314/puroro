@@ -11,11 +11,11 @@ pub trait MaybeRepeatedField<'a> {
     /// the field value is equal to default or not.
     /// If this field is a repeated field, then the iterator iterates
     /// over the repeated items.
-    fn iter(&'a self) -> Self::Iter;
+    fn iter_for_ser(&'a self) -> Self::Iter;
     /// Returns an mutable reference for the:
     /// - Optional / required field: The field item.
     /// - Repeated field: A new item pushed into the tail of the list.
-    fn last_mut(&'a mut self) -> &'a mut Self::Item;
+    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item;
 }
 pub trait MaybeRepeatedVariantField<'a>: MaybeRepeatedField<'a> {
     /// Extends the field by the given iterator.
@@ -33,7 +33,7 @@ macro_rules! define_maybe_repeated_field {
         impl<'a> MaybeRepeatedField<'a> for $ty {
             type Item = $ty;
             type Iter = std::option::IntoIter<&'a $ty>;
-            fn iter(&'a self) -> Self::Iter {
+            fn iter_for_ser(&'a self) -> Self::Iter {
                 // Do not encode if the value is equal to default
                 // Not applicable for proto2 because they have [default=xx]!!
                 if *self == <$ty as Default>::default() {
@@ -43,28 +43,28 @@ macro_rules! define_maybe_repeated_field {
                 }
                 .into_iter()
             }
-            fn last_mut(&'a mut self) -> &'a mut Self::Item {
+            fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
                 self
             }
         }
         impl<'a> MaybeRepeatedField<'a> for Vec<$ty> {
             type Item = $ty;
             type Iter = std::slice::Iter<'a, $ty>;
-            fn iter(&'a self) -> Self::Iter {
-                <[$ty]>::iter(self)
+            fn iter_for_ser(&'a self) -> Self::Iter {
+                self.iter()
             }
-            fn last_mut(&'a mut self) -> &'a mut Self::Item {
+            fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
                 self.push(Default::default());
-                <[$ty]>::last_mut(self).unwrap()
+                self.last_mut().unwrap()
             }
         }
         impl<'a> MaybeRepeatedField<'a> for Option<$ty> {
             type Item = $ty;
             type Iter = std::option::Iter<'a, $ty>;
-            fn iter(&'a self) -> Self::Iter {
-                Option::<Self::Item>::iter(self)
+            fn iter_for_ser(&'a self) -> Self::Iter {
+                self.iter()
             }
-            fn last_mut(&'a mut self) -> &'a mut Self::Item {
+            fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
                 self.get_or_insert_with(Default::default)
             }
         }
@@ -109,55 +109,51 @@ define_maybe_repeated_variant_field!(bool);
 // Manual implementation for enum
 impl<'a, T: 'a> MaybeRepeatedField<'a> for std::result::Result<T, i32>
 where
-    i32: From<T>,
-    T: Clone + TryFrom<i32, Error = i32>,
+    T: Clone + TryFrom<i32, Error = i32> + Into<i32>,
 {
     type Item = std::result::Result<T, i32>;
     type Iter = std::option::IntoIter<&'a std::result::Result<T, i32>>;
-    fn iter(&'a self) -> Self::Iter {
+    fn iter_for_ser(&'a self) -> Self::Iter {
         let int_value = match self {
-            Ok(x) => i32::from(x.clone()),
+            Ok(x) => T::into(x.clone()),
             Err(i) => *i,
         };
         if int_value != 0 { Some(self) } else { None }.into_iter()
     }
-    fn last_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
         self
     }
 }
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Vec<std::result::Result<T, i32>>
 where
-    i32: From<T>,
-    T: Clone + TryFrom<i32, Error = i32>,
+    T: Clone + TryFrom<i32, Error = i32> + Into<i32>,
 {
     type Item = std::result::Result<T, i32>;
     type Iter = std::slice::Iter<'a, std::result::Result<T, i32>>;
-    fn iter(&'a self) -> Self::Iter {
-        <[Self::Item]>::iter(self)
+    fn iter_for_ser(&'a self) -> Self::Iter {
+        self.iter()
     }
-    fn last_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
         self.push(T::try_from(0i32));
-        <[Self::Item]>::last_mut(self).unwrap()
+        self.last_mut().unwrap()
     }
 }
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Option<std::result::Result<T, i32>>
 where
-    i32: From<T>,
-    T: Clone + TryFrom<i32, Error = i32>,
+    T: Clone + TryFrom<i32, Error = i32> + Into<i32>,
 {
     type Item = std::result::Result<T, i32>;
     type Iter = std::option::Iter<'a, std::result::Result<T, i32>>;
-    fn iter(&'a self) -> Self::Iter {
-        Option::<Self::Item>::iter(self)
+    fn iter_for_ser(&'a self) -> Self::Iter {
+        self.iter()
     }
-    fn last_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
         self.get_or_insert(T::try_from(0i32))
     }
 }
 impl<'a, T: 'a> MaybeRepeatedVariantField<'a> for std::result::Result<T, i32>
 where
-    i32: From<T>,
-    T: Clone + TryFrom<i32, Error = i32>,
+    T: Clone + TryFrom<i32, Error = i32> + Into<i32>,
 {
     fn extend<I: Iterator<Item = Self::Item>>(&mut self, first: Self::Item, rest: I) {
         *self = rest.last().unwrap_or(first);
@@ -165,8 +161,7 @@ where
 }
 impl<'a, T: 'a> MaybeRepeatedVariantField<'a> for Vec<std::result::Result<T, i32>>
 where
-    i32: From<T>,
-    T: Clone + TryFrom<i32, Error = i32>,
+    T: Clone + TryFrom<i32, Error = i32> + Into<i32>,
 {
     fn extend<I: Iterator<Item = Self::Item>>(&mut self, first: Self::Item, rest: I) {
         self.push(first);
@@ -175,8 +170,7 @@ where
 }
 impl<'a, T: 'a> MaybeRepeatedVariantField<'a> for Option<std::result::Result<T, i32>>
 where
-    i32: From<T>,
-    T: Clone + TryFrom<i32, Error = i32>,
+    T: Clone + TryFrom<i32, Error = i32> + Into<i32>,
 {
     fn extend<I: Iterator<Item = Self::Item>>(&mut self, first: Self::Item, rest: I) {
         *self = Some(rest.last().unwrap_or(first));
@@ -190,10 +184,10 @@ where
 {
     type Item = T;
     type Iter = std::iter::Once<&'a T>;
-    fn iter(&'a self) -> Self::Iter {
+    fn iter_for_ser(&'a self) -> Self::Iter {
         std::iter::once(self)
     }
-    fn last_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
         self.as_mut()
     }
 }
@@ -203,12 +197,12 @@ where
 {
     type Item = T;
     type Iter = std::slice::Iter<'a, T>;
-    fn iter(&'a self) -> Self::Iter {
-        <[T]>::iter(self)
+    fn iter_for_ser(&'a self) -> Self::Iter {
+        self.iter()
     }
-    fn last_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
         self.push(Default::default());
-        <[T]>::last_mut(self).unwrap()
+        self.last_mut().unwrap()
     }
 }
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Option<Box<T>>
@@ -217,10 +211,10 @@ where
 {
     type Item = T;
     type Iter = std::option::IntoIter<&'a T>;
-    fn iter(&'a self) -> Self::Iter {
+    fn iter_for_ser(&'a self) -> Self::Iter {
         Option::<&'a Self::Item>::into_iter(self.as_deref())
     }
-    fn last_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
         self.get_or_insert_with(|| Box::new(Default::default()))
             .as_mut()
     }

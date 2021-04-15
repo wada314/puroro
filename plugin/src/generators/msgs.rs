@@ -101,6 +101,8 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
         field: {d}::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {{
+        use ::puroro::helpers::MaybeRepeatedField;
+        use ::puroro::helpers::MaybeRepeatedVariantField;
         match field {{\n",
             d = DESER_MOD,
             name = msg.native_bare_type_name(),
@@ -112,7 +114,6 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
                 func(|output| print_msg_deser_deserializable_length_delimited_arm(output, msg)),
                 func(|output| print_msg_deser_deserializable_bitsxx_arm(output, msg, 32)),
                 func(|output| print_msg_deser_deserializable_bitsxx_arm(output, msg, 64)),
-                "_ => Err(::puroro::PuroroError::UnexpectedFieldType)?,\n",
             ),
         ),
         "        \
@@ -133,26 +134,29 @@ pub fn print_msg_deser_deserializable_variant_arm<'c, W: std::fmt::Write>(
             "{d}::Field::Variant(variant) => match field_number {{\n",
             d = DESER_MOD
         ),
-        indent((iter(msg.fields().map(|field| -> Result<Fragment<_>> {
-            Ok(match field.wire_type()? {
-                WireType::Variant(field_type) => seq((
-                    format!("{number} => {{\n", number = field.number()),
-                    indent(format!(
-                        "*::puroro::helpers::MaybeRepeatedField::last_mut(\
-                            &mut self.{name}) = variant.to_native::<{tag}>()?;\n",
-                        name = field.native_name(),
-                        tag = field_type.native_tag_type(msg.path_to_root_mod()),
-                    )),
-                    "}}\n",
-                ))
-                .into(),
-                _ => format!(
-                    "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
-                    number = field.number()
-                )
-                .into(),
-            })
-        })),)),
+        indent((
+            iter(msg.fields().map(|field| -> Result<Fragment<_>> {
+                Ok(match field.wire_type()? {
+                    WireType::Variant(field_type) => seq((
+                        format!("{number} => {{\n", number = field.number()),
+                        indent(format!(
+                            "*self.{name}.push_and_get_mut() \
+                            = variant.to_native::<{tag}>()?;\n",
+                            name = field.native_name(),
+                            tag = field_type.native_tag_type(msg.path_to_root_mod()),
+                        )),
+                        "}}\n",
+                    ))
+                    .into(),
+                    _ => format!(
+                        "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
+                        number = field.number()
+                    )
+                    .into(),
+                })
+            })),
+            "_ => Err(::puroro::PuroroError::UnexpectedFieldId)?,\n",
+        )),
         "}}\n",
     )
         .write_into(output)
@@ -178,27 +182,28 @@ pub fn print_msg_deser_deserializable_length_delimited_arm<'c, W: std::fmt::Writ
 let values = ldd.deserialize_as_variants().map(|rv| {{
     rv.and_then(|variant| variant.to_native::<{tag}>())
 }}).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-::puroro::helpers::MaybeRepeatedVariantField::extend(
-    &mut self.{name}, values.into_iter());\n",
+let mut iter = values.into_iter();
+let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
+MaybeRepeatedVariantField::extend(&mut self.{name}, first, iter);\n",
                             name = field.native_name(),
                             tag = field_type.native_tag_type(msg.path_to_root_mod()),
                         ),
                         WireType::LengthDelimited(field_type) => match field_type {
                             LengthDelimitedFieldType::String => format!(
                                 "\
-*::puroro::helpers::MaybeRepeatedField::last_mut(&mut self.{name}) 
+*self.{name}.push_and_get_mut()
     = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;\n",
                                 name = field.native_name()
                             ),
                             LengthDelimitedFieldType::Bytes => format!(
                                 "\
-*::puroro::helpers::MaybeRepeatedField::last_mut(&mut self.{name}) 
+*self.{name}.push_and_get_mut()
     = ldd.deserialize_as_bytes().collect::<::puroro::Result<_>>()?;\n",
                                 name = field.native_name()
                             ),
                             LengthDelimitedFieldType::Message(_) => format!(
                                 "\
-let msg = ::puroro::helpers::MaybeRepeatedField::last_mut(&mut self.{name});
+let msg = self.{name}.push_and_get_mut();
 ldd.deserialize_as_message(msg)?;\n",
                                 name = field.native_name()
                             ),
@@ -272,8 +277,11 @@ pub fn print_msg_puroro_deserializable<'c, W: std::fmt::Write>(
         "\
 impl ::puroro::Deserializable for {name} {{
     fn from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {{
-        let mut deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
-        deserializer.deserialize(<{name} as ::std::default::Default>::default())
+        use ::puroro::deserializer::stream::Deserializer;
+        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let mut msg = <{name} as ::std::default::Default>::default();
+        deserializer.deserialize(&mut msg)?;
+        Ok(msg)
     }}
 }}\n",
         name = msg.native_bare_type_name()
@@ -291,7 +299,8 @@ pub fn print_msg_ser_serializable<'c, W: std::fmt::Write>(
 impl ::puroro::serializer::Serializable for {name} {{
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
-    {{\n",
+    {{
+        use ::puroro::helpers::MaybeRepeatedField;\n",
             name = msg.native_bare_type_name()
         ),
         indent_n(
@@ -300,9 +309,11 @@ impl ::puroro::serializer::Serializable for {name} {{
                 Ok(match field.wire_type()? {
                     WireType::Variant(field_type) => format!(
                         "\
-serializer.serialize_variants_twice::<{tag}>(
+serializer.serialize_variants_twice::<{tag}, _>(
     {number}, 
-    ::puroro::helpers::MaybeRepeatedField::iter(&self.{name}))?;\n",
+    self.{name}.iter_for_ser()
+        .cloned()
+        .map(|v| Ok(v)))?;\n",
                         number = field.number(),
                         tag = field_type.native_tag_type(msg.path_to_root_mod()),
                         name = field.native_name(),
@@ -311,7 +322,7 @@ serializer.serialize_variants_twice::<{tag}>(
                     WireType::LengthDelimited(field_type) => match field_type {
                         LengthDelimitedFieldType::String => format!(
                             "\
-for string in ::puroro::MaybeRepeatedField::iter(&self.{name}) {{
+for string in self.{name}.iter_for_ser() {{
     serializer.serialize_bytes_twice({number}, string.bytes().map(|b| Ok(b)))?;
 }}\n",
                             name = field.native_name(),
@@ -319,15 +330,15 @@ for string in ::puroro::MaybeRepeatedField::iter(&self.{name}) {{
                         ),
                         LengthDelimitedFieldType::Bytes => format!(
                             "\
-for bytes in ::puroro::MaybeRepeatedField::iter(&self.{name}) {{
-    serializer.serialize_bytes_twice({number}, bytes.iter().map(|b| Ok(b)))?;
+for bytes in self.{name}.iter_for_ser() {{
+    serializer.serialize_bytes_twice({number}, bytes.iter().map(|b| Ok(*b)))?;
 }}\n",
                             name = field.native_name(),
                             number = field.number()
                         ),
                         LengthDelimitedFieldType::Message(_) => format!(
                             "\
-for msg in ::puroro::MaybeRepeatedField::iter(&self.{name}) {{
+for msg in self.{name}.iter_for_ser() {{
     serializer.serialize_message_twice({number}, msg)?;
 }}\n",
                             number = field.number(),
@@ -336,8 +347,8 @@ for msg in ::puroro::MaybeRepeatedField::iter(&self.{name}) {{
                     },
                     WireType::Bits32(_) | WireType::Bits64(_) => format!(
                         "\
-for item in ::puroro::MaybeRepeatedField::iter(&self.{name}) {{
-    serializer.serialize_fixed_bits({number}, &item.to_le_bytes())?;
+for item in self.{name}.iter_for_ser() {{
+    serializer.serialize_fixed_bits({number}, item.to_le_bytes())?;
 }}\n",
                         name = field.native_name(),
                         number = field.number(),
@@ -345,7 +356,8 @@ for item in ::puroro::MaybeRepeatedField::iter(&self.{name}) {{
                 })
             })),),
         ),
-        "    \
+        "        \
+        Ok(())
     }}
 }}\n",
     )
@@ -361,7 +373,7 @@ pub fn print_msg_puroro_serializable<'c, W: std::fmt::Write>(
 impl ::puroro::Serializable for {name} {{
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {{
         let mut serializer = ::puroro::serializer::default_serializer(write);
-        <Self as ::puroro::serialize::Serializable>::serialize(&mut serializer)
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }}
 }}\n",
         name = msg.native_bare_type_name()

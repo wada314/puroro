@@ -117,3 +117,15 @@ pub fn get_keyword_safe_ident(input: &str) -> String {
     }
     s
 }
+
+pub fn iter_package_to_root(package: &str) -> impl Iterator<Item = &str> {
+    std::iter::successors(Some(package), |package| {
+        if package.is_empty() {
+            None
+        } else if let Some((remain, _)) = package.rsplit_once('.') {
+            Some(remain)
+        } else {
+            Some("")
+        }
+    })
+}

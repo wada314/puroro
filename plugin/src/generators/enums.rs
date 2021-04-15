@@ -25,7 +25,7 @@ pub enum {name} {{\n",
 }}\n",
         format!(
             "\
-impl std::convert::TryFrom<i32> for {name} {{
+impl ::std::convert::TryFrom<i32> for {name} {{
     type Error = i32;
     fn try_from(val: i32) -> ::std::result::Result<Self, i32> {{
         match val {{\n",
@@ -50,7 +50,7 @@ impl std::convert::TryFrom<i32> for {name} {{
 }}\n",
         format!(
             "\
-impl std::convert::Into<i32> for {name} {{
+impl ::std::convert::Into<i32> for {name} {{
     fn into(self) -> i32 {{
         self as i32
     }}

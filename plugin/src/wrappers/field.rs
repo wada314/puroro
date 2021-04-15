@@ -3,7 +3,7 @@ use std::fmt::Debug;
 
 use crate::google::protobuf::field_descriptor_proto::Label;
 use crate::google::protobuf::FieldDescriptorProto;
-use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
+use crate::utils::{get_keyword_safe_ident, iter_package_to_root, to_lower_snake_case};
 use crate::Context;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -195,7 +195,7 @@ impl<'c> FieldDescriptor<'c> {
                     FieldLabel::Optional => {
                         if let FieldType::Message(_) = self.type_()? {
                             format!(
-                                "::std::option::Optional<::std::boxed::Box<{name}>>",
+                                "::std::option::Option<::std::boxed::Box<{name}>>",
                                 name = native_fully_qualified_type
                             )
                         } else {
@@ -232,18 +232,6 @@ impl Debug for FieldDescriptor<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("FieldDescriptor").finish()
     }
-}
-
-fn iter_package_to_root(package: &str) -> impl Iterator<Item = &str> {
-    std::iter::successors(Some(package), |package| {
-        if package.is_empty() {
-            None
-        } else if let Some((remain, _)) = package.rsplit_once('.') {
-            Some(remain)
-        } else {
-            Some("")
-        }
-    })
 }
 
 #[derive(Debug, Clone)]

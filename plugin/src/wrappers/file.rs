@@ -29,9 +29,6 @@ impl<'c> FileDescriptor<'c> {
             lazy_output_file_path_from_root: Default::default(),
         }
     }
-    pub fn file_path_from_root(&'c self) -> &str {
-        &self.proto.name
-    }
     pub fn output_file_path_from_root(&'c self) -> &str {
         self.lazy_output_file_path_from_root.get_or_init(|| {
             if self.package().is_empty() {
