@@ -36,7 +36,6 @@ pub trait MessageSerializer {
     fn direct_write_ld_field<I>(
         &mut self,
         field_number: usize,
-        wire_type: WireType,
         length: usize,
         input: I,
     ) -> Result<()>
@@ -96,26 +95,33 @@ where
         Ok(())
     }
 
-    fn serialize_variants_twice<T, I>(&mut self, field_number: usize, iter: I) -> Result<()>
+    fn serialize_variants_twice<T, I>(&mut self, field_number: usize, mut iter: I) -> Result<()>
     where
         T: VariantType,
         I: Clone + Iterator<Item = Result<T::NativeType>>,
     {
-        let iter2 = iter.clone();
+        match iter.clone().count() {
+            0 => (),
+            1 => {
+                self.serialize_variant::<T>(field_number, iter.next().unwrap()?)?;
+            }
+            _ => {
+                // Count the bytes length using a fake `Write`
+                let mut length_counter = CounterWrite::new();
+                for rvalue in iter.clone() {
+                    let variant = T::to_variant(rvalue?)?;
+                    variant.encode_bytes(&mut length_counter)?;
+                }
+                let length = length_counter.count();
 
-        // Count the bytes length using a fake `Write`
-        let mut length_counter = CounterWrite::new();
-        for rvalue in iter {
-            let variant = T::to_variant(rvalue?)?;
-            variant.encode_bytes(&mut length_counter)?;
-        }
-
-        self.write_field_number_and_wire_type(field_number, WireType::LengthDelimited)?;
-        RustUsize::to_variant(length_counter.count())?.encode_bytes(&mut self.write)?;
-        // Real write.
-        for rvalue in iter2 {
-            let variant = T::to_variant(rvalue?)?;
-            variant.encode_bytes(&mut self.write)?;
+                self.write_field_number_and_wire_type(field_number, WireType::LengthDelimited)?;
+                RustUsize::to_variant(length)?.encode_bytes(&mut self.write)?;
+                // Real write.
+                for rvalue in iter {
+                    let variant = T::to_variant(rvalue?)?;
+                    variant.encode_bytes(&mut self.write)?;
+                }
+            }
         }
 
         Ok(())
@@ -154,14 +160,13 @@ where
     fn direct_write_ld_field<I>(
         &mut self,
         field_number: usize,
-        wire_type: WireType,
         length: usize,
         input: I,
     ) -> Result<()>
     where
         I: Iterator<Item = IoResult<u8>>,
     {
-        self.write_field_number_and_wire_type(field_number, wire_type)?;
+        self.write_field_number_and_wire_type(field_number, WireType::LengthDelimited)?;
         RustUsize::to_variant(length)?.encode_bytes(&mut self.write)?;
         for rbyte in input {
             self.write.write_all(std::slice::from_ref(&rbyte?))?;

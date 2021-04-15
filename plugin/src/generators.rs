@@ -49,7 +49,8 @@ impl ::std::default::Default for {name} {{
                 3,
                 (iter(msg.fields().map(|field| {
                     match (field.label()?, field.type_()?) {
-                        (FieldLabel::Optional, FieldType::Enum(_)) => Ok(format!(
+                        (FieldLabel::Optional, FieldType::Enum(_))
+                        | (FieldLabel::Required, FieldType::Enum(_)) => Ok(format!(
                             "{name}: 0i32.try_into(),\n",
                             name = field.native_name()
                         )),
@@ -65,6 +66,7 @@ impl ::std::default::Default for {name} {{
     }}
 }}\n",
             func(|output| print_msg_deserializable(output, msg)),
+            func(|output| print_msg_serializable(output, msg)),
         )
             .write_into(&mut self.output)
     }
@@ -204,19 +206,12 @@ pub fn print_msg_deserializable_variant_arm<'c>(
             Ok(match field.wire_type()? {
                 WireType::Variant(field_type) => seq((
                     format!("{number} => {{\n", number = field.number()),
-                    indent((if field.is_repeated()? {
-                        format!(
-                            "self.{name}.push(variant.to_native::<{tag}>()?);\n",
-                            name = field.native_name(),
-                            tag = field_type.native_tag_type(msg.path_to_root_mod()),
-                        )
-                    } else {
-                        format!(
-                            "self.{name} = variant.to_native::<{tag}>()?;\n",
-                            name = field.native_name(),
-                            tag = field_type.native_tag_type(msg.path_to_root_mod()),
-                        )
-                    },)),
+                    indent(format!(
+                        "*::puroro::helpers::MaybeRepeatedField::last_mut(\
+                            &mut self.{name}) = variant.to_native::<{tag}>()?;\n",
+                        name = field.native_name(),
+                        tag = field_type.native_tag_type(msg.path_to_root_mod()),
+                    )),
                     "}}\n",
                 ))
                 .into(),
@@ -247,78 +242,35 @@ pub fn print_msg_deserializable_length_delimited_arm<'c>(
                     format!("{number} => {{\n", number = field.number()),
                     indent((match field.wire_type()? {
                         // Deserialize packed variant(s)
-                        WireType::Variant(field_type) => {
-                            if field.is_repeated()? {
-                                format!(
-                                    "\
-self.{name}.append(&mut ldd.deserialize_as_variants().map(|rv| {{
+                        WireType::Variant(field_type) => format!(
+                            "\
+let values = ldd.deserialize_as_variants().map(|rv| {{
     rv.and_then(|variant| variant.to_native::<{tag}>())
-}}).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);\n",
-                                    name = field.native_name(),
-                                    tag = field_type.native_tag_type(msg.path_to_root_mod()),
-                                )
-                            } else {
-                                format!(
-                                    "\
-self.{name} = ldd.deserialize_as_variants()
-    .last()
-    .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
-    .and_then(|variant| variant.to_native::<{tag}>())?;\n",
-                                    name = field.native_name(),
-                                    tag = field_type.native_tag_type(msg.path_to_root_mod()),
-                                )
-                            }
-                        }
+}}).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
+::puroro::helpers::MaybeRepeatedVariantField::extend(
+    &mut self.{name}, values.into_iter());\n",
+                            name = field.native_name(),
+                            tag = field_type.native_tag_type(msg.path_to_root_mod()),
+                        ),
                         WireType::LengthDelimited(field_type) => match field_type {
-                            LengthDelimitedFieldType::String => {
-                                if field.is_repeated()? {
-                                    format!(
-                                        "self.{name}.push(ldd.deserialize_as_chars()\
-                                            .collect::<::puroro::Result<_>>()?);\n",
-                                        name = field.native_name()
-                                    )
-                                } else {
-                                    format!(
-                                        "self.{name} = ldd.deserialize_as_chars()\
-                                            .collect::<::puroro::Result<_>>()?;\n",
-                                        name = field.native_name()
-                                    )
-                                }
-                            }
-                            LengthDelimitedFieldType::Bytes => {
-                                if field.is_repeated()? {
-                                    format!(
-                                        "self.{name}.push(ldd.deserialize_as_bytes()\
-                                            .collect::<::puroro::Result<_>>()?);\n",
-                                        name = field.native_name()
-                                    )
-                                } else {
-                                    format!(
-                                        "self.{name} = ldd.deserialize_as_bytes()\
-                                            .collect::<::puroro::Result<_>>()?;\n",
-                                        name = field.native_name()
-                                    )
-                                }
-                            }
-                            LengthDelimitedFieldType::Message(_) => {
-                                if field.is_repeated()? {
-                                    format!(
-                                        "\
-let mut msg = ::std::default::Default::default();
-ldd.deserialize_as_message(&mut msg)?;
-self.{name}.push(msg);",
-                                        name = field.native_name()
-                                    )
-                                } else {
-                                    format!(
-                                        "\
-let boxed_msg = self.{name}.get_or_insert_with(
-    || ::std::boxed::Box::new(::std::default::Default::default()));
-ldd.deserialize_as_message(boxed_msg.as_mut())?;",
-                                        name = field.native_name()
-                                    )
-                                }
-                            }
+                            LengthDelimitedFieldType::String => format!(
+                                "\
+*::puroro::helpers::MaybeRepeatedField::last_mut(&mut self.{name}) 
+    = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;\n",
+                                name = field.native_name()
+                            ),
+                            LengthDelimitedFieldType::Bytes => format!(
+                                "\
+*::puroro::helpers::MaybeRepeatedField::last_mut(&mut self.{name}) 
+    = ldd.deserialize_as_bytes().collect::<::puroro::Result<_>>()?;\n",
+                                name = field.native_name()
+                            ),
+                            LengthDelimitedFieldType::Message(_) => format!(
+                                "\
+let msg = ::puroro::helpers::MaybeRepeatedField::last_mut(&mut self.{name});
+ldd.deserialize_as_message(msg)?;\n",
+                                name = field.native_name()
+                            ),
                         },
                         _ => "Err(::puroro::PuroroError::UnexpectedWireType)?\n".into(),
                     },)),
@@ -398,106 +350,56 @@ impl ::puroro::serializer::Serializable for {name} {{
             2,
             (iter(msg.fields().map(|field| -> Result<_> {
                 Ok(match field.wire_type()? {
-                    WireType::Variant(field_type) => {
-                        if field.is_repeated()? {
-                            format!(
-                                "serializer.serialize_variants_twice::<{tag}>(\
-                                    {number}, self.{name}.iter())?;\n",
-                                number = field.number(),
-                                tag = field_type.native_tag_type(msg.path_to_root_mod()),
-                                name = field.native_name(),
-                            )
-                        } else {
-                            format!(
-                                "serializer.serialize_variant::<{tag}>({number}, self.{name})?;\n",
-                                number = field.number(),
-                                tag = field_type.native_tag_type(msg.path_to_root_mod()),
-                                name = field.native_name(),
-                            )
-                        }
-                    }
+                    WireType::Variant(field_type) => format!(
+                        "\
+serializer.serialize_variants_twice::<{tag}>(
+    {number}, 
+    ::puroro::helpers::MaybeRepeatedField::iter(&self.{name}))?;\n",
+                        number = field.number(),
+                        tag = field_type.native_tag_type(msg.path_to_root_mod()),
+                        name = field.native_name(),
+                    ),
+
                     WireType::LengthDelimited(field_type) => match field_type {
-                        LengthDelimitedFieldType::String => {
-                            if field.is_repeated()? {
-                                format!(
-                                    "\
-for string in &self.{name} {{
+                        LengthDelimitedFieldType::String => format!(
+                            "\
+for string in ::puroro::MaybeRepeatedField::iter(&self.{name}) {{
     serializer.serialize_bytes_twice({number}, string.bytes().map(|b| Ok(b)))?;
 }}\n",
-                                    name = field.native_name(),
-                                    number = field.number()
-                                )
-                            } else {
-                                format!(
-                                    "serializer.serialize_bytes_twice({number}, \
-                                        self.{name}.bytes().map(|b| Ok(b)))?;\n",
-                                    name = field.native_name(),
-                                    number = field.number()
-                                )
-                            }
-                        }
-                        LengthDelimitedFieldType::Bytes => {
-                            if field.is_repeated()? {
-                                format!(
-                                    "\
-for bytes in &self.{name} {{
+                            name = field.native_name(),
+                            number = field.number()
+                        ),
+                        LengthDelimitedFieldType::Bytes => format!(
+                            "\
+for bytes in ::puroro::MaybeRepeatedField::iter(&self.{name}) {{
     serializer.serialize_bytes_twice({number}, bytes.iter().map(|b| Ok(b)))?;
 }}\n",
-                                    name = field.native_name(),
-                                    number = field.number()
-                                )
-                            } else {
-                                format!(
-                                    "serializer.serialize_bytes_twice({number}, \
-                                        self.{name}.iter().map(|b| Ok(b)))?;\n",
-                                    name = field.native_name(),
-                                    number = field.number()
-                                )
-                            }
-                        }
-                        LengthDelimitedFieldType::Message(_) => {
-                            if field.is_repeated()? {
-                                format!(
-                                    "\
-for string in &self.{name} {{
-    serializer.serialize_bytes_twice({number}, string.bytes().map(|b| Ok(b)))?;
+                            name = field.native_name(),
+                            number = field.number()
+                        ),
+                        LengthDelimitedFieldType::Message(_) => format!(
+                            "\
+for msg in ::puroro::MaybeRepeatedField::iter(&self.{name}) {{
+    serializer.serialize_message_twice({number}, msg)?;
 }}\n",
-                                    number = field.number(),
-                                    name = field.native_name(),
-                                )
-                            } else {
-                                format!(
-                                    "serializer.serialize_bytes_twice(\
-                                        {number}, self.{name}.bytes().map(|b| Ok(b)))?;\n",
-                                    number = field.number(),
-                                    name = field.native_name(),
-                                )
-                            }
-                        }
+                            number = field.number(),
+                            name = field.native_name(),
+                        ),
                     },
-                    WireType::Bits32(_) | WireType::Bits64(_) => {
-                        if field.is_repeated()? {
-                            format!(
-                                "\
-for item in &self.{name} {{
+                    WireType::Bits32(_) | WireType::Bits64(_) => format!(
+                        "\
+for item in ::puroro::MaybeRepeatedField::iter(&self.{name}) {{
     serializer.serialize_fixed_bits({number}, &item.to_le_bytes())?;
 }}\n",
-                                name = field.native_name(),
-                                number = field.number(),
-                            )
-                        } else {
-                            format!(
-                                "serializer.serialize_fixed_bits(\
-                                    {number}, &self.{name}.to_le_bytes())?;\n",
-                                name = field.native_name(),
-                                number = field.number(),
-                            )
-                        }
-                    }
+                        name = field.native_name(),
+                        number = field.number(),
+                    ),
                 })
             })),),
         ),
-        "}}\n",
+        "    \
+    }}
+}}\n",
     )
         .write_into(output)
 }
