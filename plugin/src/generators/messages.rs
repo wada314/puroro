@@ -233,28 +233,50 @@ pub fn print_msg_deser_deserializable_bitsxx_arm<'c, W: std::fmt::Write>(
         ),
         indent((
             iter(msg.fields().map(|field| -> Result<Fragment<_>> {
-                Ok(seq((
-                    format!("{number} => {{\n", number = field.number()),
-                    indent(({
-                        let opt_native_type = match (bits, field.wire_type()?) {
-                            (32, WireType::Bits32(field_type)) => Some(field_type.native_type()),
-                            (64, WireType::Bits64(field_type)) => Some(field_type.native_type()),
-                            _ => None,
-                        };
-                        if let Some(native_type) = opt_native_type {
-                            format!(
-                                "*self.{name}.push_and_get_mut() \
-                                    = {type_}::from_le_bytes(bytes);\n",
-                                name = field.native_name(),
-                                type_ = native_type
-                            )
-                        } else {
-                            "Err(::puroro::PuroroError::UnexpectedWireType)?\n".into()
-                        }
-                    },)),
-                    "}}\n",
-                )))
+                Ok({
+                    let opt_native_type = match (bits, field.wire_type()?) {
+                        (32, WireType::Bits32(field_type)) => Some(field_type.native_type()),
+                        (64, WireType::Bits64(field_type)) => Some(field_type.native_type()),
+                        _ => None,
+                    };
+                    if let Some(native_type) = opt_native_type {
+                        format!(
+                            "\
+{number} => {{
+    *self.{name}.push_and_get_mut() = {type_}::from_le_bytes(bytes);
+}}\n",
+                            number = field.number(),
+                            name = field.native_name(),
+                            type_ = native_type
+                        )
+                        .into()
+                    } else {
+                        "".into()
+                    }
+                })
             })),
+            // group the wrong wire type fields.
+            {
+                let wrong_wire_field_numbers_iter =
+                    msg.fields()
+                        .filter_map(|field| match (bits, field.wire_type()?) {
+                            (32, WireType::Bits32(_)) | (64, WireType::Bits64(_)) => None,
+                            _ => Some(field.number().to_string()),
+                        });
+                let pattern = ::itertools::Itertools::intersperse(
+                    wrong_wire_field_numbers_iter,
+                    " | ".to_string(),
+                )
+                .collect::<String>();
+                format!(
+                    "\
+{field_numbers} => {{
+    Err(::puroro::PuroroError::UnexpectedWireType)?
+}}\n",
+                    field_numbers = pattern
+                )
+            },
+            // TODO: handle unknown field id
             "_ => Err(::puroro::PuroroError::UnexpectedFieldId)?,\n",
         )),
         "}}\n",
