@@ -201,3 +201,92 @@ impl Write for CounterWrite {
         Ok(())
     }
 }
+
+// A utility for protobuf implementation.
+trait MaybeRepeatedField<'a> {
+    type Item: 'a;
+    type Iter: Iterator<Item = &'a Self::Item>;
+    fn iter(&'a self) -> Self::Iter;
+    fn extend<I: Iterator<Item = Self::Item>>(&mut self, first: Self::Item, rest: I);
+}
+macro_rules! define_maybe_repeated_field {
+    ($ty:ty) => {
+        impl<'a> MaybeRepeatedField<'a> for $ty {
+            type Item = $ty;
+            type Iter = std::option::IntoIter<&'a $ty>;
+            fn iter(&'a self) -> Self::Iter {
+                // Do not encode if the value is equal to default
+                // Not applicable for proto2 because they have [default=xx]!!
+                if *self == <$ty as Default>::default() {
+                    Some(self)
+                } else {
+                    None
+                }
+                .into_iter()
+            }
+            fn extend<I: Iterator<Item = Self::Item>>(&mut self, first: Self::Item, rest: I) {
+                *self = rest.last().unwrap_or(first);
+            }
+        }
+        impl<'a> MaybeRepeatedField<'a> for Vec<$ty> {
+            type Item = $ty;
+            type Iter = std::slice::Iter<'a, $ty>;
+            fn iter(&'a self) -> Self::Iter {
+                self.iter()
+            }
+            fn extend<I: Iterator<Item = Self::Item>>(&mut self, first: Self::Item, rest: I) {
+                self.push(first);
+                <Self as std::iter::Extend<Self::Item>>::extend(self, rest);
+            }
+        }
+        impl<'a> MaybeRepeatedField<'a> for Option<$ty> {
+            type Item = $ty;
+            type Iter = std::option::Iter<'a, $ty>;
+            fn iter(&'a self) -> Self::Iter {
+                self.iter()
+            }
+            fn extend<I: Iterator<Item = Self::Item>>(&mut self, first: Self::Item, rest: I) {
+                *self = Some(rest.last().unwrap_or(first));
+            }
+        }
+    };
+}
+define_maybe_repeated_field!(i32);
+define_maybe_repeated_field!(i64);
+define_maybe_repeated_field!(u32);
+define_maybe_repeated_field!(u64);
+define_maybe_repeated_field!(f32);
+define_maybe_repeated_field!(f64);
+define_maybe_repeated_field!(bool);
+define_maybe_repeated_field!(String);
+define_maybe_repeated_field!(Vec<u8>);
+// Manual implementation for enum
+impl<'a, T: 'a> MaybeRepeatedField<'a> for std::result::Result<T, i32>
+where
+    i32: From<T>,
+    T: Clone,
+{
+    type Item = std::result::Result<T, i32>;
+    type Iter = std::option::IntoIter<&'a std::result::Result<T, i32>>;
+    fn iter(&'a self) -> Self::Iter {
+        let int_value = match self {
+            Ok(x) => i32::from(x.clone()),
+            Err(i) => *i,
+        };
+        if int_value != 0 { Some(self) } else { None }.into_iter()
+    }
+}
+impl<'a, T: 'a> MaybeRepeatedField<'a> for Vec<std::result::Result<T, i32>> {
+    type Item = std::result::Result<T, i32>;
+    type Iter = std::slice::Iter<'a, std::result::Result<T, i32>>;
+    fn iter(&'a self) -> Self::Iter {
+        self.iter()
+    }
+}
+impl<'a, T: 'a> MaybeRepeatedField<'a> for Option<std::result::Result<T, i32>> {
+    type Item = std::result::Result<T, i32>;
+    type Iter = std::option::Iter<'a, std::result::Result<T, i32>>;
+    fn iter(&'a self) -> Self::Iter {
+        self.iter()
+    }
+}
