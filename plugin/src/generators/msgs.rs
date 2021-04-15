@@ -12,6 +12,21 @@ pub fn print_msg<'c, W: std::fmt::Write>(
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (
+        func(|output| print_msg_struct(output, msg)),
+        func(|output| print_msg_default(output, msg)),
+        func(|output| print_msg_deser_deserializable(output, msg)),
+        func(|output| print_msg_puroro_deserializable(output, msg)),
+        func(|output| print_msg_ser_serializable(output, msg)),
+        func(|output| print_msg_puroro_serializable(output, msg)),
+    )
+        .write_into(output)
+}
+
+pub fn print_msg_struct<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    msg: &'c MessageDescriptor<'c>,
+) -> Result<()> {
+    (
         format!(
             "\
 #[derive(Debug, Clone)]
@@ -27,6 +42,15 @@ pub struct {name} {{\n",
         })),)),
         "\
 }}\n",
+    )
+        .write_into(output)
+}
+
+pub fn print_msg_default<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    msg: &'c MessageDescriptor<'c>,
+) -> Result<()> {
+    (
         format!(
             "\
 impl ::std::default::Default for {name} {{
@@ -56,13 +80,11 @@ impl ::std::default::Default for {name} {{
         }}
     }}
 }}\n",
-        func(|output| print_msg_deserializable(output, msg)),
-        func(|output| print_msg_serializable(output, msg)),
     )
         .write_into(output)
 }
 
-pub fn print_msg_deserializable<'c, W: std::fmt::Write>(
+pub fn print_msg_deser_deserializable<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
@@ -86,10 +108,10 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
         indent_n(
             3,
             (
-                func(|output| print_msg_deserializable_variant_arm(output, msg)),
-                func(|output| print_msg_deserializable_length_delimited_arm(output, msg)),
-                func(|output| print_msg_deserializable_bitsxx_arm(output, msg, 32)),
-                func(|output| print_msg_deserializable_bitsxx_arm(output, msg, 64)),
+                func(|output| print_msg_deser_deserializable_variant_arm(output, msg)),
+                func(|output| print_msg_deser_deserializable_length_delimited_arm(output, msg)),
+                func(|output| print_msg_deser_deserializable_bitsxx_arm(output, msg, 32)),
+                func(|output| print_msg_deser_deserializable_bitsxx_arm(output, msg, 64)),
                 "_ => Err(::puroro::PuroroError::UnexpectedFieldType)?,\n",
             ),
         ),
@@ -102,7 +124,7 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
         .write_into(output)
 }
 
-pub fn print_msg_deserializable_variant_arm<'c, W: std::fmt::Write>(
+pub fn print_msg_deser_deserializable_variant_arm<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
@@ -136,7 +158,7 @@ pub fn print_msg_deserializable_variant_arm<'c, W: std::fmt::Write>(
         .write_into(output)
 }
 
-pub fn print_msg_deserializable_length_delimited_arm<'c, W: std::fmt::Write>(
+pub fn print_msg_deser_deserializable_length_delimited_arm<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
@@ -193,7 +215,7 @@ ldd.deserialize_as_message(msg)?;\n",
         .write_into(output)
 }
 
-pub fn print_msg_deserializable_bitsxx_arm<'c, W: std::fmt::Write>(
+pub fn print_msg_deser_deserializable_bitsxx_arm<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
     msg: &'c MessageDescriptor<'c>,
     bits: usize,
@@ -242,7 +264,24 @@ pub fn print_msg_deserializable_bitsxx_arm<'c, W: std::fmt::Write>(
         .write_into(output)
 }
 
-pub fn print_msg_serializable<'c, W: std::fmt::Write>(
+pub fn print_msg_puroro_deserializable<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    msg: &'c MessageDescriptor<'c>,
+) -> Result<()> {
+    (format!(
+        "\
+impl ::puroro::Deserializable for {name} {{
+    fn from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {{
+        let mut deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        deserializer.deserialize(<{name} as ::std::default::Default>::default())
+    }}
+}}\n",
+        name = msg.native_bare_type_name()
+    ),)
+        .write_into(output)
+}
+
+pub fn print_msg_ser_serializable<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
@@ -310,5 +349,22 @@ for item in ::puroro::MaybeRepeatedField::iter(&self.{name}) {{
     }}
 }}\n",
     )
+        .write_into(output)
+}
+
+pub fn print_msg_puroro_serializable<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    msg: &'c MessageDescriptor<'c>,
+) -> Result<()> {
+    (format!(
+        "\
+impl ::puroro::Serializable for {name} {{
+    fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {{
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serialize::Serializable>::serialize(&mut serializer)
+    }}
+}}\n",
+        name = msg.native_bare_type_name()
+    ),)
         .write_into(output)
 }

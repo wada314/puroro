@@ -7,6 +7,8 @@ mod generators;
 mod stage1;
 #[cfg(feature = "stage2")]
 mod stage2;
+#[cfg(feature = "stage3")]
+mod stage3;
 mod utils;
 mod wrappers;
 
@@ -24,6 +26,8 @@ mod protos {
     pub use crate::stage1::*;
     #[cfg(feature = "stage2")]
     pub use crate::stage2::google;
+    #[cfg(feature = "stage3")]
+    pub use crate::stage3::google;
 }
 use google::protobuf::compiler::{
     code_generator_response, CodeGeneratorRequest, CodeGeneratorResponse,

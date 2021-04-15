@@ -1,11 +1,13 @@
 use std::fmt::Debug;
 
 use crate::google::protobuf::FileDescriptorProto;
+use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::Context;
 use crate::Result;
 
 use super::{EnumDescriptor, FileOrMessageRef, MessageDescriptor};
 use ::once_cell::unsync::OnceCell;
+use itertools::Itertools;
 
 #[derive(Clone)]
 pub struct FileDescriptor<'c> {
@@ -32,10 +34,17 @@ impl<'c> FileDescriptor<'c> {
     }
     pub fn output_file_path_from_root(&'c self) -> &str {
         self.lazy_output_file_path_from_root.get_or_init(|| {
-            if let Some((file_path_without_ext, _)) = self.file_path_from_root().rsplit_once('.') {
-                file_path_without_ext.to_string() + ".rs"
+            if self.package().is_empty() {
+                "mod.rs".to_string()
             } else {
-                self.file_path_from_root().to_string() + ".rs"
+                Itertools::intersperse(
+                    self.package()
+                        .split('.')
+                        .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
+                    "/".to_string(),
+                )
+                .collect::<String>()
+                    + ".rs"
             }
         })
     }

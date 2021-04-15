@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 
 use crate::google::protobuf::compiler::CodeGeneratorRequest;
@@ -13,6 +13,7 @@ pub struct Context<'c> {
     proto: CodeGeneratorRequest,
     lazy_file_descriptors: OnceCell<Vec<FileDescriptor<'c>>>,
     lazy_fq_name_to_desc_map: OnceCell<HashMap<&'c str, EnumOrMessageRef<'c>>>,
+    lazy_packages_with_subpackages_map: OnceCell<HashMap<&'c str, HashSet<&'c str>>>,
 }
 
 impl<'c> Context<'c> {
@@ -21,6 +22,7 @@ impl<'c> Context<'c> {
             proto: cgreq,
             lazy_file_descriptors: Default::default(),
             lazy_fq_name_to_desc_map: Default::default(),
+            lazy_packages_with_subpackages_map: Default::default(),
         })
     }
     pub fn file_descriptors(&'c self) -> impl Iterator<Item = &FileDescriptor<'c>> + 'c {
@@ -72,6 +74,25 @@ impl<'c> Context<'c> {
                 Ok(map)
             })?;
         Ok(map.get(fq_name).cloned())
+    }
+
+    pub fn packages_with_subpackages(
+        &'c self,
+    ) -> impl Iterator<Item = (&'c str, impl Iterator<Item = &'c str>)> {
+        let map = self.lazy_packages_with_subpackages_map.get_or_init(|| {
+            let mut map: HashMap<&'c str, HashSet<&'c str>> = HashMap::new();
+            for file in self.file_descriptors() {
+                if file.package().is_empty() {
+                    // Do nothing?
+                } else if let Some((package, subpackage)) = file.package().rsplit_once('.') {
+                    map.entry(package).or_default().insert(subpackage);
+                } else {
+                    map.entry("").or_default().insert(file.package());
+                }
+            }
+            map
+        });
+        map.iter().map(|(k, v)| (*k, v.iter().cloned()))
     }
 }
 
