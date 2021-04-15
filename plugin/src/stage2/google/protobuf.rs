@@ -1,7 +1,8 @@
 pub mod compiler;
 #[derive(Debug, Clone)]
 pub struct GeneratedCodeInfo {
-    pub annotation: ::std::vec::Vec<super::super::google::protobuf::generated_code_info::Annotation>,
+    pub annotation:
+        ::std::vec::Vec<super::super::google::protobuf::generated_code_info::Annotation>,
 }
 impl ::std::default::Default for GeneratedCodeInfo {
     fn default() -> Self {
@@ -12,37 +13,39 @@ impl ::std::default::Default for GeneratedCodeInfo {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut GeneratedCodeInfo {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut GeneratedCodeInfo
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
                     let mut msg = ::std::default::Default::default();
                     ldd.deserialize_as_message(&mut msg)?;
                     self.annotation.push(msg);
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -50,16 +53,17 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for GeneratedCodeInfo {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for GeneratedCodeInfo {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for GeneratedCodeInfo {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         for msg in &self.annotation {
             serializer.serialize_message_twice::<super::super::google::protobuf::generated_code_info::Annotation>(1, msg)?;
         }
@@ -68,8 +72,8 @@ impl ::puroro_serializer::serializer::Serializable for GeneratedCodeInfo {
 }
 impl ::puroro::Serializable for GeneratedCodeInfo {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 pub mod generated_code_info {
@@ -92,22 +96,23 @@ pub mod generated_code_info {
             }
         }
     }
-    impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut Annotation {
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut Annotation {
         type Target = ();
         fn finish(self) -> ::puroro::Result<Self::Target> {
             Ok(())
         }
-        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
             &mut self,
-            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field: ::puroro::deserializer::stream::Field<T>,
             field_number: usize,
         ) -> ::puroro::Result<()> {
             match field {
-                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                     1 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.path.push(variant.to_native::<::puroro::tags::Int32>()?);
+                        self.path
+                            .push(variant.to_native::<::puroro::tags::Int32>()?);
                     }
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     3 => {
@@ -121,22 +126,32 @@ pub mod generated_code_info {
                         self.end = variant.to_native::<::puroro::tags::Int32>()?;
                     }
                     _ => todo!("Unknown field number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                     1 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.path.append(&mut ldd.deserialize_as_variants().map(|rv| {
-                            rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                        }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);
+                        self.path.append(
+                            &mut ldd
+                                .deserialize_as_variants()
+                                .map(|rv| {
+                                    rv.and_then(|variant| {
+                                        variant.to_native::<::puroro::tags::Int32>()
+                                    })
+                                })
+                                .collect::<::puroro::Result<::std::vec::Vec<_>>>()?,
+                        );
                     }
                     2 => {
-                        self.source_file = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                        self.source_file = ldd
+                            .deserialize_as_chars()
+                            .collect::<::puroro::Result<_>>()?;
                     }
                     3 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.begin = ldd.deserialize_as_variants()
+                        self.begin = ldd
+                            .deserialize_as_variants()
                             .last()
                             .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
@@ -144,27 +159,28 @@ pub mod generated_code_info {
                     4 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.end = ldd.deserialize_as_variants()
+                        self.end = ldd
+                            .deserialize_as_variants()
                             .last()
                             .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     _ => todo!("Unknown filed number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown filed number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown filed number"),
-                }
+                },
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
             }
             Ok(())
@@ -172,24 +188,25 @@ pub mod generated_code_info {
     }
     impl ::puroro::Deserializable for Annotation {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-            use ::puroro_serializer::deserializer::stream::Deserializer;
+            use ::puroro::deserializer::stream::Deserializer;
             let mut msg = <Self as ::std::default::Default>::default();
-            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+            ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
             Ok(msg)
         }
     }
-    impl ::puroro_serializer::serializer::Serializable for Annotation {
-        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-            &self, serializer: &mut T) -> ::puroro::Result<()>
-        {
+    impl ::puroro::serializer::Serializable for Annotation {
+        fn serialize<T: ::puroro::serializer::MessageSerializer>(
+            &self,
+            serializer: &mut T,
+        ) -> ::puroro::Result<()> {
             serializer.serialize_bytes_twice(2, self.source_file.bytes().map(|b| Ok(b)))?;
             Ok(())
         }
     }
     impl ::puroro::Serializable for Annotation {
         fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-            let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-            <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+            let mut serializer = ::puroro::serializer::default_serializer(write);
+            <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
         }
     }
 }
@@ -206,37 +223,37 @@ impl ::std::default::Default for SourceCodeInfo {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut SourceCodeInfo {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut SourceCodeInfo {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
                     let mut msg = ::std::default::Default::default();
                     ldd.deserialize_as_message(&mut msg)?;
                     self.location.push(msg);
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -244,16 +261,17 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for SourceCodeInfo {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for SourceCodeInfo {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for SourceCodeInfo {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         for msg in &self.location {
             serializer.serialize_message_twice::<super::super::google::protobuf::source_code_info::Location>(1, msg)?;
         }
@@ -262,8 +280,8 @@ impl ::puroro_serializer::serializer::Serializable for SourceCodeInfo {
 }
 impl ::puroro::Serializable for SourceCodeInfo {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 pub mod source_code_info {
@@ -288,75 +306,98 @@ pub mod source_code_info {
             }
         }
     }
-    impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut Location {
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut Location {
         type Target = ();
         fn finish(self) -> ::puroro::Result<Self::Target> {
             Ok(())
         }
-        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
             &mut self,
-            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field: ::puroro::deserializer::stream::Field<T>,
             field_number: usize,
         ) -> ::puroro::Result<()> {
             match field {
-                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                     1 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.path.push(variant.to_native::<::puroro::tags::Int32>()?);
+                        self.path
+                            .push(variant.to_native::<::puroro::tags::Int32>()?);
                     }
                     2 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.span.push(variant.to_native::<::puroro::tags::Int32>()?);
+                        self.span
+                            .push(variant.to_native::<::puroro::tags::Int32>()?);
                     }
                     3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown field number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                     1 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.path.append(&mut ldd.deserialize_as_variants().map(|rv| {
-                            rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                        }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);
+                        self.path.append(
+                            &mut ldd
+                                .deserialize_as_variants()
+                                .map(|rv| {
+                                    rv.and_then(|variant| {
+                                        variant.to_native::<::puroro::tags::Int32>()
+                                    })
+                                })
+                                .collect::<::puroro::Result<::std::vec::Vec<_>>>()?,
+                        );
                     }
                     2 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.span.append(&mut ldd.deserialize_as_variants().map(|rv| {
-                            rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                        }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);
+                        self.span.append(
+                            &mut ldd
+                                .deserialize_as_variants()
+                                .map(|rv| {
+                                    rv.and_then(|variant| {
+                                        variant.to_native::<::puroro::tags::Int32>()
+                                    })
+                                })
+                                .collect::<::puroro::Result<::std::vec::Vec<_>>>()?,
+                        );
                     }
                     3 => {
-                        self.leading_comments = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                        self.leading_comments = ldd
+                            .deserialize_as_chars()
+                            .collect::<::puroro::Result<_>>()?;
                     }
                     4 => {
-                        self.trailing_comments = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                        self.trailing_comments = ldd
+                            .deserialize_as_chars()
+                            .collect::<::puroro::Result<_>>()?;
                     }
                     6 => {
-                        self.leading_detached_comments.push(ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?);
+                        self.leading_detached_comments.push(
+                            ldd.deserialize_as_chars()
+                                .collect::<::puroro::Result<_>>()?,
+                        );
                     }
                     _ => todo!("Unknown filed number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown filed number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown filed number"),
-                }
+                },
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
             }
             Ok(())
@@ -364,16 +405,17 @@ pub mod source_code_info {
     }
     impl ::puroro::Deserializable for Location {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-            use ::puroro_serializer::deserializer::stream::Deserializer;
+            use ::puroro::deserializer::stream::Deserializer;
             let mut msg = <Self as ::std::default::Default>::default();
-            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+            ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
             Ok(msg)
         }
     }
-    impl ::puroro_serializer::serializer::Serializable for Location {
-        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-            &self, serializer: &mut T) -> ::puroro::Result<()>
-        {
+    impl ::puroro::serializer::Serializable for Location {
+        fn serialize<T: ::puroro::serializer::MessageSerializer>(
+            &self,
+            serializer: &mut T,
+        ) -> ::puroro::Result<()> {
             serializer.serialize_bytes_twice(3, self.leading_comments.bytes().map(|b| Ok(b)))?;
             serializer.serialize_bytes_twice(4, self.trailing_comments.bytes().map(|b| Ok(b)))?;
             for string in &self.leading_detached_comments {
@@ -384,8 +426,8 @@ pub mod source_code_info {
     }
     impl ::puroro::Serializable for Location {
         fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-            let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-            <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+            let mut serializer = ::puroro::serializer::default_serializer(write);
+            <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
         }
     }
 }
@@ -414,18 +456,20 @@ impl ::std::default::Default for UninterpretedOption {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut UninterpretedOption {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut UninterpretedOption
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 4 => {
@@ -442,20 +486,23 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 2 => {
                     let mut msg = ::std::default::Default::default();
                     ldd.deserialize_as_message(&mut msg)?;
                     self.name.push(msg);
                 }
                 3 => {
-                    self.identifier_value = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.identifier_value = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 4 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.positive_int_value = ldd.deserialize_as_variants()
+                    self.positive_int_value = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::UInt64>())?;
@@ -463,21 +510,26 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 5 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.negative_int_value = ldd.deserialize_as_variants()
+                    self.negative_int_value = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int64>())?;
                 }
                 6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 7 => {
-                    self.string_value = ldd.deserialize_as_bytes().collect::<::puroro::Result<_>>()?;
+                    self.string_value = ldd
+                        .deserialize_as_bytes()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 8 => {
-                    self.aggregate_value = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.aggregate_value = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -486,8 +538,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -498,7 +550,7 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -506,16 +558,17 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for UninterpretedOption {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for UninterpretedOption {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for UninterpretedOption {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         for msg in &self.name {
             serializer.serialize_message_twice::<super::super::google::protobuf::uninterpreted_option::NamePart>(2, msg)?;
         }
@@ -527,8 +580,8 @@ impl ::puroro_serializer::serializer::Serializable for UninterpretedOption {
 }
 impl ::puroro::Serializable for UninterpretedOption {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 pub mod uninterpreted_option {
@@ -547,18 +600,18 @@ pub mod uninterpreted_option {
             }
         }
     }
-    impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut NamePart {
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut NamePart {
         type Target = ();
         fn finish(self) -> ::puroro::Result<Self::Target> {
             Ok(())
         }
-        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
             &mut self,
-            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field: ::puroro::deserializer::stream::Field<T>,
             field_number: usize,
         ) -> ::puroro::Result<()> {
             match field {
-                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => {
                         #[allow(unused)]
@@ -566,31 +619,34 @@ pub mod uninterpreted_option {
                         self.is_extension = variant.to_native::<::puroro::tags::Bool>()?;
                     }
                     _ => todo!("Unknown field number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                     1 => {
-                        self.name_part = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                        self.name_part = ldd
+                            .deserialize_as_chars()
+                            .collect::<::puroro::Result<_>>()?;
                     }
                     2 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.is_extension = ldd.deserialize_as_variants()
+                        self.is_extension = ldd
+                            .deserialize_as_variants()
                             .last()
                             .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                     }
                     _ => todo!("Unknown filed number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown filed number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown filed number"),
-                }
+                },
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
             }
             Ok(())
@@ -598,31 +654,35 @@ pub mod uninterpreted_option {
     }
     impl ::puroro::Deserializable for NamePart {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-            use ::puroro_serializer::deserializer::stream::Deserializer;
+            use ::puroro::deserializer::stream::Deserializer;
             let mut msg = <Self as ::std::default::Default>::default();
-            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+            ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
             Ok(msg)
         }
     }
-    impl ::puroro_serializer::serializer::Serializable for NamePart {
-        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-            &self, serializer: &mut T) -> ::puroro::Result<()>
-        {
+    impl ::puroro::serializer::Serializable for NamePart {
+        fn serialize<T: ::puroro::serializer::MessageSerializer>(
+            &self,
+            serializer: &mut T,
+        ) -> ::puroro::Result<()> {
             serializer.serialize_bytes_twice(1, self.name_part.bytes().map(|b| Ok(b)))?;
             Ok(())
         }
     }
     impl ::puroro::Serializable for NamePart {
         fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-            let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-            <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+            let mut serializer = ::puroro::serializer::default_serializer(write);
+            <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
         }
     }
 }
 #[derive(Debug, Clone)]
 pub struct MethodOptions {
     pub deprecated: bool,
-    pub idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
+    pub idempotency_level: ::std::result::Result<
+        super::super::google::protobuf::method_options::IdempotencyLevel,
+        i32,
+    >,
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for MethodOptions {
@@ -636,18 +696,18 @@ impl ::std::default::Default for MethodOptions {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut MethodOptions {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MethodOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 33 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
@@ -656,16 +716,18 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 34 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.idempotency_level = variant.to_native::<::puroro::tags::Int32>()?.try_into();
+                    self.idempotency_level =
+                        variant.to_native::<::puroro::tags::Int32>()?.try_into();
                 }
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 33 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.deprecated = ldd.deserialize_as_variants()
+                    self.deprecated = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -673,10 +735,12 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 34 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.idempotency_level = ldd.deserialize_as_variants()
+                    self.idempotency_level = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
-                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?.try_into();
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?
+                        .try_into();
                 }
                 999 => {
                     let mut msg = ::std::default::Default::default();
@@ -684,19 +748,19 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.uninterpreted_option.push(msg);
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 33 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 34 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 33 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 34 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -704,30 +768,36 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for MethodOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for MethodOptions {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for MethodOptions {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         serializer.serialize_variant::<::puroro::tags::Int32>(
-            34, 
-            self.idempotency_level.clone().map_or_else(|e| e, |v| v as i32)
+            34,
+            self.idempotency_level
+                .clone()
+                .map_or_else(|e| e, |v| v as i32),
         )?;
         for msg in &self.uninterpreted_option {
-            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(
+                    999, msg,
+                )?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for MethodOptions {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 pub mod method_options {
@@ -738,7 +808,7 @@ pub mod method_options {
         Idempotent = 2,
     }
     impl std::convert::TryFrom<i32> for IdempotencyLevel {
-        type Error = i32; 
+        type Error = i32;
         fn try_from(val: i32) -> std::result::Result<Self, i32> {
             match val {
                 0 => Ok(Self::IdempotencyUnknown),
@@ -764,18 +834,18 @@ impl ::std::default::Default for ServiceOptions {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut ServiceOptions {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ServiceOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 33 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
@@ -783,12 +853,13 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 }
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 33 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.deprecated = ldd.deserialize_as_variants()
+                    self.deprecated = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -799,17 +870,17 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.uninterpreted_option.push(msg);
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 33 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 33 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -817,26 +888,30 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for ServiceOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for ServiceOptions {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for ServiceOptions {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         for msg in &self.uninterpreted_option {
-            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(
+                    999, msg,
+                )?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for ServiceOptions {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[derive(Debug, Clone)]
@@ -854,18 +929,20 @@ impl ::std::default::Default for EnumValueOptions {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumValueOptions {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut EnumValueOptions
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
@@ -873,12 +950,13 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 }
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.deprecated = ldd.deserialize_as_variants()
+                    self.deprecated = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -889,17 +967,17 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.uninterpreted_option.push(msg);
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -907,26 +985,30 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for EnumValueOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for EnumValueOptions {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for EnumValueOptions {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         for msg in &self.uninterpreted_option {
-            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(
+                    999, msg,
+                )?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for EnumValueOptions {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[derive(Debug, Clone)]
@@ -946,18 +1028,18 @@ impl ::std::default::Default for EnumOptions {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumOptions {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 2 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
@@ -970,12 +1052,13 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 }
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 2 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.allow_alias = ldd.deserialize_as_variants()
+                    self.allow_alias = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -983,7 +1066,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 3 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.deprecated = ldd.deserialize_as_variants()
+                    self.deprecated = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -994,19 +1078,19 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.uninterpreted_option.push(msg);
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -1014,26 +1098,30 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for EnumOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for EnumOptions {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for EnumOptions {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         for msg in &self.uninterpreted_option {
-            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(
+                    999, msg,
+                )?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for EnumOptions {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[derive(Debug, Clone)]
@@ -1049,37 +1137,37 @@ impl ::std::default::Default for OneofOptions {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut OneofOptions {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut OneofOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 999 => {
                     let mut msg = ::std::default::Default::default();
                     ldd.deserialize_as_message(&mut msg)?;
                     self.uninterpreted_option.push(msg);
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -1087,26 +1175,30 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for OneofOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for OneofOptions {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for OneofOptions {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         for msg in &self.uninterpreted_option {
-            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(
+                    999, msg,
+                )?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for OneofOptions {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[derive(Debug, Clone)]
@@ -1134,18 +1226,18 @@ impl ::std::default::Default for FieldOptions {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut FieldOptions {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FieldOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
@@ -1178,20 +1270,23 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 }
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.ctype = ldd.deserialize_as_variants()
+                    self.ctype = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
-                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?.try_into();
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?
+                        .try_into();
                 }
                 2 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.packed = ldd.deserialize_as_variants()
+                    self.packed = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1199,15 +1294,18 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 6 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.jstype = ldd.deserialize_as_variants()
+                    self.jstype = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
-                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?.try_into();
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?
+                        .try_into();
                 }
                 5 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.lazy = ldd.deserialize_as_variants()
+                    self.lazy = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1215,7 +1313,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 3 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.deprecated = ldd.deserialize_as_variants()
+                    self.deprecated = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1223,7 +1322,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 10 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.weak = ldd.deserialize_as_variants()
+                    self.weak = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1234,8 +1334,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.uninterpreted_option.push(msg);
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -1244,8 +1344,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -1254,7 +1354,7 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -1262,34 +1362,38 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for FieldOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for FieldOptions {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for FieldOptions {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         serializer.serialize_variant::<::puroro::tags::Int32>(
-            1, 
-            self.ctype.clone().map_or_else(|e| e, |v| v as i32)
+            1,
+            self.ctype.clone().map_or_else(|e| e, |v| v as i32),
         )?;
         serializer.serialize_variant::<::puroro::tags::Int32>(
-            6, 
-            self.jstype.clone().map_or_else(|e| e, |v| v as i32)
+            6,
+            self.jstype.clone().map_or_else(|e| e, |v| v as i32),
         )?;
         for msg in &self.uninterpreted_option {
-            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(
+                    999, msg,
+                )?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for FieldOptions {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 pub mod field_options {
@@ -1300,7 +1404,7 @@ pub mod field_options {
         JsNumber = 2,
     }
     impl std::convert::TryFrom<i32> for JSType {
-        type Error = i32; 
+        type Error = i32;
         fn try_from(val: i32) -> std::result::Result<Self, i32> {
             match val {
                 0 => Ok(Self::JsNormal),
@@ -1317,7 +1421,7 @@ pub mod field_options {
         StringPiece = 2,
     }
     impl std::convert::TryFrom<i32> for CType {
-        type Error = i32; 
+        type Error = i32;
         fn try_from(val: i32) -> std::result::Result<Self, i32> {
             match val {
                 0 => Ok(Self::String),
@@ -1349,18 +1453,18 @@ impl ::std::default::Default for MessageOptions {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut MessageOptions {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MessageOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
@@ -1369,7 +1473,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 2 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.no_standard_descriptor_accessor = variant.to_native::<::puroro::tags::Bool>()?;
+                    self.no_standard_descriptor_accessor =
+                        variant.to_native::<::puroro::tags::Bool>()?;
                 }
                 3 => {
                     #[allow(unused)]
@@ -1383,12 +1488,13 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 }
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.message_set_wire_format = ldd.deserialize_as_variants()
+                    self.message_set_wire_format = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1396,7 +1502,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 2 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.no_standard_descriptor_accessor = ldd.deserialize_as_variants()
+                    self.no_standard_descriptor_accessor = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1404,7 +1511,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 3 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.deprecated = ldd.deserialize_as_variants()
+                    self.deprecated = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1412,7 +1520,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 7 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.map_entry = ldd.deserialize_as_variants()
+                    self.map_entry = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1423,23 +1532,23 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.uninterpreted_option.push(msg);
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -1447,26 +1556,30 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for MessageOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for MessageOptions {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for MessageOptions {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         for msg in &self.uninterpreted_option {
-            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(
+                    999, msg,
+                )?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for MessageOptions {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[derive(Debug, Clone)]
@@ -1476,7 +1589,8 @@ pub struct FileOptions {
     pub java_multiple_files: bool,
     pub java_generate_equals_and_hash: bool,
     pub java_string_check_utf8: bool,
-    pub optimize_for: ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>,
+    pub optimize_for:
+        ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>,
     pub go_package: String,
     pub cc_generic_services: bool,
     pub java_generic_services: bool,
@@ -1522,18 +1636,18 @@ impl ::std::default::Default for FileOptions {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileOptions {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 10 => {
@@ -1544,7 +1658,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 20 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.java_generate_equals_and_hash = variant.to_native::<::puroro::tags::Bool>()?;
+                    self.java_generate_equals_and_hash =
+                        variant.to_native::<::puroro::tags::Bool>()?;
                 }
                 27 => {
                     #[allow(unused)]
@@ -1596,18 +1711,23 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 45 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    self.java_package = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.java_package = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 8 => {
-                    self.java_outer_classname = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.java_outer_classname = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 10 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.java_multiple_files = ldd.deserialize_as_variants()
+                    self.java_multiple_files = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1615,7 +1735,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 20 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.java_generate_equals_and_hash = ldd.deserialize_as_variants()
+                    self.java_generate_equals_and_hash = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1623,7 +1744,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 27 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.java_string_check_utf8 = ldd.deserialize_as_variants()
+                    self.java_string_check_utf8 = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1631,18 +1753,23 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 9 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.optimize_for = ldd.deserialize_as_variants()
+                    self.optimize_for = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
-                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?.try_into();
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?
+                        .try_into();
                 }
                 11 => {
-                    self.go_package = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.go_package = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 16 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.cc_generic_services = ldd.deserialize_as_variants()
+                    self.cc_generic_services = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1650,7 +1777,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 17 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.java_generic_services = ldd.deserialize_as_variants()
+                    self.java_generic_services = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1658,7 +1786,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 18 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.py_generic_services = ldd.deserialize_as_variants()
+                    self.py_generic_services = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1666,7 +1795,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 42 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.php_generic_services = ldd.deserialize_as_variants()
+                    self.php_generic_services = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1674,7 +1804,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 23 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.deprecated = ldd.deserialize_as_variants()
+                    self.deprecated = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1682,31 +1813,46 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 31 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.cc_enable_arenas = ldd.deserialize_as_variants()
+                    self.cc_enable_arenas = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 36 => {
-                    self.objc_class_prefix = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.objc_class_prefix = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 37 => {
-                    self.csharp_namespace = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.csharp_namespace = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 39 => {
-                    self.swift_prefix = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.swift_prefix = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 40 => {
-                    self.php_class_prefix = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.php_class_prefix = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 41 => {
-                    self.php_namespace = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.php_namespace = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 44 => {
-                    self.php_metadata_namespace = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.php_metadata_namespace = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 45 => {
-                    self.ruby_package = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.ruby_package = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 999 => {
                     let mut msg = ::std::default::Default::default();
@@ -1714,8 +1860,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.uninterpreted_option.push(msg);
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -1738,8 +1884,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 45 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -1762,7 +1908,7 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 45 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -1770,21 +1916,22 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for FileOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for FileOptions {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for FileOptions {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         serializer.serialize_bytes_twice(1, self.java_package.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(8, self.java_outer_classname.bytes().map(|b| Ok(b)))?;
         serializer.serialize_variant::<::puroro::tags::Int32>(
-            9, 
-            self.optimize_for.clone().map_or_else(|e| e, |v| v as i32)
+            9,
+            self.optimize_for.clone().map_or_else(|e| e, |v| v as i32),
         )?;
         serializer.serialize_bytes_twice(11, self.go_package.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(36, self.objc_class_prefix.bytes().map(|b| Ok(b)))?;
@@ -1795,15 +1942,18 @@ impl ::puroro_serializer::serializer::Serializable for FileOptions {
         serializer.serialize_bytes_twice(44, self.php_metadata_namespace.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(45, self.ruby_package.bytes().map(|b| Ok(b)))?;
         for msg in &self.uninterpreted_option {
-            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(
+                    999, msg,
+                )?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for FileOptions {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 pub mod file_options {
@@ -1814,7 +1964,7 @@ pub mod file_options {
         LiteRuntime = 3,
     }
     impl std::convert::TryFrom<i32> for OptimizeMode {
-        type Error = i32; 
+        type Error = i32;
         fn try_from(val: i32) -> std::result::Result<Self, i32> {
             match val {
                 1 => Ok(Self::Speed),
@@ -1830,7 +1980,8 @@ pub struct MethodDescriptorProto {
     pub name: String,
     pub input_type: String,
     pub output_type: String,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MethodOptions>>,
+    pub options:
+        ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MethodOptions>>,
     pub client_streaming: bool,
     pub server_streaming: bool,
 }
@@ -1848,18 +1999,20 @@ impl ::std::default::Default for MethodDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut MethodDescriptorProto {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut MethodDescriptorProto
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -1875,26 +2028,34 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.server_streaming = variant.to_native::<::puroro::tags::Bool>()?;
                 }
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.name = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    self.input_type = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.input_type = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 3 => {
-                    self.output_type = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.output_type = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 4 => {
-                    let boxed_msg = self.options.get_or_insert_with(
-                        || ::std::boxed::Box::new(::std::default::Default::default()));
+                    let boxed_msg = self.options.get_or_insert_with(|| {
+                        ::std::boxed::Box::new(::std::default::Default::default())
+                    });
                     ldd.deserialize_as_message(boxed_msg.as_mut())?;
                 }
                 5 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.client_streaming = ldd.deserialize_as_variants()
+                    self.client_streaming = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
@@ -1902,14 +2063,15 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 6 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.server_streaming = ldd.deserialize_as_variants()
+                    self.server_streaming = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -1917,8 +2079,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -1926,7 +2088,7 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -1934,36 +2096,39 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for MethodDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for MethodDescriptorProto {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for MethodDescriptorProto {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(2, self.input_type.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(3, self.output_type.bytes().map(|b| Ok(b)))?;
         if let Some(msg) = &self.options {
-            serializer.serialize_message_twice::<super::super::google::protobuf::MethodOptions>(4, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::MethodOptions>(4, msg)?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for MethodDescriptorProto {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[derive(Debug, Clone)]
 pub struct ServiceDescriptorProto {
     pub name: String,
     pub method: ::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto>,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>>,
+    pub options:
+        ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>>,
 }
 impl ::std::default::Default for ServiceDescriptorProto {
     fn default() -> Self {
@@ -1976,26 +2141,30 @@ impl ::std::default::Default for ServiceDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut ServiceDescriptorProto {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut ServiceDescriptorProto
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.name = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
                     let mut msg = ::std::default::Default::default();
@@ -2003,24 +2172,25 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.method.push(msg);
                 }
                 3 => {
-                    let boxed_msg = self.options.get_or_insert_with(
-                        || ::std::boxed::Box::new(::std::default::Default::default()));
+                    let boxed_msg = self.options.get_or_insert_with(|| {
+                        ::std::boxed::Box::new(::std::default::Default::default())
+                    });
                     ldd.deserialize_as_message(boxed_msg.as_mut())?;
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -2028,37 +2198,44 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for ServiceDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for ServiceDescriptorProto {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for ServiceDescriptorProto {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
         for msg in &self.method {
-            serializer.serialize_message_twice::<super::super::google::protobuf::MethodDescriptorProto>(2, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::MethodDescriptorProto>(
+                    2, msg,
+                )?;
         }
         if let Some(msg) = &self.options {
-            serializer.serialize_message_twice::<super::super::google::protobuf::ServiceOptions>(3, msg)?;
+            serializer.serialize_message_twice::<super::super::google::protobuf::ServiceOptions>(
+                3, msg,
+            )?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for ServiceDescriptorProto {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[derive(Debug, Clone)]
 pub struct EnumValueDescriptorProto {
     pub name: String,
     pub number: i32,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>>,
+    pub options:
+        ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>>,
 }
 impl ::std::default::Default for EnumValueDescriptorProto {
     fn default() -> Self {
@@ -2071,18 +2248,20 @@ impl ::std::default::Default for EnumValueDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumValueDescriptorProto {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut EnumValueDescriptorProto
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => {
                     #[allow(unused)]
@@ -2091,38 +2270,42 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 }
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.name = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.number = ldd.deserialize_as_variants()
+                    self.number = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                 }
                 3 => {
-                    let boxed_msg = self.options.get_or_insert_with(
-                        || ::std::boxed::Box::new(::std::default::Default::default()));
+                    let boxed_msg = self.options.get_or_insert_with(|| {
+                        ::std::boxed::Box::new(::std::default::Default::default())
+                    });
                     ldd.deserialize_as_message(boxed_msg.as_mut())?;
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -2130,35 +2313,41 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for EnumValueDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for EnumValueDescriptorProto {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for EnumValueDescriptorProto {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
         if let Some(msg) = &self.options {
-            serializer.serialize_message_twice::<super::super::google::protobuf::EnumValueOptions>(3, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::EnumValueOptions>(
+                    3, msg,
+                )?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for EnumValueDescriptorProto {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[derive(Debug, Clone)]
 pub struct EnumDescriptorProto {
     pub name: String,
     pub value: ::std::vec::Vec<super::super::google::protobuf::EnumValueDescriptorProto>,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>>,
-    pub reserved_range: ::std::vec::Vec<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>,
+    pub options:
+        ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>>,
+    pub reserved_range:
+        ::std::vec::Vec<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>,
     pub reserved_name: ::std::vec::Vec<String>,
 }
 impl ::std::default::Default for EnumDescriptorProto {
@@ -2174,28 +2363,32 @@ impl ::std::default::Default for EnumDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumDescriptorProto {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut EnumDescriptorProto
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.name = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
                     let mut msg = ::std::default::Default::default();
@@ -2203,8 +2396,9 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.value.push(msg);
                 }
                 3 => {
-                    let boxed_msg = self.options.get_or_insert_with(
-                        || ::std::boxed::Box::new(::std::default::Default::default()));
+                    let boxed_msg = self.options.get_or_insert_with(|| {
+                        ::std::boxed::Box::new(::std::default::Default::default())
+                    });
                     ldd.deserialize_as_message(boxed_msg.as_mut())?;
                 }
                 4 => {
@@ -2213,26 +2407,29 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.reserved_range.push(msg);
                 }
                 5 => {
-                    self.reserved_name.push(ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?);
+                    self.reserved_name.push(
+                        ldd.deserialize_as_chars()
+                            .collect::<::puroro::Result<_>>()?,
+                    );
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -2240,22 +2437,24 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for EnumDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for EnumDescriptorProto {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for EnumDescriptorProto {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
         for msg in &self.value {
             serializer.serialize_message_twice::<super::super::google::protobuf::EnumValueDescriptorProto>(2, msg)?;
         }
         if let Some(msg) = &self.options {
-            serializer.serialize_message_twice::<super::super::google::protobuf::EnumOptions>(3, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::EnumOptions>(3, msg)?;
         }
         for msg in &self.reserved_range {
             serializer.serialize_message_twice::<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>(4, msg)?;
@@ -2268,8 +2467,8 @@ impl ::puroro_serializer::serializer::Serializable for EnumDescriptorProto {
 }
 impl ::puroro::Serializable for EnumDescriptorProto {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 pub mod enum_descriptor_proto {
@@ -2288,18 +2487,20 @@ pub mod enum_descriptor_proto {
             }
         }
     }
-    impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumReservedRange {
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+        for &'a mut EnumReservedRange
+    {
         type Target = ();
         fn finish(self) -> ::puroro::Result<Self::Target> {
             Ok(())
         }
-        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
             &mut self,
-            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field: ::puroro::deserializer::stream::Field<T>,
             field_number: usize,
         ) -> ::puroro::Result<()> {
             match field {
-                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                     1 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
@@ -2311,12 +2512,13 @@ pub mod enum_descriptor_proto {
                         self.end = variant.to_native::<::puroro::tags::Int32>()?;
                     }
                     _ => todo!("Unknown field number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                     1 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.start = ldd.deserialize_as_variants()
+                        self.start = ldd
+                            .deserialize_as_variants()
                             .last()
                             .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
@@ -2324,23 +2526,24 @@ pub mod enum_descriptor_proto {
                     2 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.end = ldd.deserialize_as_variants()
+                        self.end = ldd
+                            .deserialize_as_variants()
                             .last()
                             .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     _ => todo!("Unknown filed number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown filed number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown filed number"),
-                }
+                },
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
             }
             Ok(())
@@ -2348,30 +2551,32 @@ pub mod enum_descriptor_proto {
     }
     impl ::puroro::Deserializable for EnumReservedRange {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-            use ::puroro_serializer::deserializer::stream::Deserializer;
+            use ::puroro::deserializer::stream::Deserializer;
             let mut msg = <Self as ::std::default::Default>::default();
-            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+            ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
             Ok(msg)
         }
     }
-    impl ::puroro_serializer::serializer::Serializable for EnumReservedRange {
-        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-            &self, serializer: &mut T) -> ::puroro::Result<()>
-        {
+    impl ::puroro::serializer::Serializable for EnumReservedRange {
+        fn serialize<T: ::puroro::serializer::MessageSerializer>(
+            &self,
+            serializer: &mut T,
+        ) -> ::puroro::Result<()> {
             Ok(())
         }
     }
     impl ::puroro::Serializable for EnumReservedRange {
         fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-            let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-            <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+            let mut serializer = ::puroro::serializer::default_serializer(write);
+            <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
         }
     }
 }
 #[derive(Debug, Clone)]
 pub struct OneofDescriptorProto {
     pub name: String,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>>,
+    pub options:
+        ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>>,
 }
 impl ::std::default::Default for OneofDescriptorProto {
     fn default() -> Self {
@@ -2383,43 +2588,48 @@ impl ::std::default::Default for OneofDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut OneofDescriptorProto {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut OneofDescriptorProto
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.name = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    let boxed_msg = self.options.get_or_insert_with(
-                        || ::std::boxed::Box::new(::std::default::Default::default()));
+                    let boxed_msg = self.options.get_or_insert_with(|| {
+                        ::std::boxed::Box::new(::std::default::Default::default())
+                    });
                     ldd.deserialize_as_message(boxed_msg.as_mut())?;
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -2427,41 +2637,46 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for OneofDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for OneofDescriptorProto {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for OneofDescriptorProto {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
         if let Some(msg) = &self.options {
-            serializer.serialize_message_twice::<super::super::google::protobuf::OneofOptions>(2, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::OneofOptions>(2, msg)?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for OneofDescriptorProto {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[derive(Debug, Clone)]
 pub struct FieldDescriptorProto {
     pub name: String,
     pub number: i32,
-    pub label: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>,
-    pub type_: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>,
+    pub label:
+        ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>,
+    pub type_:
+        ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>,
     pub type_name: String,
     pub extendee: String,
     pub default_value: String,
     pub oneof_index: i32,
     pub json_name: String,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FieldOptions>>,
+    pub options:
+        ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FieldOptions>>,
     pub proto3_optional: bool,
 }
 impl ::std::default::Default for FieldDescriptorProto {
@@ -2483,18 +2698,20 @@ impl ::std::default::Default for FieldDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut FieldDescriptorProto {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut FieldDescriptorProto
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => {
                     #[allow(unused)]
@@ -2527,15 +2744,18 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.proto3_optional = variant.to_native::<::puroro::tags::Bool>()?;
                 }
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.name = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 3 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.number = ldd.deserialize_as_variants()
+                    self.number = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
@@ -2543,55 +2763,70 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 4 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.label = ldd.deserialize_as_variants()
+                    self.label = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
-                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?.try_into();
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?
+                        .try_into();
                 }
                 5 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.type_ = ldd.deserialize_as_variants()
+                    self.type_ = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
-                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?.try_into();
+                        .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?
+                        .try_into();
                 }
                 6 => {
-                    self.type_name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.type_name = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    self.extendee = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.extendee = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 7 => {
-                    self.default_value = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.default_value = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 9 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.oneof_index = ldd.deserialize_as_variants()
+                    self.oneof_index = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                 }
                 10 => {
-                    self.json_name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.json_name = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 8 => {
-                    let boxed_msg = self.options.get_or_insert_with(
-                        || ::std::boxed::Box::new(::std::default::Default::default()));
+                    let boxed_msg = self.options.get_or_insert_with(|| {
+                        ::std::boxed::Box::new(::std::default::Default::default())
+                    });
                     ldd.deserialize_as_message(boxed_msg.as_mut())?;
                 }
                 17 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.proto3_optional = ldd.deserialize_as_variants()
+                    self.proto3_optional = ldd
+                        .deserialize_as_variants()
                         .last()
                         .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                         .and_then(|variant| variant.to_native::<::puroro::tags::Bool>())?;
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -2604,8 +2839,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 17 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -2618,7 +2853,7 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 17 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -2626,39 +2861,41 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for FieldDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for FieldDescriptorProto {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for FieldDescriptorProto {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
         serializer.serialize_variant::<::puroro::tags::Int32>(
-            4, 
-            self.label.clone().map_or_else(|e| e, |v| v as i32)
+            4,
+            self.label.clone().map_or_else(|e| e, |v| v as i32),
         )?;
         serializer.serialize_variant::<::puroro::tags::Int32>(
-            5, 
-            self.type_.clone().map_or_else(|e| e, |v| v as i32)
+            5,
+            self.type_.clone().map_or_else(|e| e, |v| v as i32),
         )?;
         serializer.serialize_bytes_twice(6, self.type_name.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(2, self.extendee.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(7, self.default_value.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(10, self.json_name.bytes().map(|b| Ok(b)))?;
         if let Some(msg) = &self.options {
-            serializer.serialize_message_twice::<super::super::google::protobuf::FieldOptions>(8, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::FieldOptions>(8, msg)?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for FieldDescriptorProto {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 pub mod field_descriptor_proto {
@@ -2669,7 +2906,7 @@ pub mod field_descriptor_proto {
         LabelRepeated = 3,
     }
     impl std::convert::TryFrom<i32> for Label {
-        type Error = i32; 
+        type Error = i32;
         fn try_from(val: i32) -> std::result::Result<Self, i32> {
             match val {
                 1 => Ok(Self::LabelOptional),
@@ -2701,7 +2938,7 @@ pub mod field_descriptor_proto {
         TypeSint64 = 18,
     }
     impl std::convert::TryFrom<i32> for Type {
-        type Error = i32; 
+        type Error = i32;
         fn try_from(val: i32) -> std::result::Result<Self, i32> {
             match val {
                 1 => Ok(Self::TypeDouble),
@@ -2740,37 +2977,39 @@ impl ::std::default::Default for ExtensionRangeOptions {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut ExtensionRangeOptions {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut ExtensionRangeOptions
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 999 => {
                     let mut msg = ::std::default::Default::default();
                     ldd.deserialize_as_message(&mut msg)?;
                     self.uninterpreted_option.push(msg);
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -2778,26 +3017,30 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for ExtensionRangeOptions {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for ExtensionRangeOptions {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for ExtensionRangeOptions {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         for msg in &self.uninterpreted_option {
-            serializer.serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(999, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::UninterpretedOption>(
+                    999, msg,
+                )?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for ExtensionRangeOptions {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[derive(Debug, Clone)]
@@ -2807,10 +3050,13 @@ pub struct DescriptorProto {
     pub extension: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
     pub nested_type: ::std::vec::Vec<super::super::google::protobuf::DescriptorProto>,
     pub enum_type: ::std::vec::Vec<super::super::google::protobuf::EnumDescriptorProto>,
-    pub extension_range: ::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ExtensionRange>,
+    pub extension_range:
+        ::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ExtensionRange>,
     pub oneof_decl: ::std::vec::Vec<super::super::google::protobuf::OneofDescriptorProto>,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MessageOptions>>,
-    pub reserved_range: ::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ReservedRange>,
+    pub options:
+        ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MessageOptions>>,
+    pub reserved_range:
+        ::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ReservedRange>,
     pub reserved_name: ::std::vec::Vec<String>,
 }
 impl ::std::default::Default for DescriptorProto {
@@ -2831,18 +3077,20 @@ impl ::std::default::Default for DescriptorProto {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut DescriptorProto {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut DescriptorProto
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -2854,10 +3102,12 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 9 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.name = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
                     let mut msg = ::std::default::Default::default();
@@ -2890,8 +3140,9 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.oneof_decl.push(msg);
                 }
                 7 => {
-                    let boxed_msg = self.options.get_or_insert_with(
-                        || ::std::boxed::Box::new(::std::default::Default::default()));
+                    let boxed_msg = self.options.get_or_insert_with(|| {
+                        ::std::boxed::Box::new(::std::default::Default::default())
+                    });
                     ldd.deserialize_as_message(boxed_msg.as_mut())?;
                 }
                 9 => {
@@ -2900,11 +3151,14 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.reserved_range.push(msg);
                 }
                 10 => {
-                    self.reserved_name.push(ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?);
+                    self.reserved_name.push(
+                        ldd.deserialize_as_chars()
+                            .collect::<::puroro::Result<_>>()?,
+                    );
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -2916,8 +3170,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 9 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -2929,7 +3183,7 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 9 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -2937,37 +3191,54 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for DescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for DescriptorProto {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for DescriptorProto {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
         for msg in &self.field {
-            serializer.serialize_message_twice::<super::super::google::protobuf::FieldDescriptorProto>(2, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::FieldDescriptorProto>(
+                    2, msg,
+                )?;
         }
         for msg in &self.extension {
-            serializer.serialize_message_twice::<super::super::google::protobuf::FieldDescriptorProto>(6, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::FieldDescriptorProto>(
+                    6, msg,
+                )?;
         }
         for msg in &self.nested_type {
-            serializer.serialize_message_twice::<super::super::google::protobuf::DescriptorProto>(3, msg)?;
+            serializer.serialize_message_twice::<super::super::google::protobuf::DescriptorProto>(
+                3, msg,
+            )?;
         }
         for msg in &self.enum_type {
-            serializer.serialize_message_twice::<super::super::google::protobuf::EnumDescriptorProto>(4, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::EnumDescriptorProto>(
+                    4, msg,
+                )?;
         }
         for msg in &self.extension_range {
             serializer.serialize_message_twice::<super::super::google::protobuf::descriptor_proto::ExtensionRange>(5, msg)?;
         }
         for msg in &self.oneof_decl {
-            serializer.serialize_message_twice::<super::super::google::protobuf::OneofDescriptorProto>(8, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::OneofDescriptorProto>(
+                    8, msg,
+                )?;
         }
         if let Some(msg) = &self.options {
-            serializer.serialize_message_twice::<super::super::google::protobuf::MessageOptions>(7, msg)?;
+            serializer.serialize_message_twice::<super::super::google::protobuf::MessageOptions>(
+                7, msg,
+            )?;
         }
         for msg in &self.reserved_range {
             serializer.serialize_message_twice::<super::super::google::protobuf::descriptor_proto::ReservedRange>(9, msg)?;
@@ -2980,8 +3251,8 @@ impl ::puroro_serializer::serializer::Serializable for DescriptorProto {
 }
 impl ::puroro::Serializable for DescriptorProto {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 pub mod descriptor_proto {
@@ -3000,18 +3271,18 @@ pub mod descriptor_proto {
             }
         }
     }
-    impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut ReservedRange {
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ReservedRange {
         type Target = ();
         fn finish(self) -> ::puroro::Result<Self::Target> {
             Ok(())
         }
-        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
             &mut self,
-            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field: ::puroro::deserializer::stream::Field<T>,
             field_number: usize,
         ) -> ::puroro::Result<()> {
             match field {
-                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                     1 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
@@ -3023,12 +3294,13 @@ pub mod descriptor_proto {
                         self.end = variant.to_native::<::puroro::tags::Int32>()?;
                     }
                     _ => todo!("Unknown field number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                     1 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.start = ldd.deserialize_as_variants()
+                        self.start = ldd
+                            .deserialize_as_variants()
                             .last()
                             .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
@@ -3036,23 +3308,24 @@ pub mod descriptor_proto {
                     2 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.end = ldd.deserialize_as_variants()
+                        self.end = ldd
+                            .deserialize_as_variants()
                             .last()
                             .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     _ => todo!("Unknown filed number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown filed number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown filed number"),
-                }
+                },
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
             }
             Ok(())
@@ -3060,30 +3333,33 @@ pub mod descriptor_proto {
     }
     impl ::puroro::Deserializable for ReservedRange {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-            use ::puroro_serializer::deserializer::stream::Deserializer;
+            use ::puroro::deserializer::stream::Deserializer;
             let mut msg = <Self as ::std::default::Default>::default();
-            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+            ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
             Ok(msg)
         }
     }
-    impl ::puroro_serializer::serializer::Serializable for ReservedRange {
-        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-            &self, serializer: &mut T) -> ::puroro::Result<()>
-        {
+    impl ::puroro::serializer::Serializable for ReservedRange {
+        fn serialize<T: ::puroro::serializer::MessageSerializer>(
+            &self,
+            serializer: &mut T,
+        ) -> ::puroro::Result<()> {
             Ok(())
         }
     }
     impl ::puroro::Serializable for ReservedRange {
         fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-            let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-            <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+            let mut serializer = ::puroro::serializer::default_serializer(write);
+            <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
         }
     }
     #[derive(Debug, Clone)]
     pub struct ExtensionRange {
         pub start: i32,
         pub end: i32,
-        pub options: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>>,
+        pub options: ::std::option::Option<
+            ::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>,
+        >,
     }
     impl ::std::default::Default for ExtensionRange {
         fn default() -> Self {
@@ -3096,18 +3372,18 @@ pub mod descriptor_proto {
             }
         }
     }
-    impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut ExtensionRange {
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ExtensionRange {
         type Target = ();
         fn finish(self) -> ::puroro::Result<Self::Target> {
             Ok(())
         }
-        fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+        fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
             &mut self,
-            field: ::puroro_serializer::deserializer::stream::Field<T>,
+            field: ::puroro::deserializer::stream::Field<T>,
             field_number: usize,
         ) -> ::puroro::Result<()> {
             match field {
-                ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+                ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                     1 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
@@ -3120,12 +3396,13 @@ pub mod descriptor_proto {
                     }
                     3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown field number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                     1 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.start = ldd.deserialize_as_variants()
+                        self.start = ldd
+                            .deserialize_as_variants()
                             .last()
                             .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
@@ -3133,30 +3410,32 @@ pub mod descriptor_proto {
                     2 => {
                         #[allow(unused)]
                         use ::std::convert::TryInto;
-                        self.end = ldd.deserialize_as_variants()
+                        self.end = ldd
+                            .deserialize_as_variants()
                             .last()
                             .unwrap_or(Err(::puroro::PuroroError::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<::puroro::tags::Int32>())?;
                     }
                     3 => {
-                        let boxed_msg = self.options.get_or_insert_with(
-                            || ::std::boxed::Box::new(::std::default::Default::default()));
+                        let boxed_msg = self.options.get_or_insert_with(|| {
+                            ::std::boxed::Box::new(::std::default::Default::default())
+                        });
                         ldd.deserialize_as_message(boxed_msg.as_mut())?;
                     }
                     _ => todo!("Unknown filed number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown filed number"),
-                }
-                ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+                },
+                ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                     1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                     _ => todo!("Unknown filed number"),
-                }
+                },
                 _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
             }
             Ok(())
@@ -3164,16 +3443,17 @@ pub mod descriptor_proto {
     }
     impl ::puroro::Deserializable for ExtensionRange {
         fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-            use ::puroro_serializer::deserializer::stream::Deserializer;
+            use ::puroro::deserializer::stream::Deserializer;
             let mut msg = <Self as ::std::default::Default>::default();
-            ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+            ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
             Ok(msg)
         }
     }
-    impl ::puroro_serializer::serializer::Serializable for ExtensionRange {
-        fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-            &self, serializer: &mut T) -> ::puroro::Result<()>
-        {
+    impl ::puroro::serializer::Serializable for ExtensionRange {
+        fn serialize<T: ::puroro::serializer::MessageSerializer>(
+            &self,
+            serializer: &mut T,
+        ) -> ::puroro::Result<()> {
             if let Some(msg) = &self.options {
                 serializer.serialize_message_twice::<super::super::super::google::protobuf::ExtensionRangeOptions>(3, msg)?;
             }
@@ -3182,8 +3462,8 @@ pub mod descriptor_proto {
     }
     impl ::puroro::Serializable for ExtensionRange {
         fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-            let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-            <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+            let mut serializer = ::puroro::serializer::default_serializer(write);
+            <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
         }
     }
 }
@@ -3198,8 +3478,10 @@ pub struct FileDescriptorProto {
     pub enum_type: ::std::vec::Vec<super::super::google::protobuf::EnumDescriptorProto>,
     pub service: ::std::vec::Vec<super::super::google::protobuf::ServiceDescriptorProto>,
     pub extension: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FileOptions>>,
-    pub source_code_info: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::SourceCodeInfo>>,
+    pub options:
+        ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FileOptions>>,
+    pub source_code_info:
+        ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::SourceCodeInfo>>,
     pub syntax: String,
 }
 impl ::std::default::Default for FileDescriptorProto {
@@ -3222,30 +3504,34 @@ impl ::std::default::Default for FileDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileDescriptorProto {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut FileDescriptorProto
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 10 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.public_dependency.push(variant.to_native::<::puroro::tags::Int32>()?);
+                    self.public_dependency
+                        .push(variant.to_native::<::puroro::tags::Int32>()?);
                 }
                 11 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.weak_dependency.push(variant.to_native::<::puroro::tags::Int32>()?);
+                    self.weak_dependency
+                        .push(variant.to_native::<::puroro::tags::Int32>()?);
                 }
                 4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -3255,30 +3541,47 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 9 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 12 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    self.name = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.name = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    self.package = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.package = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 3 => {
-                    self.dependency.push(ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?);
+                    self.dependency.push(
+                        ldd.deserialize_as_chars()
+                            .collect::<::puroro::Result<_>>()?,
+                    );
                 }
                 10 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.public_dependency.append(&mut ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);
+                    self.public_dependency.append(
+                        &mut ldd
+                            .deserialize_as_variants()
+                            .map(|rv| {
+                                rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
+                            })
+                            .collect::<::puroro::Result<::std::vec::Vec<_>>>()?,
+                    );
                 }
                 11 => {
                     #[allow(unused)]
                     use ::std::convert::TryInto;
-                    self.weak_dependency.append(&mut ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?);
+                    self.weak_dependency.append(
+                        &mut ldd
+                            .deserialize_as_variants()
+                            .map(|rv| {
+                                rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
+                            })
+                            .collect::<::puroro::Result<::std::vec::Vec<_>>>()?,
+                    );
                 }
                 4 => {
                     let mut msg = ::std::default::Default::default();
@@ -3301,21 +3604,25 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                     self.extension.push(msg);
                 }
                 8 => {
-                    let boxed_msg = self.options.get_or_insert_with(
-                        || ::std::boxed::Box::new(::std::default::Default::default()));
+                    let boxed_msg = self.options.get_or_insert_with(|| {
+                        ::std::boxed::Box::new(::std::default::Default::default())
+                    });
                     ldd.deserialize_as_message(boxed_msg.as_mut())?;
                 }
                 9 => {
-                    let boxed_msg = self.source_code_info.get_or_insert_with(
-                        || ::std::boxed::Box::new(::std::default::Default::default()));
+                    let boxed_msg = self.source_code_info.get_or_insert_with(|| {
+                        ::std::boxed::Box::new(::std::default::Default::default())
+                    });
                     ldd.deserialize_as_message(boxed_msg.as_mut())?;
                 }
                 12 => {
-                    self.syntax = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
+                    self.syntax = ldd
+                        .deserialize_as_chars()
+                        .collect::<::puroro::Result<_>>()?;
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -3329,8 +3636,8 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 9 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 12 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
@@ -3344,7 +3651,7 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
                 9 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 12 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -3352,38 +3659,53 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for FileDescriptorProto {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for FileDescriptorProto {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for FileDescriptorProto {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         serializer.serialize_bytes_twice(1, self.name.bytes().map(|b| Ok(b)))?;
         serializer.serialize_bytes_twice(2, self.package.bytes().map(|b| Ok(b)))?;
         for string in &self.dependency {
             serializer.serialize_bytes_twice(3, string.bytes().map(|b| Ok(b)))?;
         }
         for msg in &self.message_type {
-            serializer.serialize_message_twice::<super::super::google::protobuf::DescriptorProto>(4, msg)?;
+            serializer.serialize_message_twice::<super::super::google::protobuf::DescriptorProto>(
+                4, msg,
+            )?;
         }
         for msg in &self.enum_type {
-            serializer.serialize_message_twice::<super::super::google::protobuf::EnumDescriptorProto>(5, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::EnumDescriptorProto>(
+                    5, msg,
+                )?;
         }
         for msg in &self.service {
-            serializer.serialize_message_twice::<super::super::google::protobuf::ServiceDescriptorProto>(6, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::ServiceDescriptorProto>(
+                    6, msg,
+                )?;
         }
         for msg in &self.extension {
-            serializer.serialize_message_twice::<super::super::google::protobuf::FieldDescriptorProto>(7, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::FieldDescriptorProto>(
+                    7, msg,
+                )?;
         }
         if let Some(msg) = &self.options {
-            serializer.serialize_message_twice::<super::super::google::protobuf::FileOptions>(8, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::FileOptions>(8, msg)?;
         }
         if let Some(msg) = &self.source_code_info {
-            serializer.serialize_message_twice::<super::super::google::protobuf::SourceCodeInfo>(9, msg)?;
+            serializer.serialize_message_twice::<super::super::google::protobuf::SourceCodeInfo>(
+                9, msg,
+            )?;
         }
         serializer.serialize_bytes_twice(12, self.syntax.bytes().map(|b| Ok(b)))?;
         Ok(())
@@ -3391,8 +3713,8 @@ impl ::puroro_serializer::serializer::Serializable for FileDescriptorProto {
 }
 impl ::puroro::Serializable for FileDescriptorProto {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[derive(Debug, Clone)]
@@ -3408,37 +3730,39 @@ impl ::std::default::Default for FileDescriptorSet {
         }
     }
 }
-impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileDescriptorSet {
+impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
+    for &'a mut FileDescriptorSet
+{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro_serializer::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro_serializer::deserializer::stream::Field<T>,
+        field: ::puroro::deserializer::stream::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {
         match field {
-            ::puroro_serializer::deserializer::stream::Field::Variant(variant) => match field_number {
+            ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown field number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
                     let mut msg = ::std::default::Default::default();
                     ldd.deserialize_as_message(&mut msg)?;
                     self.file.push(msg);
                 }
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits32(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
-            ::puroro_serializer::deserializer::stream::Field::Bits64(bytes) => match field_number {
+            },
+            ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => todo!("Unknown filed number"),
-            }
+            },
             _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
         }
         Ok(())
@@ -3446,25 +3770,29 @@ impl<'a> ::puroro_serializer::deserializer::stream::MessageDeserializeEventHandl
 }
 impl ::puroro::Deserializable for FileDescriptorSet {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {
-        use ::puroro_serializer::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::stream::Deserializer;
         let mut msg = <Self as ::std::default::Default>::default();
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(&mut msg)?;
         Ok(msg)
     }
 }
-impl ::puroro_serializer::serializer::Serializable for FileDescriptorSet {
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+impl ::puroro::serializer::Serializable for FileDescriptorSet {
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+        &self,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         for msg in &self.file {
-            serializer.serialize_message_twice::<super::super::google::protobuf::FileDescriptorProto>(1, msg)?;
+            serializer
+                .serialize_message_twice::<super::super::google::protobuf::FileDescriptorProto>(
+                    1, msg,
+                )?;
         }
         Ok(())
     }
 }
 impl ::puroro::Serializable for FileDescriptorSet {
     fn serialize<W: ::std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_serializer::serializer::default_serializer(write);
-        <Self as ::puroro_serializer::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro::serializer::default_serializer(write);
+        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }

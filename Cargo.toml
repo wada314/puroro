@@ -1,2 +1,2 @@
 [workspace]
-members = ["puroro", "puroro-serializer", "plugin", "puroro-unknown"]
+members = ["puroro", "plugin", "puroro-unknown"]

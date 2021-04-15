@@ -6,8 +6,8 @@ use crate::types::*;
 use std::io::{Read, Result as IoResult};
 
 pub use crate::variant::Variant;
-pub use ::puroro::{PuroroError, Result};
-pub use ::puroro::{RepeatedFieldCollector, RepeatedFieldHandler};
+pub use crate::{PuroroError, Result};
+pub use crate::{RepeatedFieldCollector, RepeatedFieldHandler};
 
 pub use delayed::DelayedLengthDelimitedDeserializer;
 

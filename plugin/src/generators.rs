@@ -2,7 +2,7 @@ pub mod shared;
 //pub mod simple;
 
 // Too long!
-const DESER_MOD: &'static str = "::puroro_serializer::deserializer::stream";
+const DESER_MOD: &'static str = "::puroro::deserializer::stream";
 
 use std::fmt::Write;
 
@@ -388,8 +388,8 @@ pub fn print_msg_serializable<'c>(
     (
         format!(
             "\
-impl ::puroro_serializer::serializer::Serializable for {name} {{
-    fn serialize<T: ::puroro_serializer::serializer::MessageSerializer>(
+impl ::puroro::serializer::Serializable for {name} {{
+    fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{\n",
             name = msg.native_bare_type_name()

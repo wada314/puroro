@@ -1,12 +1,12 @@
 use ::itertools::Either;
-use ::puroro::tags;
-use ::puroro::{Deserializable, Mergeable, Message, PuroroError, RepeatedFieldHandler};
-use ::puroro_serializer::deserializer::stream::{
+use ::puroro::deserializer::stream::{
     DelayedLengthDelimitedDeserializer, Deserializer, Field, LengthDelimitedDeserializer,
     MessageDeserializeEventHandler,
 };
-use ::puroro_serializer::variant;
-use ::puroro_serializer::variant::Variant;
+use ::puroro::tags;
+use ::puroro::variant;
+use ::puroro::variant::Variant;
+use ::puroro::{Deserializable, Mergeable, Message, PuroroError, RepeatedFieldHandler};
 use std::collections::HashMap;
 
 type Result<T> = std::result::Result<T, PuroroError>;
@@ -247,7 +247,7 @@ impl Message for UnknownMessage {
 }
 impl Deserializable for UnknownMessage {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self> {
-        ::puroro_serializer::deserializer::stream::deserializer_from_bytes(iter)
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter)
             .deserialize(UnknownMessage::new())
     }
 }
