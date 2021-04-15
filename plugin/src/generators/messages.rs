@@ -242,19 +242,12 @@ pub fn print_msg_deser_deserializable_bitsxx_arm<'c, W: std::fmt::Write>(
                             _ => None,
                         };
                         if let Some(native_type) = opt_native_type {
-                            if field.is_repeated()? {
-                                format!(
-                                    "self.{name}.push({type_}::from_le_bytes(bytes));\n",
-                                    name = field.native_name(),
-                                    type_ = native_type
-                                )
-                            } else {
-                                format!(
-                                    "self.{name} = {type_}::from_le_bytes(bytes);\n",
-                                    name = field.native_name(),
-                                    type_ = native_type
-                                )
-                            }
+                            format!(
+                                "*self.{name}.push_and_get_mut() \
+                                    = {type_}::from_le_bytes(bytes);\n",
+                                name = field.native_name(),
+                                type_ = native_type
+                            )
                         } else {
                             "Err(::puroro::PuroroError::UnexpectedWireType)?\n".into()
                         }

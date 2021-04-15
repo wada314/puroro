@@ -601,7 +601,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 6 => {
-                    self.double_value = f64::from_le_bytes(bytes);
+                    *self.double_value.push_and_get_mut() = f64::from_le_bytes(bytes);
                 }
                 7 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
