@@ -1,5 +1,5 @@
 mod enums;
-mod msgs;
+mod messages;
 mod writer;
 
 use itertools::Itertools;
@@ -16,7 +16,7 @@ struct Visitor {
 }
 impl<'c> DescriptorVisitor<'c> for Visitor {
     fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
-        msgs::print_msg(&mut self.output, msg)
+        messages::print_msg(&mut self.output, msg)
     }
 
     fn handle_enum(&mut self, enume: &'c EnumDescriptor<'c>) -> Result<()> {
