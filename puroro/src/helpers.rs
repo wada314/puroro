@@ -36,7 +36,7 @@ macro_rules! define_maybe_repeated_field {
             fn iter_for_ser(&'a self) -> Self::Iter {
                 // Do not encode if the value is equal to default
                 // Not applicable for proto2 because they have [default=xx]!!
-                if *self == <$ty as Default>::default() {
+                if *self != <$ty as Default>::default() {
                     Some(self)
                 } else {
                     None
