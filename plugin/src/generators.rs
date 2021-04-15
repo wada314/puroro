@@ -1,5 +1,4 @@
 pub mod shared;
-//pub mod simple;
 
 // Too long!
 const DESER_MOD: &'static str = "::puroro::deserializer::stream";

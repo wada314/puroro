@@ -37,7 +37,7 @@ macro_rules! impl_tuple_into_fragments {
         impl_tuple_into_fragments!($len-1 $(, $rest)*);
     }
 }
-impl_tuple_into_fragments!(8, A, B, C, D, E, F, G, H);
+impl_tuple_into_fragments!(12, A, B, C, D, E, F, G, H, I, J, K, L);
 
 impl<'w, W: 'w> TupleOfIntoFragments<'w, W> for &'static str {
     type Iter = std::iter::Once<Fragment<'w, W>>;
