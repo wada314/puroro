@@ -27,7 +27,13 @@ pub trait MessageSerializer {
         message: &T,
     ) -> Result<()>;
 
-    fn direct_write_field<I>(
+    fn serialize_fixed_bits<const BYTES: usize>(
+        &mut self,
+        field_number: usize,
+        bytes: [u8; BYTES],
+    ) -> Result<()>;
+
+    fn direct_write_ld_field<I>(
         &mut self,
         field_number: usize,
         wire_type: WireType,
@@ -145,7 +151,7 @@ where
         Ok(())
     }
 
-    fn direct_write_field<I>(
+    fn direct_write_ld_field<I>(
         &mut self,
         field_number: usize,
         wire_type: WireType,
@@ -160,6 +166,16 @@ where
         for rbyte in input {
             self.write.write_all(std::slice::from_ref(&rbyte?))?;
         }
+        Ok(())
+    }
+
+    fn serialize_fixed_bits<const BYTES: usize>(
+        &mut self,
+        field_number: usize,
+        bytes: [u8; BYTES],
+    ) -> Result<()> {
+        self.write_field_number_and_wire_type(field_number, WireType::Bits32)?;
+        self.write.write_all(&bytes)?;
         Ok(())
     }
 }

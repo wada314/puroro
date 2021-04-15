@@ -394,7 +394,109 @@ impl ::puroro_serializer::serializer::Serializable for {name} {{
     {{\n",
             name = msg.native_bare_type_name()
         ),
-        indent((iter(msg.fields().map(|field| -> Result<_> { Ok("") })),)),
+        indent_n(
+            2,
+            (iter(msg.fields().map(|field| -> Result<_> {
+                Ok(match field.wire_type()? {
+                    WireType::Variant(field_type) => {
+                        if field.is_repeated()? {
+                            format!(
+                                "serializer.serialize_variants_twice::<{tag}>(\
+                                    {number}, self.{name}.iter())?;\n",
+                                number = field.number(),
+                                tag = field_type.native_tag_type(msg.path_to_root_mod()),
+                                name = field.native_name(),
+                            )
+                        } else {
+                            format!(
+                                "serializer.serialize_variant::<{tag}>({number}, self.{name})?;\n",
+                                number = field.number(),
+                                tag = field_type.native_tag_type(msg.path_to_root_mod()),
+                                name = field.native_name(),
+                            )
+                        }
+                    }
+                    WireType::LengthDelimited(field_type) => match field_type {
+                        LengthDelimitedFieldType::String => {
+                            if field.is_repeated()? {
+                                format!(
+                                    "\
+for string in &self.{name} {{
+    serializer.serialize_bytes_twice({number}, string.bytes().map(|b| Ok(b)))?;
+}}\n",
+                                    name = field.native_name(),
+                                    number = field.number()
+                                )
+                            } else {
+                                format!(
+                                    "serializer.serialize_bytes_twice({number}, \
+                                        self.{name}.bytes().map(|b| Ok(b)))?;\n",
+                                    name = field.native_name(),
+                                    number = field.number()
+                                )
+                            }
+                        }
+                        LengthDelimitedFieldType::Bytes => {
+                            if field.is_repeated()? {
+                                format!(
+                                    "\
+for bytes in &self.{name} {{
+    serializer.serialize_bytes_twice({number}, bytes.iter().map(|b| Ok(b)))?;
+}}\n",
+                                    name = field.native_name(),
+                                    number = field.number()
+                                )
+                            } else {
+                                format!(
+                                    "serializer.serialize_bytes_twice({number}, \
+                                        self.{name}.iter().map(|b| Ok(b)))?;\n",
+                                    name = field.native_name(),
+                                    number = field.number()
+                                )
+                            }
+                        }
+                        LengthDelimitedFieldType::Message(_) => {
+                            if field.is_repeated()? {
+                                format!(
+                                    "\
+for string in &self.{name} {{
+    serializer.serialize_bytes_twice({number}, string.bytes().map(|b| Ok(b)))?;
+}}\n",
+                                    number = field.number(),
+                                    name = field.native_name(),
+                                )
+                            } else {
+                                format!(
+                                    "serializer.serialize_bytes_twice(\
+                                        {number}, self.{name}.bytes().map(|b| Ok(b)))?;\n",
+                                    number = field.number(),
+                                    name = field.native_name(),
+                                )
+                            }
+                        }
+                    },
+                    WireType::Bits32(_) | WireType::Bits64(_) => {
+                        if field.is_repeated()? {
+                            format!(
+                                "\
+for item in &self.{name} {{
+    serializer.serialize_fixed_bits({number}, &item.to_le_bytes())?;
+}}\n",
+                                name = field.native_name(),
+                                number = field.number(),
+                            )
+                        } else {
+                            format!(
+                                "serializer.serialize_fixed_bits(\
+                                    {number}, &self.{name}.to_le_bytes())?;\n",
+                                name = field.native_name(),
+                                number = field.number(),
+                            )
+                        }
+                    }
+                })
+            })),),
+        ),
         "}}\n",
     )
         .write_into(output)
