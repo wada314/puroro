@@ -1,4 +1,4 @@
-pub mod shared;
+mod writer;
 
 // Too long!
 const DESER_MOD: &'static str = "::puroro::deserializer::stream";
@@ -11,7 +11,7 @@ use crate::wrappers::{
     MessageDescriptor, WireType,
 };
 use crate::Result;
-use shared::writers::{func, indent, indent_n, iter, seq, Fragment, TupleOfIntoFragments};
+use writer::{func, indent, indent_n, iter, seq, Fragment, TupleOfIntoFragments};
 
 use super::Context;
 struct Visitor {
