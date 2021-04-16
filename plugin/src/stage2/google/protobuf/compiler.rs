@@ -9,7 +9,6 @@ pub struct CodeGeneratorResponse {
 }
 impl ::std::default::Default for CodeGeneratorResponse {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             error: ::std::default::Default::default(),
@@ -59,25 +58,13 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                15 => {
+                1 | 2 | 15 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                15 => {
+                1 | 2 | 15 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -120,6 +107,34 @@ impl ::puroro::Serializable for CodeGeneratorResponse {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait CodeGeneratorResponseTrait {
+    fn error(&self) -> &str;
+    fn supported_features(&self) -> u64;
+    fn for_each_file<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::super::google::protobuf::compiler::code_generator_response::File);
+    fn file_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::super::google::protobuf::compiler::code_generator_response::File>>;
+}
+impl CodeGeneratorResponseTrait for CodeGeneratorResponse {
+    fn error(&self) -> &str {
+        self.error.as_ref()
+    }
+    fn supported_features(&self) -> u64 {
+        self.supported_features.clone()
+    }
+    fn for_each_file<F>(&self, mut f: F)
+    where
+        F: FnMut(&super::super::super::google::protobuf::compiler::code_generator_response::File) {
+        for item in (self.file).iter() {
+            (f)(item);
+        }
+    }
+    fn file_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::super::google::protobuf::compiler::code_generator_response::File>> {
+        ::std::boxed::Box::new(self.file.iter())
+    }
+}
 pub mod code_generator_response {
 #[derive(Debug, Clone)]
 pub enum Feature {
@@ -150,7 +165,6 @@ pub struct File {
 }
 impl ::std::default::Default for File {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -200,31 +214,13 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                15 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                16 => {
+                1 | 2 | 15 | 16 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                15 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                16 => {
+                1 | 2 | 15 | 16 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -268,6 +264,26 @@ impl ::puroro::Serializable for File {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait FileTrait {
+    fn name(&self) -> &str;
+    fn insertion_point(&self) -> &str;
+    fn content(&self) -> &str;
+    fn generated_code_info(&self) -> ::std::option::Option<&super::super::super::super::google::protobuf::GeneratedCodeInfo>;
+}
+impl FileTrait for File {
+    fn name(&self) -> &str {
+        self.name.as_ref()
+    }
+    fn insertion_point(&self) -> &str {
+        self.insertion_point.as_ref()
+    }
+    fn content(&self) -> &str {
+        self.content.as_ref()
+    }
+    fn generated_code_info(&self) -> ::std::option::Option<&super::super::super::super::google::protobuf::GeneratedCodeInfo> {
+        self.generated_code_info.as_deref()
+    }
+}
 } // mod code_generator_response
 #[derive(Debug, Clone)]
 pub struct CodeGeneratorRequest {
@@ -278,7 +294,6 @@ pub struct CodeGeneratorRequest {
 }
 impl ::std::default::Default for CodeGeneratorRequest {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             file_to_generate: ::std::default::Default::default(),
@@ -328,31 +343,13 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                15 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                3 => {
+                1 | 2 | 15 | 3 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                15 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                3 => {
+                1 | 2 | 15 | 3 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -396,6 +393,50 @@ impl ::puroro::Serializable for CodeGeneratorRequest {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait CodeGeneratorRequestTrait {
+    fn for_each_file_to_generate<F>(&self, f: F)
+    where
+        F: FnMut(&str);
+    fn file_to_generate_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+    fn parameter(&self) -> &str;
+    fn for_each_proto_file<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::super::google::protobuf::FileDescriptorProto);
+    fn proto_file_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::super::google::protobuf::FileDescriptorProto>>;
+    fn compiler_version(&self) -> ::std::option::Option<&super::super::super::google::protobuf::compiler::Version>;
+}
+impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
+    fn for_each_file_to_generate<F>(&self, mut f: F)
+    where
+        F: FnMut(&str) {
+        for item in (self.file_to_generate).iter().map(|v| v.as_ref()) {
+            (f)(item);
+        }
+    }
+    fn file_to_generate_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+        ::std::boxed::Box::new(self.file_to_generate.iter().map(|v| v.as_ref()))
+    }
+    fn parameter(&self) -> &str {
+        self.parameter.as_ref()
+    }
+    fn for_each_proto_file<F>(&self, mut f: F)
+    where
+        F: FnMut(&super::super::super::google::protobuf::FileDescriptorProto) {
+        for item in (self.proto_file).iter() {
+            (f)(item);
+        }
+    }
+    fn proto_file_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::super::google::protobuf::FileDescriptorProto>> {
+        ::std::boxed::Box::new(self.proto_file.iter())
+    }
+    fn compiler_version(&self) -> ::std::option::Option<&super::super::super::google::protobuf::compiler::Version> {
+        self.compiler_version.as_deref()
+    }
+}
 #[derive(Debug, Clone)]
 pub struct Version {
     pub major: i32,
@@ -405,7 +446,6 @@ pub struct Version {
 }
 impl ::std::default::Default for Version {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             major: ::std::default::Default::default(),
@@ -473,31 +513,13 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                4 => {
+                1 | 2 | 3 | 4 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                4 => {
+                1 | 2 | 3 | 4 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -545,5 +567,25 @@ impl ::puroro::Serializable for Version {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
+    }
+}
+pub trait VersionTrait {
+    fn major(&self) -> i32;
+    fn minor(&self) -> i32;
+    fn patch(&self) -> i32;
+    fn suffix(&self) -> &str;
+}
+impl VersionTrait for Version {
+    fn major(&self) -> i32 {
+        self.major.clone()
+    }
+    fn minor(&self) -> i32 {
+        self.minor.clone()
+    }
+    fn patch(&self) -> i32 {
+        self.patch.clone()
+    }
+    fn suffix(&self) -> &str {
+        self.suffix.as_ref()
     }
 }
