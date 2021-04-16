@@ -147,7 +147,7 @@ pub fn print_msg_deser_deserializable_variant_arm<'c, W: std::fmt::Write>(
                         )),
                         "}}\n",
                     )
-                        .into_frag(),
+                        .into(),
                     _ => format!(
                         "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
                         number = field.number()
@@ -212,7 +212,7 @@ ldd.deserialize_as_message(msg)?;\n",
                     },)),
                     "}}\n",
                 )
-                    .into_frag())
+                    .into())
             })),
             "_ => Err(::puroro::PuroroError::UnexpectedFieldId)?,\n",
         )),

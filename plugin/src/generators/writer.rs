@@ -5,32 +5,26 @@ use std::{borrow::Cow, fmt::Write};
 
 // TupleOfIntoFragments
 
-pub trait IntoFragment<'w, W: 'w>: Sized {
-    fn into_frag(self) -> Fragment<'w, W>;
-
+pub trait IntoFragment<'w, W: 'w>: Into<Fragment<'w, W>> {
     fn write_into(self, output: &'w mut Indentor<W>) -> Result<()>
     where
         W: std::fmt::Write,
     {
-        frag_write_impl(output, self)
+        frag_write_impl(output, self.into())
     }
 }
-impl<'w, W: 'w> IntoFragment<'w, W> for Fragment<'w, W> {
-    fn into_frag(self) -> Fragment<'w, W> {
-        self
-    }
-}
+impl<'w, W: 'w, T> IntoFragment<'w, W> for T where T: Into<Fragment<'w, W>> {}
 
 macro_rules! impl_tuple_into_fragments {
     ($len:expr) => {};
     ($len:expr, $a:ident $(, $rest:ident)*) => {
         #[allow(non_snake_case)]
-        impl<'w, W: 'w, $a $(, $rest)*> IntoFragment<'w, W> for ($a, $($rest),*)
+        impl<'w, W: 'w, $a $(, $rest)*> From<($a, $($rest),*)> for Fragment<'w, W>
         where
             Fragment<'w, W>: From<$a> $(+ From<$rest>)*,
         {
-            fn into_frag(self) -> Fragment<'w, W> {
-                let ($a, $($rest),*) = self;
+            fn from(frags: ($a, $($rest),*)) -> Self {
+                let ($a, $($rest),*) = frags;
                 Fragment::Iter(Box::new(core::array::IntoIter::new([
                     Ok(<Fragment<'w, W> as From::<$a>>::from($a))
                     $(, Ok(<Fragment<'w, W> as From::<$rest>>::from($rest)))*
@@ -41,22 +35,6 @@ macro_rules! impl_tuple_into_fragments {
     }
 }
 impl_tuple_into_fragments!(12, A, B, C, D, E, F, G, H, I, J, K, L);
-
-impl<'w, W: 'w> IntoFragment<'w, W> for &'static str {
-    fn into_frag(self) -> Fragment<'w, W> {
-        Fragment::Str(self)
-    }
-}
-impl<'w, W: 'w> IntoFragment<'w, W> for String {
-    fn into_frag(self) -> Fragment<'w, W> {
-        Fragment::String(self)
-    }
-}
-impl<'w, W: 'w> IntoFragment<'w, W> for Cow<'static, str> {
-    fn into_frag(self) -> Fragment<'w, W> {
-        Fragment::Cow(self)
-    }
-}
 
 // Fragment
 
@@ -86,25 +64,23 @@ impl<'w, W> From<Cow<'static, str>> for Fragment<'w, W> {
 
 pub fn indent<'w, T, W: 'w>(frags: T) -> Fragment<'w, W>
 where
-    T: IntoFragment<'w, W>,
+    Fragment<'w, W>: From<T>,
 {
-    Fragment::Indent(1, Box::new(frags.into_frag()))
+    Fragment::Indent(1, Box::new(frags.into()))
 }
 pub fn indent_n<'w, T, W: 'w>(n: usize, frags: T) -> Fragment<'w, W>
 where
-    T: IntoFragment<'w, W>,
+    Fragment<'w, W>: From<T>,
 {
-    Fragment::Indent(n, Box::new(frags.into_frag()))
+    Fragment::Indent(n, Box::new(frags.into()))
 }
 pub fn iter<'w, W, I, F>(iter: I) -> Fragment<'w, W>
 where
     I: 'w + Iterator<Item = Result<F>>,
-    F: IntoFragment<'w, W>,
+    Fragment<'w, W>: From<F>,
 {
-    Fragment::Iter(
-        Box::new(iter.map(|rv| rv.map(|v| <F as IntoFragment<'w, W>>::into_frag(v))))
-            as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>,
-    )
+    Fragment::Iter(Box::new(iter.map(|rv| rv.map(|v| v.into())))
+        as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>)
 }
 pub fn func<'w, 'p, W, F>(f: F) -> Fragment<'w, W>
 where
@@ -113,10 +89,9 @@ where
     Fragment::Functor(Box::new(f) as Box<dyn FnOnce(&mut Indentor<W>) -> Result<()>>)
 }
 
-fn frag_write_impl<'w, T, W>(w: &'w mut Indentor<W>, frags: T) -> Result<()>
+fn frag_write_impl<'w, W>(w: &'w mut Indentor<W>, frag: Fragment<'w, W>) -> Result<()>
 where
     W: Write,
-    T: IntoFragment<'w, W>,
 {
     enum Task<'w, W: 'w + std::fmt::Write> {
         WriteFragment(Fragment<'w, W>),
@@ -126,7 +101,7 @@ where
         Unindent(),
     }
     let mut tasks = VecDeque::new();
-    tasks.push_back(Task::WriteFragment(frags.into_frag()));
+    tasks.push_back(Task::WriteFragment(frag.into()));
     while let Some(task) = tasks.pop_front() {
         match task {
             Task::WriteFragment(fragment) => match fragment {
