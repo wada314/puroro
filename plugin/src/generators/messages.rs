@@ -34,13 +34,13 @@ pub fn print_msg_struct<'c, W: std::fmt::Write>(
 pub struct {name} {{\n",
             name = msg.native_bare_type_name(),
         ),
-        indent((iter(msg.fields().map(|field| {
+        indent(iter(msg.fields().map(|field| {
             Ok(format!(
                 "pub {name}: {type_},\n",
                 name = field.native_name(),
                 type_ = field.native_owned_type_name()?,
             ))
-        })),)),
+        }))),
         "\
 }}\n",
     )
@@ -62,19 +62,20 @@ impl ::std::default::Default for {name} {{
         ),
         indent_n(
             3,
-            (iter(msg.fields().map(|field| {
-                match (field.label()?, field.type_()?) {
-                    (FieldLabel::Optional, FieldType::Enum(_))
-                    | (FieldLabel::Required, FieldType::Enum(_)) => Ok(format!(
-                        "{name}: 0i32.try_into(),\n",
-                        name = field.native_name()
-                    )),
-                    (_, _) => Ok(format!(
-                        "{name}: ::std::default::Default::default(),\n",
-                        name = field.native_name(),
-                    )),
-                }
-            })),),
+            iter(
+                msg.fields()
+                    .map(|field| match (field.label()?, field.type_()?) {
+                        (FieldLabel::Optional, FieldType::Enum(_))
+                        | (FieldLabel::Required, FieldType::Enum(_)) => Ok(format!(
+                            "{name}: 0i32.try_into(),\n",
+                            name = field.native_name()
+                        )),
+                        (_, _) => Ok(format!(
+                            "{name}: ::std::default::Default::default(),\n",
+                            name = field.native_name(),
+                        )),
+                    }),
+            ),
         ),
         "        \
         }}
@@ -323,7 +324,7 @@ impl ::puroro::serializer::Serializable for {name} {{
         ),
         indent_n(
             2,
-            (iter(msg.fields().map(|field| -> Result<_> {
+            iter(msg.fields().map(|field| -> Result<_> {
                 Ok(match field.wire_type()? {
                     WireType::Variant(field_type) => format!(
                         "\
@@ -372,7 +373,7 @@ for item in self.{name}.iter_for_ser() {{
                         number = field.number(),
                     ),
                 })
-            })),),
+            })),
         ),
         "        \
         Ok(())
