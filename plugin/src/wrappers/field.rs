@@ -239,6 +239,29 @@ impl<'c> FieldDescriptor<'c> {
             })?)
     }
 
+    // Returns a mutable ref type name for required field.
+    pub fn native_scalar_mut_ref_type_name(&'c self) -> Result<&str> {
+        Ok(self
+            .lazy_native_scalar_ref_type_name
+            .get_or_try_init(|| -> Result<_> {
+                Ok(match self.wire_type()? {
+                    WireType::Variant(field_type) => format!(
+                        "&mut {name}",
+                        name = field_type.native_type(self.parent.path_to_root_mod())
+                    ),
+                    WireType::LengthDelimited(field_type) => field_type
+                        .native_mut_ref_type(self.parent.path_to_root_mod())
+                        .into_owned(),
+                    WireType::Bits32(field_type) => {
+                        format!("&mut {name}", name = field_type.native_type().to_string())
+                    }
+                    WireType::Bits64(field_type) => {
+                        format!("&mut {name}", name = field_type.native_type().to_string())
+                    }
+                })
+            })?)
+    }
+
     pub fn native_name(&'c self) -> &str {
         self.lazy_native_name
             .get_or_init(|| get_keyword_safe_ident(&to_lower_snake_case(self.name())))
@@ -326,6 +349,17 @@ impl<'c> LengthDelimitedFieldType<'c> {
             LengthDelimitedFieldType::Bytes => "&[u8]".into(),
             LengthDelimitedFieldType::Message(m) => format!(
                 "&{name}",
+                name = m.native_fully_qualified_type_name(path_to_root_mod)
+            )
+            .into(),
+        }
+    }
+    pub fn native_mut_ref_type(&self, path_to_root_mod: &str) -> Cow<'static, str> {
+        match self {
+            LengthDelimitedFieldType::String => "&mut String".into(),
+            LengthDelimitedFieldType::Bytes => "&mut Vec<u8>".into(),
+            LengthDelimitedFieldType::Message(m) => format!(
+                "&mut {name}",
                 name = m.native_fully_qualified_type_name(path_to_root_mod)
             )
             .into(),

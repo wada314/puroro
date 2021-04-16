@@ -14,10 +14,12 @@ pub fn print_msg<'c, W: std::fmt::Write>(
     (
         func(|output| print_msg_struct(output, msg)),
         func(|output| print_msg_default(output, msg)),
-        func(|output| print_msg_deser_deserializable(output, msg)),
-        func(|output| print_msg_puroro_deserializable(output, msg)),
-        func(|output| print_msg_ser_serializable(output, msg)),
-        func(|output| print_msg_puroro_serializable(output, msg)),
+        (
+            func(|output| print_msg_deser_deserializable(output, msg)),
+            func(|output| print_msg_puroro_deserializable(output, msg)),
+            func(|output| print_msg_ser_serializable(output, msg)),
+            func(|output| print_msg_puroro_serializable(output, msg)),
+        ),
         func(|output| print_msg_trait(output, msg)),
         func(|output| print_msg_trait_impl(output, msg)),
     )
@@ -32,7 +34,9 @@ pub fn print_msg_struct<'c, W: std::fmt::Write>(
         format!(
             "\
 #[derive(Debug, Clone)]
-pub struct {name} {{\n",
+pub struct {name}<
+    #[cfg(feature = \"puroro-nightly\")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {{\n",
             name = msg.native_bare_type_name(),
         ),
         indent(iter(msg.fields().map(|field| {
@@ -525,6 +529,54 @@ fn {name}_boxed_iter(&self)
                         name = field.native_name(),
                         reftype = field.native_scalar_ref_type_name()?,
                         process_iter = process_iter,
+                    )
+                }
+            })
+        }))),
+        "}}\n",
+    )
+        .write_into(output)
+}
+
+pub fn print_msg_mutable_trait<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    msg: &'c MessageDescriptor<'c>,
+) -> Result<()> {
+    (
+        format!(
+            "\
+pub trait {name}MutTrait {{\n",
+            name = msg.native_bare_type_name()
+        ),
+        indent(iter(msg.fields().map(|field| -> Result<_> {
+            Ok(match (field.label()?, field.type_()?) {
+                (FieldLabel::Optional, FieldType::Message(_)) => {
+                    // getter function for optional message field, wrapped by Option.
+                    format!(
+                        "fn {name}_mut(&mut self) -> ::std::option::Option<{reftype}>;\n",
+                        name = field.native_name(),
+                        reftype = field.native_scalar_mut_ref_type_name()?,
+                    )
+                }
+                (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
+                    // normal getter function.
+                    format!(
+                        "fn {name}_mut(&mut self) -> {reftype};\n",
+                        name = field.native_name(),
+                        reftype = field.native_scalar_mut_ref_type_name()?,
+                    )
+                }
+                (FieldLabel::Repeated, _) => {
+                    format!(
+                        "\
+fn for_each_{name}_mut<F>(&mut self, f: F)
+where
+    F: FnMut({reftype});
+fn {name}_boxed_iter_mut(&mut self)
+    -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>;
+// We need more! Maybe just expose &mut Vec<T> ? \n",
+                        name = field.native_name(),
+                        reftype = field.native_scalar_mut_ref_type_name()?,
                     )
                 }
             })
