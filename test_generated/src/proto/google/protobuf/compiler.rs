@@ -59,25 +59,13 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                15 => {
+                1 | 2 | 15 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                15 => {
+                1 | 2 | 15 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -200,31 +188,13 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                15 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                16 => {
+                1 | 2 | 15 | 16 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                15 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                16 => {
+                1 | 2 | 15 | 16 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -328,31 +298,13 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                15 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                3 => {
+                1 | 2 | 15 | 3 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                15 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                3 => {
+                1 | 2 | 15 | 3 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -473,31 +425,13 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                4 => {
+                1 | 2 | 3 | 4 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                4 => {
+                1 | 2 | 3 | 4 => {
                     Err(::puroro::PuroroError::UnexpectedWireType)?
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,

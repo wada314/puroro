@@ -55,7 +55,6 @@ pub fn print_msg_default<'c, W: std::fmt::Write>(
             "\
 impl ::std::default::Default for {name} {{
     fn default() -> Self {{
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {{\n",
             name = msg.native_bare_type_name(),
@@ -257,17 +256,20 @@ pub fn print_msg_deser_deserializable_bitsxx_arm<'c, W: std::fmt::Write>(
             })),
             // group the wrong wire type fields.
             {
-                let wrong_wire_field_numbers_iter =
-                    msg.fields()
-                        .filter_map(|field| match (bits, field.wire_type()?) {
+                let wrong_wire_field_numbers_iter = msg
+                    .fields()
+                    .map(|field| {
+                        Ok(match (bits, field.wire_type()?) {
                             (32, WireType::Bits32(_)) | (64, WireType::Bits64(_)) => None,
                             _ => Some(field.number().to_string()),
-                        });
-                let pattern = ::itertools::Itertools::intersperse(
-                    wrong_wire_field_numbers_iter,
-                    " | ".to_string(),
-                )
-                .collect::<String>();
+                        })
+                    })
+                    .filter_map(|ro| ro.transpose());
+                let pattern =
+                    ::itertools::Itertools::intersperse_with(wrong_wire_field_numbers_iter, || {
+                        Ok(" | ".to_string())
+                    })
+                    .collect::<Result<String>>()?;
                 format!(
                     "\
 {field_numbers} => {{
