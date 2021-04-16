@@ -51,9 +51,6 @@ impl<'c> FieldDescriptor<'c> {
             Err(id) => Err(ErrorKind::UnknownLabelId { id })?,
         }
     }
-    pub fn is_repeated(&self) -> Result<bool> {
-        Ok(matches!(self.label()?, FieldLabel::Repeated))
-    }
 
     pub fn type_(&'c self) -> Result<FieldType<'c>> {
         Ok(match &self.proto.type_ {

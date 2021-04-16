@@ -231,29 +231,28 @@ pub fn print_msg_deser_deserializable_bitsxx_arm<'c, W: std::fmt::Write>(
             d = DESER_MOD
         ),
         indent((
-            iter(msg.fields().map(|field| -> Result<Fragment<_>> {
-                Ok({
-                    let opt_native_type = match (bits, field.wire_type()?) {
-                        (32, WireType::Bits32(field_type)) => Some(field_type.native_type()),
-                        (64, WireType::Bits64(field_type)) => Some(field_type.native_type()),
-                        _ => None,
-                    };
-                    if let Some(native_type) = opt_native_type {
-                        format!(
-                            "\
+            iter(
+                msg.fields()
+                    .map(|field| -> Result<_> {
+                        Ok(match (bits, field.wire_type()?) {
+                            (32, WireType::Bits32(field_type)) => Some(field_type.native_type()),
+                            (64, WireType::Bits64(field_type)) => Some(field_type.native_type()),
+                            _ => None,
+                        }
+                        .map(|native_type| {
+                            format!(
+                                "\
 {number} => {{
     *self.{name}.push_and_get_mut() = {type_}::from_le_bytes(bytes);
 }}\n",
-                            number = field.number(),
-                            name = field.native_name(),
-                            type_ = native_type
-                        )
-                        .into()
-                    } else {
-                        "".into()
-                    }
-                })
-            })),
+                                number = field.number(),
+                                name = field.native_name(),
+                                type_ = native_type
+                            )
+                        }))
+                    })
+                    .filter_map(|ro| ro.transpose()),
+            ),
             // group the wrong wire type fields.
             {
                 let wrong_wire_field_numbers_iter = msg
