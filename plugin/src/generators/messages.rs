@@ -1,4 +1,4 @@
-use super::writer::{func, indent, indent_n, iter, seq, Fragment, TupleOfIntoFragments};
+use super::writer::{func, indent, indent_n, iter, Fragment, IntoFragment};
 use crate::utils::Indentor;
 use crate::wrappers::{
     FieldLabel, FieldType, LengthDelimitedFieldType, MessageDescriptor, WireType,
@@ -18,6 +18,7 @@ pub fn print_msg<'c, W: std::fmt::Write>(
         func(|output| print_msg_puroro_deserializable(output, msg)),
         func(|output| print_msg_ser_serializable(output, msg)),
         func(|output| print_msg_puroro_serializable(output, msg)),
+        func(|output| print_msg_trait(output, msg)),
     )
         .write_into(output)
 }
@@ -136,7 +137,7 @@ pub fn print_msg_deser_deserializable_variant_arm<'c, W: std::fmt::Write>(
         indent((
             iter(msg.fields().map(|field| -> Result<Fragment<_>> {
                 Ok(match field.wire_type()? {
-                    WireType::Variant(field_type) => seq((
+                    WireType::Variant(field_type) => (
                         format!("{number} => {{\n", number = field.number()),
                         indent(format!(
                             "*self.{name}.push_and_get_mut() \
@@ -145,8 +146,8 @@ pub fn print_msg_deser_deserializable_variant_arm<'c, W: std::fmt::Write>(
                             tag = field_type.native_tag_type(msg.path_to_root_mod()),
                         )),
                         "}}\n",
-                    ))
-                    .into(),
+                    )
+                        .into_frag(),
                     _ => format!(
                         "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
                         number = field.number()
@@ -172,7 +173,7 @@ pub fn print_msg_deser_deserializable_length_delimited_arm<'c, W: std::fmt::Writ
         ),
         indent((
             iter(msg.fields().map(|field| -> Result<Fragment<_>> {
-                Ok(seq((
+                Ok((
                     format!("{number} => {{\n", number = field.number()),
                     indent((match field.wire_type()? {
                         // Deserialize packed variant(s)
@@ -210,7 +211,8 @@ ldd.deserialize_as_message(msg)?;\n",
                         _ => "Err(::puroro::PuroroError::UnexpectedWireType)?\n".into(),
                     },)),
                     "}}\n",
-                )))
+                )
+                    .into_frag())
             })),
             "_ => Err(::puroro::PuroroError::UnexpectedFieldId)?,\n",
         )),
@@ -394,5 +396,21 @@ impl ::puroro::Serializable for {name} {{
 }}\n",
         name = msg.native_bare_type_name()
     ),)
+        .write_into(output)
+}
+
+pub fn print_msg_trait<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    msg: &'c MessageDescriptor<'c>,
+) -> Result<()> {
+    (
+        format!(
+            "\
+pub trait {name}Trait {{\n",
+            name = msg.native_bare_type_name()
+        ),
+        indent(iter(msg.fields().map(|field| Ok("")))),
+        "}}\n",
+    )
         .write_into(output)
 }

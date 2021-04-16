@@ -1,4 +1,4 @@
-use super::writer::{indent, indent_n, iter, TupleOfIntoFragments};
+use super::writer::{indent, indent_n, iter, IntoFragment};
 use crate::utils::Indentor;
 use crate::wrappers::EnumDescriptor;
 use crate::Result;
