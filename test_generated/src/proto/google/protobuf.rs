@@ -7,7 +7,6 @@ pub struct GeneratedCodeInfo {
 }
 impl ::std::default::Default for GeneratedCodeInfo {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             annotation: ::std::default::Default::default(),
@@ -80,6 +79,26 @@ impl ::puroro::Serializable for GeneratedCodeInfo {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait GeneratedCodeInfoTrait {
+    fn for_each_annotation<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::generated_code_info::Annotation);
+    fn annotation_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::generated_code_info::Annotation>>;
+}
+impl GeneratedCodeInfoTrait for GeneratedCodeInfo {
+    fn for_each_annotation<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::generated_code_info::Annotation) {
+        for item in &self.annotation {
+            (f)(item);
+        }
+    }
+    fn annotation_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::generated_code_info::Annotation>> {
+        ::std::boxed::Box::new(self.annotation.iter())
+    }
+}
 pub mod generated_code_info {
 #[derive(Debug, Clone)]
 pub struct Annotation {
@@ -90,7 +109,6 @@ pub struct Annotation {
 }
 impl ::std::default::Default for Annotation {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             path: ::std::default::Default::default(),
@@ -214,6 +232,38 @@ impl ::puroro::Serializable for Annotation {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait AnnotationTrait {
+    fn for_each_path<F>(&self, f: F)
+    where
+        F: FnMut(i32);
+    fn path_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
+    fn source_file(&self) -> &str;
+    fn begin(&self) -> i32;
+    fn end(&self) -> i32;
+}
+impl AnnotationTrait for Annotation {
+    fn for_each_path<F>(&self, f: F)
+    where
+        F: FnMut(i32) {
+        for item in &self.path {
+            (f)(item);
+        }
+    }
+    fn path_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+        ::std::boxed::Box::new(self.path.iter().cloned())
+    }
+    fn source_file(&self) -> &str {
+        &self.source_file
+    }
+    fn begin(&self) -> i32 {
+        &self.begin
+    }
+    fn end(&self) -> i32 {
+        &self.end
+    }
+}
 } // mod generated_code_info
 #[derive(Debug, Clone)]
 pub struct SourceCodeInfo {
@@ -221,7 +271,6 @@ pub struct SourceCodeInfo {
 }
 impl ::std::default::Default for SourceCodeInfo {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             location: ::std::default::Default::default(),
@@ -294,6 +343,26 @@ impl ::puroro::Serializable for SourceCodeInfo {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait SourceCodeInfoTrait {
+    fn for_each_location<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::source_code_info::Location);
+    fn location_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::source_code_info::Location>>;
+}
+impl SourceCodeInfoTrait for SourceCodeInfo {
+    fn for_each_location<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::source_code_info::Location) {
+        for item in &self.location {
+            (f)(item);
+        }
+    }
+    fn location_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::source_code_info::Location>> {
+        ::std::boxed::Box::new(self.location.iter())
+    }
+}
 pub mod source_code_info {
 #[derive(Debug, Clone)]
 pub struct Location {
@@ -305,7 +374,6 @@ pub struct Location {
 }
 impl ::std::default::Default for Location {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             path: ::std::default::Default::default(),
@@ -430,6 +498,66 @@ impl ::puroro::Serializable for Location {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait LocationTrait {
+    fn for_each_path<F>(&self, f: F)
+    where
+        F: FnMut(i32);
+    fn path_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
+    fn for_each_span<F>(&self, f: F)
+    where
+        F: FnMut(i32);
+    fn span_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
+    fn leading_comments(&self) -> &str;
+    fn trailing_comments(&self) -> &str;
+    fn for_each_leading_detached_comments<F>(&self, f: F)
+    where
+        F: FnMut(&str);
+    fn leading_detached_comments_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+}
+impl LocationTrait for Location {
+    fn for_each_path<F>(&self, f: F)
+    where
+        F: FnMut(i32) {
+        for item in &self.path {
+            (f)(item);
+        }
+    }
+    fn path_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+        ::std::boxed::Box::new(self.path.iter().cloned())
+    }
+    fn for_each_span<F>(&self, f: F)
+    where
+        F: FnMut(i32) {
+        for item in &self.span {
+            (f)(item);
+        }
+    }
+    fn span_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+        ::std::boxed::Box::new(self.span.iter().cloned())
+    }
+    fn leading_comments(&self) -> &str {
+        &self.leading_comments
+    }
+    fn trailing_comments(&self) -> &str {
+        &self.trailing_comments
+    }
+    fn for_each_leading_detached_comments<F>(&self, f: F)
+    where
+        F: FnMut(&str) {
+        for item in &self.leading_detached_comments {
+            (f)(item);
+        }
+    }
+    fn leading_detached_comments_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+        ::std::boxed::Box::new(self.leading_detached_comments.iter().cloned())
+    }
+}
 } // mod source_code_info
 #[derive(Debug, Clone)]
 pub struct UninterpretedOption {
@@ -443,7 +571,6 @@ pub struct UninterpretedOption {
 }
 impl ::std::default::Default for UninterpretedOption {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -588,6 +715,50 @@ impl ::puroro::Serializable for UninterpretedOption {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait UninterpretedOptionTrait {
+    fn for_each_name<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::uninterpreted_option::NamePart);
+    fn name_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::uninterpreted_option::NamePart>>;
+    fn identifier_value(&self) -> &str;
+    fn positive_int_value(&self) -> u64;
+    fn negative_int_value(&self) -> i64;
+    fn double_value(&self) -> f64;
+    fn string_value(&self) -> &[u8];
+    fn aggregate_value(&self) -> &str;
+}
+impl UninterpretedOptionTrait for UninterpretedOption {
+    fn for_each_name<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::uninterpreted_option::NamePart) {
+        for item in &self.name {
+            (f)(item);
+        }
+    }
+    fn name_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::uninterpreted_option::NamePart>> {
+        ::std::boxed::Box::new(self.name.iter())
+    }
+    fn identifier_value(&self) -> &str {
+        &self.identifier_value
+    }
+    fn positive_int_value(&self) -> u64 {
+        &self.positive_int_value
+    }
+    fn negative_int_value(&self) -> i64 {
+        &self.negative_int_value
+    }
+    fn double_value(&self) -> f64 {
+        &self.double_value
+    }
+    fn string_value(&self) -> &[u8] {
+        &self.string_value
+    }
+    fn aggregate_value(&self) -> &str {
+        &self.aggregate_value
+    }
+}
 pub mod uninterpreted_option {
 #[derive(Debug, Clone)]
 pub struct NamePart {
@@ -596,7 +767,6 @@ pub struct NamePart {
 }
 impl ::std::default::Default for NamePart {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             name_part: ::std::default::Default::default(),
@@ -686,6 +856,18 @@ impl ::puroro::Serializable for NamePart {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait NamePartTrait {
+    fn name_part(&self) -> &str;
+    fn is_extension(&self) -> bool;
+}
+impl NamePartTrait for NamePart {
+    fn name_part(&self) -> &str {
+        &self.name_part
+    }
+    fn is_extension(&self) -> bool {
+        &self.is_extension
+    }
+}
 } // mod uninterpreted_option
 #[derive(Debug, Clone)]
 pub struct MethodOptions {
@@ -695,7 +877,6 @@ pub struct MethodOptions {
 }
 impl ::std::default::Default for MethodOptions {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             deprecated: ::std::default::Default::default(),
@@ -802,6 +983,34 @@ impl ::puroro::Serializable for MethodOptions {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait MethodOptionsTrait {
+    fn deprecated(&self) -> bool;
+    fn idempotency_level(&self) -> ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>;
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+}
+impl MethodOptionsTrait for MethodOptions {
+    fn deprecated(&self) -> bool {
+        &self.deprecated
+    }
+    fn idempotency_level(&self) -> ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32> {
+        &self.idempotency_level
+    }
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        for item in &self.uninterpreted_option {
+            (f)(item);
+        }
+    }
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+        ::std::boxed::Box::new(self.uninterpreted_option.iter())
+    }
+}
 pub mod method_options {
 #[derive(Debug, Clone)]
 pub enum IdempotencyLevel {
@@ -833,7 +1042,6 @@ pub struct ServiceOptions {
 }
 impl ::std::default::Default for ServiceOptions {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             deprecated: ::std::default::Default::default(),
@@ -923,6 +1131,30 @@ impl ::puroro::Serializable for ServiceOptions {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait ServiceOptionsTrait {
+    fn deprecated(&self) -> bool;
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+}
+impl ServiceOptionsTrait for ServiceOptions {
+    fn deprecated(&self) -> bool {
+        &self.deprecated
+    }
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        for item in &self.uninterpreted_option {
+            (f)(item);
+        }
+    }
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+        ::std::boxed::Box::new(self.uninterpreted_option.iter())
+    }
+}
 #[derive(Debug, Clone)]
 pub struct EnumValueOptions {
     pub deprecated: bool,
@@ -930,7 +1162,6 @@ pub struct EnumValueOptions {
 }
 impl ::std::default::Default for EnumValueOptions {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             deprecated: ::std::default::Default::default(),
@@ -1020,6 +1251,30 @@ impl ::puroro::Serializable for EnumValueOptions {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait EnumValueOptionsTrait {
+    fn deprecated(&self) -> bool;
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+}
+impl EnumValueOptionsTrait for EnumValueOptions {
+    fn deprecated(&self) -> bool {
+        &self.deprecated
+    }
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        for item in &self.uninterpreted_option {
+            (f)(item);
+        }
+    }
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+        ::std::boxed::Box::new(self.uninterpreted_option.iter())
+    }
+}
 #[derive(Debug, Clone)]
 pub struct EnumOptions {
     pub allow_alias: bool,
@@ -1028,7 +1283,6 @@ pub struct EnumOptions {
 }
 impl ::std::default::Default for EnumOptions {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             allow_alias: ::std::default::Default::default(),
@@ -1135,13 +1389,40 @@ impl ::puroro::Serializable for EnumOptions {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait EnumOptionsTrait {
+    fn allow_alias(&self) -> bool;
+    fn deprecated(&self) -> bool;
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+}
+impl EnumOptionsTrait for EnumOptions {
+    fn allow_alias(&self) -> bool {
+        &self.allow_alias
+    }
+    fn deprecated(&self) -> bool {
+        &self.deprecated
+    }
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        for item in &self.uninterpreted_option {
+            (f)(item);
+        }
+    }
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+        ::std::boxed::Box::new(self.uninterpreted_option.iter())
+    }
+}
 #[derive(Debug, Clone)]
 pub struct OneofOptions {
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for OneofOptions {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             uninterpreted_option: ::std::default::Default::default(),
@@ -1214,6 +1495,26 @@ impl ::puroro::Serializable for OneofOptions {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait OneofOptionsTrait {
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+}
+impl OneofOptionsTrait for OneofOptions {
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        for item in &self.uninterpreted_option {
+            (f)(item);
+        }
+    }
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+        ::std::boxed::Box::new(self.uninterpreted_option.iter())
+    }
+}
 #[derive(Debug, Clone)]
 pub struct FieldOptions {
     pub ctype: ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>,
@@ -1226,7 +1527,6 @@ pub struct FieldOptions {
 }
 impl ::std::default::Default for FieldOptions {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             ctype: 0i32.try_into(),
@@ -1401,6 +1701,50 @@ impl ::puroro::Serializable for FieldOptions {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait FieldOptionsTrait {
+    fn ctype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>;
+    fn packed(&self) -> bool;
+    fn jstype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32>;
+    fn lazy(&self) -> bool;
+    fn deprecated(&self) -> bool;
+    fn weak(&self) -> bool;
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+}
+impl FieldOptionsTrait for FieldOptions {
+    fn ctype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32> {
+        &self.ctype
+    }
+    fn packed(&self) -> bool {
+        &self.packed
+    }
+    fn jstype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32> {
+        &self.jstype
+    }
+    fn lazy(&self) -> bool {
+        &self.lazy
+    }
+    fn deprecated(&self) -> bool {
+        &self.deprecated
+    }
+    fn weak(&self) -> bool {
+        &self.weak
+    }
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        for item in &self.uninterpreted_option {
+            (f)(item);
+        }
+    }
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+        ::std::boxed::Box::new(self.uninterpreted_option.iter())
+    }
+}
 pub mod field_options {
 #[derive(Debug, Clone)]
 pub enum Jstype {
@@ -1457,7 +1801,6 @@ pub struct MessageOptions {
 }
 impl ::std::default::Default for MessageOptions {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             message_set_wire_format: ::std::default::Default::default(),
@@ -1598,6 +1941,42 @@ impl ::puroro::Serializable for MessageOptions {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait MessageOptionsTrait {
+    fn message_set_wire_format(&self) -> bool;
+    fn no_standard_descriptor_accessor(&self) -> bool;
+    fn deprecated(&self) -> bool;
+    fn map_entry(&self) -> bool;
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+}
+impl MessageOptionsTrait for MessageOptions {
+    fn message_set_wire_format(&self) -> bool {
+        &self.message_set_wire_format
+    }
+    fn no_standard_descriptor_accessor(&self) -> bool {
+        &self.no_standard_descriptor_accessor
+    }
+    fn deprecated(&self) -> bool {
+        &self.deprecated
+    }
+    fn map_entry(&self) -> bool {
+        &self.map_entry
+    }
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        for item in &self.uninterpreted_option {
+            (f)(item);
+        }
+    }
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+        ::std::boxed::Box::new(self.uninterpreted_option.iter())
+    }
+}
 #[derive(Debug, Clone)]
 pub struct FileOptions {
     pub java_package: ::std::string::String,
@@ -1624,7 +2003,6 @@ pub struct FileOptions {
 }
 impl ::std::default::Default for FileOptions {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             java_package: ::std::default::Default::default(),
@@ -1957,6 +2335,106 @@ impl ::puroro::Serializable for FileOptions {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait FileOptionsTrait {
+    fn java_package(&self) -> &str;
+    fn java_outer_classname(&self) -> &str;
+    fn java_multiple_files(&self) -> bool;
+    fn java_generate_equals_and_hash(&self) -> bool;
+    fn java_string_check_utf8(&self) -> bool;
+    fn optimize_for(&self) -> ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>;
+    fn go_package(&self) -> &str;
+    fn cc_generic_services(&self) -> bool;
+    fn java_generic_services(&self) -> bool;
+    fn py_generic_services(&self) -> bool;
+    fn php_generic_services(&self) -> bool;
+    fn deprecated(&self) -> bool;
+    fn cc_enable_arenas(&self) -> bool;
+    fn objc_class_prefix(&self) -> &str;
+    fn csharp_namespace(&self) -> &str;
+    fn swift_prefix(&self) -> &str;
+    fn php_class_prefix(&self) -> &str;
+    fn php_namespace(&self) -> &str;
+    fn php_metadata_namespace(&self) -> &str;
+    fn ruby_package(&self) -> &str;
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+}
+impl FileOptionsTrait for FileOptions {
+    fn java_package(&self) -> &str {
+        &self.java_package
+    }
+    fn java_outer_classname(&self) -> &str {
+        &self.java_outer_classname
+    }
+    fn java_multiple_files(&self) -> bool {
+        &self.java_multiple_files
+    }
+    fn java_generate_equals_and_hash(&self) -> bool {
+        &self.java_generate_equals_and_hash
+    }
+    fn java_string_check_utf8(&self) -> bool {
+        &self.java_string_check_utf8
+    }
+    fn optimize_for(&self) -> ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32> {
+        &self.optimize_for
+    }
+    fn go_package(&self) -> &str {
+        &self.go_package
+    }
+    fn cc_generic_services(&self) -> bool {
+        &self.cc_generic_services
+    }
+    fn java_generic_services(&self) -> bool {
+        &self.java_generic_services
+    }
+    fn py_generic_services(&self) -> bool {
+        &self.py_generic_services
+    }
+    fn php_generic_services(&self) -> bool {
+        &self.php_generic_services
+    }
+    fn deprecated(&self) -> bool {
+        &self.deprecated
+    }
+    fn cc_enable_arenas(&self) -> bool {
+        &self.cc_enable_arenas
+    }
+    fn objc_class_prefix(&self) -> &str {
+        &self.objc_class_prefix
+    }
+    fn csharp_namespace(&self) -> &str {
+        &self.csharp_namespace
+    }
+    fn swift_prefix(&self) -> &str {
+        &self.swift_prefix
+    }
+    fn php_class_prefix(&self) -> &str {
+        &self.php_class_prefix
+    }
+    fn php_namespace(&self) -> &str {
+        &self.php_namespace
+    }
+    fn php_metadata_namespace(&self) -> &str {
+        &self.php_metadata_namespace
+    }
+    fn ruby_package(&self) -> &str {
+        &self.ruby_package
+    }
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        for item in &self.uninterpreted_option {
+            (f)(item);
+        }
+    }
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+        ::std::boxed::Box::new(self.uninterpreted_option.iter())
+    }
+}
 pub mod file_options {
 #[derive(Debug, Clone)]
 pub enum OptimizeMode {
@@ -1992,7 +2470,6 @@ pub struct MethodDescriptorProto {
 }
 impl ::std::default::Default for MethodDescriptorProto {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -2126,6 +2603,34 @@ impl ::puroro::Serializable for MethodDescriptorProto {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait MethodDescriptorProtoTrait {
+    fn name(&self) -> &str;
+    fn input_type(&self) -> &str;
+    fn output_type(&self) -> &str;
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MethodOptions>;
+    fn client_streaming(&self) -> bool;
+    fn server_streaming(&self) -> bool;
+}
+impl MethodDescriptorProtoTrait for MethodDescriptorProto {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn input_type(&self) -> &str {
+        &self.input_type
+    }
+    fn output_type(&self) -> &str {
+        &self.output_type
+    }
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MethodOptions> {
+        self.options.as_ref()
+    }
+    fn client_streaming(&self) -> bool {
+        &self.client_streaming
+    }
+    fn server_streaming(&self) -> bool {
+        &self.server_streaming
+    }
+}
 #[derive(Debug, Clone)]
 pub struct ServiceDescriptorProto {
     pub name: ::std::string::String,
@@ -2134,7 +2639,6 @@ pub struct ServiceDescriptorProto {
 }
 impl ::std::default::Default for ServiceDescriptorProto {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -2225,6 +2729,34 @@ impl ::puroro::Serializable for ServiceDescriptorProto {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait ServiceDescriptorProtoTrait {
+    fn name(&self) -> &str;
+    fn for_each_method<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::MethodDescriptorProto);
+    fn method_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::MethodDescriptorProto>>;
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::ServiceOptions>;
+}
+impl ServiceDescriptorProtoTrait for ServiceDescriptorProto {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn for_each_method<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::MethodDescriptorProto) {
+        for item in &self.method {
+            (f)(item);
+        }
+    }
+    fn method_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::MethodDescriptorProto>> {
+        ::std::boxed::Box::new(self.method.iter())
+    }
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::ServiceOptions> {
+        self.options.as_ref()
+    }
+}
 #[derive(Debug, Clone)]
 pub struct EnumValueDescriptorProto {
     pub name: ::std::string::String,
@@ -2233,7 +2765,6 @@ pub struct EnumValueDescriptorProto {
 }
 impl ::std::default::Default for EnumValueDescriptorProto {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -2332,6 +2863,22 @@ impl ::puroro::Serializable for EnumValueDescriptorProto {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait EnumValueDescriptorProtoTrait {
+    fn name(&self) -> &str;
+    fn number(&self) -> i32;
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumValueOptions>;
+}
+impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProto {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn number(&self) -> i32 {
+        &self.number
+    }
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumValueOptions> {
+        self.options.as_ref()
+    }
+}
 #[derive(Debug, Clone)]
 pub struct EnumDescriptorProto {
     pub name: ::std::string::String,
@@ -2342,7 +2889,6 @@ pub struct EnumDescriptorProto {
 }
 impl ::std::default::Default for EnumDescriptorProto {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -2451,6 +2997,66 @@ impl ::puroro::Serializable for EnumDescriptorProto {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait EnumDescriptorProtoTrait {
+    fn name(&self) -> &str;
+    fn for_each_value<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::EnumValueDescriptorProto);
+    fn value_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumValueDescriptorProto>>;
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumOptions>;
+    fn for_each_reserved_range<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange);
+    fn reserved_range_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>>;
+    fn for_each_reserved_name<F>(&self, f: F)
+    where
+        F: FnMut(&str);
+    fn reserved_name_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+}
+impl EnumDescriptorProtoTrait for EnumDescriptorProto {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn for_each_value<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::EnumValueDescriptorProto) {
+        for item in &self.value {
+            (f)(item);
+        }
+    }
+    fn value_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumValueDescriptorProto>> {
+        ::std::boxed::Box::new(self.value.iter())
+    }
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumOptions> {
+        self.options.as_ref()
+    }
+    fn for_each_reserved_range<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange) {
+        for item in &self.reserved_range {
+            (f)(item);
+        }
+    }
+    fn reserved_range_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>> {
+        ::std::boxed::Box::new(self.reserved_range.iter())
+    }
+    fn for_each_reserved_name<F>(&self, f: F)
+    where
+        F: FnMut(&str) {
+        for item in &self.reserved_name {
+            (f)(item);
+        }
+    }
+    fn reserved_name_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+        ::std::boxed::Box::new(self.reserved_name.iter().cloned())
+    }
+}
 pub mod enum_descriptor_proto {
 #[derive(Debug, Clone)]
 pub struct EnumReservedRange {
@@ -2459,7 +3065,6 @@ pub struct EnumReservedRange {
 }
 impl ::std::default::Default for EnumReservedRange {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             start: ::std::default::Default::default(),
@@ -2557,6 +3162,18 @@ impl ::puroro::Serializable for EnumReservedRange {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait EnumReservedRangeTrait {
+    fn start(&self) -> i32;
+    fn end(&self) -> i32;
+}
+impl EnumReservedRangeTrait for EnumReservedRange {
+    fn start(&self) -> i32 {
+        &self.start
+    }
+    fn end(&self) -> i32 {
+        &self.end
+    }
+}
 } // mod enum_descriptor_proto
 #[derive(Debug, Clone)]
 pub struct OneofDescriptorProto {
@@ -2565,7 +3182,6 @@ pub struct OneofDescriptorProto {
 }
 impl ::std::default::Default for OneofDescriptorProto {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -2647,6 +3263,18 @@ impl ::puroro::Serializable for OneofDescriptorProto {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait OneofDescriptorProtoTrait {
+    fn name(&self) -> &str;
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::OneofOptions>;
+}
+impl OneofDescriptorProtoTrait for OneofDescriptorProto {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::OneofOptions> {
+        self.options.as_ref()
+    }
+}
 #[derive(Debug, Clone)]
 pub struct FieldDescriptorProto {
     pub name: ::std::string::String,
@@ -2663,7 +3291,6 @@ pub struct FieldDescriptorProto {
 }
 impl ::std::default::Default for FieldDescriptorProto {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -2866,6 +3493,54 @@ impl ::puroro::Serializable for FieldDescriptorProto {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait FieldDescriptorProtoTrait {
+    fn name(&self) -> &str;
+    fn number(&self) -> i32;
+    fn label(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>;
+    fn type_(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>;
+    fn type_name(&self) -> &str;
+    fn extendee(&self) -> &str;
+    fn default_value(&self) -> &str;
+    fn oneof_index(&self) -> i32;
+    fn json_name(&self) -> &str;
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FieldOptions>;
+    fn proto3_optional(&self) -> bool;
+}
+impl FieldDescriptorProtoTrait for FieldDescriptorProto {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn number(&self) -> i32 {
+        &self.number
+    }
+    fn label(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32> {
+        &self.label
+    }
+    fn type_(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32> {
+        &self.type_
+    }
+    fn type_name(&self) -> &str {
+        &self.type_name
+    }
+    fn extendee(&self) -> &str {
+        &self.extendee
+    }
+    fn default_value(&self) -> &str {
+        &self.default_value
+    }
+    fn oneof_index(&self) -> i32 {
+        &self.oneof_index
+    }
+    fn json_name(&self) -> &str {
+        &self.json_name
+    }
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FieldOptions> {
+        self.options.as_ref()
+    }
+    fn proto3_optional(&self) -> bool {
+        &self.proto3_optional
+    }
+}
 pub mod field_descriptor_proto {
 #[derive(Debug, Clone)]
 pub enum Label {
@@ -2948,7 +3623,6 @@ pub struct ExtensionRangeOptions {
 }
 impl ::std::default::Default for ExtensionRangeOptions {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             uninterpreted_option: ::std::default::Default::default(),
@@ -3021,6 +3695,26 @@ impl ::puroro::Serializable for ExtensionRangeOptions {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait ExtensionRangeOptionsTrait {
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+}
+impl ExtensionRangeOptionsTrait for ExtensionRangeOptions {
+    fn for_each_uninterpreted_option<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        for item in &self.uninterpreted_option {
+            (f)(item);
+        }
+    }
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+        ::std::boxed::Box::new(self.uninterpreted_option.iter())
+    }
+}
 #[derive(Debug, Clone)]
 pub struct DescriptorProto {
     pub name: ::std::string::String,
@@ -3036,7 +3730,6 @@ pub struct DescriptorProto {
 }
 impl ::std::default::Default for DescriptorProto {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -3190,6 +3883,146 @@ impl ::puroro::Serializable for DescriptorProto {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait DescriptorProtoTrait {
+    fn name(&self) -> &str;
+    fn for_each_field<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto);
+    fn field_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>>;
+    fn for_each_extension<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto);
+    fn extension_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>>;
+    fn for_each_nested_type<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::DescriptorProto);
+    fn nested_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>>;
+    fn for_each_enum_type<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::EnumDescriptorProto);
+    fn enum_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>>;
+    fn for_each_extension_range<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::descriptor_proto::ExtensionRange);
+    fn extension_range_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ExtensionRange>>;
+    fn for_each_oneof_decl<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::OneofDescriptorProto);
+    fn oneof_decl_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::OneofDescriptorProto>>;
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MessageOptions>;
+    fn for_each_reserved_range<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::descriptor_proto::ReservedRange);
+    fn reserved_range_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ReservedRange>>;
+    fn for_each_reserved_name<F>(&self, f: F)
+    where
+        F: FnMut(&str);
+    fn reserved_name_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+}
+impl DescriptorProtoTrait for DescriptorProto {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn for_each_field<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
+        for item in &self.field {
+            (f)(item);
+        }
+    }
+    fn field_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
+        ::std::boxed::Box::new(self.field.iter())
+    }
+    fn for_each_extension<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
+        for item in &self.extension {
+            (f)(item);
+        }
+    }
+    fn extension_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
+        ::std::boxed::Box::new(self.extension.iter())
+    }
+    fn for_each_nested_type<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::DescriptorProto) {
+        for item in &self.nested_type {
+            (f)(item);
+        }
+    }
+    fn nested_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>> {
+        ::std::boxed::Box::new(self.nested_type.iter())
+    }
+    fn for_each_enum_type<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::EnumDescriptorProto) {
+        for item in &self.enum_type {
+            (f)(item);
+        }
+    }
+    fn enum_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>> {
+        ::std::boxed::Box::new(self.enum_type.iter())
+    }
+    fn for_each_extension_range<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::descriptor_proto::ExtensionRange) {
+        for item in &self.extension_range {
+            (f)(item);
+        }
+    }
+    fn extension_range_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ExtensionRange>> {
+        ::std::boxed::Box::new(self.extension_range.iter())
+    }
+    fn for_each_oneof_decl<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::OneofDescriptorProto) {
+        for item in &self.oneof_decl {
+            (f)(item);
+        }
+    }
+    fn oneof_decl_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::OneofDescriptorProto>> {
+        ::std::boxed::Box::new(self.oneof_decl.iter())
+    }
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MessageOptions> {
+        self.options.as_ref()
+    }
+    fn for_each_reserved_range<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::descriptor_proto::ReservedRange) {
+        for item in &self.reserved_range {
+            (f)(item);
+        }
+    }
+    fn reserved_range_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ReservedRange>> {
+        ::std::boxed::Box::new(self.reserved_range.iter())
+    }
+    fn for_each_reserved_name<F>(&self, f: F)
+    where
+        F: FnMut(&str) {
+        for item in &self.reserved_name {
+            (f)(item);
+        }
+    }
+    fn reserved_name_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+        ::std::boxed::Box::new(self.reserved_name.iter().cloned())
+    }
+}
 pub mod descriptor_proto {
 #[derive(Debug, Clone)]
 pub struct ReservedRange {
@@ -3198,7 +4031,6 @@ pub struct ReservedRange {
 }
 impl ::std::default::Default for ReservedRange {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             start: ::std::default::Default::default(),
@@ -3296,6 +4128,18 @@ impl ::puroro::Serializable for ReservedRange {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait ReservedRangeTrait {
+    fn start(&self) -> i32;
+    fn end(&self) -> i32;
+}
+impl ReservedRangeTrait for ReservedRange {
+    fn start(&self) -> i32 {
+        &self.start
+    }
+    fn end(&self) -> i32 {
+        &self.end
+    }
+}
 #[derive(Debug, Clone)]
 pub struct ExtensionRange {
     pub start: i32,
@@ -3304,7 +4148,6 @@ pub struct ExtensionRange {
 }
 impl ::std::default::Default for ExtensionRange {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             start: ::std::default::Default::default(),
@@ -3411,6 +4254,22 @@ impl ::puroro::Serializable for ExtensionRange {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait ExtensionRangeTrait {
+    fn start(&self) -> i32;
+    fn end(&self) -> i32;
+    fn options(&self) -> ::std::option::Option<&super::super::super::google::protobuf::ExtensionRangeOptions>;
+}
+impl ExtensionRangeTrait for ExtensionRange {
+    fn start(&self) -> i32 {
+        &self.start
+    }
+    fn end(&self) -> i32 {
+        &self.end
+    }
+    fn options(&self) -> ::std::option::Option<&super::super::super::google::protobuf::ExtensionRangeOptions> {
+        self.options.as_ref()
+    }
+}
 } // mod descriptor_proto
 #[derive(Debug, Clone)]
 pub struct FileDescriptorProto {
@@ -3429,7 +4288,6 @@ pub struct FileDescriptorProto {
 }
 impl ::std::default::Default for FileDescriptorProto {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -3617,13 +4475,148 @@ impl ::puroro::Serializable for FileDescriptorProto {
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }
 }
+pub trait FileDescriptorProtoTrait {
+    fn name(&self) -> &str;
+    fn package(&self) -> &str;
+    fn for_each_dependency<F>(&self, f: F)
+    where
+        F: FnMut(&str);
+    fn dependency_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+    fn for_each_public_dependency<F>(&self, f: F)
+    where
+        F: FnMut(i32);
+    fn public_dependency_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
+    fn for_each_weak_dependency<F>(&self, f: F)
+    where
+        F: FnMut(i32);
+    fn weak_dependency_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
+    fn for_each_message_type<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::DescriptorProto);
+    fn message_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>>;
+    fn for_each_enum_type<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::EnumDescriptorProto);
+    fn enum_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>>;
+    fn for_each_service<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::ServiceDescriptorProto);
+    fn service_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::ServiceDescriptorProto>>;
+    fn for_each_extension<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto);
+    fn extension_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>>;
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FileOptions>;
+    fn source_code_info(&self) -> ::std::option::Option<&super::super::google::protobuf::SourceCodeInfo>;
+    fn syntax(&self) -> &str;
+}
+impl FileDescriptorProtoTrait for FileDescriptorProto {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn package(&self) -> &str {
+        &self.package
+    }
+    fn for_each_dependency<F>(&self, f: F)
+    where
+        F: FnMut(&str) {
+        for item in &self.dependency {
+            (f)(item);
+        }
+    }
+    fn dependency_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+        ::std::boxed::Box::new(self.dependency.iter().cloned())
+    }
+    fn for_each_public_dependency<F>(&self, f: F)
+    where
+        F: FnMut(i32) {
+        for item in &self.public_dependency {
+            (f)(item);
+        }
+    }
+    fn public_dependency_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+        ::std::boxed::Box::new(self.public_dependency.iter().cloned())
+    }
+    fn for_each_weak_dependency<F>(&self, f: F)
+    where
+        F: FnMut(i32) {
+        for item in &self.weak_dependency {
+            (f)(item);
+        }
+    }
+    fn weak_dependency_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+        ::std::boxed::Box::new(self.weak_dependency.iter().cloned())
+    }
+    fn for_each_message_type<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::DescriptorProto) {
+        for item in &self.message_type {
+            (f)(item);
+        }
+    }
+    fn message_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>> {
+        ::std::boxed::Box::new(self.message_type.iter())
+    }
+    fn for_each_enum_type<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::EnumDescriptorProto) {
+        for item in &self.enum_type {
+            (f)(item);
+        }
+    }
+    fn enum_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>> {
+        ::std::boxed::Box::new(self.enum_type.iter())
+    }
+    fn for_each_service<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::ServiceDescriptorProto) {
+        for item in &self.service {
+            (f)(item);
+        }
+    }
+    fn service_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::ServiceDescriptorProto>> {
+        ::std::boxed::Box::new(self.service.iter())
+    }
+    fn for_each_extension<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
+        for item in &self.extension {
+            (f)(item);
+        }
+    }
+    fn extension_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
+        ::std::boxed::Box::new(self.extension.iter())
+    }
+    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FileOptions> {
+        self.options.as_ref()
+    }
+    fn source_code_info(&self) -> ::std::option::Option<&super::super::google::protobuf::SourceCodeInfo> {
+        self.source_code_info.as_ref()
+    }
+    fn syntax(&self) -> &str {
+        &self.syntax
+    }
+}
 #[derive(Debug, Clone)]
 pub struct FileDescriptorSet {
     pub file: ::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto>,
 }
 impl ::std::default::Default for FileDescriptorSet {
     fn default() -> Self {
-        #[allow(unused)]
         use ::std::convert::TryInto;
         Self {
             file: ::std::default::Default::default(),
@@ -3694,6 +4687,26 @@ impl ::puroro::Serializable for FileDescriptorSet {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
+    }
+}
+pub trait FileDescriptorSetTrait {
+    fn for_each_file<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::FileDescriptorProto);
+    fn file_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FileDescriptorProto>>;
+}
+impl FileDescriptorSetTrait for FileDescriptorSet {
+    fn for_each_file<F>(&self, f: F)
+    where
+        F: FnMut(&super::super::google::protobuf::FileDescriptorProto) {
+        for item in &self.file {
+            (f)(item);
+        }
+    }
+    fn file_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FileDescriptorProto>> {
+        ::std::boxed::Box::new(self.file.iter())
     }
 }
 

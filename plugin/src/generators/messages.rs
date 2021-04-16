@@ -19,6 +19,7 @@ pub fn print_msg<'c, W: std::fmt::Write>(
         func(|output| print_msg_ser_serializable(output, msg)),
         func(|output| print_msg_puroro_serializable(output, msg)),
         func(|output| print_msg_trait(output, msg)),
+        func(|output| print_msg_trait_impl(output, msg)),
     )
         .write_into(output)
 }
@@ -410,7 +411,117 @@ pub fn print_msg_trait<'c, W: std::fmt::Write>(
 pub trait {name}Trait {{\n",
             name = msg.native_bare_type_name()
         ),
-        indent(iter(msg.fields().map(|field| Ok("")))),
+        indent(iter(msg.fields().map(|field| -> Result<_> {
+            Ok(match (field.label()?, field.type_()?) {
+                (FieldLabel::Optional, FieldType::Message(_)) => {
+                    // getter function for optional message field, wrapped by Option.
+                    format!(
+                        "fn {name}(&self) -> ::std::option::Option<{reftype}>;\n",
+                        name = field.native_name(),
+                        reftype = field.native_scalar_ref_type_name()?,
+                    )
+                }
+                (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
+                    // normal getter function.
+                    format!(
+                        "fn {name}(&self) -> {reftype};\n",
+                        name = field.native_name(),
+                        reftype = field.native_scalar_ref_type_name()?,
+                    )
+                }
+                (FieldLabel::Repeated, _) => {
+                    // for_each_***:
+                    // A generic getter function for repeated field.
+                    // Because of some current Rust language limitations we can only
+                    // use an internal iterator, which reminds me Rust @ 2013.
+                    // https://doc.rust-lang.org/0.6/std/list.html#function-iter
+                    // ***_boxed_iter:
+                    // Another restricted getter function. Returns an iterator,
+                    // but it is wrapped by `Box`.
+                    format!(
+                        "\
+fn for_each_{name}<F>(&self, f: F)
+where
+    F: FnMut({reftype});
+fn {name}_boxed_iter(&self)
+    -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>;\n",
+                        name = field.native_name(),
+                        reftype = field.native_scalar_ref_type_name()?,
+                    )
+                }
+            })
+        }))),
+        "}}\n",
+    )
+        .write_into(output)
+}
+pub fn print_msg_trait_impl<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    msg: &'c MessageDescriptor<'c>,
+) -> Result<()> {
+    (
+        format!(
+            "impl {name}Trait for {name} {{\n",
+            name = msg.native_bare_type_name()
+        ),
+        indent(iter(msg.fields().map(|field| -> Result<_> {
+            Ok(match (field.label()?, field.type_()?) {
+                (FieldLabel::Optional, FieldType::Message(_)) => {
+                    format!(
+                        "\
+fn {name}(&self) -> ::std::option::Option<{reftype}> {{
+    self.{name}.as_ref()
+}}\n",
+                        name = field.native_name(),
+                        reftype = field.native_scalar_ref_type_name()?,
+                    )
+                }
+                (FieldLabel::Required, FieldType::Message(_)) => {
+                    format!(
+                        "\
+fn {name}(&self) -> {reftype} {{
+    self.{name}.as_ref()
+}}\n",
+                        name = field.native_name(),
+                        reftype = field.native_scalar_ref_type_name()?,
+                    )
+                }
+                (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
+                    // normal getter function.
+                    format!(
+                        "\
+fn {name}(&self) -> {reftype} {{
+    &self.{name}
+}}\n",
+                        name = field.native_name(),
+                        reftype = field.native_scalar_ref_type_name()?,
+                    )
+                }
+                (FieldLabel::Repeated, _) => {
+                    let maybe_cloned = match field.type_()? {
+                        FieldType::Message(_) | FieldType::String | FieldType::Bytes => "",
+                        _ => ".cloned()",
+                    };
+                    format!(
+                        "\
+fn for_each_{name}<F>(&self, f: F)
+where
+    F: FnMut({reftype}) {{
+    for item in &self.{name} {{
+        (f)(item);
+    }}
+}}
+fn {name}_boxed_iter(&self)
+    -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>> {{
+    ::std::boxed::Box::new(self.{name}.iter(){maybe_cloned})
+}}\n",
+                        name = field.native_name(),
+                        reftype = field.native_scalar_ref_type_name()?,
+                        maybe_cloned = maybe_cloned,
+                    )
+                }
+            })
+        }))),
         "}}\n",
     )
         .write_into(output)

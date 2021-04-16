@@ -19,6 +19,7 @@ pub struct FieldDescriptor<'c> {
     lazy_type: OnceCell<FieldType<'c>>,
     lazy_fq_type_name: OnceCell<String>,
     lazy_native_owned_type_name: OnceCell<String>,
+    lazy_native_scalar_ref_type_name: OnceCell<String>,
     lazy_native_name: OnceCell<String>,
 }
 impl<'c> FieldDescriptor<'c> {
@@ -34,6 +35,7 @@ impl<'c> FieldDescriptor<'c> {
             lazy_type: Default::default(),
             lazy_fq_type_name: Default::default(),
             lazy_native_owned_type_name: Default::default(),
+            lazy_native_scalar_ref_type_name: Default::default(),
             lazy_native_name: Default::default(),
         }
     }
@@ -171,7 +173,7 @@ impl<'c> FieldDescriptor<'c> {
         })?)
     }
 
-    // Returns type name, which will suit for struct definition.
+    // Returns type name, which will suit for the struct's field definition.
     pub fn native_owned_type_name(&'c self) -> Result<&str> {
         Ok(self
             .lazy_native_owned_type_name
@@ -215,6 +217,24 @@ impl<'c> FieldDescriptor<'c> {
                             name = native_fully_qualified_type
                         )
                     }
+                })
+            })?)
+    }
+
+    // Returns a ref type name for required field.
+    pub fn native_scalar_ref_type_name(&'c self) -> Result<&str> {
+        Ok(self
+            .lazy_native_scalar_ref_type_name
+            .get_or_try_init(|| -> Result<_> {
+                Ok(match self.wire_type()? {
+                    WireType::Variant(field_type) => field_type
+                        .native_type(self.parent.path_to_root_mod())
+                        .into_owned(),
+                    WireType::LengthDelimited(field_type) => field_type
+                        .native_ref_type(self.parent.path_to_root_mod())
+                        .into_owned(),
+                    WireType::Bits32(field_type) => field_type.native_type().to_string(),
+                    WireType::Bits64(field_type) => field_type.native_type().to_string(),
                 })
             })?)
     }
@@ -298,6 +318,17 @@ impl<'c> LengthDelimitedFieldType<'c> {
             LengthDelimitedFieldType::Message(m) => {
                 m.native_fully_qualified_type_name(path_to_root_mod).into()
             }
+        }
+    }
+    pub fn native_ref_type(&self, path_to_root_mod: &str) -> Cow<'static, str> {
+        match self {
+            LengthDelimitedFieldType::String => "&str".into(),
+            LengthDelimitedFieldType::Bytes => "&[u8]".into(),
+            LengthDelimitedFieldType::Message(m) => format!(
+                "&{name}",
+                name = m.native_fully_qualified_type_name(path_to_root_mod)
+            )
+            .into(),
         }
     }
 }
