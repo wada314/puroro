@@ -118,15 +118,15 @@ pub trait CodeGeneratorResponseTrait {
 }
 impl CodeGeneratorResponseTrait for CodeGeneratorResponse {
     fn error(&self) -> &str {
-        &self.error
+        self.error.as_ref()
     }
     fn supported_features(&self) -> u64 {
-        &self.supported_features
+        self.supported_features.clone()
     }
-    fn for_each_file<F>(&self, f: F)
+    fn for_each_file<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::super::google::protobuf::compiler::code_generator_response::File) {
-        for item in &self.file {
+        for item in (self.file).iter() {
             (f)(item);
         }
     }
@@ -272,16 +272,16 @@ pub trait FileTrait {
 }
 impl FileTrait for File {
     fn name(&self) -> &str {
-        &self.name
+        self.name.as_ref()
     }
     fn insertion_point(&self) -> &str {
-        &self.insertion_point
+        self.insertion_point.as_ref()
     }
     fn content(&self) -> &str {
-        &self.content
+        self.content.as_ref()
     }
     fn generated_code_info(&self) -> ::std::option::Option<&super::super::super::super::google::protobuf::GeneratedCodeInfo> {
-        self.generated_code_info.as_ref()
+        self.generated_code_info.as_deref()
     }
 }
 } // mod code_generator_response
@@ -408,24 +408,24 @@ pub trait CodeGeneratorRequestTrait {
     fn compiler_version(&self) -> ::std::option::Option<&super::super::super::google::protobuf::compiler::Version>;
 }
 impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
-    fn for_each_file_to_generate<F>(&self, f: F)
+    fn for_each_file_to_generate<F>(&self, mut f: F)
     where
         F: FnMut(&str) {
-        for item in &self.file_to_generate {
+        for item in (self.file_to_generate).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
     fn file_to_generate_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
-        ::std::boxed::Box::new(self.file_to_generate.iter().cloned())
+        ::std::boxed::Box::new(self.file_to_generate.iter().map(|v| v.as_ref()))
     }
     fn parameter(&self) -> &str {
-        &self.parameter
+        self.parameter.as_ref()
     }
-    fn for_each_proto_file<F>(&self, f: F)
+    fn for_each_proto_file<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::super::google::protobuf::FileDescriptorProto) {
-        for item in &self.proto_file {
+        for item in (self.proto_file).iter() {
             (f)(item);
         }
     }
@@ -434,7 +434,7 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
         ::std::boxed::Box::new(self.proto_file.iter())
     }
     fn compiler_version(&self) -> ::std::option::Option<&super::super::super::google::protobuf::compiler::Version> {
-        self.compiler_version.as_ref()
+        self.compiler_version.as_deref()
     }
 }
 #[derive(Debug, Clone)]
@@ -577,15 +577,15 @@ pub trait VersionTrait {
 }
 impl VersionTrait for Version {
     fn major(&self) -> i32 {
-        &self.major
+        self.major.clone()
     }
     fn minor(&self) -> i32 {
-        &self.minor
+        self.minor.clone()
     }
     fn patch(&self) -> i32 {
-        &self.patch
+        self.patch.clone()
     }
     fn suffix(&self) -> &str {
-        &self.suffix
+        self.suffix.as_ref()
     }
 }

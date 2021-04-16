@@ -470,7 +470,7 @@ pub fn print_msg_trait_impl<'c, W: std::fmt::Write>(
                     format!(
                         "\
 fn {name}(&self) -> ::std::option::Option<{reftype}> {{
-    self.{name}.as_ref()
+    self.{name}.as_deref()
 }}\n",
                         name = field.native_name(),
                         reftype = field.native_scalar_ref_type_name()?,
@@ -488,36 +488,43 @@ fn {name}(&self) -> {reftype} {{
                 }
                 (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
                     // normal getter function.
+                    let process_ref = match field.type_()? {
+                        FieldType::String | FieldType::Bytes => ".as_ref()",
+                        FieldType::Message(_) => "", // This should be catched by the arm above
+                        _ => ".clone()",
+                    };
                     format!(
                         "\
 fn {name}(&self) -> {reftype} {{
-    &self.{name}
+    self.{name}{process_ref}
 }}\n",
                         name = field.native_name(),
                         reftype = field.native_scalar_ref_type_name()?,
+                        process_ref = process_ref,
                     )
                 }
                 (FieldLabel::Repeated, _) => {
-                    let maybe_cloned = match field.type_()? {
-                        FieldType::Message(_) | FieldType::String | FieldType::Bytes => "",
+                    let process_iter = match field.type_()? {
+                        FieldType::Message(_) => "",
+                        FieldType::String | FieldType::Bytes => ".map(|v| v.as_ref())",
                         _ => ".cloned()",
                     };
                     format!(
                         "\
-fn for_each_{name}<F>(&self, f: F)
+fn for_each_{name}<F>(&self, mut f: F)
 where
     F: FnMut({reftype}) {{
-    for item in &self.{name} {{
+    for item in (self.{name}).iter(){process_iter} {{
         (f)(item);
     }}
 }}
 fn {name}_boxed_iter(&self)
     -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>> {{
-    ::std::boxed::Box::new(self.{name}.iter(){maybe_cloned})
+    ::std::boxed::Box::new(self.{name}.iter(){process_iter})
 }}\n",
                         name = field.native_name(),
                         reftype = field.native_scalar_ref_type_name()?,
-                        maybe_cloned = maybe_cloned,
+                        process_iter = process_iter,
                     )
                 }
             })

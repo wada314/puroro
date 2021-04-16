@@ -87,10 +87,10 @@ pub trait GeneratedCodeInfoTrait {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::generated_code_info::Annotation>>;
 }
 impl GeneratedCodeInfoTrait for GeneratedCodeInfo {
-    fn for_each_annotation<F>(&self, f: F)
+    fn for_each_annotation<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::generated_code_info::Annotation) {
-        for item in &self.annotation {
+        for item in (self.annotation).iter() {
             (f)(item);
         }
     }
@@ -243,10 +243,10 @@ pub trait AnnotationTrait {
     fn end(&self) -> i32;
 }
 impl AnnotationTrait for Annotation {
-    fn for_each_path<F>(&self, f: F)
+    fn for_each_path<F>(&self, mut f: F)
     where
         F: FnMut(i32) {
-        for item in &self.path {
+        for item in (self.path).iter().cloned() {
             (f)(item);
         }
     }
@@ -255,13 +255,13 @@ impl AnnotationTrait for Annotation {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     fn source_file(&self) -> &str {
-        &self.source_file
+        self.source_file.as_ref()
     }
     fn begin(&self) -> i32 {
-        &self.begin
+        self.begin.clone()
     }
     fn end(&self) -> i32 {
-        &self.end
+        self.end.clone()
     }
 }
 } // mod generated_code_info
@@ -351,10 +351,10 @@ pub trait SourceCodeInfoTrait {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::source_code_info::Location>>;
 }
 impl SourceCodeInfoTrait for SourceCodeInfo {
-    fn for_each_location<F>(&self, f: F)
+    fn for_each_location<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::source_code_info::Location) {
-        for item in &self.location {
+        for item in (self.location).iter() {
             (f)(item);
         }
     }
@@ -518,10 +518,10 @@ pub trait LocationTrait {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
 }
 impl LocationTrait for Location {
-    fn for_each_path<F>(&self, f: F)
+    fn for_each_path<F>(&self, mut f: F)
     where
         F: FnMut(i32) {
-        for item in &self.path {
+        for item in (self.path).iter().cloned() {
             (f)(item);
         }
     }
@@ -529,10 +529,10 @@ impl LocationTrait for Location {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
-    fn for_each_span<F>(&self, f: F)
+    fn for_each_span<F>(&self, mut f: F)
     where
         F: FnMut(i32) {
-        for item in &self.span {
+        for item in (self.span).iter().cloned() {
             (f)(item);
         }
     }
@@ -541,21 +541,21 @@ impl LocationTrait for Location {
         ::std::boxed::Box::new(self.span.iter().cloned())
     }
     fn leading_comments(&self) -> &str {
-        &self.leading_comments
+        self.leading_comments.as_ref()
     }
     fn trailing_comments(&self) -> &str {
-        &self.trailing_comments
+        self.trailing_comments.as_ref()
     }
-    fn for_each_leading_detached_comments<F>(&self, f: F)
+    fn for_each_leading_detached_comments<F>(&self, mut f: F)
     where
         F: FnMut(&str) {
-        for item in &self.leading_detached_comments {
+        for item in (self.leading_detached_comments).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
     fn leading_detached_comments_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
-        ::std::boxed::Box::new(self.leading_detached_comments.iter().cloned())
+        ::std::boxed::Box::new(self.leading_detached_comments.iter().map(|v| v.as_ref()))
     }
 }
 } // mod source_code_info
@@ -729,10 +729,10 @@ pub trait UninterpretedOptionTrait {
     fn aggregate_value(&self) -> &str;
 }
 impl UninterpretedOptionTrait for UninterpretedOption {
-    fn for_each_name<F>(&self, f: F)
+    fn for_each_name<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::uninterpreted_option::NamePart) {
-        for item in &self.name {
+        for item in (self.name).iter() {
             (f)(item);
         }
     }
@@ -741,22 +741,22 @@ impl UninterpretedOptionTrait for UninterpretedOption {
         ::std::boxed::Box::new(self.name.iter())
     }
     fn identifier_value(&self) -> &str {
-        &self.identifier_value
+        self.identifier_value.as_ref()
     }
     fn positive_int_value(&self) -> u64 {
-        &self.positive_int_value
+        self.positive_int_value.clone()
     }
     fn negative_int_value(&self) -> i64 {
-        &self.negative_int_value
+        self.negative_int_value.clone()
     }
     fn double_value(&self) -> f64 {
-        &self.double_value
+        self.double_value.clone()
     }
     fn string_value(&self) -> &[u8] {
-        &self.string_value
+        self.string_value.as_ref()
     }
     fn aggregate_value(&self) -> &str {
-        &self.aggregate_value
+        self.aggregate_value.as_ref()
     }
 }
 pub mod uninterpreted_option {
@@ -862,10 +862,10 @@ pub trait NamePartTrait {
 }
 impl NamePartTrait for NamePart {
     fn name_part(&self) -> &str {
-        &self.name_part
+        self.name_part.as_ref()
     }
     fn is_extension(&self) -> bool {
-        &self.is_extension
+        self.is_extension.clone()
     }
 }
 } // mod uninterpreted_option
@@ -994,15 +994,15 @@ pub trait MethodOptionsTrait {
 }
 impl MethodOptionsTrait for MethodOptions {
     fn deprecated(&self) -> bool {
-        &self.deprecated
+        self.deprecated.clone()
     }
     fn idempotency_level(&self) -> ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32> {
-        &self.idempotency_level
+        self.idempotency_level.clone()
     }
-    fn for_each_uninterpreted_option<F>(&self, f: F)
+    fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
-        for item in &self.uninterpreted_option {
+        for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
@@ -1141,12 +1141,12 @@ pub trait ServiceOptionsTrait {
 }
 impl ServiceOptionsTrait for ServiceOptions {
     fn deprecated(&self) -> bool {
-        &self.deprecated
+        self.deprecated.clone()
     }
-    fn for_each_uninterpreted_option<F>(&self, f: F)
+    fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
-        for item in &self.uninterpreted_option {
+        for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
@@ -1261,12 +1261,12 @@ pub trait EnumValueOptionsTrait {
 }
 impl EnumValueOptionsTrait for EnumValueOptions {
     fn deprecated(&self) -> bool {
-        &self.deprecated
+        self.deprecated.clone()
     }
-    fn for_each_uninterpreted_option<F>(&self, f: F)
+    fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
-        for item in &self.uninterpreted_option {
+        for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
@@ -1400,15 +1400,15 @@ pub trait EnumOptionsTrait {
 }
 impl EnumOptionsTrait for EnumOptions {
     fn allow_alias(&self) -> bool {
-        &self.allow_alias
+        self.allow_alias.clone()
     }
     fn deprecated(&self) -> bool {
-        &self.deprecated
+        self.deprecated.clone()
     }
-    fn for_each_uninterpreted_option<F>(&self, f: F)
+    fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
-        for item in &self.uninterpreted_option {
+        for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
@@ -1503,10 +1503,10 @@ pub trait OneofOptionsTrait {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
 }
 impl OneofOptionsTrait for OneofOptions {
-    fn for_each_uninterpreted_option<F>(&self, f: F)
+    fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
-        for item in &self.uninterpreted_option {
+        for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
@@ -1716,27 +1716,27 @@ pub trait FieldOptionsTrait {
 }
 impl FieldOptionsTrait for FieldOptions {
     fn ctype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32> {
-        &self.ctype
+        self.ctype.clone()
     }
     fn packed(&self) -> bool {
-        &self.packed
+        self.packed.clone()
     }
     fn jstype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32> {
-        &self.jstype
+        self.jstype.clone()
     }
     fn lazy(&self) -> bool {
-        &self.lazy
+        self.lazy.clone()
     }
     fn deprecated(&self) -> bool {
-        &self.deprecated
+        self.deprecated.clone()
     }
     fn weak(&self) -> bool {
-        &self.weak
+        self.weak.clone()
     }
-    fn for_each_uninterpreted_option<F>(&self, f: F)
+    fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
-        for item in &self.uninterpreted_option {
+        for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
@@ -1954,21 +1954,21 @@ pub trait MessageOptionsTrait {
 }
 impl MessageOptionsTrait for MessageOptions {
     fn message_set_wire_format(&self) -> bool {
-        &self.message_set_wire_format
+        self.message_set_wire_format.clone()
     }
     fn no_standard_descriptor_accessor(&self) -> bool {
-        &self.no_standard_descriptor_accessor
+        self.no_standard_descriptor_accessor.clone()
     }
     fn deprecated(&self) -> bool {
-        &self.deprecated
+        self.deprecated.clone()
     }
     fn map_entry(&self) -> bool {
-        &self.map_entry
+        self.map_entry.clone()
     }
-    fn for_each_uninterpreted_option<F>(&self, f: F)
+    fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
-        for item in &self.uninterpreted_option {
+        for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
@@ -2364,69 +2364,69 @@ pub trait FileOptionsTrait {
 }
 impl FileOptionsTrait for FileOptions {
     fn java_package(&self) -> &str {
-        &self.java_package
+        self.java_package.as_ref()
     }
     fn java_outer_classname(&self) -> &str {
-        &self.java_outer_classname
+        self.java_outer_classname.as_ref()
     }
     fn java_multiple_files(&self) -> bool {
-        &self.java_multiple_files
+        self.java_multiple_files.clone()
     }
     fn java_generate_equals_and_hash(&self) -> bool {
-        &self.java_generate_equals_and_hash
+        self.java_generate_equals_and_hash.clone()
     }
     fn java_string_check_utf8(&self) -> bool {
-        &self.java_string_check_utf8
+        self.java_string_check_utf8.clone()
     }
     fn optimize_for(&self) -> ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32> {
-        &self.optimize_for
+        self.optimize_for.clone()
     }
     fn go_package(&self) -> &str {
-        &self.go_package
+        self.go_package.as_ref()
     }
     fn cc_generic_services(&self) -> bool {
-        &self.cc_generic_services
+        self.cc_generic_services.clone()
     }
     fn java_generic_services(&self) -> bool {
-        &self.java_generic_services
+        self.java_generic_services.clone()
     }
     fn py_generic_services(&self) -> bool {
-        &self.py_generic_services
+        self.py_generic_services.clone()
     }
     fn php_generic_services(&self) -> bool {
-        &self.php_generic_services
+        self.php_generic_services.clone()
     }
     fn deprecated(&self) -> bool {
-        &self.deprecated
+        self.deprecated.clone()
     }
     fn cc_enable_arenas(&self) -> bool {
-        &self.cc_enable_arenas
+        self.cc_enable_arenas.clone()
     }
     fn objc_class_prefix(&self) -> &str {
-        &self.objc_class_prefix
+        self.objc_class_prefix.as_ref()
     }
     fn csharp_namespace(&self) -> &str {
-        &self.csharp_namespace
+        self.csharp_namespace.as_ref()
     }
     fn swift_prefix(&self) -> &str {
-        &self.swift_prefix
+        self.swift_prefix.as_ref()
     }
     fn php_class_prefix(&self) -> &str {
-        &self.php_class_prefix
+        self.php_class_prefix.as_ref()
     }
     fn php_namespace(&self) -> &str {
-        &self.php_namespace
+        self.php_namespace.as_ref()
     }
     fn php_metadata_namespace(&self) -> &str {
-        &self.php_metadata_namespace
+        self.php_metadata_namespace.as_ref()
     }
     fn ruby_package(&self) -> &str {
-        &self.ruby_package
+        self.ruby_package.as_ref()
     }
-    fn for_each_uninterpreted_option<F>(&self, f: F)
+    fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
-        for item in &self.uninterpreted_option {
+        for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
@@ -2613,22 +2613,22 @@ pub trait MethodDescriptorProtoTrait {
 }
 impl MethodDescriptorProtoTrait for MethodDescriptorProto {
     fn name(&self) -> &str {
-        &self.name
+        self.name.as_ref()
     }
     fn input_type(&self) -> &str {
-        &self.input_type
+        self.input_type.as_ref()
     }
     fn output_type(&self) -> &str {
-        &self.output_type
+        self.output_type.as_ref()
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MethodOptions> {
-        self.options.as_ref()
+        self.options.as_deref()
     }
     fn client_streaming(&self) -> bool {
-        &self.client_streaming
+        self.client_streaming.clone()
     }
     fn server_streaming(&self) -> bool {
-        &self.server_streaming
+        self.server_streaming.clone()
     }
 }
 #[derive(Debug, Clone)]
@@ -2740,12 +2740,12 @@ pub trait ServiceDescriptorProtoTrait {
 }
 impl ServiceDescriptorProtoTrait for ServiceDescriptorProto {
     fn name(&self) -> &str {
-        &self.name
+        self.name.as_ref()
     }
-    fn for_each_method<F>(&self, f: F)
+    fn for_each_method<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::MethodDescriptorProto) {
-        for item in &self.method {
+        for item in (self.method).iter() {
             (f)(item);
         }
     }
@@ -2754,7 +2754,7 @@ impl ServiceDescriptorProtoTrait for ServiceDescriptorProto {
         ::std::boxed::Box::new(self.method.iter())
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::ServiceOptions> {
-        self.options.as_ref()
+        self.options.as_deref()
     }
 }
 #[derive(Debug, Clone)]
@@ -2870,13 +2870,13 @@ pub trait EnumValueDescriptorProtoTrait {
 }
 impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProto {
     fn name(&self) -> &str {
-        &self.name
+        self.name.as_ref()
     }
     fn number(&self) -> i32 {
-        &self.number
+        self.number.clone()
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumValueOptions> {
-        self.options.as_ref()
+        self.options.as_deref()
     }
 }
 #[derive(Debug, Clone)]
@@ -3018,12 +3018,12 @@ pub trait EnumDescriptorProtoTrait {
 }
 impl EnumDescriptorProtoTrait for EnumDescriptorProto {
     fn name(&self) -> &str {
-        &self.name
+        self.name.as_ref()
     }
-    fn for_each_value<F>(&self, f: F)
+    fn for_each_value<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::EnumValueDescriptorProto) {
-        for item in &self.value {
+        for item in (self.value).iter() {
             (f)(item);
         }
     }
@@ -3032,12 +3032,12 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProto {
         ::std::boxed::Box::new(self.value.iter())
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumOptions> {
-        self.options.as_ref()
+        self.options.as_deref()
     }
-    fn for_each_reserved_range<F>(&self, f: F)
+    fn for_each_reserved_range<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange) {
-        for item in &self.reserved_range {
+        for item in (self.reserved_range).iter() {
             (f)(item);
         }
     }
@@ -3045,16 +3045,16 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>> {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
-    fn for_each_reserved_name<F>(&self, f: F)
+    fn for_each_reserved_name<F>(&self, mut f: F)
     where
         F: FnMut(&str) {
-        for item in &self.reserved_name {
+        for item in (self.reserved_name).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
     fn reserved_name_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
-        ::std::boxed::Box::new(self.reserved_name.iter().cloned())
+        ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
 }
 pub mod enum_descriptor_proto {
@@ -3168,10 +3168,10 @@ pub trait EnumReservedRangeTrait {
 }
 impl EnumReservedRangeTrait for EnumReservedRange {
     fn start(&self) -> i32 {
-        &self.start
+        self.start.clone()
     }
     fn end(&self) -> i32 {
-        &self.end
+        self.end.clone()
     }
 }
 } // mod enum_descriptor_proto
@@ -3269,10 +3269,10 @@ pub trait OneofDescriptorProtoTrait {
 }
 impl OneofDescriptorProtoTrait for OneofDescriptorProto {
     fn name(&self) -> &str {
-        &self.name
+        self.name.as_ref()
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::OneofOptions> {
-        self.options.as_ref()
+        self.options.as_deref()
     }
 }
 #[derive(Debug, Clone)]
@@ -3508,37 +3508,37 @@ pub trait FieldDescriptorProtoTrait {
 }
 impl FieldDescriptorProtoTrait for FieldDescriptorProto {
     fn name(&self) -> &str {
-        &self.name
+        self.name.as_ref()
     }
     fn number(&self) -> i32 {
-        &self.number
+        self.number.clone()
     }
     fn label(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32> {
-        &self.label
+        self.label.clone()
     }
     fn type_(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32> {
-        &self.type_
+        self.type_.clone()
     }
     fn type_name(&self) -> &str {
-        &self.type_name
+        self.type_name.as_ref()
     }
     fn extendee(&self) -> &str {
-        &self.extendee
+        self.extendee.as_ref()
     }
     fn default_value(&self) -> &str {
-        &self.default_value
+        self.default_value.as_ref()
     }
     fn oneof_index(&self) -> i32 {
-        &self.oneof_index
+        self.oneof_index.clone()
     }
     fn json_name(&self) -> &str {
-        &self.json_name
+        self.json_name.as_ref()
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FieldOptions> {
-        self.options.as_ref()
+        self.options.as_deref()
     }
     fn proto3_optional(&self) -> bool {
-        &self.proto3_optional
+        self.proto3_optional.clone()
     }
 }
 pub mod field_descriptor_proto {
@@ -3703,10 +3703,10 @@ pub trait ExtensionRangeOptionsTrait {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
 }
 impl ExtensionRangeOptionsTrait for ExtensionRangeOptions {
-    fn for_each_uninterpreted_option<F>(&self, f: F)
+    fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
-        for item in &self.uninterpreted_option {
+        for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
@@ -3929,12 +3929,12 @@ pub trait DescriptorProtoTrait {
 }
 impl DescriptorProtoTrait for DescriptorProto {
     fn name(&self) -> &str {
-        &self.name
+        self.name.as_ref()
     }
-    fn for_each_field<F>(&self, f: F)
+    fn for_each_field<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
-        for item in &self.field {
+        for item in (self.field).iter() {
             (f)(item);
         }
     }
@@ -3942,10 +3942,10 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
         ::std::boxed::Box::new(self.field.iter())
     }
-    fn for_each_extension<F>(&self, f: F)
+    fn for_each_extension<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
-        for item in &self.extension {
+        for item in (self.extension).iter() {
             (f)(item);
         }
     }
@@ -3953,10 +3953,10 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
         ::std::boxed::Box::new(self.extension.iter())
     }
-    fn for_each_nested_type<F>(&self, f: F)
+    fn for_each_nested_type<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::DescriptorProto) {
-        for item in &self.nested_type {
+        for item in (self.nested_type).iter() {
             (f)(item);
         }
     }
@@ -3964,10 +3964,10 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>> {
         ::std::boxed::Box::new(self.nested_type.iter())
     }
-    fn for_each_enum_type<F>(&self, f: F)
+    fn for_each_enum_type<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::EnumDescriptorProto) {
-        for item in &self.enum_type {
+        for item in (self.enum_type).iter() {
             (f)(item);
         }
     }
@@ -3975,10 +3975,10 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>> {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
-    fn for_each_extension_range<F>(&self, f: F)
+    fn for_each_extension_range<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::descriptor_proto::ExtensionRange) {
-        for item in &self.extension_range {
+        for item in (self.extension_range).iter() {
             (f)(item);
         }
     }
@@ -3986,10 +3986,10 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ExtensionRange>> {
         ::std::boxed::Box::new(self.extension_range.iter())
     }
-    fn for_each_oneof_decl<F>(&self, f: F)
+    fn for_each_oneof_decl<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::OneofDescriptorProto) {
-        for item in &self.oneof_decl {
+        for item in (self.oneof_decl).iter() {
             (f)(item);
         }
     }
@@ -3998,12 +3998,12 @@ impl DescriptorProtoTrait for DescriptorProto {
         ::std::boxed::Box::new(self.oneof_decl.iter())
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MessageOptions> {
-        self.options.as_ref()
+        self.options.as_deref()
     }
-    fn for_each_reserved_range<F>(&self, f: F)
+    fn for_each_reserved_range<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::descriptor_proto::ReservedRange) {
-        for item in &self.reserved_range {
+        for item in (self.reserved_range).iter() {
             (f)(item);
         }
     }
@@ -4011,16 +4011,16 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ReservedRange>> {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
-    fn for_each_reserved_name<F>(&self, f: F)
+    fn for_each_reserved_name<F>(&self, mut f: F)
     where
         F: FnMut(&str) {
-        for item in &self.reserved_name {
+        for item in (self.reserved_name).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
     fn reserved_name_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
-        ::std::boxed::Box::new(self.reserved_name.iter().cloned())
+        ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
 }
 pub mod descriptor_proto {
@@ -4134,10 +4134,10 @@ pub trait ReservedRangeTrait {
 }
 impl ReservedRangeTrait for ReservedRange {
     fn start(&self) -> i32 {
-        &self.start
+        self.start.clone()
     }
     fn end(&self) -> i32 {
-        &self.end
+        self.end.clone()
     }
 }
 #[derive(Debug, Clone)]
@@ -4261,13 +4261,13 @@ pub trait ExtensionRangeTrait {
 }
 impl ExtensionRangeTrait for ExtensionRange {
     fn start(&self) -> i32 {
-        &self.start
+        self.start.clone()
     }
     fn end(&self) -> i32 {
-        &self.end
+        self.end.clone()
     }
     fn options(&self) -> ::std::option::Option<&super::super::super::google::protobuf::ExtensionRangeOptions> {
-        self.options.as_ref()
+        self.options.as_deref()
     }
 }
 } // mod descriptor_proto
@@ -4519,26 +4519,26 @@ pub trait FileDescriptorProtoTrait {
 }
 impl FileDescriptorProtoTrait for FileDescriptorProto {
     fn name(&self) -> &str {
-        &self.name
+        self.name.as_ref()
     }
     fn package(&self) -> &str {
-        &self.package
+        self.package.as_ref()
     }
-    fn for_each_dependency<F>(&self, f: F)
+    fn for_each_dependency<F>(&self, mut f: F)
     where
         F: FnMut(&str) {
-        for item in &self.dependency {
+        for item in (self.dependency).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
     fn dependency_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
-        ::std::boxed::Box::new(self.dependency.iter().cloned())
+        ::std::boxed::Box::new(self.dependency.iter().map(|v| v.as_ref()))
     }
-    fn for_each_public_dependency<F>(&self, f: F)
+    fn for_each_public_dependency<F>(&self, mut f: F)
     where
         F: FnMut(i32) {
-        for item in &self.public_dependency {
+        for item in (self.public_dependency).iter().cloned() {
             (f)(item);
         }
     }
@@ -4546,10 +4546,10 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.public_dependency.iter().cloned())
     }
-    fn for_each_weak_dependency<F>(&self, f: F)
+    fn for_each_weak_dependency<F>(&self, mut f: F)
     where
         F: FnMut(i32) {
-        for item in &self.weak_dependency {
+        for item in (self.weak_dependency).iter().cloned() {
             (f)(item);
         }
     }
@@ -4557,10 +4557,10 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.weak_dependency.iter().cloned())
     }
-    fn for_each_message_type<F>(&self, f: F)
+    fn for_each_message_type<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::DescriptorProto) {
-        for item in &self.message_type {
+        for item in (self.message_type).iter() {
             (f)(item);
         }
     }
@@ -4568,10 +4568,10 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>> {
         ::std::boxed::Box::new(self.message_type.iter())
     }
-    fn for_each_enum_type<F>(&self, f: F)
+    fn for_each_enum_type<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::EnumDescriptorProto) {
-        for item in &self.enum_type {
+        for item in (self.enum_type).iter() {
             (f)(item);
         }
     }
@@ -4579,10 +4579,10 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>> {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
-    fn for_each_service<F>(&self, f: F)
+    fn for_each_service<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::ServiceDescriptorProto) {
-        for item in &self.service {
+        for item in (self.service).iter() {
             (f)(item);
         }
     }
@@ -4590,10 +4590,10 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::ServiceDescriptorProto>> {
         ::std::boxed::Box::new(self.service.iter())
     }
-    fn for_each_extension<F>(&self, f: F)
+    fn for_each_extension<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
-        for item in &self.extension {
+        for item in (self.extension).iter() {
             (f)(item);
         }
     }
@@ -4602,13 +4602,13 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         ::std::boxed::Box::new(self.extension.iter())
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FileOptions> {
-        self.options.as_ref()
+        self.options.as_deref()
     }
     fn source_code_info(&self) -> ::std::option::Option<&super::super::google::protobuf::SourceCodeInfo> {
-        self.source_code_info.as_ref()
+        self.source_code_info.as_deref()
     }
     fn syntax(&self) -> &str {
-        &self.syntax
+        self.syntax.as_ref()
     }
 }
 #[derive(Debug, Clone)]
@@ -4697,10 +4697,10 @@ pub trait FileDescriptorSetTrait {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FileDescriptorProto>>;
 }
 impl FileDescriptorSetTrait for FileDescriptorSet {
-    fn for_each_file<F>(&self, f: F)
+    fn for_each_file<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::FileDescriptorProto) {
-        for item in &self.file {
+        for item in (self.file).iter() {
             (f)(item);
         }
     }
