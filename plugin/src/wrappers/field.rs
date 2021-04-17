@@ -148,6 +148,14 @@ impl<'c> FieldDescriptor<'c> {
         })
     }
 
+    pub fn package(&'c self) -> &str {
+        self.parent.package()
+    }
+
+    pub fn path_to_root_mod(&'c self) -> &str {
+        self.parent.path_to_root_mod()
+    }
+
     pub fn fully_qualified_type_name(&'c self) -> Result<&str> {
         Ok(self.lazy_fq_type_name.get_or_try_init(|| -> Result<_> {
             // If the type name starts with ".", then just return the remaining part.
@@ -274,7 +282,7 @@ impl Debug for FieldDescriptor<'_> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub enum WireType<'c> {
     Variant(VariantFieldType<'c>),
     LengthDelimited(LengthDelimitedFieldType<'c>),
@@ -283,7 +291,7 @@ pub enum WireType<'c> {
     //Group(GroupFieldType),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub enum VariantFieldType<'c> {
     Int32,
     Int64,
@@ -327,7 +335,7 @@ impl<'c> VariantFieldType<'c> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub enum LengthDelimitedFieldType<'c> {
     String,
     Bytes,
@@ -367,7 +375,7 @@ impl<'c> LengthDelimitedFieldType<'c> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub enum Bits32FieldType {
     Float,
     Fixed32,
@@ -383,7 +391,7 @@ impl Bits32FieldType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub enum Bits64FieldType {
     Double,
     Fixed64,
@@ -414,6 +422,34 @@ pub enum FieldType<'c> {
     SFixed32,
     SFixed64,
     Bool,
+    Group,
+    String,
+    Bytes,
+    Enum(&'c super::EnumDescriptor<'c>),
+    Message(&'c super::MessageDescriptor<'c>),
+}
+impl<'c> FieldType<'c> {
+    pub fn native_trivial_type_name(
+        &self,
+    ) -> std::result::Result<&'static str, NonTrivialFieldType<'c>> {
+        match self {
+            FieldType::Double => Ok("f64"),
+            FieldType::Float => Ok("f32"),
+            FieldType::Int32 | FieldType::SInt32 | FieldType::SFixed32 => Ok("i32"),
+            FieldType::Int64 | FieldType::SInt64 | FieldType::SFixed64 => Ok("i64"),
+            FieldType::UInt32 | FieldType::Fixed32 => Ok("u32"),
+            FieldType::UInt64 | FieldType::Fixed64 => Ok("u64"),
+            FieldType::Bool => Ok("bool"),
+            FieldType::Group => Err(NonTrivialFieldType::Group),
+            FieldType::String => Err(NonTrivialFieldType::String),
+            FieldType::Bytes => Err(NonTrivialFieldType::Bytes),
+            FieldType::Enum(e) => Err(NonTrivialFieldType::Enum(e)),
+            FieldType::Message(m) => Err(NonTrivialFieldType::Message(m)),
+        }
+    }
+}
+
+pub enum NonTrivialFieldType<'c> {
     Group,
     String,
     Bytes,

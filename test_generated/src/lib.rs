@@ -1,3 +1,5 @@
+#![feature(allocator_api)]
+
 mod proto;
 #[cfg(test)]
 mod tests {

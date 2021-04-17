@@ -5,28 +5,22 @@ use super::writer::{func, indent, indent_n, iter, Fragment, IntoFragment};
 use crate::context::Context;
 use crate::utils::Indentor;
 use crate::wrappers::{
-    FieldDescriptor, FieldLabel, FieldType, LengthDelimitedFieldType, MessageDescriptor, WireType,
+    Bits32FieldType, Bits64FieldType, FieldDescriptor, FieldLabel, FieldType,
+    LengthDelimitedFieldType, MessageDescriptor, NonTrivialFieldType, VariantFieldType, WireType,
 };
-use crate::Result;
+use crate::{ErrorKind, Result};
 
 const DESER_MOD: &'static str = "::puroro::deserializer::stream";
-trait NativeFieldGenerator {
-    fn native_field_type_for<'c>(field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>>;
-}
-struct NativeFieldGeneratorForNormalStruct<'c> {
-    context: &'c Context<'c>,
-    native_field_type_cache: HashMap<(FieldType<'c>, FieldLabel), String>,
-}
 
-pub fn print_msg<'c, W: std::fmt::Write>(
+pub fn print_msg<'c, W: std::fmt::Write, G: NativeFieldGenerator<'c>>(
     output: &mut Indentor<W>,
     #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
+    field_gen: &G,
 ) -> Result<()> {
     (
-        func(|output| print_msg_struct(output, context, msg)),
+        func(|output| print_msg_struct(output, context, msg, field_gen)),
         func(|output| print_msg_default(output, context, msg)),
-        func(|output| print_msg_impl(output, context, msg)),
         (
             func(|output| print_msg_deser_deserializable(output, context, msg)),
             func(|output| print_msg_puroro_deserializable(output, context, msg)),
@@ -39,25 +33,24 @@ pub fn print_msg<'c, W: std::fmt::Write>(
         .write_into(output)
 }
 
-pub fn print_msg_struct<'c, W: std::fmt::Write>(
+pub fn print_msg_struct<'c, W: std::fmt::Write, G: NativeFieldGenerator<'c>>(
     output: &mut Indentor<W>,
     #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
+    field_gen: &G,
 ) -> Result<()> {
     (
         format!(
             "\
 #[derive(Debug, Clone)]
-pub struct {name}<
-    #[cfg(feature = \"puroro-nightly\")] A: ::std::alloc::Allocator = ::std::alloc::Global
-> {{\n",
+pub struct {name} {{\n",
             name = msg.native_bare_type_name(),
         ),
         indent(iter(msg.fields().map(|field| {
             Ok(format!(
                 "pub {name}: {type_},\n",
                 name = field.native_name(),
-                type_ = field.native_owned_type_name()?,
+                type_ = field_gen.field_type_for(field)?,
             ))
         }))),
         "\
@@ -101,52 +94,6 @@ impl ::std::default::Default for {name} {{
         }}
     }}
 }}\n",
-    )
-        .write_into(output)
-}
-
-pub fn print_msg_impl<'c, W: std::fmt::Write>(
-    output: &mut Indentor<W>,
-    #[allow(unused_variables)] context: &'c Context<'c>,
-    msg: &'c MessageDescriptor<'c>,
-) -> Result<()> {
-    (
-        format!(
-            "\
-impl<A: ::std::alloc::Allocator> {name}<A> {{
-    pub fn new_in(alloc: A) -> Self {{
-        use ::std::convert::TryInto;
-        Self {{\n",
-            name = msg.native_bare_type_name(),
-        ),
-        indent_n(
-            3,
-            iter(
-                msg.fields()
-                    .map(|field| match (field.label()?, field.type_()?) {
-                        (FieldLabel::Optional, FieldType::Enum(_))
-                        | (FieldLabel::Required, FieldType::Enum(_)) => Ok(format!(
-                            "{name}: 0i32.try_into(),\n",
-                            name = field.native_name()
-                        )),
-                        (FieldLabel::Optional, FieldType::Bytes)
-                        | (FieldLabel::Required, FieldType::Bytes)
-                        | (FieldLabel::Repeated, _) => Ok(format!(
-                            "{name}: ::std::vec::Vec::new_in(alloc),\n",
-                            name = field.native_name()
-                        )),
-                        (_, _) => Ok(format!(
-                            "{name}: ::std::default::Default::default(),\n",
-                            name = field.native_name(),
-                        )),
-                    }),
-            ),
-        ),
-        "        \
-        }}
-    }}
-}}
-    ",
     )
         .write_into(output)
 }
@@ -657,4 +604,61 @@ fn {name}_boxed_iter_mut(&mut self)
         "}}\n",
     )
         .write_into(output)
+}
+
+pub trait NativeFieldGenerator<'c> {
+    fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>>;
+}
+pub struct NativeFieldGeneratorForNormalStruct<'c> {
+    context: &'c Context<'c>,
+}
+
+impl<'c> NativeFieldGenerator<'c> for NativeFieldGeneratorForNormalStruct<'c> {
+    fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+        let scalar_type: Cow<'static, str> = match field.type_()?.native_trivial_type_name() {
+            Ok(name) => name.into(),
+            Err(nontrivial_type) => match nontrivial_type {
+                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                NonTrivialFieldType::String => "String".into(),
+                NonTrivialFieldType::Bytes => "Vec<u8>".into(),
+                NonTrivialFieldType::Enum(e) => format!(
+                    "::std::result::Result<{type_}, i32>",
+                    type_ = e.native_fully_qualified_type_name(field.path_to_root_mod())
+                )
+                .into(),
+                NonTrivialFieldType::Message(m) => m
+                    .native_fully_qualified_type_name(field.path_to_root_mod())
+                    .into(),
+            },
+        };
+        Ok(match field.label()? {
+            FieldLabel::Optional => {
+                if matches!(field.type_()?, FieldType::Message(_)) {
+                    format!(
+                        "::std::option::Option<::std::boxed::Box<{type_}>>",
+                        type_ = scalar_type,
+                    )
+                    .into()
+                } else {
+                    scalar_type.into()
+                }
+            }
+            FieldLabel::Required => {
+                if matches!(field.type_()?, FieldType::Message(_)) {
+                    format!("::std::boxed::Box<{type_}>", type_ = scalar_type,).into()
+                } else {
+                    scalar_type.into()
+                }
+            }
+            FieldLabel::Repeated => {
+                format!("::std::vec::Vec<{type_}>", type_ = scalar_type,).into()
+            }
+        })
+    }
+}
+
+impl<'c> NativeFieldGeneratorForNormalStruct<'c> {
+    pub fn new(context: &'c Context<'c>) -> Self {
+        Self { context }
+    }
 }
