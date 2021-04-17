@@ -1,5 +1,6 @@
 mod enums;
-mod messages;
+mod message_impls;
+mod message_traits;
 mod writer;
 
 use itertools::Itertools;
@@ -11,7 +12,8 @@ use crate::Result;
 use std::collections::HashMap;
 use std::fmt::Write;
 
-use self::messages::{MessageCodeGenerator, NativeCodeFragmentGeneratorForNormalStruct};
+use self::message_impls::{MessageCodeGenerator, NativeCodeFragmentGeneratorForNormalStruct};
+use self::message_traits::MessageTraitCodeGenerator;
 
 struct Visitor<'c> {
     output: Indentor<String>,
@@ -20,9 +22,12 @@ struct Visitor<'c> {
 }
 impl<'c> DescriptorVisitor<'c> for Visitor<'c> {
     fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
-        let gen = MessageCodeGenerator::new(self.context, msg, &self.normal_field_gen);
+        let impl_gen = MessageCodeGenerator::new(self.context, msg, &self.normal_field_gen);
+        let trait_gen = MessageTraitCodeGenerator::new(self.context, msg);
 
-        gen.print_msg(&mut self.output)
+        impl_gen.print_msg(&mut self.output)?;
+        trait_gen.print_msg_traits(&mut self.output)?;
+        Ok(())
     }
 
     fn handle_enum(&mut self, enume: &'c EnumDescriptor<'c>) -> Result<()> {

@@ -1,12 +1,11 @@
 use std::borrow::Cow;
-use std::collections::HashMap;
 
 use super::writer::{func, indent, indent_n, iter, Fragment, IntoFragment};
 use crate::context::Context;
 use crate::utils::Indentor;
 use crate::wrappers::{
-    Bits32FieldType, Bits64FieldType, FieldDescriptor, FieldLabel, FieldType,
-    LengthDelimitedFieldType, MessageDescriptor, NonTrivialFieldType, VariantFieldType, WireType,
+    FieldDescriptor, FieldLabel, FieldType, LengthDelimitedFieldType, MessageDescriptor,
+    NonTrivialFieldType, WireType,
 };
 use crate::{ErrorKind, Result};
 
@@ -43,7 +42,6 @@ where
                 func(|output| self.print_msg_ser_serializable(output)),
                 func(|output| self.print_msg_puroro_serializable(output)),
             ),
-            func(|output| self.print_msg_trait(output)),
             func(|output| self.print_msg_trait_impl(output)),
         )
             .write_into(output)
@@ -53,9 +51,11 @@ where
         (
             format!(
                 "\
+{cfg}
 #[derive(Debug, Clone)]
 pub struct {name} {{\n",
-                name = self.msg.native_bare_type_name(),
+                name = self.field_gen.struct_name(self.msg)?,
+                cfg = self.field_gen.cfg_condition(),
             ),
             indent(iter(self.msg.fields().map(|field| {
                 Ok(format!(
@@ -74,11 +74,13 @@ pub struct {name} {{\n",
         (
             format!(
                 "\
+{cfg}
 impl ::std::default::Default for {name} {{
     fn default() -> Self {{
         use ::std::convert::TryInto;
         Self {{\n",
-                name = self.msg.native_bare_type_name(),
+                name = self.field_gen.struct_name(self.msg)?,
+                cfg = self.field_gen.cfg_condition(),
             ),
             indent_n(
                 3,
@@ -113,6 +115,7 @@ impl ::std::default::Default for {name} {{
         (
             format!(
                 "\
+{cfg}
 impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
     type Target = ();
     fn finish(self, output: &mut Indentor<W>) -> ::puroro::Result<Self::Target> {{
@@ -127,7 +130,8 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
         use ::puroro::helpers::MaybeRepeatedVariantField;
         match field {{\n",
                 d = DESER_MOD,
-                name = self.msg.native_bare_type_name(),
+                name = self.field_gen.struct_name(self.msg)?,
+                cfg = self.field_gen.cfg_condition(),
             ),
             indent_n(
                 3,
@@ -321,6 +325,7 @@ ldd.deserialize_as_message(msg)?;\n",
     ) -> Result<()> {
         (format!(
             "\
+{cfg}
 impl ::puroro::Deserializable for {name} {{
     fn from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {{
         use ::puroro::deserializer::stream::Deserializer;
@@ -330,7 +335,8 @@ impl ::puroro::Deserializable for {name} {{
         Ok(msg)
     }}
 }}\n",
-            name = self.msg.native_bare_type_name()
+            name = self.field_gen.struct_name(self.msg)?,
+            cfg = self.field_gen.cfg_condition(),
         ),)
             .write_into(output)
     }
@@ -342,12 +348,14 @@ impl ::puroro::Deserializable for {name} {{
         (
             format!(
                 "\
+{cfg}
 impl ::puroro::serializer::Serializable for {name} {{
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
         use ::puroro::helpers::MaybeRepeatedField;\n",
-                name = self.msg.native_bare_type_name()
+                name = self.field_gen.struct_name(self.msg)?,
+                cfg = self.field_gen.cfg_condition(),
             ),
             indent_n(
                 2,
@@ -416,74 +424,28 @@ for item in self.{name}.iter_for_ser() {{
     ) -> Result<()> {
         (format!(
             "\
+{cfg}
 impl ::puroro::Serializable for {name} {{
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {{
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
     }}
 }}\n",
-            name = self.msg.native_bare_type_name()
+            name = self.field_gen.struct_name(self.msg)?,
+            cfg = self.field_gen.cfg_condition(),
         ),)
-            .write_into(output)
-    }
-
-    pub fn print_msg_trait<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
-        (
-            format!(
-                "\
-pub trait {name}Trait {{\n",
-                name = self.msg.native_bare_type_name()
-            ),
-            indent(iter(self.msg.fields().map(|field| -> Result<_> {
-                Ok(match (field.label()?, field.type_()?) {
-                    (FieldLabel::Optional, FieldType::Message(_)) => {
-                        // getter function for optional message field, wrapped by Option.
-                        format!(
-                            "fn {name}(&self, output: &mut Indentor<W>) -> ::std::option::Option<{reftype}>;\n",
-                            name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name()?,
-                        )
-                    }
-                    (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
-                        // normal getter function.
-                        format!(
-                            "fn {name}(&self, output: &mut Indentor<W>) -> {reftype};\n",
-                            name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name()?,
-                        )
-                    }
-                    (FieldLabel::Repeated, _) => {
-                        // for_each_***:
-                        // A generic getter function for repeated field.
-                        // Because of some current Rust language limitations we can only
-                        // use an internal iterator, which reminds me Rust @ 2013.
-                        // https://doc.rust-lang.org/0.6/std/list.html#function-iter
-                        // ***_boxed_iter:
-                        // Another restricted getter function. Returns an iterator,
-                        // but it is wrapped by `Box`.
-                        format!(
-                            "\
-fn for_each_{name}<F>(&self, f: F)
-where
-    F: FnMut({reftype});
-fn {name}_boxed_iter(&self, output: &mut Indentor<W>)
-    -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>;\n",
-                            name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name()?,
-                        )
-                    }
-                })
-            }))),
-            "}}\n",
-        )
             .write_into(output)
     }
 
     fn print_msg_trait_impl<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
             format!(
-                "impl {name}Trait for {name} {{\n",
-                name = self.msg.native_bare_type_name()
+                "\
+{cfg}
+impl {name}Trait for {struct_name} {{\n",
+                struct_name = self.field_gen.struct_name(self.msg)?,
+                name = self.msg.native_bare_type_name(),
+                cfg = self.field_gen.cfg_condition(),
             ),
             indent(iter(self.msg.fields().map(|field| -> Result<_> {
                 Ok(match (field.label()?, field.type_()?) {
@@ -553,54 +515,6 @@ fn {name}_boxed_iter(&self, output: &mut Indentor<W>)
             "}}\n",
         )
             .write_into(output)
-    }
-
-    pub fn print_msg_mutable_trait<W: std::fmt::Write>(
-        &self,
-        output: &mut Indentor<W>,
-    ) -> Result<()> {
-        (
-        format!(
-            "\
-pub trait {name}MutTrait {{\n",
-            name = self.msg.native_bare_type_name()
-        ),
-        indent(iter(self.msg.fields().map(|field| -> Result<_> {
-            Ok(match (field.label()?, field.type_()?) {
-                (FieldLabel::Optional, FieldType::Message(_)) => {
-                    // getter function for optional message field, wrapped by Option.
-                    format!(
-                        "fn {name}_mut(&self, output: &mut Indentor<W>) -> ::std::option::Option<{reftype}>;\n",
-                        name = field.native_name(),
-                        reftype = field.native_scalar_mut_ref_type_name()?,
-                    )
-                }
-                (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
-                    // normal getter function.
-                    format!(
-                        "fn {name}_mut(&self, output: &mut Indentor<W>) -> {reftype};\n",
-                        name = field.native_name(),
-                        reftype = field.native_scalar_mut_ref_type_name()?,
-                    )
-                }
-                (FieldLabel::Repeated, _) => {
-                    format!(
-                        "\
-fn for_each_{name}_mut<F>(&self, f: F)
-where
-    F: FnMut({reftype});
-fn {name}_boxed_iter_mut(&self, output: &mut Indentor<W>)
-    -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>;
-// We need more! Maybe just expose &mut Vec<T> ? \n",
-                        name = field.native_name(),
-                        reftype = field.native_scalar_mut_ref_type_name()?,
-                    )
-                }
-            })
-        }))),
-        "}}\n",
-    )
-        .write_into(output)
     }
 }
 
