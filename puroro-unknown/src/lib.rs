@@ -1,9 +1,10 @@
 use ::itertools::Either;
 use ::puroro::deserializer::stream::{
-    DelayedLengthDelimitedDeserializer, Deserializer, Field, LengthDelimitedDeserializer,
+    DelayedLengthDelimitedDeserializer, Deserializer, LengthDelimitedDeserializer,
     MessageDeserializeEventHandler,
 };
 use ::puroro::tags;
+use ::puroro::types::Field;
 use ::puroro::variant;
 use ::puroro::variant::Variant;
 use ::puroro::{Deserializable, Mergeable, Message, PuroroError, RepeatedFieldHandler};

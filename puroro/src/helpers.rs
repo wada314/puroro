@@ -1,7 +1,13 @@
+use crate::types::Field;
+use std::collections::HashMap;
 use std::convert::TryFrom;
 
 /// An utility for protobuf implementation code.
 /// Used for simplifying the serialization / deserialization code.
+/// The lifetime parameter `'a` is used for the generated iterator's lifetime.
+/// This is a workaround for the lack of Generic Associated Types (GAT)
+/// in the current (1.52.0) Rust.
+/// Essentially `'a` should be equal to the lifetime of the `&self`.
 pub trait MaybeRepeatedField<'a> {
     type Item: 'a;
     type Iter: Iterator<Item = &'a Self::Item>;
@@ -308,5 +314,53 @@ where
         /*self.get_or_insert_with(|| ::bumpalo::boxed::Box::new(Default::default()))
         .as_mut()*/
         unimplemented!()
+    }
+}
+
+pub trait InternalData {
+    #[cfg(feature = "puroro-bumpalo")]
+    fn bumpalo(&self) -> &bumpalo::Bump {
+        panic!("The Bumpalo field should only be owned by a Bumpalo struct!")
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct InternalDataForNormalStruct {
+    unknown_fields: Option<HashMap<usize, Field<Vec<u8>>>>,
+}
+impl InternalDataForNormalStruct {
+    pub fn new() -> Self {
+        Self {
+            unknown_fields: None,
+        }
+    }
+}
+impl InternalData for InternalDataForNormalStruct {}
+
+#[cfg(feature = "puroro-bumpalo")]
+#[derive(Debug, Clone)]
+pub struct InternalDataForBumpaloStruct<'b> {
+    // No hashmap implementation in bumpalo...
+    unknown_fields: Option<
+        ::bumpalo::collections::Vec<'b, (usize, Field<::bumpalo::collections::Vec<'b, u8>>)>,
+    >,
+    bump: &'b ::bumpalo::Bump,
+}
+
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b> InternalDataForBumpaloStruct<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump) -> Self {
+        Self {
+            unknown_fields: None,
+            bump,
+        }
+    }
+}
+impl<'b> InternalData for InternalDataForBumpaloStruct<'b> {
+    /// Note that the returned bumpalo lifetime is not `'b' but `'_`.
+    /// This is because I don't want to introduce the lifetime parameter
+    /// `'b` into the trait's definition.
+    fn bumpalo(&self) -> &bumpalo::Bump {
+        self.bump
     }
 }

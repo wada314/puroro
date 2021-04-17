@@ -66,7 +66,10 @@ pub struct {name}{gp} {{\n",
                         type_ = self.field_gen.field_type_for(field)?,
                     ))
                 })),
-                self.field_gen.struct_extra_field(),
+                format!(
+                    "puroro_internal: {type_},\n",
+                    type_ = self.field_gen.internal_data_type()
+                ),
             )),
             "\
 }}\n",
@@ -113,7 +116,10 @@ impl{gp} {name}{gpb} {{
                                 )),
                             }),
                     ),
-                    self.field_gen.struct_extra_field_init(),
+                    format!(
+                        "puroro_internal: {value},\n",
+                        value = self.field_gen.internal_field_init_value()
+                    ),
                 ),
             ),
             "        \
@@ -156,7 +162,7 @@ impl{gp} {d}::MessageDeserializeEventHandler for &'a mut {name}{gpb} {{
     }}
     fn met_field<T: {d}::LengthDelimitedDeserializer>(
         &mut self,
-        field: {d}::Field<T>,
+        field: ::puroro::types::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {{
         use ::puroro::helpers::MaybeRepeatedField;
@@ -191,10 +197,7 @@ impl{gp} {d}::MessageDeserializeEventHandler for &'a mut {name}{gpb} {{
         output: &mut Indentor<W>,
     ) -> Result<()> {
         (
-            format!(
-                "{d}::Field::Variant(variant) => match field_number {{\n",
-                d = DESER_MOD
-            ),
+            "::puroro::types::Field::Variant(variant) => match field_number {{\n",
             indent((
                 iter(self.msg.fields().map(|field| -> Result<Fragment<_>> {
                     Ok(match field.wire_type()? {
@@ -228,10 +231,7 @@ impl{gp} {d}::MessageDeserializeEventHandler for &'a mut {name}{gpb} {{
         output: &mut Indentor<W>,
     ) -> Result<()> {
         (
-            format!(
-                "{d}::Field::LengthDelimited(ldd) => match field_number {{\n",
-                d = DESER_MOD
-            ),
+            "::puroro::types::Field::LengthDelimited(ldd) => match field_number {{\n",
             indent((
                 iter(self.msg.fields().map(|field| -> Result<Fragment<_>> {
                     Ok((
@@ -289,9 +289,8 @@ ldd.deserialize_as_message(msg)?;\n",
     ) -> Result<()> {
         (
             format!(
-                "{d}::Field::Bits{bits}(bytes) => match field_number {{\n",
+                "::puroro::types::Field::Bits{bits}(bytes) => match field_number {{\n",
                 bits = bits,
-                d = DESER_MOD
             ),
             indent((
                 iter(
@@ -568,9 +567,9 @@ pub trait MessageImplFragmentGenerator<'c> {
     fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str>;
     fn new_method_params(&self) -> &'static str;
     fn new_method_call_params(&self) -> &'static str;
-    fn struct_extra_field(&self) -> &'static str;
-    fn struct_extra_field_init(&self) -> &'static str;
     fn box_type(&self) -> &'static str;
+    fn internal_data_type(&self) -> &'static str;
+    fn internal_field_init_value(&self) -> &'static str;
 }
 pub struct MessageImplFragmentGeneratorForNormalStruct<'c> {
     context: &'c Context<'c>,
@@ -630,7 +629,6 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForNor
             }
         })
     }
-
     fn struct_generic_params(&self, extra_args: &'static str) -> Cow<'static, str> {
         if extra_args.is_empty() {
             "".into()
@@ -638,7 +636,6 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForNor
             format!("<{args}>", args = extra_args).into()
         }
     }
-
     fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str> {
         if extra_args.is_empty() {
             "".into()
@@ -646,25 +643,20 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForNor
             format!("<{args}>", args = extra_args).into()
         }
     }
-
     fn new_method_params(&self) -> &'static str {
         ""
     }
-
     fn new_method_call_params(&self) -> &'static str {
         ""
     }
-
-    fn struct_extra_field(&self) -> &'static str {
-        ""
-    }
-
-    fn struct_extra_field_init(&self) -> &'static str {
-        ""
-    }
-
     fn box_type(&self) -> &'static str {
         "::std::boxed::Box"
+    }
+    fn internal_data_type(&self) -> &'static str {
+        "::puroro::helpers::InternalDataForNormalStruct"
+    }
+    fn internal_field_init_value(&self) -> &'static str {
+        "::puroro::helpers::InternalDataForNormalStruct::new()"
     }
 }
 
@@ -740,7 +732,6 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForBum
             format!("<'b, {args}>", args = extra_args).into()
         }
     }
-
     fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str> {
         if extra_args.is_empty() {
             "<'b>".into()
@@ -748,25 +739,20 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForBum
             format!("<'b, {args}>", args = extra_args).into()
         }
     }
-
     fn new_method_params(&self) -> &'static str {
         "bump: &'b ::bumpalo::Bump\n"
     }
-
     fn new_method_call_params(&self) -> &'static str {
-        "self.bump"
+        "self.puroro_internal.bumpalo()"
     }
-
-    fn struct_extra_field(&self) -> &'static str {
-        "bump: &'b ::bumpalo::Bump,\n"
-    }
-
-    fn struct_extra_field_init(&self) -> &'static str {
-        "bump,\n"
-    }
-
     fn box_type(&self) -> &'static str {
         "::bumpalo::boxed::Box"
+    }
+    fn internal_data_type(&self) -> &'static str {
+        "::puroro::helpers::InternalDataForBumpaloStruct<'b>"
+    }
+    fn internal_field_init_value(&self) -> &'static str {
+        "::puroro::helpers::InternalDataForBumpaloStruct::new(bump)"
     }
 }
 

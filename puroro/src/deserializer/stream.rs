@@ -2,7 +2,7 @@ mod delayed;
 mod impls;
 mod iters;
 
-use crate::types::*;
+use crate::types::{Field, WireType};
 use std::io::{Read, Result as IoResult};
 
 pub use crate::variant::Variant;
@@ -40,14 +40,6 @@ pub trait LengthDelimitedDeserializer: Sized + IntoIterator<Item = IoResult<u8>>
 
     // Delay the deserializing
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer>;
-}
-
-#[derive(Debug, Clone)]
-pub enum Field<T> {
-    Variant(Variant),
-    LengthDelimited(T),
-    Bits32([u8; 4]),
-    Bits64([u8; 8]),
 }
 
 pub trait MessageDeserializeEventHandler {
