@@ -37,6 +37,10 @@ impl<'c> Context<'c> {
             })
             .iter()
     }
+    pub fn use_allocator_api(&self) -> bool {
+        true
+    }
+
     pub fn fq_name_to_desc(&'c self, fq_name: &str) -> Result<Option<EnumOrMessageRef<'c>>> {
         let map = self
             .lazy_fq_name_to_desc_map

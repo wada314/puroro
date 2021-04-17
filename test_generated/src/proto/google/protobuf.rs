@@ -2,7 +2,9 @@
 #![allow(unused_imports)]
 
 #[derive(Debug, Clone)]
-pub struct GeneratedCodeInfo {
+pub struct GeneratedCodeInfo<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub annotation: ::std::vec::Vec<super::super::google::protobuf::generated_code_info::Annotation>,
 }
 impl ::std::default::Default for GeneratedCodeInfo {
@@ -13,7 +15,15 @@ impl ::std::default::Default for GeneratedCodeInfo {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut GeneratedCodeInfo {
+impl<A: ::std::alloc::Allocator> GeneratedCodeInfo<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            annotation: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut GeneratedCodeInfo {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -101,7 +111,9 @@ impl GeneratedCodeInfoTrait for GeneratedCodeInfo {
 }
 pub mod generated_code_info {
 #[derive(Debug, Clone)]
-pub struct Annotation {
+pub struct Annotation<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub path: ::std::vec::Vec<i32>,
     pub source_file: ::std::string::String,
     pub begin: i32,
@@ -118,7 +130,18 @@ impl ::std::default::Default for Annotation {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut Annotation {
+impl<A: ::std::alloc::Allocator> Annotation<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            path: ::std::vec::Vec::new_in(alloc),
+            source_file: ::std::default::Default::default(),
+            begin: ::std::default::Default::default(),
+            end: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut Annotation {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -266,7 +289,9 @@ impl AnnotationTrait for Annotation {
 }
 } // mod generated_code_info
 #[derive(Debug, Clone)]
-pub struct SourceCodeInfo {
+pub struct SourceCodeInfo<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub location: ::std::vec::Vec<super::super::google::protobuf::source_code_info::Location>,
 }
 impl ::std::default::Default for SourceCodeInfo {
@@ -277,7 +302,15 @@ impl ::std::default::Default for SourceCodeInfo {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut SourceCodeInfo {
+impl<A: ::std::alloc::Allocator> SourceCodeInfo<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            location: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut SourceCodeInfo {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -365,7 +398,9 @@ impl SourceCodeInfoTrait for SourceCodeInfo {
 }
 pub mod source_code_info {
 #[derive(Debug, Clone)]
-pub struct Location {
+pub struct Location<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub path: ::std::vec::Vec<i32>,
     pub span: ::std::vec::Vec<i32>,
     pub leading_comments: ::std::string::String,
@@ -384,7 +419,19 @@ impl ::std::default::Default for Location {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut Location {
+impl<A: ::std::alloc::Allocator> Location<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            path: ::std::vec::Vec::new_in(alloc),
+            span: ::std::vec::Vec::new_in(alloc),
+            leading_comments: ::std::default::Default::default(),
+            trailing_comments: ::std::default::Default::default(),
+            leading_detached_comments: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut Location {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -560,7 +607,9 @@ impl LocationTrait for Location {
 }
 } // mod source_code_info
 #[derive(Debug, Clone)]
-pub struct UninterpretedOption {
+pub struct UninterpretedOption<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub name: ::std::vec::Vec<super::super::google::protobuf::uninterpreted_option::NamePart>,
     pub identifier_value: ::std::string::String,
     pub positive_int_value: u64,
@@ -583,7 +632,21 @@ impl ::std::default::Default for UninterpretedOption {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut UninterpretedOption {
+impl<A: ::std::alloc::Allocator> UninterpretedOption<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::vec::Vec::new_in(alloc),
+            identifier_value: ::std::default::Default::default(),
+            positive_int_value: ::std::default::Default::default(),
+            negative_int_value: ::std::default::Default::default(),
+            double_value: ::std::default::Default::default(),
+            string_value: ::std::vec::Vec::new_in(alloc),
+            aggregate_value: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut UninterpretedOption {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -761,7 +824,9 @@ impl UninterpretedOptionTrait for UninterpretedOption {
 }
 pub mod uninterpreted_option {
 #[derive(Debug, Clone)]
-pub struct NamePart {
+pub struct NamePart<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub name_part: ::std::string::String,
     pub is_extension: bool,
 }
@@ -774,7 +839,16 @@ impl ::std::default::Default for NamePart {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut NamePart {
+impl<A: ::std::alloc::Allocator> NamePart<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name_part: ::std::default::Default::default(),
+            is_extension: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut NamePart {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -870,7 +944,9 @@ impl NamePartTrait for NamePart {
 }
 } // mod uninterpreted_option
 #[derive(Debug, Clone)]
-pub struct MethodOptions {
+pub struct MethodOptions<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub deprecated: bool,
     pub idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
@@ -885,7 +961,17 @@ impl ::std::default::Default for MethodOptions {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MethodOptions {
+impl<A: ::std::alloc::Allocator> MethodOptions<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            deprecated: ::std::default::Default::default(),
+            idempotency_level: 0i32.try_into(),
+            uninterpreted_option: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MethodOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1036,7 +1122,9 @@ impl ::std::convert::Into<i32> for IdempotencyLevel {
 }
 } // mod method_options
 #[derive(Debug, Clone)]
-pub struct ServiceOptions {
+pub struct ServiceOptions<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub deprecated: bool,
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
@@ -1049,7 +1137,16 @@ impl ::std::default::Default for ServiceOptions {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ServiceOptions {
+impl<A: ::std::alloc::Allocator> ServiceOptions<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            deprecated: ::std::default::Default::default(),
+            uninterpreted_option: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ServiceOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1156,7 +1253,9 @@ impl ServiceOptionsTrait for ServiceOptions {
     }
 }
 #[derive(Debug, Clone)]
-pub struct EnumValueOptions {
+pub struct EnumValueOptions<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub deprecated: bool,
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
@@ -1169,7 +1268,16 @@ impl ::std::default::Default for EnumValueOptions {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumValueOptions {
+impl<A: ::std::alloc::Allocator> EnumValueOptions<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            deprecated: ::std::default::Default::default(),
+            uninterpreted_option: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumValueOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1276,7 +1384,9 @@ impl EnumValueOptionsTrait for EnumValueOptions {
     }
 }
 #[derive(Debug, Clone)]
-pub struct EnumOptions {
+pub struct EnumOptions<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub allow_alias: bool,
     pub deprecated: bool,
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
@@ -1291,7 +1401,17 @@ impl ::std::default::Default for EnumOptions {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumOptions {
+impl<A: ::std::alloc::Allocator> EnumOptions<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            allow_alias: ::std::default::Default::default(),
+            deprecated: ::std::default::Default::default(),
+            uninterpreted_option: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1418,7 +1538,9 @@ impl EnumOptionsTrait for EnumOptions {
     }
 }
 #[derive(Debug, Clone)]
-pub struct OneofOptions {
+pub struct OneofOptions<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for OneofOptions {
@@ -1429,7 +1551,15 @@ impl ::std::default::Default for OneofOptions {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut OneofOptions {
+impl<A: ::std::alloc::Allocator> OneofOptions<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            uninterpreted_option: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut OneofOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1516,7 +1646,9 @@ impl OneofOptionsTrait for OneofOptions {
     }
 }
 #[derive(Debug, Clone)]
-pub struct FieldOptions {
+pub struct FieldOptions<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub ctype: ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>,
     pub packed: bool,
     pub jstype: ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32>,
@@ -1539,7 +1671,21 @@ impl ::std::default::Default for FieldOptions {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FieldOptions {
+impl<A: ::std::alloc::Allocator> FieldOptions<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            ctype: 0i32.try_into(),
+            packed: ::std::default::Default::default(),
+            jstype: 0i32.try_into(),
+            lazy: ::std::default::Default::default(),
+            deprecated: ::std::default::Default::default(),
+            weak: ::std::default::Default::default(),
+            uninterpreted_option: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FieldOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1792,7 +1938,9 @@ impl ::std::convert::Into<i32> for Ctype {
 }
 } // mod field_options
 #[derive(Debug, Clone)]
-pub struct MessageOptions {
+pub struct MessageOptions<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub message_set_wire_format: bool,
     pub no_standard_descriptor_accessor: bool,
     pub deprecated: bool,
@@ -1811,7 +1959,19 @@ impl ::std::default::Default for MessageOptions {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MessageOptions {
+impl<A: ::std::alloc::Allocator> MessageOptions<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            message_set_wire_format: ::std::default::Default::default(),
+            no_standard_descriptor_accessor: ::std::default::Default::default(),
+            deprecated: ::std::default::Default::default(),
+            map_entry: ::std::default::Default::default(),
+            uninterpreted_option: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MessageOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1978,7 +2138,9 @@ impl MessageOptionsTrait for MessageOptions {
     }
 }
 #[derive(Debug, Clone)]
-pub struct FileOptions {
+pub struct FileOptions<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub java_package: ::std::string::String,
     pub java_outer_classname: ::std::string::String,
     pub java_multiple_files: bool,
@@ -2029,7 +2191,35 @@ impl ::std::default::Default for FileOptions {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileOptions {
+impl<A: ::std::alloc::Allocator> FileOptions<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            java_package: ::std::default::Default::default(),
+            java_outer_classname: ::std::default::Default::default(),
+            java_multiple_files: ::std::default::Default::default(),
+            java_generate_equals_and_hash: ::std::default::Default::default(),
+            java_string_check_utf8: ::std::default::Default::default(),
+            optimize_for: 0i32.try_into(),
+            go_package: ::std::default::Default::default(),
+            cc_generic_services: ::std::default::Default::default(),
+            java_generic_services: ::std::default::Default::default(),
+            py_generic_services: ::std::default::Default::default(),
+            php_generic_services: ::std::default::Default::default(),
+            deprecated: ::std::default::Default::default(),
+            cc_enable_arenas: ::std::default::Default::default(),
+            objc_class_prefix: ::std::default::Default::default(),
+            csharp_namespace: ::std::default::Default::default(),
+            swift_prefix: ::std::default::Default::default(),
+            php_class_prefix: ::std::default::Default::default(),
+            php_namespace: ::std::default::Default::default(),
+            php_metadata_namespace: ::std::default::Default::default(),
+            ruby_package: ::std::default::Default::default(),
+            uninterpreted_option: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -2460,7 +2650,9 @@ impl ::std::convert::Into<i32> for OptimizeMode {
 }
 } // mod file_options
 #[derive(Debug, Clone)]
-pub struct MethodDescriptorProto {
+pub struct MethodDescriptorProto<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub name: ::std::string::String,
     pub input_type: ::std::string::String,
     pub output_type: ::std::string::String,
@@ -2481,7 +2673,20 @@ impl ::std::default::Default for MethodDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MethodDescriptorProto {
+impl<A: ::std::alloc::Allocator> MethodDescriptorProto<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            input_type: ::std::default::Default::default(),
+            output_type: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+            client_streaming: ::std::default::Default::default(),
+            server_streaming: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MethodDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -2632,7 +2837,9 @@ impl MethodDescriptorProtoTrait for MethodDescriptorProto {
     }
 }
 #[derive(Debug, Clone)]
-pub struct ServiceDescriptorProto {
+pub struct ServiceDescriptorProto<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub name: ::std::string::String,
     pub method: ::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto>,
     pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>>,
@@ -2647,7 +2854,17 @@ impl ::std::default::Default for ServiceDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ServiceDescriptorProto {
+impl<A: ::std::alloc::Allocator> ServiceDescriptorProto<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            method: ::std::vec::Vec::new_in(alloc),
+            options: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ServiceDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -2758,7 +2975,9 @@ impl ServiceDescriptorProtoTrait for ServiceDescriptorProto {
     }
 }
 #[derive(Debug, Clone)]
-pub struct EnumValueDescriptorProto {
+pub struct EnumValueDescriptorProto<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub name: ::std::string::String,
     pub number: i32,
     pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>>,
@@ -2773,7 +2992,17 @@ impl ::std::default::Default for EnumValueDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumValueDescriptorProto {
+impl<A: ::std::alloc::Allocator> EnumValueDescriptorProto<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            number: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumValueDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -2880,7 +3109,9 @@ impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProto {
     }
 }
 #[derive(Debug, Clone)]
-pub struct EnumDescriptorProto {
+pub struct EnumDescriptorProto<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub name: ::std::string::String,
     pub value: ::std::vec::Vec<super::super::google::protobuf::EnumValueDescriptorProto>,
     pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>>,
@@ -2899,7 +3130,19 @@ impl ::std::default::Default for EnumDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumDescriptorProto {
+impl<A: ::std::alloc::Allocator> EnumDescriptorProto<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            value: ::std::vec::Vec::new_in(alloc),
+            options: ::std::default::Default::default(),
+            reserved_range: ::std::vec::Vec::new_in(alloc),
+            reserved_name: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -3059,7 +3302,9 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProto {
 }
 pub mod enum_descriptor_proto {
 #[derive(Debug, Clone)]
-pub struct EnumReservedRange {
+pub struct EnumReservedRange<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub start: i32,
     pub end: i32,
 }
@@ -3072,7 +3317,16 @@ impl ::std::default::Default for EnumReservedRange {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumReservedRange {
+impl<A: ::std::alloc::Allocator> EnumReservedRange<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            start: ::std::default::Default::default(),
+            end: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumReservedRange {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -3176,7 +3430,9 @@ impl EnumReservedRangeTrait for EnumReservedRange {
 }
 } // mod enum_descriptor_proto
 #[derive(Debug, Clone)]
-pub struct OneofDescriptorProto {
+pub struct OneofDescriptorProto<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub name: ::std::string::String,
     pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>>,
 }
@@ -3189,7 +3445,16 @@ impl ::std::default::Default for OneofDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut OneofDescriptorProto {
+impl<A: ::std::alloc::Allocator> OneofDescriptorProto<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut OneofDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -3276,7 +3541,9 @@ impl OneofDescriptorProtoTrait for OneofDescriptorProto {
     }
 }
 #[derive(Debug, Clone)]
-pub struct FieldDescriptorProto {
+pub struct FieldDescriptorProto<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub name: ::std::string::String,
     pub number: i32,
     pub label: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>,
@@ -3307,7 +3574,25 @@ impl ::std::default::Default for FieldDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FieldDescriptorProto {
+impl<A: ::std::alloc::Allocator> FieldDescriptorProto<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            number: ::std::default::Default::default(),
+            label: 0i32.try_into(),
+            type_: 0i32.try_into(),
+            type_name: ::std::default::Default::default(),
+            extendee: ::std::default::Default::default(),
+            default_value: ::std::default::Default::default(),
+            oneof_index: ::std::default::Default::default(),
+            json_name: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+            proto3_optional: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FieldDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -3618,7 +3903,9 @@ impl ::std::convert::Into<i32> for Type {
 }
 } // mod field_descriptor_proto
 #[derive(Debug, Clone)]
-pub struct ExtensionRangeOptions {
+pub struct ExtensionRangeOptions<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
 }
 impl ::std::default::Default for ExtensionRangeOptions {
@@ -3629,7 +3916,15 @@ impl ::std::default::Default for ExtensionRangeOptions {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ExtensionRangeOptions {
+impl<A: ::std::alloc::Allocator> ExtensionRangeOptions<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            uninterpreted_option: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ExtensionRangeOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -3716,7 +4011,9 @@ impl ExtensionRangeOptionsTrait for ExtensionRangeOptions {
     }
 }
 #[derive(Debug, Clone)]
-pub struct DescriptorProto {
+pub struct DescriptorProto<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub name: ::std::string::String,
     pub field: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
     pub extension: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
@@ -3745,7 +4042,24 @@ impl ::std::default::Default for DescriptorProto {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut DescriptorProto {
+impl<A: ::std::alloc::Allocator> DescriptorProto<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            field: ::std::vec::Vec::new_in(alloc),
+            extension: ::std::vec::Vec::new_in(alloc),
+            nested_type: ::std::vec::Vec::new_in(alloc),
+            enum_type: ::std::vec::Vec::new_in(alloc),
+            extension_range: ::std::vec::Vec::new_in(alloc),
+            oneof_decl: ::std::vec::Vec::new_in(alloc),
+            options: ::std::default::Default::default(),
+            reserved_range: ::std::vec::Vec::new_in(alloc),
+            reserved_name: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut DescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -4025,7 +4339,9 @@ impl DescriptorProtoTrait for DescriptorProto {
 }
 pub mod descriptor_proto {
 #[derive(Debug, Clone)]
-pub struct ReservedRange {
+pub struct ReservedRange<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub start: i32,
     pub end: i32,
 }
@@ -4038,7 +4354,16 @@ impl ::std::default::Default for ReservedRange {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ReservedRange {
+impl<A: ::std::alloc::Allocator> ReservedRange<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            start: ::std::default::Default::default(),
+            end: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ReservedRange {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -4141,7 +4466,9 @@ impl ReservedRangeTrait for ReservedRange {
     }
 }
 #[derive(Debug, Clone)]
-pub struct ExtensionRange {
+pub struct ExtensionRange<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub start: i32,
     pub end: i32,
     pub options: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>>,
@@ -4156,7 +4483,17 @@ impl ::std::default::Default for ExtensionRange {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ExtensionRange {
+impl<A: ::std::alloc::Allocator> ExtensionRange<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            start: ::std::default::Default::default(),
+            end: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ExtensionRange {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -4272,7 +4609,9 @@ impl ExtensionRangeTrait for ExtensionRange {
 }
 } // mod descriptor_proto
 #[derive(Debug, Clone)]
-pub struct FileDescriptorProto {
+pub struct FileDescriptorProto<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub name: ::std::string::String,
     pub package: ::std::string::String,
     pub dependency: ::std::vec::Vec<::std::string::String>,
@@ -4305,7 +4644,26 @@ impl ::std::default::Default for FileDescriptorProto {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileDescriptorProto {
+impl<A: ::std::alloc::Allocator> FileDescriptorProto<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            package: ::std::default::Default::default(),
+            dependency: ::std::vec::Vec::new_in(alloc),
+            public_dependency: ::std::vec::Vec::new_in(alloc),
+            weak_dependency: ::std::vec::Vec::new_in(alloc),
+            message_type: ::std::vec::Vec::new_in(alloc),
+            enum_type: ::std::vec::Vec::new_in(alloc),
+            service: ::std::vec::Vec::new_in(alloc),
+            extension: ::std::vec::Vec::new_in(alloc),
+            options: ::std::default::Default::default(),
+            source_code_info: ::std::default::Default::default(),
+            syntax: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -4612,7 +4970,9 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
     }
 }
 #[derive(Debug, Clone)]
-pub struct FileDescriptorSet {
+pub struct FileDescriptorSet<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub file: ::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto>,
 }
 impl ::std::default::Default for FileDescriptorSet {
@@ -4623,7 +4983,15 @@ impl ::std::default::Default for FileDescriptorSet {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileDescriptorSet {
+impl<A: ::std::alloc::Allocator> FileDescriptorSet<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            file: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileDescriptorSet {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())

@@ -8,3 +8,6 @@ edition = "2018"
 
 [dependencies]
 puroro = { path = "../puroro" }
+
+[features]
+puroro-nightly = []

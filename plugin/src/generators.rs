@@ -4,19 +4,20 @@ mod writer;
 
 use itertools::Itertools;
 
-use super::Context;
+use crate::context::Context;
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case, Indentor};
 use crate::wrappers::{DescriptorVisitor, EnumDescriptor, MessageDescriptor};
 use crate::Result;
 use std::collections::HashMap;
 use std::fmt::Write;
 
-struct Visitor {
+struct Visitor<'c> {
     output: Indentor<String>,
+    context: &'c Context<'c>,
 }
-impl<'c> DescriptorVisitor<'c> for Visitor {
+impl<'c> DescriptorVisitor<'c> for Visitor<'c> {
     fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
-        messages::print_msg(&mut self.output, msg)
+        messages::print_msg(&mut self.output, self.context, msg)
     }
 
     fn handle_enum(&mut self, enume: &'c EnumDescriptor<'c>) -> Result<()> {
@@ -48,6 +49,7 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
         .to_string();
         let mut visitor = Visitor {
             output: Indentor::new(output),
+            context,
         };
         file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
         filenames_and_contents.insert(file_name, visitor.output.into_inner());

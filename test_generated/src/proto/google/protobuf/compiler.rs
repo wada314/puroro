@@ -1,8 +1,11 @@
 #![allow(unused_variables)]
 #![allow(unused_imports)]
+#![cfg_attr(feature = "puroro-nightly", feature(allocator_api))]
 
 #[derive(Debug, Clone)]
-pub struct CodeGeneratorResponse {
+pub struct CodeGeneratorResponse<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub error: ::std::string::String,
     pub supported_features: u64,
     pub file: ::std::vec::Vec<super::super::super::google::protobuf::compiler::code_generator_response::File>,
@@ -17,7 +20,17 @@ impl ::std::default::Default for CodeGeneratorResponse {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut CodeGeneratorResponse {
+impl<A: ::std::alloc::Allocator> CodeGeneratorResponse<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            error: ::std::default::Default::default(),
+            supported_features: ::std::default::Default::default(),
+            file: ::std::vec::Vec::new_in(alloc),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut CodeGeneratorResponse {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -157,7 +170,9 @@ impl ::std::convert::Into<i32> for Feature {
     }
 }
 #[derive(Debug, Clone)]
-pub struct File {
+pub struct File<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub name: ::std::string::String,
     pub insertion_point: ::std::string::String,
     pub content: ::std::string::String,
@@ -174,7 +189,18 @@ impl ::std::default::Default for File {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut File {
+impl<A: ::std::alloc::Allocator> File<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            insertion_point: ::std::default::Default::default(),
+            content: ::std::default::Default::default(),
+            generated_code_info: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut File {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -286,7 +312,9 @@ impl FileTrait for File {
 }
 } // mod code_generator_response
 #[derive(Debug, Clone)]
-pub struct CodeGeneratorRequest {
+pub struct CodeGeneratorRequest<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub file_to_generate: ::std::vec::Vec<::std::string::String>,
     pub parameter: ::std::string::String,
     pub proto_file: ::std::vec::Vec<super::super::super::google::protobuf::FileDescriptorProto>,
@@ -303,7 +331,18 @@ impl ::std::default::Default for CodeGeneratorRequest {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut CodeGeneratorRequest {
+impl<A: ::std::alloc::Allocator> CodeGeneratorRequest<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            file_to_generate: ::std::vec::Vec::new_in(alloc),
+            parameter: ::std::default::Default::default(),
+            proto_file: ::std::vec::Vec::new_in(alloc),
+            compiler_version: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut CodeGeneratorRequest {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -438,7 +477,9 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
     }
 }
 #[derive(Debug, Clone)]
-pub struct Version {
+pub struct Version<
+    #[cfg(feature = "puroro-nightly")] A: ::std::alloc::Allocator = ::std::alloc::Global
+> {
     pub major: i32,
     pub minor: i32,
     pub patch: i32,
@@ -455,7 +496,18 @@ impl ::std::default::Default for Version {
         }
     }
 }
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut Version {
+impl<A: ::std::alloc::Allocator> Version<A> {
+    pub fn new_in(alloc: A) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            major: ::std::default::Default::default(),
+            minor: ::std::default::Default::default(),
+            patch: ::std::default::Default::default(),
+            suffix: ::std::default::Default::default(),
+        }
+    }
+}
+    impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut Version {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())

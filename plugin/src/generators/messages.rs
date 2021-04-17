@@ -1,4 +1,5 @@
 use super::writer::{func, indent, indent_n, iter, Fragment, IntoFragment};
+use crate::context::Context;
 use crate::utils::Indentor;
 use crate::wrappers::{
     FieldLabel, FieldType, LengthDelimitedFieldType, MessageDescriptor, WireType,
@@ -9,25 +10,28 @@ const DESER_MOD: &'static str = "::puroro::deserializer::stream";
 
 pub fn print_msg<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (
-        func(|output| print_msg_struct(output, msg)),
-        func(|output| print_msg_default(output, msg)),
+        func(|output| print_msg_struct(output, context, msg)),
+        func(|output| print_msg_default(output, context, msg)),
+        func(|output| print_msg_impl(output, context, msg)),
         (
-            func(|output| print_msg_deser_deserializable(output, msg)),
-            func(|output| print_msg_puroro_deserializable(output, msg)),
-            func(|output| print_msg_ser_serializable(output, msg)),
-            func(|output| print_msg_puroro_serializable(output, msg)),
+            func(|output| print_msg_deser_deserializable(output, context, msg)),
+            func(|output| print_msg_puroro_deserializable(output, context, msg)),
+            func(|output| print_msg_ser_serializable(output, context, msg)),
+            func(|output| print_msg_puroro_serializable(output, context, msg)),
         ),
-        func(|output| print_msg_trait(output, msg)),
-        func(|output| print_msg_trait_impl(output, msg)),
+        func(|output| print_msg_trait(output, context, msg)),
+        func(|output| print_msg_trait_impl(output, context, msg)),
     )
         .write_into(output)
 }
 
 pub fn print_msg_struct<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (
@@ -54,6 +58,7 @@ pub struct {name}<
 
 pub fn print_msg_default<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (
@@ -90,8 +95,55 @@ impl ::std::default::Default for {name} {{
         .write_into(output)
 }
 
+pub fn print_msg_impl<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
+    msg: &'c MessageDescriptor<'c>,
+) -> Result<()> {
+    (
+        format!(
+            "\
+impl<A: ::std::alloc::Allocator> {name}<A> {{
+    pub fn new_in(alloc: A) -> Self {{
+        use ::std::convert::TryInto;
+        Self {{\n",
+            name = msg.native_bare_type_name(),
+        ),
+        indent_n(
+            3,
+            iter(
+                msg.fields()
+                    .map(|field| match (field.label()?, field.type_()?) {
+                        (FieldLabel::Optional, FieldType::Enum(_))
+                        | (FieldLabel::Required, FieldType::Enum(_)) => Ok(format!(
+                            "{name}: 0i32.try_into(),\n",
+                            name = field.native_name()
+                        )),
+                        (FieldLabel::Optional, FieldType::Bytes)
+                        | (FieldLabel::Required, FieldType::Bytes)
+                        | (FieldLabel::Repeated, _) => Ok(format!(
+                            "{name}: ::std::vec::Vec::new_in(alloc),\n",
+                            name = field.native_name()
+                        )),
+                        (_, _) => Ok(format!(
+                            "{name}: ::std::default::Default::default(),\n",
+                            name = field.native_name(),
+                        )),
+                    }),
+            ),
+        ),
+        "        \
+        }}
+    }}
+}}
+    ",
+    )
+        .write_into(output)
+}
+
 pub fn print_msg_deser_deserializable<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (
@@ -116,10 +168,12 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
         indent_n(
             3,
             (
-                func(|output| print_msg_deser_deserializable_variant_arm(output, msg)),
-                func(|output| print_msg_deser_deserializable_length_delimited_arm(output, msg)),
-                func(|output| print_msg_deser_deserializable_bitsxx_arm(output, msg, 32)),
-                func(|output| print_msg_deser_deserializable_bitsxx_arm(output, msg, 64)),
+                func(|output| print_msg_deser_deserializable_variant_arm(output, context, msg)),
+                func(|output| {
+                    print_msg_deser_deserializable_length_delimited_arm(output, context, msg)
+                }),
+                func(|output| print_msg_deser_deserializable_bitsxx_arm(output, context, msg, 32)),
+                func(|output| print_msg_deser_deserializable_bitsxx_arm(output, context, msg, 64)),
             ),
         ),
         "        \
@@ -133,6 +187,7 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
 
 pub fn print_msg_deser_deserializable_variant_arm<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (
@@ -170,6 +225,7 @@ pub fn print_msg_deser_deserializable_variant_arm<'c, W: std::fmt::Write>(
 
 pub fn print_msg_deser_deserializable_length_delimited_arm<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (
@@ -229,6 +285,7 @@ ldd.deserialize_as_message(msg)?;\n",
 
 pub fn print_msg_deser_deserializable_bitsxx_arm<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
     bits: usize,
 ) -> Result<()> {
@@ -295,6 +352,7 @@ pub fn print_msg_deser_deserializable_bitsxx_arm<'c, W: std::fmt::Write>(
 
 pub fn print_msg_puroro_deserializable<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (format!(
@@ -315,6 +373,7 @@ impl ::puroro::Deserializable for {name} {{
 
 pub fn print_msg_ser_serializable<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (
@@ -390,6 +449,7 @@ for item in self.{name}.iter_for_ser() {{
 
 pub fn print_msg_puroro_serializable<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (format!(
@@ -407,6 +467,7 @@ impl ::puroro::Serializable for {name} {{
 
 pub fn print_msg_trait<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (
@@ -461,6 +522,7 @@ fn {name}_boxed_iter(&self)
 }
 pub fn print_msg_trait_impl<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (
@@ -540,6 +602,7 @@ fn {name}_boxed_iter(&self)
 
 pub fn print_msg_mutable_trait<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
+    #[allow(unused_variables)] context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 ) -> Result<()> {
     (
