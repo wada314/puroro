@@ -1,12 +1,22 @@
+use std::borrow::Cow;
+use std::collections::HashMap;
+
 use super::writer::{func, indent, indent_n, iter, Fragment, IntoFragment};
 use crate::context::Context;
 use crate::utils::Indentor;
 use crate::wrappers::{
-    FieldLabel, FieldType, LengthDelimitedFieldType, MessageDescriptor, WireType,
+    FieldDescriptor, FieldLabel, FieldType, LengthDelimitedFieldType, MessageDescriptor, WireType,
 };
 use crate::Result;
 
 const DESER_MOD: &'static str = "::puroro::deserializer::stream";
+trait NativeFieldGenerator {
+    fn native_field_type_for<'c>(field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>>;
+}
+struct NativeFieldGeneratorForNormalStruct<'c> {
+    context: &'c Context<'c>,
+    native_field_type_cache: HashMap<(FieldType<'c>, FieldLabel), String>,
+}
 
 pub fn print_msg<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,

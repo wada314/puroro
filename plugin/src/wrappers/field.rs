@@ -399,7 +399,7 @@ impl Bits64FieldType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub enum FieldType<'c> {
     Double,
     Float,
@@ -421,7 +421,7 @@ pub enum FieldType<'c> {
     Message(&'c super::MessageDescriptor<'c>),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub enum FieldLabel {
     Optional,
     Required,

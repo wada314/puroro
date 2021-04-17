@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use std::hash::Hash;
 
 use super::FileOrMessageRef;
 use crate::google::protobuf::{EnumDescriptorProto, EnumValueDescriptorProto};
@@ -95,6 +96,13 @@ impl<'c> EnumDescriptor<'c> {
             path_to_root_mod = path_to_root_mod,
             type_name = native_type_name_from_root
         )
+    }
+}
+
+impl Hash for EnumDescriptor<'_> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.parent.package_for_child().hash(state);
+        self.proto.name.hash(state);
     }
 }
 

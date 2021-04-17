@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use std::hash::Hash;
 
 use super::{EnumDescriptor, FieldDescriptor, FileOrMessageRef};
 use crate::google::protobuf::DescriptorProto;
@@ -145,5 +146,12 @@ impl<'c> MessageDescriptor<'c> {
 impl Debug for MessageDescriptor<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MessageDescriptor").finish()
+    }
+}
+
+impl Hash for MessageDescriptor<'_> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.parent.package_for_child().hash(state);
+        self.proto.name.hash(state);
     }
 }
