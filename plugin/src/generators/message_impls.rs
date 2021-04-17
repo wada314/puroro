@@ -71,6 +71,9 @@ pub struct {name} {{\n",
     }
 
     pub fn print_msg_default<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+        if !self.field_gen.is_default_available() {
+            return Ok(());
+        }
         (
             format!(
                 "\
@@ -521,6 +524,7 @@ fn {name}_boxed_iter(&self, output: &mut Indentor<W>)
 pub trait MessageImplFragmentGenerator<'c> {
     fn struct_name(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>>;
     fn cfg_condition(&self) -> &'static str;
+    fn is_default_available(&self) -> bool;
     fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>>;
 }
 pub struct MessageImplFragmentGeneratorForNormalStruct<'c> {
@@ -534,6 +538,10 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForNor
 
     fn cfg_condition(&self) -> &'static str {
         ""
+    }
+
+    fn is_default_available(&self) -> bool {
+        true
     }
 
     fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
@@ -596,6 +604,10 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForBum
 
     fn cfg_condition(&self) -> &'static str {
         "#[cfg(feature = \"puroro-bumpalo\")]"
+    }
+
+    fn is_default_available(&self) -> bool {
+        false
     }
 
     fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
