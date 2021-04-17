@@ -35,7 +35,7 @@ where
     pub fn print_msg<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
             func(|output| self.print_msg_struct(output)),
-            func(|output| self.print_msg_default(output)),
+            func(|output| self.print_msg_new(output)),
             (
                 func(|output| self.print_msg_deser_deserializable(output)),
                 func(|output| self.print_msg_puroro_deserializable(output)),
@@ -58,52 +58,56 @@ pub struct {name}{gp} {{\n",
                 cfg = self.field_gen.cfg_condition(),
                 gp = self.field_gen.struct_generic_params(""),
             ),
-            indent(iter(self.msg.fields().map(|field| {
-                Ok(format!(
-                    "pub {name}: {type_},\n",
-                    name = field.native_name(),
-                    type_ = self.field_gen.field_type_for(field)?,
-                ))
-            }))),
+            indent((
+                iter(self.msg.fields().map(|field| {
+                    Ok(format!(
+                        "pub {name}: {type_},\n",
+                        name = field.native_name(),
+                        type_ = self.field_gen.field_type_for(field)?,
+                    ))
+                })),
+                self.field_gen.struct_extra_field(),
+            )),
             "\
 }}\n",
         )
             .write_into(output)
     }
 
-    pub fn print_msg_default<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
-        if !self.field_gen.is_default_available() {
-            return Ok(());
-        }
+    pub fn print_msg_new<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
             format!(
                 "\
 {cfg}
-impl{gp} ::std::default::Default for {name}{gpb} {{
-    fn default() -> Self {{
+impl{gp} {name}{gpb} {{
+    pub fn new({new_params}) -> Self {{
         use ::std::convert::TryInto;
         Self {{\n",
                 name = self.field_gen.struct_name(self.msg)?,
                 cfg = self.field_gen.cfg_condition(),
                 gp = self.field_gen.struct_generic_params(""),
                 gpb = self.field_gen.struct_generic_params_bounds(""),
+                new_params = self.field_gen.new_method_params(),
             ),
             indent_n(
                 3,
-                iter(
-                    self.msg
-                        .fields()
-                        .map(|field| match (field.label()?, field.type_()?) {
-                            (FieldLabel::Optional, FieldType::Enum(_))
-                            | (FieldLabel::Required, FieldType::Enum(_)) => Ok(format!(
-                                "{name}: 0i32.try_into(),\n",
-                                name = field.native_name()
-                            )),
-                            (_, _) => Ok(format!(
-                                "{name}: ::std::default::Default::default(),\n",
-                                name = field.native_name(),
-                            )),
-                        }),
+                (
+                    iter(
+                        self.msg
+                            .fields()
+                            .map(|field| match (field.label()?, field.type_()?) {
+                                (FieldLabel::Optional, FieldType::Enum(_))
+                                | (FieldLabel::Required, FieldType::Enum(_)) => Ok(format!(
+                                    "{name}: 0i32.try_into(),\n",
+                                    name = field.native_name()
+                                )),
+                                (_, _) => Ok(format!(
+                                    "{name}: ::std::default::Default::default(),\n",
+                                    name = field.native_name(),
+                                )),
+                            }),
+                    ),
+                    self.field_gen.struct_extra_field_init(),
                 ),
             ),
             "        \
@@ -539,6 +543,9 @@ pub trait MessageImplFragmentGenerator<'c> {
     fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>>;
     fn struct_generic_params(&self, extra_args: &'static str) -> Cow<'static, str>;
     fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str>;
+    fn new_method_params(&self) -> &'static str;
+    fn struct_extra_field(&self) -> &'static str;
+    fn struct_extra_field_init(&self) -> &'static str;
 }
 pub struct MessageImplFragmentGeneratorForNormalStruct<'c> {
     context: &'c Context<'c>,
@@ -613,6 +620,18 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForNor
         } else {
             format!("<{args}>", args = extra_args).into()
         }
+    }
+
+    fn new_method_params(&self) -> &'static str {
+        ""
+    }
+
+    fn struct_extra_field(&self) -> &'static str {
+        ""
+    }
+
+    fn struct_extra_field_init(&self) -> &'static str {
+        ""
     }
 }
 
@@ -695,6 +714,18 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForBum
         } else {
             format!("<'b, {args}>", args = extra_args).into()
         }
+    }
+
+    fn new_method_params(&self) -> &'static str {
+        "bump: &'b ::bumpalo::Bump\n"
+    }
+
+    fn struct_extra_field(&self) -> &'static str {
+        "bump: &'b ::bumpalo::Bump,\n"
+    }
+
+    fn struct_extra_field_init(&self) -> &'static str {
+        "bump,\n"
     }
 }
 
