@@ -329,7 +329,7 @@ ldd.deserialize_as_message(msg)?;\n",
         (format!(
             "\
 {cfg}
-impl ::puroro::Deserializable2 for {name} {{
+impl ::puroro::Deserializable for {name} {{
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {{
         use ::puroro::deserializer::stream::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);

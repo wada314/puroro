@@ -85,11 +85,11 @@ impl UnknownMessage {
     }
 }
 
-impl MessageDeserializeEventHandler for UnknownMessage {
-    type Target = Self;
+impl<'a> MessageDeserializeEventHandler for &'a mut UnknownMessage {
+    type Target = ();
 
     fn finish(self) -> Result<Self::Target> {
-        Ok(self)
+        Ok(())
     }
 
     fn met_field<T: LengthDelimitedDeserializer>(
@@ -214,41 +214,19 @@ impl Message for UnknownMessage {
     where
         T: Mergeable + Deserializable,
     {
-        if let Some(fields) = self.fields.get(&field_number) {
-            return fields
-                .iter()
-                .map(|field| match field {
-                    Field::LengthDelimited(ref dldd) => T::from_bytes(dldd.bytes()),
-                    _ => Err(PuroroError::UnexpectedWireType),
-                })
-                .try_fold(None, |acc: Option<T>, r| match acc {
-                    None => Ok(Some(r?)),
-                    Some(acc_msg) => Ok(Some(acc_msg.merge(&r?)?)),
-                });
-        }
-        Ok(None)
+        todo!()
     }
 
     fn collect_field_as_repeated_message<T: Deserializable, U: std::iter::FromIterator<T>>(
         &self,
         field_number: usize,
     ) -> Result<U> {
-        if let Some(fields) = self.fields.get(&field_number) {
-            return fields
-                .iter()
-                .map(|field| match field {
-                    Field::LengthDelimited(ref dldd) => T::from_bytes(dldd.bytes()),
-                    _ => Err(PuroroError::InvalidWireType),
-                })
-                .collect::<Result<U>>();
-        }
-        Ok(std::iter::empty().collect::<U>())
+        todo!()
     }
 }
 impl Deserializable for UnknownMessage {
-    fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self> {
-        ::puroro::deserializer::stream::deserializer_from_bytes(iter)
-            .deserialize(UnknownMessage::new())
+    fn deser_from_bytes<I: Iterator<Item = std::io::Result<u8>>>(&mut self, iter: I) -> Result<()> {
+        ::puroro::deserializer::stream::deserializer_from_bytes(iter).deserialize(self)
     }
 }
 impl Mergeable for UnknownMessage {
