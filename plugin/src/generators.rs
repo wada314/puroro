@@ -12,20 +12,27 @@ use crate::Result;
 use std::collections::HashMap;
 use std::fmt::Write;
 
-use self::message_impls::{MessageCodeGenerator, NativeCodeFragmentGeneratorForNormalStruct};
+use self::message_impls::{
+    MessageImplCodeGenerator, MessageImplFragmentGeneratorForBumpaloStruct,
+    MessageImplFragmentGeneratorForNormalStruct,
+};
 use self::message_traits::MessageTraitCodeGenerator;
 
 struct Visitor<'c> {
     output: Indentor<String>,
     context: &'c Context<'c>,
-    normal_field_gen: NativeCodeFragmentGeneratorForNormalStruct<'c>,
+    normal_field_gen: MessageImplFragmentGeneratorForNormalStruct<'c>,
+    bumpalo_field_gen: MessageImplFragmentGeneratorForBumpaloStruct<'c>,
 }
 impl<'c> DescriptorVisitor<'c> for Visitor<'c> {
     fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
-        let impl_gen = MessageCodeGenerator::new(self.context, msg, &self.normal_field_gen);
+        let normal_impl_gen = MessageImplCodeGenerator::new(self.context, msg, &self.normal_field_gen);
+        let bumpalo_impl_gen =
+            MessageImplCodeGenerator::new(self.context, msg, &self.bumpalo_field_gen);
         let trait_gen = MessageTraitCodeGenerator::new(self.context, msg);
 
-        impl_gen.print_msg(&mut self.output)?;
+        normal_impl_gen.print_msg(&mut self.output)?;
+        bumpalo_impl_gen.print_msg(&mut self.output)?;
         trait_gen.print_msg_traits(&mut self.output)?;
         Ok(())
     }
@@ -60,7 +67,8 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
         let mut visitor = Visitor {
             output: Indentor::new(output),
             context,
-            normal_field_gen: NativeCodeFragmentGeneratorForNormalStruct::new(context),
+            normal_field_gen: MessageImplFragmentGeneratorForNormalStruct::new(context),
+            bumpalo_field_gen: MessageImplFragmentGeneratorForBumpaloStruct::new(context),
         };
         file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
         filenames_and_contents.insert(file_name, visitor.output.into_inner());

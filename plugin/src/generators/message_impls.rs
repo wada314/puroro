@@ -11,18 +11,18 @@ use crate::{ErrorKind, Result};
 
 const DESER_MOD: &'static str = "::puroro::deserializer::stream";
 
-pub struct MessageCodeGenerator<'c, 'g, G>
+pub struct MessageImplCodeGenerator<'c, 'g, G>
 where
-    G: NativeCodeFragmentGenerator<'c>,
+    G: MessageImplFragmentGenerator<'c>,
 {
     context: &'c Context<'c>,
     msg: &'c MessageDescriptor<'c>,
     field_gen: &'g G,
 }
 
-impl<'c, 'g, G> MessageCodeGenerator<'c, 'g, G>
+impl<'c, 'g, G> MessageImplCodeGenerator<'c, 'g, G>
 where
-    G: NativeCodeFragmentGenerator<'c>,
+    G: MessageImplFragmentGenerator<'c>,
 {
     pub fn new(context: &'c Context<'c>, msg: &'c MessageDescriptor<'c>, field_gen: &'g G) -> Self {
         Self {
@@ -518,16 +518,16 @@ fn {name}_boxed_iter(&self, output: &mut Indentor<W>)
     }
 }
 
-pub trait NativeCodeFragmentGenerator<'c> {
+pub trait MessageImplFragmentGenerator<'c> {
     fn struct_name(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>>;
     fn cfg_condition(&self) -> &'static str;
     fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>>;
 }
-pub struct NativeCodeFragmentGeneratorForNormalStruct<'c> {
+pub struct MessageImplFragmentGeneratorForNormalStruct<'c> {
     context: &'c Context<'c>,
 }
 
-impl<'c> NativeCodeFragmentGenerator<'c> for NativeCodeFragmentGeneratorForNormalStruct<'c> {
+impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForNormalStruct<'c> {
     fn struct_name(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
         Ok(msg.native_bare_type_name().into())
     }
@@ -541,8 +541,8 @@ impl<'c> NativeCodeFragmentGenerator<'c> for NativeCodeFragmentGeneratorForNorma
             Ok(name) => name.into(),
             Err(nontrivial_type) => match nontrivial_type {
                 NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                NonTrivialFieldType::String => "String".into(),
-                NonTrivialFieldType::Bytes => "Vec<u8>".into(),
+                NonTrivialFieldType::String => "::std::string::String".into(),
+                NonTrivialFieldType::Bytes => "::std::vec::Vec<u8>".into(),
                 NonTrivialFieldType::Enum(e) => format!(
                     "::std::result::Result<{type_}, i32>",
                     type_ = e.native_fully_qualified_type_name(field.path_to_root_mod())
@@ -579,7 +579,69 @@ impl<'c> NativeCodeFragmentGenerator<'c> for NativeCodeFragmentGeneratorForNorma
     }
 }
 
-impl<'c> NativeCodeFragmentGeneratorForNormalStruct<'c> {
+impl<'c> MessageImplFragmentGeneratorForNormalStruct<'c> {
+    pub fn new(context: &'c Context<'c>) -> Self {
+        Self { context }
+    }
+}
+
+pub struct MessageImplFragmentGeneratorForBumpaloStruct<'c> {
+    context: &'c Context<'c>,
+}
+
+impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForBumpaloStruct<'c> {
+    fn struct_name(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
+        Ok(format!("{name}Bumpalo", name = msg.native_bare_type_name()).into())
+    }
+
+    fn cfg_condition(&self) -> &'static str {
+        "#[cfg(feature = \"puroro-bumpalo\")]"
+    }
+
+    fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+        let scalar_type: Cow<'static, str> = match field.type_()?.native_trivial_type_name() {
+            Ok(name) => name.into(),
+            Err(nontrivial_type) => match nontrivial_type {
+                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                NonTrivialFieldType::String => "::bumpalo::collections::String".into(),
+                NonTrivialFieldType::Bytes => "::bumpalo::collections::Vec<u8>".into(),
+                NonTrivialFieldType::Enum(e) => format!(
+                    "::std::result::Result<{type_}, i32>",
+                    type_ = e.native_fully_qualified_type_name(field.path_to_root_mod())
+                )
+                .into(),
+                NonTrivialFieldType::Message(m) => m
+                    .native_fully_qualified_type_name(field.path_to_root_mod())
+                    .into(),
+            },
+        };
+        Ok(match field.label()? {
+            FieldLabel::Optional => {
+                if matches!(field.type_()?, FieldType::Message(_)) {
+                    format!(
+                        "::std::option::Option<::bumpalo::boxed::Box<{type_}>>",
+                        type_ = scalar_type,
+                    )
+                    .into()
+                } else {
+                    scalar_type.into()
+                }
+            }
+            FieldLabel::Required => {
+                if matches!(field.type_()?, FieldType::Message(_)) {
+                    format!("::bumpalo::boxed::Box<{type_}>", type_ = scalar_type,).into()
+                } else {
+                    scalar_type.into()
+                }
+            }
+            FieldLabel::Repeated => {
+                format!("::bumpalo::collections::Vec<{type_}>", type_ = scalar_type,).into()
+            }
+        })
+    }
+}
+
+impl<'c> MessageImplFragmentGeneratorForBumpaloStruct<'c> {
     pub fn new(context: &'c Context<'c>) -> Self {
         Self { context }
     }
