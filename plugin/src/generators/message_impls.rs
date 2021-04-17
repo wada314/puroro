@@ -101,6 +101,12 @@ impl{gp} {name}{gpb} {{
                                     "{name}: 0i32.try_into(),\n",
                                     name = field.native_name()
                                 )),
+                                (FieldLabel::Required, FieldType::Message(m)) => Ok(format!(
+                                    "{box_}::new({name}::new({new_params})):,\n",
+                                    name = field.native_name(),
+                                    box_ = self.field_gen.box_type(),
+                                    new_params = self.field_gen.new_method_call_params()
+                                )),
                                 (_, _) => Ok(format!(
                                     "{name}: ::std::default::Default::default(),\n",
                                     name = field.native_name(),
@@ -114,6 +120,23 @@ impl{gp} {name}{gpb} {{
         }}
     }}
 }}\n",
+            if self.field_gen.is_default_available() {
+                format!(
+                    "\
+{cfg}
+impl{gp} ::std::default::Default for {name}{gpb} {{
+    fn default() -> Self {{
+        Self::new()
+    }}
+}}\n",
+                    name = self.field_gen.struct_name(self.msg)?,
+                    cfg = self.field_gen.cfg_condition(),
+                    gp = self.field_gen.struct_generic_params(""),
+                    gpb = self.field_gen.struct_generic_params_bounds(""),
+                )
+            } else {
+                "".to_string()
+            },
         )
             .write_into(output)
     }
@@ -544,8 +567,10 @@ pub trait MessageImplFragmentGenerator<'c> {
     fn struct_generic_params(&self, extra_args: &'static str) -> Cow<'static, str>;
     fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str>;
     fn new_method_params(&self) -> &'static str;
+    fn new_method_call_params(&self) -> &'static str;
     fn struct_extra_field(&self) -> &'static str;
     fn struct_extra_field_init(&self) -> &'static str;
+    fn box_type(&self) -> &'static str;
 }
 pub struct MessageImplFragmentGeneratorForNormalStruct<'c> {
     context: &'c Context<'c>,
@@ -626,12 +651,20 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForNor
         ""
     }
 
+    fn new_method_call_params(&self) -> &'static str {
+        ""
+    }
+
     fn struct_extra_field(&self) -> &'static str {
         ""
     }
 
     fn struct_extra_field_init(&self) -> &'static str {
         ""
+    }
+
+    fn box_type(&self) -> &'static str {
+        "::std::boxed::Box"
     }
 }
 
@@ -720,12 +753,20 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForBum
         "bump: &'b ::bumpalo::Bump\n"
     }
 
+    fn new_method_call_params(&self) -> &'static str {
+        "self.bump"
+    }
+
     fn struct_extra_field(&self) -> &'static str {
         "bump: &'b ::bumpalo::Bump,\n"
     }
 
     fn struct_extra_field_init(&self) -> &'static str {
         "bump,\n"
+    }
+
+    fn box_type(&self) -> &'static str {
+        "::bumpalo::boxed::Box"
     }
 }
 

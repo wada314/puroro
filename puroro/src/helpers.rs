@@ -58,6 +58,18 @@ macro_rules! define_maybe_repeated_field {
                 self.last_mut().unwrap()
             }
         }
+        #[cfg(feature = "puroro-bumpalo")]
+        impl<'a, 'b> MaybeRepeatedField<'a> for ::bumpalo::collections::Vec<'b, $ty> {
+            type Item = $ty;
+            type Iter = std::slice::Iter<'a, $ty>;
+            fn iter_for_ser(&'a self) -> Self::Iter {
+                self.iter()
+            }
+            fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+                self.push(Default::default());
+                self.last_mut().unwrap()
+            }
+        }
         impl<'a> MaybeRepeatedField<'a> for Option<$ty> {
             type Item = $ty;
             type Iter = std::option::Iter<'a, $ty>;
@@ -88,6 +100,13 @@ macro_rules! define_maybe_repeated_variant_field {
             }
         }
         impl<'a> MaybeRepeatedVariantField<'a> for Vec<$ty> {
+            fn extend<I: Iterator<Item = Self::Item>>(&mut self, first: Self::Item, rest: I) {
+                self.push(first);
+                <Self as std::iter::Extend<Self::Item>>::extend(self, rest);
+            }
+        }
+        #[cfg(feature = "puroro-bumpalo")]
+        impl<'a, 'b> MaybeRepeatedVariantField<'a> for ::bumpalo::collections::Vec<'b, $ty> {
             fn extend<I: Iterator<Item = Self::Item>>(&mut self, first: Self::Item, rest: I) {
                 self.push(first);
                 <Self as std::iter::Extend<Self::Item>>::extend(self, rest);
@@ -138,6 +157,22 @@ where
         self.last_mut().unwrap()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'a, 'b, T: 'a> MaybeRepeatedField<'a>
+    for ::bumpalo::collections::Vec<'b, std::result::Result<T, i32>>
+where
+    T: Clone + TryFrom<i32, Error = i32> + Into<i32>,
+{
+    type Item = std::result::Result<T, i32>;
+    type Iter = std::slice::Iter<'a, std::result::Result<T, i32>>;
+    fn iter_for_ser(&'a self) -> Self::Iter {
+        self.iter()
+    }
+    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+        self.push(T::try_from(0i32));
+        self.last_mut().unwrap()
+    }
+}
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Option<std::result::Result<T, i32>>
 where
     T: Clone + TryFrom<i32, Error = i32> + Into<i32>,
@@ -160,6 +195,17 @@ where
     }
 }
 impl<'a, T: 'a> MaybeRepeatedVariantField<'a> for Vec<std::result::Result<T, i32>>
+where
+    T: Clone + TryFrom<i32, Error = i32> + Into<i32>,
+{
+    fn extend<I: Iterator<Item = Self::Item>>(&mut self, first: Self::Item, rest: I) {
+        self.push(first);
+        <Self as std::iter::Extend<Self::Item>>::extend(self, rest);
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'a, 'b, T: 'a> MaybeRepeatedVariantField<'a>
+    for ::bumpalo::collections::Vec<'b, std::result::Result<T, i32>>
 where
     T: Clone + TryFrom<i32, Error = i32> + Into<i32>,
 {
@@ -191,7 +237,36 @@ where
         self.as_mut()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'a, 'b, T: 'a> MaybeRepeatedField<'a> for ::bumpalo::boxed::Box<'b, T>
+where
+    T: crate::serializer::Serializable,
+{
+    type Item = T;
+    type Iter = std::iter::Once<&'a T>;
+    fn iter_for_ser(&'a self) -> Self::Iter {
+        std::iter::once(self)
+    }
+    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+        self.as_mut()
+    }
+}
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Vec<T>
+where
+    T: Default + crate::serializer::Serializable,
+{
+    type Item = T;
+    type Iter = std::slice::Iter<'a, T>;
+    fn iter_for_ser(&'a self) -> Self::Iter {
+        self.iter()
+    }
+    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+        self.push(Default::default());
+        self.last_mut().unwrap()
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'a, 'b, T: 'a> MaybeRepeatedField<'a> for ::bumpalo::collections::Vec<'b, T>
 where
     T: Default + crate::serializer::Serializable,
 {
@@ -217,5 +292,21 @@ where
     fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
         self.get_or_insert_with(|| Box::new(Default::default()))
             .as_mut()
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'a, 'b, T: 'a> MaybeRepeatedField<'a> for Option<::bumpalo::boxed::Box<'b, T>>
+where
+    T: Default + crate::serializer::Serializable,
+{
+    type Item = T;
+    type Iter = std::option::IntoIter<&'a T>;
+    fn iter_for_ser(&'a self) -> Self::Iter {
+        Option::<&'a Self::Item>::into_iter(self.as_deref())
+    }
+    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+        /*self.get_or_insert_with(|| ::bumpalo::boxed::Box::new(Default::default()))
+        .as_mut()*/
+        unimplemented!()
     }
 }

@@ -12,13 +12,9 @@ num-traits = "0.2.14"
 num-derive = "0.3.3"
 utf8-decode = "1.0.1"
 either = "1.6.1"
+bumpalo = { version = "3.6.1", features = ["collections", "boxed"], optional = true }
 
 [features]
-nightly-min-specialization = []
-nightly-generic-associated-types = []
-nightly-min-type-alias-impl-trait = []
-nightly = [
-    "nightly-min-specialization",
-    "nightly-generic-associated-types",
-    "nightly-min-type-alias-impl-trait",
-]
+puroro-nightly = []
+puroro-bumpalo = ["bumpalo"]
+default = ["puroro-nightly", "puroro-bumpalo"]

@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 puroro = { path = "../puroro" }
-bumpalo = { version = "3.6.1", optional = true }
+bumpalo = { version = "3.6.1", features = ["collections", "boxed"], optional = true }
 
 [features]
 puroro-nightly = []
