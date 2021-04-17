@@ -63,7 +63,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.supported_features, first, iter);
                 }
                 15 => {
-                    let msg = self.file.push_and_get_mut();
+                    let msg = self.file.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -198,7 +198,7 @@ impl<'b, 'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for 
                     MaybeRepeatedVariantField::extend(&mut self.supported_features, first, iter);
                 }
                 15 => {
-                    let msg = self.file.push_and_get_mut();
+                    let msg = self.file.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -379,7 +379,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 16 => {
-                    let msg = self.generated_code_info.push_and_get_mut();
+                    let msg = self.generated_code_info.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -511,7 +511,7 @@ impl<'b, 'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 16 => {
-                    let msg = self.generated_code_info.push_and_get_mut();
+                    let msg = self.generated_code_info.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -657,11 +657,11 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 15 => {
-                    let msg = self.proto_file.push_and_get_mut();
+                    let msg = self.proto_file.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 3 => {
-                    let msg = self.compiler_version.push_and_get_mut();
+                    let msg = self.compiler_version.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -805,11 +805,11 @@ impl<'b, 'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 15 => {
-                    let msg = self.proto_file.push_and_get_mut();
+                    let msg = self.proto_file.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 3 => {
-                    let msg = self.compiler_version.push_and_get_mut();
+                    let msg = self.compiler_version.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,

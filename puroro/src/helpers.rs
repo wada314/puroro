@@ -22,6 +22,12 @@ pub trait MaybeRepeatedField<'a> {
     /// - Optional / required field: The field item.
     /// - Repeated field: A new item pushed into the tail of the list.
     fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item;
+    fn push_and_get_mut2<T>(&'a mut self, internal: &'a T) -> &'a mut Self::Item
+    where
+        T: InternalData,
+    {
+        self.push_and_get_mut()
+    }
 }
 pub trait MaybeRepeatedVariantField<'a>: MaybeRepeatedField<'a> {
     /// Extends the field by the given iterator.
@@ -301,7 +307,7 @@ where
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a, 'b, T: 'a> MaybeRepeatedField<'a> for Option<::bumpalo::boxed::Box<'b, T>>
+impl<'a, T: 'a> MaybeRepeatedField<'a> for Option<::bumpalo::boxed::Box<'a, T>>
 where
     T: Default + crate::serializer::Serializable,
 {
@@ -311,9 +317,16 @@ where
         Option::<&'a Self::Item>::into_iter(self.as_deref())
     }
     fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
-        /*self.get_or_insert_with(|| ::bumpalo::boxed::Box::new(Default::default()))
-        .as_mut()*/
         unimplemented!()
+    }
+    fn push_and_get_mut2<U>(&'a mut self, internal: &'a U) -> &'a mut Self::Item
+    where
+        U: InternalData,
+    {
+        self.get_or_insert_with(|| {
+            ::bumpalo::boxed::Box::new_in(Default::default(), internal.bumpalo())
+        })
+        .as_mut()
     }
 }
 

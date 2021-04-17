@@ -264,7 +264,7 @@ MaybeRepeatedVariantField::extend(&mut self.{name}, first, iter);\n",
                                 ),
                                 LengthDelimitedFieldType::Message(_) => format!(
                                     "\
-let msg = self.{name}.push_and_get_mut();
+let msg = self.{name}.push_and_get_mut2(&self.puroro_internal);
 ldd.deserialize_as_message(msg)?;\n",
                                     name = field.native_name()
                                 ),
