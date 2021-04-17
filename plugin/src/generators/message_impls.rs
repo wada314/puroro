@@ -525,6 +525,8 @@ pub trait MessageImplFragmentGenerator<'c> {
     fn cfg_condition(&self) -> &'static str;
     fn is_default_available(&self) -> bool;
     fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>>;
+    fn struct_generic_params(&self) -> &'static str;
+    fn struct_generic_params_bounds(&self) -> &'static str;
 }
 pub struct MessageImplFragmentGeneratorForNormalStruct<'c> {
     context: &'c Context<'c>,
@@ -583,6 +585,14 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForNor
                 format!("::std::vec::Vec<{type_}>", type_ = scalar_type,).into()
             }
         })
+    }
+
+    fn struct_generic_params(&self) -> &'static str {
+        ""
+    }
+
+    fn struct_generic_params_bounds(&self) -> &'static str {
+        ""
     }
 }
 
@@ -649,6 +659,14 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForBum
                 format!("::bumpalo::collections::Vec<{type_}>", type_ = scalar_type,).into()
             }
         })
+    }
+
+    fn struct_generic_params(&self) -> &'static str {
+        "<'b>"
+    }
+
+    fn struct_generic_params_bounds(&self) -> &'static str {
+        "<'b>"
     }
 }
 
