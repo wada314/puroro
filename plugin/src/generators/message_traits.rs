@@ -33,7 +33,7 @@ pub trait {name}Trait {{\n",
                     (FieldLabel::Optional, FieldType::Message(_)) => {
                         // getter function for optional message field, wrapped by Option.
                         format!(
-                            "fn {name}(&self, output: &mut Indentor<W>) -> ::std::option::Option<{reftype}>;\n",
+                            "fn {name}(&self) -> ::std::option::Option<{reftype}>;\n",
                             name = field.native_name(),
                             reftype = field.native_scalar_ref_type_name()?,
                         )
@@ -41,7 +41,7 @@ pub trait {name}Trait {{\n",
                     (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
                         // normal getter function.
                         format!(
-                            "fn {name}(&self, output: &mut Indentor<W>) -> {reftype};\n",
+                            "fn {name}(&self) -> {reftype};\n",
                             name = field.native_name(),
                             reftype = field.native_scalar_ref_type_name()?,
                         )
@@ -60,7 +60,7 @@ pub trait {name}Trait {{\n",
 fn for_each_{name}<F>(&self, f: F)
 where
     F: FnMut({reftype});
-fn {name}_boxed_iter(&self, output: &mut Indentor<W>)
+fn {name}_boxed_iter(&self)
     -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>;\n",
                             name = field.native_name(),
                             reftype = field.native_scalar_ref_type_name()?,
@@ -75,46 +75,46 @@ fn {name}_boxed_iter(&self, output: &mut Indentor<W>)
 
     fn print_msg_mutable_trait<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
-        format!(
-            "\
+            format!(
+                "\
 pub trait {name}MutTrait {{\n",
-            name = self.msg.native_bare_type_name()
-        ),
-        indent(iter(self.msg.fields().map(|field| -> Result<_> {
-            Ok(match (field.label()?, field.type_()?) {
-                (FieldLabel::Optional, FieldType::Message(_)) => {
-                    // getter function for optional message field, wrapped by Option.
-                    format!(
-                        "fn {name}_mut(&self, output: &mut Indentor<W>) -> ::std::option::Option<{reftype}>;\n",
-                        name = field.native_name(),
-                        reftype = field.native_scalar_mut_ref_type_name()?,
-                    )
-                }
-                (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
-                    // normal getter function.
-                    format!(
-                        "fn {name}_mut(&self, output: &mut Indentor<W>) -> {reftype};\n",
-                        name = field.native_name(),
-                        reftype = field.native_scalar_mut_ref_type_name()?,
-                    )
-                }
-                (FieldLabel::Repeated, _) => {
-                    format!(
-                        "\
+                name = self.msg.native_bare_type_name()
+            ),
+            indent(iter(self.msg.fields().map(|field| -> Result<_> {
+                Ok(match (field.label()?, field.type_()?) {
+                    (FieldLabel::Optional, FieldType::Message(_)) => {
+                        // getter function for optional message field, wrapped by Option.
+                        format!(
+                            "fn {name}_mut(&self) -> ::std::option::Option<{reftype}>;\n",
+                            name = field.native_name(),
+                            reftype = field.native_scalar_mut_ref_type_name()?,
+                        )
+                    }
+                    (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
+                        // normal getter function.
+                        format!(
+                            "fn {name}_mut(&self) -> {reftype};\n",
+                            name = field.native_name(),
+                            reftype = field.native_scalar_mut_ref_type_name()?,
+                        )
+                    }
+                    (FieldLabel::Repeated, _) => {
+                        format!(
+                            "\
 fn for_each_{name}_mut<F>(&self, f: F)
 where
     F: FnMut({reftype});
-fn {name}_boxed_iter_mut(&self, output: &mut Indentor<W>)
+fn {name}_boxed_iter_mut(&self)
     -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>;
 // We need more! Maybe just expose &mut Vec<T> ? \n",
-                        name = field.native_name(),
-                        reftype = field.native_scalar_mut_ref_type_name()?,
-                    )
-                }
-            })
-        }))),
-        "}}\n",
-    )
-        .write_into(output)
+                            name = field.native_name(),
+                            reftype = field.native_scalar_mut_ref_type_name()?,
+                        )
+                    }
+                })
+            }))),
+            "}}\n",
+        )
+            .write_into(output)
     }
 }

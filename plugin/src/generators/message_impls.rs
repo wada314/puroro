@@ -121,11 +121,11 @@ impl ::std::default::Default for {name} {{
 {cfg}
 impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
     type Target = ();
-    fn finish(self, output: &mut Indentor<W>) -> ::puroro::Result<Self::Target> {{
+    fn finish(self) -> ::puroro::Result<Self::Target> {{
         Ok(())
     }}
     fn met_field<T: {d}::LengthDelimitedDeserializer>(
-        &self,
+        &mut self,
         field: {d}::Field<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {{
@@ -213,7 +213,7 @@ let values = ldd.deserialize_as_variants().map(|rv| {{
 }}).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
 let mut iter = values.into_iter();
 let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-MaybeRepeatedVariantField::extend(&self.{name}, first, iter);\n",
+MaybeRepeatedVariantField::extend(&mut self.{name}, first, iter);\n",
                                 name = field.native_name(),
                                 tag = field_type.native_tag_type(self.msg.path_to_root_mod()),
                             ),
@@ -329,13 +329,12 @@ ldd.deserialize_as_message(msg)?;\n",
         (format!(
             "\
 {cfg}
-impl ::puroro::Deserializable for {name} {{
-    fn from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(iter: I) -> ::puroro::Result<Self> {{
+impl ::puroro::Deserializable2 for {name} {{
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {{
         use ::puroro::deserializer::stream::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
-        let mut msg = <{name} as ::std::default::Default>::default();
-        deserializer.deserialize(&mut msg)?;
-        Ok(msg)
+        deserializer.deserialize(self)?;
+        Ok(())
     }}
 }}\n",
             name = self.field_gen.struct_name(self.msg)?,
@@ -455,7 +454,7 @@ impl {name}Trait for {struct_name} {{\n",
                     (FieldLabel::Optional, FieldType::Message(_)) => {
                         format!(
                             "\
-fn {name}(&self, output: &mut Indentor<W>) -> ::std::option::Option<{reftype}> {{
+fn {name}(&self) -> ::std::option::Option<{reftype}> {{
     self.{name}.as_deref()
 }}\n",
                             name = field.native_name(),
@@ -465,7 +464,7 @@ fn {name}(&self, output: &mut Indentor<W>) -> ::std::option::Option<{reftype}> {
                     (FieldLabel::Required, FieldType::Message(_)) => {
                         format!(
                             "\
-fn {name}(&self, output: &mut Indentor<W>) -> {reftype} {{
+fn {name}(&self) -> {reftype} {{
     self.{name}.as_ref()
 }}\n",
                             name = field.native_name(),
@@ -481,7 +480,7 @@ fn {name}(&self, output: &mut Indentor<W>) -> {reftype} {{
                         };
                         format!(
                             "\
-fn {name}(&self, output: &mut Indentor<W>) -> {reftype} {{
+fn {name}(&self) -> {reftype} {{
     self.{name}{process_ref}
 }}\n",
                             name = field.native_name(),
@@ -504,7 +503,7 @@ where
         (f)(item);
     }}
 }}
-fn {name}_boxed_iter(&self, output: &mut Indentor<W>)
+fn {name}_boxed_iter(&self)
     -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>> {{
     ::std::boxed::Box::new(self.{name}.iter(){process_iter})
 }}\n",

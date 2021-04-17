@@ -93,6 +93,9 @@ pub trait Message {
 pub trait Deserializable: Sized {
     fn from_bytes<I: Iterator<Item = std::io::Result<u8>>>(iter: I) -> Result<Self>;
 }
+pub trait Deserializable2: Sized {
+    fn deser_from_bytes<I: Iterator<Item = std::io::Result<u8>>>(&mut self, iter: I) -> Result<()>;
+}
 pub trait Serializable: Sized {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> Result<()>;
 }
