@@ -53,9 +53,10 @@ where
                 "\
 {cfg}
 #[derive(Debug, Clone)]
-pub struct {name} {{\n",
+pub struct {name}{gp} {{\n",
                 name = self.field_gen.struct_name(self.msg)?,
                 cfg = self.field_gen.cfg_condition(),
+                gp = self.field_gen.struct_generic_params(""),
             ),
             indent(iter(self.msg.fields().map(|field| {
                 Ok(format!(
@@ -78,12 +79,14 @@ pub struct {name} {{\n",
             format!(
                 "\
 {cfg}
-impl ::std::default::Default for {name} {{
+impl{gp} ::std::default::Default for {name}{gpb} {{
     fn default() -> Self {{
         use ::std::convert::TryInto;
         Self {{\n",
                 name = self.field_gen.struct_name(self.msg)?,
                 cfg = self.field_gen.cfg_condition(),
+                gp = self.field_gen.struct_generic_params(""),
+                gpb = self.field_gen.struct_generic_params_bounds(""),
             ),
             indent_n(
                 3,
@@ -119,7 +122,7 @@ impl ::std::default::Default for {name} {{
             format!(
                 "\
 {cfg}
-impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
+impl{gp} {d}::MessageDeserializeEventHandler for &'a mut {name}{gpb} {{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {{
         Ok(())
@@ -135,6 +138,8 @@ impl<'a> {d}::MessageDeserializeEventHandler for &'a mut {name} {{
                 d = DESER_MOD,
                 name = self.field_gen.struct_name(self.msg)?,
                 cfg = self.field_gen.cfg_condition(),
+                gp = self.field_gen.struct_generic_params("'a"),
+                gpb = self.field_gen.struct_generic_params_bounds(""),
             ),
             indent_n(
                 3,
@@ -329,8 +334,9 @@ ldd.deserialize_as_message(msg)?;\n",
         (format!(
             "\
 {cfg}
-impl ::puroro::Deserializable for {name} {{
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {{
+impl{gpb} ::puroro::Deserializable for {name}{gp} {{
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {{
         use ::puroro::deserializer::stream::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
@@ -339,6 +345,8 @@ impl ::puroro::Deserializable for {name} {{
 }}\n",
             name = self.field_gen.struct_name(self.msg)?,
             cfg = self.field_gen.cfg_condition(),
+            gp = self.field_gen.struct_generic_params(""),
+            gpb = self.field_gen.struct_generic_params_bounds(""),
         ),)
             .write_into(output)
     }
@@ -351,13 +359,15 @@ impl ::puroro::Deserializable for {name} {{
             format!(
                 "\
 {cfg}
-impl ::puroro::serializer::Serializable for {name} {{
+impl{gp} ::puroro::serializer::Serializable for {name}{gpb} {{
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
         use ::puroro::helpers::MaybeRepeatedField;\n",
                 name = self.field_gen.struct_name(self.msg)?,
                 cfg = self.field_gen.cfg_condition(),
+                gp = self.field_gen.struct_generic_params(""),
+                gpb = self.field_gen.struct_generic_params_bounds(""),
             ),
             indent_n(
                 2,
@@ -427,7 +437,7 @@ for item in self.{name}.iter_for_ser() {{
         (format!(
             "\
 {cfg}
-impl ::puroro::Serializable for {name} {{
+impl{gp} ::puroro::Serializable for {name}{gpb} {{
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {{
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -435,6 +445,8 @@ impl ::puroro::Serializable for {name} {{
 }}\n",
             name = self.field_gen.struct_name(self.msg)?,
             cfg = self.field_gen.cfg_condition(),
+            gp = self.field_gen.struct_generic_params(""),
+            gpb = self.field_gen.struct_generic_params_bounds(""),
         ),)
             .write_into(output)
     }
@@ -525,8 +537,8 @@ pub trait MessageImplFragmentGenerator<'c> {
     fn cfg_condition(&self) -> &'static str;
     fn is_default_available(&self) -> bool;
     fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>>;
-    fn struct_generic_params(&self) -> &'static str;
-    fn struct_generic_params_bounds(&self) -> &'static str;
+    fn struct_generic_params(&self, extra_args: &'static str) -> Cow<'static, str>;
+    fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str>;
 }
 pub struct MessageImplFragmentGeneratorForNormalStruct<'c> {
     context: &'c Context<'c>,
@@ -587,12 +599,20 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForNor
         })
     }
 
-    fn struct_generic_params(&self) -> &'static str {
-        ""
+    fn struct_generic_params(&self, extra_args: &'static str) -> Cow<'static, str> {
+        if extra_args.is_empty() {
+            "".into()
+        } else {
+            format!("<{args}>", args = extra_args).into()
+        }
     }
 
-    fn struct_generic_params_bounds(&self) -> &'static str {
-        ""
+    fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str> {
+        if extra_args.is_empty() {
+            "".into()
+        } else {
+            format!("<{args}>", args = extra_args).into()
+        }
     }
 }
 
@@ -661,12 +681,20 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForBum
         })
     }
 
-    fn struct_generic_params(&self) -> &'static str {
-        "<'b>"
+    fn struct_generic_params(&self, extra_args: &'static str) -> Cow<'static, str> {
+        if extra_args.is_empty() {
+            "<'b>".into()
+        } else {
+            format!("<'b, {args}>", args = extra_args).into()
+        }
     }
 
-    fn struct_generic_params_bounds(&self) -> &'static str {
-        "<'b>"
+    fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str> {
+        if extra_args.is_empty() {
+            "<'b>".into()
+        } else {
+            format!("<'b, {args}>", args = extra_args).into()
+        }
     }
 }
 
