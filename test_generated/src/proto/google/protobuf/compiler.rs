@@ -140,6 +140,12 @@ impl CodeGeneratorResponseTrait for CodeGeneratorResponse {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::super::google::protobuf::compiler::code_generator_response::File>> {
         ::std::boxed::Box::new(self.file.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type FileIter<'a> = impl Iterator<Item=&'a super::super::super::google::protobuf::compiler::code_generator_response::File>;
+    #[cfg(feature = "puroro-nightly")]
+    fn file_iter(&self) -> Self::FileIter<'_> {
+        self.file.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
@@ -275,6 +281,12 @@ impl CodeGeneratorResponseTrait for CodeGeneratorResponseBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::super::google::protobuf::compiler::code_generator_response::File>> {
         ::std::boxed::Box::new(self.file.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type FileIter<'a> = impl Iterator<Item=&'a super::super::super::google::protobuf::compiler::code_generator_response::File>;
+    #[cfg(feature = "puroro-nightly")]
+    fn file_iter(&self) -> Self::FileIter<'_> {
+        self.file.iter()
+    }
 }
 pub trait CodeGeneratorResponseTrait {
     fn error(&self) -> &str;
@@ -284,15 +296,19 @@ pub trait CodeGeneratorResponseTrait {
         F: FnMut(&super::super::super::google::protobuf::compiler::code_generator_response::File);
     fn file_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::super::google::protobuf::compiler::code_generator_response::File>>;
+    #[cfg(feature = "puroro-nightly")]
+    type FileIter<'a>: Iterator<Item=&'a super::super::super::google::protobuf::compiler::code_generator_response::File>;
+    #[cfg(feature = "puroro-nightly")]
+    fn file_iter(&self) -> Self::FileIter<'_>;
 }
 pub trait CodeGeneratorResponseMutTrait {
-    fn error_mut(&self) -> &str;
-    fn supported_features_mut(&self) -> u64;
+    fn error_mut(&self) -> &mut String;
+    fn supported_features_mut(&self) -> &mut u64;
     fn for_each_file_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::super::google::protobuf::compiler::code_generator_response::File);
+        F: FnMut(&mut super::super::super::google::protobuf::compiler::code_generator_response::File);
     fn file_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::super::google::protobuf::compiler::code_generator_response::File>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::super::google::protobuf::compiler::code_generator_response::File>>;
     // We need more! Maybe just expose &mut Vec<T> ? 
 }
 pub mod code_generator_response {
@@ -592,10 +608,10 @@ pub trait FileTrait {
     fn generated_code_info(&self) -> ::std::option::Option<&super::super::super::super::google::protobuf::GeneratedCodeInfo>;
 }
 pub trait FileMutTrait {
-    fn name_mut(&self) -> &str;
-    fn insertion_point_mut(&self) -> &str;
-    fn content_mut(&self) -> &str;
-    fn generated_code_info_mut(&self) -> ::std::option::Option<&super::super::super::super::google::protobuf::GeneratedCodeInfo>;
+    fn name_mut(&self) -> &mut String;
+    fn insertion_point_mut(&self) -> &mut String;
+    fn content_mut(&self) -> &mut String;
+    fn generated_code_info_mut(&self) -> ::std::option::Option<&mut super::super::super::super::google::protobuf::GeneratedCodeInfo>;
 }
 } // mod code_generator_response
 
@@ -733,6 +749,12 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
         ::std::boxed::Box::new(self.file_to_generate.iter().map(|v| v.as_ref()))
     }
+    #[cfg(feature = "puroro-nightly")]
+    type FileToGenerateIter<'a> = impl Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_> {
+        self.file_to_generate.iter().map(|v| v.as_ref())
+    }
     fn parameter(&self) -> &str {
         self.parameter.as_ref()
     }
@@ -746,6 +768,12 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
     fn proto_file_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::super::google::protobuf::FileDescriptorProto>> {
         ::std::boxed::Box::new(self.proto_file.iter())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type ProtoFileIter<'a> = impl Iterator<Item=&'a super::super::super::google::protobuf::FileDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn proto_file_iter(&self) -> Self::ProtoFileIter<'_> {
+        self.proto_file.iter()
     }
     fn compiler_version(&self) -> ::std::option::Option<&super::super::super::google::protobuf::compiler::Version> {
         self.compiler_version.as_deref()
@@ -881,6 +909,12 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
         ::std::boxed::Box::new(self.file_to_generate.iter().map(|v| v.as_ref()))
     }
+    #[cfg(feature = "puroro-nightly")]
+    type FileToGenerateIter<'a> = impl Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_> {
+        self.file_to_generate.iter().map(|v| v.as_ref())
+    }
     fn parameter(&self) -> &str {
         self.parameter.as_ref()
     }
@@ -895,6 +929,12 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::super::google::protobuf::FileDescriptorProto>> {
         ::std::boxed::Box::new(self.proto_file.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ProtoFileIter<'a> = impl Iterator<Item=&'a super::super::super::google::protobuf::FileDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn proto_file_iter(&self) -> Self::ProtoFileIter<'_> {
+        self.proto_file.iter()
+    }
     fn compiler_version(&self) -> ::std::option::Option<&super::super::super::google::protobuf::compiler::Version> {
         self.compiler_version.as_deref()
     }
@@ -905,29 +945,37 @@ pub trait CodeGeneratorRequestTrait {
         F: FnMut(&str);
     fn file_to_generate_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+    #[cfg(feature = "puroro-nightly")]
+    type FileToGenerateIter<'a>: Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_>;
     fn parameter(&self) -> &str;
     fn for_each_proto_file<F>(&self, f: F)
     where
         F: FnMut(&super::super::super::google::protobuf::FileDescriptorProto);
     fn proto_file_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::super::google::protobuf::FileDescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type ProtoFileIter<'a>: Iterator<Item=&'a super::super::super::google::protobuf::FileDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn proto_file_iter(&self) -> Self::ProtoFileIter<'_>;
     fn compiler_version(&self) -> ::std::option::Option<&super::super::super::google::protobuf::compiler::Version>;
 }
 pub trait CodeGeneratorRequestMutTrait {
     fn for_each_file_to_generate_mut<F>(&self, f: F)
     where
-        F: FnMut(&str);
+        F: FnMut(&mut String);
     fn file_to_generate_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
     // We need more! Maybe just expose &mut Vec<T> ? 
-    fn parameter_mut(&self) -> &str;
+    fn parameter_mut(&self) -> &mut String;
     fn for_each_proto_file_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::super::google::protobuf::FileDescriptorProto);
+        F: FnMut(&mut super::super::super::google::protobuf::FileDescriptorProto);
     fn proto_file_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::super::google::protobuf::FileDescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::super::google::protobuf::FileDescriptorProto>>;
     // We need more! Maybe just expose &mut Vec<T> ? 
-    fn compiler_version_mut(&self) -> ::std::option::Option<&super::super::super::google::protobuf::compiler::Version>;
+    fn compiler_version_mut(&self) -> ::std::option::Option<&mut super::super::super::google::protobuf::compiler::Version>;
 }
 
 #[derive(Debug, Clone)]
@@ -1253,8 +1301,8 @@ pub trait VersionTrait {
     fn suffix(&self) -> &str;
 }
 pub trait VersionMutTrait {
-    fn major_mut(&self) -> i32;
-    fn minor_mut(&self) -> i32;
-    fn patch_mut(&self) -> i32;
-    fn suffix_mut(&self) -> &str;
+    fn major_mut(&self) -> &mut i32;
+    fn minor_mut(&self) -> &mut i32;
+    fn patch_mut(&self) -> &mut i32;
+    fn suffix_mut(&self) -> &mut String;
 }

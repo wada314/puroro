@@ -13,3 +13,4 @@ bumpalo = { version = "3.6.1", features = ["collections", "boxed"], optional = t
 [features]
 puroro-nightly = []
 puroro-bumpalo = ["bumpalo"]
+default = ["puroro-nightly"]

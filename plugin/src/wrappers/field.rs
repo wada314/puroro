@@ -20,6 +20,7 @@ pub struct FieldDescriptor<'c> {
     lazy_fq_type_name: OnceCell<String>,
     lazy_native_owned_type_name: OnceCell<String>,
     lazy_native_scalar_ref_type_name: OnceCell<String>,
+    lazy_native_scalar_mut_ref_type_name: OnceCell<String>,
     lazy_native_name: OnceCell<String>,
 }
 impl<'c> FieldDescriptor<'c> {
@@ -36,6 +37,7 @@ impl<'c> FieldDescriptor<'c> {
             lazy_fq_type_name: Default::default(),
             lazy_native_owned_type_name: Default::default(),
             lazy_native_scalar_ref_type_name: Default::default(),
+            lazy_native_scalar_mut_ref_type_name: Default::default(),
             lazy_native_name: Default::default(),
         }
     }
@@ -230,27 +232,23 @@ impl<'c> FieldDescriptor<'c> {
     }
 
     // Returns a ref type name for required field.
-    pub fn native_scalar_ref_type_name(&'c self) -> Result<&str> {
-        Ok(self
-            .lazy_native_scalar_ref_type_name
-            .get_or_try_init(|| -> Result<_> {
-                Ok(match self.wire_type()? {
-                    WireType::Variant(field_type) => field_type
-                        .native_type(self.parent.path_to_root_mod())
-                        .into_owned(),
-                    WireType::LengthDelimited(field_type) => field_type
-                        .native_ref_type(self.parent.path_to_root_mod())
-                        .into_owned(),
-                    WireType::Bits32(field_type) => field_type.native_type().to_string(),
-                    WireType::Bits64(field_type) => field_type.native_type().to_string(),
-                })
-            })?)
+    pub fn native_scalar_ref_type_name(&'c self, lifetime: &str) -> Result<String> {
+        Ok(match self.wire_type()? {
+            WireType::Variant(field_type) => field_type
+                .native_type(self.parent.path_to_root_mod())
+                .into_owned(),
+            WireType::LengthDelimited(field_type) => field_type
+                .native_ref_type(self.parent.path_to_root_mod(), lifetime)
+                .into_owned(),
+            WireType::Bits32(field_type) => field_type.native_type().to_string(),
+            WireType::Bits64(field_type) => field_type.native_type().to_string(),
+        })
     }
 
     // Returns a mutable ref type name for required field.
     pub fn native_scalar_mut_ref_type_name(&'c self) -> Result<&str> {
         Ok(self
-            .lazy_native_scalar_ref_type_name
+            .lazy_native_scalar_mut_ref_type_name
             .get_or_try_init(|| -> Result<_> {
                 Ok(match self.wire_type()? {
                     WireType::Variant(field_type) => format!(
@@ -351,12 +349,18 @@ impl<'c> LengthDelimitedFieldType<'c> {
             }
         }
     }
-    pub fn native_ref_type(&self, path_to_root_mod: &str) -> Cow<'static, str> {
+    pub fn native_ref_type(&self, path_to_root_mod: &str, lifetime: &str) -> Cow<'static, str> {
+        let lt: Cow<'static, str> = if lifetime.is_empty() {
+            "".into()
+        } else {
+            format!("{} ", lifetime).into()
+        };
         match self {
-            LengthDelimitedFieldType::String => "&str".into(),
-            LengthDelimitedFieldType::Bytes => "&[u8]".into(),
+            LengthDelimitedFieldType::String => format!("&{lt}str", lt = lt).into(),
+            LengthDelimitedFieldType::Bytes => format!("&{lt}[u8]", lt = lt).into(),
             LengthDelimitedFieldType::Message(m) => format!(
-                "&{name}",
+                "&{lt}{name}",
+                lt = lt,
                 name = m.native_fully_qualified_type_name(path_to_root_mod)
             )
             .into(),

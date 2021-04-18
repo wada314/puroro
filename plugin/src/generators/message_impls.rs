@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use super::writer::{func, indent, indent_n, iter, Fragment, IntoFragment};
 use crate::context::Context;
-use crate::utils::Indentor;
+use crate::utils::{to_camel_case, Indentor};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, LengthDelimitedFieldType, MessageDescriptor,
     NonTrivialFieldType, WireType,
@@ -496,7 +496,7 @@ fn {name}(&self) -> ::std::option::Option<{reftype}> {{
     self.{name}.as_deref()
 }}\n",
                             name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name()?,
+                            reftype = field.native_scalar_ref_type_name("")?,
                         )
                     }
                     (FieldLabel::Required, FieldType::Message(_)) => {
@@ -506,7 +506,7 @@ fn {name}(&self) -> {reftype} {{
     self.{name}.as_ref()
 }}\n",
                             name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name()?,
+                            reftype = field.native_scalar_ref_type_name("")?,
                         )
                     }
                     (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
@@ -522,7 +522,7 @@ fn {name}(&self) -> {reftype} {{
     self.{name}{process_ref}
 }}\n",
                             name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name()?,
+                            reftype = field.native_scalar_ref_type_name("")?,
                             process_ref = process_ref,
                         )
                     }
@@ -544,10 +544,18 @@ where
 fn {name}_boxed_iter(&self)
     -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>> {{
     ::std::boxed::Box::new(self.{name}.iter(){process_iter})
+}}
+#[cfg(feature = \"puroro-nightly\")]
+type {camel_name}Iter<'a> = impl Iterator<Item={reftype_lt_a}>;
+#[cfg(feature = \"puroro-nightly\")]
+fn {name}_iter(&self) -> Self::{camel_name}Iter<'_> {{
+    self.{name}.iter(){process_iter}
 }}\n",
                             name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name()?,
+                            camel_name = to_camel_case(field.native_name()),
+                            reftype = field.native_scalar_ref_type_name("")?,
                             process_iter = process_iter,
+                            reftype_lt_a = field.native_scalar_ref_type_name("'a")?,
                         )
                     }
                 })

@@ -1,6 +1,6 @@
 use super::writer::{func, indent, iter, IntoFragment};
 use crate::context::Context;
-use crate::utils::Indentor;
+use crate::utils::{to_camel_case, Indentor};
 use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
 use crate::Result;
 
@@ -35,7 +35,7 @@ pub trait {name}Trait {{\n",
                         format!(
                             "fn {name}(&self) -> ::std::option::Option<{reftype}>;\n",
                             name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name()?,
+                            reftype = field.native_scalar_ref_type_name("")?,
                         )
                     }
                     (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
@@ -43,7 +43,7 @@ pub trait {name}Trait {{\n",
                         format!(
                             "fn {name}(&self) -> {reftype};\n",
                             name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name()?,
+                            reftype = field.native_scalar_ref_type_name("")?,
                         )
                     }
                     (FieldLabel::Repeated, _) => {
@@ -61,9 +61,15 @@ fn for_each_{name}<F>(&self, f: F)
 where
     F: FnMut({reftype});
 fn {name}_boxed_iter(&self)
-    -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>;\n",
+    -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>;
+#[cfg(feature = \"puroro-nightly\")]
+type {camel_name}Iter<'a>: Iterator<Item={reftype_lt_a}>;
+#[cfg(feature = \"puroro-nightly\")]
+fn {name}_iter(&self) -> Self::{camel_name}Iter<'_>;\n",
                             name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name()?,
+                            camel_name = to_camel_case(field.native_name()),
+                            reftype = field.native_scalar_ref_type_name("")?,
+                            reftype_lt_a = field.native_scalar_ref_type_name("'a")?,
                         )
                     }
                 })
