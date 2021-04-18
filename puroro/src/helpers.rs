@@ -317,7 +317,10 @@ where
         Option::<&'a Self::Item>::into_iter(self.as_deref())
     }
     fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
-        unimplemented!()
+        unimplemented!(
+            "Please call the push_and_get_mut2 method for this type \
+                because we need an allocator info."
+        )
     }
     fn push_and_get_mut2<U>(&'a mut self, internal: &'a U) -> &'a mut Self::Item
     where
@@ -333,7 +336,7 @@ where
 pub trait InternalData {
     #[cfg(feature = "puroro-bumpalo")]
     fn bumpalo(&self) -> &bumpalo::Bump {
-        panic!("The Bumpalo field should only be owned by a Bumpalo struct!")
+        panic!("The Bumpalo data field should only be owned by a Bumpalo struct!")
     }
 }
 
@@ -372,7 +375,8 @@ impl<'b> InternalDataForBumpaloStruct<'b> {
 impl<'b> InternalData for InternalDataForBumpaloStruct<'b> {
     /// Note that the returned bumpalo lifetime is not `'b' but `'_`.
     /// This is because I don't want to introduce the lifetime parameter
-    /// `'b` into the trait's definition.
+    /// `'b` into the trait's definition. The lifetime `'_` might be shorter
+    /// than `'b`, but I believe it's not a problem.
     fn bumpalo(&self) -> &bumpalo::Bump {
         self.bump
     }
