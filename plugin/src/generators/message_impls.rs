@@ -155,7 +155,7 @@ impl{gp} ::std::default::Default for {name}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} {d}::MessageDeserializeEventHandler for &'a mut {name}{gpb} {{
+impl{gp} ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut {name}{gpb} {{
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {{
         Ok(())
@@ -363,7 +363,7 @@ ldd.deserialize_as_message(msg)?;\n",
 impl{gpb} ::puroro::Deserializable for {name}{gp} {{
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {{
-        use ::puroro::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())

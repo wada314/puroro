@@ -2,18 +2,15 @@ mod delayed;
 mod impls;
 mod iters;
 
+use super::{Deserializer, MessageDeserializeEventHandler};
 use crate::types::{Field, WireType};
-use std::io::{Read, Result as IoResult};
-
 pub use crate::variant::Variant;
 pub use crate::{PuroroError, Result};
 pub use crate::{RepeatedFieldCollector, RepeatedFieldHandler};
+use std::io::{Read, Result as IoResult};
 
 pub use delayed::DelayedLengthDelimitedDeserializer;
 
-pub trait Deserializer {
-    fn deserialize<H: MessageDeserializeEventHandler>(self, handler: H) -> Result<H::Target>;
-}
 pub fn deserializer_from_read<R: Read>(read: R) -> impl Deserializer {
     impls::DeserializerImpl::<std::io::Bytes<R>>::new(read.bytes())
 }
@@ -40,15 +37,4 @@ pub trait LengthDelimitedDeserializer: Sized + IntoIterator<Item = IoResult<u8>>
 
     // Delay the deserializing
     fn leave_as_unknown(self) -> Result<DelayedLengthDelimitedDeserializer>;
-}
-
-pub trait MessageDeserializeEventHandler {
-    type Target;
-    fn finish(self) -> Result<Self::Target>;
-
-    fn met_field<T: LengthDelimitedDeserializer>(
-        &mut self,
-        field: Field<T>,
-        field_number: usize,
-    ) -> Result<()>;
 }

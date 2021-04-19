@@ -28,7 +28,7 @@ impl ::std::default::Default for CodeGeneratorResponse {
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut CodeGeneratorResponse {
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut CodeGeneratorResponse {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -88,7 +88,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 impl ::puroro::Deserializable for CodeGeneratorResponse {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -169,7 +169,7 @@ impl<'b> CodeGeneratorResponseBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut CodeGeneratorResponseBumpalo<'b> {
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut CodeGeneratorResponseBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -229,7 +229,7 @@ impl<'b, 'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for 
 impl<'b> ::puroro::Deserializable for CodeGeneratorResponseBumpalo<'b> {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -361,7 +361,7 @@ impl ::std::default::Default for File {
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut File {
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut File {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -420,7 +420,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 impl ::puroro::Deserializable for File {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -493,7 +493,7 @@ impl<'b> FileBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileBumpalo<'b> {
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -552,7 +552,7 @@ impl<'b, 'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for 
 impl<'b> ::puroro::Deserializable for FileBumpalo<'b> {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -643,7 +643,7 @@ impl ::std::default::Default for CodeGeneratorRequest {
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut CodeGeneratorRequest {
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut CodeGeneratorRequest {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -702,7 +702,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 impl ::puroro::Deserializable for CodeGeneratorRequest {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -803,7 +803,7 @@ impl<'b> CodeGeneratorRequestBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut CodeGeneratorRequestBumpalo<'b> {
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut CodeGeneratorRequestBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -862,7 +862,7 @@ impl<'b, 'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for 
 impl<'b> ::puroro::Deserializable for CodeGeneratorRequestBumpalo<'b> {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -1006,7 +1006,7 @@ impl ::std::default::Default for Version {
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut Version {
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Version {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1083,7 +1083,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 impl ::puroro::Deserializable for Version {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -1162,7 +1162,7 @@ impl<'b> VersionBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut VersionBumpalo<'b> {
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut VersionBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1239,7 +1239,7 @@ impl<'b, 'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for 
 impl<'b> ::puroro::Deserializable for VersionBumpalo<'b> {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())

@@ -5,18 +5,26 @@
 #[derive(Debug, Clone)]
 pub struct GeneratedCodeInfo {
     pub annotation: ::std::vec::Vec<super::super::google::protobuf::generated_code_info::Annotation>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for GeneratedCodeInfo {
-    fn default() -> Self {
+impl GeneratedCodeInfo {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             annotation: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut GeneratedCodeInfo {
+impl ::std::default::Default for GeneratedCodeInfo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut GeneratedCodeInfo {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -35,7 +43,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
             }
             ::puroro::types::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    let msg = self.annotation.push_and_get_mut();
+                    let msg = self.annotation.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -58,8 +66,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for GeneratedCodeInfo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -97,14 +106,32 @@ impl GeneratedCodeInfoTrait for GeneratedCodeInfo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::generated_code_info::Annotation>> {
         ::std::boxed::Box::new(self.annotation.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type AnnotationIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::generated_code_info::Annotation>;
+    #[cfg(feature = "puroro-nightly")]
+    fn annotation_iter(&self) -> Self::AnnotationIter<'_> {
+        self.annotation.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct GeneratedCodeInfoBumpalo {
+pub struct GeneratedCodeInfoBumpalo<'b> {
     pub annotation: ::bumpalo::collections::Vec<super::super::google::protobuf::generated_code_info::Annotation>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut GeneratedCodeInfoBumpalo {
+impl<'b> GeneratedCodeInfoBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            annotation: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut GeneratedCodeInfoBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -123,7 +150,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
             }
             ::puroro::types::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    let msg = self.annotation.push_and_get_mut();
+                    let msg = self.annotation.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -145,16 +172,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for GeneratedCodeInfoBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for GeneratedCodeInfoBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for GeneratedCodeInfoBumpalo {
+impl<'b> ::puroro::serializer::Serializable for GeneratedCodeInfoBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -166,7 +194,7 @@ impl ::puroro::serializer::Serializable for GeneratedCodeInfoBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for GeneratedCodeInfoBumpalo {
+impl<'b> ::puroro::Serializable for GeneratedCodeInfoBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -185,6 +213,12 @@ impl GeneratedCodeInfoTrait for GeneratedCodeInfoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::generated_code_info::Annotation>> {
         ::std::boxed::Box::new(self.annotation.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type AnnotationIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::generated_code_info::Annotation>;
+    #[cfg(feature = "puroro-nightly")]
+    fn annotation_iter(&self) -> Self::AnnotationIter<'_> {
+        self.annotation.iter()
+    }
 }
 pub trait GeneratedCodeInfoTrait {
     fn for_each_annotation<F>(&self, f: F)
@@ -192,14 +226,18 @@ pub trait GeneratedCodeInfoTrait {
         F: FnMut(&super::super::google::protobuf::generated_code_info::Annotation);
     fn annotation_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::generated_code_info::Annotation>>;
+    #[cfg(feature = "puroro-nightly")]
+    type AnnotationIter<'a>: Iterator<Item=&'a super::super::google::protobuf::generated_code_info::Annotation>;
+    #[cfg(feature = "puroro-nightly")]
+    fn annotation_iter(&self) -> Self::AnnotationIter<'_>;
 }
 pub trait GeneratedCodeInfoMutTrait {
     fn for_each_annotation_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::generated_code_info::Annotation);
+        F: FnMut(&mut super::super::google::protobuf::generated_code_info::Annotation);
     fn annotation_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::generated_code_info::Annotation>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::generated_code_info::Annotation>>;
+    // We need more! 
 }
 pub mod generated_code_info {
 
@@ -209,21 +247,29 @@ pub struct Annotation {
     pub source_file: ::std::string::String,
     pub begin: i32,
     pub end: i32,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for Annotation {
-    fn default() -> Self {
+impl Annotation {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             path: ::std::default::Default::default(),
             source_file: ::std::default::Default::default(),
             begin: ::std::default::Default::default(),
             end: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut Annotation {
+impl ::std::default::Default for Annotation {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Annotation {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -298,8 +344,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for Annotation {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -352,6 +399,12 @@ impl AnnotationTrait for Annotation {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type PathIter<'a> = impl Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn path_iter(&self) -> Self::PathIter<'_> {
+        self.path.iter().cloned()
+    }
     fn source_file(&self) -> &str {
         self.source_file.as_ref()
     }
@@ -364,14 +417,29 @@ impl AnnotationTrait for Annotation {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct AnnotationBumpalo {
+pub struct AnnotationBumpalo<'b> {
     pub path: ::bumpalo::collections::Vec<i32>,
     pub source_file: ::bumpalo::collections::String,
     pub begin: i32,
     pub end: i32,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut AnnotationBumpalo {
+impl<'b> AnnotationBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            path: ::std::default::Default::default(),
+            source_file: ::std::default::Default::default(),
+            begin: ::std::default::Default::default(),
+            end: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut AnnotationBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -445,16 +513,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for AnnotationBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for AnnotationBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for AnnotationBumpalo {
+impl<'b> ::puroro::serializer::Serializable for AnnotationBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -481,7 +550,7 @@ impl ::puroro::serializer::Serializable for AnnotationBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for AnnotationBumpalo {
+impl<'b> ::puroro::Serializable for AnnotationBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -500,6 +569,12 @@ impl AnnotationTrait for AnnotationBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type PathIter<'a> = impl Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn path_iter(&self) -> Self::PathIter<'_> {
+        self.path.iter().cloned()
+    }
     fn source_file(&self) -> &str {
         self.source_file.as_ref()
     }
@@ -516,6 +591,10 @@ pub trait AnnotationTrait {
         F: FnMut(i32);
     fn path_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
+    #[cfg(feature = "puroro-nightly")]
+    type PathIter<'a>: Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn path_iter(&self) -> Self::PathIter<'_>;
     fn source_file(&self) -> &str;
     fn begin(&self) -> i32;
     fn end(&self) -> i32;
@@ -523,31 +602,39 @@ pub trait AnnotationTrait {
 pub trait AnnotationMutTrait {
     fn for_each_path_mut<F>(&self, f: F)
     where
-        F: FnMut(i32);
+        F: FnMut(&mut i32);
     fn path_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
-    fn source_file_mut(&self) -> &str;
-    fn begin_mut(&self) -> i32;
-    fn end_mut(&self) -> i32;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
+    // We need more! 
+    fn source_file_mut(&self) -> &mut String;
+    fn begin_mut(&self) -> &mut i32;
+    fn end_mut(&self) -> &mut i32;
 }
 } // mod generated_code_info
 
 #[derive(Debug, Clone)]
 pub struct SourceCodeInfo {
     pub location: ::std::vec::Vec<super::super::google::protobuf::source_code_info::Location>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for SourceCodeInfo {
-    fn default() -> Self {
+impl SourceCodeInfo {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             location: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut SourceCodeInfo {
+impl ::std::default::Default for SourceCodeInfo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut SourceCodeInfo {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -566,7 +653,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
             }
             ::puroro::types::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    let msg = self.location.push_and_get_mut();
+                    let msg = self.location.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -589,8 +676,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for SourceCodeInfo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -628,14 +716,32 @@ impl SourceCodeInfoTrait for SourceCodeInfo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::source_code_info::Location>> {
         ::std::boxed::Box::new(self.location.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type LocationIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::source_code_info::Location>;
+    #[cfg(feature = "puroro-nightly")]
+    fn location_iter(&self) -> Self::LocationIter<'_> {
+        self.location.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct SourceCodeInfoBumpalo {
+pub struct SourceCodeInfoBumpalo<'b> {
     pub location: ::bumpalo::collections::Vec<super::super::google::protobuf::source_code_info::Location>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut SourceCodeInfoBumpalo {
+impl<'b> SourceCodeInfoBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            location: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut SourceCodeInfoBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -654,7 +760,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
             }
             ::puroro::types::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    let msg = self.location.push_and_get_mut();
+                    let msg = self.location.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -676,16 +782,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for SourceCodeInfoBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for SourceCodeInfoBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for SourceCodeInfoBumpalo {
+impl<'b> ::puroro::serializer::Serializable for SourceCodeInfoBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -697,7 +804,7 @@ impl ::puroro::serializer::Serializable for SourceCodeInfoBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for SourceCodeInfoBumpalo {
+impl<'b> ::puroro::Serializable for SourceCodeInfoBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -716,6 +823,12 @@ impl SourceCodeInfoTrait for SourceCodeInfoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::source_code_info::Location>> {
         ::std::boxed::Box::new(self.location.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type LocationIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::source_code_info::Location>;
+    #[cfg(feature = "puroro-nightly")]
+    fn location_iter(&self) -> Self::LocationIter<'_> {
+        self.location.iter()
+    }
 }
 pub trait SourceCodeInfoTrait {
     fn for_each_location<F>(&self, f: F)
@@ -723,14 +836,18 @@ pub trait SourceCodeInfoTrait {
         F: FnMut(&super::super::google::protobuf::source_code_info::Location);
     fn location_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::source_code_info::Location>>;
+    #[cfg(feature = "puroro-nightly")]
+    type LocationIter<'a>: Iterator<Item=&'a super::super::google::protobuf::source_code_info::Location>;
+    #[cfg(feature = "puroro-nightly")]
+    fn location_iter(&self) -> Self::LocationIter<'_>;
 }
 pub trait SourceCodeInfoMutTrait {
     fn for_each_location_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::source_code_info::Location);
+        F: FnMut(&mut super::super::google::protobuf::source_code_info::Location);
     fn location_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::source_code_info::Location>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::source_code_info::Location>>;
+    // We need more! 
 }
 pub mod source_code_info {
 
@@ -741,10 +858,11 @@ pub struct Location {
     pub leading_comments: ::std::string::String,
     pub trailing_comments: ::std::string::String,
     pub leading_detached_comments: ::std::vec::Vec<::std::string::String>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for Location {
-    fn default() -> Self {
+impl Location {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             path: ::std::default::Default::default(),
@@ -752,11 +870,18 @@ impl ::std::default::Default for Location {
             leading_comments: ::std::default::Default::default(),
             trailing_comments: ::std::default::Default::default(),
             leading_detached_comments: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut Location {
+impl ::std::default::Default for Location {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Location {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -830,8 +955,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for Location {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -885,6 +1011,12 @@ impl LocationTrait for Location {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type PathIter<'a> = impl Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn path_iter(&self) -> Self::PathIter<'_> {
+        self.path.iter().cloned()
+    }
     fn for_each_span<F>(&self, mut f: F)
     where
         F: FnMut(i32) {
@@ -895,6 +1027,12 @@ impl LocationTrait for Location {
     fn span_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.span.iter().cloned())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type SpanIter<'a> = impl Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn span_iter(&self) -> Self::SpanIter<'_> {
+        self.span.iter().cloned()
     }
     fn leading_comments(&self) -> &str {
         self.leading_comments.as_ref()
@@ -913,18 +1051,40 @@ impl LocationTrait for Location {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
         ::std::boxed::Box::new(self.leading_detached_comments.iter().map(|v| v.as_ref()))
     }
+    #[cfg(feature = "puroro-nightly")]
+    type LeadingDetachedCommentsIter<'a> = impl Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn leading_detached_comments_iter(&self) -> Self::LeadingDetachedCommentsIter<'_> {
+        self.leading_detached_comments.iter().map(|v| v.as_ref())
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct LocationBumpalo {
+pub struct LocationBumpalo<'b> {
     pub path: ::bumpalo::collections::Vec<i32>,
     pub span: ::bumpalo::collections::Vec<i32>,
     pub leading_comments: ::bumpalo::collections::String,
     pub trailing_comments: ::bumpalo::collections::String,
     pub leading_detached_comments: ::bumpalo::collections::Vec<::bumpalo::collections::String>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut LocationBumpalo {
+impl<'b> LocationBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            path: ::std::default::Default::default(),
+            span: ::std::default::Default::default(),
+            leading_comments: ::std::default::Default::default(),
+            trailing_comments: ::std::default::Default::default(),
+            leading_detached_comments: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut LocationBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -997,16 +1157,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for LocationBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for LocationBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for LocationBumpalo {
+impl<'b> ::puroro::serializer::Serializable for LocationBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -1034,7 +1195,7 @@ impl ::puroro::serializer::Serializable for LocationBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for LocationBumpalo {
+impl<'b> ::puroro::Serializable for LocationBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -1053,6 +1214,12 @@ impl LocationTrait for LocationBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type PathIter<'a> = impl Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn path_iter(&self) -> Self::PathIter<'_> {
+        self.path.iter().cloned()
+    }
     fn for_each_span<F>(&self, mut f: F)
     where
         F: FnMut(i32) {
@@ -1063,6 +1230,12 @@ impl LocationTrait for LocationBumpalo {
     fn span_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.span.iter().cloned())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type SpanIter<'a> = impl Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn span_iter(&self) -> Self::SpanIter<'_> {
+        self.span.iter().cloned()
     }
     fn leading_comments(&self) -> &str {
         self.leading_comments.as_ref()
@@ -1081,6 +1254,12 @@ impl LocationTrait for LocationBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
         ::std::boxed::Box::new(self.leading_detached_comments.iter().map(|v| v.as_ref()))
     }
+    #[cfg(feature = "puroro-nightly")]
+    type LeadingDetachedCommentsIter<'a> = impl Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn leading_detached_comments_iter(&self) -> Self::LeadingDetachedCommentsIter<'_> {
+        self.leading_detached_comments.iter().map(|v| v.as_ref())
+    }
 }
 pub trait LocationTrait {
     fn for_each_path<F>(&self, f: F)
@@ -1088,11 +1267,19 @@ pub trait LocationTrait {
         F: FnMut(i32);
     fn path_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
+    #[cfg(feature = "puroro-nightly")]
+    type PathIter<'a>: Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn path_iter(&self) -> Self::PathIter<'_>;
     fn for_each_span<F>(&self, f: F)
     where
         F: FnMut(i32);
     fn span_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
+    #[cfg(feature = "puroro-nightly")]
+    type SpanIter<'a>: Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn span_iter(&self) -> Self::SpanIter<'_>;
     fn leading_comments(&self) -> &str;
     fn trailing_comments(&self) -> &str;
     fn for_each_leading_detached_comments<F>(&self, f: F)
@@ -1100,28 +1287,32 @@ pub trait LocationTrait {
         F: FnMut(&str);
     fn leading_detached_comments_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+    #[cfg(feature = "puroro-nightly")]
+    type LeadingDetachedCommentsIter<'a>: Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn leading_detached_comments_iter(&self) -> Self::LeadingDetachedCommentsIter<'_>;
 }
 pub trait LocationMutTrait {
     fn for_each_path_mut<F>(&self, f: F)
     where
-        F: FnMut(i32);
+        F: FnMut(&mut i32);
     fn path_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
+    // We need more! 
     fn for_each_span_mut<F>(&self, f: F)
     where
-        F: FnMut(i32);
+        F: FnMut(&mut i32);
     fn span_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
-    fn leading_comments_mut(&self) -> &str;
-    fn trailing_comments_mut(&self) -> &str;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
+    // We need more! 
+    fn leading_comments_mut(&self) -> &mut String;
+    fn trailing_comments_mut(&self) -> &mut String;
     fn for_each_leading_detached_comments_mut<F>(&self, f: F)
     where
-        F: FnMut(&str);
+        F: FnMut(&mut String);
     fn leading_detached_comments_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
+    // We need more! 
 }
 } // mod source_code_info
 
@@ -1134,10 +1325,11 @@ pub struct UninterpretedOption {
     pub double_value: f64,
     pub string_value: ::std::vec::Vec<u8>,
     pub aggregate_value: ::std::string::String,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for UninterpretedOption {
-    fn default() -> Self {
+impl UninterpretedOption {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -1147,11 +1339,18 @@ impl ::std::default::Default for UninterpretedOption {
             double_value: ::std::default::Default::default(),
             string_value: ::std::default::Default::default(),
             aggregate_value: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut UninterpretedOption {
+impl ::std::default::Default for UninterpretedOption {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut UninterpretedOption {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1180,7 +1379,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
             }
             ::puroro::types::Field::LengthDelimited(ldd) => match field_number {
                 2 => {
-                    let msg = self.name.push_and_get_mut();
+                    let msg = self.name.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 3 => {
@@ -1237,8 +1436,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for UninterpretedOption {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -1298,6 +1498,12 @@ impl UninterpretedOptionTrait for UninterpretedOption {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::uninterpreted_option::NamePart>> {
         ::std::boxed::Box::new(self.name.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type NameIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::uninterpreted_option::NamePart>;
+    #[cfg(feature = "puroro-nightly")]
+    fn name_iter(&self) -> Self::NameIter<'_> {
+        self.name.iter()
+    }
     fn identifier_value(&self) -> &str {
         self.identifier_value.as_ref()
     }
@@ -1319,7 +1525,7 @@ impl UninterpretedOptionTrait for UninterpretedOption {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct UninterpretedOptionBumpalo {
+pub struct UninterpretedOptionBumpalo<'b> {
     pub name: ::bumpalo::collections::Vec<super::super::google::protobuf::uninterpreted_option::NamePart>,
     pub identifier_value: ::bumpalo::collections::String,
     pub positive_int_value: u64,
@@ -1327,9 +1533,27 @@ pub struct UninterpretedOptionBumpalo {
     pub double_value: f64,
     pub string_value: ::bumpalo::collections::Vec<u8>,
     pub aggregate_value: ::bumpalo::collections::String,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut UninterpretedOptionBumpalo {
+impl<'b> UninterpretedOptionBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            identifier_value: ::std::default::Default::default(),
+            positive_int_value: ::std::default::Default::default(),
+            negative_int_value: ::std::default::Default::default(),
+            double_value: ::std::default::Default::default(),
+            string_value: ::std::default::Default::default(),
+            aggregate_value: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut UninterpretedOptionBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1358,7 +1582,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
             }
             ::puroro::types::Field::LengthDelimited(ldd) => match field_number {
                 2 => {
-                    let msg = self.name.push_and_get_mut();
+                    let msg = self.name.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 3 => {
@@ -1414,16 +1638,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for UninterpretedOptionBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for UninterpretedOptionBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for UninterpretedOptionBumpalo {
+impl<'b> ::puroro::serializer::Serializable for UninterpretedOptionBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -1457,7 +1682,7 @@ impl ::puroro::serializer::Serializable for UninterpretedOptionBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for UninterpretedOptionBumpalo {
+impl<'b> ::puroro::Serializable for UninterpretedOptionBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -1475,6 +1700,12 @@ impl UninterpretedOptionTrait for UninterpretedOptionBumpalo {
     fn name_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::uninterpreted_option::NamePart>> {
         ::std::boxed::Box::new(self.name.iter())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type NameIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::uninterpreted_option::NamePart>;
+    #[cfg(feature = "puroro-nightly")]
+    fn name_iter(&self) -> Self::NameIter<'_> {
+        self.name.iter()
     }
     fn identifier_value(&self) -> &str {
         self.identifier_value.as_ref()
@@ -1501,6 +1732,10 @@ pub trait UninterpretedOptionTrait {
         F: FnMut(&super::super::google::protobuf::uninterpreted_option::NamePart);
     fn name_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::uninterpreted_option::NamePart>>;
+    #[cfg(feature = "puroro-nightly")]
+    type NameIter<'a>: Iterator<Item=&'a super::super::google::protobuf::uninterpreted_option::NamePart>;
+    #[cfg(feature = "puroro-nightly")]
+    fn name_iter(&self) -> Self::NameIter<'_>;
     fn identifier_value(&self) -> &str;
     fn positive_int_value(&self) -> u64;
     fn negative_int_value(&self) -> i64;
@@ -1511,16 +1746,16 @@ pub trait UninterpretedOptionTrait {
 pub trait UninterpretedOptionMutTrait {
     fn for_each_name_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::uninterpreted_option::NamePart);
+        F: FnMut(&mut super::super::google::protobuf::uninterpreted_option::NamePart);
     fn name_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::uninterpreted_option::NamePart>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
-    fn identifier_value_mut(&self) -> &str;
-    fn positive_int_value_mut(&self) -> u64;
-    fn negative_int_value_mut(&self) -> i64;
-    fn double_value_mut(&self) -> f64;
-    fn string_value_mut(&self) -> &[u8];
-    fn aggregate_value_mut(&self) -> &str;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::uninterpreted_option::NamePart>>;
+    // We need more! 
+    fn identifier_value_mut(&self) -> &mut String;
+    fn positive_int_value_mut(&self) -> &mut u64;
+    fn negative_int_value_mut(&self) -> &mut i64;
+    fn double_value_mut(&self) -> &mut f64;
+    fn string_value_mut(&self) -> &mut Vec<u8>;
+    fn aggregate_value_mut(&self) -> &mut String;
 }
 pub mod uninterpreted_option {
 
@@ -1528,19 +1763,27 @@ pub mod uninterpreted_option {
 pub struct NamePart {
     pub name_part: ::std::string::String,
     pub is_extension: bool,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for NamePart {
-    fn default() -> Self {
+impl NamePart {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             name_part: ::std::default::Default::default(),
             is_extension: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut NamePart {
+impl ::std::default::Default for NamePart {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut NamePart {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1593,8 +1836,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for NamePart {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -1635,12 +1879,25 @@ impl NamePartTrait for NamePart {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct NamePartBumpalo {
+pub struct NamePartBumpalo<'b> {
     pub name_part: ::bumpalo::collections::String,
     pub is_extension: bool,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut NamePartBumpalo {
+impl<'b> NamePartBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name_part: ::std::default::Default::default(),
+            is_extension: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut NamePartBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1692,16 +1949,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for NamePartBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for NamePartBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for NamePartBumpalo {
+impl<'b> ::puroro::serializer::Serializable for NamePartBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -1718,7 +1976,7 @@ impl ::puroro::serializer::Serializable for NamePartBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for NamePartBumpalo {
+impl<'b> ::puroro::Serializable for NamePartBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -1738,8 +1996,8 @@ pub trait NamePartTrait {
     fn is_extension(&self) -> bool;
 }
 pub trait NamePartMutTrait {
-    fn name_part_mut(&self) -> &str;
-    fn is_extension_mut(&self) -> bool;
+    fn name_part_mut(&self) -> &mut String;
+    fn is_extension_mut(&self) -> &mut bool;
 }
 } // mod uninterpreted_option
 
@@ -1748,20 +2006,28 @@ pub struct MethodOptions {
     pub deprecated: bool,
     pub idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for MethodOptions {
-    fn default() -> Self {
+impl MethodOptions {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             deprecated: ::std::default::Default::default(),
             idempotency_level: 0i32.try_into(),
             uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MethodOptions {
+impl ::std::default::Default for MethodOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut MethodOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1802,7 +2068,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.idempotency_level, first, iter);
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -1825,8 +2091,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for MethodOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -1880,16 +2147,36 @@ impl MethodOptionsTrait for MethodOptions {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct MethodOptionsBumpalo {
+pub struct MethodOptionsBumpalo<'b> {
     pub deprecated: bool,
     pub idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MethodOptionsBumpalo {
+impl<'b> MethodOptionsBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            deprecated: ::std::default::Default::default(),
+            idempotency_level: 0i32.try_into(),
+            uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut MethodOptionsBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -1930,7 +2217,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.idempotency_level, first, iter);
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -1952,16 +2239,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for MethodOptionsBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for MethodOptionsBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for MethodOptionsBumpalo {
+impl<'b> ::puroro::serializer::Serializable for MethodOptionsBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -1983,7 +2271,7 @@ impl ::puroro::serializer::Serializable for MethodOptionsBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for MethodOptionsBumpalo {
+impl<'b> ::puroro::Serializable for MethodOptionsBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -2008,6 +2296,12 @@ impl MethodOptionsTrait for MethodOptionsBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 pub trait MethodOptionsTrait {
     fn deprecated(&self) -> bool;
@@ -2017,16 +2311,20 @@ pub trait MethodOptionsTrait {
         F: FnMut(&super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 pub trait MethodOptionsMutTrait {
-    fn deprecated_mut(&self) -> bool;
-    fn idempotency_level_mut(&self) -> ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>;
+    fn deprecated_mut(&self) -> &mut bool;
+    fn idempotency_level_mut(&self) -> &mut ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>;
     fn for_each_uninterpreted_option_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
+    // We need more! 
 }
 pub mod method_options {
 #[derive(Debug, Clone)]
@@ -2057,19 +2355,27 @@ impl ::std::convert::Into<i32> for IdempotencyLevel {
 pub struct ServiceOptions {
     pub deprecated: bool,
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for ServiceOptions {
-    fn default() -> Self {
+impl ServiceOptions {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             deprecated: ::std::default::Default::default(),
             uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ServiceOptions {
+impl ::std::default::Default for ServiceOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ServiceOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -2099,7 +2405,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -2122,8 +2428,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for ServiceOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -2169,15 +2476,34 @@ impl ServiceOptionsTrait for ServiceOptions {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct ServiceOptionsBumpalo {
+pub struct ServiceOptionsBumpalo<'b> {
     pub deprecated: bool,
     pub uninterpreted_option: ::bumpalo::collections::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ServiceOptionsBumpalo {
+impl<'b> ServiceOptionsBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            deprecated: ::std::default::Default::default(),
+            uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ServiceOptionsBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -2207,7 +2533,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -2229,16 +2555,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for ServiceOptionsBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for ServiceOptionsBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for ServiceOptionsBumpalo {
+impl<'b> ::puroro::serializer::Serializable for ServiceOptionsBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -2255,7 +2582,7 @@ impl ::puroro::serializer::Serializable for ServiceOptionsBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for ServiceOptionsBumpalo {
+impl<'b> ::puroro::Serializable for ServiceOptionsBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -2277,6 +2604,12 @@ impl ServiceOptionsTrait for ServiceOptionsBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 pub trait ServiceOptionsTrait {
     fn deprecated(&self) -> bool;
@@ -2285,34 +2618,46 @@ pub trait ServiceOptionsTrait {
         F: FnMut(&super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 pub trait ServiceOptionsMutTrait {
-    fn deprecated_mut(&self) -> bool;
+    fn deprecated_mut(&self) -> &mut bool;
     fn for_each_uninterpreted_option_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
+    // We need more! 
 }
 
 #[derive(Debug, Clone)]
 pub struct EnumValueOptions {
     pub deprecated: bool,
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for EnumValueOptions {
-    fn default() -> Self {
+impl EnumValueOptions {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             deprecated: ::std::default::Default::default(),
             uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumValueOptions {
+impl ::std::default::Default for EnumValueOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumValueOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -2342,7 +2687,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -2365,8 +2710,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for EnumValueOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -2412,15 +2758,34 @@ impl EnumValueOptionsTrait for EnumValueOptions {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct EnumValueOptionsBumpalo {
+pub struct EnumValueOptionsBumpalo<'b> {
     pub deprecated: bool,
     pub uninterpreted_option: ::bumpalo::collections::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumValueOptionsBumpalo {
+impl<'b> EnumValueOptionsBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            deprecated: ::std::default::Default::default(),
+            uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumValueOptionsBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -2450,7 +2815,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -2472,16 +2837,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for EnumValueOptionsBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for EnumValueOptionsBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for EnumValueOptionsBumpalo {
+impl<'b> ::puroro::serializer::Serializable for EnumValueOptionsBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -2498,7 +2864,7 @@ impl ::puroro::serializer::Serializable for EnumValueOptionsBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for EnumValueOptionsBumpalo {
+impl<'b> ::puroro::Serializable for EnumValueOptionsBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -2520,6 +2886,12 @@ impl EnumValueOptionsTrait for EnumValueOptionsBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 pub trait EnumValueOptionsTrait {
     fn deprecated(&self) -> bool;
@@ -2528,15 +2900,19 @@ pub trait EnumValueOptionsTrait {
         F: FnMut(&super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 pub trait EnumValueOptionsMutTrait {
-    fn deprecated_mut(&self) -> bool;
+    fn deprecated_mut(&self) -> &mut bool;
     fn for_each_uninterpreted_option_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
+    // We need more! 
 }
 
 #[derive(Debug, Clone)]
@@ -2544,20 +2920,28 @@ pub struct EnumOptions {
     pub allow_alias: bool,
     pub deprecated: bool,
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for EnumOptions {
-    fn default() -> Self {
+impl EnumOptions {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             allow_alias: ::std::default::Default::default(),
             deprecated: ::std::default::Default::default(),
             uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumOptions {
+impl ::std::default::Default for EnumOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -2598,7 +2982,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -2621,8 +3005,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for EnumOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -2676,16 +3061,36 @@ impl EnumOptionsTrait for EnumOptions {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct EnumOptionsBumpalo {
+pub struct EnumOptionsBumpalo<'b> {
     pub allow_alias: bool,
     pub deprecated: bool,
     pub uninterpreted_option: ::bumpalo::collections::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumOptionsBumpalo {
+impl<'b> EnumOptionsBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            allow_alias: ::std::default::Default::default(),
+            deprecated: ::std::default::Default::default(),
+            uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumOptionsBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -2726,7 +3131,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -2748,16 +3153,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for EnumOptionsBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for EnumOptionsBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for EnumOptionsBumpalo {
+impl<'b> ::puroro::serializer::Serializable for EnumOptionsBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -2779,7 +3185,7 @@ impl ::puroro::serializer::Serializable for EnumOptionsBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for EnumOptionsBumpalo {
+impl<'b> ::puroro::Serializable for EnumOptionsBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -2804,6 +3210,12 @@ impl EnumOptionsTrait for EnumOptionsBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 pub trait EnumOptionsTrait {
     fn allow_alias(&self) -> bool;
@@ -2813,33 +3225,45 @@ pub trait EnumOptionsTrait {
         F: FnMut(&super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 pub trait EnumOptionsMutTrait {
-    fn allow_alias_mut(&self) -> bool;
-    fn deprecated_mut(&self) -> bool;
+    fn allow_alias_mut(&self) -> &mut bool;
+    fn deprecated_mut(&self) -> &mut bool;
     fn for_each_uninterpreted_option_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
+    // We need more! 
 }
 
 #[derive(Debug, Clone)]
 pub struct OneofOptions {
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for OneofOptions {
-    fn default() -> Self {
+impl OneofOptions {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut OneofOptions {
+impl ::std::default::Default for OneofOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut OneofOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -2858,7 +3282,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
             }
             ::puroro::types::Field::LengthDelimited(ldd) => match field_number {
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -2881,8 +3305,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for OneofOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -2920,14 +3345,32 @@ impl OneofOptionsTrait for OneofOptions {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct OneofOptionsBumpalo {
+pub struct OneofOptionsBumpalo<'b> {
     pub uninterpreted_option: ::bumpalo::collections::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut OneofOptionsBumpalo {
+impl<'b> OneofOptionsBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut OneofOptionsBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -2946,7 +3389,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
             }
             ::puroro::types::Field::LengthDelimited(ldd) => match field_number {
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -2968,16 +3411,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for OneofOptionsBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for OneofOptionsBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for OneofOptionsBumpalo {
+impl<'b> ::puroro::serializer::Serializable for OneofOptionsBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -2989,7 +3433,7 @@ impl ::puroro::serializer::Serializable for OneofOptionsBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for OneofOptionsBumpalo {
+impl<'b> ::puroro::Serializable for OneofOptionsBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -3008,6 +3452,12 @@ impl OneofOptionsTrait for OneofOptionsBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 pub trait OneofOptionsTrait {
     fn for_each_uninterpreted_option<F>(&self, f: F)
@@ -3015,14 +3465,18 @@ pub trait OneofOptionsTrait {
         F: FnMut(&super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 pub trait OneofOptionsMutTrait {
     fn for_each_uninterpreted_option_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
+    // We need more! 
 }
 
 #[derive(Debug, Clone)]
@@ -3034,10 +3488,11 @@ pub struct FieldOptions {
     pub deprecated: bool,
     pub weak: bool,
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for FieldOptions {
-    fn default() -> Self {
+impl FieldOptions {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             ctype: 0i32.try_into(),
@@ -3047,11 +3502,18 @@ impl ::std::default::Default for FieldOptions {
             deprecated: ::std::default::Default::default(),
             weak: ::std::default::Default::default(),
             uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FieldOptions {
+impl ::std::default::Default for FieldOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FieldOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -3136,7 +3598,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.weak, first, iter);
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -3159,8 +3621,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for FieldOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -3246,10 +3709,16 @@ impl FieldOptionsTrait for FieldOptions {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct FieldOptionsBumpalo {
+pub struct FieldOptionsBumpalo<'b> {
     pub ctype: ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>,
     pub packed: bool,
     pub jstype: ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32>,
@@ -3257,9 +3726,27 @@ pub struct FieldOptionsBumpalo {
     pub deprecated: bool,
     pub weak: bool,
     pub uninterpreted_option: ::bumpalo::collections::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FieldOptionsBumpalo {
+impl<'b> FieldOptionsBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            ctype: 0i32.try_into(),
+            packed: ::std::default::Default::default(),
+            jstype: 0i32.try_into(),
+            lazy: ::std::default::Default::default(),
+            deprecated: ::std::default::Default::default(),
+            weak: ::std::default::Default::default(),
+            uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FieldOptionsBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -3344,7 +3831,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.weak, first, iter);
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -3366,16 +3853,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for FieldOptionsBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for FieldOptionsBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for FieldOptionsBumpalo {
+impl<'b> ::puroro::serializer::Serializable for FieldOptionsBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -3417,7 +3905,7 @@ impl ::puroro::serializer::Serializable for FieldOptionsBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for FieldOptionsBumpalo {
+impl<'b> ::puroro::Serializable for FieldOptionsBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -3454,6 +3942,12 @@ impl FieldOptionsTrait for FieldOptionsBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 pub trait FieldOptionsTrait {
     fn ctype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>;
@@ -3467,20 +3961,24 @@ pub trait FieldOptionsTrait {
         F: FnMut(&super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 pub trait FieldOptionsMutTrait {
-    fn ctype_mut(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>;
-    fn packed_mut(&self) -> bool;
-    fn jstype_mut(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32>;
-    fn lazy_mut(&self) -> bool;
-    fn deprecated_mut(&self) -> bool;
-    fn weak_mut(&self) -> bool;
+    fn ctype_mut(&self) -> &mut ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>;
+    fn packed_mut(&self) -> &mut bool;
+    fn jstype_mut(&self) -> &mut ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32>;
+    fn lazy_mut(&self) -> &mut bool;
+    fn deprecated_mut(&self) -> &mut bool;
+    fn weak_mut(&self) -> &mut bool;
     fn for_each_uninterpreted_option_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
+    // We need more! 
 }
 pub mod field_options {
 #[derive(Debug, Clone)]
@@ -3536,10 +4034,11 @@ pub struct MessageOptions {
     pub deprecated: bool,
     pub map_entry: bool,
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for MessageOptions {
-    fn default() -> Self {
+impl MessageOptions {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             message_set_wire_format: ::std::default::Default::default(),
@@ -3547,11 +4046,18 @@ impl ::std::default::Default for MessageOptions {
             deprecated: ::std::default::Default::default(),
             map_entry: ::std::default::Default::default(),
             uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MessageOptions {
+impl ::std::default::Default for MessageOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut MessageOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -3614,7 +4120,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.map_entry, first, iter);
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -3637,8 +4143,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for MessageOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -3708,18 +4215,40 @@ impl MessageOptionsTrait for MessageOptions {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct MessageOptionsBumpalo {
+pub struct MessageOptionsBumpalo<'b> {
     pub message_set_wire_format: bool,
     pub no_standard_descriptor_accessor: bool,
     pub deprecated: bool,
     pub map_entry: bool,
     pub uninterpreted_option: ::bumpalo::collections::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MessageOptionsBumpalo {
+impl<'b> MessageOptionsBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            message_set_wire_format: ::std::default::Default::default(),
+            no_standard_descriptor_accessor: ::std::default::Default::default(),
+            deprecated: ::std::default::Default::default(),
+            map_entry: ::std::default::Default::default(),
+            uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut MessageOptionsBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -3782,7 +4311,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.map_entry, first, iter);
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -3804,16 +4333,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for MessageOptionsBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for MessageOptionsBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for MessageOptionsBumpalo {
+impl<'b> ::puroro::serializer::Serializable for MessageOptionsBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -3845,7 +4375,7 @@ impl ::puroro::serializer::Serializable for MessageOptionsBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for MessageOptionsBumpalo {
+impl<'b> ::puroro::Serializable for MessageOptionsBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -3876,6 +4406,12 @@ impl MessageOptionsTrait for MessageOptionsBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 pub trait MessageOptionsTrait {
     fn message_set_wire_format(&self) -> bool;
@@ -3887,18 +4423,22 @@ pub trait MessageOptionsTrait {
         F: FnMut(&super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 pub trait MessageOptionsMutTrait {
-    fn message_set_wire_format_mut(&self) -> bool;
-    fn no_standard_descriptor_accessor_mut(&self) -> bool;
-    fn deprecated_mut(&self) -> bool;
-    fn map_entry_mut(&self) -> bool;
+    fn message_set_wire_format_mut(&self) -> &mut bool;
+    fn no_standard_descriptor_accessor_mut(&self) -> &mut bool;
+    fn deprecated_mut(&self) -> &mut bool;
+    fn map_entry_mut(&self) -> &mut bool;
     fn for_each_uninterpreted_option_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
+    // We need more! 
 }
 
 #[derive(Debug, Clone)]
@@ -3924,10 +4464,11 @@ pub struct FileOptions {
     pub php_metadata_namespace: ::std::string::String,
     pub ruby_package: ::std::string::String,
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for FileOptions {
-    fn default() -> Self {
+impl FileOptions {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             java_package: ::std::default::Default::default(),
@@ -3951,11 +4492,18 @@ impl ::std::default::Default for FileOptions {
             php_metadata_namespace: ::std::default::Default::default(),
             ruby_package: ::std::default::Default::default(),
             uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileOptions {
+impl ::std::default::Default for FileOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -4134,7 +4682,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -4157,8 +4705,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for FileOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -4336,10 +4885,16 @@ impl FileOptionsTrait for FileOptions {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct FileOptionsBumpalo {
+pub struct FileOptionsBumpalo<'b> {
     pub java_package: ::bumpalo::collections::String,
     pub java_outer_classname: ::bumpalo::collections::String,
     pub java_multiple_files: bool,
@@ -4361,9 +4916,41 @@ pub struct FileOptionsBumpalo {
     pub php_metadata_namespace: ::bumpalo::collections::String,
     pub ruby_package: ::bumpalo::collections::String,
     pub uninterpreted_option: ::bumpalo::collections::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileOptionsBumpalo {
+impl<'b> FileOptionsBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            java_package: ::std::default::Default::default(),
+            java_outer_classname: ::std::default::Default::default(),
+            java_multiple_files: ::std::default::Default::default(),
+            java_generate_equals_and_hash: ::std::default::Default::default(),
+            java_string_check_utf8: ::std::default::Default::default(),
+            optimize_for: 0i32.try_into(),
+            go_package: ::std::default::Default::default(),
+            cc_generic_services: ::std::default::Default::default(),
+            java_generic_services: ::std::default::Default::default(),
+            py_generic_services: ::std::default::Default::default(),
+            php_generic_services: ::std::default::Default::default(),
+            deprecated: ::std::default::Default::default(),
+            cc_enable_arenas: ::std::default::Default::default(),
+            objc_class_prefix: ::std::default::Default::default(),
+            csharp_namespace: ::std::default::Default::default(),
+            swift_prefix: ::std::default::Default::default(),
+            php_class_prefix: ::std::default::Default::default(),
+            php_namespace: ::std::default::Default::default(),
+            php_metadata_namespace: ::std::default::Default::default(),
+            ruby_package: ::std::default::Default::default(),
+            uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileOptionsBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -4542,7 +5129,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -4564,16 +5151,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for FileOptionsBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for FileOptionsBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for FileOptionsBumpalo {
+impl<'b> ::puroro::serializer::Serializable for FileOptionsBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -4665,7 +5253,7 @@ impl ::puroro::serializer::Serializable for FileOptionsBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for FileOptionsBumpalo {
+impl<'b> ::puroro::Serializable for FileOptionsBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -4744,6 +5332,12 @@ impl FileOptionsTrait for FileOptionsBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 pub trait FileOptionsTrait {
     fn java_package(&self) -> &str;
@@ -4771,34 +5365,38 @@ pub trait FileOptionsTrait {
         F: FnMut(&super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 pub trait FileOptionsMutTrait {
-    fn java_package_mut(&self) -> &str;
-    fn java_outer_classname_mut(&self) -> &str;
-    fn java_multiple_files_mut(&self) -> bool;
-    fn java_generate_equals_and_hash_mut(&self) -> bool;
-    fn java_string_check_utf8_mut(&self) -> bool;
-    fn optimize_for_mut(&self) -> ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>;
-    fn go_package_mut(&self) -> &str;
-    fn cc_generic_services_mut(&self) -> bool;
-    fn java_generic_services_mut(&self) -> bool;
-    fn py_generic_services_mut(&self) -> bool;
-    fn php_generic_services_mut(&self) -> bool;
-    fn deprecated_mut(&self) -> bool;
-    fn cc_enable_arenas_mut(&self) -> bool;
-    fn objc_class_prefix_mut(&self) -> &str;
-    fn csharp_namespace_mut(&self) -> &str;
-    fn swift_prefix_mut(&self) -> &str;
-    fn php_class_prefix_mut(&self) -> &str;
-    fn php_namespace_mut(&self) -> &str;
-    fn php_metadata_namespace_mut(&self) -> &str;
-    fn ruby_package_mut(&self) -> &str;
+    fn java_package_mut(&self) -> &mut String;
+    fn java_outer_classname_mut(&self) -> &mut String;
+    fn java_multiple_files_mut(&self) -> &mut bool;
+    fn java_generate_equals_and_hash_mut(&self) -> &mut bool;
+    fn java_string_check_utf8_mut(&self) -> &mut bool;
+    fn optimize_for_mut(&self) -> &mut ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>;
+    fn go_package_mut(&self) -> &mut String;
+    fn cc_generic_services_mut(&self) -> &mut bool;
+    fn java_generic_services_mut(&self) -> &mut bool;
+    fn py_generic_services_mut(&self) -> &mut bool;
+    fn php_generic_services_mut(&self) -> &mut bool;
+    fn deprecated_mut(&self) -> &mut bool;
+    fn cc_enable_arenas_mut(&self) -> &mut bool;
+    fn objc_class_prefix_mut(&self) -> &mut String;
+    fn csharp_namespace_mut(&self) -> &mut String;
+    fn swift_prefix_mut(&self) -> &mut String;
+    fn php_class_prefix_mut(&self) -> &mut String;
+    fn php_namespace_mut(&self) -> &mut String;
+    fn php_metadata_namespace_mut(&self) -> &mut String;
+    fn ruby_package_mut(&self) -> &mut String;
     fn for_each_uninterpreted_option_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
+    // We need more! 
 }
 pub mod file_options {
 #[derive(Debug, Clone)]
@@ -4833,10 +5431,11 @@ pub struct MethodDescriptorProto {
     pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MethodOptions>>,
     pub client_streaming: bool,
     pub server_streaming: bool,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for MethodDescriptorProto {
-    fn default() -> Self {
+impl MethodDescriptorProto {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -4845,11 +5444,18 @@ impl ::std::default::Default for MethodDescriptorProto {
             options: ::std::default::Default::default(),
             client_streaming: ::std::default::Default::default(),
             server_streaming: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MethodDescriptorProto {
+impl ::std::default::Default for MethodDescriptorProto {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut MethodDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -4889,7 +5495,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 4 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 5 => {
@@ -4928,8 +5534,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for MethodDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -4996,16 +5603,33 @@ impl MethodDescriptorProtoTrait for MethodDescriptorProto {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct MethodDescriptorProtoBumpalo {
+pub struct MethodDescriptorProtoBumpalo<'b> {
     pub name: ::bumpalo::collections::String,
     pub input_type: ::bumpalo::collections::String,
     pub output_type: ::bumpalo::collections::String,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<super::super::google::protobuf::MethodOptions>>,
     pub client_streaming: bool,
     pub server_streaming: bool,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut MethodDescriptorProtoBumpalo {
+impl<'b> MethodDescriptorProtoBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            input_type: ::std::default::Default::default(),
+            output_type: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+            client_streaming: ::std::default::Default::default(),
+            server_streaming: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut MethodDescriptorProtoBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -5045,7 +5669,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 4 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 5 => {
@@ -5083,16 +5707,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for MethodDescriptorProtoBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for MethodDescriptorProtoBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for MethodDescriptorProtoBumpalo {
+impl<'b> ::puroro::serializer::Serializable for MethodDescriptorProtoBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -5123,7 +5748,7 @@ impl ::puroro::serializer::Serializable for MethodDescriptorProtoBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for MethodDescriptorProtoBumpalo {
+impl<'b> ::puroro::Serializable for MethodDescriptorProtoBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -5159,12 +5784,12 @@ pub trait MethodDescriptorProtoTrait {
     fn server_streaming(&self) -> bool;
 }
 pub trait MethodDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &str;
-    fn input_type_mut(&self) -> &str;
-    fn output_type_mut(&self) -> &str;
-    fn options_mut(&self) -> ::std::option::Option<&super::super::google::protobuf::MethodOptions>;
-    fn client_streaming_mut(&self) -> bool;
-    fn server_streaming_mut(&self) -> bool;
+    fn name_mut(&self) -> &mut String;
+    fn input_type_mut(&self) -> &mut String;
+    fn output_type_mut(&self) -> &mut String;
+    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::MethodOptions>;
+    fn client_streaming_mut(&self) -> &mut bool;
+    fn server_streaming_mut(&self) -> &mut bool;
 }
 
 #[derive(Debug, Clone)]
@@ -5172,20 +5797,28 @@ pub struct ServiceDescriptorProto {
     pub name: ::std::string::String,
     pub method: ::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto>,
     pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for ServiceDescriptorProto {
-    fn default() -> Self {
+impl ServiceDescriptorProto {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
             method: ::std::default::Default::default(),
             options: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ServiceDescriptorProto {
+impl ::std::default::Default for ServiceDescriptorProto {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ServiceDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -5210,11 +5843,11 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    let msg = self.method.push_and_get_mut();
+                    let msg = self.method.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 3 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -5237,8 +5870,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for ServiceDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -5285,19 +5919,39 @@ impl ServiceDescriptorProtoTrait for ServiceDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::MethodDescriptorProto>> {
         ::std::boxed::Box::new(self.method.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type MethodIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::MethodDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn method_iter(&self) -> Self::MethodIter<'_> {
+        self.method.iter()
+    }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::ServiceOptions> {
         self.options.as_deref()
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct ServiceDescriptorProtoBumpalo {
+pub struct ServiceDescriptorProtoBumpalo<'b> {
     pub name: ::bumpalo::collections::String,
     pub method: ::bumpalo::collections::Vec<super::super::google::protobuf::MethodDescriptorProto>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<super::super::google::protobuf::ServiceOptions>>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ServiceDescriptorProtoBumpalo {
+impl<'b> ServiceDescriptorProtoBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            method: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ServiceDescriptorProtoBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -5322,11 +5976,11 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    let msg = self.method.push_and_get_mut();
+                    let msg = self.method.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 3 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -5348,16 +6002,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for ServiceDescriptorProtoBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for ServiceDescriptorProtoBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for ServiceDescriptorProtoBumpalo {
+impl<'b> ::puroro::serializer::Serializable for ServiceDescriptorProtoBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -5375,7 +6030,7 @@ impl ::puroro::serializer::Serializable for ServiceDescriptorProtoBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for ServiceDescriptorProtoBumpalo {
+impl<'b> ::puroro::Serializable for ServiceDescriptorProtoBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -5397,6 +6052,12 @@ impl ServiceDescriptorProtoTrait for ServiceDescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::MethodDescriptorProto>> {
         ::std::boxed::Box::new(self.method.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type MethodIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::MethodDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn method_iter(&self) -> Self::MethodIter<'_> {
+        self.method.iter()
+    }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::ServiceOptions> {
         self.options.as_deref()
     }
@@ -5408,17 +6069,21 @@ pub trait ServiceDescriptorProtoTrait {
         F: FnMut(&super::super::google::protobuf::MethodDescriptorProto);
     fn method_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::MethodDescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type MethodIter<'a>: Iterator<Item=&'a super::super::google::protobuf::MethodDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn method_iter(&self) -> Self::MethodIter<'_>;
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::ServiceOptions>;
 }
 pub trait ServiceDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &str;
+    fn name_mut(&self) -> &mut String;
     fn for_each_method_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::MethodDescriptorProto);
+        F: FnMut(&mut super::super::google::protobuf::MethodDescriptorProto);
     fn method_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::MethodDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
-    fn options_mut(&self) -> ::std::option::Option<&super::super::google::protobuf::ServiceOptions>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::MethodDescriptorProto>>;
+    // We need more! 
+    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::ServiceOptions>;
 }
 
 #[derive(Debug, Clone)]
@@ -5426,20 +6091,28 @@ pub struct EnumValueDescriptorProto {
     pub name: ::std::string::String,
     pub number: i32,
     pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for EnumValueDescriptorProto {
-    fn default() -> Self {
+impl EnumValueDescriptorProto {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
             number: ::std::default::Default::default(),
             options: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumValueDescriptorProto {
+impl ::std::default::Default for EnumValueDescriptorProto {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumValueDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -5474,7 +6147,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.number, first, iter);
                 }
                 3 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -5497,8 +6170,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for EnumValueDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -5545,13 +6219,27 @@ impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProto {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct EnumValueDescriptorProtoBumpalo {
+pub struct EnumValueDescriptorProtoBumpalo<'b> {
     pub name: ::bumpalo::collections::String,
     pub number: i32,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<super::super::google::protobuf::EnumValueOptions>>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumValueDescriptorProtoBumpalo {
+impl<'b> EnumValueDescriptorProtoBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            number: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumValueDescriptorProtoBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -5586,7 +6274,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.number, first, iter);
                 }
                 3 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -5608,16 +6296,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for EnumValueDescriptorProtoBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for EnumValueDescriptorProtoBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for EnumValueDescriptorProtoBumpalo {
+impl<'b> ::puroro::serializer::Serializable for EnumValueDescriptorProtoBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -5637,7 +6326,7 @@ impl ::puroro::serializer::Serializable for EnumValueDescriptorProtoBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for EnumValueDescriptorProtoBumpalo {
+impl<'b> ::puroro::Serializable for EnumValueDescriptorProtoBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -5661,9 +6350,9 @@ pub trait EnumValueDescriptorProtoTrait {
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumValueOptions>;
 }
 pub trait EnumValueDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &str;
-    fn number_mut(&self) -> i32;
-    fn options_mut(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumValueOptions>;
+    fn name_mut(&self) -> &mut String;
+    fn number_mut(&self) -> &mut i32;
+    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::EnumValueOptions>;
 }
 
 #[derive(Debug, Clone)]
@@ -5673,10 +6362,11 @@ pub struct EnumDescriptorProto {
     pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>>,
     pub reserved_range: ::std::vec::Vec<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>,
     pub reserved_name: ::std::vec::Vec<::std::string::String>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for EnumDescriptorProto {
-    fn default() -> Self {
+impl EnumDescriptorProto {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -5684,11 +6374,18 @@ impl ::std::default::Default for EnumDescriptorProto {
             options: ::std::default::Default::default(),
             reserved_range: ::std::default::Default::default(),
             reserved_name: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumDescriptorProto {
+impl ::std::default::Default for EnumDescriptorProto {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -5715,15 +6412,15 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    let msg = self.value.push_and_get_mut();
+                    let msg = self.value.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 3 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 4 => {
-                    let msg = self.reserved_range.push_and_get_mut();
+                    let msg = self.reserved_range.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 5 => {
@@ -5750,8 +6447,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for EnumDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -5804,6 +6502,12 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumValueDescriptorProto>> {
         ::std::boxed::Box::new(self.value.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ValueIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::EnumValueDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn value_iter(&self) -> Self::ValueIter<'_> {
+        self.value.iter()
+    }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumOptions> {
         self.options.as_deref()
     }
@@ -5818,6 +6522,12 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>> {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedRangeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>;
+    #[cfg(feature = "puroro-nightly")]
+    fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
+        self.reserved_range.iter()
+    }
     fn for_each_reserved_name<F>(&self, mut f: F)
     where
         F: FnMut(&str) {
@@ -5829,18 +6539,40 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedNameIter<'a> = impl Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_> {
+        self.reserved_name.iter().map(|v| v.as_ref())
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct EnumDescriptorProtoBumpalo {
+pub struct EnumDescriptorProtoBumpalo<'b> {
     pub name: ::bumpalo::collections::String,
     pub value: ::bumpalo::collections::Vec<super::super::google::protobuf::EnumValueDescriptorProto>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<super::super::google::protobuf::EnumOptions>>,
     pub reserved_range: ::bumpalo::collections::Vec<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>,
     pub reserved_name: ::bumpalo::collections::Vec<::bumpalo::collections::String>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumDescriptorProtoBumpalo {
+impl<'b> EnumDescriptorProtoBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            value: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+            reserved_range: ::std::default::Default::default(),
+            reserved_name: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumDescriptorProtoBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -5867,15 +6599,15 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    let msg = self.value.push_and_get_mut();
+                    let msg = self.value.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 3 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 4 => {
-                    let msg = self.reserved_range.push_and_get_mut();
+                    let msg = self.reserved_range.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 5 => {
@@ -5901,16 +6633,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for EnumDescriptorProtoBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for EnumDescriptorProtoBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for EnumDescriptorProtoBumpalo {
+impl<'b> ::puroro::serializer::Serializable for EnumDescriptorProtoBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -5934,7 +6667,7 @@ impl ::puroro::serializer::Serializable for EnumDescriptorProtoBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for EnumDescriptorProtoBumpalo {
+impl<'b> ::puroro::Serializable for EnumDescriptorProtoBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -5956,6 +6689,12 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumValueDescriptorProto>> {
         ::std::boxed::Box::new(self.value.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ValueIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::EnumValueDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn value_iter(&self) -> Self::ValueIter<'_> {
+        self.value.iter()
+    }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumOptions> {
         self.options.as_deref()
     }
@@ -5970,6 +6709,12 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>> {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedRangeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>;
+    #[cfg(feature = "puroro-nightly")]
+    fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
+        self.reserved_range.iter()
+    }
     fn for_each_reserved_name<F>(&self, mut f: F)
     where
         F: FnMut(&str) {
@@ -5981,6 +6726,12 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedNameIter<'a> = impl Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_> {
+        self.reserved_name.iter().map(|v| v.as_ref())
+    }
 }
 pub trait EnumDescriptorProtoTrait {
     fn name(&self) -> &str;
@@ -5989,39 +6740,51 @@ pub trait EnumDescriptorProtoTrait {
         F: FnMut(&super::super::google::protobuf::EnumValueDescriptorProto);
     fn value_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumValueDescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type ValueIter<'a>: Iterator<Item=&'a super::super::google::protobuf::EnumValueDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn value_iter(&self) -> Self::ValueIter<'_>;
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumOptions>;
     fn for_each_reserved_range<F>(&self, f: F)
     where
         F: FnMut(&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange);
     fn reserved_range_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>>;
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedRangeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>;
+    #[cfg(feature = "puroro-nightly")]
+    fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_>;
     fn for_each_reserved_name<F>(&self, f: F)
     where
         F: FnMut(&str);
     fn reserved_name_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedNameIter<'a>: Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_>;
 }
 pub trait EnumDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &str;
+    fn name_mut(&self) -> &mut String;
     fn for_each_value_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::EnumValueDescriptorProto);
+        F: FnMut(&mut super::super::google::protobuf::EnumValueDescriptorProto);
     fn value_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumValueDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
-    fn options_mut(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumOptions>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::EnumValueDescriptorProto>>;
+    // We need more! 
+    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::EnumOptions>;
     fn for_each_reserved_range_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange);
+        F: FnMut(&mut super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange);
     fn reserved_range_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>>;
+    // We need more! 
     fn for_each_reserved_name_mut<F>(&self, f: F)
     where
-        F: FnMut(&str);
+        F: FnMut(&mut String);
     fn reserved_name_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
+    // We need more! 
 }
 pub mod enum_descriptor_proto {
 
@@ -6029,19 +6792,27 @@ pub mod enum_descriptor_proto {
 pub struct EnumReservedRange {
     pub start: i32,
     pub end: i32,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for EnumReservedRange {
-    fn default() -> Self {
+impl EnumReservedRange {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             start: ::std::default::Default::default(),
             end: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumReservedRange {
+impl ::std::default::Default for EnumReservedRange {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumReservedRange {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -6100,8 +6871,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for EnumReservedRange {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -6144,12 +6916,25 @@ impl EnumReservedRangeTrait for EnumReservedRange {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct EnumReservedRangeBumpalo {
+pub struct EnumReservedRangeBumpalo<'b> {
     pub start: i32,
     pub end: i32,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut EnumReservedRangeBumpalo {
+impl<'b> EnumReservedRangeBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            start: ::std::default::Default::default(),
+            end: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumReservedRangeBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -6207,16 +6992,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for EnumReservedRangeBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for EnumReservedRangeBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for EnumReservedRangeBumpalo {
+impl<'b> ::puroro::serializer::Serializable for EnumReservedRangeBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -6235,7 +7021,7 @@ impl ::puroro::serializer::Serializable for EnumReservedRangeBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for EnumReservedRangeBumpalo {
+impl<'b> ::puroro::Serializable for EnumReservedRangeBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -6255,8 +7041,8 @@ pub trait EnumReservedRangeTrait {
     fn end(&self) -> i32;
 }
 pub trait EnumReservedRangeMutTrait {
-    fn start_mut(&self) -> i32;
-    fn end_mut(&self) -> i32;
+    fn start_mut(&self) -> &mut i32;
+    fn end_mut(&self) -> &mut i32;
 }
 } // mod enum_descriptor_proto
 
@@ -6264,19 +7050,27 @@ pub trait EnumReservedRangeMutTrait {
 pub struct OneofDescriptorProto {
     pub name: ::std::string::String,
     pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for OneofDescriptorProto {
-    fn default() -> Self {
+impl OneofDescriptorProto {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
             options: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut OneofDescriptorProto {
+impl ::std::default::Default for OneofDescriptorProto {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut OneofDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -6300,7 +7094,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -6323,8 +7117,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for OneofDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -6363,12 +7158,25 @@ impl OneofDescriptorProtoTrait for OneofDescriptorProto {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct OneofDescriptorProtoBumpalo {
+pub struct OneofDescriptorProtoBumpalo<'b> {
     pub name: ::bumpalo::collections::String,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<super::super::google::protobuf::OneofOptions>>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut OneofDescriptorProtoBumpalo {
+impl<'b> OneofDescriptorProtoBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut OneofDescriptorProtoBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -6392,7 +7200,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -6414,16 +7222,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for OneofDescriptorProtoBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for OneofDescriptorProtoBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for OneofDescriptorProtoBumpalo {
+impl<'b> ::puroro::serializer::Serializable for OneofDescriptorProtoBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -6438,7 +7247,7 @@ impl ::puroro::serializer::Serializable for OneofDescriptorProtoBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for OneofDescriptorProtoBumpalo {
+impl<'b> ::puroro::Serializable for OneofDescriptorProtoBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -6458,8 +7267,8 @@ pub trait OneofDescriptorProtoTrait {
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::OneofOptions>;
 }
 pub trait OneofDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &str;
-    fn options_mut(&self) -> ::std::option::Option<&super::super::google::protobuf::OneofOptions>;
+    fn name_mut(&self) -> &mut String;
+    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::OneofOptions>;
 }
 
 #[derive(Debug, Clone)]
@@ -6475,10 +7284,11 @@ pub struct FieldDescriptorProto {
     pub json_name: ::std::string::String,
     pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FieldOptions>>,
     pub proto3_optional: bool,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for FieldDescriptorProto {
-    fn default() -> Self {
+impl FieldDescriptorProto {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -6492,11 +7302,18 @@ impl ::std::default::Default for FieldDescriptorProto {
             json_name: ::std::default::Default::default(),
             options: ::std::default::Default::default(),
             proto3_optional: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FieldDescriptorProto {
+impl ::std::default::Default for FieldDescriptorProto {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FieldDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -6587,7 +7404,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 8 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 17 => {
@@ -6618,8 +7435,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for FieldDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -6722,7 +7540,7 @@ impl FieldDescriptorProtoTrait for FieldDescriptorProto {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct FieldDescriptorProtoBumpalo {
+pub struct FieldDescriptorProtoBumpalo<'b> {
     pub name: ::bumpalo::collections::String,
     pub number: i32,
     pub label: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>,
@@ -6734,9 +7552,31 @@ pub struct FieldDescriptorProtoBumpalo {
     pub json_name: ::bumpalo::collections::String,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<super::super::google::protobuf::FieldOptions>>,
     pub proto3_optional: bool,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FieldDescriptorProtoBumpalo {
+impl<'b> FieldDescriptorProtoBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            number: ::std::default::Default::default(),
+            label: 0i32.try_into(),
+            type_: 0i32.try_into(),
+            type_name: ::std::default::Default::default(),
+            extendee: ::std::default::Default::default(),
+            default_value: ::std::default::Default::default(),
+            oneof_index: ::std::default::Default::default(),
+            json_name: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+            proto3_optional: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FieldDescriptorProtoBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -6827,7 +7667,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 8 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 17 => {
@@ -6857,16 +7697,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for FieldDescriptorProtoBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for FieldDescriptorProtoBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for FieldDescriptorProtoBumpalo {
+impl<'b> ::puroro::serializer::Serializable for FieldDescriptorProtoBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -6918,7 +7759,7 @@ impl ::puroro::serializer::Serializable for FieldDescriptorProtoBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for FieldDescriptorProtoBumpalo {
+impl<'b> ::puroro::Serializable for FieldDescriptorProtoBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -6974,17 +7815,17 @@ pub trait FieldDescriptorProtoTrait {
     fn proto3_optional(&self) -> bool;
 }
 pub trait FieldDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &str;
-    fn number_mut(&self) -> i32;
-    fn label_mut(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>;
-    fn type__mut(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>;
-    fn type_name_mut(&self) -> &str;
-    fn extendee_mut(&self) -> &str;
-    fn default_value_mut(&self) -> &str;
-    fn oneof_index_mut(&self) -> i32;
-    fn json_name_mut(&self) -> &str;
-    fn options_mut(&self) -> ::std::option::Option<&super::super::google::protobuf::FieldOptions>;
-    fn proto3_optional_mut(&self) -> bool;
+    fn name_mut(&self) -> &mut String;
+    fn number_mut(&self) -> &mut i32;
+    fn label_mut(&self) -> &mut ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>;
+    fn type__mut(&self) -> &mut ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>;
+    fn type_name_mut(&self) -> &mut String;
+    fn extendee_mut(&self) -> &mut String;
+    fn default_value_mut(&self) -> &mut String;
+    fn oneof_index_mut(&self) -> &mut i32;
+    fn json_name_mut(&self) -> &mut String;
+    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::FieldOptions>;
+    fn proto3_optional_mut(&self) -> &mut bool;
 }
 pub mod field_descriptor_proto {
 #[derive(Debug, Clone)]
@@ -7066,18 +7907,26 @@ impl ::std::convert::Into<i32> for Type {
 #[derive(Debug, Clone)]
 pub struct ExtensionRangeOptions {
     pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for ExtensionRangeOptions {
-    fn default() -> Self {
+impl ExtensionRangeOptions {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ExtensionRangeOptions {
+impl ::std::default::Default for ExtensionRangeOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ExtensionRangeOptions {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -7096,7 +7945,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
             }
             ::puroro::types::Field::LengthDelimited(ldd) => match field_number {
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -7119,8 +7968,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for ExtensionRangeOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -7158,14 +8008,32 @@ impl ExtensionRangeOptionsTrait for ExtensionRangeOptions {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct ExtensionRangeOptionsBumpalo {
+pub struct ExtensionRangeOptionsBumpalo<'b> {
     pub uninterpreted_option: ::bumpalo::collections::Vec<super::super::google::protobuf::UninterpretedOption>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ExtensionRangeOptionsBumpalo {
+impl<'b> ExtensionRangeOptionsBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            uninterpreted_option: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ExtensionRangeOptionsBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -7184,7 +8052,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
             }
             ::puroro::types::Field::LengthDelimited(ldd) => match field_number {
                 999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut();
+                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -7206,16 +8074,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for ExtensionRangeOptionsBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for ExtensionRangeOptionsBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for ExtensionRangeOptionsBumpalo {
+impl<'b> ::puroro::serializer::Serializable for ExtensionRangeOptionsBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -7227,7 +8096,7 @@ impl ::puroro::serializer::Serializable for ExtensionRangeOptionsBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for ExtensionRangeOptionsBumpalo {
+impl<'b> ::puroro::Serializable for ExtensionRangeOptionsBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -7246,6 +8115,12 @@ impl ExtensionRangeOptionsTrait for ExtensionRangeOptionsBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
+        self.uninterpreted_option.iter()
+    }
 }
 pub trait ExtensionRangeOptionsTrait {
     fn for_each_uninterpreted_option<F>(&self, f: F)
@@ -7253,14 +8128,18 @@ pub trait ExtensionRangeOptionsTrait {
         F: FnMut(&super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    #[cfg(feature = "puroro-nightly")]
+    fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 pub trait ExtensionRangeOptionsMutTrait {
     fn for_each_uninterpreted_option_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
+    // We need more! 
 }
 
 #[derive(Debug, Clone)]
@@ -7275,10 +8154,11 @@ pub struct DescriptorProto {
     pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MessageOptions>>,
     pub reserved_range: ::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ReservedRange>,
     pub reserved_name: ::std::vec::Vec<::std::string::String>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for DescriptorProto {
-    fn default() -> Self {
+impl DescriptorProto {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -7291,11 +8171,18 @@ impl ::std::default::Default for DescriptorProto {
             options: ::std::default::Default::default(),
             reserved_range: ::std::default::Default::default(),
             reserved_name: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut DescriptorProto {
+impl ::std::default::Default for DescriptorProto {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut DescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -7327,35 +8214,35 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    let msg = self.field.push_and_get_mut();
+                    let msg = self.field.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 6 => {
-                    let msg = self.extension.push_and_get_mut();
+                    let msg = self.extension.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 3 => {
-                    let msg = self.nested_type.push_and_get_mut();
+                    let msg = self.nested_type.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 4 => {
-                    let msg = self.enum_type.push_and_get_mut();
+                    let msg = self.enum_type.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 5 => {
-                    let msg = self.extension_range.push_and_get_mut();
+                    let msg = self.extension_range.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 8 => {
-                    let msg = self.oneof_decl.push_and_get_mut();
+                    let msg = self.oneof_decl.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 7 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 9 => {
-                    let msg = self.reserved_range.push_and_get_mut();
+                    let msg = self.reserved_range.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 10 => {
@@ -7382,8 +8269,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for DescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -7451,6 +8339,12 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
         ::std::boxed::Box::new(self.field.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type FieldIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn field_iter(&self) -> Self::FieldIter<'_> {
+        self.field.iter()
+    }
     fn for_each_extension<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
@@ -7461,6 +8355,12 @@ impl DescriptorProtoTrait for DescriptorProto {
     fn extension_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
         ::std::boxed::Box::new(self.extension.iter())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn extension_iter(&self) -> Self::ExtensionIter<'_> {
+        self.extension.iter()
     }
     fn for_each_nested_type<F>(&self, mut f: F)
     where
@@ -7473,6 +8373,12 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>> {
         ::std::boxed::Box::new(self.nested_type.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type NestedTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::DescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn nested_type_iter(&self) -> Self::NestedTypeIter<'_> {
+        self.nested_type.iter()
+    }
     fn for_each_enum_type<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::EnumDescriptorProto) {
@@ -7483,6 +8389,12 @@ impl DescriptorProtoTrait for DescriptorProto {
     fn enum_type_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>> {
         ::std::boxed::Box::new(self.enum_type.iter())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type EnumTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::EnumDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
+        self.enum_type.iter()
     }
     fn for_each_extension_range<F>(&self, mut f: F)
     where
@@ -7495,6 +8407,12 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ExtensionRange>> {
         ::std::boxed::Box::new(self.extension_range.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionRangeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::descriptor_proto::ExtensionRange>;
+    #[cfg(feature = "puroro-nightly")]
+    fn extension_range_iter(&self) -> Self::ExtensionRangeIter<'_> {
+        self.extension_range.iter()
+    }
     fn for_each_oneof_decl<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::OneofDescriptorProto) {
@@ -7505,6 +8423,12 @@ impl DescriptorProtoTrait for DescriptorProto {
     fn oneof_decl_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::OneofDescriptorProto>> {
         ::std::boxed::Box::new(self.oneof_decl.iter())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type OneofDeclIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::OneofDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn oneof_decl_iter(&self) -> Self::OneofDeclIter<'_> {
+        self.oneof_decl.iter()
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MessageOptions> {
         self.options.as_deref()
@@ -7520,6 +8444,12 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ReservedRange>> {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedRangeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::descriptor_proto::ReservedRange>;
+    #[cfg(feature = "puroro-nightly")]
+    fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
+        self.reserved_range.iter()
+    }
     fn for_each_reserved_name<F>(&self, mut f: F)
     where
         F: FnMut(&str) {
@@ -7531,10 +8461,16 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedNameIter<'a> = impl Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_> {
+        self.reserved_name.iter().map(|v| v.as_ref())
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct DescriptorProtoBumpalo {
+pub struct DescriptorProtoBumpalo<'b> {
     pub name: ::bumpalo::collections::String,
     pub field: ::bumpalo::collections::Vec<super::super::google::protobuf::FieldDescriptorProto>,
     pub extension: ::bumpalo::collections::Vec<super::super::google::protobuf::FieldDescriptorProto>,
@@ -7545,9 +8481,30 @@ pub struct DescriptorProtoBumpalo {
     pub options: ::std::option::Option<::bumpalo::boxed::Box<super::super::google::protobuf::MessageOptions>>,
     pub reserved_range: ::bumpalo::collections::Vec<super::super::google::protobuf::descriptor_proto::ReservedRange>,
     pub reserved_name: ::bumpalo::collections::Vec<::bumpalo::collections::String>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut DescriptorProtoBumpalo {
+impl<'b> DescriptorProtoBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            field: ::std::default::Default::default(),
+            extension: ::std::default::Default::default(),
+            nested_type: ::std::default::Default::default(),
+            enum_type: ::std::default::Default::default(),
+            extension_range: ::std::default::Default::default(),
+            oneof_decl: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+            reserved_range: ::std::default::Default::default(),
+            reserved_name: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut DescriptorProtoBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -7579,35 +8536,35 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    let msg = self.field.push_and_get_mut();
+                    let msg = self.field.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 6 => {
-                    let msg = self.extension.push_and_get_mut();
+                    let msg = self.extension.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 3 => {
-                    let msg = self.nested_type.push_and_get_mut();
+                    let msg = self.nested_type.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 4 => {
-                    let msg = self.enum_type.push_and_get_mut();
+                    let msg = self.enum_type.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 5 => {
-                    let msg = self.extension_range.push_and_get_mut();
+                    let msg = self.extension_range.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 8 => {
-                    let msg = self.oneof_decl.push_and_get_mut();
+                    let msg = self.oneof_decl.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 7 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 9 => {
-                    let msg = self.reserved_range.push_and_get_mut();
+                    let msg = self.reserved_range.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 10 => {
@@ -7633,16 +8590,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for DescriptorProtoBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for DescriptorProtoBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for DescriptorProtoBumpalo {
+impl<'b> ::puroro::serializer::Serializable for DescriptorProtoBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -7681,7 +8639,7 @@ impl ::puroro::serializer::Serializable for DescriptorProtoBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for DescriptorProtoBumpalo {
+impl<'b> ::puroro::Serializable for DescriptorProtoBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -7703,6 +8661,12 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
         ::std::boxed::Box::new(self.field.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type FieldIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn field_iter(&self) -> Self::FieldIter<'_> {
+        self.field.iter()
+    }
     fn for_each_extension<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
@@ -7713,6 +8677,12 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
     fn extension_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
         ::std::boxed::Box::new(self.extension.iter())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn extension_iter(&self) -> Self::ExtensionIter<'_> {
+        self.extension.iter()
     }
     fn for_each_nested_type<F>(&self, mut f: F)
     where
@@ -7725,6 +8695,12 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>> {
         ::std::boxed::Box::new(self.nested_type.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type NestedTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::DescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn nested_type_iter(&self) -> Self::NestedTypeIter<'_> {
+        self.nested_type.iter()
+    }
     fn for_each_enum_type<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::EnumDescriptorProto) {
@@ -7735,6 +8711,12 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
     fn enum_type_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>> {
         ::std::boxed::Box::new(self.enum_type.iter())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type EnumTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::EnumDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
+        self.enum_type.iter()
     }
     fn for_each_extension_range<F>(&self, mut f: F)
     where
@@ -7747,6 +8729,12 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ExtensionRange>> {
         ::std::boxed::Box::new(self.extension_range.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionRangeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::descriptor_proto::ExtensionRange>;
+    #[cfg(feature = "puroro-nightly")]
+    fn extension_range_iter(&self) -> Self::ExtensionRangeIter<'_> {
+        self.extension_range.iter()
+    }
     fn for_each_oneof_decl<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::OneofDescriptorProto) {
@@ -7757,6 +8745,12 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
     fn oneof_decl_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::OneofDescriptorProto>> {
         ::std::boxed::Box::new(self.oneof_decl.iter())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type OneofDeclIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::OneofDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn oneof_decl_iter(&self) -> Self::OneofDeclIter<'_> {
+        self.oneof_decl.iter()
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MessageOptions> {
         self.options.as_deref()
@@ -7772,6 +8766,12 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ReservedRange>> {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedRangeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::descriptor_proto::ReservedRange>;
+    #[cfg(feature = "puroro-nightly")]
+    fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
+        self.reserved_range.iter()
+    }
     fn for_each_reserved_name<F>(&self, mut f: F)
     where
         F: FnMut(&str) {
@@ -7783,6 +8783,12 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedNameIter<'a> = impl Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_> {
+        self.reserved_name.iter().map(|v| v.as_ref())
+    }
 }
 pub trait DescriptorProtoTrait {
     fn name(&self) -> &str;
@@ -7791,94 +8797,126 @@ pub trait DescriptorProtoTrait {
         F: FnMut(&super::super::google::protobuf::FieldDescriptorProto);
     fn field_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type FieldIter<'a>: Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn field_iter(&self) -> Self::FieldIter<'_>;
     fn for_each_extension<F>(&self, f: F)
     where
         F: FnMut(&super::super::google::protobuf::FieldDescriptorProto);
     fn extension_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn extension_iter(&self) -> Self::ExtensionIter<'_>;
     fn for_each_nested_type<F>(&self, f: F)
     where
         F: FnMut(&super::super::google::protobuf::DescriptorProto);
     fn nested_type_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type NestedTypeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::DescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn nested_type_iter(&self) -> Self::NestedTypeIter<'_>;
     fn for_each_enum_type<F>(&self, f: F)
     where
         F: FnMut(&super::super::google::protobuf::EnumDescriptorProto);
     fn enum_type_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type EnumTypeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::EnumDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn enum_type_iter(&self) -> Self::EnumTypeIter<'_>;
     fn for_each_extension_range<F>(&self, f: F)
     where
         F: FnMut(&super::super::google::protobuf::descriptor_proto::ExtensionRange);
     fn extension_range_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ExtensionRange>>;
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionRangeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::descriptor_proto::ExtensionRange>;
+    #[cfg(feature = "puroro-nightly")]
+    fn extension_range_iter(&self) -> Self::ExtensionRangeIter<'_>;
     fn for_each_oneof_decl<F>(&self, f: F)
     where
         F: FnMut(&super::super::google::protobuf::OneofDescriptorProto);
     fn oneof_decl_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::OneofDescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type OneofDeclIter<'a>: Iterator<Item=&'a super::super::google::protobuf::OneofDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn oneof_decl_iter(&self) -> Self::OneofDeclIter<'_>;
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MessageOptions>;
     fn for_each_reserved_range<F>(&self, f: F)
     where
         F: FnMut(&super::super::google::protobuf::descriptor_proto::ReservedRange);
     fn reserved_range_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ReservedRange>>;
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedRangeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::descriptor_proto::ReservedRange>;
+    #[cfg(feature = "puroro-nightly")]
+    fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_>;
     fn for_each_reserved_name<F>(&self, f: F)
     where
         F: FnMut(&str);
     fn reserved_name_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedNameIter<'a>: Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_>;
 }
 pub trait DescriptorProtoMutTrait {
-    fn name_mut(&self) -> &str;
+    fn name_mut(&self) -> &mut String;
     fn for_each_field_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto);
+        F: FnMut(&mut super::super::google::protobuf::FieldDescriptorProto);
     fn field_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::FieldDescriptorProto>>;
+    // We need more! 
     fn for_each_extension_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto);
+        F: FnMut(&mut super::super::google::protobuf::FieldDescriptorProto);
     fn extension_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::FieldDescriptorProto>>;
+    // We need more! 
     fn for_each_nested_type_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::DescriptorProto);
+        F: FnMut(&mut super::super::google::protobuf::DescriptorProto);
     fn nested_type_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::DescriptorProto>>;
+    // We need more! 
     fn for_each_enum_type_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::EnumDescriptorProto);
+        F: FnMut(&mut super::super::google::protobuf::EnumDescriptorProto);
     fn enum_type_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::EnumDescriptorProto>>;
+    // We need more! 
     fn for_each_extension_range_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::descriptor_proto::ExtensionRange);
+        F: FnMut(&mut super::super::google::protobuf::descriptor_proto::ExtensionRange);
     fn extension_range_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ExtensionRange>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::descriptor_proto::ExtensionRange>>;
+    // We need more! 
     fn for_each_oneof_decl_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::OneofDescriptorProto);
+        F: FnMut(&mut super::super::google::protobuf::OneofDescriptorProto);
     fn oneof_decl_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::OneofDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
-    fn options_mut(&self) -> ::std::option::Option<&super::super::google::protobuf::MessageOptions>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::OneofDescriptorProto>>;
+    // We need more! 
+    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::MessageOptions>;
     fn for_each_reserved_range_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::descriptor_proto::ReservedRange);
+        F: FnMut(&mut super::super::google::protobuf::descriptor_proto::ReservedRange);
     fn reserved_range_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ReservedRange>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::descriptor_proto::ReservedRange>>;
+    // We need more! 
     fn for_each_reserved_name_mut<F>(&self, f: F)
     where
-        F: FnMut(&str);
+        F: FnMut(&mut String);
     fn reserved_name_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
+    // We need more! 
 }
 pub mod descriptor_proto {
 
@@ -7886,19 +8924,27 @@ pub mod descriptor_proto {
 pub struct ReservedRange {
     pub start: i32,
     pub end: i32,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for ReservedRange {
-    fn default() -> Self {
+impl ReservedRange {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             start: ::std::default::Default::default(),
             end: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ReservedRange {
+impl ::std::default::Default for ReservedRange {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ReservedRange {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -7957,8 +9003,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for ReservedRange {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -8001,12 +9048,25 @@ impl ReservedRangeTrait for ReservedRange {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct ReservedRangeBumpalo {
+pub struct ReservedRangeBumpalo<'b> {
     pub start: i32,
     pub end: i32,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ReservedRangeBumpalo {
+impl<'b> ReservedRangeBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            start: ::std::default::Default::default(),
+            end: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ReservedRangeBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -8064,16 +9124,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for ReservedRangeBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for ReservedRangeBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for ReservedRangeBumpalo {
+impl<'b> ::puroro::serializer::Serializable for ReservedRangeBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -8092,7 +9153,7 @@ impl ::puroro::serializer::Serializable for ReservedRangeBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for ReservedRangeBumpalo {
+impl<'b> ::puroro::Serializable for ReservedRangeBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -8112,8 +9173,8 @@ pub trait ReservedRangeTrait {
     fn end(&self) -> i32;
 }
 pub trait ReservedRangeMutTrait {
-    fn start_mut(&self) -> i32;
-    fn end_mut(&self) -> i32;
+    fn start_mut(&self) -> &mut i32;
+    fn end_mut(&self) -> &mut i32;
 }
 
 #[derive(Debug, Clone)]
@@ -8121,20 +9182,28 @@ pub struct ExtensionRange {
     pub start: i32,
     pub end: i32,
     pub options: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for ExtensionRange {
-    fn default() -> Self {
+impl ExtensionRange {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             start: ::std::default::Default::default(),
             end: ::std::default::Default::default(),
             options: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ExtensionRange {
+impl ::std::default::Default for ExtensionRange {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ExtensionRange {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -8175,7 +9244,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.end, first, iter);
                 }
                 3 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -8198,8 +9267,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for ExtensionRange {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -8248,13 +9318,27 @@ impl ExtensionRangeTrait for ExtensionRange {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct ExtensionRangeBumpalo {
+pub struct ExtensionRangeBumpalo<'b> {
     pub start: i32,
     pub end: i32,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut ExtensionRangeBumpalo {
+impl<'b> ExtensionRangeBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            start: ::std::default::Default::default(),
+            end: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ExtensionRangeBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -8295,7 +9379,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.end, first, iter);
                 }
                 3 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -8317,16 +9401,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for ExtensionRangeBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for ExtensionRangeBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for ExtensionRangeBumpalo {
+impl<'b> ::puroro::serializer::Serializable for ExtensionRangeBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -8348,7 +9433,7 @@ impl ::puroro::serializer::Serializable for ExtensionRangeBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for ExtensionRangeBumpalo {
+impl<'b> ::puroro::Serializable for ExtensionRangeBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -8372,9 +9457,9 @@ pub trait ExtensionRangeTrait {
     fn options(&self) -> ::std::option::Option<&super::super::super::google::protobuf::ExtensionRangeOptions>;
 }
 pub trait ExtensionRangeMutTrait {
-    fn start_mut(&self) -> i32;
-    fn end_mut(&self) -> i32;
-    fn options_mut(&self) -> ::std::option::Option<&super::super::super::google::protobuf::ExtensionRangeOptions>;
+    fn start_mut(&self) -> &mut i32;
+    fn end_mut(&self) -> &mut i32;
+    fn options_mut(&self) -> ::std::option::Option<&mut super::super::super::google::protobuf::ExtensionRangeOptions>;
 }
 } // mod descriptor_proto
 
@@ -8392,10 +9477,11 @@ pub struct FileDescriptorProto {
     pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FileOptions>>,
     pub source_code_info: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::SourceCodeInfo>>,
     pub syntax: ::std::string::String,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for FileDescriptorProto {
-    fn default() -> Self {
+impl FileDescriptorProto {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -8410,11 +9496,18 @@ impl ::std::default::Default for FileDescriptorProto {
             options: ::std::default::Default::default(),
             source_code_info: ::std::default::Default::default(),
             syntax: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileDescriptorProto {
+impl ::std::default::Default for FileDescriptorProto {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileDescriptorProto {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -8476,27 +9569,27 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.weak_dependency, first, iter);
                 }
                 4 => {
-                    let msg = self.message_type.push_and_get_mut();
+                    let msg = self.message_type.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 5 => {
-                    let msg = self.enum_type.push_and_get_mut();
+                    let msg = self.enum_type.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 6 => {
-                    let msg = self.service.push_and_get_mut();
+                    let msg = self.service.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 7 => {
-                    let msg = self.extension.push_and_get_mut();
+                    let msg = self.extension.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 8 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 9 => {
-                    let msg = self.source_code_info.push_and_get_mut();
+                    let msg = self.source_code_info.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 12 => {
@@ -8523,8 +9616,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for FileDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -8605,6 +9699,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
         ::std::boxed::Box::new(self.dependency.iter().map(|v| v.as_ref()))
     }
+    #[cfg(feature = "puroro-nightly")]
+    type DependencyIter<'a> = impl Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn dependency_iter(&self) -> Self::DependencyIter<'_> {
+        self.dependency.iter().map(|v| v.as_ref())
+    }
     fn for_each_public_dependency<F>(&self, mut f: F)
     where
         F: FnMut(i32) {
@@ -8615,6 +9715,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
     fn public_dependency_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.public_dependency.iter().cloned())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type PublicDependencyIter<'a> = impl Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn public_dependency_iter(&self) -> Self::PublicDependencyIter<'_> {
+        self.public_dependency.iter().cloned()
     }
     fn for_each_weak_dependency<F>(&self, mut f: F)
     where
@@ -8627,6 +9733,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.weak_dependency.iter().cloned())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type WeakDependencyIter<'a> = impl Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn weak_dependency_iter(&self) -> Self::WeakDependencyIter<'_> {
+        self.weak_dependency.iter().cloned()
+    }
     fn for_each_message_type<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::DescriptorProto) {
@@ -8637,6 +9749,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
     fn message_type_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>> {
         ::std::boxed::Box::new(self.message_type.iter())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type MessageTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::DescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn message_type_iter(&self) -> Self::MessageTypeIter<'_> {
+        self.message_type.iter()
     }
     fn for_each_enum_type<F>(&self, mut f: F)
     where
@@ -8649,6 +9767,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>> {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type EnumTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::EnumDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
+        self.enum_type.iter()
+    }
     fn for_each_service<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::ServiceDescriptorProto) {
@@ -8660,6 +9784,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::ServiceDescriptorProto>> {
         ::std::boxed::Box::new(self.service.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ServiceIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::ServiceDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn service_iter(&self) -> Self::ServiceIter<'_> {
+        self.service.iter()
+    }
     fn for_each_extension<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
@@ -8670,6 +9800,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
     fn extension_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
         ::std::boxed::Box::new(self.extension.iter())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn extension_iter(&self) -> Self::ExtensionIter<'_> {
+        self.extension.iter()
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FileOptions> {
         self.options.as_deref()
@@ -8683,7 +9819,7 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct FileDescriptorProtoBumpalo {
+pub struct FileDescriptorProtoBumpalo<'b> {
     pub name: ::bumpalo::collections::String,
     pub package: ::bumpalo::collections::String,
     pub dependency: ::bumpalo::collections::Vec<::bumpalo::collections::String>,
@@ -8696,9 +9832,32 @@ pub struct FileDescriptorProtoBumpalo {
     pub options: ::std::option::Option<::bumpalo::boxed::Box<super::super::google::protobuf::FileOptions>>,
     pub source_code_info: ::std::option::Option<::bumpalo::boxed::Box<super::super::google::protobuf::SourceCodeInfo>>,
     pub syntax: ::bumpalo::collections::String,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileDescriptorProtoBumpalo {
+impl<'b> FileDescriptorProtoBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            name: ::std::default::Default::default(),
+            package: ::std::default::Default::default(),
+            dependency: ::std::default::Default::default(),
+            public_dependency: ::std::default::Default::default(),
+            weak_dependency: ::std::default::Default::default(),
+            message_type: ::std::default::Default::default(),
+            enum_type: ::std::default::Default::default(),
+            service: ::std::default::Default::default(),
+            extension: ::std::default::Default::default(),
+            options: ::std::default::Default::default(),
+            source_code_info: ::std::default::Default::default(),
+            syntax: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileDescriptorProtoBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -8760,27 +9919,27 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     MaybeRepeatedVariantField::extend(&mut self.weak_dependency, first, iter);
                 }
                 4 => {
-                    let msg = self.message_type.push_and_get_mut();
+                    let msg = self.message_type.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 5 => {
-                    let msg = self.enum_type.push_and_get_mut();
+                    let msg = self.enum_type.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 6 => {
-                    let msg = self.service.push_and_get_mut();
+                    let msg = self.service.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 7 => {
-                    let msg = self.extension.push_and_get_mut();
+                    let msg = self.extension.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 8 => {
-                    let msg = self.options.push_and_get_mut();
+                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 9 => {
-                    let msg = self.source_code_info.push_and_get_mut();
+                    let msg = self.source_code_info.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 12 => {
@@ -8806,16 +9965,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for FileDescriptorProtoBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for FileDescriptorProtoBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for FileDescriptorProtoBumpalo {
+impl<'b> ::puroro::serializer::Serializable for FileDescriptorProtoBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -8864,7 +10024,7 @@ impl ::puroro::serializer::Serializable for FileDescriptorProtoBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for FileDescriptorProtoBumpalo {
+impl<'b> ::puroro::Serializable for FileDescriptorProtoBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -8889,6 +10049,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
         ::std::boxed::Box::new(self.dependency.iter().map(|v| v.as_ref()))
     }
+    #[cfg(feature = "puroro-nightly")]
+    type DependencyIter<'a> = impl Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn dependency_iter(&self) -> Self::DependencyIter<'_> {
+        self.dependency.iter().map(|v| v.as_ref())
+    }
     fn for_each_public_dependency<F>(&self, mut f: F)
     where
         F: FnMut(i32) {
@@ -8899,6 +10065,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
     fn public_dependency_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.public_dependency.iter().cloned())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type PublicDependencyIter<'a> = impl Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn public_dependency_iter(&self) -> Self::PublicDependencyIter<'_> {
+        self.public_dependency.iter().cloned()
     }
     fn for_each_weak_dependency<F>(&self, mut f: F)
     where
@@ -8911,6 +10083,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.weak_dependency.iter().cloned())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type WeakDependencyIter<'a> = impl Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn weak_dependency_iter(&self) -> Self::WeakDependencyIter<'_> {
+        self.weak_dependency.iter().cloned()
+    }
     fn for_each_message_type<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::DescriptorProto) {
@@ -8921,6 +10099,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
     fn message_type_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>> {
         ::std::boxed::Box::new(self.message_type.iter())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type MessageTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::DescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn message_type_iter(&self) -> Self::MessageTypeIter<'_> {
+        self.message_type.iter()
     }
     fn for_each_enum_type<F>(&self, mut f: F)
     where
@@ -8933,6 +10117,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>> {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type EnumTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::EnumDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
+        self.enum_type.iter()
+    }
     fn for_each_service<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::ServiceDescriptorProto) {
@@ -8944,6 +10134,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::ServiceDescriptorProto>> {
         ::std::boxed::Box::new(self.service.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type ServiceIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::ServiceDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn service_iter(&self) -> Self::ServiceIter<'_> {
+        self.service.iter()
+    }
     fn for_each_extension<F>(&self, mut f: F)
     where
         F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
@@ -8954,6 +10150,12 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
     fn extension_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
         ::std::boxed::Box::new(self.extension.iter())
+    }
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn extension_iter(&self) -> Self::ExtensionIter<'_> {
+        self.extension.iter()
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FileOptions> {
         self.options.as_deref()
@@ -8973,105 +10175,141 @@ pub trait FileDescriptorProtoTrait {
         F: FnMut(&str);
     fn dependency_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+    #[cfg(feature = "puroro-nightly")]
+    type DependencyIter<'a>: Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    fn dependency_iter(&self) -> Self::DependencyIter<'_>;
     fn for_each_public_dependency<F>(&self, f: F)
     where
         F: FnMut(i32);
     fn public_dependency_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
+    #[cfg(feature = "puroro-nightly")]
+    type PublicDependencyIter<'a>: Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn public_dependency_iter(&self) -> Self::PublicDependencyIter<'_>;
     fn for_each_weak_dependency<F>(&self, f: F)
     where
         F: FnMut(i32);
     fn weak_dependency_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
+    #[cfg(feature = "puroro-nightly")]
+    type WeakDependencyIter<'a>: Iterator<Item=i32>;
+    #[cfg(feature = "puroro-nightly")]
+    fn weak_dependency_iter(&self) -> Self::WeakDependencyIter<'_>;
     fn for_each_message_type<F>(&self, f: F)
     where
         F: FnMut(&super::super::google::protobuf::DescriptorProto);
     fn message_type_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type MessageTypeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::DescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn message_type_iter(&self) -> Self::MessageTypeIter<'_>;
     fn for_each_enum_type<F>(&self, f: F)
     where
         F: FnMut(&super::super::google::protobuf::EnumDescriptorProto);
     fn enum_type_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type EnumTypeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::EnumDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn enum_type_iter(&self) -> Self::EnumTypeIter<'_>;
     fn for_each_service<F>(&self, f: F)
     where
         F: FnMut(&super::super::google::protobuf::ServiceDescriptorProto);
     fn service_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::ServiceDescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type ServiceIter<'a>: Iterator<Item=&'a super::super::google::protobuf::ServiceDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn service_iter(&self) -> Self::ServiceIter<'_>;
     fn for_each_extension<F>(&self, f: F)
     where
         F: FnMut(&super::super::google::protobuf::FieldDescriptorProto);
     fn extension_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn extension_iter(&self) -> Self::ExtensionIter<'_>;
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FileOptions>;
     fn source_code_info(&self) -> ::std::option::Option<&super::super::google::protobuf::SourceCodeInfo>;
     fn syntax(&self) -> &str;
 }
 pub trait FileDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &str;
-    fn package_mut(&self) -> &str;
+    fn name_mut(&self) -> &mut String;
+    fn package_mut(&self) -> &mut String;
     fn for_each_dependency_mut<F>(&self, f: F)
     where
-        F: FnMut(&str);
+        F: FnMut(&mut String);
     fn dependency_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
+    // We need more! 
     fn for_each_public_dependency_mut<F>(&self, f: F)
     where
-        F: FnMut(i32);
+        F: FnMut(&mut i32);
     fn public_dependency_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
+    // We need more! 
     fn for_each_weak_dependency_mut<F>(&self, f: F)
     where
-        F: FnMut(i32);
+        F: FnMut(&mut i32);
     fn weak_dependency_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
+    // We need more! 
     fn for_each_message_type_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::DescriptorProto);
+        F: FnMut(&mut super::super::google::protobuf::DescriptorProto);
     fn message_type_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::DescriptorProto>>;
+    // We need more! 
     fn for_each_enum_type_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::EnumDescriptorProto);
+        F: FnMut(&mut super::super::google::protobuf::EnumDescriptorProto);
     fn enum_type_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::EnumDescriptorProto>>;
+    // We need more! 
     fn for_each_service_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::ServiceDescriptorProto);
+        F: FnMut(&mut super::super::google::protobuf::ServiceDescriptorProto);
     fn service_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::ServiceDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::ServiceDescriptorProto>>;
+    // We need more! 
     fn for_each_extension_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto);
+        F: FnMut(&mut super::super::google::protobuf::FieldDescriptorProto);
     fn extension_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
-    fn options_mut(&self) -> ::std::option::Option<&super::super::google::protobuf::FileOptions>;
-    fn source_code_info_mut(&self) -> ::std::option::Option<&super::super::google::protobuf::SourceCodeInfo>;
-    fn syntax_mut(&self) -> &str;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::FieldDescriptorProto>>;
+    // We need more! 
+    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::FileOptions>;
+    fn source_code_info_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::SourceCodeInfo>;
+    fn syntax_mut(&self) -> &mut String;
 }
 
 #[derive(Debug, Clone)]
 pub struct FileDescriptorSet {
     pub file: ::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto>,
+    puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
-impl ::std::default::Default for FileDescriptorSet {
-    fn default() -> Self {
+impl FileDescriptorSet {
+    pub fn new() -> Self {
         use ::std::convert::TryInto;
         Self {
             file: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
 }
 
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileDescriptorSet {
+impl ::std::default::Default for FileDescriptorSet {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileDescriptorSet {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -9090,7 +10328,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
             }
             ::puroro::types::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    let msg = self.file.push_and_get_mut();
+                    let msg = self.file.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -9113,8 +10351,9 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
 }
 
 impl ::puroro::Deserializable for FileDescriptorSet {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
@@ -9152,14 +10391,32 @@ impl FileDescriptorSetTrait for FileDescriptorSet {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FileDescriptorProto>> {
         ::std::boxed::Box::new(self.file.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type FileIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FileDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn file_iter(&self) -> Self::FileIter<'_> {
+        self.file.iter()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct FileDescriptorSetBumpalo {
+pub struct FileDescriptorSetBumpalo<'b> {
     pub file: ::bumpalo::collections::Vec<super::super::google::protobuf::FileDescriptorProto>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a mut FileDescriptorSetBumpalo {
+impl<'b> FileDescriptorSetBumpalo<'b> {
+    pub fn new(bump: &'b ::bumpalo::Bump
+) -> Self {
+        use ::std::convert::TryInto;
+        Self {
+            file: ::std::default::Default::default(),
+            puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileDescriptorSetBumpalo<'b> {
     type Target = ();
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
@@ -9178,7 +10435,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
             }
             ::puroro::types::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
-                    let msg = self.file.push_and_get_mut();
+                    let msg = self.file.push_and_get_mut2(&self.puroro_internal);
                     ldd.deserialize_as_message(msg)?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -9200,16 +10457,17 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Deserializable for FileDescriptorSetBumpalo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(&mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::stream::Deserializer;
+impl<'b> ::puroro::Deserializable for FileDescriptorSetBumpalo<'b> {
+    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
+            &mut self, iter: I) -> ::puroro::Result<()> {
+        use ::puroro::deserializer::Deserializer;
         let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::serializer::Serializable for FileDescriptorSetBumpalo {
+impl<'b> ::puroro::serializer::Serializable for FileDescriptorSetBumpalo<'b> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -9221,7 +10479,7 @@ impl ::puroro::serializer::Serializable for FileDescriptorSetBumpalo {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ::puroro::Serializable for FileDescriptorSetBumpalo {
+impl<'b> ::puroro::Serializable for FileDescriptorSetBumpalo<'b> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -9240,6 +10498,12 @@ impl FileDescriptorSetTrait for FileDescriptorSetBumpalo {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FileDescriptorProto>> {
         ::std::boxed::Box::new(self.file.iter())
     }
+    #[cfg(feature = "puroro-nightly")]
+    type FileIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FileDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn file_iter(&self) -> Self::FileIter<'_> {
+        self.file.iter()
+    }
 }
 pub trait FileDescriptorSetTrait {
     fn for_each_file<F>(&self, f: F)
@@ -9247,14 +10511,18 @@ pub trait FileDescriptorSetTrait {
         F: FnMut(&super::super::google::protobuf::FileDescriptorProto);
     fn file_boxed_iter(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FileDescriptorProto>>;
+    #[cfg(feature = "puroro-nightly")]
+    type FileIter<'a>: Iterator<Item=&'a super::super::google::protobuf::FileDescriptorProto>;
+    #[cfg(feature = "puroro-nightly")]
+    fn file_iter(&self) -> Self::FileIter<'_>;
 }
 pub trait FileDescriptorSetMutTrait {
     fn for_each_file_mut<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FileDescriptorProto);
+        F: FnMut(&mut super::super::google::protobuf::FileDescriptorProto);
     fn file_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FileDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::FileDescriptorProto>>;
+    // We need more! 
 }
 
 pub mod compiler;
