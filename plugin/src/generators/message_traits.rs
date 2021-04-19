@@ -93,7 +93,7 @@ pub trait {name}MutTrait {{\n",
                         format!(
                             "fn {name}_mut(&self) -> ::std::option::Option<{reftype}>;\n",
                             name = field.native_name(),
-                            reftype = field.native_scalar_mut_ref_type_name()?,
+                            reftype = field.native_scalar_mut_ref_type_name("")?,
                         )
                     }
                     (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
@@ -101,7 +101,7 @@ pub trait {name}MutTrait {{\n",
                         format!(
                             "fn {name}_mut(&self) -> {reftype};\n",
                             name = field.native_name(),
-                            reftype = field.native_scalar_mut_ref_type_name()?,
+                            reftype = field.native_scalar_mut_ref_type_name("")?,
                         )
                     }
                     (FieldLabel::Repeated, _) => {
@@ -112,9 +112,9 @@ where
     F: FnMut({reftype});
 fn {name}_boxed_iter_mut(&self)
     -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>;
-// We need more! Maybe just expose &mut Vec<T> ? \n",
+// We need more! \n",
                             name = field.native_name(),
-                            reftype = field.native_scalar_mut_ref_type_name()?,
+                            reftype = field.native_scalar_mut_ref_type_name("")?,
                         )
                     }
                 })

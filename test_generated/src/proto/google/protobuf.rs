@@ -237,7 +237,7 @@ pub trait GeneratedCodeInfoMutTrait {
         F: FnMut(&mut super::super::google::protobuf::generated_code_info::Annotation);
     fn annotation_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::generated_code_info::Annotation>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 pub mod generated_code_info {
 
@@ -605,7 +605,7 @@ pub trait AnnotationMutTrait {
         F: FnMut(&mut i32);
     fn path_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn source_file_mut(&self) -> &mut String;
     fn begin_mut(&self) -> &mut i32;
     fn end_mut(&self) -> &mut i32;
@@ -847,7 +847,7 @@ pub trait SourceCodeInfoMutTrait {
         F: FnMut(&mut super::super::google::protobuf::source_code_info::Location);
     fn location_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::source_code_info::Location>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 pub mod source_code_info {
 
@@ -1298,13 +1298,13 @@ pub trait LocationMutTrait {
         F: FnMut(&mut i32);
     fn path_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_span_mut<F>(&self, f: F)
     where
         F: FnMut(&mut i32);
     fn span_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn leading_comments_mut(&self) -> &mut String;
     fn trailing_comments_mut(&self) -> &mut String;
     fn for_each_leading_detached_comments_mut<F>(&self, f: F)
@@ -1312,7 +1312,7 @@ pub trait LocationMutTrait {
         F: FnMut(&mut String);
     fn leading_detached_comments_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 } // mod source_code_info
 
@@ -1749,7 +1749,7 @@ pub trait UninterpretedOptionMutTrait {
         F: FnMut(&mut super::super::google::protobuf::uninterpreted_option::NamePart);
     fn name_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::uninterpreted_option::NamePart>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn identifier_value_mut(&self) -> &mut String;
     fn positive_int_value_mut(&self) -> &mut u64;
     fn negative_int_value_mut(&self) -> &mut i64;
@@ -2324,7 +2324,7 @@ pub trait MethodOptionsMutTrait {
         F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 pub mod method_options {
 #[derive(Debug, Clone)]
@@ -2630,7 +2630,7 @@ pub trait ServiceOptionsMutTrait {
         F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 
 #[derive(Debug, Clone)]
@@ -2912,7 +2912,7 @@ pub trait EnumValueOptionsMutTrait {
         F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 
 #[derive(Debug, Clone)]
@@ -3238,7 +3238,7 @@ pub trait EnumOptionsMutTrait {
         F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 
 #[derive(Debug, Clone)]
@@ -3476,7 +3476,7 @@ pub trait OneofOptionsMutTrait {
         F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 
 #[derive(Debug, Clone)]
@@ -3978,7 +3978,7 @@ pub trait FieldOptionsMutTrait {
         F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 pub mod field_options {
 #[derive(Debug, Clone)]
@@ -4438,7 +4438,7 @@ pub trait MessageOptionsMutTrait {
         F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 
 #[derive(Debug, Clone)]
@@ -5396,7 +5396,7 @@ pub trait FileOptionsMutTrait {
         F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 pub mod file_options {
 #[derive(Debug, Clone)]
@@ -6082,7 +6082,7 @@ pub trait ServiceDescriptorProtoMutTrait {
         F: FnMut(&mut super::super::google::protobuf::MethodDescriptorProto);
     fn method_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::MethodDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::ServiceOptions>;
 }
 
@@ -6771,20 +6771,20 @@ pub trait EnumDescriptorProtoMutTrait {
         F: FnMut(&mut super::super::google::protobuf::EnumValueDescriptorProto);
     fn value_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::EnumValueDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::EnumOptions>;
     fn for_each_reserved_range_mut<F>(&self, f: F)
     where
         F: FnMut(&mut super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange);
     fn reserved_range_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_reserved_name_mut<F>(&self, f: F)
     where
         F: FnMut(&mut String);
     fn reserved_name_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 pub mod enum_descriptor_proto {
 
@@ -8139,7 +8139,7 @@ pub trait ExtensionRangeOptionsMutTrait {
         F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
     fn uninterpreted_option_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 
 #[derive(Debug, Clone)]
@@ -8873,50 +8873,50 @@ pub trait DescriptorProtoMutTrait {
         F: FnMut(&mut super::super::google::protobuf::FieldDescriptorProto);
     fn field_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::FieldDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_extension_mut<F>(&self, f: F)
     where
         F: FnMut(&mut super::super::google::protobuf::FieldDescriptorProto);
     fn extension_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::FieldDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_nested_type_mut<F>(&self, f: F)
     where
         F: FnMut(&mut super::super::google::protobuf::DescriptorProto);
     fn nested_type_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::DescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_enum_type_mut<F>(&self, f: F)
     where
         F: FnMut(&mut super::super::google::protobuf::EnumDescriptorProto);
     fn enum_type_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::EnumDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_extension_range_mut<F>(&self, f: F)
     where
         F: FnMut(&mut super::super::google::protobuf::descriptor_proto::ExtensionRange);
     fn extension_range_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::descriptor_proto::ExtensionRange>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_oneof_decl_mut<F>(&self, f: F)
     where
         F: FnMut(&mut super::super::google::protobuf::OneofDescriptorProto);
     fn oneof_decl_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::OneofDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::MessageOptions>;
     fn for_each_reserved_range_mut<F>(&self, f: F)
     where
         F: FnMut(&mut super::super::google::protobuf::descriptor_proto::ReservedRange);
     fn reserved_range_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::descriptor_proto::ReservedRange>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_reserved_name_mut<F>(&self, f: F)
     where
         F: FnMut(&mut String);
     fn reserved_name_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 pub mod descriptor_proto {
 
@@ -10245,43 +10245,43 @@ pub trait FileDescriptorProtoMutTrait {
         F: FnMut(&mut String);
     fn dependency_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_public_dependency_mut<F>(&self, f: F)
     where
         F: FnMut(&mut i32);
     fn public_dependency_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_weak_dependency_mut<F>(&self, f: F)
     where
         F: FnMut(&mut i32);
     fn weak_dependency_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_message_type_mut<F>(&self, f: F)
     where
         F: FnMut(&mut super::super::google::protobuf::DescriptorProto);
     fn message_type_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::DescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_enum_type_mut<F>(&self, f: F)
     where
         F: FnMut(&mut super::super::google::protobuf::EnumDescriptorProto);
     fn enum_type_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::EnumDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_service_mut<F>(&self, f: F)
     where
         F: FnMut(&mut super::super::google::protobuf::ServiceDescriptorProto);
     fn service_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::ServiceDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn for_each_extension_mut<F>(&self, f: F)
     where
         F: FnMut(&mut super::super::google::protobuf::FieldDescriptorProto);
     fn extension_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::FieldDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::FileOptions>;
     fn source_code_info_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::SourceCodeInfo>;
     fn syntax_mut(&self) -> &mut String;
@@ -10522,7 +10522,7 @@ pub trait FileDescriptorSetMutTrait {
         F: FnMut(&mut super::super::google::protobuf::FileDescriptorProto);
     fn file_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::FileDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 
 pub mod compiler;

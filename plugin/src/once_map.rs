@@ -9,6 +9,7 @@ where
 
 macro_rules! define_node {
     ($node:ident) => {
+        #[derive(Debug, Clone)]
         struct $node<K, V> {
             key: K,
             value: OnceCell<V>,
@@ -34,6 +35,7 @@ macro_rules! define_node {
         }
     };
     ($node_k:ident, $node_l:ident $(, $rest:ident)*) => {
+        #[derive(Debug, Clone)]
         struct $node_k<K, V> {
             key: K,
             value: OnceCell<V>,
@@ -66,6 +68,7 @@ define_node!(Node4, Node3, Node2, Node);
 
 macro_rules! define_map {
     ($map_name:ident, $node_name:ident) => {
+        #[derive(Debug, Clone)]
         pub struct $map_name<K, V> {
             first: OnceCell<$node_name<K, V>>,
         }
@@ -74,13 +77,19 @@ macro_rules! define_map {
             pub fn new() -> Self {
                 Default::default()
             }
-
             pub fn get_or_init<F>(&self, key: K, f: F) -> &V
             where
                 F: FnOnce() -> V,
                 K: PartialEq + Clone,
             {
                 self.first.find_value_cell(key).get_or_init(f)
+            }
+            pub fn get_or_try_init<F, E>(&self, key: K, f: F) -> Result<&V, E>
+            where
+                F: FnOnce() -> Result<V, E>,
+                K: PartialEq + Clone,
+            {
+                self.first.find_value_cell(key).get_or_try_init(f)
             }
         }
 

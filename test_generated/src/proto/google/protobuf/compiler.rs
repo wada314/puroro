@@ -309,7 +309,7 @@ pub trait CodeGeneratorResponseMutTrait {
         F: FnMut(&mut super::super::super::google::protobuf::compiler::code_generator_response::File);
     fn file_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::super::google::protobuf::compiler::code_generator_response::File>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
 }
 pub mod code_generator_response {
 #[derive(Debug, Clone)]
@@ -967,14 +967,14 @@ pub trait CodeGeneratorRequestMutTrait {
         F: FnMut(&mut String);
     fn file_to_generate_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn parameter_mut(&self) -> &mut String;
     fn for_each_proto_file_mut<F>(&self, f: F)
     where
         F: FnMut(&mut super::super::super::google::protobuf::FileDescriptorProto);
     fn proto_file_boxed_iter_mut(&self)
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::super::google::protobuf::FileDescriptorProto>>;
-    // We need more! Maybe just expose &mut Vec<T> ? 
+    // We need more! 
     fn compiler_version_mut(&self) -> ::std::option::Option<&mut super::super::super::google::protobuf::compiler::Version>;
 }
 

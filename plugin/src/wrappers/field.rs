@@ -3,6 +3,7 @@ use std::fmt::Debug;
 
 use crate::google::protobuf::field_descriptor_proto::Label;
 use crate::google::protobuf::FieldDescriptorProto;
+use crate::once_map::OnceCellMap2;
 use crate::utils::{get_keyword_safe_ident, iter_package_to_root, to_lower_snake_case};
 use crate::Context;
 use crate::{ErrorKind, Result};
@@ -19,8 +20,8 @@ pub struct FieldDescriptor<'c> {
     lazy_type: OnceCell<FieldType<'c>>,
     lazy_fq_type_name: OnceCell<String>,
     lazy_native_owned_type_name: OnceCell<String>,
-    lazy_native_scalar_ref_type_name: OnceCell<String>,
-    lazy_native_scalar_mut_ref_type_name: OnceCell<String>,
+    lazy_native_scalar_ref_type_name: OnceCellMap2<&'static str, String>,
+    lazy_native_scalar_mut_ref_type_name: OnceCellMap2<&'static str, String>,
     lazy_native_name: OnceCell<String>,
 }
 impl<'c> FieldDescriptor<'c> {
@@ -232,24 +233,28 @@ impl<'c> FieldDescriptor<'c> {
     }
 
     // Returns a ref type name for required field.
-    pub fn native_scalar_ref_type_name(&'c self, lifetime: &str) -> Result<String> {
-        Ok(match self.wire_type()? {
-            WireType::Variant(field_type) => field_type
-                .native_type(self.parent.path_to_root_mod())
-                .into_owned(),
-            WireType::LengthDelimited(field_type) => field_type
-                .native_ref_type(self.parent.path_to_root_mod(), lifetime)
-                .into_owned(),
-            WireType::Bits32(field_type) => field_type.native_type().to_string(),
-            WireType::Bits64(field_type) => field_type.native_type().to_string(),
-        })
+    pub fn native_scalar_ref_type_name(&'c self, lifetime: &'static str) -> Result<&str> {
+        Ok(self
+            .lazy_native_scalar_ref_type_name
+            .get_or_try_init(lifetime, || -> Result<_> {
+                Ok(match self.wire_type()? {
+                    WireType::Variant(field_type) => field_type
+                        .native_type(self.parent.path_to_root_mod())
+                        .into_owned(),
+                    WireType::LengthDelimited(field_type) => field_type
+                        .native_ref_type(self.parent.path_to_root_mod(), lifetime)
+                        .into_owned(),
+                    WireType::Bits32(field_type) => field_type.native_type().to_string(),
+                    WireType::Bits64(field_type) => field_type.native_type().to_string(),
+                })
+            })?)
     }
 
     // Returns a mutable ref type name for required field.
-    pub fn native_scalar_mut_ref_type_name(&'c self) -> Result<&str> {
-        Ok(self
-            .lazy_native_scalar_mut_ref_type_name
-            .get_or_try_init(|| -> Result<_> {
+    pub fn native_scalar_mut_ref_type_name(&'c self, lifetime: &'static str) -> Result<&str> {
+        Ok(self.lazy_native_scalar_mut_ref_type_name.get_or_try_init(
+            lifetime,
+            || -> Result<_> {
                 Ok(match self.wire_type()? {
                     WireType::Variant(field_type) => format!(
                         "&mut {name}",
@@ -265,7 +270,8 @@ impl<'c> FieldDescriptor<'c> {
                         format!("&mut {name}", name = field_type.native_type().to_string())
                     }
                 })
-            })?)
+            },
+        )?)
     }
 
     pub fn native_name(&'c self) -> &str {
