@@ -30,6 +30,8 @@ pub enum PuroroError {
     FormatterError(#[from] std::fmt::Error),
     #[error("The string length is not correct.")]
     InvalidFieldLength,
+    #[error("Group is not supported.")]
+    GroupNotSupported,
     #[error("Other error: {0}")]
     OtherErrors(Box<dyn std::error::Error>),
 }
