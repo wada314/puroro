@@ -1,9 +1,9 @@
 use crate::types::Field;
 
-use self::stream::LengthDelimitedDeserializer;
+use self::bytes::LengthDelimitedDeserializer;
 use crate::Result;
 
-pub mod stream;
+pub mod bytes;
 
 pub trait Deserializer {
     fn deserialize<H: MessageDeserializeEventHandler>(self, handler: H) -> Result<H::Target>;

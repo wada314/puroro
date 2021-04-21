@@ -29,7 +29,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Gene
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -69,7 +69,7 @@ impl ::puroro::Deserializable for GeneratedCodeInfo {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -274,7 +274,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Anno
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -347,7 +347,7 @@ impl ::puroro::Deserializable for Annotation {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -639,7 +639,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Sour
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -679,7 +679,7 @@ impl ::puroro::Deserializable for SourceCodeInfo {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -886,7 +886,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Loca
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -958,7 +958,7 @@ impl ::puroro::Deserializable for Location {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -1355,7 +1355,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Unin
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -1439,7 +1439,7 @@ impl ::puroro::Deserializable for UninterpretedOption {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -1788,7 +1788,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Name
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -1839,7 +1839,7 @@ impl ::puroro::Deserializable for NamePart {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -2032,7 +2032,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Meth
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -2094,7 +2094,7 @@ impl ::puroro::Deserializable for MethodOptions {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -2380,7 +2380,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Serv
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -2431,7 +2431,7 @@ impl ::puroro::Deserializable for ServiceOptions {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -2662,7 +2662,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Enum
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -2713,7 +2713,7 @@ impl ::puroro::Deserializable for EnumValueOptions {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -2946,7 +2946,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Enum
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -3008,7 +3008,7 @@ impl ::puroro::Deserializable for EnumOptions {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -3268,7 +3268,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Oneo
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -3308,7 +3308,7 @@ impl ::puroro::Deserializable for OneofOptions {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -3518,7 +3518,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Fiel
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -3624,7 +3624,7 @@ impl ::puroro::Deserializable for FieldOptions {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -4062,7 +4062,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Mess
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -4146,7 +4146,7 @@ impl ::puroro::Deserializable for MessageOptions {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -4508,7 +4508,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut File
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -4708,7 +4708,7 @@ impl ::puroro::Deserializable for FileOptions {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -5460,7 +5460,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Meth
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -5537,7 +5537,7 @@ impl ::puroro::Deserializable for MethodDescriptorProto {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -5823,7 +5823,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Serv
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -5873,7 +5873,7 @@ impl ::puroro::Deserializable for ServiceDescriptorProto {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -6117,7 +6117,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Enum
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -6173,7 +6173,7 @@ impl ::puroro::Deserializable for EnumValueDescriptorProto {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -6390,7 +6390,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Enum
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -6450,7 +6450,7 @@ impl ::puroro::Deserializable for EnumDescriptorProto {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -6817,7 +6817,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Enum
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -6874,7 +6874,7 @@ impl ::puroro::Deserializable for EnumReservedRange {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -7075,7 +7075,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Oneo
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -7120,7 +7120,7 @@ impl ::puroro::Deserializable for OneofDescriptorProto {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -7318,7 +7318,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Fiel
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -7438,7 +7438,7 @@ impl ::puroro::Deserializable for FieldDescriptorProto {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -7931,7 +7931,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Exte
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -7971,7 +7971,7 @@ impl ::puroro::Deserializable for ExtensionRangeOptions {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -8187,7 +8187,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Desc
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -8272,7 +8272,7 @@ impl ::puroro::Deserializable for DescriptorProto {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -8949,7 +8949,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Rese
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -9006,7 +9006,7 @@ impl ::puroro::Deserializable for ReservedRange {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -9208,7 +9208,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Exte
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -9270,7 +9270,7 @@ impl ::puroro::Deserializable for ExtensionRange {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -9512,7 +9512,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut File
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -9619,7 +9619,7 @@ impl ::puroro::Deserializable for FileDescriptorProto {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
@@ -10314,7 +10314,7 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut File
     fn finish(self) -> ::puroro::Result<Self::Target> {
         Ok(())
     }
-    fn met_field<T: ::puroro::deserializer::stream::LengthDelimitedDeserializer>(
+    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
         &mut self,
         field: ::puroro::types::Field<T>,
         field_number: usize,
@@ -10354,7 +10354,7 @@ impl ::puroro::Deserializable for FileDescriptorSet {
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }
