@@ -1,3 +1,4 @@
+use super::iters::{CharsIterator, VariantsIterator};
 use super::BytesIterator;
 use crate::types::{FieldData, WireType};
 use crate::variant::Variant;
@@ -55,6 +56,14 @@ pub trait BytesIter: Sized + Iterator<Item = ::std::io::Result<u8>> {
 
     fn bytes(&mut self) -> BytesIterator<'_, Self> {
         BytesIterator::new(self)
+    }
+
+    fn chars(&mut self) -> CharsIterator<'_, Self> {
+        CharsIterator::new(self)
+    }
+
+    fn variants(&mut self) -> VariantsIterator<'_, Self> {
+        VariantsIterator::new(self)
     }
 }
 // blanket implementation

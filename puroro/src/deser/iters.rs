@@ -19,17 +19,17 @@ impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for BytesIterator<'a, I> {
 }
 
 /// Converts `Result<u8, std::io::IoError>` into `Result<char, PuroroError>`.
-pub struct CharsIterator<I: Iterator<Item = IoResult<u8>>> {
-    iter: ::utf8_decode::UnsafeDecoder<I>,
+pub struct CharsIterator<'a, I: Iterator<Item = IoResult<u8>>> {
+    iter: ::utf8_decode::UnsafeDecoder<&'a mut I>,
 }
-impl<I: Iterator<Item = IoResult<u8>>> CharsIterator<I> {
-    pub(crate) fn new(iter: I) -> Self {
+impl<'a, I: Iterator<Item = IoResult<u8>>> CharsIterator<'a, I> {
+    pub(crate) fn new(iter: &'a mut I) -> Self {
         Self {
             iter: ::utf8_decode::UnsafeDecoder::new(iter),
         }
     }
 }
-impl<I: Iterator<Item = IoResult<u8>>> Iterator for CharsIterator<I> {
+impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for CharsIterator<'a, I> {
     type Item = Result<char>;
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|ior| ior.map_err(|ioe| ioe.into()))
@@ -37,15 +37,15 @@ impl<I: Iterator<Item = IoResult<u8>>> Iterator for CharsIterator<I> {
 }
 
 /// Converts `Result<u8, std::io::IoError>` into `Result<Variant, PuroroError>`.
-pub struct VariantsIterator<I: Iterator<Item = IoResult<u8>>> {
-    iter: I,
+pub struct VariantsIterator<'a, I: Iterator<Item = IoResult<u8>>> {
+    iter: &'a mut I,
 }
-impl<I: Iterator<Item = IoResult<u8>>> VariantsIterator<I> {
-    pub(crate) fn new(iter: I) -> Self {
+impl<'a, I: Iterator<Item = IoResult<u8>>> VariantsIterator<'a, I> {
+    pub(crate) fn new(iter: &'a mut I) -> Self {
         Self { iter }
     }
 }
-impl<I: Iterator<Item = IoResult<u8>>> Iterator for VariantsIterator<I> {
+impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for VariantsIterator<'a, I> {
     type Item = Result<Variant>;
     fn next(&mut self) -> Option<Self::Item> {
         let mut peekable = self.iter.by_ref().peekable();
