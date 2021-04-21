@@ -7,6 +7,13 @@ use crate::PuroroError;
 use crate::Result;
 use ::num_traits::FromPrimitive;
 
+pub trait DeserializableFromBytes {
+    fn deserialize(slice: &[u8]) -> Self;
+}
+pub trait DeserializeMessageFromSliceEventHandler {
+    fn met_field(&mut self, field: FieldData<&[u8]>, field_number: usize) -> Result<()>;
+}
+
 pub trait BytesSlice: Sized + std::io::Read {
     fn deser_message<H: DeserializeMessageFromSliceEventHandler>(
         &mut self,
@@ -63,14 +70,6 @@ impl<'a> BytesSlice for &'a [u8] {
         }
         Ok(())
     }
-}
-
-pub trait DeserializableFromBytes {
-    fn deserialize(slice: &[u8]) -> Self;
-}
-
-pub trait DeserializeMessageFromSliceEventHandler {
-    fn met_field(&mut self, field: FieldData<&[u8]>, field_number: usize) -> Result<()>;
 }
 
 fn try_get_wire_type_and_field_number(slice: &[u8]) -> Result<Option<(&[u8], WireType, usize)>> {

@@ -6,6 +6,14 @@ use crate::PuroroError;
 use crate::Result;
 use ::num_traits::FromPrimitive;
 
+pub trait DeserializableFromBytes {
+    fn deserialize<B: BytesIter>(iter: B) -> Self;
+}
+
+pub trait DeserializeMessageFromBytesEventHandler {
+    fn met_field<B: BytesIter>(&mut self, field: FieldData<B>, field_number: usize) -> Result<()>;
+}
+
 pub trait BytesIter: Sized + Iterator<Item = ::std::io::Result<u8>> {
     fn try_get_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, usize)>> {
         let mut peekable = self.by_ref().peekable();
@@ -68,11 +76,3 @@ pub trait BytesIter: Sized + Iterator<Item = ::std::io::Result<u8>> {
 }
 // blanket implementation
 impl<T> BytesIter for T where T: Sized + Iterator<Item = ::std::io::Result<u8>> {}
-
-pub trait DeserializableFromBytes {
-    fn deserialize<B: BytesIter>(iter: B) -> Self;
-}
-
-pub trait DeserializeMessageFromBytesEventHandler {
-    fn met_field<B: BytesIter>(&mut self, field: FieldData<B>, field_number: usize) -> Result<()>;
-}
