@@ -7,7 +7,7 @@ use crate::Result;
 use ::num_traits::FromPrimitive;
 
 pub trait DeserializableFromBytes {
-    fn deserialize<B: BytesIter>(iter: B) -> Self;
+    fn deserialize<B: BytesIter>(&mut self, iter: &mut B) -> Result<()>;
 }
 
 pub trait DeserializeMessageFromBytesEventHandler {

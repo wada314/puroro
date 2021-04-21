@@ -446,8 +446,9 @@ ldd.deserialize_as_message(msg)?;\n",
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
-        (format!(
-            "\
+        (
+            format!(
+                "\
 {cfg}
 impl{gpb} ::puroro::Deserializable for {name}{gp} {{
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
@@ -458,11 +459,25 @@ impl{gpb} ::puroro::Deserializable for {name}{gp} {{
         Ok(())
     }}
 }}\n",
-            name = self.frag_gen.struct_name(self.msg)?,
-            cfg = self.frag_gen.cfg_condition(),
-            gp = self.frag_gen.struct_generic_params(""),
-            gpb = self.frag_gen.struct_generic_params_bounds(""),
-        ),)
+                name = self.frag_gen.struct_name(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params(""),
+                gpb = self.frag_gen.struct_generic_params_bounds(""),
+            ),
+            format!(
+                "\
+{cfg}
+impl{gpb} ::puroro::deser::DeserializableFromBytes for {name}{gp} {{
+    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {{
+        bytes_iter.deser_message(self)
+    }}
+}}\n",
+                name = self.frag_gen.struct_name(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params(""),
+                gpb = self.frag_gen.struct_generic_params_bounds(""),
+            ),
+        )
             .write_into(output)
     }
 

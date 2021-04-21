@@ -8,7 +8,7 @@ use crate::Result;
 use ::num_traits::FromPrimitive;
 
 pub trait DeserializableFromSlice {
-    fn deserialize(slice: &[u8]) -> Self;
+    fn deserialize(&mut self, slice: &[u8]) -> Result<()>;
 }
 pub trait DeserializeMessageFromSliceEventHandler {
     fn met_field(&mut self, field: FieldData<&[u8]>, field_number: usize) -> Result<()>;

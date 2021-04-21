@@ -148,6 +148,12 @@ impl ::puroro::Deserializable for CodeGeneratorResponse {
     }
 }
 
+impl ::puroro::deser::DeserializableFromBytes for CodeGeneratorResponse {
+    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+        bytes_iter.deser_message(self)
+    }
+}
+
 impl ::puroro::serializer::Serializable for CodeGeneratorResponse {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -339,6 +345,12 @@ impl<'b> ::puroro::Deserializable for CodeGeneratorResponseBumpalo<'b> {
         let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b> ::puroro::deser::DeserializableFromBytes for CodeGeneratorResponseBumpalo<'b> {
+    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+        bytes_iter.deser_message(self)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -585,6 +597,12 @@ impl ::puroro::Deserializable for File {
     }
 }
 
+impl ::puroro::deser::DeserializableFromBytes for File {
+    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+        bytes_iter.deser_message(self)
+    }
+}
+
 impl ::puroro::serializer::Serializable for File {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -766,6 +784,12 @@ impl<'b> ::puroro::Deserializable for FileBumpalo<'b> {
         let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b> ::puroro::deser::DeserializableFromBytes for FileBumpalo<'b> {
+    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+        bytes_iter.deser_message(self)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -968,6 +992,12 @@ impl ::puroro::Deserializable for CodeGeneratorRequest {
         let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
+    }
+}
+
+impl ::puroro::deser::DeserializableFromBytes for CodeGeneratorRequest {
+    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+        bytes_iter.deser_message(self)
     }
 }
 
@@ -1180,6 +1210,12 @@ impl<'b> ::puroro::Deserializable for CodeGeneratorRequestBumpalo<'b> {
         let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b> ::puroro::deser::DeserializableFromBytes for CodeGeneratorRequestBumpalo<'b> {
+    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+        bytes_iter.deser_message(self)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1474,6 +1510,12 @@ impl ::puroro::Deserializable for Version {
     }
 }
 
+impl ::puroro::deser::DeserializableFromBytes for Version {
+    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+        bytes_iter.deser_message(self)
+    }
+}
+
 impl ::puroro::serializer::Serializable for Version {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1697,6 +1739,12 @@ impl<'b> ::puroro::Deserializable for VersionBumpalo<'b> {
         let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'b> ::puroro::deser::DeserializableFromBytes for VersionBumpalo<'b> {
+    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+        bytes_iter.deser_message(self)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
