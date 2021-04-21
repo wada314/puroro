@@ -1,8 +1,6 @@
 use std::convert::TryInto;
 use std::io::Read;
 
-use super::iters::{CharsIterator, VariantsIterator};
-use super::BytesIterator;
 use crate::types::{FieldData, WireType};
 use crate::variant::Variant;
 use crate::PuroroError;
@@ -75,9 +73,7 @@ pub trait DeserializeMessageFromSliceEventHandler {
     fn met_field(&mut self, field: FieldData<&[u8]>, field_number: usize) -> Result<()>;
 }
 
-fn try_get_wire_type_and_field_number(
-    mut slice: &[u8],
-) -> Result<Option<(&[u8], WireType, usize)>> {
+fn try_get_wire_type_and_field_number(slice: &[u8]) -> Result<Option<(&[u8], WireType, usize)>> {
     if slice.len() == 0 {
         return Ok(None);
     }
