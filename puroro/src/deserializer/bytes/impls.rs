@@ -144,19 +144,19 @@ where
             let field = match wire_type {
                 WireType::Variant => {
                     let variant = Variant::decode_bytes(&mut self)?;
-                    Field::Variant(variant)
+                    FieldData::Variant(variant)
                 }
                 WireType::LengthDelimited => {
                     let field_length = Variant::decode_bytes(&mut self)?.to_usize()?;
                     let deserializer_for_inner = self.make_sub_deserializer(field_length);
-                    Field::LengthDelimited(deserializer_for_inner)
+                    FieldData::LengthDelimited(deserializer_for_inner)
                 }
                 WireType::Bits32 => {
                     let v0 = self.eat_one_byte()?;
                     let v1 = self.eat_one_byte()?;
                     let v2 = self.eat_one_byte()?;
                     let v3 = self.eat_one_byte()?;
-                    Field::Bits32([v0, v1, v2, v3])
+                    FieldData::Bits32([v0, v1, v2, v3])
                 }
                 WireType::Bits64 => {
                     let v0 = self.eat_one_byte()?;
@@ -167,7 +167,7 @@ where
                     let v5 = self.eat_one_byte()?;
                     let v6 = self.eat_one_byte()?;
                     let v7 = self.eat_one_byte()?;
-                    Field::Bits64([v0, v1, v2, v3, v4, v5, v6, v7])
+                    FieldData::Bits64([v0, v1, v2, v3, v4, v5, v6, v7])
                 }
                 _ => {
                     return Err(PuroroError::UnexpectedWireType);
@@ -267,11 +267,11 @@ mod tests {
             }
             fn met_field<T: LengthDelimitedDeserializer>(
                 &mut self,
-                field: Field<T>,
+                field: FieldData<T>,
                 field_number: usize,
             ) -> Result<()> {
                 assert_eq!(1, field_number);
-                if let Field::Variant(v) = field {
+                if let FieldData::Variant(v) = field {
                     self.a = v.to_i32()?;
                 } else {
                     panic!();
@@ -307,11 +307,11 @@ mod tests {
 
             fn met_field<T: LengthDelimitedDeserializer>(
                 &mut self,
-                field: Field<T>,
+                field: FieldData<T>,
                 field_number: usize,
             ) -> Result<()> {
                 assert_eq!(field_number, 2);
-                if let Field::LengthDelimited(ldd) = field {
+                if let FieldData::LengthDelimited(ldd) = field {
                     self.b = ldd.deserialize_as_chars().collect::<Result<String>>()?;
                 } else {
                     panic!();
@@ -354,11 +354,11 @@ mod tests {
             }
             fn met_field<T: LengthDelimitedDeserializer>(
                 &mut self,
-                field: Field<T>,
+                field: FieldData<T>,
                 field_number: usize,
             ) -> Result<()> {
                 assert_eq!(1, field_number);
-                if let Field::Variant(v) = field {
+                if let FieldData::Variant(v) = field {
                     self.a = v.to_i32()?;
                 } else {
                     panic!();
@@ -373,11 +373,11 @@ mod tests {
             }
             fn met_field<T: LengthDelimitedDeserializer>(
                 &mut self,
-                field: Field<T>,
+                field: FieldData<T>,
                 field_number: usize,
             ) -> Result<()> {
                 assert_eq!(3, field_number);
-                if let Field::LengthDelimited(ldd) = field {
+                if let FieldData::LengthDelimited(ldd) = field {
                     self.c = ldd.deserialize_as_message(Test1::default())?
                 } else {
                     panic!()
@@ -412,11 +412,11 @@ mod tests {
             }
             fn met_field<T: LengthDelimitedDeserializer>(
                 &mut self,
-                field: Field<T>,
+                field: FieldData<T>,
                 field_number: usize,
             ) -> Result<()> {
                 assert_eq!(4, field_number);
-                if let Field::LengthDelimited(ldd) = field {
+                if let FieldData::LengthDelimited(ldd) = field {
                     self.d = ldd
                         .deserialize_as_variants()
                         .map(|rv| rv.and_then(|v| v.to_i32()))

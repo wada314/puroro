@@ -1,4 +1,4 @@
-use crate::types::Field;
+use crate::types::FieldData;
 
 use self::bytes::LengthDelimitedDeserializer;
 use crate::Result;
@@ -15,7 +15,7 @@ pub trait MessageDeserializeEventHandler {
 
     fn met_field<T: LengthDelimitedDeserializer>(
         &mut self,
-        field: Field<T>,
+        field: FieldData<T>,
         field_number: usize,
     ) -> Result<()>;
 }

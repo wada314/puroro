@@ -13,7 +13,7 @@ pub enum WireType {
 }
 
 #[derive(Debug, Clone)]
-pub enum Field<T> {
+pub enum FieldData<T> {
     Variant(Variant),
     LengthDelimited(T),
     Bits32([u8; 4]),

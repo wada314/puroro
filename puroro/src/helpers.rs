@@ -1,4 +1,4 @@
-use crate::types::Field;
+use crate::types::FieldData;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
@@ -342,7 +342,7 @@ pub trait InternalData {
 
 #[derive(Debug, Clone)]
 pub struct InternalDataForNormalStruct {
-    unknown_fields: Option<HashMap<usize, Field<Vec<u8>>>>,
+    unknown_fields: Option<HashMap<usize, FieldData<Vec<u8>>>>,
 }
 impl InternalDataForNormalStruct {
     pub fn new() -> Self {
@@ -358,7 +358,7 @@ impl InternalData for InternalDataForNormalStruct {}
 pub struct InternalDataForBumpaloStruct<'b> {
     // No hashmap implementation in bumpalo...
     unknown_fields: Option<
-        ::bumpalo::collections::Vec<'b, (usize, Field<::bumpalo::collections::Vec<'b, u8>>)>,
+        ::bumpalo::collections::Vec<'b, (usize, FieldData<::bumpalo::collections::Vec<'b, u8>>)>,
     >,
     bump: &'b ::bumpalo::Bump,
 }

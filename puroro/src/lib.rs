@@ -1,6 +1,7 @@
 use std::iter::FromIterator;
 use std::marker::PhantomData;
 
+pub mod deser;
 pub mod deserializer;
 pub mod error;
 pub mod helpers;

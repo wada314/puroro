@@ -3,7 +3,7 @@ mod impls;
 mod iters;
 
 use super::{Deserializer, MessageDeserializeEventHandler};
-use crate::types::{Field, WireType};
+use crate::types::{FieldData, WireType};
 pub use crate::variant::Variant;
 pub use crate::{PuroroError, Result};
 pub use crate::{RepeatedFieldCollector, RepeatedFieldHandler};

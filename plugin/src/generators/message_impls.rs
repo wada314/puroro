@@ -9,7 +9,7 @@ use crate::wrappers::{
 };
 use crate::{ErrorKind, Result};
 
-const DESER_MOD: &'static str = "::puroro::deserializer::stream";
+const DESER_MOD: &'static str = "::puroro::deserializer::bytes";
 
 pub struct MessageImplCodeGenerator<'c, 'g, G>
 where
@@ -162,7 +162,7 @@ impl{gp} ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut {nam
     }}
     fn met_field<T: {d}::LengthDelimitedDeserializer>(
         &mut self,
-        field: ::puroro::types::Field<T>,
+        field: ::puroro::types::FieldData<T>,
         field_number: usize,
     ) -> ::puroro::Result<()> {{
         use ::puroro::helpers::MaybeRepeatedField;
@@ -197,7 +197,7 @@ impl{gp} ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut {nam
         output: &mut Indentor<W>,
     ) -> Result<()> {
         (
-            "::puroro::types::Field::Variant(variant) => match field_number {{\n",
+            "::puroro::types::FieldData::Variant(variant) => match field_number {{\n",
             indent((
                 iter(self.msg.fields().map(|field| -> Result<Fragment<_>> {
                     Ok(match field.wire_type()? {
@@ -231,7 +231,7 @@ impl{gp} ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut {nam
         output: &mut Indentor<W>,
     ) -> Result<()> {
         (
-            "::puroro::types::Field::LengthDelimited(ldd) => match field_number {{\n",
+            "::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {{\n",
             indent((
                 iter(self.msg.fields().map(|field| -> Result<Fragment<_>> {
                     Ok((
@@ -289,7 +289,7 @@ ldd.deserialize_as_message(msg)?;\n",
     ) -> Result<()> {
         (
             format!(
-                "::puroro::types::Field::Bits{bits}(bytes) => match field_number {{\n",
+                "::puroro::types::FieldData::Bits{bits}(bytes) => match field_number {{\n",
                 bits = bits,
             ),
             indent((
@@ -364,7 +364,7 @@ impl{gpb} ::puroro::Deserializable for {name}{gp} {{
     fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
             &mut self, iter: I) -> ::puroro::Result<()> {{
         use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::stream::deserializer_from_bytes(iter);
+        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
         deserializer.deserialize(self)?;
         Ok(())
     }}
