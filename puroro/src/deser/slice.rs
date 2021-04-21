@@ -7,7 +7,7 @@ use crate::PuroroError;
 use crate::Result;
 use ::num_traits::FromPrimitive;
 
-pub trait DeserializableFromBytes {
+pub trait DeserializableFromSlice {
     fn deserialize(slice: &[u8]) -> Self;
 }
 pub trait DeserializeMessageFromSliceEventHandler {

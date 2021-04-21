@@ -188,6 +188,39 @@ impl{gp} ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut {nam
         Ok(())
     }}
 }}\n",
+            format!(
+                "\
+{cfg}
+impl{gp} ::puroro::deser::DeserializeMessageFromBytesEventHandler for {name}{gpb} {{
+    fn met_field<B: ::puroro::deser::BytesIter>(
+        &mut self,
+        field: ::puroro::types::FieldData<B>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> {{
+        use ::puroro::helpers::MaybeRepeatedField;
+        use ::puroro::helpers::MaybeRepeatedVariantField;
+        match field {{\n",
+                name = self.frag_gen.struct_name(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params("'a"),
+                gpb = self.frag_gen.struct_generic_params_bounds(""),
+            ),
+            indent_n(
+                3,
+                (
+                    func(|output| self.print_msg_deser_deserializable_variant_arm(output)),
+                    func(|output| {
+                        self.print_msg_deser_deserializable_length_delimited_arm2(output)
+                    }),
+                    func(|output| self.print_msg_deser_deserializable_bitsxx_arm(output, 32)),
+                    func(|output| self.print_msg_deser_deserializable_bitsxx_arm(output, 64)),
+                ),
+            ),
+            "        \
+        }}
+        Ok(())
+    }}
+}}\n",
         )
             .write_into(output)
     }
@@ -226,12 +259,12 @@ impl{gp} ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut {nam
             .write_into(output)
     }
 
-    pub fn print_msg_deser_deserializable_length_delimited_arm<W: std::fmt::Write>(
+    pub fn print_msg_deser_deserializable_length_delimited_arm2<W: std::fmt::Write>(
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
         (
-            "::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {{\n",
+            "::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {{\n",
             indent((
                 iter(self.msg.fields().map(|field| -> Result<Fragment<_>> {
                     Ok((
@@ -240,7 +273,7 @@ impl{gp} ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut {nam
                             // Deserialize packed variant(s)
                             WireType::Variant(field_type) => format!(
                                 "\
-let values = ldd.deserialize_as_variants().map(|rv| {{
+let values = bytes_iter.variants().map(|rv| {{
     rv.and_then(|variant| variant.to_native::<{tag}>())
 }}).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
 let mut iter = values.into_iter();
@@ -253,19 +286,19 @@ MaybeRepeatedVariantField::extend(&mut self.{name}, first, iter);\n",
                                 LengthDelimitedFieldType::String => format!(
                                     "\
 *self.{name}.push_and_get_mut()
-    = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;\n",
+    = bytes_iter.chars().collect::<::puroro::Result<_>>()?;\n",
                                     name = field.native_name()
                                 ),
                                 LengthDelimitedFieldType::Bytes => format!(
                                     "\
 *self.{name}.push_and_get_mut()
-    = ldd.deserialize_as_bytes().collect::<::puroro::Result<_>>()?;\n",
+    = bytes_iter.bytes().collect::<::puroro::Result<_>>()?;\n",
                                     name = field.native_name()
                                 ),
                                 LengthDelimitedFieldType::Message(_) => format!(
                                     "\
 let msg = self.{name}.push_and_get_mut2(&self.puroro_internal);
-ldd.deserialize_as_message(msg)?;\n",
+bytes_iter.deser_message(msg)?;\n",
                                     name = field.native_name()
                                 ),
                             },
@@ -346,6 +379,62 @@ ldd.deserialize_as_message(msg)?;\n",
                     )
                 },
                 // TODO: handle unknown field id
+                "_ => Err(::puroro::PuroroError::UnexpectedFieldId)?,\n",
+            )),
+            "}}\n",
+        )
+            .write_into(output)
+    }
+
+    pub fn print_msg_deser_deserializable_length_delimited_arm<W: std::fmt::Write>(
+        &self,
+        output: &mut Indentor<W>,
+    ) -> Result<()> {
+        (
+            "::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {{\n",
+            indent((
+                iter(self.msg.fields().map(|field| -> Result<Fragment<_>> {
+                    Ok((
+                        format!("{number} => {{\n", number = field.number()),
+                        indent((match field.wire_type()? {
+                            // Deserialize packed variant(s)
+                            WireType::Variant(field_type) => format!(
+                                "\
+let values = ldd.deserialize_as_variants().map(|rv| {{
+    rv.and_then(|variant| variant.to_native::<{tag}>())
+}}).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
+let mut iter = values.into_iter();
+let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
+MaybeRepeatedVariantField::extend(&mut self.{name}, first, iter);\n",
+                                name = field.native_name(),
+                                tag = field_type.native_tag_type(self.msg.path_to_root_mod()),
+                            ),
+                            WireType::LengthDelimited(field_type) => match field_type {
+                                LengthDelimitedFieldType::String => format!(
+                                    "\
+*self.{name}.push_and_get_mut()
+    = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;\n",
+                                    name = field.native_name()
+                                ),
+                                LengthDelimitedFieldType::Bytes => format!(
+                                    "\
+*self.{name}.push_and_get_mut()
+    = ldd.deserialize_as_bytes().collect::<::puroro::Result<_>>()?;\n",
+                                    name = field.native_name()
+                                ),
+                                LengthDelimitedFieldType::Message(_) => format!(
+                                    "\
+let msg = self.{name}.push_and_get_mut2(&self.puroro_internal);
+ldd.deserialize_as_message(msg)?;\n",
+                                    name = field.native_name()
+                                ),
+                            },
+                            _ => "Err(::puroro::PuroroError::UnexpectedWireType)?\n".into(),
+                        },)),
+                        "}}\n",
+                    )
+                        .into())
+                })),
                 "_ => Err(::puroro::PuroroError::UnexpectedFieldId)?,\n",
             )),
             "}}\n",
