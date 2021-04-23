@@ -1,5 +1,5 @@
-use super::iters::{CharsIterator, VariantsIterator};
-use super::BytesIterator;
+use super::iters::{Chars, Variants};
+use super::Bytes;
 use crate::types::{FieldData, WireType};
 use crate::variant::Variant;
 use crate::PuroroError;
@@ -119,16 +119,16 @@ where
         Ok(())
     }
 
-    pub fn bytes(&mut self) -> BytesIterator<'_, Self> {
-        BytesIterator::new(self)
+    pub fn bytes(&mut self) -> Bytes<'_, Self> {
+        Bytes::new(self)
     }
 
-    pub fn chars(&mut self) -> CharsIterator<'_, Self> {
-        CharsIterator::new(self)
+    pub fn chars(&mut self) -> Chars<'_, Self> {
+        Chars::new(self)
     }
 
-    pub fn variants(&mut self) -> VariantsIterator<'_, Self> {
-        VariantsIterator::new(self)
+    pub fn variants(&mut self) -> Variants<'_, Self> {
+        Variants::new(self)
     }
 }
 
