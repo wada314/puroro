@@ -367,6 +367,14 @@ impl<'a, T> FieldNew<'a> for ::std::option::Option<T> {
         ::std::option::Option::new()
     }
 }
+impl<'a, T> FieldNew<'a> for ::std::result::Result<T, i32>
+where
+    T: TryFrom<i32, Error = i32>,
+{
+    fn new() -> Self {
+        T::try_from(0i32)
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump, T> FieldNew<'bump> for ::bumpalo::collections::Vec<'bump, T> {
     fn new() -> Self {

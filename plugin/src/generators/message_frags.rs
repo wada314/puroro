@@ -125,13 +125,6 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
-    pub fn call_new_from_new(&self) -> &'static str {
-        match self.context.alloc_type() {
-            AllocatorType::Default => "new()",
-            AllocatorType::Bumpalo => "new_in(bump)",
-        }
-    }
-
     pub fn vec_type(&self, item: &str) -> String {
         match self.context.alloc_type() {
             AllocatorType::Default => format!("::std::vec::Vec<{item}>", item = item),

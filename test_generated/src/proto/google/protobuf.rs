@@ -10,9 +10,8 @@ pub struct GeneratedCodeInfo {
 
 impl GeneratedCodeInfo {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            annotation: ::std::default::Default::default(),
+            annotation: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -126,9 +125,8 @@ pub struct GeneratedCodeInfoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> GeneratedCodeInfoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            annotation: ::std::default::Default::default(),
+            annotation: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -227,7 +225,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for GeneratedCodeInfoBumpalo<'bum
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -264,12 +261,11 @@ pub struct Annotation {
 
 impl Annotation {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            path: ::std::default::Default::default(),
-            source_file: ::std::default::Default::default(),
-            begin: ::std::default::Default::default(),
-            end: ::std::default::Default::default(),
+            path: ::puroro::helpers::FieldNew::new(),
+            source_file: ::puroro::helpers::FieldNew::new(),
+            begin: ::puroro::helpers::FieldNew::new(),
+            end: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -443,12 +439,11 @@ pub struct AnnotationBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> AnnotationBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            path: ::std::default::Default::default(),
-            source_file: ::std::default::Default::default(),
-            begin: ::std::default::Default::default(),
-            end: ::std::default::Default::default(),
+            path: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            source_file: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            begin: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            end: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -604,7 +599,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for AnnotationBumpalo<'bump> {
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -644,9 +638,8 @@ pub struct SourceCodeInfo {
 
 impl SourceCodeInfo {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            location: ::std::default::Default::default(),
+            location: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -760,9 +753,8 @@ pub struct SourceCodeInfoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> SourceCodeInfoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            location: ::std::default::Default::default(),
+            location: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -861,7 +853,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for SourceCodeInfoBumpalo<'bump> 
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -899,13 +890,12 @@ pub struct Location {
 
 impl Location {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            path: ::std::default::Default::default(),
-            span: ::std::default::Default::default(),
-            leading_comments: ::std::default::Default::default(),
-            trailing_comments: ::std::default::Default::default(),
-            leading_detached_comments: ::std::default::Default::default(),
+            path: ::puroro::helpers::FieldNew::new(),
+            span: ::puroro::helpers::FieldNew::new(),
+            leading_comments: ::puroro::helpers::FieldNew::new(),
+            trailing_comments: ::puroro::helpers::FieldNew::new(),
+            leading_detached_comments: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -1111,13 +1101,12 @@ pub struct LocationBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> LocationBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            path: ::std::default::Default::default(),
-            span: ::std::default::Default::default(),
-            leading_comments: ::std::default::Default::default(),
-            trailing_comments: ::std::default::Default::default(),
-            leading_detached_comments: ::std::default::Default::default(),
+            path: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            span: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            leading_comments: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            trailing_comments: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            leading_detached_comments: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -1304,7 +1293,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for LocationBumpalo<'bump> {
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -1378,15 +1366,14 @@ pub struct UninterpretedOption {
 
 impl UninterpretedOption {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            identifier_value: ::std::default::Default::default(),
-            positive_int_value: ::std::default::Default::default(),
-            negative_int_value: ::std::default::Default::default(),
-            double_value: ::std::default::Default::default(),
-            string_value: ::std::default::Default::default(),
-            aggregate_value: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new(),
+            identifier_value: ::puroro::helpers::FieldNew::new(),
+            positive_int_value: ::puroro::helpers::FieldNew::new(),
+            negative_int_value: ::puroro::helpers::FieldNew::new(),
+            double_value: ::puroro::helpers::FieldNew::new(),
+            string_value: ::puroro::helpers::FieldNew::new(),
+            aggregate_value: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -1590,15 +1577,14 @@ pub struct UninterpretedOptionBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> UninterpretedOptionBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            identifier_value: ::std::default::Default::default(),
-            positive_int_value: ::std::default::Default::default(),
-            negative_int_value: ::std::default::Default::default(),
-            double_value: ::std::default::Default::default(),
-            string_value: ::std::default::Default::default(),
-            aggregate_value: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            identifier_value: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            positive_int_value: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            negative_int_value: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            double_value: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            string_value: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            aggregate_value: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -1781,7 +1767,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for UninterpretedOptionBumpalo<'b
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -1828,10 +1813,9 @@ pub struct NamePart {
 
 impl NamePart {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name_part: ::std::default::Default::default(),
-            is_extension: ::std::default::Default::default(),
+            name_part: ::puroro::helpers::FieldNew::new(),
+            is_extension: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -1951,10 +1935,9 @@ pub struct NamePartBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> NamePartBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name_part: ::std::default::Default::default(),
-            is_extension: ::std::default::Default::default(),
+            name_part: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            is_extension: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -2058,7 +2041,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for NamePartBumpalo<'bump> {
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -2083,11 +2065,10 @@ pub struct MethodOptions {
 
 impl MethodOptions {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            deprecated: ::std::default::Default::default(),
-            idempotency_level: 0i32.try_into(),
-            uninterpreted_option: ::std::default::Default::default(),
+            deprecated: ::puroro::helpers::FieldNew::new(),
+            idempotency_level: ::puroro::helpers::FieldNew::new(),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -2241,11 +2222,10 @@ pub struct MethodOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MethodOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            deprecated: ::std::default::Default::default(),
-            idempotency_level: 0i32.try_into(),
-            uninterpreted_option: ::std::default::Default::default(),
+            deprecated: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            idempotency_level: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -2382,7 +2362,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for MethodOptionsBumpalo<'bump> {
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -2444,10 +2423,9 @@ pub struct ServiceOptions {
 
 impl ServiceOptions {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            deprecated: ::std::default::Default::default(),
-            uninterpreted_option: ::std::default::Default::default(),
+            deprecated: ::puroro::helpers::FieldNew::new(),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -2581,10 +2559,9 @@ pub struct ServiceOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ServiceOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            deprecated: ::std::default::Default::default(),
-            uninterpreted_option: ::std::default::Default::default(),
+            deprecated: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -2702,7 +2679,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for ServiceOptionsBumpalo<'bump> 
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -2738,10 +2714,9 @@ pub struct EnumValueOptions {
 
 impl EnumValueOptions {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            deprecated: ::std::default::Default::default(),
-            uninterpreted_option: ::std::default::Default::default(),
+            deprecated: ::puroro::helpers::FieldNew::new(),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -2875,10 +2850,9 @@ pub struct EnumValueOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumValueOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            deprecated: ::std::default::Default::default(),
-            uninterpreted_option: ::std::default::Default::default(),
+            deprecated: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -2996,7 +2970,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumValueOptionsBumpalo<'bump
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -3033,11 +3006,10 @@ pub struct EnumOptions {
 
 impl EnumOptions {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            allow_alias: ::std::default::Default::default(),
-            deprecated: ::std::default::Default::default(),
-            uninterpreted_option: ::std::default::Default::default(),
+            allow_alias: ::puroro::helpers::FieldNew::new(),
+            deprecated: ::puroro::helpers::FieldNew::new(),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -3191,11 +3163,10 @@ pub struct EnumOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            allow_alias: ::std::default::Default::default(),
-            deprecated: ::std::default::Default::default(),
-            uninterpreted_option: ::std::default::Default::default(),
+            allow_alias: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            deprecated: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -3332,7 +3303,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumOptionsBumpalo<'bump> {
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -3369,9 +3339,8 @@ pub struct OneofOptions {
 
 impl OneofOptions {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            uninterpreted_option: ::std::default::Default::default(),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -3485,9 +3454,8 @@ pub struct OneofOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> OneofOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            uninterpreted_option: ::std::default::Default::default(),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -3586,7 +3554,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for OneofOptionsBumpalo<'bump> {
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -3625,15 +3592,14 @@ pub struct FieldOptions {
 
 impl FieldOptions {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            ctype: 0i32.try_into(),
-            packed: ::std::default::Default::default(),
-            jstype: 0i32.try_into(),
-            lazy: ::std::default::Default::default(),
-            deprecated: ::std::default::Default::default(),
-            weak: ::std::default::Default::default(),
-            uninterpreted_option: ::std::default::Default::default(),
+            ctype: ::puroro::helpers::FieldNew::new(),
+            packed: ::puroro::helpers::FieldNew::new(),
+            jstype: ::puroro::helpers::FieldNew::new(),
+            lazy: ::puroro::helpers::FieldNew::new(),
+            deprecated: ::puroro::helpers::FieldNew::new(),
+            weak: ::puroro::helpers::FieldNew::new(),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -3867,15 +3833,14 @@ pub struct FieldOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FieldOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            ctype: 0i32.try_into(),
-            packed: ::std::default::Default::default(),
-            jstype: 0i32.try_into(),
-            lazy: ::std::default::Default::default(),
-            deprecated: ::std::default::Default::default(),
-            weak: ::std::default::Default::default(),
-            uninterpreted_option: ::std::default::Default::default(),
+            ctype: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            packed: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            jstype: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            lazy: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            deprecated: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            weak: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -4088,7 +4053,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for FieldOptionsBumpalo<'bump> {
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -4183,13 +4147,12 @@ pub struct MessageOptions {
 
 impl MessageOptions {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            message_set_wire_format: ::std::default::Default::default(),
-            no_standard_descriptor_accessor: ::std::default::Default::default(),
-            deprecated: ::std::default::Default::default(),
-            map_entry: ::std::default::Default::default(),
-            uninterpreted_option: ::std::default::Default::default(),
+            message_set_wire_format: ::puroro::helpers::FieldNew::new(),
+            no_standard_descriptor_accessor: ::puroro::helpers::FieldNew::new(),
+            deprecated: ::puroro::helpers::FieldNew::new(),
+            map_entry: ::puroro::helpers::FieldNew::new(),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -4383,13 +4346,12 @@ pub struct MessageOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MessageOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            message_set_wire_format: ::std::default::Default::default(),
-            no_standard_descriptor_accessor: ::std::default::Default::default(),
-            deprecated: ::std::default::Default::default(),
-            map_entry: ::std::default::Default::default(),
-            uninterpreted_option: ::std::default::Default::default(),
+            message_set_wire_format: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            no_standard_descriptor_accessor: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            deprecated: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            map_entry: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -4564,7 +4526,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for MessageOptionsBumpalo<'bump> 
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -4625,29 +4586,28 @@ pub struct FileOptions {
 
 impl FileOptions {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            java_package: ::std::default::Default::default(),
-            java_outer_classname: ::std::default::Default::default(),
-            java_multiple_files: ::std::default::Default::default(),
-            java_generate_equals_and_hash: ::std::default::Default::default(),
-            java_string_check_utf8: ::std::default::Default::default(),
-            optimize_for: 0i32.try_into(),
-            go_package: ::std::default::Default::default(),
-            cc_generic_services: ::std::default::Default::default(),
-            java_generic_services: ::std::default::Default::default(),
-            py_generic_services: ::std::default::Default::default(),
-            php_generic_services: ::std::default::Default::default(),
-            deprecated: ::std::default::Default::default(),
-            cc_enable_arenas: ::std::default::Default::default(),
-            objc_class_prefix: ::std::default::Default::default(),
-            csharp_namespace: ::std::default::Default::default(),
-            swift_prefix: ::std::default::Default::default(),
-            php_class_prefix: ::std::default::Default::default(),
-            php_namespace: ::std::default::Default::default(),
-            php_metadata_namespace: ::std::default::Default::default(),
-            ruby_package: ::std::default::Default::default(),
-            uninterpreted_option: ::std::default::Default::default(),
+            java_package: ::puroro::helpers::FieldNew::new(),
+            java_outer_classname: ::puroro::helpers::FieldNew::new(),
+            java_multiple_files: ::puroro::helpers::FieldNew::new(),
+            java_generate_equals_and_hash: ::puroro::helpers::FieldNew::new(),
+            java_string_check_utf8: ::puroro::helpers::FieldNew::new(),
+            optimize_for: ::puroro::helpers::FieldNew::new(),
+            go_package: ::puroro::helpers::FieldNew::new(),
+            cc_generic_services: ::puroro::helpers::FieldNew::new(),
+            java_generic_services: ::puroro::helpers::FieldNew::new(),
+            py_generic_services: ::puroro::helpers::FieldNew::new(),
+            php_generic_services: ::puroro::helpers::FieldNew::new(),
+            deprecated: ::puroro::helpers::FieldNew::new(),
+            cc_enable_arenas: ::puroro::helpers::FieldNew::new(),
+            objc_class_prefix: ::puroro::helpers::FieldNew::new(),
+            csharp_namespace: ::puroro::helpers::FieldNew::new(),
+            swift_prefix: ::puroro::helpers::FieldNew::new(),
+            php_class_prefix: ::puroro::helpers::FieldNew::new(),
+            php_namespace: ::puroro::helpers::FieldNew::new(),
+            php_metadata_namespace: ::puroro::helpers::FieldNew::new(),
+            ruby_package: ::puroro::helpers::FieldNew::new(),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -5081,29 +5041,28 @@ pub struct FileOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            java_package: ::std::default::Default::default(),
-            java_outer_classname: ::std::default::Default::default(),
-            java_multiple_files: ::std::default::Default::default(),
-            java_generate_equals_and_hash: ::std::default::Default::default(),
-            java_string_check_utf8: ::std::default::Default::default(),
-            optimize_for: 0i32.try_into(),
-            go_package: ::std::default::Default::default(),
-            cc_generic_services: ::std::default::Default::default(),
-            java_generic_services: ::std::default::Default::default(),
-            py_generic_services: ::std::default::Default::default(),
-            php_generic_services: ::std::default::Default::default(),
-            deprecated: ::std::default::Default::default(),
-            cc_enable_arenas: ::std::default::Default::default(),
-            objc_class_prefix: ::std::default::Default::default(),
-            csharp_namespace: ::std::default::Default::default(),
-            swift_prefix: ::std::default::Default::default(),
-            php_class_prefix: ::std::default::Default::default(),
-            php_namespace: ::std::default::Default::default(),
-            php_metadata_namespace: ::std::default::Default::default(),
-            ruby_package: ::std::default::Default::default(),
-            uninterpreted_option: ::std::default::Default::default(),
+            java_package: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            java_outer_classname: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            java_multiple_files: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            java_generate_equals_and_hash: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            java_string_check_utf8: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            optimize_for: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            go_package: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            cc_generic_services: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            java_generic_services: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            py_generic_services: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            php_generic_services: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            deprecated: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            cc_enable_arenas: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            objc_class_prefix: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            csharp_namespace: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            swift_prefix: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            php_class_prefix: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            php_namespace: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            php_metadata_namespace: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            ruby_package: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -5502,7 +5461,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for FileOptionsBumpalo<'bump> {
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -5604,14 +5562,13 @@ pub struct MethodDescriptorProto {
 
 impl MethodDescriptorProto {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            input_type: ::std::default::Default::default(),
-            output_type: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
-            client_streaming: ::std::default::Default::default(),
-            server_streaming: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new(),
+            input_type: ::puroro::helpers::FieldNew::new(),
+            output_type: ::puroro::helpers::FieldNew::new(),
+            options: ::puroro::helpers::FieldNew::new(),
+            client_streaming: ::puroro::helpers::FieldNew::new(),
+            server_streaming: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -5787,14 +5744,13 @@ pub struct MethodDescriptorProtoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MethodDescriptorProtoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            input_type: ::std::default::Default::default(),
-            output_type: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
-            client_streaming: ::std::default::Default::default(),
-            server_streaming: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            input_type: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            output_type: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            options: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            client_streaming: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            server_streaming: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -5950,7 +5906,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for MethodDescriptorProtoBumpalo<
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -5982,11 +5937,10 @@ pub struct ServiceDescriptorProto {
 
 impl ServiceDescriptorProto {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            method: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new(),
+            method: ::puroro::helpers::FieldNew::new(),
+            options: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -6124,11 +6078,10 @@ pub struct ServiceDescriptorProtoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ServiceDescriptorProtoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            method: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            method: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            options: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -6249,7 +6202,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for ServiceDescriptorProtoBumpalo
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -6288,11 +6240,10 @@ pub struct EnumValueDescriptorProto {
 
 impl EnumValueDescriptorProto {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            number: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new(),
+            number: ::puroro::helpers::FieldNew::new(),
+            options: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -6424,11 +6375,10 @@ pub struct EnumValueDescriptorProtoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumValueDescriptorProtoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            number: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            number: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            options: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -6543,7 +6493,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumValueDescriptorProtoBumpa
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -6571,13 +6520,12 @@ pub struct EnumDescriptorProto {
 
 impl EnumDescriptorProto {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            value: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
-            reserved_range: ::std::default::Default::default(),
-            reserved_name: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new(),
+            value: ::puroro::helpers::FieldNew::new(),
+            options: ::puroro::helpers::FieldNew::new(),
+            reserved_range: ::puroro::helpers::FieldNew::new(),
+            reserved_name: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -6767,13 +6715,12 @@ pub struct EnumDescriptorProtoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumDescriptorProtoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            value: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
-            reserved_range: ::std::default::Default::default(),
-            reserved_name: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            value: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            options: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            reserved_range: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            reserved_name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -6944,7 +6891,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumDescriptorProtoBumpalo<'b
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -7013,10 +6959,9 @@ pub struct EnumReservedRange {
 
 impl EnumReservedRange {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            start: ::std::default::Default::default(),
-            end: ::std::default::Default::default(),
+            start: ::puroro::helpers::FieldNew::new(),
+            end: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -7144,10 +7089,9 @@ pub struct EnumReservedRangeBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumReservedRangeBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            start: ::std::default::Default::default(),
-            end: ::std::default::Default::default(),
+            start: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            end: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -7259,7 +7203,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumReservedRangeBumpalo<'bum
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -7283,10 +7226,9 @@ pub struct OneofDescriptorProto {
 
 impl OneofDescriptorProto {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new(),
+            options: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -7398,10 +7340,9 @@ pub struct OneofDescriptorProtoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> OneofDescriptorProtoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            options: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -7497,7 +7438,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for OneofDescriptorProtoBumpalo<'
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -7529,19 +7469,18 @@ pub struct FieldDescriptorProto {
 
 impl FieldDescriptorProto {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            number: ::std::default::Default::default(),
-            label: 0i32.try_into(),
-            type_: 0i32.try_into(),
-            type_name: ::std::default::Default::default(),
-            extendee: ::std::default::Default::default(),
-            default_value: ::std::default::Default::default(),
-            oneof_index: ::std::default::Default::default(),
-            json_name: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
-            proto3_optional: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new(),
+            number: ::puroro::helpers::FieldNew::new(),
+            label: ::puroro::helpers::FieldNew::new(),
+            type_: ::puroro::helpers::FieldNew::new(),
+            type_name: ::puroro::helpers::FieldNew::new(),
+            extendee: ::puroro::helpers::FieldNew::new(),
+            default_value: ::puroro::helpers::FieldNew::new(),
+            oneof_index: ::puroro::helpers::FieldNew::new(),
+            json_name: ::puroro::helpers::FieldNew::new(),
+            options: ::puroro::helpers::FieldNew::new(),
+            proto3_optional: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -7801,19 +7740,18 @@ pub struct FieldDescriptorProtoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FieldDescriptorProtoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            number: ::std::default::Default::default(),
-            label: 0i32.try_into(),
-            type_: 0i32.try_into(),
-            type_name: ::std::default::Default::default(),
-            extendee: ::std::default::Default::default(),
-            default_value: ::std::default::Default::default(),
-            oneof_index: ::std::default::Default::default(),
-            json_name: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
-            proto3_optional: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            number: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            label: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            type_: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            type_name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            extendee: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            default_value: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            oneof_index: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            json_name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            options: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            proto3_optional: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -8048,7 +7986,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for FieldDescriptorProtoBumpalo<'
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -8164,9 +8101,8 @@ pub struct ExtensionRangeOptions {
 
 impl ExtensionRangeOptions {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            uninterpreted_option: ::std::default::Default::default(),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -8280,9 +8216,8 @@ pub struct ExtensionRangeOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ExtensionRangeOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            uninterpreted_option: ::std::default::Default::default(),
+            uninterpreted_option: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -8381,7 +8316,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for ExtensionRangeOptionsBumpalo<
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -8423,18 +8357,17 @@ pub struct DescriptorProto {
 
 impl DescriptorProto {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            field: ::std::default::Default::default(),
-            extension: ::std::default::Default::default(),
-            nested_type: ::std::default::Default::default(),
-            enum_type: ::std::default::Default::default(),
-            extension_range: ::std::default::Default::default(),
-            oneof_decl: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
-            reserved_range: ::std::default::Default::default(),
-            reserved_name: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new(),
+            field: ::puroro::helpers::FieldNew::new(),
+            extension: ::puroro::helpers::FieldNew::new(),
+            nested_type: ::puroro::helpers::FieldNew::new(),
+            enum_type: ::puroro::helpers::FieldNew::new(),
+            extension_range: ::puroro::helpers::FieldNew::new(),
+            oneof_decl: ::puroro::helpers::FieldNew::new(),
+            options: ::puroro::helpers::FieldNew::new(),
+            reserved_range: ::puroro::helpers::FieldNew::new(),
+            reserved_name: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -8754,18 +8687,17 @@ pub struct DescriptorProtoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> DescriptorProtoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            field: ::std::default::Default::default(),
-            extension: ::std::default::Default::default(),
-            nested_type: ::std::default::Default::default(),
-            enum_type: ::std::default::Default::default(),
-            extension_range: ::std::default::Default::default(),
-            oneof_decl: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
-            reserved_range: ::std::default::Default::default(),
-            reserved_name: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            field: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            extension: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            nested_type: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            enum_type: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            extension_range: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            oneof_decl: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            options: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            reserved_range: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            reserved_name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -9061,7 +8993,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for DescriptorProtoBumpalo<'bump>
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -9205,10 +9136,9 @@ pub struct ReservedRange {
 
 impl ReservedRange {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            start: ::std::default::Default::default(),
-            end: ::std::default::Default::default(),
+            start: ::puroro::helpers::FieldNew::new(),
+            end: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -9336,10 +9266,9 @@ pub struct ReservedRangeBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ReservedRangeBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            start: ::std::default::Default::default(),
-            end: ::std::default::Default::default(),
+            start: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            end: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -9451,7 +9380,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for ReservedRangeBumpalo<'bump> {
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -9475,11 +9403,10 @@ pub struct ExtensionRange {
 
 impl ExtensionRange {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            start: ::std::default::Default::default(),
-            end: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
+            start: ::puroro::helpers::FieldNew::new(),
+            end: ::puroro::helpers::FieldNew::new(),
+            options: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -9619,11 +9546,10 @@ pub struct ExtensionRangeBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ExtensionRangeBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            start: ::std::default::Default::default(),
-            end: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
+            start: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            end: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            options: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -9746,7 +9672,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for ExtensionRangeBumpalo<'bump> 
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -9782,20 +9707,19 @@ pub struct FileDescriptorProto {
 
 impl FileDescriptorProto {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            package: ::std::default::Default::default(),
-            dependency: ::std::default::Default::default(),
-            public_dependency: ::std::default::Default::default(),
-            weak_dependency: ::std::default::Default::default(),
-            message_type: ::std::default::Default::default(),
-            enum_type: ::std::default::Default::default(),
-            service: ::std::default::Default::default(),
-            extension: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
-            source_code_info: ::std::default::Default::default(),
-            syntax: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new(),
+            package: ::puroro::helpers::FieldNew::new(),
+            dependency: ::puroro::helpers::FieldNew::new(),
+            public_dependency: ::puroro::helpers::FieldNew::new(),
+            weak_dependency: ::puroro::helpers::FieldNew::new(),
+            message_type: ::puroro::helpers::FieldNew::new(),
+            enum_type: ::puroro::helpers::FieldNew::new(),
+            service: ::puroro::helpers::FieldNew::new(),
+            extension: ::puroro::helpers::FieldNew::new(),
+            options: ::puroro::helpers::FieldNew::new(),
+            source_code_info: ::puroro::helpers::FieldNew::new(),
+            syntax: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -10141,20 +10065,19 @@ pub struct FileDescriptorProtoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileDescriptorProtoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            package: ::std::default::Default::default(),
-            dependency: ::std::default::Default::default(),
-            public_dependency: ::std::default::Default::default(),
-            weak_dependency: ::std::default::Default::default(),
-            message_type: ::std::default::Default::default(),
-            enum_type: ::std::default::Default::default(),
-            service: ::std::default::Default::default(),
-            extension: ::std::default::Default::default(),
-            options: ::std::default::Default::default(),
-            source_code_info: ::std::default::Default::default(),
-            syntax: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            package: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            dependency: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            public_dependency: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            weak_dependency: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            message_type: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            enum_type: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            service: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            extension: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            options: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            source_code_info: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            syntax: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -10474,7 +10397,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for FileDescriptorProtoBumpalo<'b
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -10607,9 +10529,8 @@ pub struct FileDescriptorSet {
 
 impl FileDescriptorSet {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            file: ::std::default::Default::default(),
+            file: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -10723,9 +10644,8 @@ pub struct FileDescriptorSetBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileDescriptorSetBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            file: ::std::default::Default::default(),
+            file: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -10824,7 +10744,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for FileDescriptorSetBumpalo<'bum
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }

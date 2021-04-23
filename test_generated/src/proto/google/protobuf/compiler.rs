@@ -12,11 +12,10 @@ pub struct CodeGeneratorResponse {
 
 impl CodeGeneratorResponse {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            error: ::std::default::Default::default(),
-            supported_features: ::std::default::Default::default(),
-            file: ::std::default::Default::default(),
+            error: ::puroro::helpers::FieldNew::new(),
+            supported_features: ::puroro::helpers::FieldNew::new(),
+            file: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -162,11 +161,10 @@ pub struct CodeGeneratorResponseBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorResponseBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            error: ::std::default::Default::default(),
-            supported_features: ::std::default::Default::default(),
-            file: ::std::default::Default::default(),
+            error: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            supported_features: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            file: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -295,7 +293,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for CodeGeneratorResponseBumpalo<
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -356,12 +353,11 @@ pub struct File {
 
 impl File {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            insertion_point: ::std::default::Default::default(),
-            content: ::std::default::Default::default(),
-            generated_code_info: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new(),
+            insertion_point: ::puroro::helpers::FieldNew::new(),
+            content: ::puroro::helpers::FieldNew::new(),
+            generated_code_info: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -497,12 +493,11 @@ pub struct FileBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            name: ::std::default::Default::default(),
-            insertion_point: ::std::default::Default::default(),
-            content: ::std::default::Default::default(),
-            generated_code_info: ::std::default::Default::default(),
+            name: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            insertion_point: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            content: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            generated_code_info: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -620,7 +615,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for FileBumpalo<'bump> {
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -650,12 +644,11 @@ pub struct CodeGeneratorRequest {
 
 impl CodeGeneratorRequest {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            file_to_generate: ::std::default::Default::default(),
-            parameter: ::std::default::Default::default(),
-            proto_file: ::std::default::Default::default(),
-            compiler_version: ::std::default::Default::default(),
+            file_to_generate: ::puroro::helpers::FieldNew::new(),
+            parameter: ::puroro::helpers::FieldNew::new(),
+            proto_file: ::puroro::helpers::FieldNew::new(),
+            compiler_version: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -819,12 +812,11 @@ pub struct CodeGeneratorRequestBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorRequestBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            file_to_generate: ::std::default::Default::default(),
-            parameter: ::std::default::Default::default(),
-            proto_file: ::std::default::Default::default(),
-            compiler_version: ::std::default::Default::default(),
+            file_to_generate: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            parameter: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            proto_file: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            compiler_version: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -970,7 +962,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for CodeGeneratorRequestBumpalo<'
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
@@ -1025,12 +1016,11 @@ pub struct Version {
 
 impl Version {
     pub fn new() -> Self {
-        use ::std::convert::TryInto;
         Self {
-            major: ::std::default::Default::default(),
-            minor: ::std::default::Default::default(),
-            patch: ::std::default::Default::default(),
-            suffix: ::std::default::Default::default(),
+            major: ::puroro::helpers::FieldNew::new(),
+            minor: ::puroro::helpers::FieldNew::new(),
+            patch: ::puroro::helpers::FieldNew::new(),
+            suffix: ::puroro::helpers::FieldNew::new(),
             puroro_internal: ::puroro::helpers::InternalDataForNormalStruct::new(),
         }
     }
@@ -1190,12 +1180,11 @@ pub struct VersionBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> VersionBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
-        use ::std::convert::TryInto;
         Self {
-            major: ::std::default::Default::default(),
-            minor: ::std::default::Default::default(),
-            patch: ::std::default::Default::default(),
-            suffix: ::std::default::Default::default(),
+            major: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            minor: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            patch: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
+            suffix: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct::new(bump),
         }
     }
@@ -1337,7 +1326,6 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for VersionBumpalo<'bump> {
     fn new() -> Self {
         unimplemented!()
     }
-    #[cfg(feature = "puroro-bumpalo")]
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }

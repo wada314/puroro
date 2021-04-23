@@ -1,13 +1,11 @@
 use super::message_frags::MessageImplFragmentGenerator;
 use super::writer::{func, indent, indent_n, iter, Fragment, IntoFragment};
-use crate::context::Context;
+use crate::context::{AllocatorType, Context};
 use crate::utils::{to_camel_case, Indentor};
 use crate::wrappers::{
     FieldLabel, FieldType, LengthDelimitedFieldType, MessageDescriptor, WireType,
 };
 use crate::Result;
-
-const DESER_MOD: &'static str = "::puroro::deserializer::bytes";
 
 pub struct MessageImplCodeGenerator<'a, 'c> {
     context: &'a Context<'c>,
@@ -77,7 +75,6 @@ pub struct {name}{gp} {{\n",
 {cfg}
 impl{gp} {name}{gpb} {{
     pub {new_decl} {{
-        use ::std::convert::TryInto;
         Self {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
@@ -88,27 +85,20 @@ impl{gp} {name}{gpb} {{
             indent_n(
                 3,
                 (
-                    iter(
-                        self.msg
-                            .fields()
-                            .map(|field| match (field.label()?, field.type_()?) {
-                                (FieldLabel::Optional, FieldType::Enum(_))
-                                | (FieldLabel::Required, FieldType::Enum(_)) => Ok(format!(
-                                    "{name}: 0i32.try_into(),\n",
+                    iter(self.msg.fields().map(|field| {
+                        Ok(match self.context.alloc_type() {
+                            AllocatorType::Default => {
+                                format!(
+                                    "{name}: ::puroro::helpers::FieldNew::new(),\n",
                                     name = field.native_name()
-                                )),
-                                (FieldLabel::Required, FieldType::Message(m)) => Ok(format!(
-                                    "{name}: {msg_type}::{call_new},\n",
-                                    name = field.native_name(),
-                                    msg_type = self.frag_gen.field_type_for(field)?,
-                                    call_new = self.frag_gen.call_new_from_new(),
-                                )),
-                                (_, _) => Ok(format!(
-                                    "{name}: ::std::default::Default::default(),\n",
-                                    name = field.native_name(),
-                                )),
-                            }),
-                    ),
+                                )
+                            }
+                            AllocatorType::Bumpalo => format!(
+                                "{name}: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),\n",
+                                name = field.native_name()
+                            ),
+                        })
+                    })),
                     format!(
                         "puroro_internal: {value},\n",
                         value = self.frag_gen.internal_field_init_value()
