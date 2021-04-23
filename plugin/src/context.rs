@@ -9,23 +9,37 @@ use crate::wrappers::{
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 
+#[derive(Debug, Clone)]
+pub enum ImplType {
+    Default,
+    Bumpalo,
+    SliceRef,
+}
+
 #[derive(Clone)]
 pub struct Context<'c> {
     proto: &'c CodeGeneratorRequest,
+    impl_type: ImplType,
+
     lazy_file_descriptors: OnceCell<Vec<FileDescriptor<'c>>>,
     lazy_fq_name_to_desc_map: OnceCell<HashMap<&'c str, EnumOrMessageRef<'c>>>,
     lazy_packages_with_subpackages_map: OnceCell<HashMap<&'c str, HashSet<&'c str>>>,
 }
 
 impl<'c> Context<'c> {
-    pub fn new(cgreq: &'c CodeGeneratorRequest) -> Result<Self> {
-        Ok(Self {
+    pub fn new(cgreq: &'c CodeGeneratorRequest, impl_type: ImplType) -> Self {
+        Self {
             proto: cgreq,
+            impl_type,
             lazy_file_descriptors: Default::default(),
             lazy_fq_name_to_desc_map: Default::default(),
             lazy_packages_with_subpackages_map: Default::default(),
-        })
+        }
     }
+    pub fn with_impl_type(&self, impl_type: ImplType) -> Self {
+        Self::new(self.proto, impl_type)
+    }
+
     pub fn file_descriptors(&'c self) -> impl Iterator<Item = &FileDescriptor<'c>> + 'c {
         self.lazy_file_descriptors
             .get_or_init(|| {
@@ -36,9 +50,6 @@ impl<'c> Context<'c> {
                     .collect()
             })
             .iter()
-    }
-    pub fn use_allocator_api(&self) -> bool {
-        true
     }
 
     pub fn fq_name_to_desc(&'c self, fq_name: &str) -> Result<Option<EnumOrMessageRef<'c>>> {
