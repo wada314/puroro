@@ -11,14 +11,14 @@ use ::once_cell::unsync::OnceCell;
 
 #[derive(Clone)]
 pub struct Context<'c> {
-    proto: CodeGeneratorRequest,
+    proto: &'c CodeGeneratorRequest,
     lazy_file_descriptors: OnceCell<Vec<FileDescriptor<'c>>>,
     lazy_fq_name_to_desc_map: OnceCell<HashMap<&'c str, EnumOrMessageRef<'c>>>,
     lazy_packages_with_subpackages_map: OnceCell<HashMap<&'c str, HashSet<&'c str>>>,
 }
 
 impl<'c> Context<'c> {
-    pub fn new(cgreq: CodeGeneratorRequest) -> Result<Self> {
+    pub fn new(cgreq: &'c CodeGeneratorRequest) -> Result<Self> {
         Ok(Self {
             proto: cgreq,
             lazy_file_descriptors: Default::default(),
