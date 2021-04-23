@@ -37,9 +37,8 @@ use google::protobuf::compiler::{
 pub use protos::google;
 
 fn main() -> Result<()> {
-    use ::puroro::Deserializable;
     let mut cgreq = CodeGeneratorRequest::default();
-    cgreq.deser_from_bytes(stdin().bytes()).unwrap();
+    cgreq.deserialize(&mut stdin().bytes()).unwrap();
     let context = Context::new(cgreq.clone())?;
     let filename_and_content = generators::do_generate(&context)?;
     let mut cgres = CodeGeneratorResponse::default();
