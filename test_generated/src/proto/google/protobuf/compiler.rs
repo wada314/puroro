@@ -42,14 +42,14 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorR
             ::puroro::types::FieldData::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => {
-                    *self.supported_features.push_and_get_mut() = variant.to_native::<::puroro::tags::UInt64>()?;
+                    *self.supported_features.push_and_get_mut2(&self.puroro_internal) = variant.to_native::<::puroro::tags::UInt64>()?;
                 }
                 15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
-                    *self.error.push_and_get_mut()
+                    *self.error.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
@@ -188,14 +188,14 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGen
             ::puroro::types::FieldData::Variant(variant) => match field_number {
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 2 => {
-                    *self.supported_features.push_and_get_mut() = variant.to_native::<::puroro::tags::UInt64>()?;
+                    *self.supported_features.push_and_get_mut2(&self.puroro_internal) = variant.to_native::<::puroro::tags::UInt64>()?;
                 }
                 15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
             ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
-                    *self.error.push_and_get_mut()
+                    *self.error.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
@@ -397,15 +397,15 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for File {
             }
             ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
-                    *self.name.push_and_get_mut()
+                    *self.name.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    *self.insertion_point.push_and_get_mut()
+                    *self.insertion_point.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 15 => {
-                    *self.content.push_and_get_mut()
+                    *self.content.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 16 => {
@@ -532,15 +532,15 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileBum
             }
             ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
-                    *self.name.push_and_get_mut()
+                    *self.name.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    *self.insertion_point.push_and_get_mut()
+                    *self.insertion_point.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 15 => {
-                    *self.content.push_and_get_mut()
+                    *self.content.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 16 => {
@@ -691,11 +691,11 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorR
             }
             ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
-                    *self.file_to_generate.push_and_get_mut()
+                    *self.file_to_generate.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    *self.parameter.push_and_get_mut()
+                    *self.parameter.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 15 => {
@@ -859,11 +859,11 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGen
             }
             ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
-                    *self.file_to_generate.push_and_get_mut()
+                    *self.file_to_generate.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 2 => {
-                    *self.parameter.push_and_get_mut()
+                    *self.parameter.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 15 => {
@@ -1070,13 +1070,13 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for Version {
         match field {
             ::puroro::types::FieldData::Variant(variant) => match field_number {
                 1 => {
-                    *self.major.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
+                    *self.major.push_and_get_mut2(&self.puroro_internal) = variant.to_native::<::puroro::tags::Int32>()?;
                 }
                 2 => {
-                    *self.minor.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
+                    *self.minor.push_and_get_mut2(&self.puroro_internal) = variant.to_native::<::puroro::tags::Int32>()?;
                 }
                 3 => {
-                    *self.patch.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
+                    *self.patch.push_and_get_mut2(&self.puroro_internal) = variant.to_native::<::puroro::tags::Int32>()?;
                 }
                 4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -1107,7 +1107,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for Version {
                     MaybeRepeatedVariantField::extend(&mut self.patch, first, iter);
                 }
                 4 => {
-                    *self.suffix.push_and_get_mut()
+                    *self.suffix.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -1228,13 +1228,13 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Version
         match field {
             ::puroro::types::FieldData::Variant(variant) => match field_number {
                 1 => {
-                    *self.major.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
+                    *self.major.push_and_get_mut2(&self.puroro_internal) = variant.to_native::<::puroro::tags::Int32>()?;
                 }
                 2 => {
-                    *self.minor.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
+                    *self.minor.push_and_get_mut2(&self.puroro_internal) = variant.to_native::<::puroro::tags::Int32>()?;
                 }
                 3 => {
-                    *self.patch.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
+                    *self.patch.push_and_get_mut2(&self.puroro_internal) = variant.to_native::<::puroro::tags::Int32>()?;
                 }
                 4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
@@ -1265,7 +1265,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Version
                     MaybeRepeatedVariantField::extend(&mut self.patch, first, iter);
                 }
                 4 => {
-                    *self.suffix.push_and_get_mut()
+                    *self.suffix.push_and_get_mut2(&self.puroro_internal)
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,

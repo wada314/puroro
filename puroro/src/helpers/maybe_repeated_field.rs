@@ -47,6 +47,12 @@ macro_rules! define_maybe_repeated_field {
             fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
                 self
             }
+            fn push_and_get_mut2<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
+            where
+                T: InternalData,
+            {
+                self
+            }
         }
         impl<'a> MaybeRepeatedField<'a> for Vec<$ty> {
             type Item = $ty;
@@ -55,6 +61,13 @@ macro_rules! define_maybe_repeated_field {
                 self.iter()
             }
             fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+                self.push(Default::default());
+                self.last_mut().unwrap()
+            }
+            fn push_and_get_mut2<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
+            where
+                T: InternalData,
+            {
                 self.push(Default::default());
                 self.last_mut().unwrap()
             }
@@ -70,6 +83,13 @@ macro_rules! define_maybe_repeated_field {
                 self.push(Default::default());
                 self.last_mut().unwrap()
             }
+            fn push_and_get_mut2<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
+            where
+                T: InternalData,
+            {
+                self.push(Default::default());
+                self.last_mut().unwrap()
+            }
         }
         impl<'a> MaybeRepeatedField<'a> for Option<$ty> {
             type Item = $ty;
@@ -78,6 +98,12 @@ macro_rules! define_maybe_repeated_field {
                 self.iter()
             }
             fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+                self.get_or_insert_with(Default::default)
+            }
+            fn push_and_get_mut2<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
+            where
+                T: InternalData,
+            {
                 self.get_or_insert_with(Default::default)
             }
         }
@@ -110,6 +136,12 @@ where
     fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
         self
     }
+    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    where
+        U: InternalData,
+    {
+        self
+    }
 }
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Vec<std::result::Result<T, i32>>
 where
@@ -121,6 +153,13 @@ where
         self.iter()
     }
     fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+        self.push(T::try_from(0i32));
+        self.last_mut().unwrap()
+    }
+    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    where
+        U: InternalData,
+    {
         self.push(T::try_from(0i32));
         self.last_mut().unwrap()
     }
@@ -140,6 +179,13 @@ where
         self.push(T::try_from(0i32));
         self.last_mut().unwrap()
     }
+    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    where
+        U: InternalData,
+    {
+        self.push(T::try_from(0i32));
+        self.last_mut().unwrap()
+    }
 }
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Option<std::result::Result<T, i32>>
 where
@@ -151,6 +197,12 @@ where
         self.iter()
     }
     fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+        self.get_or_insert(T::try_from(0i32))
+    }
+    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    where
+        U: InternalData,
+    {
         self.get_or_insert(T::try_from(0i32))
     }
 }
@@ -168,6 +220,12 @@ where
     fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
         self.as_mut()
     }
+    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    where
+        U: InternalData,
+    {
+        self.as_mut()
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'a, 'bump, T: 'a> MaybeRepeatedField<'a> for ::bumpalo::boxed::Box<'bump, T>
@@ -182,6 +240,12 @@ where
     fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
         self.as_mut()
     }
+    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    where
+        U: InternalData,
+    {
+        self.as_mut()
+    }
 }
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Vec<T>
 where
@@ -193,6 +257,13 @@ where
         self.iter()
     }
     fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+        self.push(Default::default());
+        self.last_mut().unwrap()
+    }
+    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    where
+        U: InternalData,
+    {
         self.push(Default::default());
         self.last_mut().unwrap()
     }
@@ -211,6 +282,13 @@ where
         self.push(Default::default());
         self.last_mut().unwrap()
     }
+    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    where
+        U: InternalData,
+    {
+        self.push(Default::default());
+        self.last_mut().unwrap()
+    }
 }
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Option<Box<T>>
 where
@@ -222,6 +300,13 @@ where
         Option::<&'a Self::Item>::into_iter(self.as_deref())
     }
     fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+        self.get_or_insert_with(|| Box::new(Default::default()))
+            .as_mut()
+    }
+    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    where
+        U: InternalData,
+    {
         self.get_or_insert_with(|| Box::new(Default::default()))
             .as_mut()
     }
