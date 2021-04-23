@@ -29,8 +29,8 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             func(|output| self.print_msg_struct(output)),
             func(|output| self.print_msg_new(output)),
             (
+                func(|output| self.print_msg_deser_handler(output)),
                 func(|output| self.print_msg_deser_deserializable(output)),
-                func(|output| self.print_msg_puroro_deserializable(output)),
                 func(|output| self.print_msg_ser_serializable(output)),
                 func(|output| self.print_msg_puroro_serializable(output)),
             ),
@@ -139,7 +139,7 @@ impl{gp} ::std::default::Default for {name}{gpb} {{
             .write_into(output)
     }
 
-    pub fn print_msg_deser_deserializable<W: std::fmt::Write>(
+    pub fn print_msg_deser_handler<W: std::fmt::Write>(
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
@@ -343,7 +343,7 @@ bytes_iter.deser_message(msg)?;\n",
             .write_into(output)
     }
 
-    pub fn print_msg_puroro_deserializable<W: std::fmt::Write>(
+    pub fn print_msg_deser_deserializable<W: std::fmt::Write>(
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
