@@ -158,7 +158,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for CodeGeneratorResponse<> {
 pub struct CodeGeneratorResponseBumpalo<'bump> {
     pub error: ::bumpalo::collections::String<'bump>,
     pub supported_features: u64,
-    pub file: ::bumpalo::collections::Vec<'bump, code_generator_response::FileBumpalo>,
+    pub file: ::bumpalo::collections::Vec<'bump, code_generator_response::FileBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -495,7 +495,7 @@ pub struct FileBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
     pub insertion_point: ::bumpalo::collections::String<'bump>,
     pub content: ::bumpalo::collections::String<'bump>,
-    pub generated_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo>>,
+    pub generated_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -821,8 +821,8 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for CodeGeneratorRequest<> {
 pub struct CodeGeneratorRequestBumpalo<'bump> {
     pub file_to_generate: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     pub parameter: ::bumpalo::collections::String<'bump>,
-    pub proto_file: ::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo>,
-    pub compiler_version: ::std::option::Option<::bumpalo::boxed::Box<'bump, VersionBumpalo>>,
+    pub proto_file: ::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>>,
+    pub compiler_version: ::std::option::Option<::bumpalo::boxed::Box<'bump, VersionBumpalo<'bump>>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]

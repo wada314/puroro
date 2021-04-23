@@ -63,6 +63,28 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         ))
     }
 
+    pub fn type_name_of_msg(
+        &self,
+        msg: &'c MessageDescriptor<'c>,
+        cur_package: &'c str,
+    ) -> Result<String> {
+        let generic_args_iter = match self.context.alloc_type() {
+            AllocatorType::Default => None,
+            AllocatorType::Bumpalo => Some("'bump"),
+        }
+        .into_iter();
+        if generic_args_iter.clone().count() == 0 {
+            Ok(self.struct_name_with_relative_path(msg, cur_package)?)
+        } else {
+            let generic_args = Itertools::intersperse(generic_args_iter, ", ").collect::<String>();
+            Ok(format!(
+                "{name}<{gargs}>",
+                name = self.struct_name_with_relative_path(msg, cur_package)?,
+                gargs = generic_args,
+            ))
+        }
+    }
+
     pub fn cfg_condition(&self) -> &'static str {
         match self.context.alloc_type() {
             AllocatorType::Bumpalo => "#[cfg(feature = \"puroro-bumpalo\")]",
@@ -100,9 +122,9 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             type_ = e.native_fully_qualified_type_name(field.path_to_root_mod())
                         )
                         .into(),
-                        NonTrivialFieldType::Message(m) => self
-                            .struct_name_with_relative_path(m, field.package())?
-                            .into(),
+                        NonTrivialFieldType::Message(m) => {
+                            self.type_name_of_msg(m, field.package())?.into()
+                        }
                     },
                 };
                 match field.label()? {

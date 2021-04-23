@@ -122,7 +122,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for GeneratedCodeInfo<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct GeneratedCodeInfoBumpalo<'bump> {
-    pub annotation: ::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo>,
+    pub annotation: ::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -761,7 +761,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for SourceCodeInfo<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct SourceCodeInfoBumpalo<'bump> {
-    pub location: ::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo>,
+    pub location: ::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1598,7 +1598,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for UninterpretedOption<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct UninterpretedOptionBumpalo<'bump> {
-    pub name: ::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo>,
+    pub name: ::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo<'bump>>,
     pub identifier_value: ::bumpalo::collections::String<'bump>,
     pub positive_int_value: u64,
     pub negative_int_value: i64,
@@ -2256,7 +2256,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for MethodOptions<> {
 pub struct MethodOptionsBumpalo<'bump> {
     pub deprecated: bool,
     pub idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2600,7 +2600,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for ServiceOptions<> {
 #[derive(Debug, Clone)]
 pub struct ServiceOptionsBumpalo<'bump> {
     pub deprecated: bool,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2898,7 +2898,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for EnumValueOptions<> {
 #[derive(Debug, Clone)]
 pub struct EnumValueOptionsBumpalo<'bump> {
     pub deprecated: bool,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3218,7 +3218,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for EnumOptions<> {
 pub struct EnumOptionsBumpalo<'bump> {
     pub allow_alias: bool,
     pub deprecated: bool,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3516,7 +3516,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for OneofOptions<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct OneofOptionsBumpalo<'bump> {
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3902,7 +3902,7 @@ pub struct FieldOptionsBumpalo<'bump> {
     pub lazy: bool,
     pub deprecated: bool,
     pub weak: bool,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -4422,7 +4422,7 @@ pub struct MessageOptionsBumpalo<'bump> {
     pub no_standard_descriptor_accessor: bool,
     pub deprecated: bool,
     pub map_entry: bool,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5124,7 +5124,7 @@ pub struct FileOptionsBumpalo<'bump> {
     pub php_namespace: ::bumpalo::collections::String<'bump>,
     pub php_metadata_namespace: ::bumpalo::collections::String<'bump>,
     pub ruby_package: ::bumpalo::collections::String<'bump>,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5830,7 +5830,7 @@ pub struct MethodDescriptorProtoBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
     pub input_type: ::bumpalo::collections::String<'bump>,
     pub output_type: ::bumpalo::collections::String<'bump>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, MethodOptionsBumpalo>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, MethodOptionsBumpalo<'bump>>>,
     pub client_streaming: bool,
     pub server_streaming: bool,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
@@ -6171,8 +6171,8 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for ServiceDescriptorProto<> {
 #[derive(Debug, Clone)]
 pub struct ServiceDescriptorProtoBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
-    pub method: ::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, ServiceOptionsBumpalo>>,
+    pub method: ::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo<'bump>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, ServiceOptionsBumpalo<'bump>>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6476,7 +6476,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for EnumValueDescriptorProto<> {
 pub struct EnumValueDescriptorProtoBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
     pub number: i32,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, EnumValueOptionsBumpalo>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, EnumValueOptionsBumpalo<'bump>>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6824,9 +6824,9 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for EnumDescriptorProto<> {
 #[derive(Debug, Clone)]
 pub struct EnumDescriptorProtoBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
-    pub value: ::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, EnumOptionsBumpalo>>,
-    pub reserved_range: ::bumpalo::collections::Vec<'bump, enum_descriptor_proto::EnumReservedRangeBumpalo>,
+    pub value: ::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo<'bump>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, EnumOptionsBumpalo<'bump>>>,
+    pub reserved_range: ::bumpalo::collections::Vec<'bump, enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>>,
     pub reserved_name: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -7465,7 +7465,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for OneofDescriptorProto<> {
 #[derive(Debug, Clone)]
 pub struct OneofDescriptorProtoBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo<'bump>>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -7867,7 +7867,7 @@ pub struct FieldDescriptorProtoBumpalo<'bump> {
     pub default_value: ::bumpalo::collections::String<'bump>,
     pub oneof_index: i32,
     pub json_name: ::bumpalo::collections::String<'bump>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, FieldOptionsBumpalo>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, FieldOptionsBumpalo<'bump>>>,
     pub proto3_optional: bool,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -8349,7 +8349,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for ExtensionRangeOptions<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct ExtensionRangeOptionsBumpalo<'bump> {
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8840,14 +8840,14 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for DescriptorProto<> {
 #[derive(Debug, Clone)]
 pub struct DescriptorProtoBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
-    pub field: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo>,
-    pub extension: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo>,
-    pub nested_type: ::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo>,
-    pub enum_type: ::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo>,
-    pub extension_range: ::bumpalo::collections::Vec<'bump, descriptor_proto::ExtensionRangeBumpalo>,
-    pub oneof_decl: ::bumpalo::collections::Vec<'bump, OneofDescriptorProtoBumpalo>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, MessageOptionsBumpalo>>,
-    pub reserved_range: ::bumpalo::collections::Vec<'bump, descriptor_proto::ReservedRangeBumpalo>,
+    pub field: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>>,
+    pub extension: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>>,
+    pub nested_type: ::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>>,
+    pub enum_type: ::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>>,
+    pub extension_range: ::bumpalo::collections::Vec<'bump, descriptor_proto::ExtensionRangeBumpalo<'bump>>,
+    pub oneof_decl: ::bumpalo::collections::Vec<'bump, OneofDescriptorProtoBumpalo<'bump>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, MessageOptionsBumpalo<'bump>>>,
+    pub reserved_range: ::bumpalo::collections::Vec<'bump, descriptor_proto::ReservedRangeBumpalo<'bump>>,
     pub reserved_name: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -9740,7 +9740,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for ExtensionRange<> {
 pub struct ExtensionRangeBumpalo<'bump> {
     pub start: i32,
     pub end: i32,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo<'bump>>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -10275,12 +10275,12 @@ pub struct FileDescriptorProtoBumpalo<'bump> {
     pub dependency: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     pub public_dependency: ::bumpalo::collections::Vec<'bump, i32>,
     pub weak_dependency: ::bumpalo::collections::Vec<'bump, i32>,
-    pub message_type: ::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo>,
-    pub enum_type: ::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo>,
-    pub service: ::bumpalo::collections::Vec<'bump, ServiceDescriptorProtoBumpalo>,
-    pub extension: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, FileOptionsBumpalo>>,
-    pub source_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, SourceCodeInfoBumpalo>>,
+    pub message_type: ::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>>,
+    pub enum_type: ::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>>,
+    pub service: ::bumpalo::collections::Vec<'bump, ServiceDescriptorProtoBumpalo<'bump>>,
+    pub extension: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, FileOptionsBumpalo<'bump>>>,
+    pub source_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, SourceCodeInfoBumpalo<'bump>>>,
     pub syntax: ::bumpalo::collections::String<'bump>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -10889,7 +10889,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for FileDescriptorSet<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FileDescriptorSetBumpalo<'bump> {
-    pub file: ::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo>,
+    pub file: ::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
