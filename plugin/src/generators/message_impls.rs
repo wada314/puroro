@@ -493,7 +493,7 @@ fn {name}(&self) -> ::std::option::Option<{reftype}> {{
                         format!(
                             "\
 fn {name}(&self) -> {reftype} {{
-    self.{name}.as_ref()
+    &self.{name}
 }}\n",
                             name = field.native_name(),
                             reftype = field.native_scalar_ref_type_name("")?,
