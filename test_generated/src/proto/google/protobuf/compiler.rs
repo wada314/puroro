@@ -6,7 +6,7 @@
 pub struct CodeGeneratorResponse {
     pub error: ::std::string::String,
     pub supported_features: u64,
-    pub file: ::std::vec::Vec<super::super::super::google::protobuf::compiler::code_generator_response::File>,
+    pub file: ::std::vec::Vec<code_generator_response::File>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -155,7 +155,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for CodeGeneratorResponse<> {
 pub struct CodeGeneratorResponseBumpalo<'bump> {
     pub error: ::bumpalo::collections::String<'bump>,
     pub supported_features: u64,
-    pub file: ::bumpalo::collections::Vec<'bump, super::super::super::google::protobuf::compiler::code_generator_response::File>,
+    pub file: ::bumpalo::collections::Vec<'bump, code_generator_response::FileBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -347,7 +347,7 @@ pub struct File {
     pub name: ::std::string::String,
     pub insertion_point: ::std::string::String,
     pub content: ::std::string::String,
-    pub generated_code_info: ::std::option::Option<::std::boxed::Box<super::super::super::super::google::protobuf::GeneratedCodeInfo>>,
+    pub generated_code_info: ::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -487,7 +487,7 @@ pub struct FileBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
     pub insertion_point: ::bumpalo::collections::String<'bump>,
     pub content: ::bumpalo::collections::String<'bump>,
-    pub generated_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::super::super::google::protobuf::GeneratedCodeInfo>>,
+    pub generated_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -637,8 +637,8 @@ pub trait FileMutTrait {
 pub struct CodeGeneratorRequest {
     pub file_to_generate: ::std::vec::Vec<::std::string::String>,
     pub parameter: ::std::string::String,
-    pub proto_file: ::std::vec::Vec<super::super::super::google::protobuf::FileDescriptorProto>,
-    pub compiler_version: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::compiler::Version>>,
+    pub proto_file: ::std::vec::Vec<super::FileDescriptorProto>,
+    pub compiler_version: ::std::option::Option<::std::boxed::Box<Version>>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -805,8 +805,8 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for CodeGeneratorRequest<> {
 pub struct CodeGeneratorRequestBumpalo<'bump> {
     pub file_to_generate: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     pub parameter: ::bumpalo::collections::String<'bump>,
-    pub proto_file: ::bumpalo::collections::Vec<'bump, super::super::super::google::protobuf::FileDescriptorProto>,
-    pub compiler_version: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::super::google::protobuf::compiler::Version>>,
+    pub proto_file: ::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo>,
+    pub compiler_version: ::std::option::Option<::bumpalo::boxed::Box<'bump, VersionBumpalo>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]

@@ -35,6 +35,7 @@ pub trait {name}Trait {{\n",
                         format!(
                             "fn {name}(&self) -> ::std::option::Option<{reftype}>;\n",
                             name = field.native_name(),
+                            // TODO: Wrong! Need to define an associated type and use that
                             reftype = field.native_scalar_ref_type_name("")?,
                         )
                     }

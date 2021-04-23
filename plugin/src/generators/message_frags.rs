@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
+use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonTrivialFieldType,
 };
@@ -32,6 +33,34 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             postfix2 = postfix2,
         )
         .into())
+    }
+
+    pub fn struct_name_with_relative_path(
+        &self,
+        msg: &'c MessageDescriptor<'c>,
+        cur_package: &'c str,
+    ) -> Result<String> {
+        let struct_name = self.struct_name(msg)?;
+        let mut struct_package_iter = msg.package().split('.').peekable();
+        let mut cur_package_iter = cur_package.split('.').peekable();
+        while let (Some(p1), Some(p2)) = (struct_package_iter.peek(), cur_package_iter.peek()) {
+            if *p1 == *p2 {
+                struct_package_iter.next();
+                cur_package_iter.next();
+            } else {
+                break;
+            }
+        }
+        Ok(format!(
+            "{supers}{mods}{name}",
+            name = struct_name,
+            supers = std::iter::repeat("super::")
+                .take(cur_package_iter.count())
+                .collect::<String>(),
+            mods = struct_package_iter
+                .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
+                .collect::<String>(),
+        ))
     }
 
     pub fn cfg_condition(&self) -> &'static str {
@@ -71,8 +100,8 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             type_ = e.native_fully_qualified_type_name(field.path_to_root_mod())
                         )
                         .into(),
-                        NonTrivialFieldType::Message(m) => m
-                            .native_fully_qualified_type_name(field.path_to_root_mod())
+                        NonTrivialFieldType::Message(m) => self
+                            .struct_name_with_relative_path(m, field.package())?
                             .into(),
                     },
                 };
@@ -92,7 +121,26 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     FieldLabel::Repeated => self.vec_type(scalar_type.as_ref()).into(),
                 }
             }
-            ImplType::SliceRef => unimplemented!(),
+            ImplType::SliceRef => {
+                let scalar_type: Cow<'static, str> = match field.type_()?.native_trivial_type_name()
+                {
+                    Ok(name) => name.into(),
+                    Err(nontrivial_type) => match nontrivial_type {
+                        NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                        NonTrivialFieldType::String => "Cow<'slice, str>".into(),
+                        NonTrivialFieldType::Bytes => "&'slice [u8]".into(),
+                        NonTrivialFieldType::Enum(e) => format!(
+                            "::std::result::Result<{type_}, i32>",
+                            type_ = e.native_fully_qualified_type_name(field.path_to_root_mod())
+                        )
+                        .into(),
+                        NonTrivialFieldType::Message(m) => self
+                            .struct_name_with_relative_path(m, field.package())?
+                            .into(),
+                    },
+                };
+                unimplemented!()
+            }
         })
     }
 

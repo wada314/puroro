@@ -4,7 +4,7 @@
 
 #[derive(Debug, Clone)]
 pub struct GeneratedCodeInfo {
-    pub annotation: ::std::vec::Vec<super::super::google::protobuf::generated_code_info::Annotation>,
+    pub annotation: ::std::vec::Vec<generated_code_info::Annotation>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -119,7 +119,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for GeneratedCodeInfo<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct GeneratedCodeInfoBumpalo<'bump> {
-    pub annotation: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::generated_code_info::Annotation>,
+    pub annotation: ::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -632,7 +632,7 @@ pub trait AnnotationMutTrait {
 
 #[derive(Debug, Clone)]
 pub struct SourceCodeInfo {
-    pub location: ::std::vec::Vec<super::super::google::protobuf::source_code_info::Location>,
+    pub location: ::std::vec::Vec<source_code_info::Location>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -747,7 +747,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for SourceCodeInfo<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct SourceCodeInfoBumpalo<'bump> {
-    pub location: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::source_code_info::Location>,
+    pub location: ::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1354,7 +1354,7 @@ pub trait LocationMutTrait {
 
 #[derive(Debug, Clone)]
 pub struct UninterpretedOption {
-    pub name: ::std::vec::Vec<super::super::google::protobuf::uninterpreted_option::NamePart>,
+    pub name: ::std::vec::Vec<uninterpreted_option::NamePart>,
     pub identifier_value: ::std::string::String,
     pub positive_int_value: u64,
     pub negative_int_value: i64,
@@ -1565,7 +1565,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for UninterpretedOption<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct UninterpretedOptionBumpalo<'bump> {
-    pub name: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::uninterpreted_option::NamePart>,
+    pub name: ::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo>,
     pub identifier_value: ::bumpalo::collections::String<'bump>,
     pub positive_int_value: u64,
     pub negative_int_value: i64,
@@ -2059,7 +2059,7 @@ pub trait NamePartMutTrait {
 pub struct MethodOptions {
     pub deprecated: bool,
     pub idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
-    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -2216,7 +2216,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for MethodOptions<> {
 pub struct MethodOptionsBumpalo<'bump> {
     pub deprecated: bool,
     pub idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2417,7 +2417,7 @@ impl ::std::convert::Into<i32> for IdempotencyLevel {
 #[derive(Debug, Clone)]
 pub struct ServiceOptions {
     pub deprecated: bool,
-    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -2553,7 +2553,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for ServiceOptions<> {
 #[derive(Debug, Clone)]
 pub struct ServiceOptionsBumpalo<'bump> {
     pub deprecated: bool,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2708,7 +2708,7 @@ pub trait ServiceOptionsMutTrait {
 #[derive(Debug, Clone)]
 pub struct EnumValueOptions {
     pub deprecated: bool,
-    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -2844,7 +2844,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for EnumValueOptions<> {
 #[derive(Debug, Clone)]
 pub struct EnumValueOptionsBumpalo<'bump> {
     pub deprecated: bool,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3000,7 +3000,7 @@ pub trait EnumValueOptionsMutTrait {
 pub struct EnumOptions {
     pub allow_alias: bool,
     pub deprecated: bool,
-    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -3157,7 +3157,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for EnumOptions<> {
 pub struct EnumOptionsBumpalo<'bump> {
     pub allow_alias: bool,
     pub deprecated: bool,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3333,7 +3333,7 @@ pub trait EnumOptionsMutTrait {
 
 #[derive(Debug, Clone)]
 pub struct OneofOptions {
-    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -3448,7 +3448,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for OneofOptions<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct OneofOptionsBumpalo<'bump> {
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3586,7 +3586,7 @@ pub struct FieldOptions {
     pub lazy: bool,
     pub deprecated: bool,
     pub weak: bool,
-    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -3827,7 +3827,7 @@ pub struct FieldOptionsBumpalo<'bump> {
     pub lazy: bool,
     pub deprecated: bool,
     pub weak: bool,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -4141,7 +4141,7 @@ pub struct MessageOptions {
     pub no_standard_descriptor_accessor: bool,
     pub deprecated: bool,
     pub map_entry: bool,
-    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -4340,7 +4340,7 @@ pub struct MessageOptionsBumpalo<'bump> {
     pub no_standard_descriptor_accessor: bool,
     pub deprecated: bool,
     pub map_entry: bool,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -4580,7 +4580,7 @@ pub struct FileOptions {
     pub php_namespace: ::std::string::String,
     pub php_metadata_namespace: ::std::string::String,
     pub ruby_package: ::std::string::String,
-    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -5035,7 +5035,7 @@ pub struct FileOptionsBumpalo<'bump> {
     pub php_namespace: ::bumpalo::collections::String<'bump>,
     pub php_metadata_namespace: ::bumpalo::collections::String<'bump>,
     pub ruby_package: ::bumpalo::collections::String<'bump>,
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5554,7 +5554,7 @@ pub struct MethodDescriptorProto {
     pub name: ::std::string::String,
     pub input_type: ::std::string::String,
     pub output_type: ::std::string::String,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MethodOptions>>,
+    pub options: ::std::option::Option<::std::boxed::Box<MethodOptions>>,
     pub client_streaming: bool,
     pub server_streaming: bool,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
@@ -5736,7 +5736,7 @@ pub struct MethodDescriptorProtoBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
     pub input_type: ::bumpalo::collections::String<'bump>,
     pub output_type: ::bumpalo::collections::String<'bump>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::google::protobuf::MethodOptions>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, MethodOptionsBumpalo>>,
     pub client_streaming: bool,
     pub server_streaming: bool,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
@@ -5930,8 +5930,8 @@ pub trait MethodDescriptorProtoMutTrait {
 #[derive(Debug, Clone)]
 pub struct ServiceDescriptorProto {
     pub name: ::std::string::String,
-    pub method: ::std::vec::Vec<super::super::google::protobuf::MethodDescriptorProto>,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::ServiceOptions>>,
+    pub method: ::std::vec::Vec<MethodDescriptorProto>,
+    pub options: ::std::option::Option<::std::boxed::Box<ServiceOptions>>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -6071,8 +6071,8 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for ServiceDescriptorProto<> {
 #[derive(Debug, Clone)]
 pub struct ServiceDescriptorProtoBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
-    pub method: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::MethodDescriptorProto>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::google::protobuf::ServiceOptions>>,
+    pub method: ::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, ServiceOptionsBumpalo>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6234,7 +6234,7 @@ pub trait ServiceDescriptorProtoMutTrait {
 pub struct EnumValueDescriptorProto {
     pub name: ::std::string::String,
     pub number: i32,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumValueOptions>>,
+    pub options: ::std::option::Option<::std::boxed::Box<EnumValueOptions>>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -6369,7 +6369,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for EnumValueDescriptorProto<> {
 pub struct EnumValueDescriptorProtoBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
     pub number: i32,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::google::protobuf::EnumValueOptions>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, EnumValueOptionsBumpalo>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6511,9 +6511,9 @@ pub trait EnumValueDescriptorProtoMutTrait {
 #[derive(Debug, Clone)]
 pub struct EnumDescriptorProto {
     pub name: ::std::string::String,
-    pub value: ::std::vec::Vec<super::super::google::protobuf::EnumValueDescriptorProto>,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::EnumOptions>>,
-    pub reserved_range: ::std::vec::Vec<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>,
+    pub value: ::std::vec::Vec<EnumValueDescriptorProto>,
+    pub options: ::std::option::Option<::std::boxed::Box<EnumOptions>>,
+    pub reserved_range: ::std::vec::Vec<enum_descriptor_proto::EnumReservedRange>,
     pub reserved_name: ::std::vec::Vec<::std::string::String>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
@@ -6706,9 +6706,9 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for EnumDescriptorProto<> {
 #[derive(Debug, Clone)]
 pub struct EnumDescriptorProtoBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
-    pub value: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::EnumValueDescriptorProto>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::google::protobuf::EnumOptions>>,
-    pub reserved_range: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>,
+    pub value: ::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, EnumOptionsBumpalo>>,
+    pub reserved_range: ::bumpalo::collections::Vec<'bump, enum_descriptor_proto::EnumReservedRangeBumpalo>,
     pub reserved_name: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -7220,7 +7220,7 @@ pub trait EnumReservedRangeMutTrait {
 #[derive(Debug, Clone)]
 pub struct OneofDescriptorProto {
     pub name: ::std::string::String,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::OneofOptions>>,
+    pub options: ::std::option::Option<::std::boxed::Box<OneofOptions>>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -7334,7 +7334,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for OneofDescriptorProto<> {
 #[derive(Debug, Clone)]
 pub struct OneofDescriptorProtoBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::google::protobuf::OneofOptions>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -7462,7 +7462,7 @@ pub struct FieldDescriptorProto {
     pub default_value: ::std::string::String,
     pub oneof_index: i32,
     pub json_name: ::std::string::String,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FieldOptions>>,
+    pub options: ::std::option::Option<::std::boxed::Box<FieldOptions>>,
     pub proto3_optional: bool,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
@@ -7733,7 +7733,7 @@ pub struct FieldDescriptorProtoBumpalo<'bump> {
     pub default_value: ::bumpalo::collections::String<'bump>,
     pub oneof_index: i32,
     pub json_name: ::bumpalo::collections::String<'bump>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::google::protobuf::FieldOptions>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, FieldOptionsBumpalo>>,
     pub proto3_optional: bool,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -8095,7 +8095,7 @@ impl ::std::convert::Into<i32> for Type {
 
 #[derive(Debug, Clone)]
 pub struct ExtensionRangeOptions {
-    pub uninterpreted_option: ::std::vec::Vec<super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -8210,7 +8210,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for ExtensionRangeOptions<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct ExtensionRangeOptionsBumpalo<'bump> {
-    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::UninterpretedOption>,
+    pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8343,14 +8343,14 @@ pub trait ExtensionRangeOptionsMutTrait {
 #[derive(Debug, Clone)]
 pub struct DescriptorProto {
     pub name: ::std::string::String,
-    pub field: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
-    pub extension: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
-    pub nested_type: ::std::vec::Vec<super::super::google::protobuf::DescriptorProto>,
-    pub enum_type: ::std::vec::Vec<super::super::google::protobuf::EnumDescriptorProto>,
-    pub extension_range: ::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ExtensionRange>,
-    pub oneof_decl: ::std::vec::Vec<super::super::google::protobuf::OneofDescriptorProto>,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::MessageOptions>>,
-    pub reserved_range: ::std::vec::Vec<super::super::google::protobuf::descriptor_proto::ReservedRange>,
+    pub field: ::std::vec::Vec<FieldDescriptorProto>,
+    pub extension: ::std::vec::Vec<FieldDescriptorProto>,
+    pub nested_type: ::std::vec::Vec<DescriptorProto>,
+    pub enum_type: ::std::vec::Vec<EnumDescriptorProto>,
+    pub extension_range: ::std::vec::Vec<descriptor_proto::ExtensionRange>,
+    pub oneof_decl: ::std::vec::Vec<OneofDescriptorProto>,
+    pub options: ::std::option::Option<::std::boxed::Box<MessageOptions>>,
+    pub reserved_range: ::std::vec::Vec<descriptor_proto::ReservedRange>,
     pub reserved_name: ::std::vec::Vec<::std::string::String>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
@@ -8673,14 +8673,14 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for DescriptorProto<> {
 #[derive(Debug, Clone)]
 pub struct DescriptorProtoBumpalo<'bump> {
     pub name: ::bumpalo::collections::String<'bump>,
-    pub field: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::FieldDescriptorProto>,
-    pub extension: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::FieldDescriptorProto>,
-    pub nested_type: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::DescriptorProto>,
-    pub enum_type: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::EnumDescriptorProto>,
-    pub extension_range: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::descriptor_proto::ExtensionRange>,
-    pub oneof_decl: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::OneofDescriptorProto>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::google::protobuf::MessageOptions>>,
-    pub reserved_range: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::descriptor_proto::ReservedRange>,
+    pub field: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo>,
+    pub extension: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo>,
+    pub nested_type: ::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo>,
+    pub enum_type: ::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo>,
+    pub extension_range: ::bumpalo::collections::Vec<'bump, descriptor_proto::ExtensionRangeBumpalo>,
+    pub oneof_decl: ::bumpalo::collections::Vec<'bump, OneofDescriptorProtoBumpalo>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, MessageOptionsBumpalo>>,
+    pub reserved_range: ::bumpalo::collections::Vec<'bump, descriptor_proto::ReservedRangeBumpalo>,
     pub reserved_name: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -9397,7 +9397,7 @@ pub trait ReservedRangeMutTrait {
 pub struct ExtensionRange {
     pub start: i32,
     pub end: i32,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::super::google::protobuf::ExtensionRangeOptions>>,
+    pub options: ::std::option::Option<::std::boxed::Box<super::ExtensionRangeOptions>>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -9540,7 +9540,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for ExtensionRange<> {
 pub struct ExtensionRangeBumpalo<'bump> {
     pub start: i32,
     pub end: i32,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::super::google::protobuf::ExtensionRangeOptions>>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo>>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -9695,12 +9695,12 @@ pub struct FileDescriptorProto {
     pub dependency: ::std::vec::Vec<::std::string::String>,
     pub public_dependency: ::std::vec::Vec<i32>,
     pub weak_dependency: ::std::vec::Vec<i32>,
-    pub message_type: ::std::vec::Vec<super::super::google::protobuf::DescriptorProto>,
-    pub enum_type: ::std::vec::Vec<super::super::google::protobuf::EnumDescriptorProto>,
-    pub service: ::std::vec::Vec<super::super::google::protobuf::ServiceDescriptorProto>,
-    pub extension: ::std::vec::Vec<super::super::google::protobuf::FieldDescriptorProto>,
-    pub options: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::FileOptions>>,
-    pub source_code_info: ::std::option::Option<::std::boxed::Box<super::super::google::protobuf::SourceCodeInfo>>,
+    pub message_type: ::std::vec::Vec<DescriptorProto>,
+    pub enum_type: ::std::vec::Vec<EnumDescriptorProto>,
+    pub service: ::std::vec::Vec<ServiceDescriptorProto>,
+    pub extension: ::std::vec::Vec<FieldDescriptorProto>,
+    pub options: ::std::option::Option<::std::boxed::Box<FileOptions>>,
+    pub source_code_info: ::std::option::Option<::std::boxed::Box<SourceCodeInfo>>,
     pub syntax: ::std::string::String,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
@@ -10053,12 +10053,12 @@ pub struct FileDescriptorProtoBumpalo<'bump> {
     pub dependency: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     pub public_dependency: ::bumpalo::collections::Vec<'bump, i32>,
     pub weak_dependency: ::bumpalo::collections::Vec<'bump, i32>,
-    pub message_type: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::DescriptorProto>,
-    pub enum_type: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::EnumDescriptorProto>,
-    pub service: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::ServiceDescriptorProto>,
-    pub extension: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::FieldDescriptorProto>,
-    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::google::protobuf::FileOptions>>,
-    pub source_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::google::protobuf::SourceCodeInfo>>,
+    pub message_type: ::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo>,
+    pub enum_type: ::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo>,
+    pub service: ::bumpalo::collections::Vec<'bump, ServiceDescriptorProtoBumpalo>,
+    pub extension: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo>,
+    pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, FileOptionsBumpalo>>,
+    pub source_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, SourceCodeInfoBumpalo>>,
     pub syntax: ::bumpalo::collections::String<'bump>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -10523,7 +10523,7 @@ pub trait FileDescriptorProtoMutTrait {
 
 #[derive(Debug, Clone)]
 pub struct FileDescriptorSet {
-    pub file: ::std::vec::Vec<super::super::google::protobuf::FileDescriptorProto>,
+    pub file: ::std::vec::Vec<FileDescriptorProto>,
     puroro_internal: ::puroro::helpers::InternalDataForNormalStruct,
 }
 
@@ -10638,7 +10638,7 @@ impl<'a> ::puroro::helpers::FieldNew<'a> for FileDescriptorSet<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FileDescriptorSetBumpalo<'bump> {
-    pub file: ::bumpalo::collections::Vec<'bump, super::super::google::protobuf::FileDescriptorProto>,
+    pub file: ::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo>,
     puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
