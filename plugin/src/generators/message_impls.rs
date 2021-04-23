@@ -192,17 +192,20 @@ impl{gp} ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut {nam
                 "\
 {cfg}
 impl{gp} ::puroro::deser::DeserializeMessageFromBytesEventHandler for {name}{gpb} {{
-    fn met_field<B: ::puroro::deser::BytesIter>(
+    fn met_field<'a, 'b, I>(
         &mut self,
-        field: ::puroro::types::FieldData<B>,
+        field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> {{
+    ) -> ::puroro::Result<()> 
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {{
         use ::puroro::helpers::MaybeRepeatedField;
         use ::puroro::helpers::MaybeRepeatedVariantField;
         match field {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params("'a"),
+                gp = self.frag_gen.struct_generic_params(""),
                 gpb = self.frag_gen.struct_generic_params_bounds(""),
             ),
             indent_n(
@@ -468,7 +471,11 @@ impl{gpb} ::puroro::Deserializable for {name}{gp} {{
                 "\
 {cfg}
 impl{gpb} ::puroro::deser::DeserializableFromBytes for {name}{gp} {{
-    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {{
+    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {{
+        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }}
 }}\n",

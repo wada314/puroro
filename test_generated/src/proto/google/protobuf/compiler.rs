@@ -85,12 +85,15 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Code
     }
 }
 
-impl<'a> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorResponse {
-    fn met_field<B: ::puroro::deser::BytesIter>(
+impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorResponse {
+    fn met_field<'a, 'b, I>(
         &mut self,
-        field: ::puroro::types::FieldData<B>,
+        field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> {
+    ) -> ::puroro::Result<()> 
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
         use ::puroro::helpers::MaybeRepeatedField;
         use ::puroro::helpers::MaybeRepeatedVariantField;
         match field {
@@ -149,7 +152,11 @@ impl ::puroro::Deserializable for CodeGeneratorResponse {
 }
 
 impl ::puroro::deser::DeserializableFromBytes for CodeGeneratorResponse {
-    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
+        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -285,12 +292,15 @@ impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorResponseBumpalo<'b> {
-    fn met_field<B: ::puroro::deser::BytesIter>(
+impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorResponseBumpalo<'b> {
+    fn met_field<'a, 'b, I>(
         &mut self,
-        field: ::puroro::types::FieldData<B>,
+        field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> {
+    ) -> ::puroro::Result<()> 
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
         use ::puroro::helpers::MaybeRepeatedField;
         use ::puroro::helpers::MaybeRepeatedVariantField;
         match field {
@@ -349,7 +359,11 @@ impl<'b> ::puroro::Deserializable for CodeGeneratorResponseBumpalo<'b> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializableFromBytes for CodeGeneratorResponseBumpalo<'b> {
-    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
+        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -535,12 +549,15 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut File
     }
 }
 
-impl<'a> ::puroro::deser::DeserializeMessageFromBytesEventHandler for File {
-    fn met_field<B: ::puroro::deser::BytesIter>(
+impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for File {
+    fn met_field<'a, 'b, I>(
         &mut self,
-        field: ::puroro::types::FieldData<B>,
+        field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> {
+    ) -> ::puroro::Result<()> 
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
         use ::puroro::helpers::MaybeRepeatedField;
         use ::puroro::helpers::MaybeRepeatedVariantField;
         match field {
@@ -598,7 +615,11 @@ impl ::puroro::Deserializable for File {
 }
 
 impl ::puroro::deser::DeserializableFromBytes for File {
-    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
+        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -725,12 +746,15 @@ impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileBumpalo<'b> {
-    fn met_field<B: ::puroro::deser::BytesIter>(
+impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileBumpalo<'b> {
+    fn met_field<'a, 'b, I>(
         &mut self,
-        field: ::puroro::types::FieldData<B>,
+        field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> {
+    ) -> ::puroro::Result<()> 
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
         use ::puroro::helpers::MaybeRepeatedField;
         use ::puroro::helpers::MaybeRepeatedVariantField;
         match field {
@@ -788,7 +812,11 @@ impl<'b> ::puroro::Deserializable for FileBumpalo<'b> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializableFromBytes for FileBumpalo<'b> {
-    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
+        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -933,12 +961,15 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Code
     }
 }
 
-impl<'a> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorRequest {
-    fn met_field<B: ::puroro::deser::BytesIter>(
+impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorRequest {
+    fn met_field<'a, 'b, I>(
         &mut self,
-        field: ::puroro::types::FieldData<B>,
+        field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> {
+    ) -> ::puroro::Result<()> 
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
         use ::puroro::helpers::MaybeRepeatedField;
         use ::puroro::helpers::MaybeRepeatedVariantField;
         match field {
@@ -996,7 +1027,11 @@ impl ::puroro::Deserializable for CodeGeneratorRequest {
 }
 
 impl ::puroro::deser::DeserializableFromBytes for CodeGeneratorRequest {
-    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
+        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -1151,12 +1186,15 @@ impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorRequestBumpalo<'b> {
-    fn met_field<B: ::puroro::deser::BytesIter>(
+impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorRequestBumpalo<'b> {
+    fn met_field<'a, 'b, I>(
         &mut self,
-        field: ::puroro::types::FieldData<B>,
+        field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> {
+    ) -> ::puroro::Result<()> 
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
         use ::puroro::helpers::MaybeRepeatedField;
         use ::puroro::helpers::MaybeRepeatedVariantField;
         match field {
@@ -1214,7 +1252,11 @@ impl<'b> ::puroro::Deserializable for CodeGeneratorRequestBumpalo<'b> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializableFromBytes for CodeGeneratorRequestBumpalo<'b> {
-    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
+        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -1430,12 +1472,15 @@ impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Vers
     }
 }
 
-impl<'a> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Version {
-    fn met_field<B: ::puroro::deser::BytesIter>(
+impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for Version {
+    fn met_field<'a, 'b, I>(
         &mut self,
-        field: ::puroro::types::FieldData<B>,
+        field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> {
+    ) -> ::puroro::Result<()> 
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
         use ::puroro::helpers::MaybeRepeatedField;
         use ::puroro::helpers::MaybeRepeatedVariantField;
         match field {
@@ -1511,7 +1556,11 @@ impl ::puroro::Deserializable for Version {
 }
 
 impl ::puroro::deser::DeserializableFromBytes for Version {
-    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
+        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -1662,12 +1711,15 @@ impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deser::DeserializeMessageFromBytesEventHandler for VersionBumpalo<'b> {
-    fn met_field<B: ::puroro::deser::BytesIter>(
+impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for VersionBumpalo<'b> {
+    fn met_field<'a, 'b, I>(
         &mut self,
-        field: ::puroro::types::FieldData<B>,
+        field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> {
+    ) -> ::puroro::Result<()> 
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
         use ::puroro::helpers::MaybeRepeatedField;
         use ::puroro::helpers::MaybeRepeatedVariantField;
         match field {
@@ -1743,7 +1795,11 @@ impl<'b> ::puroro::Deserializable for VersionBumpalo<'b> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializableFromBytes for VersionBumpalo<'b> {
-    fn deserialize<B: ::puroro::deser::BytesIter>(&mut self, bytes_iter: &mut B) -> ::puroro::Result<()> {
+    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {
+        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }

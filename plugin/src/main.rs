@@ -13,7 +13,8 @@ mod stage3;
 mod utils;
 mod wrappers;
 
-use ::puroro::{Deserializable, Serializable};
+use ::puroro::deser::DeserializableFromBytes;
+use ::puroro::Serializable;
 use context::Context;
 
 use error::{ErrorKind, GeneratorError};
@@ -36,6 +37,7 @@ use google::protobuf::compiler::{
 pub use protos::google;
 
 fn main() -> Result<()> {
+    use ::puroro::Deserializable;
     let mut cgreq = CodeGeneratorRequest::default();
     cgreq.deser_from_bytes(stdin().bytes()).unwrap();
     let context = Context::new(cgreq.clone())?;

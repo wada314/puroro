@@ -7,14 +7,69 @@ use crate::Result;
 use ::num_traits::FromPrimitive;
 
 pub trait DeserializableFromBytes {
-    fn deserialize<B: BytesIter>(&mut self, iter: &mut B) -> Result<()>;
+    fn deserialize<I>(&mut self, iter: &mut I) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>;
 }
 
 pub trait DeserializeMessageFromBytesEventHandler {
-    fn met_field<B: BytesIter>(&mut self, field: FieldData<B>, field_number: usize) -> Result<()>;
+    fn met_field<'a, 'b, I>(
+        &mut self,
+        field: FieldData<&'a mut BytesIter<'b, I>>,
+        field_number: usize,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>;
+}
+pub struct BytesHandlerToSliceHandler<T: DeserializeMessageFromBytesEventHandler>(T);
+impl<T> super::slice::DeserializeMessageFromSliceEventHandler for BytesHandlerToSliceHandler<T>
+where
+    T: DeserializeMessageFromBytesEventHandler,
+{
+    fn met_field<'a>(&mut self, field: FieldData<&'a [u8]>, field_number: usize) -> Result<()> {
+        use std::io::Read;
+        type BytesIterBoundType<'a> = BytesIter<'a, std::io::Bytes<&'a [u8]>>;
+        match field {
+            FieldData::Variant(v) => self
+                .0
+                .met_field::<BytesIterBoundType<'a>>(FieldData::Variant(v), field_number),
+            FieldData::LengthDelimited(slice) => {
+                let mut bytes = slice.bytes();
+                let mut bytes_iter = BytesIter::new(&mut bytes);
+                let field_data = FieldData::LengthDelimited(&mut bytes_iter);
+                self.0.met_field(field_data, field_number)
+            }
+            FieldData::Bits32(b) => self
+                .0
+                .met_field::<BytesIterBoundType<'a>>(FieldData::Bits32(b), field_number),
+            FieldData::Bits64(b) => self
+                .0
+                .met_field::<BytesIterBoundType<'a>>(FieldData::Bits64(b), field_number),
+        }
+    }
 }
 
-pub trait BytesIter: Sized + Iterator<Item = ::std::io::Result<u8>> {
+pub struct BytesIter<'a, I>
+where
+    I: Iterator<Item = ::std::io::Result<u8>>,
+{
+    iter: &'a mut I,
+    index: usize,
+    end: usize,
+}
+
+impl<'a, I> BytesIter<'a, I>
+where
+    I: Iterator<Item = ::std::io::Result<u8>>,
+{
+    pub fn new(iter: &'a mut I) -> Self {
+        Self {
+            iter,
+            index: 0,
+            end: usize::MAX,
+        }
+    }
+
     fn try_get_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, usize)>> {
         let mut peekable = self.by_ref().peekable();
         if let None = peekable.peek() {
@@ -38,11 +93,12 @@ pub trait BytesIter: Sized + Iterator<Item = ::std::io::Result<u8>> {
         Ok(result)
     }
 
-    fn deser_message<H: DeserializeMessageFromBytesEventHandler>(
+    pub fn deser_message<H: DeserializeMessageFromBytesEventHandler>(
         &mut self,
         handler: &mut H,
     ) -> Result<()> {
         while let Some((wire_type, field_number)) = self.try_get_wire_type_and_field_number()? {
+            let old_end_index = self.end;
             let field_data = match wire_type {
                 WireType::Variant => {
                     let variant = Variant::decode_bytes(self)?;
@@ -50,29 +106,44 @@ pub trait BytesIter: Sized + Iterator<Item = ::std::io::Result<u8>> {
                 }
                 WireType::LengthDelimited => {
                     let field_length = Variant::decode_bytes(self)?.to_usize()?;
-                    let inner_bytes = self.by_ref().take(field_length);
-                    FieldData::LengthDelimited(inner_bytes)
+                    self.end = self.index + field_length;
+                    FieldData::LengthDelimited(self.by_ref())
                 }
                 WireType::Bits32 => FieldData::Bits32(self.next_bytes::<4>()?),
                 WireType::Bits64 => FieldData::Bits64(self.next_bytes::<8>()?),
                 WireType::StartGroup | WireType::EndGroup => Err(PuroroError::GroupNotSupported)?,
             };
             handler.met_field(field_data, field_number)?;
+            self.end = old_end_index;
         }
         Ok(())
     }
 
-    fn bytes(&mut self) -> BytesIterator<'_, Self> {
+    pub fn bytes(&mut self) -> BytesIterator<'_, Self> {
         BytesIterator::new(self)
     }
 
-    fn chars(&mut self) -> CharsIterator<'_, Self> {
+    pub fn chars(&mut self) -> CharsIterator<'_, Self> {
         CharsIterator::new(self)
     }
 
-    fn variants(&mut self) -> VariantsIterator<'_, Self> {
+    pub fn variants(&mut self) -> VariantsIterator<'_, Self> {
         VariantsIterator::new(self)
     }
 }
-// blanket implementation
-impl<T> BytesIter for T where T: Sized + Iterator<Item = ::std::io::Result<u8>> {}
+
+impl<'a, I> Iterator for BytesIter<'a, I>
+where
+    I: Iterator<Item = ::std::io::Result<u8>>,
+{
+    type Item = std::io::Result<u8>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index >= self.end {
+            None
+        } else {
+            let result = self.iter.next();
+            self.index += 1;
+            result
+        }
+    }
+}

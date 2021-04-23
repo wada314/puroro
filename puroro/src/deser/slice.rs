@@ -13,21 +13,6 @@ pub trait DeserializableFromSlice {
 pub trait DeserializeMessageFromSliceEventHandler {
     fn met_field(&mut self, field: FieldData<&[u8]>, field_number: usize) -> Result<()>;
 }
-pub struct BytesHandlerToSliceHandler<T: super::bytes::DeserializeMessageFromBytesEventHandler>(T);
-impl<T> DeserializeMessageFromSliceEventHandler for BytesHandlerToSliceHandler<T>
-where
-    T: super::bytes::DeserializeMessageFromBytesEventHandler,
-{
-    fn met_field(&mut self, field: FieldData<&[u8]>, field_number: usize) -> Result<()> {
-        let field_with_iter = match field {
-            FieldData::Variant(v) => FieldData::Variant(v),
-            FieldData::LengthDelimited(slice) => FieldData::LengthDelimited(slice.bytes()),
-            FieldData::Bits32(b) => FieldData::Bits32(b),
-            FieldData::Bits64(b) => FieldData::Bits64(b),
-        };
-        self.0.met_field(field_with_iter, field_number)
-    }
-}
 
 pub trait BytesSlice: Sized + std::io::Read {
     fn deser_message<H: DeserializeMessageFromSliceEventHandler>(
