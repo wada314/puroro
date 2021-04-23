@@ -24,47 +24,6 @@ impl ::std::default::Default for GeneratedCodeInfo {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut GeneratedCodeInfo {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let msg = self.annotation.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for GeneratedCodeInfo {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -101,16 +60,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for GeneratedCodeI
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for GeneratedCodeInfo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -181,47 +130,6 @@ impl<'b> GeneratedCodeInfoBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut GeneratedCodeInfoBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let msg = self.annotation.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for GeneratedCodeInfoBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -258,16 +166,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for GeneratedC
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for GeneratedCodeInfoBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -369,80 +267,6 @@ impl ::std::default::Default for Annotation {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Annotation {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.path.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => {
-                    *self.begin.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                4 => {
-                    *self.end.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.path, first, iter);
-                }
-                2 => {
-                    *self.source_file.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                3 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.begin, first, iter);
-                }
-                4 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.end, first, iter);
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 | 4 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 | 4 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for Annotation {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -512,16 +336,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for Annotation {
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for Annotation {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -622,80 +436,6 @@ impl<'b> AnnotationBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut AnnotationBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.path.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => {
-                    *self.begin.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                4 => {
-                    *self.end.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.path, first, iter);
-                }
-                2 => {
-                    *self.source_file.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                3 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.begin, first, iter);
-                }
-                4 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.end, first, iter);
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 | 4 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 | 4 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for AnnotationBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -765,16 +505,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Annotation
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for AnnotationBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -900,47 +630,6 @@ impl ::std::default::Default for SourceCodeInfo {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut SourceCodeInfo {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let msg = self.location.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for SourceCodeInfo {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -977,16 +666,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for SourceCodeInfo
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for SourceCodeInfo {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -1057,47 +736,6 @@ impl<'b> SourceCodeInfoBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut SourceCodeInfoBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let msg = self.location.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for SourceCodeInfoBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -1134,16 +772,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for SourceCode
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for SourceCodeInfoBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -1247,79 +875,6 @@ impl ::std::default::Default for Location {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut Location {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.path.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                2 => {
-                    *self.span.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.path, first, iter);
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.span, first, iter);
-                }
-                3 => {
-                    *self.leading_comments.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                4 => {
-                    *self.trailing_comments.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                6 => {
-                    *self.leading_detached_comments.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 | 4 | 6 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 | 4 | 6 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for Location {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -1388,16 +943,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for Location {
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for Location {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -1532,79 +1077,6 @@ impl<'b> LocationBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut LocationBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.path.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                2 => {
-                    *self.span.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.path, first, iter);
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.span, first, iter);
-                }
-                3 => {
-                    *self.leading_comments.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                4 => {
-                    *self.trailing_comments.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                6 => {
-                    *self.leading_detached_comments.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 | 4 | 6 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 | 4 | 6 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for LocationBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -1673,16 +1145,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for LocationBu
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for LocationBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -1880,91 +1342,6 @@ impl ::std::default::Default for UninterpretedOption {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut UninterpretedOption {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                4 => {
-                    *self.positive_int_value.push_and_get_mut() = variant.to_native::<::puroro::tags::UInt64>()?;
-                }
-                5 => {
-                    *self.negative_int_value.push_and_get_mut() = variant.to_native::<::puroro::tags::Int64>()?;
-                }
-                6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                2 => {
-                    let msg = self.name.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                3 => {
-                    *self.identifier_value.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                4 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::UInt64>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.positive_int_value, first, iter);
-                }
-                5 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int64>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.negative_int_value, first, iter);
-                }
-                6 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                7 => {
-                    *self.string_value.push_and_get_mut()
-                        = ldd.deserialize_as_bytes().collect::<::puroro::Result<_>>()?;
-                }
-                8 => {
-                    *self.aggregate_value.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                2 | 3 | 4 | 5 | 6 | 7 | 8 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                6 => {
-                    *self.double_value.push_and_get_mut() = f64::from_le_bytes(bytes);
-                }
-                2 | 3 | 4 | 5 | 7 | 8 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for UninterpretedOption {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -2045,16 +1422,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for UninterpretedO
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for UninterpretedOption {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -2177,91 +1544,6 @@ impl<'b> UninterpretedOptionBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut UninterpretedOptionBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                4 => {
-                    *self.positive_int_value.push_and_get_mut() = variant.to_native::<::puroro::tags::UInt64>()?;
-                }
-                5 => {
-                    *self.negative_int_value.push_and_get_mut() = variant.to_native::<::puroro::tags::Int64>()?;
-                }
-                6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                2 => {
-                    let msg = self.name.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                3 => {
-                    *self.identifier_value.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                4 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::UInt64>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.positive_int_value, first, iter);
-                }
-                5 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int64>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.negative_int_value, first, iter);
-                }
-                6 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                7 => {
-                    *self.string_value.push_and_get_mut()
-                        = ldd.deserialize_as_bytes().collect::<::puroro::Result<_>>()?;
-                }
-                8 => {
-                    *self.aggregate_value.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                2 | 3 | 4 | 5 | 6 | 7 | 8 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                6 => {
-                    *self.double_value.push_and_get_mut() = f64::from_le_bytes(bytes);
-                }
-                2 | 3 | 4 | 5 | 7 | 8 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for UninterpretedOptionBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -2342,16 +1624,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Uninterpre
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for UninterpretedOptionBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -2501,58 +1773,6 @@ impl ::std::default::Default for NamePart {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut NamePart {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => {
-                    *self.is_extension.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name_part.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.is_extension, first, iter);
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for NamePart {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -2600,16 +1820,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for NamePart {
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for NamePart {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -2676,58 +1886,6 @@ impl<'b> NamePartBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut NamePartBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => {
-                    *self.is_extension.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name_part.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.is_extension, first, iter);
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for NamePartBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -2775,16 +1933,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for NamePartBu
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for NamePartBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -2867,69 +2015,6 @@ impl ::std::default::Default for MethodOptions {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut MethodOptions {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                33 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                34 => {
-                    *self.idempotency_level.push_and_get_mut() = variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::method_options::IdempotencyLevel>>()?;
-                }
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                33 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                34 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::method_options::IdempotencyLevel>>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.idempotency_level, first, iter);
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                33 | 34 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                33 | 34 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -2988,16 +2073,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodOptions 
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for MethodOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -3088,69 +2163,6 @@ impl<'b> MethodOptionsBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut MethodOptionsBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                33 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                34 => {
-                    *self.idempotency_level.push_and_get_mut() = variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::method_options::IdempotencyLevel>>()?;
-                }
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                33 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                34 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::method_options::IdempotencyLevel>>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.idempotency_level, first, iter);
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                33 | 34 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                33 | 34 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodOptionsBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -3209,16 +2221,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodOpti
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for MethodOptionsBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -3359,58 +2361,6 @@ impl ::std::default::Default for ServiceOptions {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ServiceOptions {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                33 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                33 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                33 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                33 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ServiceOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -3458,16 +2408,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ServiceOptions
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for ServiceOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -3548,58 +2488,6 @@ impl<'b> ServiceOptionsBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ServiceOptionsBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                33 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                33 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                33 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                33 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for ServiceOptionsBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -3647,16 +2535,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for ServiceOpt
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for ServiceOptionsBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -3763,58 +2641,6 @@ impl ::std::default::Default for EnumValueOptions {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumValueOptions {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumValueOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -3862,16 +2688,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumValueOptio
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for EnumValueOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -3952,58 +2768,6 @@ impl<'b> EnumValueOptionsBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumValueOptionsBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumValueOptionsBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -4051,16 +2815,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumValueO
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for EnumValueOptionsBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -4169,69 +2923,6 @@ impl ::std::default::Default for EnumOptions {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumOptions {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                2 => {
-                    *self.allow_alias.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                3 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.allow_alias, first, iter);
-                }
-                3 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                2 | 3 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                2 | 3 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -4290,16 +2981,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumOptions {
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for EnumOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -4390,69 +3071,6 @@ impl<'b> EnumOptionsBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumOptionsBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                2 => {
-                    *self.allow_alias.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                3 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.allow_alias, first, iter);
-                }
-                3 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                2 | 3 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                2 | 3 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumOptionsBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -4511,16 +3129,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumOption
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for EnumOptionsBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -4635,47 +3243,6 @@ impl ::std::default::Default for OneofOptions {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut OneofOptions {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -4712,16 +3279,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofOptions {
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for OneofOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -4792,47 +3349,6 @@ impl<'b> OneofOptionsBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut OneofOptionsBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofOptionsBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -4869,16 +3385,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofOptio
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for OneofOptionsBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -4985,113 +3491,6 @@ impl ::std::default::Default for FieldOptions {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FieldOptions {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.ctype.push_and_get_mut() = variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_options::Ctype>>()?;
-                }
-                2 => {
-                    *self.packed.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                6 => {
-                    *self.jstype.push_and_get_mut() = variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_options::Jstype>>()?;
-                }
-                5 => {
-                    *self.lazy.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                3 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                10 => {
-                    *self.weak.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_options::Ctype>>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.ctype, first, iter);
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.packed, first, iter);
-                }
-                6 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_options::Jstype>>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.jstype, first, iter);
-                }
-                5 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.lazy, first, iter);
-                }
-                3 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                10 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.weak, first, iter);
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 6 | 5 | 3 | 10 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 6 | 5 | 3 | 10 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -5194,16 +3593,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldOptions {
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for FieldOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -5334,113 +3723,6 @@ impl<'b> FieldOptionsBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FieldOptionsBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.ctype.push_and_get_mut() = variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_options::Ctype>>()?;
-                }
-                2 => {
-                    *self.packed.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                6 => {
-                    *self.jstype.push_and_get_mut() = variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_options::Jstype>>()?;
-                }
-                5 => {
-                    *self.lazy.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                3 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                10 => {
-                    *self.weak.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_options::Ctype>>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.ctype, first, iter);
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.packed, first, iter);
-                }
-                6 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_options::Jstype>>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.jstype, first, iter);
-                }
-                5 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.lazy, first, iter);
-                }
-                3 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                10 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.weak, first, iter);
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 6 | 5 | 3 | 10 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 6 | 5 | 3 | 10 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldOptionsBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -5543,16 +3825,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldOptio
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for FieldOptionsBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -5761,91 +4033,6 @@ impl ::std::default::Default for MessageOptions {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut MessageOptions {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.message_set_wire_format.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                2 => {
-                    *self.no_standard_descriptor_accessor.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                3 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                7 => {
-                    *self.map_entry.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.message_set_wire_format, first, iter);
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.no_standard_descriptor_accessor, first, iter);
-                }
-                3 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                7 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.map_entry, first, iter);
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 | 7 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 | 7 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for MessageOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -5926,16 +4113,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for MessageOptions
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for MessageOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -6046,91 +4223,6 @@ impl<'b> MessageOptionsBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut MessageOptionsBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.message_set_wire_format.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                2 => {
-                    *self.no_standard_descriptor_accessor.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                3 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                7 => {
-                    *self.map_entry.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.message_set_wire_format, first, iter);
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.no_standard_descriptor_accessor, first, iter);
-                }
-                3 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                7 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.map_entry, first, iter);
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 | 7 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 | 7 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for MessageOptionsBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -6211,16 +4303,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for MessageOpt
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for MessageOptionsBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -6392,207 +4474,6 @@ impl FileOptions {
 impl ::std::default::Default for FileOptions {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileOptions {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                10 => {
-                    *self.java_multiple_files.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                20 => {
-                    *self.java_generate_equals_and_hash.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                27 => {
-                    *self.java_string_check_utf8.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                9 => {
-                    *self.optimize_for.push_and_get_mut() = variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::file_options::OptimizeMode>>()?;
-                }
-                11 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                16 => {
-                    *self.cc_generic_services.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                17 => {
-                    *self.java_generic_services.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                18 => {
-                    *self.py_generic_services.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                42 => {
-                    *self.php_generic_services.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                23 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                31 => {
-                    *self.cc_enable_arenas.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                36 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                37 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                39 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                40 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                41 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                44 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                45 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.java_package.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                8 => {
-                    *self.java_outer_classname.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                10 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.java_multiple_files, first, iter);
-                }
-                20 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.java_generate_equals_and_hash, first, iter);
-                }
-                27 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.java_string_check_utf8, first, iter);
-                }
-                9 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::file_options::OptimizeMode>>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.optimize_for, first, iter);
-                }
-                11 => {
-                    *self.go_package.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                16 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.cc_generic_services, first, iter);
-                }
-                17 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.java_generic_services, first, iter);
-                }
-                18 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.py_generic_services, first, iter);
-                }
-                42 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.php_generic_services, first, iter);
-                }
-                23 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                31 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.cc_enable_arenas, first, iter);
-                }
-                36 => {
-                    *self.objc_class_prefix.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                37 => {
-                    *self.csharp_namespace.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                39 => {
-                    *self.swift_prefix.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                40 => {
-                    *self.php_class_prefix.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                41 => {
-                    *self.php_namespace.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                44 => {
-                    *self.php_metadata_namespace.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                45 => {
-                    *self.ruby_package.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 8 | 10 | 20 | 27 | 9 | 11 | 16 | 17 | 18 | 42 | 23 | 31 | 36 | 37 | 39 | 40 | 41 | 44 | 45 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 8 | 10 | 20 | 27 | 9 | 11 | 16 | 17 | 18 | 42 | 23 | 31 | 36 | 37 | 39 | 40 | 41 | 44 | 45 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
     }
 }
 
@@ -6792,16 +4673,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileOptions {
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for FileOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -7052,207 +4923,6 @@ impl<'b> FileOptionsBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileOptionsBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                10 => {
-                    *self.java_multiple_files.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                20 => {
-                    *self.java_generate_equals_and_hash.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                27 => {
-                    *self.java_string_check_utf8.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                9 => {
-                    *self.optimize_for.push_and_get_mut() = variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::file_options::OptimizeMode>>()?;
-                }
-                11 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                16 => {
-                    *self.cc_generic_services.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                17 => {
-                    *self.java_generic_services.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                18 => {
-                    *self.py_generic_services.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                42 => {
-                    *self.php_generic_services.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                23 => {
-                    *self.deprecated.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                31 => {
-                    *self.cc_enable_arenas.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                36 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                37 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                39 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                40 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                41 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                44 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                45 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.java_package.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                8 => {
-                    *self.java_outer_classname.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                10 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.java_multiple_files, first, iter);
-                }
-                20 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.java_generate_equals_and_hash, first, iter);
-                }
-                27 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.java_string_check_utf8, first, iter);
-                }
-                9 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::file_options::OptimizeMode>>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.optimize_for, first, iter);
-                }
-                11 => {
-                    *self.go_package.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                16 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.cc_generic_services, first, iter);
-                }
-                17 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.java_generic_services, first, iter);
-                }
-                18 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.py_generic_services, first, iter);
-                }
-                42 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.php_generic_services, first, iter);
-                }
-                23 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.deprecated, first, iter);
-                }
-                31 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.cc_enable_arenas, first, iter);
-                }
-                36 => {
-                    *self.objc_class_prefix.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                37 => {
-                    *self.csharp_namespace.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                39 => {
-                    *self.swift_prefix.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                40 => {
-                    *self.php_class_prefix.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                41 => {
-                    *self.php_namespace.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                44 => {
-                    *self.php_metadata_namespace.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                45 => {
-                    *self.ruby_package.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 8 | 10 | 20 | 27 | 9 | 11 | 16 | 17 | 18 | 42 | 23 | 31 | 36 | 37 | 39 | 40 | 41 | 44 | 45 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 8 | 10 | 20 | 27 | 9 | 11 | 16 | 17 | 18 | 42 | 23 | 31 | 36 | 37 | 39 | 40 | 41 | 44 | 45 | 999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileOptionsBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -7449,16 +5119,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileOption
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for FileOptionsBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -7767,84 +5427,6 @@ impl ::std::default::Default for MethodDescriptorProto {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut MethodDescriptorProto {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                5 => {
-                    *self.client_streaming.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                6 => {
-                    *self.server_streaming.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    *self.input_type.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                3 => {
-                    *self.output_type.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                4 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                5 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.client_streaming, first, iter);
-                }
-                6 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.server_streaming, first, iter);
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 | 4 | 5 | 6 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 | 4 | 5 | 6 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -7918,16 +5500,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodDescript
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for MethodDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -8028,84 +5600,6 @@ impl<'b> MethodDescriptorProtoBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut MethodDescriptorProtoBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                5 => {
-                    *self.client_streaming.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                6 => {
-                    *self.server_streaming.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    *self.input_type.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                3 => {
-                    *self.output_type.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                4 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                5 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.client_streaming, first, iter);
-                }
-                6 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.server_streaming, first, iter);
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 | 4 | 5 | 6 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 | 4 | 5 | 6 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodDescriptorProtoBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -8179,16 +5673,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodDesc
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for MethodDescriptorProtoBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -8304,57 +5788,6 @@ impl ::std::default::Default for ServiceDescriptorProto {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ServiceDescriptorProto {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    let msg = self.method.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                3 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ServiceDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -8401,16 +5834,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ServiceDescrip
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for ServiceDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -8497,57 +5920,6 @@ impl<'b> ServiceDescriptorProtoBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ServiceDescriptorProtoBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    let msg = self.method.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                3 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for ServiceDescriptorProtoBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -8594,16 +5966,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for ServiceDes
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for ServiceDescriptorProtoBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -8718,63 +6080,6 @@ impl ::std::default::Default for EnumValueDescriptorProto {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumValueDescriptorProto {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => {
-                    *self.number.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.number, first, iter);
-                }
-                3 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumValueDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -8827,16 +6132,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumValueDescr
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for EnumValueDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -8911,63 +6206,6 @@ impl<'b> EnumValueDescriptorProtoBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumValueDescriptorProtoBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => {
-                    *self.number.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.number, first, iter);
-                }
-                3 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumValueDescriptorProtoBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -9020,16 +6258,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumValueD
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for EnumValueDescriptorProtoBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -9123,67 +6351,6 @@ impl ::std::default::Default for EnumDescriptorProto {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumDescriptorProto {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    let msg = self.value.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                3 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                4 => {
-                    let msg = self.reserved_range.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                5 => {
-                    *self.reserved_name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 | 4 | 5 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 | 4 | 5 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -9240,16 +6407,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumDescriptor
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for EnumDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -9380,67 +6537,6 @@ impl<'b> EnumDescriptorProtoBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumDescriptorProtoBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    let msg = self.value.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                3 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                4 => {
-                    let msg = self.reserved_range.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                5 => {
-                    *self.reserved_name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 | 4 | 5 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 | 4 | 5 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumDescriptorProtoBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -9497,16 +6593,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumDescri
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for EnumDescriptorProtoBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -9690,64 +6776,6 @@ impl ::std::default::Default for EnumReservedRange {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumReservedRange {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.start.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                2 => {
-                    *self.end.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.start, first, iter);
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.end, first, iter);
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumReservedRange {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -9801,16 +6829,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumReservedRa
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for EnumReservedRange {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -9879,64 +6897,6 @@ impl<'b> EnumReservedRangeBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut EnumReservedRangeBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.start.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                2 => {
-                    *self.end.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.start, first, iter);
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.end, first, iter);
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumReservedRangeBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -9990,16 +6950,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumReserv
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for EnumReservedRangeBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -10082,52 +7032,6 @@ impl ::std::default::Default for OneofDescriptorProto {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut OneofDescriptorProto {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -10169,16 +7073,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofDescripto
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for OneofDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -10243,52 +7137,6 @@ impl<'b> OneofDescriptorProtoBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut OneofDescriptorProtoBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofDescriptorProtoBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -10330,16 +7178,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofDescr
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for OneofDescriptorProtoBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -10432,127 +7270,6 @@ impl FieldDescriptorProto {
 impl ::std::default::Default for FieldDescriptorProto {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FieldDescriptorProto {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => {
-                    *self.number.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                4 => {
-                    *self.label.push_and_get_mut() = variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_descriptor_proto::Label>>()?;
-                }
-                5 => {
-                    *self.type_.push_and_get_mut() = variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_descriptor_proto::Type>>()?;
-                }
-                6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                9 => {
-                    *self.oneof_index.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                17 => {
-                    *self.proto3_optional.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                3 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.number, first, iter);
-                }
-                4 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_descriptor_proto::Label>>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.label, first, iter);
-                }
-                5 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_descriptor_proto::Type>>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.type_, first, iter);
-                }
-                6 => {
-                    *self.type_name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    *self.extendee.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                7 => {
-                    *self.default_value.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                9 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.oneof_index, first, iter);
-                }
-                10 => {
-                    *self.json_name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                8 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                17 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.proto3_optional, first, iter);
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 3 | 4 | 5 | 6 | 2 | 7 | 9 | 10 | 8 | 17 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 3 | 4 | 5 | 6 | 2 | 7 | 9 | 10 | 8 | 17 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
     }
 }
 
@@ -10672,16 +7389,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldDescripto
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for FieldDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -10828,127 +7535,6 @@ impl<'b> FieldDescriptorProtoBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FieldDescriptorProtoBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => {
-                    *self.number.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                4 => {
-                    *self.label.push_and_get_mut() = variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_descriptor_proto::Label>>()?;
-                }
-                5 => {
-                    *self.type_.push_and_get_mut() = variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_descriptor_proto::Type>>()?;
-                }
-                6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                9 => {
-                    *self.oneof_index.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                17 => {
-                    *self.proto3_optional.push_and_get_mut() = variant.to_native::<::puroro::tags::Bool>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                3 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.number, first, iter);
-                }
-                4 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_descriptor_proto::Label>>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.label, first, iter);
-                }
-                5 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_descriptor_proto::Type>>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.type_, first, iter);
-                }
-                6 => {
-                    *self.type_name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    *self.extendee.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                7 => {
-                    *self.default_value.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                9 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.oneof_index, first, iter);
-                }
-                10 => {
-                    *self.json_name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                8 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                17 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.proto3_optional, first, iter);
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 3 | 4 | 5 | 6 | 2 | 7 | 9 | 10 | 8 | 17 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 3 | 4 | 5 | 6 | 2 | 7 | 9 | 10 | 8 | 17 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldDescriptorProtoBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -11065,16 +7651,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldDescr
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for FieldDescriptorProtoBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -11308,47 +7884,6 @@ impl ::std::default::Default for ExtensionRangeOptions {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ExtensionRangeOptions {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ExtensionRangeOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -11385,16 +7920,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ExtensionRange
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for ExtensionRangeOptions {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -11465,47 +7990,6 @@ impl<'b> ExtensionRangeOptionsBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ExtensionRangeOptionsBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                999 => {
-                    let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                999 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for ExtensionRangeOptionsBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -11542,16 +8026,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for ExtensionR
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for ExtensionRangeOptionsBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -11664,92 +8138,6 @@ impl ::std::default::Default for DescriptorProto {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut DescriptorProto {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                9 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    let msg = self.field.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                6 => {
-                    let msg = self.extension.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                3 => {
-                    let msg = self.nested_type.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                4 => {
-                    let msg = self.enum_type.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                5 => {
-                    let msg = self.extension_range.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                8 => {
-                    let msg = self.oneof_decl.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                7 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                9 => {
-                    let msg = self.reserved_range.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                10 => {
-                    *self.reserved_name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 6 | 3 | 4 | 5 | 8 | 7 | 9 | 10 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 6 | 3 | 4 | 5 | 8 | 7 | 9 | 10 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for DescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -11831,16 +8219,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for DescriptorProt
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for DescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -12081,92 +8459,6 @@ impl<'b> DescriptorProtoBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut DescriptorProtoBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                9 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    let msg = self.field.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                6 => {
-                    let msg = self.extension.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                3 => {
-                    let msg = self.nested_type.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                4 => {
-                    let msg = self.enum_type.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                5 => {
-                    let msg = self.extension_range.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                8 => {
-                    let msg = self.oneof_decl.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                7 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                9 => {
-                    let msg = self.reserved_range.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                10 => {
-                    *self.reserved_name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 6 | 3 | 4 | 5 | 8 | 7 | 9 | 10 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 6 | 3 | 4 | 5 | 8 | 7 | 9 | 10 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for DescriptorProtoBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -12248,16 +8540,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Descriptor
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for DescriptorProtoBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -12616,64 +8898,6 @@ impl ::std::default::Default for ReservedRange {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ReservedRange {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.start.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                2 => {
-                    *self.end.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.start, first, iter);
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.end, first, iter);
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ReservedRange {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -12727,16 +8951,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ReservedRange 
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for ReservedRange {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -12805,64 +9019,6 @@ impl<'b> ReservedRangeBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ReservedRangeBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.start.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                2 => {
-                    *self.end.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.start, first, iter);
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.end, first, iter);
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for ReservedRangeBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -12916,16 +9072,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for ReservedRa
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for ReservedRangeBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -13009,69 +9155,6 @@ impl ::std::default::Default for ExtensionRange {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ExtensionRange {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.start.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                2 => {
-                    *self.end.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.start, first, iter);
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.end, first, iter);
-                }
-                3 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ExtensionRange {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -13130,16 +9213,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ExtensionRange
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for ExtensionRange {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -13216,69 +9289,6 @@ impl<'b> ExtensionRangeBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut ExtensionRangeBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => {
-                    *self.start.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                2 => {
-                    *self.end.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.start, first, iter);
-                }
-                2 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.end, first, iter);
-                }
-                3 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for ExtensionRangeBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -13337,16 +9347,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for ExtensionR
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for ExtensionRangeBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -13457,114 +9457,6 @@ impl ::std::default::Default for FileDescriptorProto {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileDescriptorProto {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                10 => {
-                    *self.public_dependency.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                11 => {
-                    *self.weak_dependency.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                9 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                12 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    *self.package.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                3 => {
-                    *self.dependency.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                10 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.public_dependency, first, iter);
-                }
-                11 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.weak_dependency, first, iter);
-                }
-                4 => {
-                    let msg = self.message_type.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                5 => {
-                    let msg = self.enum_type.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                6 => {
-                    let msg = self.service.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                7 => {
-                    let msg = self.extension.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                8 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                9 => {
-                    let msg = self.source_code_info.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                12 => {
-                    *self.syntax.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 | 10 | 11 | 4 | 5 | 6 | 7 | 8 | 9 | 12 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 | 10 | 11 | 4 | 5 | 6 | 7 | 8 | 9 | 12 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -13668,16 +9560,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDescriptor
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for FileDescriptorProto {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -13924,114 +9806,6 @@ impl<'b> FileDescriptorProtoBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileDescriptorProtoBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                10 => {
-                    *self.public_dependency.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                11 => {
-                    *self.weak_dependency.push_and_get_mut() = variant.to_native::<::puroro::tags::Int32>()?;
-                }
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                7 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                9 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                12 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    *self.name.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                2 => {
-                    *self.package.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                3 => {
-                    *self.dependency.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                10 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.public_dependency, first, iter);
-                }
-                11 => {
-                    let values = ldd.deserialize_as_variants().map(|rv| {
-                        rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
-                    }).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
-                    let mut iter = values.into_iter();
-                    let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
-                    MaybeRepeatedVariantField::extend(&mut self.weak_dependency, first, iter);
-                }
-                4 => {
-                    let msg = self.message_type.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                5 => {
-                    let msg = self.enum_type.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                6 => {
-                    let msg = self.service.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                7 => {
-                    let msg = self.extension.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                8 => {
-                    let msg = self.options.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                9 => {
-                    let msg = self.source_code_info.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                12 => {
-                    *self.syntax.push_and_get_mut()
-                        = ldd.deserialize_as_chars().collect::<::puroro::Result<_>>()?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 | 2 | 3 | 10 | 11 | 4 | 5 | 6 | 7 | 8 | 9 | 12 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 | 2 | 3 | 10 | 11 | 4 | 5 | 6 | 7 | 8 | 9 | 12 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDescriptorProtoBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -14135,16 +9909,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDescri
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for FileDescriptorProtoBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -14493,47 +10257,6 @@ impl ::std::default::Default for FileDescriptorSet {
     }
 }
 
-impl<'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileDescriptorSet {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let msg = self.file.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-
 impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDescriptorSet {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -14570,16 +10293,6 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDescriptor
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-
-impl ::puroro::Deserializable for FileDescriptorSet {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
@@ -14650,47 +10363,6 @@ impl<'b> FileDescriptorSetBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b, 'a> ::puroro::deserializer::MessageDeserializeEventHandler for &'a mut FileDescriptorSetBumpalo<'b> {
-    type Target = ();
-    fn finish(self) -> ::puroro::Result<Self::Target> {
-        Ok(())
-    }
-    fn met_field<T: ::puroro::deserializer::bytes::LengthDelimitedDeserializer>(
-        &mut self,
-        field: ::puroro::types::FieldData<T>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> {
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
-        match field {
-            ::puroro::types::FieldData::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::LengthDelimited(ldd) => match field_number {
-                1 => {
-                    let msg = self.file.push_and_get_mut2(&self.puroro_internal);
-                    ldd.deserialize_as_message(msg)?;
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits32(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-            ::puroro::types::FieldData::Bits64(bytes) => match field_number {
-                1 => {
-                    Err(::puroro::PuroroError::UnexpectedWireType)?
-                }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
-            }
-        }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
 impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDescriptorSetBumpalo<'b> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -14727,16 +10399,6 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDescri
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
         }
-        Ok(())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Deserializable for FileDescriptorSetBumpalo<'b> {
-    fn deser_from_bytes<I: Iterator<Item = ::std::io::Result<u8>>>(
-            &mut self, iter: I) -> ::puroro::Result<()> {
-        use ::puroro::deserializer::Deserializer;
-        let deserializer = ::puroro::deserializer::bytes::deserializer_from_bytes(iter);
-        deserializer.deserialize(self)?;
         Ok(())
     }
 }
