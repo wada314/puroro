@@ -1,4 +1,5 @@
 mod enums;
+mod message_frags;
 mod message_impls;
 mod message_traits;
 mod writer;
@@ -14,7 +15,6 @@ use std::fmt::Write;
 
 use self::message_impls::MessageImplCodeGenerator;
 use self::message_traits::MessageTraitCodeGenerator;
-use message_impls::MessageImplFragmentGenerator;
 
 struct Visitor<'c> {
     output: Indentor<String>,
