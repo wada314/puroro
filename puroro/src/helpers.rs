@@ -18,11 +18,11 @@ pub trait MaybeRepeatedField<'a> {
     /// If this field is a repeated field, then the iterator iterates
     /// over the repeated items.
     fn iter_for_ser(&'a self) -> Self::Iter;
-    /// Returns an mutable reference for the:
+    /// Returns a mutable reference for the:
     /// - Optional / required field: The field item.
     /// - Repeated field: A new item pushed into the tail of the list.
     fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item;
-    fn push_and_get_mut2<T>(&'a mut self, internal: &'a T) -> &'a mut Self::Item
+    fn push_and_get_mut2<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
     where
         T: InternalData,
     {
@@ -336,7 +336,7 @@ where
 pub trait InternalData {
     #[cfg(feature = "puroro-bumpalo")]
     fn bumpalo(&self) -> &bumpalo::Bump {
-        panic!("The Bumpalo data field should only be owned by a Bumpalo struct!")
+        panic!("The Bumpalo data field is only available for a Bumpalo struct!")
     }
 }
 
