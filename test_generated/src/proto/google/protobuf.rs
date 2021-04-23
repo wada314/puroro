@@ -93,19 +93,22 @@ impl ::puroro::Serializable for GeneratedCodeInfo {
 }
 
 impl GeneratedCodeInfoTrait for GeneratedCodeInfo {
+    type AnnotationType = generated_code_info::Annotation;
     fn for_each_annotation<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::generated_code_info::Annotation) {
+        F: FnMut(&'_ generated_code_info::Annotation)
+    {
         for item in (self.annotation).iter() {
             (f)(item);
         }
     }
-    fn annotation_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::generated_code_info::Annotation>> {
+    fn annotation_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ generated_code_info::Annotation>>
+    {
         ::std::boxed::Box::new(self.annotation.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type AnnotationIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::generated_code_info::Annotation>;
+    type AnnotationIter<'a> = impl Iterator<Item=&'a generated_code_info::Annotation>;
     #[cfg(feature = "puroro-nightly")]
     fn annotation_iter(&self) -> Self::AnnotationIter<'_> {
         self.annotation.iter()
@@ -202,19 +205,22 @@ impl<'bump> ::puroro::Serializable for GeneratedCodeInfoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl GeneratedCodeInfoTrait for GeneratedCodeInfoBumpalo {
+    type AnnotationType = generated_code_info::AnnotationBumpalo;
     fn for_each_annotation<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::generated_code_info::Annotation) {
+        F: FnMut(&'_ generated_code_info::Annotation)
+    {
         for item in (self.annotation).iter() {
             (f)(item);
         }
     }
-    fn annotation_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::generated_code_info::Annotation>> {
+    fn annotation_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ generated_code_info::Annotation>>
+    {
         ::std::boxed::Box::new(self.annotation.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type AnnotationIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::generated_code_info::Annotation>;
+    type AnnotationIter<'a> = impl Iterator<Item=&'a generated_code_info::Annotation>;
     #[cfg(feature = "puroro-nightly")]
     fn annotation_iter(&self) -> Self::AnnotationIter<'_> {
         self.annotation.iter()
@@ -230,13 +236,14 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for GeneratedCodeInfoBumpalo<'bum
     }
 }
 pub trait GeneratedCodeInfoTrait {
+    type AnnotationType: generated_code_info::AnnotationTrait;
     fn for_each_annotation<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::generated_code_info::Annotation);
+        F: FnMut(&'_ generated_code_info::Annotation);
     fn annotation_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::generated_code_info::Annotation>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ generated_code_info::Annotation>>;
     #[cfg(feature = "puroro-nightly")]
-    type AnnotationIter<'a>: Iterator<Item=&'a super::super::google::protobuf::generated_code_info::Annotation>;
+    type AnnotationIter<'a>: Iterator<Item=&'a generated_code_info::Annotation>;
     #[cfg(feature = "puroro-nightly")]
     fn annotation_iter(&self) -> Self::AnnotationIter<'_>;
 }
@@ -397,13 +404,15 @@ impl ::puroro::Serializable for Annotation {
 impl AnnotationTrait for Annotation {
     fn for_each_path<F>(&self, mut f: F)
     where
-        F: FnMut(i32) {
+        F: FnMut(i32)
+    {
         for item in (self.path).iter().cloned() {
             (f)(item);
         }
     }
-    fn path_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+    fn path_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
+    {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
@@ -412,7 +421,7 @@ impl AnnotationTrait for Annotation {
     fn path_iter(&self) -> Self::PathIter<'_> {
         self.path.iter().cloned()
     }
-    fn source_file(&self) -> &str {
+    fn source_file(&self) -> &'_ str {
         self.source_file.as_ref()
     }
     fn begin(&self) -> i32 {
@@ -569,13 +578,15 @@ impl<'bump> ::puroro::Serializable for AnnotationBumpalo<'bump> {
 impl AnnotationTrait for AnnotationBumpalo {
     fn for_each_path<F>(&self, mut f: F)
     where
-        F: FnMut(i32) {
+        F: FnMut(i32)
+    {
         for item in (self.path).iter().cloned() {
             (f)(item);
         }
     }
-    fn path_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+    fn path_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
+    {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
@@ -584,7 +595,7 @@ impl AnnotationTrait for AnnotationBumpalo {
     fn path_iter(&self) -> Self::PathIter<'_> {
         self.path.iter().cloned()
     }
-    fn source_file(&self) -> &str {
+    fn source_file(&self) -> &'_ str {
         self.source_file.as_ref()
     }
     fn begin(&self) -> i32 {
@@ -613,9 +624,9 @@ pub trait AnnotationTrait {
     type PathIter<'a>: Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn path_iter(&self) -> Self::PathIter<'_>;
-    fn source_file(&self) -> &str;
-    fn begin(&self) -> i32;
-    fn end(&self) -> i32;
+    fn source_file(&'_ self) -> &'_ str;
+    fn begin(&'_ self) -> i32;
+    fn end(&'_ self) -> i32;
 }
 pub trait AnnotationMutTrait {
     fn for_each_path_mut<F>(&self, f: F)
@@ -721,19 +732,22 @@ impl ::puroro::Serializable for SourceCodeInfo {
 }
 
 impl SourceCodeInfoTrait for SourceCodeInfo {
+    type LocationType = source_code_info::Location;
     fn for_each_location<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::source_code_info::Location) {
+        F: FnMut(&'_ source_code_info::Location)
+    {
         for item in (self.location).iter() {
             (f)(item);
         }
     }
-    fn location_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::source_code_info::Location>> {
+    fn location_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ source_code_info::Location>>
+    {
         ::std::boxed::Box::new(self.location.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type LocationIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::source_code_info::Location>;
+    type LocationIter<'a> = impl Iterator<Item=&'a source_code_info::Location>;
     #[cfg(feature = "puroro-nightly")]
     fn location_iter(&self) -> Self::LocationIter<'_> {
         self.location.iter()
@@ -830,19 +844,22 @@ impl<'bump> ::puroro::Serializable for SourceCodeInfoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl SourceCodeInfoTrait for SourceCodeInfoBumpalo {
+    type LocationType = source_code_info::LocationBumpalo;
     fn for_each_location<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::source_code_info::Location) {
+        F: FnMut(&'_ source_code_info::Location)
+    {
         for item in (self.location).iter() {
             (f)(item);
         }
     }
-    fn location_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::source_code_info::Location>> {
+    fn location_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ source_code_info::Location>>
+    {
         ::std::boxed::Box::new(self.location.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type LocationIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::source_code_info::Location>;
+    type LocationIter<'a> = impl Iterator<Item=&'a source_code_info::Location>;
     #[cfg(feature = "puroro-nightly")]
     fn location_iter(&self) -> Self::LocationIter<'_> {
         self.location.iter()
@@ -858,13 +875,14 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for SourceCodeInfoBumpalo<'bump> 
     }
 }
 pub trait SourceCodeInfoTrait {
+    type LocationType: source_code_info::LocationTrait;
     fn for_each_location<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::source_code_info::Location);
+        F: FnMut(&'_ source_code_info::Location);
     fn location_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::source_code_info::Location>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ source_code_info::Location>>;
     #[cfg(feature = "puroro-nightly")]
-    type LocationIter<'a>: Iterator<Item=&'a super::super::google::protobuf::source_code_info::Location>;
+    type LocationIter<'a>: Iterator<Item=&'a source_code_info::Location>;
     #[cfg(feature = "puroro-nightly")]
     fn location_iter(&self) -> Self::LocationIter<'_>;
 }
@@ -1027,13 +1045,15 @@ impl ::puroro::Serializable for Location {
 impl LocationTrait for Location {
     fn for_each_path<F>(&self, mut f: F)
     where
-        F: FnMut(i32) {
+        F: FnMut(i32)
+    {
         for item in (self.path).iter().cloned() {
             (f)(item);
         }
     }
-    fn path_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+    fn path_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
+    {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
@@ -1044,13 +1064,15 @@ impl LocationTrait for Location {
     }
     fn for_each_span<F>(&self, mut f: F)
     where
-        F: FnMut(i32) {
+        F: FnMut(i32)
+    {
         for item in (self.span).iter().cloned() {
             (f)(item);
         }
     }
-    fn span_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+    fn span_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
+    {
         ::std::boxed::Box::new(self.span.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
@@ -1059,21 +1081,23 @@ impl LocationTrait for Location {
     fn span_iter(&self) -> Self::SpanIter<'_> {
         self.span.iter().cloned()
     }
-    fn leading_comments(&self) -> &str {
+    fn leading_comments(&self) -> &'_ str {
         self.leading_comments.as_ref()
     }
-    fn trailing_comments(&self) -> &str {
+    fn trailing_comments(&self) -> &'_ str {
         self.trailing_comments.as_ref()
     }
     fn for_each_leading_detached_comments<F>(&self, mut f: F)
     where
-        F: FnMut(&str) {
+        F: FnMut(&'_ str)
+    {
         for item in (self.leading_detached_comments).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn leading_detached_comments_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+    fn leading_detached_comments_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
+    {
         ::std::boxed::Box::new(self.leading_detached_comments.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
@@ -1232,13 +1256,15 @@ impl<'bump> ::puroro::Serializable for LocationBumpalo<'bump> {
 impl LocationTrait for LocationBumpalo {
     fn for_each_path<F>(&self, mut f: F)
     where
-        F: FnMut(i32) {
+        F: FnMut(i32)
+    {
         for item in (self.path).iter().cloned() {
             (f)(item);
         }
     }
-    fn path_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+    fn path_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
+    {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
@@ -1249,13 +1275,15 @@ impl LocationTrait for LocationBumpalo {
     }
     fn for_each_span<F>(&self, mut f: F)
     where
-        F: FnMut(i32) {
+        F: FnMut(i32)
+    {
         for item in (self.span).iter().cloned() {
             (f)(item);
         }
     }
-    fn span_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+    fn span_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
+    {
         ::std::boxed::Box::new(self.span.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
@@ -1264,21 +1292,23 @@ impl LocationTrait for LocationBumpalo {
     fn span_iter(&self) -> Self::SpanIter<'_> {
         self.span.iter().cloned()
     }
-    fn leading_comments(&self) -> &str {
+    fn leading_comments(&self) -> &'_ str {
         self.leading_comments.as_ref()
     }
-    fn trailing_comments(&self) -> &str {
+    fn trailing_comments(&self) -> &'_ str {
         self.trailing_comments.as_ref()
     }
     fn for_each_leading_detached_comments<F>(&self, mut f: F)
     where
-        F: FnMut(&str) {
+        F: FnMut(&'_ str)
+    {
         for item in (self.leading_detached_comments).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn leading_detached_comments_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+    fn leading_detached_comments_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
+    {
         ::std::boxed::Box::new(self.leading_detached_comments.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
@@ -1316,13 +1346,13 @@ pub trait LocationTrait {
     type SpanIter<'a>: Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn span_iter(&self) -> Self::SpanIter<'_>;
-    fn leading_comments(&self) -> &str;
-    fn trailing_comments(&self) -> &str;
+    fn leading_comments(&'_ self) -> &'_ str;
+    fn trailing_comments(&'_ self) -> &'_ str;
     fn for_each_leading_detached_comments<F>(&self, f: F)
     where
-        F: FnMut(&str);
+        F: FnMut(&'_ str);
     fn leading_detached_comments_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>;
     #[cfg(feature = "puroro-nightly")]
     type LeadingDetachedCommentsIter<'a>: Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
@@ -1521,24 +1551,27 @@ impl ::puroro::Serializable for UninterpretedOption {
 }
 
 impl UninterpretedOptionTrait for UninterpretedOption {
+    type NameType = uninterpreted_option::NamePart;
     fn for_each_name<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::uninterpreted_option::NamePart) {
+        F: FnMut(&'_ uninterpreted_option::NamePart)
+    {
         for item in (self.name).iter() {
             (f)(item);
         }
     }
-    fn name_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::uninterpreted_option::NamePart>> {
+    fn name_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ uninterpreted_option::NamePart>>
+    {
         ::std::boxed::Box::new(self.name.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type NameIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::uninterpreted_option::NamePart>;
+    type NameIter<'a> = impl Iterator<Item=&'a uninterpreted_option::NamePart>;
     #[cfg(feature = "puroro-nightly")]
     fn name_iter(&self) -> Self::NameIter<'_> {
         self.name.iter()
     }
-    fn identifier_value(&self) -> &str {
+    fn identifier_value(&self) -> &'_ str {
         self.identifier_value.as_ref()
     }
     fn positive_int_value(&self) -> u64 {
@@ -1550,10 +1583,10 @@ impl UninterpretedOptionTrait for UninterpretedOption {
     fn double_value(&self) -> f64 {
         self.double_value.clone()
     }
-    fn string_value(&self) -> &[u8] {
+    fn string_value(&self) -> &'_ [u8] {
         self.string_value.as_ref()
     }
-    fn aggregate_value(&self) -> &str {
+    fn aggregate_value(&self) -> &'_ str {
         self.aggregate_value.as_ref()
     }
 }
@@ -1726,24 +1759,27 @@ impl<'bump> ::puroro::Serializable for UninterpretedOptionBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl UninterpretedOptionTrait for UninterpretedOptionBumpalo {
+    type NameType = uninterpreted_option::NamePartBumpalo;
     fn for_each_name<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::uninterpreted_option::NamePart) {
+        F: FnMut(&'_ uninterpreted_option::NamePart)
+    {
         for item in (self.name).iter() {
             (f)(item);
         }
     }
-    fn name_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::uninterpreted_option::NamePart>> {
+    fn name_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ uninterpreted_option::NamePart>>
+    {
         ::std::boxed::Box::new(self.name.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type NameIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::uninterpreted_option::NamePart>;
+    type NameIter<'a> = impl Iterator<Item=&'a uninterpreted_option::NamePart>;
     #[cfg(feature = "puroro-nightly")]
     fn name_iter(&self) -> Self::NameIter<'_> {
         self.name.iter()
     }
-    fn identifier_value(&self) -> &str {
+    fn identifier_value(&self) -> &'_ str {
         self.identifier_value.as_ref()
     }
     fn positive_int_value(&self) -> u64 {
@@ -1755,10 +1791,10 @@ impl UninterpretedOptionTrait for UninterpretedOptionBumpalo {
     fn double_value(&self) -> f64 {
         self.double_value.clone()
     }
-    fn string_value(&self) -> &[u8] {
+    fn string_value(&self) -> &'_ [u8] {
         self.string_value.as_ref()
     }
-    fn aggregate_value(&self) -> &str {
+    fn aggregate_value(&self) -> &'_ str {
         self.aggregate_value.as_ref()
     }
 }
@@ -1772,21 +1808,22 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for UninterpretedOptionBumpalo<'b
     }
 }
 pub trait UninterpretedOptionTrait {
+    type NameType: uninterpreted_option::NamePartTrait;
     fn for_each_name<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::uninterpreted_option::NamePart);
+        F: FnMut(&'_ uninterpreted_option::NamePart);
     fn name_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::uninterpreted_option::NamePart>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ uninterpreted_option::NamePart>>;
     #[cfg(feature = "puroro-nightly")]
-    type NameIter<'a>: Iterator<Item=&'a super::super::google::protobuf::uninterpreted_option::NamePart>;
+    type NameIter<'a>: Iterator<Item=&'a uninterpreted_option::NamePart>;
     #[cfg(feature = "puroro-nightly")]
     fn name_iter(&self) -> Self::NameIter<'_>;
-    fn identifier_value(&self) -> &str;
-    fn positive_int_value(&self) -> u64;
-    fn negative_int_value(&self) -> i64;
-    fn double_value(&self) -> f64;
-    fn string_value(&self) -> &[u8];
-    fn aggregate_value(&self) -> &str;
+    fn identifier_value(&'_ self) -> &'_ str;
+    fn positive_int_value(&'_ self) -> u64;
+    fn negative_int_value(&'_ self) -> i64;
+    fn double_value(&'_ self) -> f64;
+    fn string_value(&'_ self) -> &'_ [u8];
+    fn aggregate_value(&'_ self) -> &'_ str;
 }
 pub trait UninterpretedOptionMutTrait {
     fn for_each_name_mut<F>(&self, f: F)
@@ -1913,7 +1950,7 @@ impl ::puroro::Serializable for NamePart {
 }
 
 impl NamePartTrait for NamePart {
-    fn name_part(&self) -> &str {
+    fn name_part(&self) -> &'_ str {
         self.name_part.as_ref()
     }
     fn is_extension(&self) -> bool {
@@ -2029,7 +2066,7 @@ impl<'bump> ::puroro::Serializable for NamePartBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl NamePartTrait for NamePartBumpalo {
-    fn name_part(&self) -> &str {
+    fn name_part(&self) -> &'_ str {
         self.name_part.as_ref()
     }
     fn is_extension(&self) -> bool {
@@ -2046,8 +2083,8 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for NamePartBumpalo<'bump> {
     }
 }
 pub trait NamePartTrait {
-    fn name_part(&self) -> &str;
-    fn is_extension(&self) -> bool;
+    fn name_part(&'_ self) -> &'_ str;
+    fn is_extension(&'_ self) -> bool;
 }
 pub trait NamePartMutTrait {
     fn name_part_mut(&self) -> &mut String;
@@ -2185,22 +2222,25 @@ impl MethodOptionsTrait for MethodOptions {
     fn deprecated(&self) -> bool {
         self.deprecated.clone()
     }
-    fn idempotency_level(&self) -> ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32> {
+    fn idempotency_level(&self) -> ::std::result::Result<method_options::IdempotencyLevel, i32> {
         self.idempotency_level.clone()
     }
+    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2336,22 +2376,25 @@ impl MethodOptionsTrait for MethodOptionsBumpalo {
     fn deprecated(&self) -> bool {
         self.deprecated.clone()
     }
-    fn idempotency_level(&self) -> ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32> {
+    fn idempotency_level(&self) -> ::std::result::Result<method_options::IdempotencyLevel, i32> {
         self.idempotency_level.clone()
     }
+    type UninterpretedOptionType = UninterpretedOptionBumpalo;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2367,15 +2410,16 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for MethodOptionsBumpalo<'bump> {
     }
 }
 pub trait MethodOptionsTrait {
-    fn deprecated(&self) -> bool;
-    fn idempotency_level(&self) -> ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>;
+    fn deprecated(&'_ self) -> bool;
+    fn idempotency_level(&'_ self) -> ::std::result::Result<method_options::IdempotencyLevel, i32>;
+    type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&'_ UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>;
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
@@ -2526,19 +2570,22 @@ impl ServiceOptionsTrait for ServiceOptions {
     fn deprecated(&self) -> bool {
         self.deprecated.clone()
     }
+    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2656,19 +2703,22 @@ impl ServiceOptionsTrait for ServiceOptionsBumpalo {
     fn deprecated(&self) -> bool {
         self.deprecated.clone()
     }
+    type UninterpretedOptionType = UninterpretedOptionBumpalo;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2684,14 +2734,15 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for ServiceOptionsBumpalo<'bump> 
     }
 }
 pub trait ServiceOptionsTrait {
-    fn deprecated(&self) -> bool;
+    fn deprecated(&'_ self) -> bool;
+    type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&'_ UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>;
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
@@ -2817,19 +2868,22 @@ impl EnumValueOptionsTrait for EnumValueOptions {
     fn deprecated(&self) -> bool {
         self.deprecated.clone()
     }
+    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2947,19 +3001,22 @@ impl EnumValueOptionsTrait for EnumValueOptionsBumpalo {
     fn deprecated(&self) -> bool {
         self.deprecated.clone()
     }
+    type UninterpretedOptionType = UninterpretedOptionBumpalo;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2975,14 +3032,15 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumValueOptionsBumpalo<'bump
     }
 }
 pub trait EnumValueOptionsTrait {
-    fn deprecated(&self) -> bool;
+    fn deprecated(&'_ self) -> bool;
+    type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&'_ UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>;
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
@@ -3129,19 +3187,22 @@ impl EnumOptionsTrait for EnumOptions {
     fn deprecated(&self) -> bool {
         self.deprecated.clone()
     }
+    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -3280,19 +3341,22 @@ impl EnumOptionsTrait for EnumOptionsBumpalo {
     fn deprecated(&self) -> bool {
         self.deprecated.clone()
     }
+    type UninterpretedOptionType = UninterpretedOptionBumpalo;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -3308,15 +3372,16 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumOptionsBumpalo<'bump> {
     }
 }
 pub trait EnumOptionsTrait {
-    fn allow_alias(&self) -> bool;
-    fn deprecated(&self) -> bool;
+    fn allow_alias(&'_ self) -> bool;
+    fn deprecated(&'_ self) -> bool;
+    type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&'_ UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>;
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
@@ -3422,19 +3487,22 @@ impl ::puroro::Serializable for OneofOptions {
 }
 
 impl OneofOptionsTrait for OneofOptions {
+    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -3531,19 +3599,22 @@ impl<'bump> ::puroro::Serializable for OneofOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl OneofOptionsTrait for OneofOptionsBumpalo {
+    type UninterpretedOptionType = UninterpretedOptionBumpalo;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -3559,13 +3630,14 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for OneofOptionsBumpalo<'bump> {
     }
 }
 pub trait OneofOptionsTrait {
+    type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&'_ UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>;
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
@@ -3777,13 +3849,13 @@ impl ::puroro::Serializable for FieldOptions {
 }
 
 impl FieldOptionsTrait for FieldOptions {
-    fn ctype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32> {
+    fn ctype(&self) -> ::std::result::Result<field_options::Ctype, i32> {
         self.ctype.clone()
     }
     fn packed(&self) -> bool {
         self.packed.clone()
     }
-    fn jstype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32> {
+    fn jstype(&self) -> ::std::result::Result<field_options::Jstype, i32> {
         self.jstype.clone()
     }
     fn lazy(&self) -> bool {
@@ -3795,19 +3867,22 @@ impl FieldOptionsTrait for FieldOptions {
     fn weak(&self) -> bool {
         self.weak.clone()
     }
+    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -4012,13 +4087,13 @@ impl<'bump> ::puroro::Serializable for FieldOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl FieldOptionsTrait for FieldOptionsBumpalo {
-    fn ctype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32> {
+    fn ctype(&self) -> ::std::result::Result<field_options::Ctype, i32> {
         self.ctype.clone()
     }
     fn packed(&self) -> bool {
         self.packed.clone()
     }
-    fn jstype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32> {
+    fn jstype(&self) -> ::std::result::Result<field_options::Jstype, i32> {
         self.jstype.clone()
     }
     fn lazy(&self) -> bool {
@@ -4030,19 +4105,22 @@ impl FieldOptionsTrait for FieldOptionsBumpalo {
     fn weak(&self) -> bool {
         self.weak.clone()
     }
+    type UninterpretedOptionType = UninterpretedOptionBumpalo;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -4058,19 +4136,20 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for FieldOptionsBumpalo<'bump> {
     }
 }
 pub trait FieldOptionsTrait {
-    fn ctype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>;
-    fn packed(&self) -> bool;
-    fn jstype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32>;
-    fn lazy(&self) -> bool;
-    fn deprecated(&self) -> bool;
-    fn weak(&self) -> bool;
+    fn ctype(&'_ self) -> ::std::result::Result<field_options::Ctype, i32>;
+    fn packed(&'_ self) -> bool;
+    fn jstype(&'_ self) -> ::std::result::Result<field_options::Jstype, i32>;
+    fn lazy(&'_ self) -> bool;
+    fn deprecated(&'_ self) -> bool;
+    fn weak(&'_ self) -> bool;
+    type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&'_ UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>;
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
@@ -4310,19 +4389,22 @@ impl MessageOptionsTrait for MessageOptions {
     fn map_entry(&self) -> bool {
         self.map_entry.clone()
     }
+    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -4503,19 +4585,22 @@ impl MessageOptionsTrait for MessageOptionsBumpalo {
     fn map_entry(&self) -> bool {
         self.map_entry.clone()
     }
+    type UninterpretedOptionType = UninterpretedOptionBumpalo;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -4531,17 +4616,18 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for MessageOptionsBumpalo<'bump> 
     }
 }
 pub trait MessageOptionsTrait {
-    fn message_set_wire_format(&self) -> bool;
-    fn no_standard_descriptor_accessor(&self) -> bool;
-    fn deprecated(&self) -> bool;
-    fn map_entry(&self) -> bool;
+    fn message_set_wire_format(&'_ self) -> bool;
+    fn no_standard_descriptor_accessor(&'_ self) -> bool;
+    fn deprecated(&'_ self) -> bool;
+    fn map_entry(&'_ self) -> bool;
+    type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&'_ UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>;
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
@@ -4929,10 +5015,10 @@ impl ::puroro::Serializable for FileOptions {
 }
 
 impl FileOptionsTrait for FileOptions {
-    fn java_package(&self) -> &str {
+    fn java_package(&self) -> &'_ str {
         self.java_package.as_ref()
     }
-    fn java_outer_classname(&self) -> &str {
+    fn java_outer_classname(&self) -> &'_ str {
         self.java_outer_classname.as_ref()
     }
     fn java_multiple_files(&self) -> bool {
@@ -4944,10 +5030,10 @@ impl FileOptionsTrait for FileOptions {
     fn java_string_check_utf8(&self) -> bool {
         self.java_string_check_utf8.clone()
     }
-    fn optimize_for(&self) -> ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32> {
+    fn optimize_for(&self) -> ::std::result::Result<file_options::OptimizeMode, i32> {
         self.optimize_for.clone()
     }
-    fn go_package(&self) -> &str {
+    fn go_package(&self) -> &'_ str {
         self.go_package.as_ref()
     }
     fn cc_generic_services(&self) -> bool {
@@ -4968,40 +5054,43 @@ impl FileOptionsTrait for FileOptions {
     fn cc_enable_arenas(&self) -> bool {
         self.cc_enable_arenas.clone()
     }
-    fn objc_class_prefix(&self) -> &str {
+    fn objc_class_prefix(&self) -> &'_ str {
         self.objc_class_prefix.as_ref()
     }
-    fn csharp_namespace(&self) -> &str {
+    fn csharp_namespace(&self) -> &'_ str {
         self.csharp_namespace.as_ref()
     }
-    fn swift_prefix(&self) -> &str {
+    fn swift_prefix(&self) -> &'_ str {
         self.swift_prefix.as_ref()
     }
-    fn php_class_prefix(&self) -> &str {
+    fn php_class_prefix(&self) -> &'_ str {
         self.php_class_prefix.as_ref()
     }
-    fn php_namespace(&self) -> &str {
+    fn php_namespace(&self) -> &'_ str {
         self.php_namespace.as_ref()
     }
-    fn php_metadata_namespace(&self) -> &str {
+    fn php_metadata_namespace(&self) -> &'_ str {
         self.php_metadata_namespace.as_ref()
     }
-    fn ruby_package(&self) -> &str {
+    fn ruby_package(&self) -> &'_ str {
         self.ruby_package.as_ref()
     }
+    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -5378,10 +5467,10 @@ impl<'bump> ::puroro::Serializable for FileOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl FileOptionsTrait for FileOptionsBumpalo {
-    fn java_package(&self) -> &str {
+    fn java_package(&self) -> &'_ str {
         self.java_package.as_ref()
     }
-    fn java_outer_classname(&self) -> &str {
+    fn java_outer_classname(&self) -> &'_ str {
         self.java_outer_classname.as_ref()
     }
     fn java_multiple_files(&self) -> bool {
@@ -5393,10 +5482,10 @@ impl FileOptionsTrait for FileOptionsBumpalo {
     fn java_string_check_utf8(&self) -> bool {
         self.java_string_check_utf8.clone()
     }
-    fn optimize_for(&self) -> ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32> {
+    fn optimize_for(&self) -> ::std::result::Result<file_options::OptimizeMode, i32> {
         self.optimize_for.clone()
     }
-    fn go_package(&self) -> &str {
+    fn go_package(&self) -> &'_ str {
         self.go_package.as_ref()
     }
     fn cc_generic_services(&self) -> bool {
@@ -5417,40 +5506,43 @@ impl FileOptionsTrait for FileOptionsBumpalo {
     fn cc_enable_arenas(&self) -> bool {
         self.cc_enable_arenas.clone()
     }
-    fn objc_class_prefix(&self) -> &str {
+    fn objc_class_prefix(&self) -> &'_ str {
         self.objc_class_prefix.as_ref()
     }
-    fn csharp_namespace(&self) -> &str {
+    fn csharp_namespace(&self) -> &'_ str {
         self.csharp_namespace.as_ref()
     }
-    fn swift_prefix(&self) -> &str {
+    fn swift_prefix(&self) -> &'_ str {
         self.swift_prefix.as_ref()
     }
-    fn php_class_prefix(&self) -> &str {
+    fn php_class_prefix(&self) -> &'_ str {
         self.php_class_prefix.as_ref()
     }
-    fn php_namespace(&self) -> &str {
+    fn php_namespace(&self) -> &'_ str {
         self.php_namespace.as_ref()
     }
-    fn php_metadata_namespace(&self) -> &str {
+    fn php_metadata_namespace(&self) -> &'_ str {
         self.php_metadata_namespace.as_ref()
     }
-    fn ruby_package(&self) -> &str {
+    fn ruby_package(&self) -> &'_ str {
         self.ruby_package.as_ref()
     }
+    type UninterpretedOptionType = UninterpretedOptionBumpalo;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -5466,33 +5558,34 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for FileOptionsBumpalo<'bump> {
     }
 }
 pub trait FileOptionsTrait {
-    fn java_package(&self) -> &str;
-    fn java_outer_classname(&self) -> &str;
-    fn java_multiple_files(&self) -> bool;
-    fn java_generate_equals_and_hash(&self) -> bool;
-    fn java_string_check_utf8(&self) -> bool;
-    fn optimize_for(&self) -> ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>;
-    fn go_package(&self) -> &str;
-    fn cc_generic_services(&self) -> bool;
-    fn java_generic_services(&self) -> bool;
-    fn py_generic_services(&self) -> bool;
-    fn php_generic_services(&self) -> bool;
-    fn deprecated(&self) -> bool;
-    fn cc_enable_arenas(&self) -> bool;
-    fn objc_class_prefix(&self) -> &str;
-    fn csharp_namespace(&self) -> &str;
-    fn swift_prefix(&self) -> &str;
-    fn php_class_prefix(&self) -> &str;
-    fn php_namespace(&self) -> &str;
-    fn php_metadata_namespace(&self) -> &str;
-    fn ruby_package(&self) -> &str;
+    fn java_package(&'_ self) -> &'_ str;
+    fn java_outer_classname(&'_ self) -> &'_ str;
+    fn java_multiple_files(&'_ self) -> bool;
+    fn java_generate_equals_and_hash(&'_ self) -> bool;
+    fn java_string_check_utf8(&'_ self) -> bool;
+    fn optimize_for(&'_ self) -> ::std::result::Result<file_options::OptimizeMode, i32>;
+    fn go_package(&'_ self) -> &'_ str;
+    fn cc_generic_services(&'_ self) -> bool;
+    fn java_generic_services(&'_ self) -> bool;
+    fn py_generic_services(&'_ self) -> bool;
+    fn php_generic_services(&'_ self) -> bool;
+    fn deprecated(&'_ self) -> bool;
+    fn cc_enable_arenas(&'_ self) -> bool;
+    fn objc_class_prefix(&'_ self) -> &'_ str;
+    fn csharp_namespace(&'_ self) -> &'_ str;
+    fn swift_prefix(&'_ self) -> &'_ str;
+    fn php_class_prefix(&'_ self) -> &'_ str;
+    fn php_namespace(&'_ self) -> &'_ str;
+    fn php_metadata_namespace(&'_ self) -> &'_ str;
+    fn ruby_package(&'_ self) -> &'_ str;
+    type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&'_ UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>;
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
@@ -5706,16 +5799,17 @@ impl ::puroro::Serializable for MethodDescriptorProto {
 }
 
 impl MethodDescriptorProtoTrait for MethodDescriptorProto {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
-    fn input_type(&self) -> &str {
+    fn input_type(&self) -> &'_ str {
         self.input_type.as_ref()
     }
-    fn output_type(&self) -> &str {
+    fn output_type(&self) -> &'_ str {
         self.output_type.as_ref()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MethodOptions> {
+    type OptionsType = MethodOptions;
+    fn options(&self) -> ::std::option::Option<&'_ MethodOptions> {
         self.options.as_deref()
     }
     fn client_streaming(&self) -> bool {
@@ -5882,16 +5976,17 @@ impl<'bump> ::puroro::Serializable for MethodDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl MethodDescriptorProtoTrait for MethodDescriptorProtoBumpalo {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
-    fn input_type(&self) -> &str {
+    fn input_type(&self) -> &'_ str {
         self.input_type.as_ref()
     }
-    fn output_type(&self) -> &str {
+    fn output_type(&self) -> &'_ str {
         self.output_type.as_ref()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MethodOptions> {
+    type OptionsType = MethodOptionsBumpalo;
+    fn options(&self) -> ::std::option::Option<&'_ MethodOptions> {
         self.options.as_deref()
     }
     fn client_streaming(&self) -> bool {
@@ -5911,12 +6006,13 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for MethodDescriptorProtoBumpalo<
     }
 }
 pub trait MethodDescriptorProtoTrait {
-    fn name(&self) -> &str;
-    fn input_type(&self) -> &str;
-    fn output_type(&self) -> &str;
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MethodOptions>;
-    fn client_streaming(&self) -> bool;
-    fn server_streaming(&self) -> bool;
+    fn name(&'_ self) -> &'_ str;
+    fn input_type(&'_ self) -> &'_ str;
+    fn output_type(&'_ self) -> &'_ str;
+    type OptionsType: MethodOptionsTrait;
+    fn options(&'_ self) -> ::std::option::Option<&'_ MethodOptions>;
+    fn client_streaming(&'_ self) -> bool;
+    fn server_streaming(&'_ self) -> bool;
 }
 pub trait MethodDescriptorProtoMutTrait {
     fn name_mut(&self) -> &mut String;
@@ -6038,27 +6134,31 @@ impl ::puroro::Serializable for ServiceDescriptorProto {
 }
 
 impl ServiceDescriptorProtoTrait for ServiceDescriptorProto {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
+    type MethodType = MethodDescriptorProto;
     fn for_each_method<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::MethodDescriptorProto) {
+        F: FnMut(&'_ MethodDescriptorProto)
+    {
         for item in (self.method).iter() {
             (f)(item);
         }
     }
-    fn method_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::MethodDescriptorProto>> {
+    fn method_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ MethodDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.method.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type MethodIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::MethodDescriptorProto>;
+    type MethodIter<'a> = impl Iterator<Item=&'a MethodDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn method_iter(&self) -> Self::MethodIter<'_> {
         self.method.iter()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::ServiceOptions> {
+    type OptionsType = ServiceOptions;
+    fn options(&self) -> ::std::option::Option<&'_ ServiceOptions> {
         self.options.as_deref()
     }
 }
@@ -6173,27 +6273,31 @@ impl<'bump> ::puroro::Serializable for ServiceDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl ServiceDescriptorProtoTrait for ServiceDescriptorProtoBumpalo {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
+    type MethodType = MethodDescriptorProtoBumpalo;
     fn for_each_method<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::MethodDescriptorProto) {
+        F: FnMut(&'_ MethodDescriptorProto)
+    {
         for item in (self.method).iter() {
             (f)(item);
         }
     }
-    fn method_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::MethodDescriptorProto>> {
+    fn method_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ MethodDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.method.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type MethodIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::MethodDescriptorProto>;
+    type MethodIter<'a> = impl Iterator<Item=&'a MethodDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn method_iter(&self) -> Self::MethodIter<'_> {
         self.method.iter()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::ServiceOptions> {
+    type OptionsType = ServiceOptionsBumpalo;
+    fn options(&self) -> ::std::option::Option<&'_ ServiceOptions> {
         self.options.as_deref()
     }
 }
@@ -6207,17 +6311,19 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for ServiceDescriptorProtoBumpalo
     }
 }
 pub trait ServiceDescriptorProtoTrait {
-    fn name(&self) -> &str;
+    fn name(&'_ self) -> &'_ str;
+    type MethodType: MethodDescriptorProtoTrait;
     fn for_each_method<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::MethodDescriptorProto);
+        F: FnMut(&'_ MethodDescriptorProto);
     fn method_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::MethodDescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ MethodDescriptorProto>>;
     #[cfg(feature = "puroro-nightly")]
-    type MethodIter<'a>: Iterator<Item=&'a super::super::google::protobuf::MethodDescriptorProto>;
+    type MethodIter<'a>: Iterator<Item=&'a MethodDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn method_iter(&self) -> Self::MethodIter<'_>;
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::ServiceOptions>;
+    type OptionsType: ServiceOptionsTrait;
+    fn options(&'_ self) -> ::std::option::Option<&'_ ServiceOptions>;
 }
 pub trait ServiceDescriptorProtoMutTrait {
     fn name_mut(&self) -> &mut String;
@@ -6349,13 +6455,14 @@ impl ::puroro::Serializable for EnumValueDescriptorProto {
 }
 
 impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProto {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
     fn number(&self) -> i32 {
         self.number.clone()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumValueOptions> {
+    type OptionsType = EnumValueOptions;
+    fn options(&self) -> ::std::option::Option<&'_ EnumValueOptions> {
         self.options.as_deref()
     }
 }
@@ -6478,13 +6585,14 @@ impl<'bump> ::puroro::Serializable for EnumValueDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoBumpalo {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
     fn number(&self) -> i32 {
         self.number.clone()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumValueOptions> {
+    type OptionsType = EnumValueOptionsBumpalo;
+    fn options(&self) -> ::std::option::Option<&'_ EnumValueOptions> {
         self.options.as_deref()
     }
 }
@@ -6498,9 +6606,10 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumValueDescriptorProtoBumpa
     }
 }
 pub trait EnumValueDescriptorProtoTrait {
-    fn name(&self) -> &str;
-    fn number(&self) -> i32;
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumValueOptions>;
+    fn name(&'_ self) -> &'_ str;
+    fn number(&'_ self) -> i32;
+    type OptionsType: EnumValueOptionsTrait;
+    fn options(&'_ self) -> ::std::option::Option<&'_ EnumValueOptions>;
 }
 pub trait EnumValueDescriptorProtoMutTrait {
     fn name_mut(&self) -> &mut String;
@@ -6639,55 +6748,64 @@ impl ::puroro::Serializable for EnumDescriptorProto {
 }
 
 impl EnumDescriptorProtoTrait for EnumDescriptorProto {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
+    type ValueType = EnumValueDescriptorProto;
     fn for_each_value<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::EnumValueDescriptorProto) {
+        F: FnMut(&'_ EnumValueDescriptorProto)
+    {
         for item in (self.value).iter() {
             (f)(item);
         }
     }
-    fn value_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumValueDescriptorProto>> {
+    fn value_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ EnumValueDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.value.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ValueIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::EnumValueDescriptorProto>;
+    type ValueIter<'a> = impl Iterator<Item=&'a EnumValueDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn value_iter(&self) -> Self::ValueIter<'_> {
         self.value.iter()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumOptions> {
+    type OptionsType = EnumOptions;
+    fn options(&self) -> ::std::option::Option<&'_ EnumOptions> {
         self.options.as_deref()
     }
+    type ReservedRangeType = enum_descriptor_proto::EnumReservedRange;
     fn for_each_reserved_range<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange) {
+        F: FnMut(&'_ enum_descriptor_proto::EnumReservedRange)
+    {
         for item in (self.reserved_range).iter() {
             (f)(item);
         }
     }
-    fn reserved_range_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>> {
+    fn reserved_range_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ enum_descriptor_proto::EnumReservedRange>>
+    {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ReservedRangeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>;
+    type ReservedRangeIter<'a> = impl Iterator<Item=&'a enum_descriptor_proto::EnumReservedRange>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
         self.reserved_range.iter()
     }
     fn for_each_reserved_name<F>(&self, mut f: F)
     where
-        F: FnMut(&str) {
+        F: FnMut(&'_ str)
+    {
         for item in (self.reserved_name).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn reserved_name_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+    fn reserved_name_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
+    {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
@@ -6828,55 +6946,64 @@ impl<'bump> ::puroro::Serializable for EnumDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
+    type ValueType = EnumValueDescriptorProtoBumpalo;
     fn for_each_value<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::EnumValueDescriptorProto) {
+        F: FnMut(&'_ EnumValueDescriptorProto)
+    {
         for item in (self.value).iter() {
             (f)(item);
         }
     }
-    fn value_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumValueDescriptorProto>> {
+    fn value_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ EnumValueDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.value.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ValueIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::EnumValueDescriptorProto>;
+    type ValueIter<'a> = impl Iterator<Item=&'a EnumValueDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn value_iter(&self) -> Self::ValueIter<'_> {
         self.value.iter()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumOptions> {
+    type OptionsType = EnumOptionsBumpalo;
+    fn options(&self) -> ::std::option::Option<&'_ EnumOptions> {
         self.options.as_deref()
     }
+    type ReservedRangeType = enum_descriptor_proto::EnumReservedRangeBumpalo;
     fn for_each_reserved_range<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange) {
+        F: FnMut(&'_ enum_descriptor_proto::EnumReservedRange)
+    {
         for item in (self.reserved_range).iter() {
             (f)(item);
         }
     }
-    fn reserved_range_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>> {
+    fn reserved_range_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ enum_descriptor_proto::EnumReservedRange>>
+    {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ReservedRangeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>;
+    type ReservedRangeIter<'a> = impl Iterator<Item=&'a enum_descriptor_proto::EnumReservedRange>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
         self.reserved_range.iter()
     }
     fn for_each_reserved_name<F>(&self, mut f: F)
     where
-        F: FnMut(&str) {
+        F: FnMut(&'_ str)
+    {
         for item in (self.reserved_name).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn reserved_name_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+    fn reserved_name_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
+    {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
@@ -6896,31 +7023,34 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumDescriptorProtoBumpalo<'b
     }
 }
 pub trait EnumDescriptorProtoTrait {
-    fn name(&self) -> &str;
+    fn name(&'_ self) -> &'_ str;
+    type ValueType: EnumValueDescriptorProtoTrait;
     fn for_each_value<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::EnumValueDescriptorProto);
+        F: FnMut(&'_ EnumValueDescriptorProto);
     fn value_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumValueDescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ EnumValueDescriptorProto>>;
     #[cfg(feature = "puroro-nightly")]
-    type ValueIter<'a>: Iterator<Item=&'a super::super::google::protobuf::EnumValueDescriptorProto>;
+    type ValueIter<'a>: Iterator<Item=&'a EnumValueDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn value_iter(&self) -> Self::ValueIter<'_>;
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::EnumOptions>;
+    type OptionsType: EnumOptionsTrait;
+    fn options(&'_ self) -> ::std::option::Option<&'_ EnumOptions>;
+    type ReservedRangeType: enum_descriptor_proto::EnumReservedRangeTrait;
     fn for_each_reserved_range<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange);
+        F: FnMut(&'_ enum_descriptor_proto::EnumReservedRange);
     fn reserved_range_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ enum_descriptor_proto::EnumReservedRange>>;
     #[cfg(feature = "puroro-nightly")]
-    type ReservedRangeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>;
+    type ReservedRangeIter<'a>: Iterator<Item=&'a enum_descriptor_proto::EnumReservedRange>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_>;
     fn for_each_reserved_name<F>(&self, f: F)
     where
-        F: FnMut(&str);
+        F: FnMut(&'_ str);
     fn reserved_name_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>;
     #[cfg(feature = "puroro-nightly")]
     type ReservedNameIter<'a>: Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
@@ -7208,8 +7338,8 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumReservedRangeBumpalo<'bum
     }
 }
 pub trait EnumReservedRangeTrait {
-    fn start(&self) -> i32;
-    fn end(&self) -> i32;
+    fn start(&'_ self) -> i32;
+    fn end(&'_ self) -> i32;
 }
 pub trait EnumReservedRangeMutTrait {
     fn start_mut(&self) -> &mut i32;
@@ -7318,10 +7448,11 @@ impl ::puroro::Serializable for OneofDescriptorProto {
 }
 
 impl OneofDescriptorProtoTrait for OneofDescriptorProto {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::OneofOptions> {
+    type OptionsType = OneofOptions;
+    fn options(&self) -> ::std::option::Option<&'_ OneofOptions> {
         self.options.as_deref()
     }
 }
@@ -7426,10 +7557,11 @@ impl<'bump> ::puroro::Serializable for OneofDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl OneofDescriptorProtoTrait for OneofDescriptorProtoBumpalo {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::OneofOptions> {
+    type OptionsType = OneofOptionsBumpalo;
+    fn options(&self) -> ::std::option::Option<&'_ OneofOptions> {
         self.options.as_deref()
     }
 }
@@ -7443,8 +7575,9 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for OneofDescriptorProtoBumpalo<'
     }
 }
 pub trait OneofDescriptorProtoTrait {
-    fn name(&self) -> &str;
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::OneofOptions>;
+    fn name(&'_ self) -> &'_ str;
+    type OptionsType: OneofOptionsTrait;
+    fn options(&'_ self) -> ::std::option::Option<&'_ OneofOptions>;
 }
 pub trait OneofDescriptorProtoMutTrait {
     fn name_mut(&self) -> &mut String;
@@ -7682,34 +7815,35 @@ impl ::puroro::Serializable for FieldDescriptorProto {
 }
 
 impl FieldDescriptorProtoTrait for FieldDescriptorProto {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
     fn number(&self) -> i32 {
         self.number.clone()
     }
-    fn label(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32> {
+    fn label(&self) -> ::std::result::Result<field_descriptor_proto::Label, i32> {
         self.label.clone()
     }
-    fn type_(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32> {
+    fn type_(&self) -> ::std::result::Result<field_descriptor_proto::Type, i32> {
         self.type_.clone()
     }
-    fn type_name(&self) -> &str {
+    fn type_name(&self) -> &'_ str {
         self.type_name.as_ref()
     }
-    fn extendee(&self) -> &str {
+    fn extendee(&self) -> &'_ str {
         self.extendee.as_ref()
     }
-    fn default_value(&self) -> &str {
+    fn default_value(&self) -> &'_ str {
         self.default_value.as_ref()
     }
     fn oneof_index(&self) -> i32 {
         self.oneof_index.clone()
     }
-    fn json_name(&self) -> &str {
+    fn json_name(&self) -> &'_ str {
         self.json_name.as_ref()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FieldOptions> {
+    type OptionsType = FieldOptions;
+    fn options(&self) -> ::std::option::Option<&'_ FieldOptions> {
         self.options.as_deref()
     }
     fn proto3_optional(&self) -> bool {
@@ -7947,34 +8081,35 @@ impl<'bump> ::puroro::Serializable for FieldDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl FieldDescriptorProtoTrait for FieldDescriptorProtoBumpalo {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
     fn number(&self) -> i32 {
         self.number.clone()
     }
-    fn label(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32> {
+    fn label(&self) -> ::std::result::Result<field_descriptor_proto::Label, i32> {
         self.label.clone()
     }
-    fn type_(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32> {
+    fn type_(&self) -> ::std::result::Result<field_descriptor_proto::Type, i32> {
         self.type_.clone()
     }
-    fn type_name(&self) -> &str {
+    fn type_name(&self) -> &'_ str {
         self.type_name.as_ref()
     }
-    fn extendee(&self) -> &str {
+    fn extendee(&self) -> &'_ str {
         self.extendee.as_ref()
     }
-    fn default_value(&self) -> &str {
+    fn default_value(&self) -> &'_ str {
         self.default_value.as_ref()
     }
     fn oneof_index(&self) -> i32 {
         self.oneof_index.clone()
     }
-    fn json_name(&self) -> &str {
+    fn json_name(&self) -> &'_ str {
         self.json_name.as_ref()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FieldOptions> {
+    type OptionsType = FieldOptionsBumpalo;
+    fn options(&self) -> ::std::option::Option<&'_ FieldOptions> {
         self.options.as_deref()
     }
     fn proto3_optional(&self) -> bool {
@@ -7991,17 +8126,18 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for FieldDescriptorProtoBumpalo<'
     }
 }
 pub trait FieldDescriptorProtoTrait {
-    fn name(&self) -> &str;
-    fn number(&self) -> i32;
-    fn label(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>;
-    fn type_(&self) -> ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>;
-    fn type_name(&self) -> &str;
-    fn extendee(&self) -> &str;
-    fn default_value(&self) -> &str;
-    fn oneof_index(&self) -> i32;
-    fn json_name(&self) -> &str;
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FieldOptions>;
-    fn proto3_optional(&self) -> bool;
+    fn name(&'_ self) -> &'_ str;
+    fn number(&'_ self) -> i32;
+    fn label(&'_ self) -> ::std::result::Result<field_descriptor_proto::Label, i32>;
+    fn type_(&'_ self) -> ::std::result::Result<field_descriptor_proto::Type, i32>;
+    fn type_name(&'_ self) -> &'_ str;
+    fn extendee(&'_ self) -> &'_ str;
+    fn default_value(&'_ self) -> &'_ str;
+    fn oneof_index(&'_ self) -> i32;
+    fn json_name(&'_ self) -> &'_ str;
+    type OptionsType: FieldOptionsTrait;
+    fn options(&'_ self) -> ::std::option::Option<&'_ FieldOptions>;
+    fn proto3_optional(&'_ self) -> bool;
 }
 pub trait FieldDescriptorProtoMutTrait {
     fn name_mut(&self) -> &mut String;
@@ -8184,19 +8320,22 @@ impl ::puroro::Serializable for ExtensionRangeOptions {
 }
 
 impl ExtensionRangeOptionsTrait for ExtensionRangeOptions {
+    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -8293,19 +8432,22 @@ impl<'bump> ::puroro::Serializable for ExtensionRangeOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl ExtensionRangeOptionsTrait for ExtensionRangeOptionsBumpalo {
+    type UninterpretedOptionType = UninterpretedOptionBumpalo;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption) {
+        F: FnMut(&'_ UninterpretedOption)
+    {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>> {
+    fn uninterpreted_option_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>
+    {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -8321,13 +8463,14 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for ExtensionRangeOptionsBumpalo<
     }
 }
 pub trait ExtensionRangeOptionsTrait {
+    type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::UninterpretedOption);
+        F: FnMut(&'_ UninterpretedOption);
     fn uninterpreted_option_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::UninterpretedOption>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ UninterpretedOption>>;
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::UninterpretedOption>;
+    type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
@@ -8521,140 +8664,164 @@ impl ::puroro::Serializable for DescriptorProto {
 }
 
 impl DescriptorProtoTrait for DescriptorProto {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
+    type FieldType = FieldDescriptorProto;
     fn for_each_field<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
+        F: FnMut(&'_ FieldDescriptorProto)
+    {
         for item in (self.field).iter() {
             (f)(item);
         }
     }
-    fn field_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
+    fn field_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ FieldDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.field.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type FieldIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    type FieldIter<'a> = impl Iterator<Item=&'a FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn field_iter(&self) -> Self::FieldIter<'_> {
         self.field.iter()
     }
+    type ExtensionType = FieldDescriptorProto;
     fn for_each_extension<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
+        F: FnMut(&'_ FieldDescriptorProto)
+    {
         for item in (self.extension).iter() {
             (f)(item);
         }
     }
-    fn extension_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
+    fn extension_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ FieldDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.extension.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    type ExtensionIter<'a> = impl Iterator<Item=&'a FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
     }
+    type NestedTypeType = DescriptorProto;
     fn for_each_nested_type<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::DescriptorProto) {
+        F: FnMut(&'_ DescriptorProto)
+    {
         for item in (self.nested_type).iter() {
             (f)(item);
         }
     }
-    fn nested_type_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>> {
+    fn nested_type_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ DescriptorProto>>
+    {
         ::std::boxed::Box::new(self.nested_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type NestedTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::DescriptorProto>;
+    type NestedTypeIter<'a> = impl Iterator<Item=&'a DescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn nested_type_iter(&self) -> Self::NestedTypeIter<'_> {
         self.nested_type.iter()
     }
+    type EnumTypeType = EnumDescriptorProto;
     fn for_each_enum_type<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::EnumDescriptorProto) {
+        F: FnMut(&'_ EnumDescriptorProto)
+    {
         for item in (self.enum_type).iter() {
             (f)(item);
         }
     }
-    fn enum_type_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>> {
+    fn enum_type_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ EnumDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type EnumTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::EnumDescriptorProto>;
+    type EnumTypeIter<'a> = impl Iterator<Item=&'a EnumDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
     }
+    type ExtensionRangeType = descriptor_proto::ExtensionRange;
     fn for_each_extension_range<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::descriptor_proto::ExtensionRange) {
+        F: FnMut(&'_ descriptor_proto::ExtensionRange)
+    {
         for item in (self.extension_range).iter() {
             (f)(item);
         }
     }
-    fn extension_range_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ExtensionRange>> {
+    fn extension_range_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ descriptor_proto::ExtensionRange>>
+    {
         ::std::boxed::Box::new(self.extension_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionRangeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::descriptor_proto::ExtensionRange>;
+    type ExtensionRangeIter<'a> = impl Iterator<Item=&'a descriptor_proto::ExtensionRange>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_range_iter(&self) -> Self::ExtensionRangeIter<'_> {
         self.extension_range.iter()
     }
+    type OneofDeclType = OneofDescriptorProto;
     fn for_each_oneof_decl<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::OneofDescriptorProto) {
+        F: FnMut(&'_ OneofDescriptorProto)
+    {
         for item in (self.oneof_decl).iter() {
             (f)(item);
         }
     }
-    fn oneof_decl_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::OneofDescriptorProto>> {
+    fn oneof_decl_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ OneofDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.oneof_decl.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type OneofDeclIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::OneofDescriptorProto>;
+    type OneofDeclIter<'a> = impl Iterator<Item=&'a OneofDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn oneof_decl_iter(&self) -> Self::OneofDeclIter<'_> {
         self.oneof_decl.iter()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MessageOptions> {
+    type OptionsType = MessageOptions;
+    fn options(&self) -> ::std::option::Option<&'_ MessageOptions> {
         self.options.as_deref()
     }
+    type ReservedRangeType = descriptor_proto::ReservedRange;
     fn for_each_reserved_range<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::descriptor_proto::ReservedRange) {
+        F: FnMut(&'_ descriptor_proto::ReservedRange)
+    {
         for item in (self.reserved_range).iter() {
             (f)(item);
         }
     }
-    fn reserved_range_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ReservedRange>> {
+    fn reserved_range_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ descriptor_proto::ReservedRange>>
+    {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ReservedRangeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::descriptor_proto::ReservedRange>;
+    type ReservedRangeIter<'a> = impl Iterator<Item=&'a descriptor_proto::ReservedRange>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
         self.reserved_range.iter()
     }
     fn for_each_reserved_name<F>(&self, mut f: F)
     where
-        F: FnMut(&str) {
+        F: FnMut(&'_ str)
+    {
         for item in (self.reserved_name).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn reserved_name_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+    fn reserved_name_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
+    {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
@@ -8845,140 +9012,164 @@ impl<'bump> ::puroro::Serializable for DescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl DescriptorProtoTrait for DescriptorProtoBumpalo {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
+    type FieldType = FieldDescriptorProtoBumpalo;
     fn for_each_field<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
+        F: FnMut(&'_ FieldDescriptorProto)
+    {
         for item in (self.field).iter() {
             (f)(item);
         }
     }
-    fn field_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
+    fn field_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ FieldDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.field.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type FieldIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    type FieldIter<'a> = impl Iterator<Item=&'a FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn field_iter(&self) -> Self::FieldIter<'_> {
         self.field.iter()
     }
+    type ExtensionType = FieldDescriptorProtoBumpalo;
     fn for_each_extension<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
+        F: FnMut(&'_ FieldDescriptorProto)
+    {
         for item in (self.extension).iter() {
             (f)(item);
         }
     }
-    fn extension_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
+    fn extension_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ FieldDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.extension.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    type ExtensionIter<'a> = impl Iterator<Item=&'a FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
     }
+    type NestedTypeType = DescriptorProtoBumpalo;
     fn for_each_nested_type<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::DescriptorProto) {
+        F: FnMut(&'_ DescriptorProto)
+    {
         for item in (self.nested_type).iter() {
             (f)(item);
         }
     }
-    fn nested_type_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>> {
+    fn nested_type_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ DescriptorProto>>
+    {
         ::std::boxed::Box::new(self.nested_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type NestedTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::DescriptorProto>;
+    type NestedTypeIter<'a> = impl Iterator<Item=&'a DescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn nested_type_iter(&self) -> Self::NestedTypeIter<'_> {
         self.nested_type.iter()
     }
+    type EnumTypeType = EnumDescriptorProtoBumpalo;
     fn for_each_enum_type<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::EnumDescriptorProto) {
+        F: FnMut(&'_ EnumDescriptorProto)
+    {
         for item in (self.enum_type).iter() {
             (f)(item);
         }
     }
-    fn enum_type_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>> {
+    fn enum_type_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ EnumDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type EnumTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::EnumDescriptorProto>;
+    type EnumTypeIter<'a> = impl Iterator<Item=&'a EnumDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
     }
+    type ExtensionRangeType = descriptor_proto::ExtensionRangeBumpalo;
     fn for_each_extension_range<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::descriptor_proto::ExtensionRange) {
+        F: FnMut(&'_ descriptor_proto::ExtensionRange)
+    {
         for item in (self.extension_range).iter() {
             (f)(item);
         }
     }
-    fn extension_range_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ExtensionRange>> {
+    fn extension_range_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ descriptor_proto::ExtensionRange>>
+    {
         ::std::boxed::Box::new(self.extension_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionRangeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::descriptor_proto::ExtensionRange>;
+    type ExtensionRangeIter<'a> = impl Iterator<Item=&'a descriptor_proto::ExtensionRange>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_range_iter(&self) -> Self::ExtensionRangeIter<'_> {
         self.extension_range.iter()
     }
+    type OneofDeclType = OneofDescriptorProtoBumpalo;
     fn for_each_oneof_decl<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::OneofDescriptorProto) {
+        F: FnMut(&'_ OneofDescriptorProto)
+    {
         for item in (self.oneof_decl).iter() {
             (f)(item);
         }
     }
-    fn oneof_decl_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::OneofDescriptorProto>> {
+    fn oneof_decl_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ OneofDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.oneof_decl.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type OneofDeclIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::OneofDescriptorProto>;
+    type OneofDeclIter<'a> = impl Iterator<Item=&'a OneofDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn oneof_decl_iter(&self) -> Self::OneofDeclIter<'_> {
         self.oneof_decl.iter()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MessageOptions> {
+    type OptionsType = MessageOptionsBumpalo;
+    fn options(&self) -> ::std::option::Option<&'_ MessageOptions> {
         self.options.as_deref()
     }
+    type ReservedRangeType = descriptor_proto::ReservedRangeBumpalo;
     fn for_each_reserved_range<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::descriptor_proto::ReservedRange) {
+        F: FnMut(&'_ descriptor_proto::ReservedRange)
+    {
         for item in (self.reserved_range).iter() {
             (f)(item);
         }
     }
-    fn reserved_range_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ReservedRange>> {
+    fn reserved_range_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ descriptor_proto::ReservedRange>>
+    {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ReservedRangeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::descriptor_proto::ReservedRange>;
+    type ReservedRangeIter<'a> = impl Iterator<Item=&'a descriptor_proto::ReservedRange>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
         self.reserved_range.iter()
     }
     fn for_each_reserved_name<F>(&self, mut f: F)
     where
-        F: FnMut(&str) {
+        F: FnMut(&'_ str)
+    {
         for item in (self.reserved_name).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn reserved_name_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+    fn reserved_name_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
+    {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
@@ -8998,76 +9189,84 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for DescriptorProtoBumpalo<'bump>
     }
 }
 pub trait DescriptorProtoTrait {
-    fn name(&self) -> &str;
+    fn name(&'_ self) -> &'_ str;
+    type FieldType: FieldDescriptorProtoTrait;
     fn for_each_field<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto);
+        F: FnMut(&'_ FieldDescriptorProto);
     fn field_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ FieldDescriptorProto>>;
     #[cfg(feature = "puroro-nightly")]
-    type FieldIter<'a>: Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    type FieldIter<'a>: Iterator<Item=&'a FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn field_iter(&self) -> Self::FieldIter<'_>;
+    type ExtensionType: FieldDescriptorProtoTrait;
     fn for_each_extension<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto);
+        F: FnMut(&'_ FieldDescriptorProto);
     fn extension_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ FieldDescriptorProto>>;
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    type ExtensionIter<'a>: Iterator<Item=&'a FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_>;
+    type NestedTypeType: DescriptorProtoTrait;
     fn for_each_nested_type<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::DescriptorProto);
+        F: FnMut(&'_ DescriptorProto);
     fn nested_type_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ DescriptorProto>>;
     #[cfg(feature = "puroro-nightly")]
-    type NestedTypeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::DescriptorProto>;
+    type NestedTypeIter<'a>: Iterator<Item=&'a DescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn nested_type_iter(&self) -> Self::NestedTypeIter<'_>;
+    type EnumTypeType: EnumDescriptorProtoTrait;
     fn for_each_enum_type<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::EnumDescriptorProto);
+        F: FnMut(&'_ EnumDescriptorProto);
     fn enum_type_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ EnumDescriptorProto>>;
     #[cfg(feature = "puroro-nightly")]
-    type EnumTypeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::EnumDescriptorProto>;
+    type EnumTypeIter<'a>: Iterator<Item=&'a EnumDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_>;
+    type ExtensionRangeType: descriptor_proto::ExtensionRangeTrait;
     fn for_each_extension_range<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::descriptor_proto::ExtensionRange);
+        F: FnMut(&'_ descriptor_proto::ExtensionRange);
     fn extension_range_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ExtensionRange>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ descriptor_proto::ExtensionRange>>;
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionRangeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::descriptor_proto::ExtensionRange>;
+    type ExtensionRangeIter<'a>: Iterator<Item=&'a descriptor_proto::ExtensionRange>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_range_iter(&self) -> Self::ExtensionRangeIter<'_>;
+    type OneofDeclType: OneofDescriptorProtoTrait;
     fn for_each_oneof_decl<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::OneofDescriptorProto);
+        F: FnMut(&'_ OneofDescriptorProto);
     fn oneof_decl_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::OneofDescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ OneofDescriptorProto>>;
     #[cfg(feature = "puroro-nightly")]
-    type OneofDeclIter<'a>: Iterator<Item=&'a super::super::google::protobuf::OneofDescriptorProto>;
+    type OneofDeclIter<'a>: Iterator<Item=&'a OneofDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn oneof_decl_iter(&self) -> Self::OneofDeclIter<'_>;
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::MessageOptions>;
+    type OptionsType: MessageOptionsTrait;
+    fn options(&'_ self) -> ::std::option::Option<&'_ MessageOptions>;
+    type ReservedRangeType: descriptor_proto::ReservedRangeTrait;
     fn for_each_reserved_range<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::descriptor_proto::ReservedRange);
+        F: FnMut(&'_ descriptor_proto::ReservedRange);
     fn reserved_range_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::descriptor_proto::ReservedRange>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ descriptor_proto::ReservedRange>>;
     #[cfg(feature = "puroro-nightly")]
-    type ReservedRangeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::descriptor_proto::ReservedRange>;
+    type ReservedRangeIter<'a>: Iterator<Item=&'a descriptor_proto::ReservedRange>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_>;
     fn for_each_reserved_name<F>(&self, f: F)
     where
-        F: FnMut(&str);
+        F: FnMut(&'_ str);
     fn reserved_name_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>;
     #[cfg(feature = "puroro-nightly")]
     type ReservedNameIter<'a>: Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
@@ -9385,8 +9584,8 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for ReservedRangeBumpalo<'bump> {
     }
 }
 pub trait ReservedRangeTrait {
-    fn start(&self) -> i32;
-    fn end(&self) -> i32;
+    fn start(&'_ self) -> i32;
+    fn end(&'_ self) -> i32;
 }
 pub trait ReservedRangeMutTrait {
     fn start_mut(&self) -> &mut i32;
@@ -9526,7 +9725,8 @@ impl ExtensionRangeTrait for ExtensionRange {
     fn end(&self) -> i32 {
         self.end.clone()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::super::google::protobuf::ExtensionRangeOptions> {
+    type OptionsType = super::ExtensionRangeOptions;
+    fn options(&self) -> ::std::option::Option<&'_ super::ExtensionRangeOptions> {
         self.options.as_deref()
     }
 }
@@ -9663,7 +9863,8 @@ impl ExtensionRangeTrait for ExtensionRangeBumpalo {
     fn end(&self) -> i32 {
         self.end.clone()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::super::google::protobuf::ExtensionRangeOptions> {
+    type OptionsType = super::ExtensionRangeOptionsBumpalo;
+    fn options(&self) -> ::std::option::Option<&'_ super::ExtensionRangeOptions> {
         self.options.as_deref()
     }
 }
@@ -9677,9 +9878,10 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for ExtensionRangeBumpalo<'bump> 
     }
 }
 pub trait ExtensionRangeTrait {
-    fn start(&self) -> i32;
-    fn end(&self) -> i32;
-    fn options(&self) -> ::std::option::Option<&super::super::super::google::protobuf::ExtensionRangeOptions>;
+    fn start(&'_ self) -> i32;
+    fn end(&'_ self) -> i32;
+    type OptionsType: super::ExtensionRangeOptionsTrait;
+    fn options(&'_ self) -> ::std::option::Option<&'_ super::ExtensionRangeOptions>;
 }
 pub trait ExtensionRangeMutTrait {
     fn start_mut(&self) -> &mut i32;
@@ -9905,21 +10107,23 @@ impl ::puroro::Serializable for FileDescriptorProto {
 }
 
 impl FileDescriptorProtoTrait for FileDescriptorProto {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
-    fn package(&self) -> &str {
+    fn package(&self) -> &'_ str {
         self.package.as_ref()
     }
     fn for_each_dependency<F>(&self, mut f: F)
     where
-        F: FnMut(&str) {
+        F: FnMut(&'_ str)
+    {
         for item in (self.dependency).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn dependency_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+    fn dependency_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
+    {
         ::std::boxed::Box::new(self.dependency.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
@@ -9930,13 +10134,15 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
     }
     fn for_each_public_dependency<F>(&self, mut f: F)
     where
-        F: FnMut(i32) {
+        F: FnMut(i32)
+    {
         for item in (self.public_dependency).iter().cloned() {
             (f)(item);
         }
     }
-    fn public_dependency_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+    fn public_dependency_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
+    {
         ::std::boxed::Box::new(self.public_dependency.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
@@ -9947,13 +10153,15 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
     }
     fn for_each_weak_dependency<F>(&self, mut f: F)
     where
-        F: FnMut(i32) {
+        F: FnMut(i32)
+    {
         for item in (self.weak_dependency).iter().cloned() {
             (f)(item);
         }
     }
-    fn weak_dependency_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+    fn weak_dependency_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
+    {
         ::std::boxed::Box::new(self.weak_dependency.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
@@ -9962,81 +10170,95 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
     fn weak_dependency_iter(&self) -> Self::WeakDependencyIter<'_> {
         self.weak_dependency.iter().cloned()
     }
+    type MessageTypeType = DescriptorProto;
     fn for_each_message_type<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::DescriptorProto) {
+        F: FnMut(&'_ DescriptorProto)
+    {
         for item in (self.message_type).iter() {
             (f)(item);
         }
     }
-    fn message_type_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>> {
+    fn message_type_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ DescriptorProto>>
+    {
         ::std::boxed::Box::new(self.message_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type MessageTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::DescriptorProto>;
+    type MessageTypeIter<'a> = impl Iterator<Item=&'a DescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn message_type_iter(&self) -> Self::MessageTypeIter<'_> {
         self.message_type.iter()
     }
+    type EnumTypeType = EnumDescriptorProto;
     fn for_each_enum_type<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::EnumDescriptorProto) {
+        F: FnMut(&'_ EnumDescriptorProto)
+    {
         for item in (self.enum_type).iter() {
             (f)(item);
         }
     }
-    fn enum_type_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>> {
+    fn enum_type_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ EnumDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type EnumTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::EnumDescriptorProto>;
+    type EnumTypeIter<'a> = impl Iterator<Item=&'a EnumDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
     }
+    type ServiceType = ServiceDescriptorProto;
     fn for_each_service<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::ServiceDescriptorProto) {
+        F: FnMut(&'_ ServiceDescriptorProto)
+    {
         for item in (self.service).iter() {
             (f)(item);
         }
     }
-    fn service_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::ServiceDescriptorProto>> {
+    fn service_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ ServiceDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.service.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ServiceIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::ServiceDescriptorProto>;
+    type ServiceIter<'a> = impl Iterator<Item=&'a ServiceDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn service_iter(&self) -> Self::ServiceIter<'_> {
         self.service.iter()
     }
+    type ExtensionType = FieldDescriptorProto;
     fn for_each_extension<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
+        F: FnMut(&'_ FieldDescriptorProto)
+    {
         for item in (self.extension).iter() {
             (f)(item);
         }
     }
-    fn extension_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
+    fn extension_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ FieldDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.extension.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    type ExtensionIter<'a> = impl Iterator<Item=&'a FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FileOptions> {
+    type OptionsType = FileOptions;
+    fn options(&self) -> ::std::option::Option<&'_ FileOptions> {
         self.options.as_deref()
     }
-    fn source_code_info(&self) -> ::std::option::Option<&super::super::google::protobuf::SourceCodeInfo> {
+    type SourceCodeInfoType = SourceCodeInfo;
+    fn source_code_info(&self) -> ::std::option::Option<&'_ SourceCodeInfo> {
         self.source_code_info.as_deref()
     }
-    fn syntax(&self) -> &str {
+    fn syntax(&self) -> &'_ str {
         self.syntax.as_ref()
     }
 }
@@ -10257,21 +10479,23 @@ impl<'bump> ::puroro::Serializable for FileDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
-    fn name(&self) -> &str {
+    fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
-    fn package(&self) -> &str {
+    fn package(&self) -> &'_ str {
         self.package.as_ref()
     }
     fn for_each_dependency<F>(&self, mut f: F)
     where
-        F: FnMut(&str) {
+        F: FnMut(&'_ str)
+    {
         for item in (self.dependency).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn dependency_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>> {
+    fn dependency_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
+    {
         ::std::boxed::Box::new(self.dependency.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
@@ -10282,13 +10506,15 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
     }
     fn for_each_public_dependency<F>(&self, mut f: F)
     where
-        F: FnMut(i32) {
+        F: FnMut(i32)
+    {
         for item in (self.public_dependency).iter().cloned() {
             (f)(item);
         }
     }
-    fn public_dependency_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+    fn public_dependency_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
+    {
         ::std::boxed::Box::new(self.public_dependency.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
@@ -10299,13 +10525,15 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
     }
     fn for_each_weak_dependency<F>(&self, mut f: F)
     where
-        F: FnMut(i32) {
+        F: FnMut(i32)
+    {
         for item in (self.weak_dependency).iter().cloned() {
             (f)(item);
         }
     }
-    fn weak_dependency_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
+    fn weak_dependency_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
+    {
         ::std::boxed::Box::new(self.weak_dependency.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
@@ -10314,81 +10542,95 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
     fn weak_dependency_iter(&self) -> Self::WeakDependencyIter<'_> {
         self.weak_dependency.iter().cloned()
     }
+    type MessageTypeType = DescriptorProtoBumpalo;
     fn for_each_message_type<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::DescriptorProto) {
+        F: FnMut(&'_ DescriptorProto)
+    {
         for item in (self.message_type).iter() {
             (f)(item);
         }
     }
-    fn message_type_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>> {
+    fn message_type_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ DescriptorProto>>
+    {
         ::std::boxed::Box::new(self.message_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type MessageTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::DescriptorProto>;
+    type MessageTypeIter<'a> = impl Iterator<Item=&'a DescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn message_type_iter(&self) -> Self::MessageTypeIter<'_> {
         self.message_type.iter()
     }
+    type EnumTypeType = EnumDescriptorProtoBumpalo;
     fn for_each_enum_type<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::EnumDescriptorProto) {
+        F: FnMut(&'_ EnumDescriptorProto)
+    {
         for item in (self.enum_type).iter() {
             (f)(item);
         }
     }
-    fn enum_type_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>> {
+    fn enum_type_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ EnumDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type EnumTypeIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::EnumDescriptorProto>;
+    type EnumTypeIter<'a> = impl Iterator<Item=&'a EnumDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
     }
+    type ServiceType = ServiceDescriptorProtoBumpalo;
     fn for_each_service<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::ServiceDescriptorProto) {
+        F: FnMut(&'_ ServiceDescriptorProto)
+    {
         for item in (self.service).iter() {
             (f)(item);
         }
     }
-    fn service_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::ServiceDescriptorProto>> {
+    fn service_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ ServiceDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.service.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ServiceIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::ServiceDescriptorProto>;
+    type ServiceIter<'a> = impl Iterator<Item=&'a ServiceDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn service_iter(&self) -> Self::ServiceIter<'_> {
         self.service.iter()
     }
+    type ExtensionType = FieldDescriptorProtoBumpalo;
     fn for_each_extension<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto) {
+        F: FnMut(&'_ FieldDescriptorProto)
+    {
         for item in (self.extension).iter() {
             (f)(item);
         }
     }
-    fn extension_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>> {
+    fn extension_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ FieldDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.extension.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    type ExtensionIter<'a> = impl Iterator<Item=&'a FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
     }
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FileOptions> {
+    type OptionsType = FileOptionsBumpalo;
+    fn options(&self) -> ::std::option::Option<&'_ FileOptions> {
         self.options.as_deref()
     }
-    fn source_code_info(&self) -> ::std::option::Option<&super::super::google::protobuf::SourceCodeInfo> {
+    type SourceCodeInfoType = SourceCodeInfoBumpalo;
+    fn source_code_info(&self) -> ::std::option::Option<&'_ SourceCodeInfo> {
         self.source_code_info.as_deref()
     }
-    fn syntax(&self) -> &str {
+    fn syntax(&self) -> &'_ str {
         self.syntax.as_ref()
     }
 }
@@ -10402,13 +10644,13 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for FileDescriptorProtoBumpalo<'b
     }
 }
 pub trait FileDescriptorProtoTrait {
-    fn name(&self) -> &str;
-    fn package(&self) -> &str;
+    fn name(&'_ self) -> &'_ str;
+    fn package(&'_ self) -> &'_ str;
     fn for_each_dependency<F>(&self, f: F)
     where
-        F: FnMut(&str);
+        F: FnMut(&'_ str);
     fn dependency_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&str>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>;
     #[cfg(feature = "puroro-nightly")]
     type DependencyIter<'a>: Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
@@ -10431,45 +10673,51 @@ pub trait FileDescriptorProtoTrait {
     type WeakDependencyIter<'a>: Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn weak_dependency_iter(&self) -> Self::WeakDependencyIter<'_>;
+    type MessageTypeType: DescriptorProtoTrait;
     fn for_each_message_type<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::DescriptorProto);
+        F: FnMut(&'_ DescriptorProto);
     fn message_type_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::DescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ DescriptorProto>>;
     #[cfg(feature = "puroro-nightly")]
-    type MessageTypeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::DescriptorProto>;
+    type MessageTypeIter<'a>: Iterator<Item=&'a DescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn message_type_iter(&self) -> Self::MessageTypeIter<'_>;
+    type EnumTypeType: EnumDescriptorProtoTrait;
     fn for_each_enum_type<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::EnumDescriptorProto);
+        F: FnMut(&'_ EnumDescriptorProto);
     fn enum_type_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::EnumDescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ EnumDescriptorProto>>;
     #[cfg(feature = "puroro-nightly")]
-    type EnumTypeIter<'a>: Iterator<Item=&'a super::super::google::protobuf::EnumDescriptorProto>;
+    type EnumTypeIter<'a>: Iterator<Item=&'a EnumDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_>;
+    type ServiceType: ServiceDescriptorProtoTrait;
     fn for_each_service<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::ServiceDescriptorProto);
+        F: FnMut(&'_ ServiceDescriptorProto);
     fn service_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::ServiceDescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ ServiceDescriptorProto>>;
     #[cfg(feature = "puroro-nightly")]
-    type ServiceIter<'a>: Iterator<Item=&'a super::super::google::protobuf::ServiceDescriptorProto>;
+    type ServiceIter<'a>: Iterator<Item=&'a ServiceDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn service_iter(&self) -> Self::ServiceIter<'_>;
+    type ExtensionType: FieldDescriptorProtoTrait;
     fn for_each_extension<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FieldDescriptorProto);
+        F: FnMut(&'_ FieldDescriptorProto);
     fn extension_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FieldDescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ FieldDescriptorProto>>;
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionIter<'a>: Iterator<Item=&'a super::super::google::protobuf::FieldDescriptorProto>;
+    type ExtensionIter<'a>: Iterator<Item=&'a FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_>;
-    fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::FileOptions>;
-    fn source_code_info(&self) -> ::std::option::Option<&super::super::google::protobuf::SourceCodeInfo>;
-    fn syntax(&self) -> &str;
+    type OptionsType: FileOptionsTrait;
+    fn options(&'_ self) -> ::std::option::Option<&'_ FileOptions>;
+    type SourceCodeInfoType: SourceCodeInfoTrait;
+    fn source_code_info(&'_ self) -> ::std::option::Option<&'_ SourceCodeInfo>;
+    fn syntax(&'_ self) -> &'_ str;
 }
 pub trait FileDescriptorProtoMutTrait {
     fn name_mut(&self) -> &mut String;
@@ -10612,19 +10860,22 @@ impl ::puroro::Serializable for FileDescriptorSet {
 }
 
 impl FileDescriptorSetTrait for FileDescriptorSet {
+    type FileType = FileDescriptorProto;
     fn for_each_file<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FileDescriptorProto) {
+        F: FnMut(&'_ FileDescriptorProto)
+    {
         for item in (self.file).iter() {
             (f)(item);
         }
     }
-    fn file_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FileDescriptorProto>> {
+    fn file_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ FileDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.file.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FileDescriptorProto>;
+    type FileIter<'a> = impl Iterator<Item=&'a FileDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_> {
         self.file.iter()
@@ -10721,19 +10972,22 @@ impl<'bump> ::puroro::Serializable for FileDescriptorSetBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl FileDescriptorSetTrait for FileDescriptorSetBumpalo {
+    type FileType = FileDescriptorProtoBumpalo;
     fn for_each_file<F>(&self, mut f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FileDescriptorProto) {
+        F: FnMut(&'_ FileDescriptorProto)
+    {
         for item in (self.file).iter() {
             (f)(item);
         }
     }
-    fn file_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FileDescriptorProto>> {
+    fn file_boxed_iter(&self) ->
+        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ FileDescriptorProto>>
+    {
         ::std::boxed::Box::new(self.file.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a> = impl Iterator<Item=&'a super::super::google::protobuf::FileDescriptorProto>;
+    type FileIter<'a> = impl Iterator<Item=&'a FileDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_> {
         self.file.iter()
@@ -10749,13 +11003,14 @@ impl<'bump> ::puroro::helpers::FieldNew<'bump> for FileDescriptorSetBumpalo<'bum
     }
 }
 pub trait FileDescriptorSetTrait {
+    type FileType: FileDescriptorProtoTrait;
     fn for_each_file<F>(&self, f: F)
     where
-        F: FnMut(&super::super::google::protobuf::FileDescriptorProto);
+        F: FnMut(&'_ FileDescriptorProto);
     fn file_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&super::super::google::protobuf::FileDescriptorProto>>;
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ FileDescriptorProto>>;
     #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a>: Iterator<Item=&'a super::super::google::protobuf::FileDescriptorProto>;
+    type FileIter<'a>: Iterator<Item=&'a FileDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_>;
 }

@@ -232,6 +232,28 @@ impl<'c> FieldDescriptor<'c> {
             })?)
     }
 
+    pub fn native_maybe_ref_type(&'c self, lifetime: &str) -> Result<Cow<'static, str>> {
+        Ok(match self.type_()?.native_trivial_type_name() {
+            Ok(name) => name.into(),
+            Err(nontrivial_type) => match nontrivial_type {
+                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                NonTrivialFieldType::String => format!("&{lt} str", lt = lifetime).into(),
+                NonTrivialFieldType::Bytes => format!("&{lt} [u8]", lt = lifetime).into(),
+                NonTrivialFieldType::Enum(e) => format!(
+                    "::std::result::Result<{name}, i32>",
+                    name = e.native_type_name_with_relative_path(self.package())
+                )
+                .into(),
+                NonTrivialFieldType::Message(m) => format!(
+                    "&{lt} {name}",
+                    lt = lifetime,
+                    name = m.native_type_name_with_relative_path(self.package())
+                )
+                .into(),
+            },
+        })
+    }
+
     // Returns a ref type name for required field.
     pub fn native_scalar_ref_type_name(&'c self, lifetime: &'static str) -> Result<&str> {
         Ok(self

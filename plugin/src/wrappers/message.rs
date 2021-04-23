@@ -120,6 +120,30 @@ impl<'c> MessageDescriptor<'c> {
             .get_or_init(|| get_keyword_safe_ident(&to_camel_case(self.name())))
     }
 
+    pub fn native_type_name_with_relative_path(&'c self, cur_package: &str) -> String {
+        let struct_name = self.native_bare_type_name();
+        let mut struct_package_iter = self.package().split('.').peekable();
+        let mut cur_package_iter = cur_package.split('.').peekable();
+        while let (Some(p1), Some(p2)) = (struct_package_iter.peek(), cur_package_iter.peek()) {
+            if *p1 == *p2 {
+                struct_package_iter.next();
+                cur_package_iter.next();
+            } else {
+                break;
+            }
+        }
+        format!(
+            "{supers}{mods}{name}",
+            name = struct_name,
+            supers = std::iter::repeat("super::")
+                .take(cur_package_iter.count())
+                .collect::<String>(),
+            mods = struct_package_iter
+                .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
+                .collect::<String>(),
+        )
+    }
+
     pub fn native_fully_qualified_type_name(&'c self, path_to_root_mod: &str) -> String {
         let native_type_name_from_root = self.lazy_native_type_name_from_root.get_or_init(|| {
             let mod_path = itertools::Itertools::intersperse(

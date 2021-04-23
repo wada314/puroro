@@ -470,61 +470,76 @@ impl {name}Trait for {struct_name} {{\n",
                 cfg = self.frag_gen.cfg_condition(),
             ),
             indent(iter(self.msg.fields().map(|field| -> Result<_> {
-                Ok(match (field.label()?, field.type_()?) {
-                    (FieldLabel::Optional, FieldType::Message(_)) => {
+                Ok((
+                    if let FieldType::Message(m) = field.type_()? {
+                        // Associated Type for the message type
                         format!(
-                            "\
+                            "type {camel_name}Type = {submsg_name};\n",
+                            camel_name = to_camel_case(field.native_name()),
+                            submsg_name = self
+                                .frag_gen
+                                .struct_name_with_relative_path(m, field.package())?,
+                        )
+                    } else {
+                        "".to_string()
+                    },
+                    match (field.label()?, field.type_()?) {
+                        (FieldLabel::Optional, FieldType::Message(_)) => {
+                            format!(
+                                "\
 fn {name}(&self) -> ::std::option::Option<{reftype}> {{
     self.{name}.as_deref()
 }}\n",
-                            name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name("")?,
-                        )
-                    }
-                    (FieldLabel::Required, FieldType::Message(_)) => {
-                        format!(
-                            "\
+                                name = field.native_name(),
+                                reftype = field.native_maybe_ref_type("'_")?,
+                            )
+                        }
+                        (FieldLabel::Required, FieldType::Message(_)) => {
+                            format!(
+                                "\
 fn {name}(&self) -> {reftype} {{
     &self.{name}
 }}\n",
-                            name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name("")?,
-                        )
-                    }
-                    (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
-                        // normal getter function.
-                        let process_ref = match field.type_()? {
-                            FieldType::String | FieldType::Bytes => ".as_ref()",
-                            FieldType::Message(_) => "", // This should be catched by the arm above
-                            _ => ".clone()",
-                        };
-                        format!(
-                            "\
+                                name = field.native_name(),
+                                reftype = field.native_maybe_ref_type("'_")?,
+                            )
+                        }
+                        (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
+                            // normal getter function.
+                            let process_ref = match field.type_()? {
+                                FieldType::String | FieldType::Bytes => ".as_ref()",
+                                FieldType::Message(_) => "", // This should be catched by the arm above
+                                _ => ".clone()",
+                            };
+                            format!(
+                                "\
 fn {name}(&self) -> {reftype} {{
     self.{name}{process_ref}
 }}\n",
-                            name = field.native_name(),
-                            reftype = field.native_scalar_ref_type_name("")?,
-                            process_ref = process_ref,
-                        )
-                    }
-                    (FieldLabel::Repeated, _) => {
-                        let process_iter = match field.type_()? {
-                            FieldType::Message(_) => "",
-                            FieldType::String | FieldType::Bytes => ".map(|v| v.as_ref())",
-                            _ => ".cloned()",
-                        };
-                        format!(
-                            "\
+                                name = field.native_name(),
+                                reftype = field.native_maybe_ref_type("'_")?,
+                                process_ref = process_ref,
+                            )
+                        }
+                        (FieldLabel::Repeated, _) => {
+                            let process_iter = match field.type_()? {
+                                FieldType::Message(_) => "",
+                                FieldType::String | FieldType::Bytes => ".map(|v| v.as_ref())",
+                                _ => ".cloned()",
+                            };
+                            format!(
+                                "\
 fn for_each_{name}<F>(&self, mut f: F)
 where
-    F: FnMut({reftype}) {{
+    F: FnMut({reftype})
+{{
     for item in (self.{name}).iter(){process_iter} {{
         (f)(item);
     }}
 }}
-fn {name}_boxed_iter(&self)
-    -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>> {{
+fn {name}_boxed_iter(&self) ->
+    ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>
+{{
     ::std::boxed::Box::new(self.{name}.iter(){process_iter})
 }}
 #[cfg(feature = \"puroro-nightly\")]
@@ -533,14 +548,15 @@ type {camel_name}Iter<'a> = impl Iterator<Item={reftype_lt_a}>;
 fn {name}_iter(&self) -> Self::{camel_name}Iter<'_> {{
     self.{name}.iter(){process_iter}
 }}\n",
-                            name = field.native_name(),
-                            camel_name = to_camel_case(field.native_name()),
-                            reftype = field.native_scalar_ref_type_name("")?,
-                            process_iter = process_iter,
-                            reftype_lt_a = field.native_scalar_ref_type_name("'a")?,
-                        )
-                    }
-                })
+                                name = field.native_name(),
+                                camel_name = to_camel_case(field.native_name()),
+                                reftype = field.native_maybe_ref_type("'_")?,
+                                process_iter = process_iter,
+                                reftype_lt_a = field.native_maybe_ref_type("'a")?,
+                            )
+                        }
+                    },
+                ))
             }))),
             "}}\n",
         )
