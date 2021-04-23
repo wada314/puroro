@@ -20,13 +20,10 @@ pub trait MaybeRepeatedField<'a> {
     /// Returns a mutable reference for the:
     /// - Optional / required field: The field item.
     /// - Repeated field: A new item pushed into the tail of the list.
-    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item;
-    fn push_and_get_mut2<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
+    fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item;
+    fn push_and_get_mut<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
     where
-        T: InternalData,
-    {
-        self.push_and_get_mut()
-    }
+        T: InternalData;
 }
 
 macro_rules! define_maybe_repeated_field {
@@ -44,10 +41,10 @@ macro_rules! define_maybe_repeated_field {
                 }
                 .into_iter()
             }
-            fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+            fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
                 self
             }
-            fn push_and_get_mut2<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
+            fn push_and_get_mut<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
             where
                 T: InternalData,
             {
@@ -60,11 +57,11 @@ macro_rules! define_maybe_repeated_field {
             fn iter_for_ser(&'a self) -> Self::Iter {
                 self.iter()
             }
-            fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+            fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
                 self.push(Default::default());
                 self.last_mut().unwrap()
             }
-            fn push_and_get_mut2<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
+            fn push_and_get_mut<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
             where
                 T: InternalData,
             {
@@ -79,11 +76,11 @@ macro_rules! define_maybe_repeated_field {
             fn iter_for_ser(&'a self) -> Self::Iter {
                 self.iter()
             }
-            fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+            fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
                 self.push(Default::default());
                 self.last_mut().unwrap()
             }
-            fn push_and_get_mut2<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
+            fn push_and_get_mut<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
             where
                 T: InternalData,
             {
@@ -97,10 +94,10 @@ macro_rules! define_maybe_repeated_field {
             fn iter_for_ser(&'a self) -> Self::Iter {
                 self.iter()
             }
-            fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+            fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
                 self.get_or_insert_with(Default::default)
             }
-            fn push_and_get_mut2<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
+            fn push_and_get_mut<T>(&'a mut self, _internal: &'a T) -> &'a mut Self::Item
             where
                 T: InternalData,
             {
@@ -133,10 +130,10 @@ where
         };
         if int_value != 0 { Some(self) } else { None }.into_iter()
     }
-    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
         self
     }
-    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    fn push_and_get_mut<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
     where
         U: InternalData,
     {
@@ -152,11 +149,11 @@ where
     fn iter_for_ser(&'a self) -> Self::Iter {
         self.iter()
     }
-    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
         self.push(T::try_from(0i32));
         self.last_mut().unwrap()
     }
-    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    fn push_and_get_mut<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
     where
         U: InternalData,
     {
@@ -175,11 +172,11 @@ where
     fn iter_for_ser(&'a self) -> Self::Iter {
         self.iter()
     }
-    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
         self.push(T::try_from(0i32));
         self.last_mut().unwrap()
     }
-    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    fn push_and_get_mut<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
     where
         U: InternalData,
     {
@@ -196,10 +193,10 @@ where
     fn iter_for_ser(&'a self) -> Self::Iter {
         self.iter()
     }
-    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
         self.get_or_insert(T::try_from(0i32))
     }
-    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    fn push_and_get_mut<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
     where
         U: InternalData,
     {
@@ -217,10 +214,10 @@ where
     fn iter_for_ser(&'a self) -> Self::Iter {
         std::iter::once(self)
     }
-    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
         self.as_mut()
     }
-    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    fn push_and_get_mut<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
     where
         U: InternalData,
     {
@@ -237,10 +234,10 @@ where
     fn iter_for_ser(&'a self) -> Self::Iter {
         std::iter::once(self)
     }
-    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
         self.as_mut()
     }
-    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    fn push_and_get_mut<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
     where
         U: InternalData,
     {
@@ -256,11 +253,11 @@ where
     fn iter_for_ser(&'a self) -> Self::Iter {
         self.iter()
     }
-    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
         self.push(Default::default());
         self.last_mut().unwrap()
     }
-    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    fn push_and_get_mut<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
     where
         U: InternalData,
     {
@@ -278,11 +275,11 @@ where
     fn iter_for_ser(&'a self) -> Self::Iter {
         self.iter()
     }
-    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
         self.push(Default::default());
         self.last_mut().unwrap()
     }
-    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    fn push_and_get_mut<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
     where
         U: InternalData,
     {
@@ -299,11 +296,11 @@ where
     fn iter_for_ser(&'a self) -> Self::Iter {
         Option::<&'a Self::Item>::into_iter(self.as_deref())
     }
-    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
         self.get_or_insert_with(|| Box::new(Default::default()))
             .as_mut()
     }
-    fn push_and_get_mut2<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    fn push_and_get_mut<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
     where
         U: InternalData,
     {
@@ -321,13 +318,13 @@ where
     fn iter_for_ser(&'a self) -> Self::Iter {
         Option::<&'a Self::Item>::into_iter(self.as_deref())
     }
-    fn push_and_get_mut(&'a mut self) -> &'a mut Self::Item {
+    fn push_and_get_mut0(&'a mut self) -> &'a mut Self::Item {
         unimplemented!(
-            "Please call the push_and_get_mut2 method for this type \
+            "Please call the push_and_get_mut method for this type \
                 because we need an allocator info."
         )
     }
-    fn push_and_get_mut2<U>(&'a mut self, internal: &'a U) -> &'a mut Self::Item
+    fn push_and_get_mut<U>(&'a mut self, internal: &'a U) -> &'a mut Self::Item
     where
         U: InternalData,
     {

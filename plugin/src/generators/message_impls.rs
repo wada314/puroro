@@ -186,7 +186,7 @@ impl{gp} ::puroro::deser::DeserializeMessageFromBytesEventHandler for {name}{gpb
                         WireType::Variant(field_type) => (
                             format!("{number} => {{\n", number = field.number()),
                             indent(format!(
-                                "*self.{name}.push_and_get_mut2(&self.puroro_internal) \
+                                "*self.{name}.push_and_get_mut(&self.puroro_internal) \
                                     = variant.to_native::<{tag}>()?;\n",
                                 name = field.native_name(),
                                 tag = field_type.native_tag_type(self.msg.path_to_root_mod()),
@@ -234,19 +234,19 @@ MaybeRepeatedVariantField::extend(&mut self.{name}, first, iter);\n",
                             WireType::LengthDelimited(field_type) => match field_type {
                                 LengthDelimitedFieldType::String => format!(
                                     "\
-*self.{name}.push_and_get_mut2(&self.puroro_internal)
+*self.{name}.push_and_get_mut(&self.puroro_internal)
     = bytes_iter.chars().collect::<::puroro::Result<_>>()?;\n",
                                     name = field.native_name()
                                 ),
                                 LengthDelimitedFieldType::Bytes => format!(
                                     "\
-*self.{name}.push_and_get_mut2(&self.puroro_internal)
+*self.{name}.push_and_get_mut(&self.puroro_internal)
     = bytes_iter.bytes().collect::<::puroro::Result<_>>()?;\n",
                                     name = field.native_name()
                                 ),
                                 LengthDelimitedFieldType::Message(_) => format!(
                                     "\
-let msg = self.{name}.push_and_get_mut2(&self.puroro_internal);
+let msg = self.{name}.push_and_get_mut(&self.puroro_internal);
 bytes_iter.deser_message(msg)?;\n",
                                     name = field.native_name()
                                 ),
@@ -292,7 +292,7 @@ bytes_iter.deser_message(msg)?;\n",
                                 format!(
                                     "\
 {number} => {{
-    *self.{name}.push_and_get_mut2(&self.puroro_internal) 
+    *self.{name}.push_and_get_mut(&self.puroro_internal) 
         = {type_}::from_le_bytes(bytes);
 }}\n",
                                     number = field.number(),

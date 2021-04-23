@@ -38,7 +38,7 @@ impl<'a, T> FieldNew<'a> for ::std::vec::Vec<T> {
 }
 impl<'a, T> FieldNew<'a> for ::std::option::Option<T> {
     fn new() -> Self {
-        ::std::option::Option::new()
+        None
     }
 }
 impl<'a, T> FieldNew<'a> for ::std::result::Result<T, i32>
