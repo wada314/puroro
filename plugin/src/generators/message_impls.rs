@@ -35,6 +35,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
                 func(|output| self.print_msg_puroro_serializable(output)),
             ),
             func(|output| self.print_msg_trait_impl(output)),
+            func(|output| self.print_msg_field_new_impl(output)),
         )
             .write_into(output)
     }
@@ -48,7 +49,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
 pub struct {name}{gp} {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(),
+                gp = self.frag_gen.struct_generic_params(&[]),
             ),
             indent((
                 iter(self.msg.fields().map(|field| {
@@ -80,8 +81,8 @@ impl{gp} {name}{gpb} {{
         Self {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(),
-                gpb = self.frag_gen.struct_generic_params_bounds(),
+                gp = self.frag_gen.struct_generic_params(&[]),
+                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
                 new_decl = self.frag_gen.new_method_declaration(),
             ),
             indent_n(
@@ -129,8 +130,8 @@ impl{gp} ::std::default::Default for {name}{gpb} {{
 }}\n",
                     name = self.frag_gen.struct_name(self.msg)?,
                     cfg = self.frag_gen.cfg_condition(),
-                    gp = self.frag_gen.struct_generic_params(),
-                    gpb = self.frag_gen.struct_generic_params_bounds(),
+                    gp = self.frag_gen.struct_generic_params(&[]),
+                    gpb = self.frag_gen.struct_generic_params_bounds(&[]),
                 )
             } else {
                 "".to_string()
@@ -161,8 +162,8 @@ impl{gp} ::puroro::deser::DeserializeMessageFromBytesEventHandler for {name}{gpb
         match field {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(),
-                gpb = self.frag_gen.struct_generic_params_bounds(),
+                gp = self.frag_gen.struct_generic_params(&[]),
+                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
             ),
             indent_n(
                 3,
@@ -221,7 +222,7 @@ impl{gp} ::puroro::deser::DeserializeMessageFromBytesEventHandler for {name}{gpb
         output: &mut Indentor<W>,
     ) -> Result<()> {
         (
-            "::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {{\n",
+            "::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {{\n",
             indent((
                 iter(self.msg.fields().map(|field| -> Result<Fragment<_>> {
                     Ok((
@@ -361,8 +362,8 @@ impl{gpb} ::puroro::deser::DeserializableFromBytes for {name}{gp} {{
 }}\n",
             name = self.frag_gen.struct_name(self.msg)?,
             cfg = self.frag_gen.cfg_condition(),
-            gp = self.frag_gen.struct_generic_params(),
-            gpb = self.frag_gen.struct_generic_params_bounds(),
+            gp = self.frag_gen.struct_generic_params(&[]),
+            gpb = self.frag_gen.struct_generic_params_bounds(&[]),
         ),)
             .write_into(output)
     }
@@ -382,8 +383,8 @@ impl{gp} ::puroro::serializer::Serializable for {name}{gpb} {{
         use ::puroro::helpers::MaybeRepeatedField;\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(),
-                gpb = self.frag_gen.struct_generic_params_bounds(),
+                gp = self.frag_gen.struct_generic_params(&[]),
+                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
             ),
             indent_n(
                 2,
@@ -461,8 +462,8 @@ impl{gp} ::puroro::Serializable for {name}{gpb} {{
 }}\n",
             name = self.frag_gen.struct_name(self.msg)?,
             cfg = self.frag_gen.cfg_condition(),
-            gp = self.frag_gen.struct_generic_params(),
-            gpb = self.frag_gen.struct_generic_params_bounds(),
+            gp = self.frag_gen.struct_generic_params(&[]),
+            gpb = self.frag_gen.struct_generic_params_bounds(&[]),
         ),)
             .write_into(output)
     }
@@ -552,6 +553,43 @@ fn {name}_iter(&self) -> Self::{camel_name}Iter<'_> {{
             }))),
             "}}\n",
         )
+            .write_into(output)
+    }
+
+    fn print_msg_field_new_impl<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+        (match self.context.alloc_type() {
+            crate::context::AllocatorType::Default => {
+                format!(
+                    "\
+impl{gp} ::puroro::helpers::FieldNew<'a> for {name}{gpb} {{
+    fn new() -> Self {{
+        Default::default()
+    }}
+}}\n",
+                    name = self.frag_gen.struct_name(self.msg)?,
+                    gp = self.frag_gen.struct_generic_params(&["'a"]),
+                    gpb = self.frag_gen.struct_generic_params_bounds(&[""]),
+                )
+            }
+            crate::context::AllocatorType::Bumpalo => {
+                format!(
+                    "\
+{cfg}
+impl{gp} ::puroro::helpers::FieldNew<'bump> for {name}{gpb} {{
+    fn new() -> Self {{
+        unimplemented!()
+    }}
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {{
+        Self::new_in(bump)
+    }}
+}}\n",
+                    cfg = self.frag_gen.cfg_condition(),
+                    name = self.frag_gen.struct_name(self.msg)?,
+                    gp = self.frag_gen.struct_generic_params(&[]),
+                    gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+                )
+            }
+        },)
             .write_into(output)
     }
 }

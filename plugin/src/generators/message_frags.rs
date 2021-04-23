@@ -1,5 +1,7 @@
 use std::borrow::Cow;
 
+use itertools::Itertools;
+
 use crate::context::{AllocatorType, Context, ImplType};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonTrivialFieldType,
@@ -87,18 +89,26 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    pub fn struct_generic_params(&self) -> &'static str {
-        match self.context.alloc_type() {
-            AllocatorType::Default => "",
-            AllocatorType::Bumpalo => "<'bump>",
+    pub fn struct_generic_params(&self, params: &[&'static str]) -> String {
+        let mut iter = params
+            .iter()
+            .cloned()
+            .chain(match self.context.alloc_type() {
+                AllocatorType::Default => None.into_iter(),
+                AllocatorType::Bumpalo => Some("'bump").into_iter(),
+            });
+        if iter.clone().count() == 0 {
+            "".to_string()
+        } else {
+            format!(
+                "<{}>",
+                Itertools::intersperse(iter, ", ").collect::<String>()
+            )
         }
     }
 
-    pub fn struct_generic_params_bounds(&self) -> &'static str {
-        match self.context.alloc_type() {
-            AllocatorType::Default => "",
-            AllocatorType::Bumpalo => "<'bump>",
-        }
+    pub fn struct_generic_params_bounds(&self, params: &[&'static str]) -> String {
+        self.struct_generic_params(params)
     }
 
     pub fn new_method_declaration(&self) -> &'static str {

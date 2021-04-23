@@ -40,7 +40,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for GeneratedCodeI
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let msg = self.annotation.push_and_get_mut2(&self.puroro_internal);
                     bytes_iter.deser_message(msg)?;
@@ -112,6 +112,11 @@ impl GeneratedCodeInfoTrait for GeneratedCodeInfo {
         self.annotation.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for GeneratedCodeInfo<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct GeneratedCodeInfoBumpalo<'bump> {
@@ -145,7 +150,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Generat
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let msg = self.annotation.push_and_get_mut2(&self.puroro_internal);
                     bytes_iter.deser_message(msg)?;
@@ -215,6 +220,16 @@ impl GeneratedCodeInfoTrait for GeneratedCodeInfoBumpalo {
     #[cfg(feature = "puroro-nightly")]
     fn annotation_iter(&self) -> Self::AnnotationIter<'_> {
         self.annotation.iter()
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for GeneratedCodeInfoBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
     }
 }
 pub trait GeneratedCodeInfoTrait {
@@ -291,7 +306,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for Annotation {
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
@@ -411,6 +426,11 @@ impl AnnotationTrait for Annotation {
         self.end.clone()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for Annotation<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct AnnotationBumpalo<'bump> {
@@ -459,7 +479,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Annotat
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
@@ -579,6 +599,16 @@ impl AnnotationTrait for AnnotationBumpalo {
         self.end.clone()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for AnnotationBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait AnnotationTrait {
     fn for_each_path<F>(&self, f: F)
     where
@@ -644,7 +674,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for SourceCodeInfo
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let msg = self.location.push_and_get_mut2(&self.puroro_internal);
                     bytes_iter.deser_message(msg)?;
@@ -716,6 +746,11 @@ impl SourceCodeInfoTrait for SourceCodeInfo {
         self.location.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for SourceCodeInfo<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct SourceCodeInfoBumpalo<'bump> {
@@ -749,7 +784,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for SourceC
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let msg = self.location.push_and_get_mut2(&self.puroro_internal);
                     bytes_iter.deser_message(msg)?;
@@ -819,6 +854,16 @@ impl SourceCodeInfoTrait for SourceCodeInfoBumpalo {
     #[cfg(feature = "puroro-nightly")]
     fn location_iter(&self) -> Self::LocationIter<'_> {
         self.location.iter()
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for SourceCodeInfoBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
     }
 }
 pub trait SourceCodeInfoTrait {
@@ -896,7 +941,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for Location {
                 6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
@@ -1048,6 +1093,11 @@ impl LocationTrait for Location {
         self.leading_detached_comments.iter().map(|v| v.as_ref())
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for Location<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct LocationBumpalo<'bump> {
@@ -1097,7 +1147,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Locatio
                 6 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
@@ -1249,6 +1299,16 @@ impl LocationTrait for LocationBumpalo {
         self.leading_detached_comments.iter().map(|v| v.as_ref())
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for LocationBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait LocationTrait {
     fn for_each_path<F>(&self, f: F)
     where
@@ -1364,7 +1424,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for UninterpretedO
                 8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 2 => {
                     let msg = self.name.push_and_get_mut2(&self.puroro_internal);
                     bytes_iter.deser_message(msg)?;
@@ -1510,6 +1570,11 @@ impl UninterpretedOptionTrait for UninterpretedOption {
         self.aggregate_value.as_ref()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for UninterpretedOption<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct UninterpretedOptionBumpalo<'bump> {
@@ -1565,7 +1630,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Uninter
                 8 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 2 => {
                     let msg = self.name.push_and_get_mut2(&self.puroro_internal);
                     bytes_iter.deser_message(msg)?;
@@ -1711,6 +1776,16 @@ impl UninterpretedOptionTrait for UninterpretedOptionBumpalo {
         self.aggregate_value.as_ref()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for UninterpretedOptionBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait UninterpretedOptionTrait {
     fn for_each_name<F>(&self, f: F)
     where
@@ -1787,7 +1862,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for NamePart {
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name_part.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -1861,6 +1936,11 @@ impl NamePartTrait for NamePart {
         self.is_extension.clone()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for NamePart<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct NamePartBumpalo<'bump> {
@@ -1899,7 +1979,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for NamePar
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name_part.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -1973,6 +2053,16 @@ impl NamePartTrait for NamePartBumpalo {
         self.is_extension.clone()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for NamePartBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait NamePartTrait {
     fn name_part(&self) -> &str;
     fn is_extension(&self) -> bool;
@@ -2031,7 +2121,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodOptions 
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 33 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
@@ -2135,6 +2225,11 @@ impl MethodOptionsTrait for MethodOptions {
         self.uninterpreted_option.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for MethodOptions<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct MethodOptionsBumpalo<'bump> {
@@ -2178,7 +2273,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodO
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 33 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
@@ -2282,6 +2377,16 @@ impl MethodOptionsTrait for MethodOptionsBumpalo {
         self.uninterpreted_option.iter()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for MethodOptionsBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait MethodOptionsTrait {
     fn deprecated(&self) -> bool;
     fn idempotency_level(&self) -> ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>;
@@ -2373,7 +2478,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ServiceOptions
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 33 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
@@ -2461,6 +2566,11 @@ impl ServiceOptionsTrait for ServiceOptions {
         self.uninterpreted_option.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for ServiceOptions<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct ServiceOptionsBumpalo<'bump> {
@@ -2499,7 +2609,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Service
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 33 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
@@ -2587,6 +2697,16 @@ impl ServiceOptionsTrait for ServiceOptionsBumpalo {
         self.uninterpreted_option.iter()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for ServiceOptionsBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait ServiceOptionsTrait {
     fn deprecated(&self) -> bool;
     fn for_each_uninterpreted_option<F>(&self, f: F)
@@ -2652,7 +2772,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumValueOptio
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
@@ -2740,6 +2860,11 @@ impl EnumValueOptionsTrait for EnumValueOptions {
         self.uninterpreted_option.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for EnumValueOptions<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct EnumValueOptionsBumpalo<'bump> {
@@ -2778,7 +2903,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumVal
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
@@ -2866,6 +2991,16 @@ impl EnumValueOptionsTrait for EnumValueOptionsBumpalo {
         self.uninterpreted_option.iter()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumValueOptionsBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait EnumValueOptionsTrait {
     fn deprecated(&self) -> bool;
     fn for_each_uninterpreted_option<F>(&self, f: F)
@@ -2936,7 +3071,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumOptions {
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 2 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
@@ -3040,6 +3175,11 @@ impl EnumOptionsTrait for EnumOptions {
         self.uninterpreted_option.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for EnumOptions<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct EnumOptionsBumpalo<'bump> {
@@ -3083,7 +3223,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumOpt
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 2 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
@@ -3187,6 +3327,16 @@ impl EnumOptionsTrait for EnumOptionsBumpalo {
         self.uninterpreted_option.iter()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumOptionsBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait EnumOptionsTrait {
     fn allow_alias(&self) -> bool;
     fn deprecated(&self) -> bool;
@@ -3249,7 +3399,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofOptions {
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 999 => {
                     let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     bytes_iter.deser_message(msg)?;
@@ -3321,6 +3471,11 @@ impl OneofOptionsTrait for OneofOptions {
         self.uninterpreted_option.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for OneofOptions<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct OneofOptionsBumpalo<'bump> {
@@ -3354,7 +3509,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofOp
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 999 => {
                     let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     bytes_iter.deser_message(msg)?;
@@ -3424,6 +3579,16 @@ impl OneofOptionsTrait for OneofOptionsBumpalo {
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for OneofOptionsBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
     }
 }
 pub trait OneofOptionsTrait {
@@ -3514,7 +3679,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldOptions {
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_options::Ctype>>())
@@ -3682,6 +3847,11 @@ impl FieldOptionsTrait for FieldOptions {
         self.uninterpreted_option.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for FieldOptions<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FieldOptionsBumpalo<'bump> {
@@ -3745,7 +3915,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldOp
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Enum<super::super::google::protobuf::field_options::Ctype>>())
@@ -3913,6 +4083,16 @@ impl FieldOptionsTrait for FieldOptionsBumpalo {
         self.uninterpreted_option.iter()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for FieldOptionsBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait FieldOptionsTrait {
     fn ctype(&self) -> ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>;
     fn packed(&self) -> bool;
@@ -4049,7 +4229,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for MessageOptions
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
@@ -4185,6 +4365,11 @@ impl MessageOptionsTrait for MessageOptions {
         self.uninterpreted_option.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for MessageOptions<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct MessageOptionsBumpalo<'bump> {
@@ -4238,7 +4423,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Message
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Bool>())
@@ -4372,6 +4557,16 @@ impl MessageOptionsTrait for MessageOptionsBumpalo {
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for MessageOptionsBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
     }
 }
 pub trait MessageOptionsTrait {
@@ -4520,7 +4715,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileOptions {
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.java_package.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -4852,6 +5047,11 @@ impl FileOptionsTrait for FileOptions {
         self.uninterpreted_option.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for FileOptions<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FileOptionsBumpalo<'bump> {
@@ -4965,7 +5165,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileOpt
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.java_package.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -5297,6 +5497,16 @@ impl FileOptionsTrait for FileOptionsBumpalo {
         self.uninterpreted_option.iter()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for FileOptionsBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait FileOptionsTrait {
     fn java_package(&self) -> &str;
     fn java_outer_classname(&self) -> &str;
@@ -5438,7 +5648,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodDescript
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -5558,6 +5768,11 @@ impl MethodDescriptorProtoTrait for MethodDescriptorProto {
         self.server_streaming.clone()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for MethodDescriptorProto<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct MethodDescriptorProtoBumpalo<'bump> {
@@ -5610,7 +5825,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodD
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -5730,6 +5945,16 @@ impl MethodDescriptorProtoTrait for MethodDescriptorProtoBumpalo {
         self.server_streaming.clone()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for MethodDescriptorProtoBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait MethodDescriptorProtoTrait {
     fn name(&self) -> &str;
     fn input_type(&self) -> &str;
@@ -5791,7 +6016,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ServiceDescrip
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -5883,6 +6108,11 @@ impl ServiceDescriptorProtoTrait for ServiceDescriptorProto {
         self.options.as_deref()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for ServiceDescriptorProto<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct ServiceDescriptorProtoBumpalo<'bump> {
@@ -5922,7 +6152,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Service
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -6014,6 +6244,16 @@ impl ServiceDescriptorProtoTrait for ServiceDescriptorProtoBumpalo {
         self.options.as_deref()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for ServiceDescriptorProtoBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait ServiceDescriptorProtoTrait {
     fn name(&self) -> &str;
     fn for_each_method<F>(&self, f: F)
@@ -6084,7 +6324,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumValueDescr
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -6168,6 +6408,11 @@ impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProto {
         self.options.as_deref()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for EnumValueDescriptorProto<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct EnumValueDescriptorProtoBumpalo<'bump> {
@@ -6209,7 +6454,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumVal
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -6293,6 +6538,16 @@ impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoBumpalo {
         self.options.as_deref()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumValueDescriptorProtoBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait EnumValueDescriptorProtoTrait {
     fn name(&self) -> &str;
     fn number(&self) -> i32;
@@ -6354,7 +6609,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumDescriptor
                 5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -6494,6 +6749,11 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProto {
         self.reserved_name.iter().map(|v| v.as_ref())
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for EnumDescriptorProto<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct EnumDescriptorProtoBumpalo<'bump> {
@@ -6539,7 +6799,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumDes
                 5 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -6679,6 +6939,16 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo {
         self.reserved_name.iter().map(|v| v.as_ref())
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumDescriptorProtoBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait EnumDescriptorProtoTrait {
     fn name(&self) -> &str;
     fn for_each_value<F>(&self, f: F)
@@ -6779,7 +7049,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumReservedRa
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
@@ -6859,6 +7129,11 @@ impl EnumReservedRangeTrait for EnumReservedRange {
         self.end.clone()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for EnumReservedRange<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct EnumReservedRangeBumpalo<'bump> {
@@ -6899,7 +7174,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumRes
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
@@ -6979,6 +7254,16 @@ impl EnumReservedRangeTrait for EnumReservedRangeBumpalo {
         self.end.clone()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for EnumReservedRangeBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait EnumReservedRangeTrait {
     fn start(&self) -> i32;
     fn end(&self) -> i32;
@@ -7030,7 +7315,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofDescripto
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -7098,6 +7383,11 @@ impl OneofDescriptorProtoTrait for OneofDescriptorProto {
         self.options.as_deref()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for OneofDescriptorProto<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct OneofDescriptorProtoBumpalo<'bump> {
@@ -7134,7 +7424,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofDe
                 2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -7200,6 +7490,16 @@ impl OneofDescriptorProtoTrait for OneofDescriptorProtoBumpalo {
     }
     fn options(&self) -> ::std::option::Option<&super::super::google::protobuf::OneofOptions> {
         self.options.as_deref()
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for OneofDescriptorProtoBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
     }
 }
 pub trait OneofDescriptorProtoTrait {
@@ -7289,7 +7589,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldDescripto
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -7477,6 +7777,11 @@ impl FieldDescriptorProtoTrait for FieldDescriptorProto {
         self.proto3_optional.clone()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for FieldDescriptorProto<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FieldDescriptorProtoBumpalo<'bump> {
@@ -7550,7 +7855,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldDe
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -7738,6 +8043,16 @@ impl FieldDescriptorProtoTrait for FieldDescriptorProtoBumpalo {
         self.proto3_optional.clone()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for FieldDescriptorProtoBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait FieldDescriptorProtoTrait {
     fn name(&self) -> &str;
     fn number(&self) -> i32;
@@ -7879,7 +8194,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ExtensionRange
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 999 => {
                     let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     bytes_iter.deser_message(msg)?;
@@ -7951,6 +8266,11 @@ impl ExtensionRangeOptionsTrait for ExtensionRangeOptions {
         self.uninterpreted_option.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for ExtensionRangeOptions<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct ExtensionRangeOptionsBumpalo<'bump> {
@@ -7984,7 +8304,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Extensi
                 999 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 999 => {
                     let msg = self.uninterpreted_option.push_and_get_mut2(&self.puroro_internal);
                     bytes_iter.deser_message(msg)?;
@@ -8054,6 +8374,16 @@ impl ExtensionRangeOptionsTrait for ExtensionRangeOptionsBumpalo {
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for ExtensionRangeOptionsBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
     }
 }
 pub trait ExtensionRangeOptionsTrait {
@@ -8141,7 +8471,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for DescriptorProt
                 10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -8401,6 +8731,11 @@ impl DescriptorProtoTrait for DescriptorProto {
         self.reserved_name.iter().map(|v| v.as_ref())
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for DescriptorProto<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct DescriptorProtoBumpalo<'bump> {
@@ -8461,7 +8796,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Descrip
                 10 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -8721,6 +9056,16 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
         self.reserved_name.iter().map(|v| v.as_ref())
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for DescriptorProtoBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait DescriptorProtoTrait {
     fn name(&self) -> &str;
     fn for_each_field<F>(&self, f: F)
@@ -8896,7 +9241,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ReservedRange 
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
@@ -8976,6 +9321,11 @@ impl ReservedRangeTrait for ReservedRange {
         self.end.clone()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for ReservedRange<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct ReservedRangeBumpalo<'bump> {
@@ -9016,7 +9366,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Reserve
                 }
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
@@ -9096,6 +9446,16 @@ impl ReservedRangeTrait for ReservedRangeBumpalo {
         self.end.clone()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for ReservedRangeBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait ReservedRangeTrait {
     fn start(&self) -> i32;
     fn end(&self) -> i32;
@@ -9153,7 +9513,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ExtensionRange
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
@@ -9243,6 +9603,11 @@ impl ExtensionRangeTrait for ExtensionRange {
         self.options.as_deref()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for ExtensionRange<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct ExtensionRangeBumpalo<'bump> {
@@ -9286,7 +9651,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Extensi
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
@@ -9376,6 +9741,16 @@ impl ExtensionRangeTrait for ExtensionRangeBumpalo {
         self.options.as_deref()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for ExtensionRangeBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait ExtensionRangeTrait {
     fn start(&self) -> i32;
     fn end(&self) -> i32;
@@ -9463,7 +9838,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDescriptor
                 12 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -9741,6 +10116,11 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         self.syntax.as_ref()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for FileDescriptorProto<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FileDescriptorProtoBumpalo<'bump> {
@@ -9811,7 +10191,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDes
                 12 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -10089,6 +10469,16 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
         self.syntax.as_ref()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for FileDescriptorProtoBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait FileDescriptorProtoTrait {
     fn name(&self) -> &str;
     fn package(&self) -> &str;
@@ -10247,7 +10637,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDescriptor
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let msg = self.file.push_and_get_mut2(&self.puroro_internal);
                     bytes_iter.deser_message(msg)?;
@@ -10319,6 +10709,11 @@ impl FileDescriptorSetTrait for FileDescriptorSet {
         self.file.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for FileDescriptorSet<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FileDescriptorSetBumpalo<'bump> {
@@ -10352,7 +10747,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDes
                 1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let msg = self.file.push_and_get_mut2(&self.puroro_internal);
                     bytes_iter.deser_message(msg)?;
@@ -10422,6 +10817,16 @@ impl FileDescriptorSetTrait for FileDescriptorSetBumpalo {
     #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_> {
         self.file.iter()
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for FileDescriptorSetBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
     }
 }
 pub trait FileDescriptorSetTrait {

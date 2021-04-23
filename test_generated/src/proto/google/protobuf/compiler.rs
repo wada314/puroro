@@ -48,7 +48,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorR
                 15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.error.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -146,6 +146,11 @@ impl CodeGeneratorResponseTrait for CodeGeneratorResponse {
         self.file.iter()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for CodeGeneratorResponse<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct CodeGeneratorResponseBumpalo<'bump> {
@@ -187,7 +192,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGen
                 15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.error.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -285,6 +290,16 @@ impl CodeGeneratorResponseTrait for CodeGeneratorResponseBumpalo {
         self.file.iter()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for CodeGeneratorResponseBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait CodeGeneratorResponseTrait {
     fn error(&self) -> &str;
     fn supported_features(&self) -> u64;
@@ -377,7 +392,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for File {
                 16 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -465,6 +480,11 @@ impl FileTrait for File {
         self.generated_code_info.as_deref()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for File<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FileBumpalo<'bump> {
@@ -507,7 +527,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileBum
                 16 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.name.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -595,6 +615,16 @@ impl FileTrait for FileBumpalo {
         self.generated_code_info.as_deref()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for FileBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait FileTrait {
     fn name(&self) -> &str;
     fn insertion_point(&self) -> &str;
@@ -656,7 +686,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorR
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.file_to_generate.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -772,6 +802,11 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
         self.compiler_version.as_deref()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for CodeGeneratorRequest<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct CodeGeneratorRequestBumpalo<'bump> {
@@ -814,7 +849,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGen
                 3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     *self.file_to_generate.push_and_get_mut()
                         = bytes_iter.chars().collect::<::puroro::Result<_>>()?;
@@ -930,6 +965,16 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo {
         self.compiler_version.as_deref()
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for CodeGeneratorRequestBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
+    }
+}
 pub trait CodeGeneratorRequestTrait {
     fn for_each_file_to_generate<F>(&self, f: F)
     where
@@ -1022,7 +1067,7 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for Version {
                 4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
@@ -1128,6 +1173,11 @@ impl VersionTrait for Version {
         self.suffix.as_ref()
     }
 }
+impl<'a> ::puroro::helpers::FieldNew<'a> for Version<> {
+    fn new() -> Self {
+        Default::default()
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct VersionBumpalo<'bump> {
@@ -1176,7 +1226,7 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Version
                 4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
                 _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
             }
-            ::puroro::types::FieldData::LengthDelimited(mut bytes_iter) => match field_number {
+            ::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {
                 1 => {
                     let values = bytes_iter.variants().map(|rv| {
                         rv.and_then(|variant| variant.to_native::<::puroro::tags::Int32>())
@@ -1280,6 +1330,16 @@ impl VersionTrait for VersionBumpalo {
     }
     fn suffix(&self) -> &str {
         self.suffix.as_ref()
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::helpers::FieldNew<'bump> for VersionBumpalo<'bump> {
+    fn new() -> Self {
+        unimplemented!()
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+        Self::new_in(bump)
     }
 }
 pub trait VersionTrait {
