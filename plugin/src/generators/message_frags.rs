@@ -79,13 +79,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             scalar_type.into()
                         }
                     }
-                    FieldLabel::Required => {
-                        if matches!(field.type_()?, FieldType::Message(_)) {
-                            self.box_type(scalar_type.as_ref()).into()
-                        } else {
-                            scalar_type.into()
-                        }
-                    }
+                    FieldLabel::Required => scalar_type.into(),
                     FieldLabel::Repeated => self.vec_type(scalar_type.as_ref()).into(),
                 }
             }
