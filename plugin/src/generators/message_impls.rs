@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use super::writer::{func, indent, indent_n, iter, Fragment, IntoFragment};
-use crate::context::Context;
+use crate::context::{AllocatorType, Context, ImplType};
 use crate::utils::{to_camel_case, Indentor};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, LengthDelimitedFieldType, MessageDescriptor,
@@ -574,9 +574,98 @@ pub trait MessageImplFragmentGenerator<'c> {
     fn new_method_params(&self) -> &'static str;
     fn new_method_call_params(&self) -> &'static str;
     fn box_type(&self) -> &'static str;
+    fn vec_type(&self) -> &'static str;
+    fn string_type(&self) -> &'static str;
     fn internal_data_type(&self) -> &'static str;
     fn internal_field_init_value(&self) -> &'static str;
 }
+
+pub struct MessageImplFragmentGeneratorImpl<'c> {
+    context: &'c Context<'c>,
+}
+impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorImpl<'c> {
+    fn struct_name(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
+        let postfix1 = match self.context.impl_type() {
+            ImplType::Default => "",
+            ImplType::SliceRef => "SliceRef",
+        };
+        let postfix2 = match self.context.alloc_type() {
+            AllocatorType::Default => "",
+            AllocatorType::Bumpalo => "Bumpalo",
+        };
+        Ok(format!(
+            "{name}{postfix1}{postfix2}",
+            name = msg.native_bare_type_name(),
+            postfix1 = postfix1,
+            postfix2 = postfix2,
+        )
+        .into())
+    }
+
+    fn cfg_condition(&self) -> &'static str {
+        match self.context.alloc_type() {
+            AllocatorType::Bumpalo => "#[cfg(feature = \"puroro-bumpalo\")]",
+            _ => "",
+        }
+    }
+
+    fn is_default_available(&self) -> bool {
+        match (self.context.impl_type(), self.context.alloc_type()) {
+            (ImplType::SliceRef, _) | (_, AllocatorType::Bumpalo) => false,
+            _ => true,
+        }
+    }
+
+    fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+        todo!()
+    }
+
+    fn struct_generic_params(&self, extra_args: &'static str) -> Cow<'static, str> {
+        todo!()
+    }
+
+    fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str> {
+        todo!()
+    }
+
+    fn new_method_params(&self) -> &'static str {
+        todo!()
+    }
+
+    fn new_method_call_params(&self) -> &'static str {
+        todo!()
+    }
+
+    fn box_type(&self) -> &'static str {
+        match self.context.alloc_type() {
+            AllocatorType::Default => "::std::boxed::Box",
+            AllocatorType::Bumpalo => "::bumpalo::boxed::Box",
+        }
+    }
+
+    fn vec_type(&self) -> &'static str {
+        match self.context.alloc_type() {
+            AllocatorType::Default => "::std::vec::Vec",
+            AllocatorType::Bumpalo => "::bumpalo::collections::Vec",
+        }
+    }
+
+    fn string_type(&self) -> &'static str {
+        match self.context.alloc_type() {
+            AllocatorType::Default => "::std::string::String",
+            AllocatorType::Bumpalo => "::bumpalo::collections::String",
+        }
+    }
+
+    fn internal_data_type(&self) -> &'static str {
+        todo!()
+    }
+
+    fn internal_field_init_value(&self) -> &'static str {
+        todo!()
+    }
+}
+
 pub struct MessageImplFragmentGeneratorForNormalStruct<'c> {
     context: &'c Context<'c>,
 }
@@ -658,9 +747,17 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForNor
     fn box_type(&self) -> &'static str {
         "::std::boxed::Box"
     }
+    fn vec_type(&self) -> &'static str {
+        "::std::vec::Vec"
+    }
+    fn string_type(&self) -> &'static str {
+        "::std::string::String"
+    }
+
     fn internal_data_type(&self) -> &'static str {
         "::puroro::helpers::InternalDataForNormalStruct"
     }
+
     fn internal_field_init_value(&self) -> &'static str {
         "::puroro::helpers::InternalDataForNormalStruct::new()"
     }
@@ -754,9 +851,17 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForBum
     fn box_type(&self) -> &'static str {
         "::bumpalo::boxed::Box"
     }
+    fn vec_type(&self) -> &'static str {
+        "::bumpalo::collections::Vec"
+    }
+    fn string_type(&self) -> &'static str {
+        "::bumpalo::collactions::String"
+    }
+
     fn internal_data_type(&self) -> &'static str {
         "::puroro::helpers::InternalDataForBumpaloStruct<'b>"
     }
+
     fn internal_field_init_value(&self) -> &'static str {
         "::puroro::helpers::InternalDataForBumpaloStruct::new(bump)"
     }

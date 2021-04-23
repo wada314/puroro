@@ -39,7 +39,11 @@ pub use protos::google;
 fn main() -> Result<()> {
     let mut cgreq = CodeGeneratorRequest::default();
     cgreq.deserialize(&mut stdin().bytes()).unwrap();
-    let context = Context::new(&cgreq, context::ImplType::Default);
+    let context = Context::new(
+        &cgreq,
+        context::ImplType::Default,
+        context::AllocatorType::Default,
+    );
     let filename_and_content = generators::do_generate(&context)?;
     let mut cgres = CodeGeneratorResponse::default();
     cgres.file = filename_and_content

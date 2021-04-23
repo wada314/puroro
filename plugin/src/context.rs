@@ -12,14 +12,20 @@ use ::once_cell::unsync::OnceCell;
 #[derive(Debug, Clone)]
 pub enum ImplType {
     Default,
-    Bumpalo,
     SliceRef,
+}
+
+#[derive(Debug, Clone)]
+pub enum AllocatorType {
+    Default,
+    Bumpalo,
 }
 
 #[derive(Clone)]
 pub struct Context<'c> {
     proto: &'c CodeGeneratorRequest,
     impl_type: ImplType,
+    alloc_type: AllocatorType,
 
     lazy_file_descriptors: OnceCell<Vec<FileDescriptor<'c>>>,
     lazy_fq_name_to_desc_map: OnceCell<HashMap<&'c str, EnumOrMessageRef<'c>>>,
@@ -27,17 +33,31 @@ pub struct Context<'c> {
 }
 
 impl<'c> Context<'c> {
-    pub fn new(cgreq: &'c CodeGeneratorRequest, impl_type: ImplType) -> Self {
+    pub fn new(
+        cgreq: &'c CodeGeneratorRequest,
+        impl_type: ImplType,
+        alloc_type: AllocatorType,
+    ) -> Self {
         Self {
             proto: cgreq,
             impl_type,
+            alloc_type,
             lazy_file_descriptors: Default::default(),
             lazy_fq_name_to_desc_map: Default::default(),
             lazy_packages_with_subpackages_map: Default::default(),
         }
     }
     pub fn with_impl_type(&self, impl_type: ImplType) -> Self {
-        Self::new(self.proto, impl_type)
+        Self::new(self.proto, impl_type, self.alloc_type.clone())
+    }
+    pub fn with_alloc_type(&self, alloc_type: AllocatorType) -> Self {
+        Self::new(self.proto, self.impl_type.clone(), alloc_type)
+    }
+    pub fn impl_type(&self) -> ImplType {
+        self.impl_type.clone()
+    }
+    pub fn alloc_type(&self) -> AllocatorType {
+        self.alloc_type.clone()
     }
 
     pub fn file_descriptors(&'c self) -> impl Iterator<Item = &FileDescriptor<'c>> + 'c {
