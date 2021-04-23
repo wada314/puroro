@@ -266,14 +266,14 @@ impl<'bump> ::puroro::Serializable for CodeGeneratorResponseBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl CodeGeneratorResponseTrait for CodeGeneratorResponseBumpalo {
+impl<'bump> CodeGeneratorResponseTrait for CodeGeneratorResponseBumpalo<'bump> {
     fn error(&self) -> &'_ str {
         self.error.as_ref()
     }
     fn supported_features(&self) -> u64 {
         self.supported_features.clone()
     }
-    type FileType = code_generator_response::FileBumpalo;
+    type FileType = code_generator_response::FileBumpalo<'bump>;
     fn for_each_file<F>(&self, mut f: F)
     where
         F: FnMut(&'_ code_generator_response::File)
@@ -604,7 +604,7 @@ impl<'bump> ::puroro::Serializable for FileBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl FileTrait for FileBumpalo {
+impl<'bump> FileTrait for FileBumpalo<'bump> {
     fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
@@ -614,7 +614,7 @@ impl FileTrait for FileBumpalo {
     fn content(&self) -> &'_ str {
         self.content.as_ref()
     }
-    type GeneratedCodeInfoType = super::super::GeneratedCodeInfoBumpalo;
+    type GeneratedCodeInfoType = super::super::GeneratedCodeInfoBumpalo<'bump>;
     fn generated_code_info(&self) -> ::std::option::Option<&'_ super::super::GeneratedCodeInfo> {
         self.generated_code_info.as_deref()
     }
@@ -931,7 +931,7 @@ impl<'bump> ::puroro::Serializable for CodeGeneratorRequestBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo {
+impl<'bump> CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo<'bump> {
     fn for_each_file_to_generate<F>(&self, mut f: F)
     where
         F: FnMut(&'_ str)
@@ -954,7 +954,7 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo {
     fn parameter(&self) -> &'_ str {
         self.parameter.as_ref()
     }
-    type ProtoFileType = super::FileDescriptorProtoBumpalo;
+    type ProtoFileType = super::FileDescriptorProtoBumpalo<'bump>;
     fn for_each_proto_file<F>(&self, mut f: F)
     where
         F: FnMut(&'_ super::FileDescriptorProto)
@@ -974,7 +974,7 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo {
     fn proto_file_iter(&self) -> Self::ProtoFileIter<'_> {
         self.proto_file.iter()
     }
-    type CompilerVersionType = VersionBumpalo;
+    type CompilerVersionType = VersionBumpalo<'bump>;
     fn compiler_version(&self) -> ::std::option::Option<&'_ Version> {
         self.compiler_version.as_deref()
     }
@@ -1331,7 +1331,7 @@ impl<'bump> ::puroro::Serializable for VersionBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl VersionTrait for VersionBumpalo {
+impl<'bump> VersionTrait for VersionBumpalo<'bump> {
     fn major(&self) -> i32 {
         self.major.clone()
     }

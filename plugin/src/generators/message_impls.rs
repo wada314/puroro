@@ -342,7 +342,7 @@ bytes_iter.deser_message(msg)?;\n",
         (format!(
             "\
 {cfg}
-impl{gpb} ::puroro::deser::DeserializableFromBytes for {name}{gp} {{
+impl{gp} ::puroro::deser::DeserializableFromBytes for {name}{gpb} {{
     fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
@@ -464,21 +464,21 @@ impl{gp} ::puroro::Serializable for {name}{gpb} {{
             format!(
                 "\
 {cfg}
-impl {name}Trait for {struct_name} {{\n",
+impl{gp} {name}Trait for {struct_name}{gpb} {{\n",
                 struct_name = self.frag_gen.struct_name(self.msg)?,
                 name = self.msg.native_bare_type_name(),
                 cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params(&[]),
+                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
             ),
             indent(iter(self.msg.fields().map(|field| -> Result<_> {
                 Ok((
                     if let FieldType::Message(m) = field.type_()? {
                         // Associated Type for the message type
                         format!(
-                            "type {camel_name}Type = {submsg_name};\n",
+                            "type {camel_name}Type = {submsg_type};\n",
                             camel_name = to_camel_case(field.native_name()),
-                            submsg_name = self
-                                .frag_gen
-                                .struct_name_with_relative_path(m, field.package())?,
+                            submsg_type = self.frag_gen.type_name_of_msg(m, field.package())?,
                         )
                     } else {
                         "".to_string()

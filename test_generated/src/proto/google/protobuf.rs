@@ -204,8 +204,8 @@ impl<'bump> ::puroro::Serializable for GeneratedCodeInfoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl GeneratedCodeInfoTrait for GeneratedCodeInfoBumpalo {
-    type AnnotationType = generated_code_info::AnnotationBumpalo;
+impl<'bump> GeneratedCodeInfoTrait for GeneratedCodeInfoBumpalo<'bump> {
+    type AnnotationType = generated_code_info::AnnotationBumpalo<'bump>;
     fn for_each_annotation<F>(&self, mut f: F)
     where
         F: FnMut(&'_ generated_code_info::Annotation)
@@ -575,7 +575,7 @@ impl<'bump> ::puroro::Serializable for AnnotationBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl AnnotationTrait for AnnotationBumpalo {
+impl<'bump> AnnotationTrait for AnnotationBumpalo<'bump> {
     fn for_each_path<F>(&self, mut f: F)
     where
         F: FnMut(i32)
@@ -843,8 +843,8 @@ impl<'bump> ::puroro::Serializable for SourceCodeInfoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl SourceCodeInfoTrait for SourceCodeInfoBumpalo {
-    type LocationType = source_code_info::LocationBumpalo;
+impl<'bump> SourceCodeInfoTrait for SourceCodeInfoBumpalo<'bump> {
+    type LocationType = source_code_info::LocationBumpalo<'bump>;
     fn for_each_location<F>(&self, mut f: F)
     where
         F: FnMut(&'_ source_code_info::Location)
@@ -1253,7 +1253,7 @@ impl<'bump> ::puroro::Serializable for LocationBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl LocationTrait for LocationBumpalo {
+impl<'bump> LocationTrait for LocationBumpalo<'bump> {
     fn for_each_path<F>(&self, mut f: F)
     where
         F: FnMut(i32)
@@ -1758,8 +1758,8 @@ impl<'bump> ::puroro::Serializable for UninterpretedOptionBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl UninterpretedOptionTrait for UninterpretedOptionBumpalo {
-    type NameType = uninterpreted_option::NamePartBumpalo;
+impl<'bump> UninterpretedOptionTrait for UninterpretedOptionBumpalo<'bump> {
+    type NameType = uninterpreted_option::NamePartBumpalo<'bump>;
     fn for_each_name<F>(&self, mut f: F)
     where
         F: FnMut(&'_ uninterpreted_option::NamePart)
@@ -2065,7 +2065,7 @@ impl<'bump> ::puroro::Serializable for NamePartBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl NamePartTrait for NamePartBumpalo {
+impl<'bump> NamePartTrait for NamePartBumpalo<'bump> {
     fn name_part(&self) -> &'_ str {
         self.name_part.as_ref()
     }
@@ -2372,14 +2372,14 @@ impl<'bump> ::puroro::Serializable for MethodOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl MethodOptionsTrait for MethodOptionsBumpalo {
+impl<'bump> MethodOptionsTrait for MethodOptionsBumpalo<'bump> {
     fn deprecated(&self) -> bool {
         self.deprecated.clone()
     }
     fn idempotency_level(&self) -> ::std::result::Result<method_options::IdempotencyLevel, i32> {
         self.idempotency_level.clone()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo;
+    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&'_ UninterpretedOption)
@@ -2699,11 +2699,11 @@ impl<'bump> ::puroro::Serializable for ServiceOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ServiceOptionsTrait for ServiceOptionsBumpalo {
+impl<'bump> ServiceOptionsTrait for ServiceOptionsBumpalo<'bump> {
     fn deprecated(&self) -> bool {
         self.deprecated.clone()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo;
+    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&'_ UninterpretedOption)
@@ -2997,11 +2997,11 @@ impl<'bump> ::puroro::Serializable for EnumValueOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl EnumValueOptionsTrait for EnumValueOptionsBumpalo {
+impl<'bump> EnumValueOptionsTrait for EnumValueOptionsBumpalo<'bump> {
     fn deprecated(&self) -> bool {
         self.deprecated.clone()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo;
+    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&'_ UninterpretedOption)
@@ -3334,14 +3334,14 @@ impl<'bump> ::puroro::Serializable for EnumOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl EnumOptionsTrait for EnumOptionsBumpalo {
+impl<'bump> EnumOptionsTrait for EnumOptionsBumpalo<'bump> {
     fn allow_alias(&self) -> bool {
         self.allow_alias.clone()
     }
     fn deprecated(&self) -> bool {
         self.deprecated.clone()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo;
+    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&'_ UninterpretedOption)
@@ -3598,8 +3598,8 @@ impl<'bump> ::puroro::Serializable for OneofOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl OneofOptionsTrait for OneofOptionsBumpalo {
-    type UninterpretedOptionType = UninterpretedOptionBumpalo;
+impl<'bump> OneofOptionsTrait for OneofOptionsBumpalo<'bump> {
+    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&'_ UninterpretedOption)
@@ -4086,7 +4086,7 @@ impl<'bump> ::puroro::Serializable for FieldOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl FieldOptionsTrait for FieldOptionsBumpalo {
+impl<'bump> FieldOptionsTrait for FieldOptionsBumpalo<'bump> {
     fn ctype(&self) -> ::std::result::Result<field_options::Ctype, i32> {
         self.ctype.clone()
     }
@@ -4105,7 +4105,7 @@ impl FieldOptionsTrait for FieldOptionsBumpalo {
     fn weak(&self) -> bool {
         self.weak.clone()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo;
+    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&'_ UninterpretedOption)
@@ -4572,7 +4572,7 @@ impl<'bump> ::puroro::Serializable for MessageOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl MessageOptionsTrait for MessageOptionsBumpalo {
+impl<'bump> MessageOptionsTrait for MessageOptionsBumpalo<'bump> {
     fn message_set_wire_format(&self) -> bool {
         self.message_set_wire_format.clone()
     }
@@ -4585,7 +4585,7 @@ impl MessageOptionsTrait for MessageOptionsBumpalo {
     fn map_entry(&self) -> bool {
         self.map_entry.clone()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo;
+    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&'_ UninterpretedOption)
@@ -5466,7 +5466,7 @@ impl<'bump> ::puroro::Serializable for FileOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl FileOptionsTrait for FileOptionsBumpalo {
+impl<'bump> FileOptionsTrait for FileOptionsBumpalo<'bump> {
     fn java_package(&self) -> &'_ str {
         self.java_package.as_ref()
     }
@@ -5527,7 +5527,7 @@ impl FileOptionsTrait for FileOptionsBumpalo {
     fn ruby_package(&self) -> &'_ str {
         self.ruby_package.as_ref()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo;
+    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&'_ UninterpretedOption)
@@ -5975,7 +5975,7 @@ impl<'bump> ::puroro::Serializable for MethodDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl MethodDescriptorProtoTrait for MethodDescriptorProtoBumpalo {
+impl<'bump> MethodDescriptorProtoTrait for MethodDescriptorProtoBumpalo<'bump> {
     fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
@@ -5985,7 +5985,7 @@ impl MethodDescriptorProtoTrait for MethodDescriptorProtoBumpalo {
     fn output_type(&self) -> &'_ str {
         self.output_type.as_ref()
     }
-    type OptionsType = MethodOptionsBumpalo;
+    type OptionsType = MethodOptionsBumpalo<'bump>;
     fn options(&self) -> ::std::option::Option<&'_ MethodOptions> {
         self.options.as_deref()
     }
@@ -6272,11 +6272,11 @@ impl<'bump> ::puroro::Serializable for ServiceDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ServiceDescriptorProtoTrait for ServiceDescriptorProtoBumpalo {
+impl<'bump> ServiceDescriptorProtoTrait for ServiceDescriptorProtoBumpalo<'bump> {
     fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
-    type MethodType = MethodDescriptorProtoBumpalo;
+    type MethodType = MethodDescriptorProtoBumpalo<'bump>;
     fn for_each_method<F>(&self, mut f: F)
     where
         F: FnMut(&'_ MethodDescriptorProto)
@@ -6296,7 +6296,7 @@ impl ServiceDescriptorProtoTrait for ServiceDescriptorProtoBumpalo {
     fn method_iter(&self) -> Self::MethodIter<'_> {
         self.method.iter()
     }
-    type OptionsType = ServiceOptionsBumpalo;
+    type OptionsType = ServiceOptionsBumpalo<'bump>;
     fn options(&self) -> ::std::option::Option<&'_ ServiceOptions> {
         self.options.as_deref()
     }
@@ -6584,14 +6584,14 @@ impl<'bump> ::puroro::Serializable for EnumValueDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoBumpalo {
+impl<'bump> EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoBumpalo<'bump> {
     fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
     fn number(&self) -> i32 {
         self.number.clone()
     }
-    type OptionsType = EnumValueOptionsBumpalo;
+    type OptionsType = EnumValueOptionsBumpalo<'bump>;
     fn options(&self) -> ::std::option::Option<&'_ EnumValueOptions> {
         self.options.as_deref()
     }
@@ -6945,11 +6945,11 @@ impl<'bump> ::puroro::Serializable for EnumDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo {
+impl<'bump> EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo<'bump> {
     fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
-    type ValueType = EnumValueDescriptorProtoBumpalo;
+    type ValueType = EnumValueDescriptorProtoBumpalo<'bump>;
     fn for_each_value<F>(&self, mut f: F)
     where
         F: FnMut(&'_ EnumValueDescriptorProto)
@@ -6969,11 +6969,11 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo {
     fn value_iter(&self) -> Self::ValueIter<'_> {
         self.value.iter()
     }
-    type OptionsType = EnumOptionsBumpalo;
+    type OptionsType = EnumOptionsBumpalo<'bump>;
     fn options(&self) -> ::std::option::Option<&'_ EnumOptions> {
         self.options.as_deref()
     }
-    type ReservedRangeType = enum_descriptor_proto::EnumReservedRangeBumpalo;
+    type ReservedRangeType = enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>;
     fn for_each_reserved_range<F>(&self, mut f: F)
     where
         F: FnMut(&'_ enum_descriptor_proto::EnumReservedRange)
@@ -7320,7 +7320,7 @@ impl<'bump> ::puroro::Serializable for EnumReservedRangeBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl EnumReservedRangeTrait for EnumReservedRangeBumpalo {
+impl<'bump> EnumReservedRangeTrait for EnumReservedRangeBumpalo<'bump> {
     fn start(&self) -> i32 {
         self.start.clone()
     }
@@ -7556,11 +7556,11 @@ impl<'bump> ::puroro::Serializable for OneofDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl OneofDescriptorProtoTrait for OneofDescriptorProtoBumpalo {
+impl<'bump> OneofDescriptorProtoTrait for OneofDescriptorProtoBumpalo<'bump> {
     fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
-    type OptionsType = OneofOptionsBumpalo;
+    type OptionsType = OneofOptionsBumpalo<'bump>;
     fn options(&self) -> ::std::option::Option<&'_ OneofOptions> {
         self.options.as_deref()
     }
@@ -8080,7 +8080,7 @@ impl<'bump> ::puroro::Serializable for FieldDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl FieldDescriptorProtoTrait for FieldDescriptorProtoBumpalo {
+impl<'bump> FieldDescriptorProtoTrait for FieldDescriptorProtoBumpalo<'bump> {
     fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
@@ -8108,7 +8108,7 @@ impl FieldDescriptorProtoTrait for FieldDescriptorProtoBumpalo {
     fn json_name(&self) -> &'_ str {
         self.json_name.as_ref()
     }
-    type OptionsType = FieldOptionsBumpalo;
+    type OptionsType = FieldOptionsBumpalo<'bump>;
     fn options(&self) -> ::std::option::Option<&'_ FieldOptions> {
         self.options.as_deref()
     }
@@ -8431,8 +8431,8 @@ impl<'bump> ::puroro::Serializable for ExtensionRangeOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ExtensionRangeOptionsTrait for ExtensionRangeOptionsBumpalo {
-    type UninterpretedOptionType = UninterpretedOptionBumpalo;
+impl<'bump> ExtensionRangeOptionsTrait for ExtensionRangeOptionsBumpalo<'bump> {
+    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
         F: FnMut(&'_ UninterpretedOption)
@@ -9011,11 +9011,11 @@ impl<'bump> ::puroro::Serializable for DescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl DescriptorProtoTrait for DescriptorProtoBumpalo {
+impl<'bump> DescriptorProtoTrait for DescriptorProtoBumpalo<'bump> {
     fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
-    type FieldType = FieldDescriptorProtoBumpalo;
+    type FieldType = FieldDescriptorProtoBumpalo<'bump>;
     fn for_each_field<F>(&self, mut f: F)
     where
         F: FnMut(&'_ FieldDescriptorProto)
@@ -9035,7 +9035,7 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
     fn field_iter(&self) -> Self::FieldIter<'_> {
         self.field.iter()
     }
-    type ExtensionType = FieldDescriptorProtoBumpalo;
+    type ExtensionType = FieldDescriptorProtoBumpalo<'bump>;
     fn for_each_extension<F>(&self, mut f: F)
     where
         F: FnMut(&'_ FieldDescriptorProto)
@@ -9055,7 +9055,7 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
     }
-    type NestedTypeType = DescriptorProtoBumpalo;
+    type NestedTypeType = DescriptorProtoBumpalo<'bump>;
     fn for_each_nested_type<F>(&self, mut f: F)
     where
         F: FnMut(&'_ DescriptorProto)
@@ -9075,7 +9075,7 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
     fn nested_type_iter(&self) -> Self::NestedTypeIter<'_> {
         self.nested_type.iter()
     }
-    type EnumTypeType = EnumDescriptorProtoBumpalo;
+    type EnumTypeType = EnumDescriptorProtoBumpalo<'bump>;
     fn for_each_enum_type<F>(&self, mut f: F)
     where
         F: FnMut(&'_ EnumDescriptorProto)
@@ -9095,7 +9095,7 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
     }
-    type ExtensionRangeType = descriptor_proto::ExtensionRangeBumpalo;
+    type ExtensionRangeType = descriptor_proto::ExtensionRangeBumpalo<'bump>;
     fn for_each_extension_range<F>(&self, mut f: F)
     where
         F: FnMut(&'_ descriptor_proto::ExtensionRange)
@@ -9115,7 +9115,7 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
     fn extension_range_iter(&self) -> Self::ExtensionRangeIter<'_> {
         self.extension_range.iter()
     }
-    type OneofDeclType = OneofDescriptorProtoBumpalo;
+    type OneofDeclType = OneofDescriptorProtoBumpalo<'bump>;
     fn for_each_oneof_decl<F>(&self, mut f: F)
     where
         F: FnMut(&'_ OneofDescriptorProto)
@@ -9135,11 +9135,11 @@ impl DescriptorProtoTrait for DescriptorProtoBumpalo {
     fn oneof_decl_iter(&self) -> Self::OneofDeclIter<'_> {
         self.oneof_decl.iter()
     }
-    type OptionsType = MessageOptionsBumpalo;
+    type OptionsType = MessageOptionsBumpalo<'bump>;
     fn options(&self) -> ::std::option::Option<&'_ MessageOptions> {
         self.options.as_deref()
     }
-    type ReservedRangeType = descriptor_proto::ReservedRangeBumpalo;
+    type ReservedRangeType = descriptor_proto::ReservedRangeBumpalo<'bump>;
     fn for_each_reserved_range<F>(&self, mut f: F)
     where
         F: FnMut(&'_ descriptor_proto::ReservedRange)
@@ -9566,7 +9566,7 @@ impl<'bump> ::puroro::Serializable for ReservedRangeBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ReservedRangeTrait for ReservedRangeBumpalo {
+impl<'bump> ReservedRangeTrait for ReservedRangeBumpalo<'bump> {
     fn start(&self) -> i32 {
         self.start.clone()
     }
@@ -9856,14 +9856,14 @@ impl<'bump> ::puroro::Serializable for ExtensionRangeBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl ExtensionRangeTrait for ExtensionRangeBumpalo {
+impl<'bump> ExtensionRangeTrait for ExtensionRangeBumpalo<'bump> {
     fn start(&self) -> i32 {
         self.start.clone()
     }
     fn end(&self) -> i32 {
         self.end.clone()
     }
-    type OptionsType = super::ExtensionRangeOptionsBumpalo;
+    type OptionsType = super::ExtensionRangeOptionsBumpalo<'bump>;
     fn options(&self) -> ::std::option::Option<&'_ super::ExtensionRangeOptions> {
         self.options.as_deref()
     }
@@ -10478,7 +10478,7 @@ impl<'bump> ::puroro::Serializable for FileDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
+impl<'bump> FileDescriptorProtoTrait for FileDescriptorProtoBumpalo<'bump> {
     fn name(&self) -> &'_ str {
         self.name.as_ref()
     }
@@ -10542,7 +10542,7 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
     fn weak_dependency_iter(&self) -> Self::WeakDependencyIter<'_> {
         self.weak_dependency.iter().cloned()
     }
-    type MessageTypeType = DescriptorProtoBumpalo;
+    type MessageTypeType = DescriptorProtoBumpalo<'bump>;
     fn for_each_message_type<F>(&self, mut f: F)
     where
         F: FnMut(&'_ DescriptorProto)
@@ -10562,7 +10562,7 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
     fn message_type_iter(&self) -> Self::MessageTypeIter<'_> {
         self.message_type.iter()
     }
-    type EnumTypeType = EnumDescriptorProtoBumpalo;
+    type EnumTypeType = EnumDescriptorProtoBumpalo<'bump>;
     fn for_each_enum_type<F>(&self, mut f: F)
     where
         F: FnMut(&'_ EnumDescriptorProto)
@@ -10582,7 +10582,7 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
     }
-    type ServiceType = ServiceDescriptorProtoBumpalo;
+    type ServiceType = ServiceDescriptorProtoBumpalo<'bump>;
     fn for_each_service<F>(&self, mut f: F)
     where
         F: FnMut(&'_ ServiceDescriptorProto)
@@ -10602,7 +10602,7 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
     fn service_iter(&self) -> Self::ServiceIter<'_> {
         self.service.iter()
     }
-    type ExtensionType = FieldDescriptorProtoBumpalo;
+    type ExtensionType = FieldDescriptorProtoBumpalo<'bump>;
     fn for_each_extension<F>(&self, mut f: F)
     where
         F: FnMut(&'_ FieldDescriptorProto)
@@ -10622,11 +10622,11 @@ impl FileDescriptorProtoTrait for FileDescriptorProtoBumpalo {
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
     }
-    type OptionsType = FileOptionsBumpalo;
+    type OptionsType = FileOptionsBumpalo<'bump>;
     fn options(&self) -> ::std::option::Option<&'_ FileOptions> {
         self.options.as_deref()
     }
-    type SourceCodeInfoType = SourceCodeInfoBumpalo;
+    type SourceCodeInfoType = SourceCodeInfoBumpalo<'bump>;
     fn source_code_info(&self) -> ::std::option::Option<&'_ SourceCodeInfo> {
         self.source_code_info.as_deref()
     }
@@ -10971,8 +10971,8 @@ impl<'bump> ::puroro::Serializable for FileDescriptorSetBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl FileDescriptorSetTrait for FileDescriptorSetBumpalo {
-    type FileType = FileDescriptorProtoBumpalo;
+impl<'bump> FileDescriptorSetTrait for FileDescriptorSetBumpalo<'bump> {
+    type FileType = FileDescriptorProtoBumpalo<'bump>;
     fn for_each_file<F>(&self, mut f: F)
     where
         F: FnMut(&'_ FileDescriptorProto)
