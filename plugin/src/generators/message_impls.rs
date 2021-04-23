@@ -52,7 +52,8 @@ pub struct {name}{gp} {{\n",
             indent((
                 iter(self.msg.fields().map(|field| {
                     Ok(format!(
-                        "pub {name}: {type_},\n",
+                        "{vis}{name}: {type_},\n",
+                        vis = self.frag_gen.field_visibility(),
                         name = field.native_name(),
                         type_ = self.frag_gen.field_type_for(field)?,
                     ))

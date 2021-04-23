@@ -48,6 +48,13 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
+    pub fn field_visibility(&self) -> &'static str {
+        match self.context.impl_type() {
+            ImplType::Default => "pub ",
+            ImplType::SliceRef => "",
+        }
+    }
+
     pub fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
         Ok(match self.context.impl_type() {
             ImplType::Default => {
@@ -90,7 +97,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     }
 
     pub fn struct_generic_params(&self, params: &[&'static str]) -> String {
-        let mut iter = params
+        let iter = params
             .iter()
             .cloned()
             .chain(match self.context.alloc_type() {
