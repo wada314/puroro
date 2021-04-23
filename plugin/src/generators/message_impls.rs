@@ -75,14 +75,14 @@ pub struct {name}{gp} {{\n",
                 "\
 {cfg}
 impl{gp} {name}{gpb} {{
-    pub fn new({new_params}) -> Self {{
+    pub {new_decl} {{
         use ::std::convert::TryInto;
         Self {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(),
                 gpb = self.frag_gen.struct_generic_params_bounds(),
-                new_params = self.frag_gen.new_method_params(),
+                new_decl = self.frag_gen.new_method_declaration(),
             ),
             indent_n(
                 3,

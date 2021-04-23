@@ -107,17 +107,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
-    pub fn new_method_params(&self) -> &'static str {
+    pub fn new_method_declaration(&self) -> &'static str {
         match self.context.alloc_type() {
-            AllocatorType::Default => "",
-            AllocatorType::Bumpalo => "bump: &'bump ::bumpalo::Bump",
-        }
-    }
-
-    pub fn new_method_call_params(&self) -> &'static str {
-        match self.context.alloc_type() {
-            AllocatorType::Default => "",
-            AllocatorType::Bumpalo => "bump",
+            AllocatorType::Default => "fn new() -> Self",
+            AllocatorType::Bumpalo => "fn new_in(bump: &'bump ::bumpalo::Bump) -> Self",
         }
     }
 

@@ -120,7 +120,7 @@ pub struct GeneratedCodeInfoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> GeneratedCodeInfoBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             annotation: ::std::default::Default::default(),
@@ -422,7 +422,7 @@ pub struct AnnotationBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> AnnotationBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             path: ::std::default::Default::default(),
@@ -724,7 +724,7 @@ pub struct SourceCodeInfoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> SourceCodeInfoBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             location: ::std::default::Default::default(),
@@ -1060,7 +1060,7 @@ pub struct LocationBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> LocationBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             path: ::std::default::Default::default(),
@@ -1524,7 +1524,7 @@ pub struct UninterpretedOptionBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> UninterpretedOptionBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -1870,7 +1870,7 @@ pub struct NamePartBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> NamePartBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             name_part: ::std::default::Default::default(),
@@ -2145,7 +2145,7 @@ pub struct MethodOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MethodOptionsBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             deprecated: ::std::default::Default::default(),
@@ -2470,7 +2470,7 @@ pub struct ServiceOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ServiceOptionsBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             deprecated: ::std::default::Default::default(),
@@ -2749,7 +2749,7 @@ pub struct EnumValueOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumValueOptionsBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             deprecated: ::std::default::Default::default(),
@@ -3050,7 +3050,7 @@ pub struct EnumOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumOptionsBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             allow_alias: ::std::default::Default::default(),
@@ -3329,7 +3329,7 @@ pub struct OneofOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> OneofOptionsBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             uninterpreted_option: ::std::default::Default::default(),
@@ -3696,7 +3696,7 @@ pub struct FieldOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FieldOptionsBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             ctype: 0i32.try_into(),
@@ -4197,7 +4197,7 @@ pub struct MessageOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MessageOptionsBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             message_set_wire_format: ::std::default::Default::default(),
@@ -4880,7 +4880,7 @@ pub struct FileOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileOptionsBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             java_package: ::std::default::Default::default(),
@@ -5571,7 +5571,7 @@ pub struct MethodDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MethodDescriptorProtoBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -5893,7 +5893,7 @@ pub struct ServiceDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ServiceDescriptorProtoBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -6178,7 +6178,7 @@ pub struct EnumValueDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumValueDescriptorProtoBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -6506,7 +6506,7 @@ pub struct EnumDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumDescriptorProtoBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -6868,7 +6868,7 @@ pub struct EnumReservedRangeBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumReservedRangeBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             start: ::std::default::Default::default(),
@@ -7107,7 +7107,7 @@ pub struct OneofDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> OneofDescriptorProtoBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -7495,7 +7495,7 @@ pub struct FieldDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FieldDescriptorProtoBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -7959,7 +7959,7 @@ pub struct ExtensionRangeOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ExtensionRangeOptionsBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             uninterpreted_option: ::std::default::Default::default(),
@@ -8418,7 +8418,7 @@ pub struct DescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> DescriptorProtoBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -8985,7 +8985,7 @@ pub struct ReservedRangeBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ReservedRangeBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             start: ::std::default::Default::default(),
@@ -9253,7 +9253,7 @@ pub struct ExtensionRangeBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ExtensionRangeBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             start: ::std::default::Default::default(),
@@ -9760,7 +9760,7 @@ pub struct FileDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileDescriptorProtoBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -10327,7 +10327,7 @@ pub struct FileDescriptorSetBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileDescriptorSetBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             file: ::std::default::Default::default(),

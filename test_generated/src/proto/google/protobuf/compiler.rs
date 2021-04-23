@@ -156,7 +156,7 @@ pub struct CodeGeneratorResponseBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorResponseBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             error: ::std::default::Default::default(),
@@ -476,7 +476,7 @@ pub struct FileBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -783,7 +783,7 @@ pub struct CodeGeneratorRequestBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorRequestBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             file_to_generate: ::std::default::Default::default(),
@@ -1139,7 +1139,7 @@ pub struct VersionBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> VersionBumpalo<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             major: ::std::default::Default::default(),
