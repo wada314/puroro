@@ -4,13 +4,13 @@ use crate::utils::{to_camel_case, Indentor};
 use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
 use crate::Result;
 
-pub struct MessageTraitCodeGenerator<'c> {
-    context: &'c Context<'c>,
+pub struct MessageTraitCodeGenerator<'a, 'c> {
+    context: &'a Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 }
 
-impl<'c> MessageTraitCodeGenerator<'c> {
-    pub fn new(context: &'c Context<'c>, msg: &'c MessageDescriptor<'c>) -> Self {
+impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
+    pub fn new(context: &'a Context<'c>, msg: &'c MessageDescriptor<'c>) -> Self {
         Self { context, msg }
     }
     pub fn print_msg_traits<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {

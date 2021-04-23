@@ -5,31 +5,27 @@ mod writer;
 
 use itertools::Itertools;
 
-use crate::context::Context;
+use crate::context::{AllocatorType, Context, ImplType};
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case, Indentor};
 use crate::wrappers::{DescriptorVisitor, EnumDescriptor, MessageDescriptor};
 use crate::Result;
 use std::collections::HashMap;
 use std::fmt::Write;
 
-use self::message_impls::{
-    MessageImplCodeGenerator, MessageImplFragmentGeneratorForBumpaloStruct,
-    MessageImplFragmentGeneratorForNormalStruct,
-};
+use self::message_impls::MessageImplCodeGenerator;
 use self::message_traits::MessageTraitCodeGenerator;
+use message_impls::MessageImplFragmentGenerator;
 
 struct Visitor<'c> {
     output: Indentor<String>,
-    context: &'c Context<'c>,
-    normal_field_gen: MessageImplFragmentGeneratorForNormalStruct<'c>,
-    bumpalo_field_gen: MessageImplFragmentGeneratorForBumpaloStruct<'c>,
+    context: Context<'c>,
+    bumpalo_context: Context<'c>,
 }
 impl<'c> DescriptorVisitor<'c> for Visitor<'c> {
     fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
-        let normal_impl_gen = MessageImplCodeGenerator::new(self.context, msg, &self.normal_field_gen);
-        let bumpalo_impl_gen =
-            MessageImplCodeGenerator::new(self.context, msg, &self.bumpalo_field_gen);
-        let trait_gen = MessageTraitCodeGenerator::new(self.context, msg);
+        let normal_impl_gen = MessageImplCodeGenerator::new(&self.context, msg);
+        let bumpalo_impl_gen = MessageImplCodeGenerator::new(&self.bumpalo_context, msg);
+        let trait_gen = MessageTraitCodeGenerator::new(&self.context, msg);
 
         normal_impl_gen.print_msg(&mut self.output)?;
         bumpalo_impl_gen.print_msg(&mut self.output)?;
@@ -66,9 +62,8 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
         .to_string();
         let mut visitor = Visitor {
             output: Indentor::new(output),
-            context,
-            normal_field_gen: MessageImplFragmentGeneratorForNormalStruct::new(context),
-            bumpalo_field_gen: MessageImplFragmentGeneratorForBumpaloStruct::new(context),
+            context: context.with_alloc_type(AllocatorType::Default),
+            bumpalo_context: context.with_alloc_type(AllocatorType::Bumpalo),
         };
         file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
         filenames_and_contents.insert(file_name, visitor.output.into_inner());

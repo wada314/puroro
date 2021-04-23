@@ -148,16 +148,15 @@ impl CodeGeneratorResponseTrait for CodeGeneratorResponse {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct CodeGeneratorResponseBumpalo<'b> {
-    pub error: ::bumpalo::collections::String,
+pub struct CodeGeneratorResponseBumpalo<'bump> {
+    pub error: ::bumpalo::collections::String<'bump>,
     pub supported_features: u64,
-    pub file: ::bumpalo::collections::Vec<super::super::super::google::protobuf::compiler::code_generator_response::File>,
-    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
+    pub file: ::bumpalo::collections::Vec<'bump, super::super::super::google::protobuf::compiler::code_generator_response::File>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> CodeGeneratorResponseBumpalo<'b> {
-    pub fn new(bump: &'b ::bumpalo::Bump
-) -> Self {
+impl<'bump> CodeGeneratorResponseBumpalo<'bump> {
+    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             error: ::std::default::Default::default(),
@@ -168,7 +167,7 @@ impl<'b> CodeGeneratorResponseBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorResponseBumpalo<'b> {
+impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorResponseBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -224,7 +223,7 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGenera
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::deser::DeserializableFromBytes for CodeGeneratorResponseBumpalo<'b> {
+impl<'bump> ::puroro::deser::DeserializableFromBytes for CodeGeneratorResponseBumpalo<'bump> {
     fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
@@ -234,7 +233,7 @@ impl<'b> ::puroro::deser::DeserializableFromBytes for CodeGeneratorResponseBumpa
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::serializer::Serializable for CodeGeneratorResponseBumpalo<'b> {
+impl<'bump> ::puroro::serializer::Serializable for CodeGeneratorResponseBumpalo<'bump> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -254,7 +253,7 @@ impl<'b> ::puroro::serializer::Serializable for CodeGeneratorResponseBumpalo<'b>
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Serializable for CodeGeneratorResponseBumpalo<'b> {
+impl<'bump> ::puroro::Serializable for CodeGeneratorResponseBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -468,17 +467,16 @@ impl FileTrait for File {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct FileBumpalo<'b> {
-    pub name: ::bumpalo::collections::String,
-    pub insertion_point: ::bumpalo::collections::String,
-    pub content: ::bumpalo::collections::String,
-    pub generated_code_info: ::std::option::Option<::bumpalo::boxed::Box<super::super::super::super::google::protobuf::GeneratedCodeInfo>>,
-    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
+pub struct FileBumpalo<'bump> {
+    pub name: ::bumpalo::collections::String<'bump>,
+    pub insertion_point: ::bumpalo::collections::String<'bump>,
+    pub content: ::bumpalo::collections::String<'bump>,
+    pub generated_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::super::super::google::protobuf::GeneratedCodeInfo>>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> FileBumpalo<'b> {
-    pub fn new(bump: &'b ::bumpalo::Bump
-) -> Self {
+impl<'bump> FileBumpalo<'bump> {
+    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             name: ::std::default::Default::default(),
@@ -490,7 +488,7 @@ impl<'b> FileBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileBumpalo<'b> {
+impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -545,7 +543,7 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileBumpal
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::deser::DeserializableFromBytes for FileBumpalo<'b> {
+impl<'bump> ::puroro::deser::DeserializableFromBytes for FileBumpalo<'bump> {
     fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
@@ -555,7 +553,7 @@ impl<'b> ::puroro::deser::DeserializableFromBytes for FileBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::serializer::Serializable for FileBumpalo<'b> {
+impl<'bump> ::puroro::serializer::Serializable for FileBumpalo<'bump> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -576,7 +574,7 @@ impl<'b> ::puroro::serializer::Serializable for FileBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Serializable for FileBumpalo<'b> {
+impl<'bump> ::puroro::Serializable for FileBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -776,17 +774,16 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct CodeGeneratorRequestBumpalo<'b> {
-    pub file_to_generate: ::bumpalo::collections::Vec<::bumpalo::collections::String>,
-    pub parameter: ::bumpalo::collections::String,
-    pub proto_file: ::bumpalo::collections::Vec<super::super::super::google::protobuf::FileDescriptorProto>,
-    pub compiler_version: ::std::option::Option<::bumpalo::boxed::Box<super::super::super::google::protobuf::compiler::Version>>,
-    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
+pub struct CodeGeneratorRequestBumpalo<'bump> {
+    pub file_to_generate: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
+    pub parameter: ::bumpalo::collections::String<'bump>,
+    pub proto_file: ::bumpalo::collections::Vec<'bump, super::super::super::google::protobuf::FileDescriptorProto>,
+    pub compiler_version: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::super::google::protobuf::compiler::Version>>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> CodeGeneratorRequestBumpalo<'b> {
-    pub fn new(bump: &'b ::bumpalo::Bump
-) -> Self {
+impl<'bump> CodeGeneratorRequestBumpalo<'bump> {
+    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             file_to_generate: ::std::default::Default::default(),
@@ -798,7 +795,7 @@ impl<'b> CodeGeneratorRequestBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorRequestBumpalo<'b> {
+impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGeneratorRequestBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -853,7 +850,7 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for CodeGenera
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::deser::DeserializableFromBytes for CodeGeneratorRequestBumpalo<'b> {
+impl<'bump> ::puroro::deser::DeserializableFromBytes for CodeGeneratorRequestBumpalo<'bump> {
     fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
@@ -863,7 +860,7 @@ impl<'b> ::puroro::deser::DeserializableFromBytes for CodeGeneratorRequestBumpal
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::serializer::Serializable for CodeGeneratorRequestBumpalo<'b> {
+impl<'bump> ::puroro::serializer::Serializable for CodeGeneratorRequestBumpalo<'bump> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -884,7 +881,7 @@ impl<'b> ::puroro::serializer::Serializable for CodeGeneratorRequestBumpalo<'b> 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Serializable for CodeGeneratorRequestBumpalo<'b> {
+impl<'bump> ::puroro::Serializable for CodeGeneratorRequestBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
@@ -1133,17 +1130,16 @@ impl VersionTrait for Version {
 }
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct VersionBumpalo<'b> {
+pub struct VersionBumpalo<'bump> {
     pub major: i32,
     pub minor: i32,
     pub patch: i32,
-    pub suffix: ::bumpalo::collections::String,
-    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'b>,
+    pub suffix: ::bumpalo::collections::String<'bump>,
+    puroro_internal: ::puroro::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> VersionBumpalo<'b> {
-    pub fn new(bump: &'b ::bumpalo::Bump
-) -> Self {
+impl<'bump> VersionBumpalo<'bump> {
+    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
         use ::std::convert::TryInto;
         Self {
             major: ::std::default::Default::default(),
@@ -1155,7 +1151,7 @@ impl<'b> VersionBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for VersionBumpalo<'b> {
+impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for VersionBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -1228,7 +1224,7 @@ impl<'b> ::puroro::deser::DeserializeMessageFromBytesEventHandler for VersionBum
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::deser::DeserializableFromBytes for VersionBumpalo<'b> {
+impl<'bump> ::puroro::deser::DeserializableFromBytes for VersionBumpalo<'bump> {
     fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
@@ -1238,7 +1234,7 @@ impl<'b> ::puroro::deser::DeserializableFromBytes for VersionBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::serializer::Serializable for VersionBumpalo<'b> {
+impl<'bump> ::puroro::serializer::Serializable for VersionBumpalo<'bump> {
     fn serialize<T: ::puroro::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -1265,7 +1261,7 @@ impl<'b> ::puroro::serializer::Serializable for VersionBumpalo<'b> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> ::puroro::Serializable for VersionBumpalo<'b> {
+impl<'bump> ::puroro::Serializable for VersionBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro::serializer::default_serializer(write);
         <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)

@@ -11,24 +11,18 @@ use crate::{ErrorKind, Result};
 
 const DESER_MOD: &'static str = "::puroro::deserializer::bytes";
 
-pub struct MessageImplCodeGenerator<'c, 'g, G>
-where
-    G: MessageImplFragmentGenerator<'c>,
-{
-    context: &'c Context<'c>,
+pub struct MessageImplCodeGenerator<'a, 'c> {
+    context: &'a Context<'c>,
     msg: &'c MessageDescriptor<'c>,
-    frag_gen: &'g G,
+    frag_gen: MessageImplFragmentGenerator<'a, 'c>,
 }
 
-impl<'c, 'g, G> MessageImplCodeGenerator<'c, 'g, G>
-where
-    G: MessageImplFragmentGenerator<'c>,
-{
-    pub fn new(context: &'c Context<'c>, msg: &'c MessageDescriptor<'c>, frag_gen: &'g G) -> Self {
+impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
+    pub fn new(context: &'a Context<'c>, msg: &'c MessageDescriptor<'c>) -> Self {
         Self {
             context,
             msg,
-            frag_gen,
+            frag_gen: MessageImplFragmentGenerator::new(context),
         }
     }
 
@@ -56,7 +50,7 @@ where
 pub struct {name}{gp} {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(""),
+                gp = self.frag_gen.struct_generic_params(),
             ),
             indent((
                 iter(self.msg.fields().map(|field| {
@@ -88,8 +82,8 @@ impl{gp} {name}{gpb} {{
         Self {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(""),
-                gpb = self.frag_gen.struct_generic_params_bounds(""),
+                gp = self.frag_gen.struct_generic_params(),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
                 new_params = self.frag_gen.new_method_params(),
             ),
             indent_n(
@@ -105,10 +99,10 @@ impl{gp} {name}{gpb} {{
                                     name = field.native_name()
                                 )),
                                 (FieldLabel::Required, FieldType::Message(m)) => Ok(format!(
-                                    "{box_}::new({name}::new({new_params})):,\n",
+                                    "{name}: {msg_type}::{call_new},\n",
                                     name = field.native_name(),
-                                    box_ = self.frag_gen.box_type(),
-                                    new_params = self.frag_gen.new_method_call_params()
+                                    msg_type = self.frag_gen.field_type_for(field)?,
+                                    call_new = self.frag_gen.call_new_from_new(),
                                 )),
                                 (_, _) => Ok(format!(
                                     "{name}: ::std::default::Default::default(),\n",
@@ -137,8 +131,8 @@ impl{gp} ::std::default::Default for {name}{gpb} {{
 }}\n",
                     name = self.frag_gen.struct_name(self.msg)?,
                     cfg = self.frag_gen.cfg_condition(),
-                    gp = self.frag_gen.struct_generic_params(""),
-                    gpb = self.frag_gen.struct_generic_params_bounds(""),
+                    gp = self.frag_gen.struct_generic_params(),
+                    gpb = self.frag_gen.struct_generic_params_bounds(),
                 )
             } else {
                 "".to_string()
@@ -169,8 +163,8 @@ impl{gp} ::puroro::deser::DeserializeMessageFromBytesEventHandler for {name}{gpb
         match field {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(""),
-                gpb = self.frag_gen.struct_generic_params_bounds(""),
+                gp = self.frag_gen.struct_generic_params(),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
             indent_n(
                 3,
@@ -369,8 +363,8 @@ impl{gpb} ::puroro::deser::DeserializableFromBytes for {name}{gp} {{
 }}\n",
             name = self.frag_gen.struct_name(self.msg)?,
             cfg = self.frag_gen.cfg_condition(),
-            gp = self.frag_gen.struct_generic_params(""),
-            gpb = self.frag_gen.struct_generic_params_bounds(""),
+            gp = self.frag_gen.struct_generic_params(),
+            gpb = self.frag_gen.struct_generic_params_bounds(),
         ),)
             .write_into(output)
     }
@@ -390,8 +384,8 @@ impl{gp} ::puroro::serializer::Serializable for {name}{gpb} {{
         use ::puroro::helpers::MaybeRepeatedField;\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(""),
-                gpb = self.frag_gen.struct_generic_params_bounds(""),
+                gp = self.frag_gen.struct_generic_params(),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
             indent_n(
                 2,
@@ -469,8 +463,8 @@ impl{gp} ::puroro::Serializable for {name}{gpb} {{
 }}\n",
             name = self.frag_gen.struct_name(self.msg)?,
             cfg = self.frag_gen.cfg_condition(),
-            gp = self.frag_gen.struct_generic_params(""),
-            gpb = self.frag_gen.struct_generic_params_bounds(""),
+            gp = self.frag_gen.struct_generic_params(),
+            gpb = self.frag_gen.struct_generic_params_bounds(),
         ),)
             .write_into(output)
     }
@@ -564,26 +558,14 @@ fn {name}_iter(&self) -> Self::{camel_name}Iter<'_> {{
     }
 }
 
-pub trait MessageImplFragmentGenerator<'c> {
-    fn struct_name(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>>;
-    fn cfg_condition(&self) -> &'static str;
-    fn is_default_available(&self) -> bool;
-    fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>>;
-    fn struct_generic_params(&self, extra_args: &'static str) -> Cow<'static, str>;
-    fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str>;
-    fn new_method_params(&self) -> &'static str;
-    fn new_method_call_params(&self) -> &'static str;
-    fn box_type(&self) -> &'static str;
-    fn vec_type(&self) -> &'static str;
-    fn string_type(&self) -> &'static str;
-    fn internal_data_type(&self) -> &'static str;
-    fn internal_field_init_value(&self) -> &'static str;
+pub struct MessageImplFragmentGenerator<'a, 'c> {
+    context: &'a Context<'c>,
 }
+impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
+    pub fn new(context: &'a Context<'c>) -> Self {
+        Self { context }
+    }
 
-pub struct MessageImplFragmentGeneratorImpl<'c> {
-    context: &'c Context<'c>,
-}
-impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorImpl<'c> {
     fn struct_name(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
         let postfix1 = match self.context.impl_type() {
             ImplType::Default => "",
@@ -617,258 +599,121 @@ impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorImpl<'
     }
 
     fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
-        todo!()
+        Ok(match self.context.impl_type() {
+            ImplType::Default => {
+                let scalar_type: Cow<'static, str> = match field.type_()?.native_trivial_type_name()
+                {
+                    Ok(name) => name.into(),
+                    Err(nontrivial_type) => match nontrivial_type {
+                        NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                        NonTrivialFieldType::String => self.string_type().into(),
+                        NonTrivialFieldType::Bytes => self.vec_type("u8").into(),
+
+                        NonTrivialFieldType::Enum(e) => format!(
+                            "::std::result::Result<{type_}, i32>",
+                            type_ = e.native_fully_qualified_type_name(field.path_to_root_mod())
+                        )
+                        .into(),
+                        NonTrivialFieldType::Message(m) => m
+                            .native_fully_qualified_type_name(field.path_to_root_mod())
+                            .into(),
+                    },
+                };
+                match field.label()? {
+                    FieldLabel::Optional => {
+                        if matches!(field.type_()?, FieldType::Message(_)) {
+                            format!(
+                                "::std::option::Option<{boxed_type}>",
+                                boxed_type = self.box_type(scalar_type.as_ref()),
+                            )
+                            .into()
+                        } else {
+                            scalar_type.into()
+                        }
+                    }
+                    FieldLabel::Required => {
+                        if matches!(field.type_()?, FieldType::Message(_)) {
+                            self.box_type(scalar_type.as_ref()).into()
+                        } else {
+                            scalar_type.into()
+                        }
+                    }
+                    FieldLabel::Repeated => self.vec_type(scalar_type.as_ref()).into(),
+                }
+            }
+            ImplType::SliceRef => unimplemented!(),
+        })
     }
 
-    fn struct_generic_params(&self, extra_args: &'static str) -> Cow<'static, str> {
-        todo!()
-    }
-
-    fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str> {
-        todo!()
-    }
-
-    fn new_method_params(&self) -> &'static str {
-        todo!()
-    }
-
-    fn new_method_call_params(&self) -> &'static str {
-        todo!()
-    }
-
-    fn box_type(&self) -> &'static str {
+    fn struct_generic_params(&self) -> &'static str {
         match self.context.alloc_type() {
-            AllocatorType::Default => "::std::boxed::Box",
-            AllocatorType::Bumpalo => "::bumpalo::boxed::Box",
+            AllocatorType::Default => "",
+            AllocatorType::Bumpalo => "<'bump>",
         }
     }
 
-    fn vec_type(&self) -> &'static str {
+    fn struct_generic_params_bounds(&self) -> &'static str {
         match self.context.alloc_type() {
-            AllocatorType::Default => "::std::vec::Vec",
-            AllocatorType::Bumpalo => "::bumpalo::collections::Vec",
+            AllocatorType::Default => "",
+            AllocatorType::Bumpalo => "<'bump>",
+        }
+    }
+
+    fn new_method_params(&self) -> &'static str {
+        match self.context.alloc_type() {
+            AllocatorType::Default => "",
+            AllocatorType::Bumpalo => "bump: &'bump ::bumpalo::Bump",
+        }
+    }
+
+    fn new_method_call_params(&self) -> &'static str {
+        match self.context.alloc_type() {
+            AllocatorType::Default => "",
+            AllocatorType::Bumpalo => "bump",
+        }
+    }
+
+    fn box_type(&self, item: &str) -> String {
+        match self.context.alloc_type() {
+            AllocatorType::Default => format!("::std::boxed::Box<{item}>", item = item),
+            AllocatorType::Bumpalo => format!("::bumpalo::boxed::Box<'bump, {item}>", item = item),
+        }
+    }
+
+    fn call_new_from_new(&self) -> &'static str {
+        match self.context.alloc_type() {
+            AllocatorType::Default => "new()",
+            AllocatorType::Bumpalo => "new_in(bump)",
+        }
+    }
+
+    fn vec_type(&self, item: &str) -> String {
+        match self.context.alloc_type() {
+            AllocatorType::Default => format!("::std::vec::Vec<{item}>", item = item),
+            AllocatorType::Bumpalo => {
+                format!("::bumpalo::collections::Vec<'bump, {item}>", item = item)
+            }
         }
     }
 
     fn string_type(&self) -> &'static str {
         match self.context.alloc_type() {
             AllocatorType::Default => "::std::string::String",
-            AllocatorType::Bumpalo => "::bumpalo::collections::String",
+            AllocatorType::Bumpalo => "::bumpalo::collections::String<'bump>",
         }
     }
 
     fn internal_data_type(&self) -> &'static str {
-        todo!()
+        match self.context.alloc_type() {
+            AllocatorType::Default => "::puroro::helpers::InternalDataForNormalStruct",
+            AllocatorType::Bumpalo => "::puroro::helpers::InternalDataForBumpaloStruct<'bump>",
+        }
     }
 
     fn internal_field_init_value(&self) -> &'static str {
-        todo!()
-    }
-}
-
-pub struct MessageImplFragmentGeneratorForNormalStruct<'c> {
-    context: &'c Context<'c>,
-}
-
-impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForNormalStruct<'c> {
-    fn struct_name(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
-        Ok(msg.native_bare_type_name().into())
-    }
-
-    fn cfg_condition(&self) -> &'static str {
-        ""
-    }
-
-    fn is_default_available(&self) -> bool {
-        true
-    }
-
-    fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
-        let scalar_type: Cow<'static, str> = match field.type_()?.native_trivial_type_name() {
-            Ok(name) => name.into(),
-            Err(nontrivial_type) => match nontrivial_type {
-                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                NonTrivialFieldType::String => "::std::string::String".into(),
-                NonTrivialFieldType::Bytes => "::std::vec::Vec<u8>".into(),
-                NonTrivialFieldType::Enum(e) => format!(
-                    "::std::result::Result<{type_}, i32>",
-                    type_ = e.native_fully_qualified_type_name(field.path_to_root_mod())
-                )
-                .into(),
-                NonTrivialFieldType::Message(m) => m
-                    .native_fully_qualified_type_name(field.path_to_root_mod())
-                    .into(),
-            },
-        };
-        Ok(match field.label()? {
-            FieldLabel::Optional => {
-                if matches!(field.type_()?, FieldType::Message(_)) {
-                    format!(
-                        "::std::option::Option<::std::boxed::Box<{type_}>>",
-                        type_ = scalar_type,
-                    )
-                    .into()
-                } else {
-                    scalar_type.into()
-                }
-            }
-            FieldLabel::Required => {
-                if matches!(field.type_()?, FieldType::Message(_)) {
-                    format!("::std::boxed::Box<{type_}>", type_ = scalar_type,).into()
-                } else {
-                    scalar_type.into()
-                }
-            }
-            FieldLabel::Repeated => {
-                format!("::std::vec::Vec<{type_}>", type_ = scalar_type,).into()
-            }
-        })
-    }
-    fn struct_generic_params(&self, extra_args: &'static str) -> Cow<'static, str> {
-        if extra_args.is_empty() {
-            "".into()
-        } else {
-            format!("<{args}>", args = extra_args).into()
+        match self.context.alloc_type() {
+            AllocatorType::Default => "::puroro::helpers::InternalDataForNormalStruct::new()",
+            AllocatorType::Bumpalo => "::puroro::helpers::InternalDataForBumpaloStruct::new(bump)",
         }
-    }
-    fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str> {
-        if extra_args.is_empty() {
-            "".into()
-        } else {
-            format!("<{args}>", args = extra_args).into()
-        }
-    }
-    fn new_method_params(&self) -> &'static str {
-        ""
-    }
-    fn new_method_call_params(&self) -> &'static str {
-        ""
-    }
-    fn box_type(&self) -> &'static str {
-        "::std::boxed::Box"
-    }
-    fn vec_type(&self) -> &'static str {
-        "::std::vec::Vec"
-    }
-    fn string_type(&self) -> &'static str {
-        "::std::string::String"
-    }
-
-    fn internal_data_type(&self) -> &'static str {
-        "::puroro::helpers::InternalDataForNormalStruct"
-    }
-
-    fn internal_field_init_value(&self) -> &'static str {
-        "::puroro::helpers::InternalDataForNormalStruct::new()"
-    }
-}
-
-impl<'c> MessageImplFragmentGeneratorForNormalStruct<'c> {
-    pub fn new(context: &'c Context<'c>) -> Self {
-        Self { context }
-    }
-}
-
-pub struct MessageImplFragmentGeneratorForBumpaloStruct<'c> {
-    context: &'c Context<'c>,
-}
-
-impl<'c> MessageImplFragmentGenerator<'c> for MessageImplFragmentGeneratorForBumpaloStruct<'c> {
-    fn struct_name(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
-        Ok(format!("{name}Bumpalo", name = msg.native_bare_type_name()).into())
-    }
-
-    fn cfg_condition(&self) -> &'static str {
-        "#[cfg(feature = \"puroro-bumpalo\")]"
-    }
-
-    fn is_default_available(&self) -> bool {
-        false
-    }
-
-    fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
-        let scalar_type: Cow<'static, str> = match field.type_()?.native_trivial_type_name() {
-            Ok(name) => name.into(),
-            Err(nontrivial_type) => match nontrivial_type {
-                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                NonTrivialFieldType::String => "::bumpalo::collections::String".into(),
-                NonTrivialFieldType::Bytes => "::bumpalo::collections::Vec<u8>".into(),
-                NonTrivialFieldType::Enum(e) => format!(
-                    "::std::result::Result<{type_}, i32>",
-                    type_ = e.native_fully_qualified_type_name(field.path_to_root_mod())
-                )
-                .into(),
-                NonTrivialFieldType::Message(m) => m
-                    .native_fully_qualified_type_name(field.path_to_root_mod())
-                    .into(),
-            },
-        };
-        Ok(match field.label()? {
-            FieldLabel::Optional => {
-                if matches!(field.type_()?, FieldType::Message(_)) {
-                    format!(
-                        "::std::option::Option<::bumpalo::boxed::Box<{type_}>>",
-                        type_ = scalar_type,
-                    )
-                    .into()
-                } else {
-                    scalar_type.into()
-                }
-            }
-            FieldLabel::Required => {
-                if matches!(field.type_()?, FieldType::Message(_)) {
-                    format!("::bumpalo::boxed::Box<{type_}>", type_ = scalar_type,).into()
-                } else {
-                    scalar_type.into()
-                }
-            }
-            FieldLabel::Repeated => {
-                format!("::bumpalo::collections::Vec<{type_}>", type_ = scalar_type,).into()
-            }
-        })
-    }
-
-    fn struct_generic_params(&self, extra_args: &'static str) -> Cow<'static, str> {
-        if extra_args.is_empty() {
-            "<'b>".into()
-        } else {
-            format!("<'b, {args}>", args = extra_args).into()
-        }
-    }
-    fn struct_generic_params_bounds(&self, extra_args: &'static str) -> Cow<'static, str> {
-        if extra_args.is_empty() {
-            "<'b>".into()
-        } else {
-            format!("<'b, {args}>", args = extra_args).into()
-        }
-    }
-    fn new_method_params(&self) -> &'static str {
-        "bump: &'b ::bumpalo::Bump\n"
-    }
-    fn new_method_call_params(&self) -> &'static str {
-        "self.puroro_internal.bumpalo()"
-    }
-    fn box_type(&self) -> &'static str {
-        "::bumpalo::boxed::Box"
-    }
-    fn vec_type(&self) -> &'static str {
-        "::bumpalo::collections::Vec"
-    }
-    fn string_type(&self) -> &'static str {
-        "::bumpalo::collactions::String"
-    }
-
-    fn internal_data_type(&self) -> &'static str {
-        "::puroro::helpers::InternalDataForBumpaloStruct<'b>"
-    }
-
-    fn internal_field_init_value(&self) -> &'static str {
-        "::puroro::helpers::InternalDataForBumpaloStruct::new(bump)"
-    }
-}
-
-impl<'c> MessageImplFragmentGeneratorForBumpaloStruct<'c> {
-    pub fn new(context: &'c Context<'c>) -> Self {
-        Self { context }
     }
 }
