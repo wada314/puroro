@@ -70,6 +70,10 @@ where
         }
     }
 
+    pub fn len(&self) -> usize {
+        self.end - self.index
+    }
+
     fn try_get_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, usize)>> {
         let mut peekable = self.by_ref().peekable();
         if let None = peekable.peek() {

@@ -11,6 +11,7 @@ pub struct Int64();
 pub struct UInt64();
 pub struct SInt64();
 pub struct Bool();
+pub struct Bytes();
 pub struct String();
 pub struct Enum<T>(PhantomData<T>);
 pub struct Message<T>(PhantomData<T>);
@@ -29,6 +30,7 @@ impl FieldTypeTag for UInt64 {}
 impl FieldTypeTag for SInt32 {}
 impl FieldTypeTag for SInt64 {}
 impl FieldTypeTag for Bool {}
+impl FieldTypeTag for Bytes {}
 impl FieldTypeTag for String {}
 impl<T> FieldTypeTag for Enum<T> {}
 impl<T> FieldTypeTag for Message<T> {}
