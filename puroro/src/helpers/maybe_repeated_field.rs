@@ -25,6 +25,52 @@ pub trait MaybeRepeatedField<'a> {
         T: InternalData;
 }
 
+/// An utility for protobuf implementation code.
+/// Used for simplifying the serialization / deserialization code.
+/// The lifetime parameter `'a` is used for the generated iterator's lifetime.
+/// This is a workaround for the lack of Generic Associated Types (GAT)
+/// in the current (1.52.0) Rust.
+/// Essentially `'a` should be equal to the lifetime of the `&self`.
+pub trait MaybeRepeatedField2<'a> {
+    type Item: 'a + ?Sized;
+    type Iter: Iterator<Item = &'a Self::Item>;
+    /// Returns an iterator over this field items.
+    /// If this field is an optional / required field, then the iterator
+    /// may or may not iterate over the single item, depend on if
+    /// the field value is equal to default or not.
+    /// If this field is a repeated field, then the iterator iterates
+    /// over the repeated items.
+    fn iter_for_ser(&'a self) -> Self::Iter;
+    /// Returns a mutable reference for the:
+    /// - Optional / required field: The field item.
+    /// - Repeated field: A new item pushed into the tail of the list.
+    fn push_and_get_mut<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    where
+        U: InternalData;
+}
+
+impl<'a, T> MaybeRepeatedField2<'a> for &&'a T
+where
+    T: Default + PartialEq + Copy,
+{
+    type Item = T;
+    type Iter = std::option::IntoIter<&'a T>;
+    fn iter_for_ser(&'a self) -> Self::Iter {
+        if ***self == Default::default() {
+            None
+        } else {
+            Some(self)
+        }
+        .into_iter()
+    }
+    fn push_and_get_mut<U>(&'a mut self, _internal: &'a U) -> &'a mut Self::Item
+    where
+        U: InternalData,
+    {
+        self
+    }
+}
+
 macro_rules! define_maybe_repeated_field {
     ($ty:ty) => {
         impl<'a> MaybeRepeatedField<'a> for $ty {

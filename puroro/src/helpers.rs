@@ -1,7 +1,7 @@
 mod maybe_repeated_field;
 mod maybe_repeated_variant_field;
-pub use maybe_repeated_field::MaybeRepeatedField;
-pub use maybe_repeated_variant_field::MaybeRepeatedVariantField;
+pub use maybe_repeated_field::{MaybeRepeatedField, MaybeRepeatedField2};
+pub use maybe_repeated_variant_field::{MaybeRepeatedVariantField, MaybeRepeatedVariantField2};
 
 use crate::types::FieldData;
 use std::collections::HashMap;
