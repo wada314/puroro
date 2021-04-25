@@ -1,13 +1,7 @@
 use std::iter::FromIterator;
 use std::marker::PhantomData;
 
-pub mod deser;
 pub mod error;
-pub mod helpers;
-pub mod serializer;
-pub mod tags;
-pub mod types;
-pub mod variant;
 
 pub use error::PuroroError;
 pub type Result<T> = std::result::Result<T, PuroroError>;

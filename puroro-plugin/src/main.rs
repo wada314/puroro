@@ -13,8 +13,8 @@ mod stage3;
 mod utils;
 mod wrappers;
 
-use ::puroro::deser::DeserializableFromIter;
 use ::puroro::Serializable;
+use ::puroro_internal::deser::DeserializableFromIter;
 use context::Context;
 
 use error::{ErrorKind, GeneratorError};

@@ -220,15 +220,21 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
     pub fn internal_data_type(&self) -> &'static str {
         match self.context.alloc_type() {
-            AllocatorType::Default => "::puroro::helpers::InternalDataForNormalStruct",
-            AllocatorType::Bumpalo => "::puroro::helpers::InternalDataForBumpaloStruct<'bump>",
+            AllocatorType::Default => "::puroro_internal::helpers::InternalDataForNormalStruct",
+            AllocatorType::Bumpalo => {
+                "::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>"
+            }
         }
     }
 
     pub fn internal_field_init_value(&self) -> &'static str {
         match self.context.alloc_type() {
-            AllocatorType::Default => "::puroro::helpers::InternalDataForNormalStruct::new()",
-            AllocatorType::Bumpalo => "::puroro::helpers::InternalDataForBumpaloStruct::new(bump)",
+            AllocatorType::Default => {
+                "::puroro_internal::helpers::InternalDataForNormalStruct::new()"
+            }
+            AllocatorType::Bumpalo => {
+                "::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump)"
+            }
         }
     }
 }

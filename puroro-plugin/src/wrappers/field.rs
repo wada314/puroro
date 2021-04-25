@@ -345,15 +345,15 @@ impl<'c> VariantFieldType<'c> {
     }
     pub fn native_tag_type(&self, path_to_root_mod: &str) -> Cow<'static, str> {
         match self {
-            VariantFieldType::Int32 => "::puroro::tags::Int32".into(),
-            VariantFieldType::Int64 => "::puroro::tags::Int64".into(),
-            VariantFieldType::UInt32 => "::puroro::tags::UInt32".into(),
-            VariantFieldType::UInt64 => "::puroro::tags::UInt64".into(),
-            VariantFieldType::SInt32 => "::puroro::tags::SInt32".into(),
-            VariantFieldType::SInt64 => "::puroro::tags::UInt64".into(),
-            VariantFieldType::Bool => "::puroro::tags::Bool".into(),
+            VariantFieldType::Int32 => "::puroro_internal::tags::Int32".into(),
+            VariantFieldType::Int64 => "::puroro_internal::tags::Int64".into(),
+            VariantFieldType::UInt32 => "::puroro_internal::tags::UInt32".into(),
+            VariantFieldType::UInt64 => "::puroro_internal::tags::UInt64".into(),
+            VariantFieldType::SInt32 => "::puroro_internal::tags::SInt32".into(),
+            VariantFieldType::SInt64 => "::puroro_internal::tags::UInt64".into(),
+            VariantFieldType::Bool => "::puroro_internal::tags::Bool".into(),
             VariantFieldType::Enum(e) => format!(
-                "::puroro::tags::Enum<{name}>",
+                "::puroro_internal::tags::Enum<{name}>",
                 name = e.native_fully_qualified_type_name(path_to_root_mod)
             )
             .into(),

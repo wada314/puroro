@@ -90,12 +90,12 @@ impl{gp} {name}{gpb} {{
                         Ok(match self.context.alloc_type() {
                             AllocatorType::Default => {
                                 format!(
-                                    "{name}: ::puroro::helpers::FieldNew::new(),\n",
+                                    "{name}: ::puroro_internal::helpers::FieldNew::new(),\n",
                                     name = field.native_name()
                                 )
                             }
                             AllocatorType::Bumpalo => format!(
-                                "{name}: ::puroro::helpers::FieldNew::new_in_bumpalo(bump),\n",
+                                "{name}: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),\n",
                                 name = field.native_name()
                             ),
                         })
@@ -139,17 +139,18 @@ impl{gp} ::std::default::Default for {name}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} ::puroro::deser::DeserializableMessageFromIter for {name}{gpb} {{
+impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb} {{
     fn met_field<'a, 'b, I>(
         &mut self,
-        field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
+        field: ::puroro_internal::types::FieldData<
+            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
     ) -> ::puroro::Result<()> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {{
-        use ::puroro::helpers::MaybeRepeatedField;
-        use ::puroro::helpers::MaybeRepeatedVariantField;
+        use ::puroro_internal::helpers::MaybeRepeatedField;
+        use ::puroro_internal::helpers::MaybeRepeatedVariantField;
         match field {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
@@ -179,7 +180,7 @@ impl{gp} ::puroro::deser::DeserializableMessageFromIter for {name}{gpb} {{
         output: &mut Indentor<W>,
     ) -> Result<()> {
         (
-            "::puroro::types::FieldData::Variant(variant) => match field_number {{\n",
+            "::puroro_internal::types::FieldData::Variant(variant) => match field_number {{\n",
             indent((
                 iter(self.msg.fields().map(|field| -> Result<Fragment<_>> {
                     Ok(match field.wire_type()? {
@@ -213,7 +214,7 @@ impl{gp} ::puroro::deser::DeserializableMessageFromIter for {name}{gpb} {{
         output: &mut Indentor<W>,
     ) -> Result<()> {
         (
-            "::puroro::types::FieldData::LengthDelimited(bytes_iter) => match field_number {{\n",
+            "::puroro_internal::types::FieldData::LengthDelimited(bytes_iter) => match field_number {{\n",
             indent((
                 iter(self.msg.fields().map(|field| -> Result<Fragment<_>> {
                     Ok((
@@ -271,7 +272,7 @@ bytes_iter.deser_message(msg)?;\n",
     ) -> Result<()> {
         (
             format!(
-                "::puroro::types::FieldData::Bits{bits}(bytes) => match field_number {{\n",
+                "::puroro_internal::types::FieldData::Bits{bits}(bytes) => match field_number {{\n",
                 bits = bits,
             ),
             indent((
@@ -343,8 +344,9 @@ bytes_iter.deser_message(msg)?;\n",
         (format!(
             "\
 {cfg}
-impl{gp} ::puroro::deser::DeserializableFromIter for {name}{gpb} {{
-    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
+impl{gp} ::puroro_internal::deser::DeserializableFromIter for {name}{gpb} {{
+    fn deserialize_from_bytes_iter<'a, I>(
+        &mut self, mut bytes_iter: ::puroro_internal::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {{
@@ -367,11 +369,11 @@ impl{gp} ::puroro::deser::DeserializableFromIter for {name}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} ::puroro::serializer::Serializable for {name}{gpb} {{
-    fn serialize<T: ::puroro::serializer::MessageSerializer>(
+impl{gp} ::puroro_internal::serializer::Serializable for {name}{gpb} {{
+    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
-        use ::puroro::helpers::MaybeRepeatedField;\n",
+        use ::puroro_internal::helpers::MaybeRepeatedField;\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
@@ -447,8 +449,8 @@ for item in self.{name}.iter_for_ser() {{
 {cfg}
 impl{gp} ::puroro::Serializable for {name}{gpb} {{
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {{
-        let mut serializer = ::puroro::serializer::default_serializer(write);
-        <Self as ::puroro::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
+        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
     }}
 }}\n",
             name = self.frag_gen.struct_name(self.msg)?,
@@ -568,7 +570,7 @@ fn {name}_iter(&self) -> Self::{camel_name}Iter<'_> {{
             crate::context::AllocatorType::Default => {
                 format!(
                     "\
-impl{gp} ::puroro::helpers::FieldNew<'a> for {name}{gpb} {{
+impl{gp} ::puroro_internal::helpers::FieldNew<'a> for {name}{gpb} {{
     fn new() -> Self {{
         Default::default()
     }}
@@ -582,7 +584,7 @@ impl{gp} ::puroro::helpers::FieldNew<'a> for {name}{gpb} {{
                 format!(
                     "\
 {cfg}
-impl{gp} ::puroro::helpers::FieldNew<'bump> for {name}{gpb} {{
+impl{gp} ::puroro_internal::helpers::FieldNew<'bump> for {name}{gpb} {{
     fn new() -> Self {{
         unimplemented!()
     }}

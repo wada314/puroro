@@ -1,20 +1,20 @@
-use ::puroro::tags;
-use ::puroro::{PuroroError, Result};
-use ::puroro_serializer::deserializer::stream::{Field, LengthDelimitedDeserializer};
+use puroro::{PuroroError, Result};
+use puroro_internal::tags;
+use puroro_serializer::deserializer::stream::{Field, LengthDelimitedDeserializer};
 
 // An (incomplete) transformation from a native type written in the macro to our `FieldTypeTag`.
 pub(crate) trait NativeTypeToFieldTypeTag {
-    type Tag: ::puroro::tags::FieldTypeTag;
+    type Tag: ::puroro_internal::tags::FieldTypeTag;
 }
 impl NativeTypeToFieldTypeTag for String {
-    type Tag = ::puroro::tags::String;
+    type Tag = ::puroro_internal::tags::String;
 }
 impl<T> NativeTypeToFieldTypeTag for Vec<T>
 where
     T: NativeTypeToFieldTypeTag,
     T::Tag: tags::SingularFieldTypeTag,
 {
-    type Tag = ::puroro::tags::Repeated<T::Tag>;
+    type Tag = ::puroro_internal::tags::Repeated<T::Tag>;
 }
 pub(crate) trait DeserializableFromField {
     fn merge_from_field<D: LengthDelimitedDeserializer>(&mut self, field: Field<D>) -> Result<()>;
@@ -368,7 +368,7 @@ macro_rules! proto_struct {
                     Ok(e) => (*e as i32),
                     Err(i) => *i,
                 };
-                serializer.serialize_variant::<::puroro::tags::Int32>(field_number, integer)?;
+                serializer.serialize_variant::<::puroro_internal::tags::Int32>(field_number, integer)?;
                 Ok(())
             }
         }
@@ -385,7 +385,7 @@ macro_rules! proto_struct {
                     };
                     Ok(integer)
                 });
-                serializer.serialize_variants_twice::<::puroro::tags::Int32, _>(field_number, iter)?;
+                serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(field_number, iter)?;
                 Ok(())
             }
         }
@@ -396,7 +396,7 @@ macro_rules! proto_struct {
 
 #[cfg(test)]
 mod tests {
-    use ::puroro::Deserializable;
+    use puroro::Deserializable;
     use std::io::Read;
     #[test]
     fn test_encoding_sample1() {
