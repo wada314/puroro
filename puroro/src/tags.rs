@@ -42,14 +42,14 @@ impl FieldTypeTag for SFixed64 {}
 
 pub trait FieldLabelTag {}
 pub struct Repeated;
-pub struct Optional2;
-pub struct Optional3NoPresence; // Proto3 unlabeled field.
-pub struct Optional3ExplicitPresence; // Proto3 explicitly optional marked field.
+// Proto3 unlabeled field.
+pub struct OptionalNoPresence;
+// Proto2 optional field || Proto3 explicitly optional marked field.
+pub struct OptionalExplicitPresence;
 pub struct Required;
 impl FieldLabelTag for Repeated {}
-impl FieldLabelTag for Optional2 {}
-impl FieldLabelTag for Optional3NoPresence {}
-impl FieldLabelTag for Optional3ExplicitPresence {}
+impl FieldLabelTag for OptionalNoPresence {}
+impl FieldLabelTag for OptionalExplicitPresence {}
 impl FieldLabelTag for Required {}
 
 impl VariantTypeTag for Int32 {}

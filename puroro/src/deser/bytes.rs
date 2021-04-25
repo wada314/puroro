@@ -11,7 +11,7 @@ pub trait DeserializableFromBytes {
     where
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
-        let mut bytes_iter = BytesIter::new(iter);
+        let bytes_iter = BytesIter::new(iter);
         self.deserialize_from_bytes_iter(bytes_iter)
     }
     fn deserialize_from_bytes_iter<'a, I>(&mut self, bytes_iter: BytesIter<'a, I>) -> Result<()>
