@@ -1,7 +1,6 @@
 use crate::types::{FieldData, WireType};
 use crate::variant::Variant;
-use crate::PuroroError;
-use crate::Result;
+use crate::{ErrorKind, PuroroError, Result};
 use std::io::Result as IoResult;
 
 use ::num_traits::FromPrimitive;
@@ -99,7 +98,7 @@ where
         }
         let key = Variant::decode_bytes(&mut peekable)?.to_usize()?;
         Ok(Some((
-            WireType::from_usize(key & 0x07).ok_or(PuroroError::InvalidWireType)?,
+            WireType::from_usize(key & 0x07).ok_or(ErrorKind::InvalidWireType)?,
             (key >> 3),
         )))
     }
@@ -109,7 +108,8 @@ where
         for i in 0..BYTES {
             result[i] = self
                 .next()
-                .ok_or(PuroroError::UnexpectedInputTermination)??;
+                .transpose()?
+                .ok_or(PuroroError::from(ErrorKind::UnexpectedInputTermination))?;
         }
         Ok(result)
     }
@@ -132,7 +132,7 @@ where
                 }
                 WireType::Bits32 => FieldData::Bits32(self.next_bytes::<4>()?),
                 WireType::Bits64 => FieldData::Bits64(self.next_bytes::<8>()?),
-                WireType::StartGroup | WireType::EndGroup => Err(PuroroError::GroupNotSupported)?,
+                WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
             };
             handler.met_field(field_data, field_number)?;
             self.end = old_end_index;
@@ -169,7 +169,7 @@ where
     }
 }
 
-/// Converts `Result<u8, std::io::IoError>` into `Result<u8, PuroroError>`.
+/// Converts `Result<u8, std::io::IoError>` into `Result<u8, ErrorKind>`.
 pub struct Bytes<'a, I: Iterator<Item = IoResult<u8>>> {
     iter: &'a mut I,
 }
@@ -185,7 +185,7 @@ impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for Bytes<'a, I> {
     }
 }
 
-/// Converts `Result<u8, std::io::IoError>` into `Result<char, PuroroError>`.
+/// Converts `Result<u8, std::io::IoError>` into `Result<char, ErrorKind>`.
 pub struct Chars<'a, I: Iterator<Item = IoResult<u8>>> {
     iter: ::utf8_decode::UnsafeDecoder<&'a mut I>,
 }
@@ -203,7 +203,7 @@ impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for Chars<'a, I> {
     }
 }
 
-/// Converts `Result<u8, std::io::IoError>` into `Result<Variant, PuroroError>`.
+/// Converts `Result<u8, std::io::IoError>` into `Result<Variant, ErrorKind>`.
 pub struct Variants<'a, I: Iterator<Item = IoResult<u8>>> {
     iter: &'a mut I,
 }

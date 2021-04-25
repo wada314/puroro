@@ -212,13 +212,13 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
                         )
                             .into(),
                         _ => format!(
-                            "{number} => Err(::puroro::PuroroError::UnexpectedWireType)?,\n",
+                            "{number} => Err(::puroro::ErrorKind::UnexpectedWireType)?,\n",
                             number = field.number()
                         )
                         .into(),
                     })
                 })),
-                "_ => Err(::puroro::PuroroError::UnexpectedFieldId)?,\n",
+                "_ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,\n",
             )),
             "}}\n",
         )
@@ -243,7 +243,7 @@ let values = bytes_iter.variants().map(|rv| {{
     rv.and_then(|variant| variant.to_native::<{tag}>())
 }}).collect::<::puroro::Result<::std::vec::Vec<_>>>()?;
 let mut iter = values.into_iter();
-let first = iter.next().ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
+let first = iter.next().ok_or(::puroro::ErrorKind::ZeroLengthPackedField)?;
 MaybeRepeatedVariantField::extend(&mut self.{name}, first, iter);\n",
                                 name = field.native_name(),
                                 tag = field_type.native_tag_type(self.msg.path_to_root_mod()),
@@ -268,13 +268,13 @@ bytes_iter.deser_message(msg)?;\n",
                                     name = field.native_name()
                                 ),
                             },
-                            _ => "Err(::puroro::PuroroError::UnexpectedWireType)?\n".into(),
+                            _ => "Err(::puroro::ErrorKind::UnexpectedWireType)?\n".into(),
                         },)),
                         "}}\n",
                     )
                         .into())
                 })),
-                "_ => Err(::puroro::PuroroError::UnexpectedFieldId)?,\n",
+                "_ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,\n",
             )),
             "}}\n",
         )
@@ -340,13 +340,13 @@ bytes_iter.deser_message(msg)?;\n",
                     format!(
                         "\
 {field_numbers} => {{
-    Err(::puroro::PuroroError::UnexpectedWireType)?
+    Err(::puroro::ErrorKind::UnexpectedWireType)?
 }}\n",
                         field_numbers = pattern
                     )
                 },
                 // TODO: handle unknown field id
-                "_ => Err(::puroro::PuroroError::UnexpectedFieldId)?,\n",
+                "_ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,\n",
             )),
             "}}\n",
         )

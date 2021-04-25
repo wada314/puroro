@@ -1,5 +1,5 @@
 use crate::tags::{Bool, Enum, Int32, Int64, SInt32, SInt64, UInt32, UInt64};
-use crate::{PuroroError, Result};
+use crate::{ErrorKind, Result};
 use std::convert::TryFrom;
 use std::io::Result as IoResult;
 use std::io::Write;
@@ -25,9 +25,7 @@ impl Variant {
                         return Ok(Variant(x.to_ne_bytes()));
                     }
                 }
-                None => {
-                    return Err(PuroroError::UnexpectedInputTermination);
-                }
+                None => Err(ErrorKind::UnexpectedInputTermination)?,
             }
         }
         // i == 9, so now checking a last MSBit.
@@ -36,14 +34,12 @@ impl Variant {
                 let byte = maybe_byte?;
                 x |= ((byte & 0x01) as u64) << 63;
                 if byte & 0xFE != 0 {
-                    return Err(PuroroError::TooLargeVariant);
+                    Err(ErrorKind::TooLargeVariant)?
                 } else {
                     return Ok(Variant(x.to_ne_bytes()));
                 }
             }
-            None => {
-                return Err(PuroroError::UnexpectedInputTermination);
-            }
+            None => Err(ErrorKind::UnexpectedInputTermination)?,
         }
     }
     pub(crate) fn encode_bytes<W>(&self, write: &mut W) -> Result<()>
@@ -178,7 +174,7 @@ impl VariantType for Bool {
         match u64::from_le_bytes(var.0) {
             0 => Ok(false),
             1 => Ok(true),
-            _ => Err(PuroroError::InvalidBooleanValue),
+            _ => Err(ErrorKind::InvalidBooleanValue)?,
         }
     }
     fn to_variant(val: Self::NativeType) -> Result<Variant> {
@@ -214,7 +210,8 @@ impl VariantType for RustUsize {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::io::{Error as IoError, ErrorKind, Read};
+    use crate::PuroroError;
+    use std::io::{Error as IoError, ErrorKind as IoErrorKind, Read};
 
     fn collect_iter<I: Iterator<Item = IoResult<u8>>>(iter: I) -> Vec<u8> {
         iter.map(|r| r.unwrap()).collect::<Vec<_>>()
@@ -222,7 +219,7 @@ mod tests {
 
     #[test]
     fn test_variant_from_bytes() {
-        let io_error1 = IoError::new(ErrorKind::InvalidData, "");
+        let io_error1 = IoError::new(IoErrorKind::InvalidData, "");
 
         fn expect_ok(input: &[u8], expected_value: u64, expected_remaining: &[u8]) {
             let mut iter = input.bytes();
@@ -248,11 +245,11 @@ mod tests {
         );
         assert!(matches!(
             get_err(vec![Ok(0x80)]),
-            PuroroError::UnexpectedInputTermination
+            IoErrorKind::UnexpectedInputTermination
         ));
         assert!(matches!(
             get_err(vec![Err(io_error1)]),
-            PuroroError::IteratorError(_)
+            IoErrorKind::IteratorError(_)
         ));
     }
 
@@ -274,11 +271,11 @@ mod tests {
         );
         assert!(matches!(
             get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0x1F]).unwrap_err(),
-            PuroroError::IntegerOverflow(_)
+            IoErrorKind::IntegerOverflow(_)
         ));
         assert!(matches!(
             get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F]).unwrap_err(),
-            PuroroError::IntegerOverflow(_)
+            IoErrorKind::IntegerOverflow(_)
         ));
     }
 
@@ -301,11 +298,11 @@ mod tests {
         );
         assert!(matches!(
             get_si32(&[0xFF, 0xFF, 0xFF, 0xFF, 0x1F]).unwrap_err(),
-            PuroroError::IntegerOverflow(_)
+            IoErrorKind::IntegerOverflow(_)
         ));
         assert!(matches!(
             get_si32(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F]).unwrap_err(),
-            PuroroError::IntegerOverflow(_)
+            IoErrorKind::IntegerOverflow(_)
         ));
     }
 }

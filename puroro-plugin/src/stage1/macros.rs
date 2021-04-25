@@ -1,4 +1,4 @@
-use puroro::{PuroroError, Result};
+use puroro::{ErrorKind, Result};
 use puroro_internal::tags;
 use puroro_serializer::deserializer::stream::{Field, LengthDelimitedDeserializer};
 
@@ -65,11 +65,11 @@ macro_rules! define_variant_fields {
                         *self = ldd
                             .deserialize_as_variants()
                             .last()
-                            .unwrap_or(Err(PuroroError::ZeroLengthPackedField))?
+                            .unwrap_or(Err(ErrorKind::ZeroLengthPackedField))?
                             .to_native::<$tag>()?;
                     }
                     _ => {
-                        Err(PuroroError::UnexpectedWireType)?;
+                        Err(ErrorKind::UnexpectedWireType)?;
                     }
                 }
                 Ok(())
@@ -89,7 +89,7 @@ macro_rules! define_variant_fields {
                     self.append(&mut vec);
                     Ok(())
                 } else {
-                    Err(PuroroError::UnexpectedWireType)
+                    Err(ErrorKind::UnexpectedWireType)
                 }
             }
         }
@@ -133,7 +133,7 @@ impl DeserializableFromField for String {
             *self = ldd.deserialize_as_chars().collect::<Result<String>>()?;
             Ok(())
         } else {
-            Err(PuroroError::UnexpectedWireType)
+            Err(ErrorKind::UnexpectedWireType)
         }
     }
 }
@@ -143,7 +143,7 @@ impl DeserializableFromField for Vec<String> {
             self.push(ldd.deserialize_as_chars().collect::<Result<String>>()?);
             Ok(())
         } else {
-            Err(PuroroError::UnexpectedWireType)
+            Err(ErrorKind::UnexpectedWireType)
         }
     }
 }
@@ -244,7 +244,7 @@ macro_rules! proto_struct {
                     ldd.deserialize_as_message(msg)?;
                     Ok(())
                 } else {
-                    Err(::puroro::PuroroError::UnexpectedWireType)
+                    Err(::puroro::ErrorKind::UnexpectedWireType)
                 }
             }
         }
@@ -257,7 +257,7 @@ macro_rules! proto_struct {
                     self.push(ldd.deserialize_as_message($structname::default())?);
                     Ok(())
                 } else {
-                    Err(::puroro::PuroroError::UnexpectedWireType)
+                    Err(::puroro::ErrorKind::UnexpectedWireType)
                 }
             }
         }

@@ -1,5 +1,14 @@
 #[derive(::thiserror::Error, Debug)]
-pub enum PuroroError {
+#[error(r#"PuroroError. kind = "{kind}""#)]
+pub struct PuroroError {
+    #[from]
+    kind: ErrorKind,
+    #[cfg(feature = "puroro-nightly")]
+    backtrace: std::backtrace::Backtrace,
+}
+
+#[derive(::thiserror::Error, Debug)]
+pub enum ErrorKind {
     #[error("The input binary has terminated in irregular position.")]
     UnexpectedInputTermination,
     #[error("A variant integer type has too large or too small value.")]
@@ -34,4 +43,20 @@ pub enum PuroroError {
     GroupNotSupported,
     #[error("Other error: {0}")]
     OtherErrors(Box<dyn std::error::Error>),
+}
+
+impl From<std::io::Error> for PuroroError {
+    fn from(input: std::io::Error) -> Self {
+        PuroroError::from(ErrorKind::from(input))
+    }
+}
+impl From<std::fmt::Error> for PuroroError {
+    fn from(input: std::fmt::Error) -> Self {
+        PuroroError::from(ErrorKind::from(input))
+    }
+}
+impl From<std::num::TryFromIntError> for PuroroError {
+    fn from(input: std::num::TryFromIntError) -> Self {
+        PuroroError::from(ErrorKind::from(input))
+    }
 }

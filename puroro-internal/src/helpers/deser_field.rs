@@ -2,7 +2,7 @@ use crate::deser::BytesIter;
 use crate::tags;
 use crate::tags::{FieldLabelTag, FieldTypeAndLabelTag, FieldTypeTag};
 use crate::types::FieldData;
-use crate::{PuroroError, Result};
+use crate::{ErrorKind, PuroroError, Result};
 use std::collections::HashMap;
 use std::convert::{TryFrom, TryInto};
 
@@ -54,11 +54,11 @@ macro_rules! define_deser_req_variants {
                             .variants()
                             .last()
                             .transpose()?
-                            .ok_or(PuroroError::ZeroLengthPackedField)
+                            .ok_or(PuroroError::from(ErrorKind::ZeroLengthPackedField))
                             .and_then(|variant| variant.to_native::<$ttag>())?;
                         Ok(())
                     }
-                    _ => Err(PuroroError::InvalidWireType)?,
+                    _ => Err(ErrorKind::InvalidWireType)?,
                 }
             }
         }
@@ -93,12 +93,12 @@ where
                     .variants()
                     .last()
                     .transpose()?
-                    .ok_or(PuroroError::ZeroLengthPackedField)
+                    .ok_or(PuroroError::from(ErrorKind::ZeroLengthPackedField))
                     .and_then(|variant| variant.to_native::<tags::Int32>())?
                     .try_into();
                 Ok(())
             }
-            _ => Err(PuroroError::InvalidWireType)?,
+            _ => Err(ErrorKind::InvalidWireType)?,
         }
     }
 }
@@ -120,7 +120,7 @@ macro_rules! define_deser_req_ld {
                     }
                     Ok(())
                 } else {
-                    Err(PuroroError::UnexpectedWireType)?
+                    Err(ErrorKind::UnexpectedWireType)?
                 }
             }
         }
@@ -158,7 +158,7 @@ where
         if let FieldData::LengthDelimited(bytes_iter) = field {
             self.deserialize_from_bytes_iter(bytes_iter)
         } else {
-            Err(PuroroError::UnexpectedWireType)?
+            Err(ErrorKind::UnexpectedWireType)?
         }
     }
 }
@@ -194,7 +194,7 @@ macro_rules! define_deser_req_fixed {
                     *self = <$ty>::from_le_bytes(array);
                     Ok(())
                 } else {
-                    Err(PuroroError::UnexpectedWireType)?
+                    Err(ErrorKind::UnexpectedWireType)?
                 }
             }
         }
@@ -222,8 +222,7 @@ where
     }
 }
 
-impl<T> DeserializableFromBytesField<(tags::Message<T>, tags::Optional3)>
-    for Option<T>
+impl<T> DeserializableFromBytesField<(tags::Message<T>, tags::Optional3)> for Option<T>
 where
     T: crate::deser::DeserializableFromIter
         + DeserializableFromBytesField<(tags::Message<T>, tags::Required)>,

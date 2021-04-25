@@ -1,6 +1,7 @@
-pub mod error;
+#![cfg_attr(feature = "puroro-nightly", feature(backtrace))]
 
-pub use error::PuroroError;
+mod error;
+pub use error::{ErrorKind, PuroroError};
 pub type Result<T> = std::result::Result<T, PuroroError>;
 
 pub trait DeserializableFromIter {

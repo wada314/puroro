@@ -5,4 +5,4 @@ pub mod tags;
 pub mod types;
 pub mod variant;
 
-pub use ::puroro::{PuroroError, Result};
+pub use ::puroro::{ErrorKind, PuroroError, Result};

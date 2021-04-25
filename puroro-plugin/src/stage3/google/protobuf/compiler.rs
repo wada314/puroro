@@ -33,12 +33,12 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
         use puroro::helpers::MaybeRepeatedVariantField;
         match field {
             ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                1 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
                 2 => {
                     *MaybeRepeatedField::last_mut(&mut self.supported_features) =
                         variant.to_native::<::puroro_internal::tags::UInt64>()?;
                 }
-                15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                15 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
             },
             ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
@@ -58,28 +58,28 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
                     let mut iter = values.into_iter();
                     let first = iter
                         .next()
-                        .ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
+                        .ok_or(::puroro::ErrorKind::ZeroLengthPackedField)?;
                     MaybeRepeatedVariantField::extend(&mut self.supported_features, first, iter);
                 }
                 15 => {
                     let msg = MaybeRepeatedField::last_mut(&mut self.file);
                     ldd.deserialize_as_message(msg)?;
                 }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
+                _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
             },
             ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
+                1 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                2 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                15 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
             },
             ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
+                1 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                2 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                15 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
             },
-            _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldType)?,
         }
         Ok(())
     }
@@ -176,10 +176,10 @@ pub mod code_generator_response {
             use puroro::helpers::MaybeRepeatedVariantField;
             match field {
                 ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
-                    1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                    2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                    15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                    16 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                    1 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                    2 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                    15 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                    16 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
                 },
                 ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                     1 => {
@@ -201,23 +201,23 @@ pub mod code_generator_response {
                         let msg = MaybeRepeatedField::last_mut(&mut self.generated_code_info);
                         ldd.deserialize_as_message(msg)?;
                     }
-                    _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
+                    _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
                 },
                 ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
-                    1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                    2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                    15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                    16 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                    _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
+                    1 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                    2 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                    15 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                    16 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                    _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
                 },
                 ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
-                    1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                    2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                    15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                    16 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                    _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
+                    1 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                    2 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                    15 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                    16 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                    _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
                 },
-                _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
+                _ => Err(::puroro::ErrorKind::UnexpectedFieldType)?,
             }
             Ok(())
         }
@@ -298,10 +298,10 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
         use puroro::helpers::MaybeRepeatedVariantField;
         match field {
             ::puroro::deserializer::stream::Field::Variant(variant) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                1 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                2 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                15 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                3 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
             },
             ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
@@ -322,23 +322,23 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler
                     let msg = MaybeRepeatedField::last_mut(&mut self.compiler_version);
                     ldd.deserialize_as_message(msg)?;
                 }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
+                _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
             },
             ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
+                1 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                2 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                15 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                3 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
             },
             ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                15 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
+                1 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                2 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                15 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                3 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
             },
-            _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldType)?,
         }
         Ok(())
     }
@@ -424,7 +424,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     *MaybeRepeatedField::last_mut(&mut self.patch) =
                         variant.to_native::<::puroro_internal::tags::Int32>()?;
                 }
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
+                4 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
             },
             ::puroro::deserializer::stream::Field::LengthDelimited(ldd) => match field_number {
                 1 => {
@@ -439,7 +439,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     let mut iter = values.into_iter();
                     let first = iter
                         .next()
-                        .ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
+                        .ok_or(::puroro::ErrorKind::ZeroLengthPackedField)?;
                     MaybeRepeatedVariantField::extend(&mut self.major, first, iter);
                 }
                 2 => {
@@ -454,7 +454,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     let mut iter = values.into_iter();
                     let first = iter
                         .next()
-                        .ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
+                        .ok_or(::puroro::ErrorKind::ZeroLengthPackedField)?;
                     MaybeRepeatedVariantField::extend(&mut self.minor, first, iter);
                 }
                 3 => {
@@ -469,7 +469,7 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                     let mut iter = values.into_iter();
                     let first = iter
                         .next()
-                        .ok_or(::puroro::PuroroError::ZeroLengthPackedField)?;
+                        .ok_or(::puroro::ErrorKind::ZeroLengthPackedField)?;
                     MaybeRepeatedVariantField::extend(&mut self.patch, first, iter);
                 }
                 4 => {
@@ -477,23 +477,23 @@ impl<'a> ::puroro::deserializer::stream::MessageDeserializeEventHandler for &'a 
                         ldd.deserialize_as_chars()
                             .collect::<::puroro::Result<_>>()?;
                 }
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
+                _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
             },
             ::puroro::deserializer::stream::Field::Bits32(bytes) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
+                1 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                2 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                3 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                4 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
             },
             ::puroro::deserializer::stream::Field::Bits64(bytes) => match field_number {
-                1 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                2 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                3 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                4 => Err(::puroro::PuroroError::UnexpectedWireType)?,
-                _ => Err(::puroro::PuroroError::UnexpectedFieldId)?,
+                1 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                2 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                3 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                4 => Err(::puroro::ErrorKind::UnexpectedWireType)?,
+                _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
             },
-            _ => Err(::puroro::PuroroError::UnexpectedFieldType)?,
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldType)?,
         }
         Ok(())
     }

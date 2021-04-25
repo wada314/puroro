@@ -3,7 +3,7 @@ use std::io::Read;
 
 use crate::types::{FieldData, WireType};
 use crate::variant::Variant;
-use crate::PuroroError;
+use crate::ErrorKind;
 use crate::Result;
 use ::num_traits::FromPrimitive;
 
@@ -36,29 +36,29 @@ impl<'a> BytesSlice for &'a [u8] {
                 }
                 WireType::Bits32 => {
                     if self.len() < 4 {
-                        Err(PuroroError::UnexpectedInputTermination)?;
+                        Err(ErrorKind::UnexpectedInputTermination)?;
                     }
                     let (bytes, rest) = self.split_at(4);
                     *self = rest;
                     FieldData::Bits32(
                         bytes
                             .try_into()
-                            .map_err(|_| PuroroError::UnexpectedInputTermination)?,
+                            .map_err(|_| ErrorKind::UnexpectedInputTermination)?,
                     )
                 }
                 WireType::Bits64 => {
                     if self.len() < 8 {
-                        Err(PuroroError::UnexpectedInputTermination)?;
+                        Err(ErrorKind::UnexpectedInputTermination)?;
                     }
                     let (bytes, rest) = self.split_at(8);
                     *self = rest;
                     FieldData::Bits64(
                         bytes
                             .try_into()
-                            .map_err(|_| PuroroError::UnexpectedInputTermination)?,
+                            .map_err(|_| ErrorKind::UnexpectedInputTermination)?,
                     )
                 }
-                WireType::StartGroup | WireType::EndGroup => Err(PuroroError::GroupNotSupported)?,
+                WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
             };
             handler.met_field(field_data, field_number)?;
         }
@@ -73,7 +73,7 @@ fn try_get_wire_type_and_field_number(slice: &[u8]) -> Result<Option<(&[u8], Wir
     let key = { Variant::decode_bytes(&mut slice.bytes())?.to_usize()? };
     Ok(Some((
         slice,
-        WireType::from_usize(key & 0x07).ok_or(PuroroError::InvalidWireType)?,
+        WireType::from_usize(key & 0x07).ok_or(ErrorKind::InvalidWireType)?,
         (key >> 3),
     )))
 }
