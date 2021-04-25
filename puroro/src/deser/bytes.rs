@@ -9,6 +9,13 @@ use ::num_traits::FromPrimitive;
 pub trait DeserializableFromBytes {
     fn deserialize<I>(&mut self, iter: &mut I) -> Result<()>
     where
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        let mut bytes_iter = BytesIter::new(iter);
+        self.deserialize_from_bytes_iter(bytes_iter)
+    }
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, bytes_iter: BytesIter<'a, I>) -> Result<()>
+    where
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
 

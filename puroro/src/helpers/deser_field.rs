@@ -124,6 +124,23 @@ define_deser_lengthdelimited!(::bumpalo::collections::String<'bump>, tags::Strin
 #[cfg(feature = "puroro-bumpalo")]
 define_deser_lengthdelimited!(::bumpalo::collections::Vec<'bump, u8>, tags::Bytes, bytes);
 
+impl<T> DeserializableFromBytesField<tags::Message<T>> for T
+where
+    T: crate::deser::DeserializableFromBytes,
+{
+    fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: FnOnce() -> Self,
+    {
+        if let FieldData::LengthDelimited(bytes_iter) = field {
+            self.deserialize_from_bytes_iter(bytes_iter)
+        } else {
+            Err(PuroroError::UnexpectedWireType)?
+        }
+    }
+}
+
 macro_rules! define_deser_fixedlengths {
     ($ty:ty, $tag:ty, $bits:ident) => {
         impl DeserializableFromBytesField<$tag> for $ty {

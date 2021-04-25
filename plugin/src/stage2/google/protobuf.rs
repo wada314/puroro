@@ -64,11 +64,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for GeneratedCodeI
 }
 
 impl ::puroro::deser::DeserializableFromBytes for GeneratedCodeInfo {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -176,11 +175,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Generat
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for GeneratedCodeInfoBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -358,11 +356,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for Annotation {
 }
 
 impl ::puroro::deser::DeserializableFromBytes for Annotation {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -532,11 +529,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Annotat
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for AnnotationBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -703,11 +699,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for SourceCodeInfo
 }
 
 impl ::puroro::deser::DeserializableFromBytes for SourceCodeInfo {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -815,11 +810,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for SourceC
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for SourceCodeInfoBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -998,11 +992,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for Location {
 }
 
 impl ::puroro::deser::DeserializableFromBytes for Location {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -1209,11 +1202,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Locatio
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for LocationBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -1501,11 +1493,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for UninterpretedO
 }
 
 impl ::puroro::deser::DeserializableFromBytes for UninterpretedOption {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -1710,11 +1701,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Uninter
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for UninterpretedOptionBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -1918,11 +1908,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for NamePart {
 }
 
 impl ::puroro::deser::DeserializableFromBytes for NamePart {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -2034,11 +2023,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for NamePar
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for NamePartBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -2182,11 +2170,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodOptions 
 }
 
 impl ::puroro::deser::DeserializableFromBytes for MethodOptions {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -2336,11 +2323,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodO
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for MethodOptionsBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -2535,11 +2521,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ServiceOptions
 }
 
 impl ::puroro::deser::DeserializableFromBytes for ServiceOptions {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -2668,11 +2653,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Service
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for ServiceOptionsBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -2833,11 +2817,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumValueOptio
 }
 
 impl ::puroro::deser::DeserializableFromBytes for EnumValueOptions {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -2966,11 +2949,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumVal
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for EnumValueOptionsBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -3144,11 +3126,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumOptions {
 }
 
 impl ::puroro::deser::DeserializableFromBytes for EnumOptions {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -3298,11 +3279,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumOpt
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for EnumOptionsBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -3460,11 +3440,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofOptions {
 }
 
 impl ::puroro::deser::DeserializableFromBytes for OneofOptions {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -3572,11 +3551,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofOp
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for OneofOptionsBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -3792,11 +3770,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldOptions {
 }
 
 impl ::puroro::deser::DeserializableFromBytes for FieldOptions {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -4030,11 +4007,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldOp
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for FieldOptionsBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -4330,11 +4306,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for MessageOptions
 }
 
 impl ::puroro::deser::DeserializableFromBytes for MessageOptions {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -4526,11 +4501,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Message
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for MessageOptionsBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -4908,11 +4882,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileOptions {
 }
 
 impl ::puroro::deser::DeserializableFromBytes for FileOptions {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -5360,11 +5333,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileOpt
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for FileOptionsBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -5753,11 +5725,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodDescript
 }
 
 impl ::puroro::deser::DeserializableFromBytes for MethodDescriptorProto {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -5930,11 +5901,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for MethodD
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for MethodDescriptorProtoBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -6101,11 +6071,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ServiceDescrip
 }
 
 impl ::puroro::deser::DeserializableFromBytes for ServiceDescriptorProto {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -6240,11 +6209,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Service
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for ServiceDescriptorProtoBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -6420,11 +6388,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumValueDescr
 }
 
 impl ::puroro::deser::DeserializableFromBytes for EnumValueDescriptorProto {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -6550,11 +6517,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumVal
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for EnumValueDescriptorProtoBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -6709,11 +6675,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumDescriptor
 }
 
 impl ::puroro::deser::DeserializableFromBytes for EnumDescriptorProto {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -6907,11 +6872,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumDes
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for EnumDescriptorProtoBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -7163,11 +7127,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumReservedRa
 }
 
 impl ::puroro::deser::DeserializableFromBytes for EnumReservedRange {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -7287,11 +7250,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for EnumRes
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for EnumReservedRangeBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -7418,11 +7380,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofDescripto
 }
 
 impl ::puroro::deser::DeserializableFromBytes for OneofDescriptorProto {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -7527,11 +7488,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for OneofDe
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for OneofDescriptorProtoBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -7748,11 +7708,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldDescripto
 }
 
 impl ::puroro::deser::DeserializableFromBytes for FieldDescriptorProto {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -8014,11 +7973,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FieldDe
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for FieldDescriptorProtoBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -8293,11 +8251,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ExtensionRange
 }
 
 impl ::puroro::deser::DeserializableFromBytes for ExtensionRangeOptions {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -8405,11 +8362,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Extensi
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for ExtensionRangeOptionsBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -8610,11 +8566,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for DescriptorProt
 }
 
 impl ::puroro::deser::DeserializableFromBytes for DescriptorProto {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -8958,11 +8913,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Descrip
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for DescriptorProtoBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -9409,11 +9363,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ReservedRange 
 }
 
 impl ::puroro::deser::DeserializableFromBytes for ReservedRange {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -9533,11 +9486,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Reserve
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for ReservedRangeBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -9682,11 +9634,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for ExtensionRange
 }
 
 impl ::puroro::deser::DeserializableFromBytes for ExtensionRange {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -9820,11 +9771,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for Extensi
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for ExtensionRangeBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -10043,11 +9993,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDescriptor
 }
 
 impl ::puroro::deser::DeserializableFromBytes for FileDescriptorProto {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -10415,11 +10364,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDes
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for FileDescriptorProtoBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -10833,11 +10781,10 @@ impl ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDescriptor
 }
 
 impl ::puroro::deser::DeserializableFromBytes for FileDescriptorSet {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
@@ -10945,11 +10892,10 @@ impl<'bump> ::puroro::deser::DeserializeMessageFromBytesEventHandler for FileDes
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::deser::DeserializableFromBytes for FileDescriptorSetBumpalo<'bump> {
-    fn deserialize<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        let mut bytes_iter = ::puroro::deser::BytesIter::new(iter);
         bytes_iter.deser_message(self)
     }
 }
