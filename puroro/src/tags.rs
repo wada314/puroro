@@ -34,6 +34,12 @@ impl FieldTypeTag for Bytes {}
 impl FieldTypeTag for String {}
 impl<T> FieldTypeTag for Enum<T> {}
 impl<T> FieldTypeTag for Message<T> {}
+impl FieldTypeTag for Float {}
+impl FieldTypeTag for Double {}
+impl FieldTypeTag for Fixed32 {}
+impl FieldTypeTag for Fixed64 {}
+impl FieldTypeTag for SFixed32 {}
+impl FieldTypeTag for SFixed64 {}
 impl<T: SingularFieldTypeTag> FieldTypeTag for Repeated<T> {}
 
 impl SingularFieldTypeTag for Int32 {}

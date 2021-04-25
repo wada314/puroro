@@ -123,3 +123,28 @@ define_deser_lengthdelimited!(Vec<u8>, tags::Bytes, bytes);
 define_deser_lengthdelimited!(::bumpalo::collections::String<'bump>, tags::String, chars);
 #[cfg(feature = "puroro-bumpalo")]
 define_deser_lengthdelimited!(::bumpalo::collections::Vec<'bump, u8>, tags::Bytes, bytes);
+
+macro_rules! define_deser_fixedlengths {
+    ($ty:ty, $tag:ty, $bits:ident) => {
+        impl DeserializableFromBytesField<$tag> for $ty {
+            fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
+            where
+                I: Iterator<Item = std::io::Result<u8>>,
+                F: FnOnce() -> Self,
+            {
+                if let FieldData::$bits(array) = field {
+                    *self = <$ty>::from_le_bytes(array);
+                    Ok(())
+                } else {
+                    Err(PuroroError::UnexpectedWireType)?
+                }
+            }
+        }
+    };
+}
+define_deser_fixedlengths!(f32, tags::Float, Bits32);
+define_deser_fixedlengths!(i32, tags::SFixed32, Bits32);
+define_deser_fixedlengths!(u32, tags::Fixed32, Bits32);
+define_deser_fixedlengths!(f64, tags::Double, Bits64);
+define_deser_fixedlengths!(i64, tags::SFixed64, Bits64);
+define_deser_fixedlengths!(u64, tags::Fixed64, Bits64);
