@@ -1,9 +1,8 @@
 use super::writer::{func, indent, iter, IntoFragment};
 use crate::context::Context;
 use crate::utils::{to_camel_case, Indentor};
-use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor, NonTrivialFieldType};
-use crate::{ErrorKind, Result};
-use std::borrow::Cow;
+use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
+use crate::Result;
 
 pub struct MessageTraitCodeGenerator<'a, 'c> {
     context: &'a Context<'c>,

@@ -40,7 +40,7 @@ impl FieldTypeTag for Fixed64 {}
 impl FieldTypeTag for SFixed32 {}
 impl FieldTypeTag for SFixed64 {}
 
-trait FieldLabelTag {}
+pub trait FieldLabelTag {}
 pub struct Repeated;
 pub struct Optional;
 pub struct Required;

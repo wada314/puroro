@@ -6,7 +6,7 @@ mod writer;
 
 use itertools::Itertools;
 
-use crate::context::{AllocatorType, Context, ImplType};
+use crate::context::{AllocatorType, Context};
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case, Indentor};
 use crate::wrappers::{DescriptorVisitor, EnumDescriptor, MessageDescriptor};
 use crate::Result;
