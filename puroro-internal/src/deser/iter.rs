@@ -38,8 +38,8 @@ pub trait DeserializableMessageFromIter: Sized {
     }
 }
 
-pub struct BytesHandlerToSliceHandler<T: DeserializableMessageFromIter>(T);
-impl<T> super::slice::DeserializableMessageFromSlice for BytesHandlerToSliceHandler<T>
+pub struct FromIterToFromSlice<T: DeserializableMessageFromIter>(T);
+impl<T> super::slice::DeserializableMessageFromSlice for FromIterToFromSlice<T>
 where
     T: DeserializableMessageFromIter,
 {
