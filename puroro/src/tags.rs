@@ -2,6 +2,8 @@ use std::marker::PhantomData;
 
 pub trait FieldTypeTag {}
 pub trait VariantTypeTag: FieldTypeTag {}
+pub trait FieldLabelTag {}
+pub trait FieldTypeAndLabelTag {}
 
 pub struct Int32();
 pub struct UInt32();
@@ -20,6 +22,8 @@ pub struct SFixed32();
 pub struct SFixed64();
 pub struct Fixed32();
 pub struct Fixed64();
+// Map is a little special, they cannot have [repeated|optional|required]
+// labels. So `Map` is NOT a `FieldTypeTag`.
 pub struct Map<K, V>(PhantomData<(K, V)>);
 
 impl FieldTypeTag for Int32 {}
@@ -39,18 +43,16 @@ impl FieldTypeTag for Fixed32 {}
 impl FieldTypeTag for Fixed64 {}
 impl FieldTypeTag for SFixed32 {}
 impl FieldTypeTag for SFixed64 {}
-impl<K, V> FieldTypeTag for Map<K, V> {}
 
-pub trait FieldLabelTag {}
 pub struct Repeated;
 // Proto3 unlabeled field.
-pub struct OptionalNoPresence;
+pub struct Optional2;
 // Proto2 optional field || Proto3 explicitly optional marked field.
-pub struct OptionalExplicitPresence;
+pub struct Optional3;
 pub struct Required;
 impl FieldLabelTag for Repeated {}
-impl FieldLabelTag for OptionalNoPresence {}
-impl FieldLabelTag for OptionalExplicitPresence {}
+impl FieldLabelTag for Optional2 {}
+impl FieldLabelTag for Optional3 {}
 impl FieldLabelTag for Required {}
 
 impl VariantTypeTag for Int32 {}
@@ -61,12 +63,15 @@ impl VariantTypeTag for SInt32 {}
 impl VariantTypeTag for SInt64 {}
 impl VariantTypeTag for Bool {}
 
-pub trait WireTypeTag {}
-pub struct Variant();
-impl WireTypeTag for Variant {}
-pub struct LengthDelimited();
-impl WireTypeTag for LengthDelimited {}
-pub struct Bits32();
-impl WireTypeTag for Bits32 {}
-pub struct Bits64();
-impl WireTypeTag for Bits64 {}
+impl<T, L> FieldTypeAndLabelTag for (T, L)
+where
+    T: FieldTypeTag,
+    L: FieldLabelTag,
+{
+}
+impl<K, V> FieldTypeAndLabelTag for Map<K, V>
+where
+    K: FieldTypeTag,
+    V: FieldTypeTag,
+{
+}
