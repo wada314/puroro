@@ -344,15 +344,16 @@ bytes_iter.deser_message(msg)?;\n",
         (format!(
             "\
 {cfg}
-impl{gp} ::puroro_internal::deser::DeserializableFromIter for {name}{gpb} {{
-    fn deserialize_from_bytes_iter<'a, I>(
-        &mut self, mut bytes_iter: ::puroro_internal::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
+impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
+    fn deser_from_iter<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
     where
-        I: Iterator<Item = ::std::io::Result<u8>>
+        I: Iterator<Item = ::std::io::Result<u8>> 
     {{
-        bytes_iter.deser_message(self)
+        <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
+            ::deser_from_iter(self, iter)
     }}
-}}\n",
+}}
+\n",
             name = self.frag_gen.struct_name(self.msg)?,
             cfg = self.frag_gen.cfg_condition(),
             gp = self.frag_gen.struct_generic_params(&[]),

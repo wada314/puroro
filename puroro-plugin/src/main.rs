@@ -13,8 +13,8 @@ mod stage3;
 mod utils;
 mod wrappers;
 
+use ::puroro::DeserializableFromIter;
 use ::puroro::Serializable;
-use ::puroro_internal::deser::DeserializableFromIter;
 use context::Context;
 
 use error::{ErrorKind, GeneratorError};
@@ -38,7 +38,7 @@ pub use protos::google;
 
 fn main() -> Result<()> {
     let mut cgreq = CodeGeneratorRequest::default();
-    cgreq.deserialize(&mut stdin().bytes()).unwrap();
+    cgreq.deser_from_iter(&mut stdin().bytes()).unwrap();
     let context = Context::new(
         &cgreq,
         context::ImplType::Default,
