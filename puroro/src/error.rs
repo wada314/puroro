@@ -2,9 +2,9 @@
 #[error(r#"PuroroError. kind = "{kind}""#)]
 pub struct PuroroError {
     #[from]
-    kind: ErrorKind,
+    pub kind: ErrorKind,
     #[cfg(feature = "puroro-nightly")]
-    backtrace: std::backtrace::Backtrace,
+    pub backtrace: std::backtrace::Backtrace,
 }
 
 #[derive(::thiserror::Error, Debug)]

@@ -244,12 +244,12 @@ mod tests {
             &[],
         );
         assert!(matches!(
-            get_err(vec![Ok(0x80)]),
-            IoErrorKind::UnexpectedInputTermination
+            get_err(vec![Ok(0x80)]).kind,
+            ErrorKind::UnexpectedInputTermination
         ));
         assert!(matches!(
-            get_err(vec![Err(io_error1)]),
-            IoErrorKind::IteratorError(_)
+            get_err(vec![Err(io_error1)]).kind,
+            ErrorKind::IteratorError(_)
         ));
     }
 
@@ -270,12 +270,14 @@ mod tests {
             0xFFFFFFFF
         );
         assert!(matches!(
-            get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0x1F]).unwrap_err(),
-            IoErrorKind::IntegerOverflow(_)
+            get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0x1F]).unwrap_err().kind,
+            ErrorKind::IntegerOverflow(_)
         ));
         assert!(matches!(
-            get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F]).unwrap_err(),
-            IoErrorKind::IntegerOverflow(_)
+            get_u32(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F])
+                .unwrap_err()
+                .kind,
+            ErrorKind::IntegerOverflow(_)
         ));
     }
 
@@ -297,12 +299,14 @@ mod tests {
             -0x80000000
         );
         assert!(matches!(
-            get_si32(&[0xFF, 0xFF, 0xFF, 0xFF, 0x1F]).unwrap_err(),
-            IoErrorKind::IntegerOverflow(_)
+            get_si32(&[0xFF, 0xFF, 0xFF, 0xFF, 0x1F]).unwrap_err().kind,
+            ErrorKind::IntegerOverflow(_)
         ));
         assert!(matches!(
-            get_si32(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F]).unwrap_err(),
-            IoErrorKind::IntegerOverflow(_)
+            get_si32(&[0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F])
+                .unwrap_err()
+                .kind,
+            ErrorKind::IntegerOverflow(_)
         ));
     }
 }

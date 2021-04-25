@@ -1,45 +1,30 @@
-#[derive(Debug)]
+#[derive(Debug, ::thiserror::Error)]
+#[error(r#"GeneratorError. kind="{kind}""#)]
 pub struct GeneratorError {
+    #[from]
     kind: ErrorKind,
     #[cfg(feature = "nightly")]
     backtrace: std::backtrace::Backtrace,
 }
-impl std::error::Error for GeneratorError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self.kind {
-            ErrorKind::WriteError { source: ref e } => Some(e),
-            _ => None,
-        }
-    }
 
-    fn backtrace(&self) -> Option<&std::backtrace::Backtrace> {
-        Some(&self.backtrace)
-    }
-}
-impl std::fmt::Display for GeneratorError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Debug::fmt(self, f)
-    }
-}
-#[derive(Debug)]
+#[derive(Debug, ::thiserror::Error)]
 pub enum ErrorKind {
+    #[error(r#"A conflicted identifier was found: "{name}""#)]
     ConflictedName { name: String },
+    #[error(r#"Unknown enum value ({id}) was found in the field descriptor's type field."#)]
     UnknownFieldTypeId { id: i32 },
+    #[error(r#"Unknown enum vvalue({id}) was found in the field descriptor's label field."#)]
     UnknownLabelId { id: i32 },
+    #[error(r#"The type name "{name}" is not found in any other input .proto files."#)]
     UnknownTypeName { name: String },
+    #[error(r#"The group feature is not yet supported. GIVE ME A DOCUMENT!!!"#)]
     GroupNotSupported,
+    #[error(r#"An error from formatter: "{source}""#)]
     WriteError { source: std::fmt::Error },
+    #[error(r#"An error from puroro: "{source}""#)]
     PuroroError { source: ::puroro::PuroroError },
+    #[error(r#"Something went wrong: "{detail}""#)]
     InternalError { detail: String },
-}
-impl From<ErrorKind> for GeneratorError {
-    fn from(kind: ErrorKind) -> Self {
-        Self {
-            kind,
-            #[cfg(feature = "nightly")]
-            backtrace: std::backtrace::Backtrace::capture(),
-        }
-    }
 }
 impl From<std::fmt::Error> for GeneratorError {
     fn from(e: std::fmt::Error) -> Self {
