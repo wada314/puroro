@@ -25,12 +25,11 @@ impl<'slice> BytesSlice<'slice> {
         while let Some((wire_type, field_number)) = self.try_get_wire_type_and_field_number()? {
             let field_data = match wire_type {
                 WireType::Variant => {
-                    let variant = Variant::decode_bytes(&mut self.slice.bytes())?;
+                    let variant = Variant::decode_bytes(&mut self.bytes())?;
                     FieldData::Variant(variant)
                 }
                 WireType::LengthDelimited => {
-                    let field_length =
-                        Variant::decode_bytes(&mut self.slice.bytes())?.to_usize()?;
+                    let field_length = Variant::decode_bytes(&mut self.bytes())?.to_usize()?;
                     let (inner_slice, rest) = self.slice.split_at(field_length);
                     self.slice = rest;
                     FieldData::LengthDelimited(inner_slice)
@@ -70,10 +69,14 @@ impl<'slice> BytesSlice<'slice> {
         if self.slice.len() == 0 {
             return Ok(None);
         }
-        let key = { Variant::decode_bytes(&mut self.slice.by_ref().bytes())?.to_usize()? };
+        let key = { Variant::decode_bytes(&mut self.bytes())?.to_usize()? };
         Ok(Some((
             WireType::from_usize(key & 0x07).ok_or(ErrorKind::InvalidWireType)?,
             (key >> 3),
         )))
+    }
+
+    fn bytes(&mut self) -> std::io::Bytes<&mut &'slice [u8]> {
+        self.slice.by_ref().bytes()
     }
 }
