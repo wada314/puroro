@@ -147,7 +147,7 @@ define_deser_req_ld!(
 // wrapped by `Option` (and neither `Box`).
 impl<T> DeserializableFromBytesField<(tags::Message<T>, tags::Required)> for T
 where
-    T: crate::deser::DeserializableFromIter,
+    T: crate::deser::DeserializableMessageFromIter,
 {
     type Item = T;
     fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
@@ -155,8 +155,8 @@ where
         I: Iterator<Item = std::io::Result<u8>>,
         F: FnOnce() -> Self::Item,
     {
-        if let FieldData::LengthDelimited(bytes_iter) = field {
-            self.deserialize_from_bytes_iter(bytes_iter)
+        if let FieldData::LengthDelimited(mut bytes_iter) = field {
+            bytes_iter.deser_message(self)
         } else {
             Err(ErrorKind::UnexpectedWireType)?
         }
@@ -213,21 +213,6 @@ where
     U: DeserializableFromBytesField<(T, tags::Required)>,
 {
     type Item = U;
-    fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, f: F) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-        F: FnOnce() -> Self::Item,
-    {
-        todo!()
-    }
-}
-
-impl<T> DeserializableFromBytesField<(tags::Message<T>, tags::Optional3)> for Option<T>
-where
-    T: crate::deser::DeserializableFromIter
-        + DeserializableFromBytesField<(tags::Message<T>, tags::Required)>,
-{
-    type Item = T;
     fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
