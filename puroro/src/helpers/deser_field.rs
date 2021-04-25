@@ -5,39 +5,26 @@ use crate::tags;
 use crate::types::FieldData;
 use crate::{PuroroError, Result};
 
-pub trait ScalarField {}
-impl ScalarField for i32 {}
-impl ScalarField for i64 {}
-impl ScalarField for u32 {}
-impl ScalarField for u64 {}
-impl ScalarField for f32 {}
-impl ScalarField for f64 {}
-impl ScalarField for bool {}
-//impl<T> ScalarField for std::result::Result<T, i32> {}
-impl ScalarField for Vec<u8> {}
-impl ScalarField for String {}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ScalarField for ::bumpalo::collections::Vec<'bump, u8> {}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ScalarField for ::bumpalo::collections::String<'bump> {}
-
 pub trait DeserializableFromBytesField<T, L>
 where
     T: tags::FieldTypeTag,
     L: tags::FieldLabelTag,
 {
+    type Item;
     fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
-        F: FnOnce() -> Self;
+        F: FnOnce() -> Self::Item;
 }
+
 macro_rules! define_deser_variants {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
         impl DeserializableFromBytesField<$ttag, $ltag> for $ty {
+            type Item = $ty;
             fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
-                F: FnOnce() -> Self,
+                F: FnOnce() -> Self::Item,
             {
                 match field {
                     FieldData::Variant(variant) => {
@@ -71,10 +58,11 @@ impl<T> DeserializableFromBytesField<tags::Enum<T>, tags::Required> for std::res
 where
     T: TryFrom<i32, Error = i32>,
 {
+    type Item = Self;
     fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
-        F: FnOnce() -> Self,
+        F: FnOnce() -> Self::Item,
     {
         match field {
             FieldData::Variant(variant) => {
@@ -99,10 +87,11 @@ where
 macro_rules! define_deser_lengthdelimited {
     ($ty:ty, $ttag:ty, $ltag:ty, $method:ident) => {
         impl<'bump> DeserializableFromBytesField<$ttag, $ltag> for $ty {
+            type Item = $ty;
             fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
-                F: FnOnce() -> Self,
+                F: FnOnce() -> Self::Item,
             {
                 if let FieldData::LengthDelimited(mut bytes_iter) = field {
                     self.clear();
@@ -135,14 +124,17 @@ define_deser_lengthdelimited!(
     bytes
 );
 
+// Unlike C++ implementation, the required message field in Rust is not
+// wrapped by `Option` (and neither `Box`).
 impl<T> DeserializableFromBytesField<tags::Message<T>, tags::Required> for T
 where
     T: crate::deser::DeserializableFromIter,
 {
+    type Item = T;
     fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
-        F: FnOnce() -> Self,
+        F: FnOnce() -> Self::Item,
     {
         if let FieldData::LengthDelimited(bytes_iter) = field {
             self.deserialize_from_bytes_iter(bytes_iter)
@@ -155,10 +147,11 @@ where
 macro_rules! define_deser_fixedlengths {
     ($ty:ty, $ttag:ty, $ltag:ty, $bits:ident) => {
         impl DeserializableFromBytesField<$ttag, $ltag> for $ty {
+            type Item = $ty;
             fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
-                F: FnOnce() -> Self,
+                F: FnOnce() -> Self::Item,
             {
                 if let FieldData::$bits(array) = field {
                     *self = <$ty>::from_le_bytes(array);
