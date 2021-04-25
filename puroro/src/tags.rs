@@ -1,7 +1,6 @@
 use std::marker::PhantomData;
 
 pub trait FieldTypeTag {}
-pub trait SingularFieldTypeTag: FieldTypeTag {}
 pub trait VariantTypeTag: FieldTypeTag {}
 
 pub struct Int32();
@@ -21,6 +20,7 @@ pub struct SFixed32();
 pub struct SFixed64();
 pub struct Fixed32();
 pub struct Fixed64();
+pub struct Map<K, V>(PhantomData<(K, V)>);
 
 impl FieldTypeTag for Int32 {}
 impl FieldTypeTag for Int64 {}
@@ -39,6 +39,7 @@ impl FieldTypeTag for Fixed32 {}
 impl FieldTypeTag for Fixed64 {}
 impl FieldTypeTag for SFixed32 {}
 impl FieldTypeTag for SFixed64 {}
+impl<K, V> FieldTypeTag for Map<K, V> {}
 
 pub trait FieldLabelTag {}
 pub struct Repeated;

@@ -2,13 +2,32 @@ use std::convert::{TryFrom, TryInto};
 
 use crate::deser::BytesIter;
 use crate::tags;
+use crate::tags::{FieldLabelTag, FieldTypeTag};
 use crate::types::FieldData;
 use crate::{PuroroError, Result};
 
+pub trait NotOptionaInNoPresenceDiscipline {}
+impl NotOptionaInNoPresenceDiscipline for tags::Int32 {}
+impl NotOptionaInNoPresenceDiscipline for tags::Int64 {}
+impl NotOptionaInNoPresenceDiscipline for tags::UInt32 {}
+impl NotOptionaInNoPresenceDiscipline for tags::UInt64 {}
+impl NotOptionaInNoPresenceDiscipline for tags::SInt32 {}
+impl NotOptionaInNoPresenceDiscipline for tags::SInt64 {}
+impl NotOptionaInNoPresenceDiscipline for tags::Bool {}
+impl NotOptionaInNoPresenceDiscipline for tags::Bytes {}
+impl NotOptionaInNoPresenceDiscipline for tags::String {}
+impl NotOptionaInNoPresenceDiscipline for tags::Float {}
+impl NotOptionaInNoPresenceDiscipline for tags::Double {}
+impl NotOptionaInNoPresenceDiscipline for tags::Fixed32 {}
+impl NotOptionaInNoPresenceDiscipline for tags::Fixed64 {}
+impl NotOptionaInNoPresenceDiscipline for tags::SFixed32 {}
+impl NotOptionaInNoPresenceDiscipline for tags::SFixed64 {}
+impl<T> NotOptionaInNoPresenceDiscipline for tags::Enum<T> {}
+
 pub trait DeserializableFromBytesField<T, L>
 where
-    T: tags::FieldTypeTag,
-    L: tags::FieldLabelTag,
+    T: FieldTypeTag,
+    L: FieldLabelTag,
 {
     type Item;
     fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, f: F) -> Result<()>
@@ -17,7 +36,7 @@ where
         F: FnOnce() -> Self::Item;
 }
 
-macro_rules! define_deser_variants {
+macro_rules! define_deser_req_variants {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
         impl DeserializableFromBytesField<$ttag, $ltag> for $ty {
             type Item = $ty;
@@ -46,13 +65,13 @@ macro_rules! define_deser_variants {
         }
     };
 }
-define_deser_variants!(i32, tags::Int32, tags::Required);
-define_deser_variants!(i64, tags::Int64, tags::Required);
-define_deser_variants!(i32, tags::SInt32, tags::Required);
-define_deser_variants!(i64, tags::SInt64, tags::Required);
-define_deser_variants!(u32, tags::UInt32, tags::Required);
-define_deser_variants!(u64, tags::UInt64, tags::Required);
-define_deser_variants!(bool, tags::Bool, tags::Required);
+define_deser_req_variants!(i32, tags::Int32, tags::Required);
+define_deser_req_variants!(i64, tags::Int64, tags::Required);
+define_deser_req_variants!(i32, tags::SInt32, tags::Required);
+define_deser_req_variants!(i64, tags::SInt64, tags::Required);
+define_deser_req_variants!(u32, tags::UInt32, tags::Required);
+define_deser_req_variants!(u64, tags::UInt64, tags::Required);
+define_deser_req_variants!(bool, tags::Bool, tags::Required);
 
 impl<T> DeserializableFromBytesField<tags::Enum<T>, tags::Required> for std::result::Result<T, i32>
 where
@@ -84,7 +103,7 @@ where
     }
 }
 
-macro_rules! define_deser_lengthdelimited {
+macro_rules! define_deser_req_ld {
     ($ty:ty, $ttag:ty, $ltag:ty, $method:ident) => {
         impl<'bump> DeserializableFromBytesField<$ttag, $ltag> for $ty {
             type Item = $ty;
@@ -107,17 +126,17 @@ macro_rules! define_deser_lengthdelimited {
         }
     };
 }
-define_deser_lengthdelimited!(String, tags::String, tags::Required, chars);
-define_deser_lengthdelimited!(Vec<u8>, tags::Bytes, tags::Required, bytes);
+define_deser_req_ld!(String, tags::String, tags::Required, chars);
+define_deser_req_ld!(Vec<u8>, tags::Bytes, tags::Required, bytes);
 #[cfg(feature = "puroro-bumpalo")]
-define_deser_lengthdelimited!(
+define_deser_req_ld!(
     ::bumpalo::collections::String<'bump>,
     tags::String,
     tags::Required,
     chars
 );
 #[cfg(feature = "puroro-bumpalo")]
-define_deser_lengthdelimited!(
+define_deser_req_ld!(
     ::bumpalo::collections::Vec<'bump, u8>,
     tags::Bytes,
     tags::Required,
@@ -144,7 +163,7 @@ where
     }
 }
 
-macro_rules! define_deser_fixedlengths {
+macro_rules! define_deser_req_fixed {
     ($ty:ty, $ttag:ty, $ltag:ty, $bits:ident) => {
         impl DeserializableFromBytesField<$ttag, $ltag> for $ty {
             type Item = $ty;
@@ -163,9 +182,39 @@ macro_rules! define_deser_fixedlengths {
         }
     };
 }
-define_deser_fixedlengths!(f32, tags::Float, tags::Required, Bits32);
-define_deser_fixedlengths!(i32, tags::SFixed32, tags::Required, Bits32);
-define_deser_fixedlengths!(u32, tags::Fixed32, tags::Required, Bits32);
-define_deser_fixedlengths!(f64, tags::Double, tags::Required, Bits64);
-define_deser_fixedlengths!(i64, tags::SFixed64, tags::Required, Bits64);
-define_deser_fixedlengths!(u64, tags::Fixed64, tags::Required, Bits64);
+define_deser_req_fixed!(f32, tags::Float, tags::Required, Bits32);
+define_deser_req_fixed!(i32, tags::SFixed32, tags::Required, Bits32);
+define_deser_req_fixed!(u32, tags::Fixed32, tags::Required, Bits32);
+define_deser_req_fixed!(f64, tags::Double, tags::Required, Bits64);
+define_deser_req_fixed!(i64, tags::SFixed64, tags::Required, Bits64);
+define_deser_req_fixed!(u64, tags::Fixed64, tags::Required, Bits64);
+
+impl<T, U> DeserializableFromBytesField<T, tags::OptionalExplicitPresence> for Option<U>
+where
+    T: FieldTypeTag + NotOptionaInNoPresenceDiscipline,
+    U: DeserializableFromBytesField<T, tags::Required>,
+{
+    type Item = U;
+    fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: FnOnce() -> Self::Item,
+    {
+        todo!()
+    }
+}
+
+impl<T> DeserializableFromBytesField<tags::Message<T>, tags::OptionalExplicitPresence> for Option<T>
+where
+    T: crate::deser::DeserializableFromIter
+        + DeserializableFromBytesField<tags::Message<T>, tags::Required>,
+{
+    type Item = T;
+    fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: FnOnce() -> Self::Item,
+    {
+        todo!()
+    }
+}
