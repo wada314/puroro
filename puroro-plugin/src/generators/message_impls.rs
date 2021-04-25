@@ -27,8 +27,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             func(|output| self.print_msg_struct(output)),
             func(|output| self.print_msg_new(output)),
             (
-                func(|output| self.print_msg_deser_handler(output)),
-                func(|output| self.print_msg_deser_deserializable(output)),
+                func(|output| self.print_msg_deser_from_iter(output)),
                 func(|output| self.print_msg_ser_serializable(output)),
                 func(|output| self.print_msg_puroro_serializable(output)),
             ),
@@ -131,7 +130,7 @@ impl{gp} ::std::default::Default for {name}{gpb} {{
             .write_into(output)
     }
 
-    pub fn print_msg_deser_handler<W: std::fmt::Write>(
+    pub fn print_msg_deser_from_iter<W: std::fmt::Write>(
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
@@ -171,6 +170,23 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
         Ok(())
     }}
 }}\n",
+            format!(
+                "\
+{cfg}
+impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
+    fn deser_from_iter<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>> 
+    {{
+        <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
+            ::deser_from_iter(self, iter)
+    }}
+}}\n",
+                name = self.frag_gen.struct_name(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params(&[]),
+                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+            ),
         )
             .write_into(output)
     }
@@ -334,31 +350,6 @@ bytes_iter.deser_message(msg)?;\n",
             )),
             "}}\n",
         )
-            .write_into(output)
-    }
-
-    pub fn print_msg_deser_deserializable<W: std::fmt::Write>(
-        &self,
-        output: &mut Indentor<W>,
-    ) -> Result<()> {
-        (format!(
-            "\
-{cfg}
-impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
-    fn deser_from_iter<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
-    where
-        I: Iterator<Item = ::std::io::Result<u8>> 
-    {{
-        <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
-            ::deser_from_iter(self, iter)
-    }}
-}}
-\n",
-            name = self.frag_gen.struct_name(self.msg)?,
-            cfg = self.frag_gen.cfg_condition(),
-            gp = self.frag_gen.struct_generic_params(&[]),
-            gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-        ),)
             .write_into(output)
     }
 

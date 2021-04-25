@@ -74,7 +74,6 @@ impl ::puroro::DeserializableFromIter for GeneratedCodeInfo {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for GeneratedCodeInfo {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -187,7 +186,6 @@ impl<'bump> ::puroro::DeserializableFromIter for GeneratedCodeInfoBumpalo<'bump>
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for GeneratedCodeInfoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -372,7 +370,6 @@ impl ::puroro::DeserializableFromIter for Annotation {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for Annotation {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -547,7 +544,6 @@ impl<'bump> ::puroro::DeserializableFromIter for AnnotationBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for AnnotationBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -721,7 +717,6 @@ impl ::puroro::DeserializableFromIter for SourceCodeInfo {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for SourceCodeInfo {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -834,7 +829,6 @@ impl<'bump> ::puroro::DeserializableFromIter for SourceCodeInfoBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for SourceCodeInfoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -1019,7 +1013,6 @@ impl ::puroro::DeserializableFromIter for Location {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for Location {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -1232,7 +1225,6 @@ impl<'bump> ::puroro::DeserializableFromIter for LocationBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for LocationBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -1527,7 +1519,6 @@ impl ::puroro::DeserializableFromIter for UninterpretedOption {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for UninterpretedOption {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1737,7 +1728,6 @@ impl<'bump> ::puroro::DeserializableFromIter for UninterpretedOptionBumpalo<'bum
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for UninterpretedOptionBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -1948,7 +1938,6 @@ impl ::puroro::DeserializableFromIter for NamePart {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for NamePart {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2065,7 +2054,6 @@ impl<'bump> ::puroro::DeserializableFromIter for NamePartBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for NamePartBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -2215,7 +2203,6 @@ impl ::puroro::DeserializableFromIter for MethodOptions {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for MethodOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -2371,7 +2358,6 @@ impl<'bump> ::puroro::DeserializableFromIter for MethodOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for MethodOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -2573,7 +2559,6 @@ impl ::puroro::DeserializableFromIter for ServiceOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for ServiceOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2707,7 +2692,6 @@ impl<'bump> ::puroro::DeserializableFromIter for ServiceOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for ServiceOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -2875,7 +2859,6 @@ impl ::puroro::DeserializableFromIter for EnumValueOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for EnumValueOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -3009,7 +2992,6 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumValueOptionsBumpalo<'bump> 
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for EnumValueOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -3190,7 +3172,6 @@ impl ::puroro::DeserializableFromIter for EnumOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for EnumOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -3345,7 +3326,6 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for EnumOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -3510,7 +3490,6 @@ impl ::puroro::DeserializableFromIter for OneofOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for OneofOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -3623,7 +3602,6 @@ impl<'bump> ::puroro::DeserializableFromIter for OneofOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for OneofOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -3845,7 +3823,6 @@ impl ::puroro::DeserializableFromIter for FieldOptions {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for FieldOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -4085,7 +4062,6 @@ impl<'bump> ::puroro::DeserializableFromIter for FieldOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for FieldOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -4388,7 +4364,6 @@ impl ::puroro::DeserializableFromIter for MessageOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for MessageOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -4585,7 +4560,6 @@ impl<'bump> ::puroro::DeserializableFromIter for MessageOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for MessageOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -4969,7 +4943,6 @@ impl ::puroro::DeserializableFromIter for FileOptions {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for FileOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -5423,7 +5396,6 @@ impl<'bump> ::puroro::DeserializableFromIter for FileOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for FileOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -5819,7 +5791,6 @@ impl ::puroro::DeserializableFromIter for MethodDescriptorProto {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for MethodDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5997,7 +5968,6 @@ impl<'bump> ::puroro::DeserializableFromIter for MethodDescriptorProtoBumpalo<'b
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for MethodDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -6171,7 +6141,6 @@ impl ::puroro::DeserializableFromIter for ServiceDescriptorProto {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for ServiceDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -6311,7 +6280,6 @@ impl<'bump> ::puroro::DeserializableFromIter for ServiceDescriptorProtoBumpalo<'
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for ServiceDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -6494,7 +6462,6 @@ impl ::puroro::DeserializableFromIter for EnumValueDescriptorProto {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for EnumValueDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -6625,7 +6592,6 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumValueDescriptorProtoBumpalo
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for EnumValueDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -6786,7 +6752,6 @@ impl ::puroro::DeserializableFromIter for EnumDescriptorProto {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for EnumDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -6986,7 +6951,6 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumDescriptorProtoBumpalo<'bum
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for EnumDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -7245,7 +7209,6 @@ impl ::puroro::DeserializableFromIter for EnumReservedRange {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for EnumReservedRange {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -7370,7 +7333,6 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumReservedRangeBumpalo<'bump>
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for EnumReservedRangeBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -7504,7 +7466,6 @@ impl ::puroro::DeserializableFromIter for OneofDescriptorProto {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for OneofDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -7614,7 +7575,6 @@ impl<'bump> ::puroro::DeserializableFromIter for OneofDescriptorProtoBumpalo<'bu
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for OneofDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -7837,7 +7797,6 @@ impl ::puroro::DeserializableFromIter for FieldDescriptorProto {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for FieldDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -8105,7 +8064,6 @@ impl<'bump> ::puroro::DeserializableFromIter for FieldDescriptorProtoBumpalo<'bu
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for FieldDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -8387,7 +8345,6 @@ impl ::puroro::DeserializableFromIter for ExtensionRangeOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for ExtensionRangeOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -8500,7 +8457,6 @@ impl<'bump> ::puroro::DeserializableFromIter for ExtensionRangeOptionsBumpalo<'b
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for ExtensionRangeOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -8707,7 +8663,6 @@ impl ::puroro::DeserializableFromIter for DescriptorProto {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for DescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -9057,7 +9012,6 @@ impl<'bump> ::puroro::DeserializableFromIter for DescriptorProtoBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for DescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -9511,7 +9465,6 @@ impl ::puroro::DeserializableFromIter for ReservedRange {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for ReservedRange {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -9636,7 +9589,6 @@ impl<'bump> ::puroro::DeserializableFromIter for ReservedRangeBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for ReservedRangeBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -9788,7 +9740,6 @@ impl ::puroro::DeserializableFromIter for ExtensionRange {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for ExtensionRange {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -9927,7 +9878,6 @@ impl<'bump> ::puroro::DeserializableFromIter for ExtensionRangeBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for ExtensionRangeBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -10152,7 +10102,6 @@ impl ::puroro::DeserializableFromIter for FileDescriptorProto {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for FileDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -10526,7 +10475,6 @@ impl<'bump> ::puroro::DeserializableFromIter for FileDescriptorProtoBumpalo<'bum
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for FileDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -10947,7 +10895,6 @@ impl ::puroro::DeserializableFromIter for FileDescriptorSet {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for FileDescriptorSet {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -11060,7 +11007,6 @@ impl<'bump> ::puroro::DeserializableFromIter for FileDescriptorSetBumpalo<'bump>
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for FileDescriptorSetBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(

@@ -94,7 +94,6 @@ impl ::puroro::DeserializableFromIter for CodeGeneratorResponse {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for CodeGeneratorResponse {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -241,7 +240,6 @@ impl<'bump> ::puroro::DeserializableFromIter for CodeGeneratorResponseBumpalo<'b
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for CodeGeneratorResponseBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -446,7 +444,6 @@ impl ::puroro::DeserializableFromIter for File {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for File {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -582,7 +579,6 @@ impl<'bump> ::puroro::DeserializableFromIter for FileBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for FileBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -743,7 +739,6 @@ impl ::puroro::DeserializableFromIter for CodeGeneratorRequest {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for CodeGeneratorRequest {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -913,7 +908,6 @@ impl<'bump> ::puroro::DeserializableFromIter for CodeGeneratorRequestBumpalo<'bu
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for CodeGeneratorRequestBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -1152,7 +1146,6 @@ impl ::puroro::DeserializableFromIter for Version {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for Version {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1311,7 +1304,6 @@ impl<'bump> ::puroro::DeserializableFromIter for VersionBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for VersionBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
