@@ -139,7 +139,7 @@ impl{gp} ::std::default::Default for {name}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} ::puroro::deser::DeserializableMessageFromBytesIter for {name}{gpb} {{
+impl{gp} ::puroro::deser::DeserializableMessageFromIter for {name}{gpb} {{
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,

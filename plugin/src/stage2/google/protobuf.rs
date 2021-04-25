@@ -23,7 +23,7 @@ impl ::std::default::Default for GeneratedCodeInfo {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for GeneratedCodeInfo {
+impl ::puroro::deser::DeserializableMessageFromIter for GeneratedCodeInfo {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -134,7 +134,7 @@ impl<'bump> GeneratedCodeInfoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for GeneratedCodeInfoBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for GeneratedCodeInfoBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -282,7 +282,7 @@ impl ::std::default::Default for Annotation {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for Annotation {
+impl ::puroro::deser::DeserializableMessageFromIter for Annotation {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -455,7 +455,7 @@ impl<'bump> AnnotationBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for AnnotationBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for AnnotationBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -658,7 +658,7 @@ impl ::std::default::Default for SourceCodeInfo {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for SourceCodeInfo {
+impl ::puroro::deser::DeserializableMessageFromIter for SourceCodeInfo {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -769,7 +769,7 @@ impl<'bump> SourceCodeInfoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for SourceCodeInfoBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for SourceCodeInfoBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -919,7 +919,7 @@ impl ::std::default::Default for Location {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for Location {
+impl ::puroro::deser::DeserializableMessageFromIter for Location {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -1129,7 +1129,7 @@ impl<'bump> LocationBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for LocationBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for LocationBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -1407,7 +1407,7 @@ impl ::std::default::Default for UninterpretedOption {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for UninterpretedOption {
+impl ::puroro::deser::DeserializableMessageFromIter for UninterpretedOption {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -1615,7 +1615,7 @@ impl<'bump> UninterpretedOptionBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for UninterpretedOptionBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for UninterpretedOptionBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -1856,7 +1856,7 @@ impl ::std::default::Default for NamePart {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for NamePart {
+impl ::puroro::deser::DeserializableMessageFromIter for NamePart {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -1971,7 +1971,7 @@ impl<'bump> NamePartBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for NamePartBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for NamePartBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -2107,7 +2107,7 @@ impl ::std::default::Default for MethodOptions {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for MethodOptions {
+impl ::puroro::deser::DeserializableMessageFromIter for MethodOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -2260,7 +2260,7 @@ impl<'bump> MethodOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for MethodOptionsBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for MethodOptionsBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -2469,7 +2469,7 @@ impl ::std::default::Default for ServiceOptions {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for ServiceOptions {
+impl ::puroro::deser::DeserializableMessageFromIter for ServiceOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -2601,7 +2601,7 @@ impl<'bump> ServiceOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for ServiceOptionsBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for ServiceOptionsBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -2765,7 +2765,7 @@ impl ::std::default::Default for EnumValueOptions {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for EnumValueOptions {
+impl ::puroro::deser::DeserializableMessageFromIter for EnumValueOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -2897,7 +2897,7 @@ impl<'bump> EnumValueOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for EnumValueOptionsBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for EnumValueOptionsBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -3063,7 +3063,7 @@ impl ::std::default::Default for EnumOptions {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for EnumOptions {
+impl ::puroro::deser::DeserializableMessageFromIter for EnumOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -3216,7 +3216,7 @@ impl<'bump> EnumOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for EnumOptionsBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for EnumOptionsBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -3399,7 +3399,7 @@ impl ::std::default::Default for OneofOptions {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for OneofOptions {
+impl ::puroro::deser::DeserializableMessageFromIter for OneofOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -3510,7 +3510,7 @@ impl<'bump> OneofOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for OneofOptionsBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for OneofOptionsBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -3663,7 +3663,7 @@ impl ::std::default::Default for FieldOptions {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for FieldOptions {
+impl ::puroro::deser::DeserializableMessageFromIter for FieldOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -3900,7 +3900,7 @@ impl<'bump> FieldOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for FieldOptionsBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for FieldOptionsBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -4221,7 +4221,7 @@ impl ::std::default::Default for MessageOptions {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for MessageOptions {
+impl ::puroro::deser::DeserializableMessageFromIter for MessageOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -4416,7 +4416,7 @@ impl<'bump> MessageOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for MessageOptionsBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for MessageOptionsBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -4681,7 +4681,7 @@ impl ::std::default::Default for FileOptions {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for FileOptions {
+impl ::puroro::deser::DeserializableMessageFromIter for FileOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -5132,7 +5132,7 @@ impl<'bump> FileOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for FileOptionsBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for FileOptionsBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -5647,7 +5647,7 @@ impl ::std::default::Default for MethodDescriptorProto {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for MethodDescriptorProto {
+impl ::puroro::deser::DeserializableMessageFromIter for MethodDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -5823,7 +5823,7 @@ impl<'bump> MethodDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for MethodDescriptorProtoBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for MethodDescriptorProtoBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -6020,7 +6020,7 @@ impl ::std::default::Default for ServiceDescriptorProto {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for ServiceDescriptorProto {
+impl ::puroro::deser::DeserializableMessageFromIter for ServiceDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -6158,7 +6158,7 @@ impl<'bump> ServiceDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for ServiceDescriptorProtoBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for ServiceDescriptorProtoBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -6331,7 +6331,7 @@ impl ::std::default::Default for EnumValueDescriptorProto {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for EnumValueDescriptorProto {
+impl ::puroro::deser::DeserializableMessageFromIter for EnumValueDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -6460,7 +6460,7 @@ impl<'bump> EnumValueDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for EnumValueDescriptorProtoBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for EnumValueDescriptorProtoBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -6614,7 +6614,7 @@ impl ::std::default::Default for EnumDescriptorProto {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for EnumDescriptorProto {
+impl ::puroro::deser::DeserializableMessageFromIter for EnumDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -6811,7 +6811,7 @@ impl<'bump> EnumDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for EnumDescriptorProtoBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for EnumDescriptorProtoBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -7069,7 +7069,7 @@ impl ::std::default::Default for EnumReservedRange {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for EnumReservedRange {
+impl ::puroro::deser::DeserializableMessageFromIter for EnumReservedRange {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -7192,7 +7192,7 @@ impl<'bump> EnumReservedRangeBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for EnumReservedRangeBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for EnumReservedRangeBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -7334,7 +7334,7 @@ impl ::std::default::Default for OneofDescriptorProto {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for OneofDescriptorProto {
+impl ::puroro::deser::DeserializableMessageFromIter for OneofDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -7442,7 +7442,7 @@ impl<'bump> OneofDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for OneofDescriptorProtoBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for OneofDescriptorProtoBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -7587,7 +7587,7 @@ impl ::std::default::Default for FieldDescriptorProto {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for FieldDescriptorProto {
+impl ::puroro::deser::DeserializableMessageFromIter for FieldDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -7852,7 +7852,7 @@ impl<'bump> FieldDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for FieldDescriptorProtoBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for FieldDescriptorProtoBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -8210,7 +8210,7 @@ impl ::std::default::Default for ExtensionRangeOptions {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for ExtensionRangeOptions {
+impl ::puroro::deser::DeserializableMessageFromIter for ExtensionRangeOptions {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -8321,7 +8321,7 @@ impl<'bump> ExtensionRangeOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for ExtensionRangeOptionsBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for ExtensionRangeOptionsBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -8480,7 +8480,7 @@ impl ::std::default::Default for DescriptorProto {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for DescriptorProto {
+impl ::puroro::deser::DeserializableMessageFromIter for DescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -8827,7 +8827,7 @@ impl<'bump> DescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for DescriptorProtoBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for DescriptorProtoBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -9305,7 +9305,7 @@ impl ::std::default::Default for ReservedRange {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for ReservedRange {
+impl ::puroro::deser::DeserializableMessageFromIter for ReservedRange {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -9428,7 +9428,7 @@ impl<'bump> ReservedRangeBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for ReservedRangeBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for ReservedRangeBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -9571,7 +9571,7 @@ impl ::std::default::Default for ExtensionRange {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for ExtensionRange {
+impl ::puroro::deser::DeserializableMessageFromIter for ExtensionRange {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -9708,7 +9708,7 @@ impl<'bump> ExtensionRangeBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for ExtensionRangeBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for ExtensionRangeBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -9885,7 +9885,7 @@ impl ::std::default::Default for FileDescriptorProto {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for FileDescriptorProto {
+impl ::puroro::deser::DeserializableMessageFromIter for FileDescriptorProto {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -10256,7 +10256,7 @@ impl<'bump> FileDescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for FileDescriptorProtoBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for FileDescriptorProtoBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -10740,7 +10740,7 @@ impl ::std::default::Default for FileDescriptorSet {
     }
 }
 
-impl ::puroro::deser::DeserializableMessageFromBytesIter for FileDescriptorSet {
+impl ::puroro::deser::DeserializableMessageFromIter for FileDescriptorSet {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,
@@ -10851,7 +10851,7 @@ impl<'bump> FileDescriptorSetBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableMessageFromBytesIter for FileDescriptorSetBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableMessageFromIter for FileDescriptorSetBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro::types::FieldData<&'a mut ::puroro::deser::BytesIter<'b, I>>,

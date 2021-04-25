@@ -10,21 +10,15 @@ use ::num_traits::FromPrimitive;
 pub trait DeserializableFromSlice {
     fn deserialize(&mut self, slice: &[u8]) -> Result<()>;
 }
-pub trait DeserializeMessageFromSliceEventHandler {
+pub trait DeserializableMessageFromSlice {
     fn met_field(&mut self, field: FieldData<&[u8]>, field_number: usize) -> Result<()>;
 }
 
 pub trait BytesSlice: Sized + std::io::Read {
-    fn deser_message<H: DeserializeMessageFromSliceEventHandler>(
-        &mut self,
-        handler: &mut H,
-    ) -> Result<()>;
+    fn deser_message<H: DeserializableMessageFromSlice>(&mut self, handler: &mut H) -> Result<()>;
 }
 impl<'a> BytesSlice for &'a [u8] {
-    fn deser_message<H: DeserializeMessageFromSliceEventHandler>(
-        &mut self,
-        handler: &mut H,
-    ) -> Result<()> {
+    fn deser_message<H: DeserializableMessageFromSlice>(&mut self, handler: &mut H) -> Result<()> {
         while let Some((new_slice, wire_type, field_number)) =
             try_get_wire_type_and_field_number(self)?
         {

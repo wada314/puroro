@@ -19,7 +19,7 @@ pub trait DeserializableFromBytes {
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
 
-pub trait DeserializableMessageFromBytesIter {
+pub trait DeserializableMessageFromIter {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: FieldData<&'a mut BytesIter<'b, I>>,
@@ -28,10 +28,10 @@ pub trait DeserializableMessageFromBytesIter {
     where
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
-pub struct BytesHandlerToSliceHandler<T: DeserializableMessageFromBytesIter>(T);
-impl<T> super::slice::DeserializeMessageFromSliceEventHandler for BytesHandlerToSliceHandler<T>
+pub struct BytesHandlerToSliceHandler<T: DeserializableMessageFromIter>(T);
+impl<T> super::slice::DeserializableMessageFromSlice for BytesHandlerToSliceHandler<T>
 where
-    T: DeserializableMessageFromBytesIter,
+    T: DeserializableMessageFromIter,
 {
     fn met_field<'a>(&mut self, field: FieldData<&'a [u8]>, field_number: usize) -> Result<()> {
         use std::io::Read;
@@ -104,7 +104,7 @@ where
         Ok(result)
     }
 
-    pub fn deser_message<H: DeserializableMessageFromBytesIter>(
+    pub fn deser_message<H: DeserializableMessageFromIter>(
         &mut self,
         handler: &mut H,
     ) -> Result<()> {
