@@ -21,7 +21,6 @@ pub struct SFixed32();
 pub struct SFixed64();
 pub struct Fixed32();
 pub struct Fixed64();
-pub struct Repeated<T: SingularFieldTypeTag>(PhantomData<T>);
 
 impl FieldTypeTag for Int32 {}
 impl FieldTypeTag for Int64 {}
@@ -40,18 +39,14 @@ impl FieldTypeTag for Fixed32 {}
 impl FieldTypeTag for Fixed64 {}
 impl FieldTypeTag for SFixed32 {}
 impl FieldTypeTag for SFixed64 {}
-impl<T: SingularFieldTypeTag> FieldTypeTag for Repeated<T> {}
 
-impl SingularFieldTypeTag for Int32 {}
-impl SingularFieldTypeTag for Int64 {}
-impl SingularFieldTypeTag for UInt32 {}
-impl SingularFieldTypeTag for UInt64 {}
-impl SingularFieldTypeTag for SInt32 {}
-impl SingularFieldTypeTag for SInt64 {}
-impl SingularFieldTypeTag for Bool {}
-impl SingularFieldTypeTag for String {}
-impl<T> SingularFieldTypeTag for Enum<T> {}
-impl<T> SingularFieldTypeTag for Message<T> {}
+trait FieldLabelTag {}
+pub struct Repeated;
+pub struct Optional;
+pub struct Required;
+impl FieldLabelTag for Repeated {}
+impl FieldLabelTag for Optional {}
+impl FieldLabelTag for Required {}
 
 impl VariantTypeTag for Int32 {}
 impl VariantTypeTag for Int64 {}
@@ -70,11 +65,3 @@ pub struct Bits32();
 impl WireTypeTag for Bits32 {}
 pub struct Bits64();
 impl WireTypeTag for Bits64 {}
-
-pub trait FieldLabelTag {}
-pub struct FieldLabelOptional();
-impl FieldLabelTag for FieldLabelOptional {}
-pub struct FieldLabelRepeated();
-impl FieldLabelTag for FieldLabelRepeated {}
-pub struct FieldLabelRequired();
-impl FieldLabelTag for FieldLabelRequired {}
