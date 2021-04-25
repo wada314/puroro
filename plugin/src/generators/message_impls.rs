@@ -343,7 +343,7 @@ bytes_iter.deser_message(msg)?;\n",
         (format!(
             "\
 {cfg}
-impl{gp} ::puroro::deser::DeserializableFromBytes for {name}{gpb} {{
+impl{gp} ::puroro::deser::DeserializableFromIter for {name}{gpb} {{
     fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>

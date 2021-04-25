@@ -83,7 +83,7 @@ impl ::puroro::deser::DeserializableMessageFromIter for CodeGeneratorResponse {
     }
 }
 
-impl ::puroro::deser::DeserializableFromBytes for CodeGeneratorResponse {
+impl ::puroro::deser::DeserializableFromIter for CodeGeneratorResponse {
     fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
@@ -228,7 +228,7 @@ impl<'bump> ::puroro::deser::DeserializableMessageFromIter for CodeGeneratorResp
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableFromBytes for CodeGeneratorResponseBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableFromIter for CodeGeneratorResponseBumpalo<'bump> {
     fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
@@ -429,7 +429,7 @@ impl ::puroro::deser::DeserializableMessageFromIter for File {
     }
 }
 
-impl ::puroro::deser::DeserializableFromBytes for File {
+impl ::puroro::deser::DeserializableFromIter for File {
     fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
@@ -563,7 +563,7 @@ impl<'bump> ::puroro::deser::DeserializableMessageFromIter for FileBumpalo<'bump
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableFromBytes for FileBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableFromIter for FileBumpalo<'bump> {
     fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
@@ -721,7 +721,7 @@ impl ::puroro::deser::DeserializableMessageFromIter for CodeGeneratorRequest {
     }
 }
 
-impl ::puroro::deser::DeserializableFromBytes for CodeGeneratorRequest {
+impl ::puroro::deser::DeserializableFromIter for CodeGeneratorRequest {
     fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
@@ -888,7 +888,7 @@ impl<'bump> ::puroro::deser::DeserializableMessageFromIter for CodeGeneratorRequ
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableFromBytes for CodeGeneratorRequestBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableFromIter for CodeGeneratorRequestBumpalo<'bump> {
     fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
@@ -1123,7 +1123,7 @@ impl ::puroro::deser::DeserializableMessageFromIter for Version {
     }
 }
 
-impl ::puroro::deser::DeserializableFromBytes for Version {
+impl ::puroro::deser::DeserializableFromIter for Version {
     fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>
@@ -1280,7 +1280,7 @@ impl<'bump> ::puroro::deser::DeserializableMessageFromIter for VersionBumpalo<'b
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro::deser::DeserializableFromBytes for VersionBumpalo<'bump> {
+impl<'bump> ::puroro::deser::DeserializableFromIter for VersionBumpalo<'bump> {
     fn deserialize_from_bytes_iter<'a, I>(&mut self, mut bytes_iter: ::puroro::deser::BytesIter<'a, I>) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>

@@ -6,7 +6,7 @@ use crate::PuroroError;
 use crate::Result;
 use ::num_traits::FromPrimitive;
 
-pub trait DeserializableFromBytes {
+pub trait DeserializableFromIter {
     fn deserialize<I>(&mut self, iter: &mut I) -> Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>,

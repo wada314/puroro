@@ -13,7 +13,7 @@ mod stage3;
 mod utils;
 mod wrappers;
 
-use ::puroro::deser::DeserializableFromBytes;
+use ::puroro::deser::DeserializableFromIter;
 use ::puroro::Serializable;
 use context::Context;
 

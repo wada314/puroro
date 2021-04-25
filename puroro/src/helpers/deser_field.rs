@@ -137,7 +137,7 @@ define_deser_lengthdelimited!(
 
 impl<T> DeserializableFromBytesField<tags::Message<T>, tags::Required> for T
 where
-    T: crate::deser::DeserializableFromBytes,
+    T: crate::deser::DeserializableFromIter,
 {
     fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
     where
