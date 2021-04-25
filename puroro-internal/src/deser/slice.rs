@@ -14,32 +14,33 @@ pub trait DeserializableMessageFromSlice {
     fn met_field(&mut self, field: FieldData<&[u8]>, field_number: usize) -> Result<()>;
 }
 
-pub trait BytesSlice: Sized + std::io::Read {
-    fn deser_message<H: DeserializableMessageFromSlice>(&mut self, handler: &mut H) -> Result<()>;
+pub struct BytesSlice<'slice> {
+    slice: &'slice [u8],
 }
-impl<'a> BytesSlice for &'a [u8] {
-    fn deser_message<H: DeserializableMessageFromSlice>(&mut self, handler: &mut H) -> Result<()> {
-        while let Some((new_slice, wire_type, field_number)) =
-            try_get_wire_type_and_field_number(self)?
-        {
-            *self = new_slice;
+impl<'slice> BytesSlice<'slice> {
+    pub fn deser_message<H: DeserializableMessageFromSlice>(
+        &mut self,
+        handler: &mut H,
+    ) -> Result<()> {
+        while let Some((wire_type, field_number)) = self.try_get_wire_type_and_field_number()? {
             let field_data = match wire_type {
                 WireType::Variant => {
-                    let variant = Variant::decode_bytes(&mut self.bytes())?;
+                    let variant = Variant::decode_bytes(&mut self.slice.bytes())?;
                     FieldData::Variant(variant)
                 }
                 WireType::LengthDelimited => {
-                    let field_length = Variant::decode_bytes(&mut self.bytes())?.to_usize()?;
-                    let (inner_slice, rest) = self.split_at(field_length);
-                    *self = rest;
+                    let field_length =
+                        Variant::decode_bytes(&mut self.slice.bytes())?.to_usize()?;
+                    let (inner_slice, rest) = self.slice.split_at(field_length);
+                    self.slice = rest;
                     FieldData::LengthDelimited(inner_slice)
                 }
                 WireType::Bits32 => {
-                    if self.len() < 4 {
+                    if self.slice.len() < 4 {
                         Err(ErrorKind::UnexpectedInputTermination)?;
                     }
-                    let (bytes, rest) = self.split_at(4);
-                    *self = rest;
+                    let (bytes, rest) = self.slice.split_at(4);
+                    self.slice = rest;
                     FieldData::Bits32(
                         bytes
                             .try_into()
@@ -47,11 +48,11 @@ impl<'a> BytesSlice for &'a [u8] {
                     )
                 }
                 WireType::Bits64 => {
-                    if self.len() < 8 {
+                    if self.slice.len() < 8 {
                         Err(ErrorKind::UnexpectedInputTermination)?;
                     }
-                    let (bytes, rest) = self.split_at(8);
-                    *self = rest;
+                    let (bytes, rest) = self.slice.split_at(8);
+                    self.slice = rest;
                     FieldData::Bits64(
                         bytes
                             .try_into()
@@ -64,16 +65,15 @@ impl<'a> BytesSlice for &'a [u8] {
         }
         Ok(())
     }
-}
 
-fn try_get_wire_type_and_field_number(slice: &[u8]) -> Result<Option<(&[u8], WireType, usize)>> {
-    if slice.len() == 0 {
-        return Ok(None);
+    fn try_get_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, usize)>> {
+        if self.slice.len() == 0 {
+            return Ok(None);
+        }
+        let key = { Variant::decode_bytes(&mut self.slice.by_ref().bytes())?.to_usize()? };
+        Ok(Some((
+            WireType::from_usize(key & 0x07).ok_or(ErrorKind::InvalidWireType)?,
+            (key >> 3),
+        )))
     }
-    let key = { Variant::decode_bytes(&mut slice.bytes())?.to_usize()? };
-    Ok(Some((
-        slice,
-        WireType::from_usize(key & 0x07).ok_or(ErrorKind::InvalidWireType)?,
-        (key >> 3),
-    )))
 }
