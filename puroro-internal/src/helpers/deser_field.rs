@@ -24,7 +24,7 @@ impl NotOptionaInNoPresenceDiscipline for tags::SFixed32 {}
 impl NotOptionaInNoPresenceDiscipline for tags::SFixed64 {}
 impl<T> NotOptionaInNoPresenceDiscipline for tags::Enum<T> {}
 
-pub trait DeserializableFromBytesField<T>
+pub trait DeserializableFromIterField<T>
 where
     T: FieldTypeAndLabelTag,
 {
@@ -37,7 +37,7 @@ where
 
 macro_rules! define_deser_req_variants {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
-        impl DeserializableFromBytesField<($ttag, $ltag)> for $ty {
+        impl DeserializableFromIterField<($ttag, $ltag)> for $ty {
             type Item = $ty;
             fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
             where
@@ -72,7 +72,7 @@ define_deser_req_variants!(u32, tags::UInt32, tags::Required);
 define_deser_req_variants!(u64, tags::UInt64, tags::Required);
 define_deser_req_variants!(bool, tags::Bool, tags::Required);
 
-impl<T> DeserializableFromBytesField<(tags::Enum<T>, tags::Required)>
+impl<T> DeserializableFromIterField<(tags::Enum<T>, tags::Required)>
     for std::result::Result<T, i32>
 where
     T: TryFrom<i32, Error = i32>,
@@ -105,7 +105,7 @@ where
 
 macro_rules! define_deser_req_ld {
     ($ty:ty, $ttag:ty, $ltag:ty, $method:ident) => {
-        impl<'bump> DeserializableFromBytesField<($ttag, $ltag)> for $ty {
+        impl<'bump> DeserializableFromIterField<($ttag, $ltag)> for $ty {
             type Item = $ty;
             fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
             where
@@ -145,7 +145,7 @@ define_deser_req_ld!(
 
 // Unlike C++ implementation, the required message field in Rust is not
 // wrapped by `Option` (and neither `Box`).
-impl<T> DeserializableFromBytesField<(tags::Message<T>, tags::Required)> for T
+impl<T> DeserializableFromIterField<(tags::Message<T>, tags::Required)> for T
 where
     T: crate::deser::DeserializableMessageFromIter,
 {
@@ -163,12 +163,12 @@ where
     }
 }
 
-impl<K, V, K2, V2> DeserializableFromBytesField<tags::Map<K, V>> for HashMap<K2, V2>
+impl<K, V, K2, V2> DeserializableFromIterField<tags::Map<K, V>> for HashMap<K2, V2>
 where
     K: FieldTypeTag,
     V: FieldTypeTag,
-    K2: DeserializableFromBytesField<(K, tags::Required)>,
-    V2: DeserializableFromBytesField<(V, tags::Required)>,
+    K2: DeserializableFromIterField<(K, tags::Required)>,
+    V2: DeserializableFromIterField<(V, tags::Required)>,
 {
     type Item = (K2, V2);
 
@@ -183,7 +183,7 @@ where
 
 macro_rules! define_deser_req_fixed {
     ($ty:ty, $ttag:ty, $ltag:ty, $bits:ident) => {
-        impl DeserializableFromBytesField<($ttag, $ltag)> for $ty {
+        impl DeserializableFromIterField<($ttag, $ltag)> for $ty {
             type Item = $ty;
             fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
             where
@@ -207,10 +207,10 @@ define_deser_req_fixed!(f64, tags::Double, tags::Required, Bits64);
 define_deser_req_fixed!(i64, tags::SFixed64, tags::Required, Bits64);
 define_deser_req_fixed!(u64, tags::Fixed64, tags::Required, Bits64);
 
-impl<T, U> DeserializableFromBytesField<(T, tags::Optional3)> for Option<U>
+impl<T, U> DeserializableFromIterField<(T, tags::Optional3)> for Option<U>
 where
     T: FieldTypeTag + NotOptionaInNoPresenceDiscipline,
-    U: DeserializableFromBytesField<(T, tags::Required)>,
+    U: DeserializableFromIterField<(T, tags::Required)>,
 {
     type Item = U;
     fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, f: F) -> Result<()>
