@@ -57,6 +57,13 @@ define_deser_scalar_variants!(i64, tags::SInt64, tags::Required);
 define_deser_scalar_variants!(u32, tags::UInt32, tags::Required);
 define_deser_scalar_variants!(u64, tags::UInt64, tags::Required);
 define_deser_scalar_variants!(bool, tags::Bool, tags::Required);
+define_deser_scalar_variants!(i32, tags::Int32, tags::Optional3);
+define_deser_scalar_variants!(i64, tags::Int64, tags::Optional3);
+define_deser_scalar_variants!(i32, tags::SInt32, tags::Optional3);
+define_deser_scalar_variants!(i64, tags::SInt64, tags::Optional3);
+define_deser_scalar_variants!(u32, tags::UInt32, tags::Optional3);
+define_deser_scalar_variants!(u64, tags::UInt64, tags::Optional3);
+define_deser_scalar_variants!(bool, tags::Bool, tags::Optional3);
 
 impl<T> DeserializableFromIterField<(tags::Enum<T>, tags::Required)> for std::result::Result<T, i32>
 where
@@ -85,6 +92,22 @@ where
             }
             _ => Err(ErrorKind::InvalidWireType)?,
         }
+    }
+}
+impl<T> DeserializableFromIterField<(tags::Enum<T>, tags::Optional3)>
+    for std::result::Result<T, i32>
+where
+    T: TryFrom<i32, Error = i32>,
+{
+    type Item = Self;
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        <Self as DeserializableFromIterField<(tags::Enum<T>, tags::Required)>>::deser(
+            self, field, f,
+        )
     }
 }
 
@@ -199,39 +222,6 @@ define_deser_scalar_fixed!(u32, tags::Fixed32, tags::Required, Bits32);
 define_deser_scalar_fixed!(f64, tags::Double, tags::Required, Bits64);
 define_deser_scalar_fixed!(i64, tags::SFixed64, tags::Required, Bits64);
 define_deser_scalar_fixed!(u64, tags::Fixed64, tags::Required, Bits64);
-
-pub trait NotOptionaInNoPresenceDiscipline {}
-impl NotOptionaInNoPresenceDiscipline for tags::Int32 {}
-impl NotOptionaInNoPresenceDiscipline for tags::Int64 {}
-impl NotOptionaInNoPresenceDiscipline for tags::UInt32 {}
-impl NotOptionaInNoPresenceDiscipline for tags::UInt64 {}
-impl NotOptionaInNoPresenceDiscipline for tags::SInt32 {}
-impl NotOptionaInNoPresenceDiscipline for tags::SInt64 {}
-impl NotOptionaInNoPresenceDiscipline for tags::Bool {}
-impl NotOptionaInNoPresenceDiscipline for tags::Bytes {}
-impl NotOptionaInNoPresenceDiscipline for tags::String {}
-impl NotOptionaInNoPresenceDiscipline for tags::Float {}
-impl NotOptionaInNoPresenceDiscipline for tags::Double {}
-impl NotOptionaInNoPresenceDiscipline for tags::Fixed32 {}
-impl NotOptionaInNoPresenceDiscipline for tags::Fixed64 {}
-impl NotOptionaInNoPresenceDiscipline for tags::SFixed32 {}
-impl NotOptionaInNoPresenceDiscipline for tags::SFixed64 {}
-impl<T> NotOptionaInNoPresenceDiscipline for tags::Enum<T> {}
-
-impl<T, U> DeserializableFromIterField<(T, tags::Optional3)> for U
-where
-    T: FieldTypeTag + NotOptionaInNoPresenceDiscipline,
-    U: DeserializableFromIterField<(T, tags::Required)>,
-{
-    type Item = <U as DeserializableFromIterField<(T, tags::Required)>>::Item;
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, f: F) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-        F: Fn() -> Self::Item,
-    {
-        <U as DeserializableFromIterField<(T, tags::Required)>>::deser(self, field, f)
-    }
-}
 
 impl<T, U> DeserializableFromIterField<(T, tags::Repeated)> for Vec<U>
 where
