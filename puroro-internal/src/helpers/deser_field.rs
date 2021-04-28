@@ -17,50 +17,51 @@ where
         F: Fn() -> Self::Item;
 }
 
-macro_rules! define_deser_scalar_variants {
-    ($ty:ty, $ttag:ty, $ltag:ty) => {
-        impl DeserializableFromIterField<($ttag, $ltag)> for $ty {
-            type Item = $ty;
-            fn deser<'a, I, F>(
-                &mut self,
-                field: FieldData<&'a mut BytesIter<'a, I>>,
-                _f: F,
-            ) -> Result<()>
-            where
-                I: Iterator<Item = std::io::Result<u8>>,
-                F: Fn() -> Self::Item,
-            {
-                match field {
-                    FieldData::Variant(variant) => {
-                        *self = variant.to_native::<$ttag>()?;
-                        Ok(())
-                    }
-                    FieldData::LengthDelimited(bytes_iter) => {
-                        *self = bytes_iter
-                            .variants()
-                            .last()
-                            .transpose()?
-                            .ok_or(PuroroError::from(ErrorKind::ZeroLengthPackedField))
-                            .and_then(|variant| variant.to_native::<$ttag>())?;
-                        Ok(())
-                    }
-                    _ => Err(ErrorKind::InvalidWireType)?,
-                }
+// For Variant types excpet enums: Int32, Int64, UInt32, UInt64, SInt32, SInt64, Bool
+impl<T, U> DeserializableFromIterField<(T, tags::Required)> for U
+where
+    T: FieldTypeTag + variant::VariantType<NativeType = U>,
+{
+    type Item = U;
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, _f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        match field {
+            FieldData::Variant(variant) => {
+                *self = variant.to_native::<T>()?;
+                Ok(())
             }
+            FieldData::LengthDelimited(bytes_iter) => {
+                *self = bytes_iter
+                    .variants()
+                    .last()
+                    .transpose()?
+                    .ok_or(PuroroError::from(ErrorKind::ZeroLengthPackedField))
+                    .and_then(|variant| variant.to_native::<T>())?;
+                Ok(())
+            }
+            _ => Err(ErrorKind::InvalidWireType)?,
         }
-    };
+    }
 }
-define_deser_scalar_variants!(i32, tags::Int32, tags::Required);
-define_deser_scalar_variants!(i64, tags::Int64, tags::Required);
-define_deser_scalar_variants!(i32, tags::SInt32, tags::Required);
-define_deser_scalar_variants!(i64, tags::SInt64, tags::Required);
-define_deser_scalar_variants!(u32, tags::UInt32, tags::Required);
-define_deser_scalar_variants!(u64, tags::UInt64, tags::Required);
-define_deser_scalar_variants!(bool, tags::Bool, tags::Required);
 
-impl<T> DeserializableFromIterField<(tags::Enum<T>, tags::Required)> for std::result::Result<T, i32>
+pub trait EnumNativeType: Sized {
+    fn try_from_i32(val: i32) -> Result<Self>;
+}
+impl<T> EnumNativeType for std::result::Result<T, i32>
 where
     T: TryFrom<i32, Error = i32>,
+{
+    fn try_from_i32(val: i32) -> Result<Self> {
+        Ok(T::try_from(val))
+    }
+}
+
+impl<T> DeserializableFromIterField<(tags::Enum<T>, tags::Required)> for T
+where
+    T: EnumNativeType,
 {
     type Item = Self;
     fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, _f: F) -> Result<()>
@@ -70,17 +71,18 @@ where
     {
         match field {
             FieldData::Variant(variant) => {
-                *self = variant.to_native::<tags::Int32>()?.try_into();
+                *self = Self::try_from_i32(variant.to_native::<tags::Int32>()?)?;
                 Ok(())
             }
             FieldData::LengthDelimited(bytes_iter) => {
-                *self = bytes_iter
-                    .variants()
-                    .last()
-                    .transpose()?
-                    .ok_or(PuroroError::from(ErrorKind::ZeroLengthPackedField))
-                    .and_then(|variant| variant.to_native::<tags::Int32>())?
-                    .try_into();
+                *self = Self::try_from_i32(
+                    bytes_iter
+                        .variants()
+                        .last()
+                        .transpose()?
+                        .ok_or(PuroroError::from(ErrorKind::ZeroLengthPackedField))?
+                        .to_native::<tags::Int32>()?,
+                )?;
                 Ok(())
             }
             _ => Err(ErrorKind::InvalidWireType)?,
@@ -256,5 +258,17 @@ where
             FieldData::Bits32(_) | FieldData::Bits64(_) => Err(ErrorKind::UnexpectedWireType)?,
         }
         Ok(())
+    }
+}
+
+impl DeserializableFromIterField<(tags::Float, tags::Repeated)> for Vec<f32> {
+    type Item = f32;
+
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        todo!()
     }
 }

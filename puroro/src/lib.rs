@@ -13,3 +13,6 @@ pub trait DeserializableFromIter {
 pub trait Serializable: Sized {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> Result<()>;
 }
+
+pub trait Message {}
+pub trait Enum {}
