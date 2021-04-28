@@ -361,9 +361,18 @@ define_deser_optional_message_field!(tags::Optional3);
 ///////////////////////////////////////////////////////////////////////////////
 
 macro_rules! define_deser_repeated_variants {
-    ($ty:ty, $ttag:ty) => {
-        impl DeserializableFromIterField<($ttag, tags::Repeated)> for Vec<$ty> {
-            type Item = $ty;
+    ($scalar:ty, $ttag:ty) => {
+        define_deser_repeated_variants!($scalar, $ttag, Vec<$scalar>);
+        #[cfg(feature = "puroro-bumpalo")]
+        define_deser_repeated_variants!(
+            $scalar,
+            $ttag,
+            ::bumpalo::collections::Vec<'bump, $scalar>
+        );
+    };
+    ($scalar:ty, $ttag:ty, $vec:ty) => {
+        impl<'bump> DeserializableFromIterField<($ttag, tags::Repeated)> for $vec {
+            type Item = $scalar;
             fn deser<'a, I, F>(
                 &mut self,
                 field: FieldData<&'a mut BytesIter<'a, I>>,
@@ -406,3 +415,91 @@ define_deser_repeated_variants!(i64, tags::SInt64);
 define_deser_repeated_variants!(u32, tags::UInt32);
 define_deser_repeated_variants!(u64, tags::UInt64);
 define_deser_repeated_variants!(bool, tags::Bool);
+
+macro_rules! define_deser_repeated_enum {
+    () => {
+        define_deser_repeated_enum!(Vec<std::result::Result<T, i32>>);
+        #[cfg(feature = "puroro-bumpalo")]
+        define_deser_repeated_enum!(
+            ::bumpalo::collections::Vec<'bump, std::result::Result<T, i32>>
+        );
+    };
+    ($vec:ty) => {
+        impl<'bump, T> DeserializableFromIterField<(tags::Enum<T>, tags::Repeated)> for $vec
+        where
+            T: TryFrom<i32, Error = i32>,
+        {
+            type Item = std::result::Result<T, i32>;
+            fn deser<'a, I, F>(
+                &mut self,
+                field: FieldData<&'a mut BytesIter<'a, I>>,
+                _: F,
+            ) -> Result<()>
+            where
+                I: Iterator<Item = std::io::Result<u8>>,
+                F: Fn() -> Self::Item,
+            {
+                match field {
+                    FieldData::Variant(variant) => {
+                        self.push(T::try_from(variant.to_native::<tags::Int32>()?))
+                    }
+                    FieldData::LengthDelimited(bytes_iter) => {
+                        for rvariant in bytes_iter.variants() {
+                            self.push(T::try_from(rvariant?.to_native::<tags::Int32>()?))
+                        }
+                    }
+                    FieldData::Bits32(_) | FieldData::Bits64(_) => {
+                        Err(ErrorKind::UnexpectedWireType)?
+                    }
+                }
+                Ok(())
+            }
+        }
+    };
+}
+define_deser_repeated_enum!();
+
+macro_rules! define_deser_repeated_ld {
+    ($scalar:ty, $ttag:ty, $method:ident) => {
+        define_deser_repeated_ld!($scalar, $ttag, $method, Vec<$scalar>);
+        #[cfg(feature = "puroro-bumpalo")]
+        define_deser_repeated_ld!(
+            $scalar,
+            $ttag,
+            $method,
+            ::bumpalo::collections::Vec<'bump, $scalar>
+        );
+    };
+    ($scalar:ty, $ttag:ty, $method:ident, $vec:ty) => {
+        impl<'bump> DeserializableFromIterField<($ttag, tags::Repeated)> for $vec {
+            type Item = $scalar;
+            fn deser<'a, I, F>(
+                &mut self,
+                field: FieldData<&'a mut BytesIter<'a, I>>,
+                f: F,
+            ) -> Result<()>
+            where
+                I: Iterator<Item = std::io::Result<u8>>,
+                F: Fn() -> Self::Item,
+            {
+                if let FieldData::LengthDelimited(bytes_iter) = field {
+                    let mut new_item = (f)();
+                    new_item.reserve(bytes_iter.len());
+                    for rv in bytes_iter.$method() {
+                        new_item.push(rv?);
+                    }
+                    self.push(new_item);
+                    Ok(())
+                } else {
+                    Err(ErrorKind::UnexpectedWireType)?
+                }
+            }
+        }
+    };
+}
+define_deser_repeated_ld!(String, tags::String, chars);
+define_deser_repeated_ld!(Vec<u8>, tags::Bytes, bytes);
+#[cfg(feature = "puroro-bumpalo")]
+define_deser_repeated_ld!(::bumpalo::collections::String<'bump>, tags::String, chars);
+#[cfg(feature = "puroro-bumpalo")]
+define_deser_repeated_ld!(::bumpalo::collections::Vec<'bump, u8>, tags::Bytes, bytes);
