@@ -70,7 +70,7 @@ where
     T: TryFrom<i32, Error = i32>,
 {
     type Item = Self;
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, _f: F) -> Result<()>
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, _: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -118,7 +118,7 @@ macro_rules! define_deser_scalar_ld {
             fn deser<'a, I, F>(
                 &mut self,
                 field: FieldData<&'a mut BytesIter<'a, I>>,
-                _f: F,
+                _: F,
             ) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
@@ -162,7 +162,7 @@ where
     T: crate::deser::DeserializableMessageFromIter,
 {
     type Item = T;
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, _f: F) -> Result<()>
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, _: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -200,7 +200,7 @@ macro_rules! define_deser_scalar_fixed {
             fn deser<'a, I, F>(
                 &mut self,
                 field: FieldData<&'a mut BytesIter<'a, I>>,
-                _f: F,
+                _: F,
             ) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
@@ -222,6 +222,36 @@ define_deser_scalar_fixed!(u32, tags::Fixed32, tags::Required, Bits32);
 define_deser_scalar_fixed!(f64, tags::Double, tags::Required, Bits64);
 define_deser_scalar_fixed!(i64, tags::SFixed64, tags::Required, Bits64);
 define_deser_scalar_fixed!(u64, tags::Fixed64, tags::Required, Bits64);
+
+macro_rules! define_deser_optional_fields_from_scalar {
+    ($ty:ty, $ttag:ty, $ltag:ty) => {
+        impl DeserializableFromIterField<($ttag, $ltag)> for Option<$ty> {
+            type Item = $ty;
+            fn deser<'a, I, F>(
+                &mut self,
+                field: FieldData<&'a mut BytesIter<'a, I>>,
+                f: F,
+            ) -> Result<()>
+            where
+                I: Iterator<Item = std::io::Result<u8>>,
+                F: Fn() -> Self::Item,
+            {
+                <Self::Item as DeserializableFromIterField<($ttag, tags::Required)>>::deser(
+                    self.get_or_insert_with(f),
+                    field,
+                    || unreachable!(),
+                )
+            }
+        }
+    };
+}
+define_deser_optional_fields_from_scalar!(i32, tags::Int32, tags::Optional2);
+define_deser_optional_fields_from_scalar!(i64, tags::Int64, tags::Optional2);
+define_deser_optional_fields_from_scalar!(i32, tags::SInt32, tags::Optional2);
+define_deser_optional_fields_from_scalar!(i64, tags::SInt64, tags::Optional2);
+define_deser_optional_fields_from_scalar!(u32, tags::UInt32, tags::Optional2);
+define_deser_optional_fields_from_scalar!(u64, tags::UInt64, tags::Optional2);
+define_deser_optional_fields_from_scalar!(bool, tags::Bool, tags::Optional2);
 
 impl<T, U> DeserializableFromIterField<(T, tags::Repeated)> for Vec<U>
 where
