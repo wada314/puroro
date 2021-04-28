@@ -1,5 +1,4 @@
-mod deser_field;
-mod map_entry;
+pub mod deser_field;
 mod maybe_repeated_field;
 mod maybe_repeated_variant_field;
 pub use maybe_repeated_field::MaybeRepeatedField;
