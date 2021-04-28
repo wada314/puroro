@@ -1,5 +1,5 @@
 use crate::deser::BytesIter;
-use crate::tags;
+use crate::tags::{self, VariantTypeTag};
 use crate::tags::{FieldLabelTag, FieldTypeAndLabelTag, FieldTypeTag};
 use crate::types::FieldData;
 use crate::{ErrorKind, PuroroError, Result};
@@ -29,20 +29,24 @@ where
     T: FieldTypeAndLabelTag,
 {
     type Item;
-    fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, f: F) -> Result<()>
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
-        F: FnOnce() -> Self::Item;
+        F: Fn() -> Self::Item;
 }
 
 macro_rules! define_deser_req_variants {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
         impl DeserializableFromIterField<($ttag, $ltag)> for $ty {
             type Item = $ty;
-            fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
+            fn deser<'a, I, F>(
+                &mut self,
+                field: FieldData<&'a mut BytesIter<'a, I>>,
+                _f: F,
+            ) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
-                F: FnOnce() -> Self::Item,
+                F: Fn() -> Self::Item,
             {
                 match field {
                     FieldData::Variant(variant) => {
@@ -72,16 +76,15 @@ define_deser_req_variants!(u32, tags::UInt32, tags::Required);
 define_deser_req_variants!(u64, tags::UInt64, tags::Required);
 define_deser_req_variants!(bool, tags::Bool, tags::Required);
 
-impl<T> DeserializableFromIterField<(tags::Enum<T>, tags::Required)>
-    for std::result::Result<T, i32>
+impl<T> DeserializableFromIterField<(tags::Enum<T>, tags::Required)> for std::result::Result<T, i32>
 where
     T: TryFrom<i32, Error = i32>,
 {
     type Item = Self;
-    fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, _f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
-        F: FnOnce() -> Self::Item,
+        F: Fn() -> Self::Item,
     {
         match field {
             FieldData::Variant(variant) => {
@@ -107,10 +110,14 @@ macro_rules! define_deser_req_ld {
     ($ty:ty, $ttag:ty, $ltag:ty, $method:ident) => {
         impl<'bump> DeserializableFromIterField<($ttag, $ltag)> for $ty {
             type Item = $ty;
-            fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
+            fn deser<'a, I, F>(
+                &mut self,
+                field: FieldData<&'a mut BytesIter<'a, I>>,
+                _f: F,
+            ) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
-                F: FnOnce() -> Self::Item,
+                F: Fn() -> Self::Item,
             {
                 if let FieldData::LengthDelimited(mut bytes_iter) = field {
                     self.clear();
@@ -150,10 +157,10 @@ where
     T: crate::deser::DeserializableMessageFromIter,
 {
     type Item = T;
-    fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, _f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
-        F: FnOnce() -> Self::Item,
+        F: Fn() -> Self::Item,
     {
         if let FieldData::LengthDelimited(mut bytes_iter) = field {
             bytes_iter.deser_message(self)
@@ -163,19 +170,19 @@ where
     }
 }
 
-impl<K, V, K2, V2> DeserializableFromIterField<tags::Map<K, V>> for HashMap<K2, V2>
+impl<KT, VT, KR, VR> DeserializableFromIterField<tags::Map<KT, VT>> for HashMap<KR, VR>
 where
-    K: FieldTypeTag,
-    V: FieldTypeTag,
-    K2: DeserializableFromIterField<(K, tags::Required)>,
-    V2: DeserializableFromIterField<(V, tags::Required)>,
+    KT: FieldTypeTag,
+    VT: FieldTypeTag,
+    KR: DeserializableFromIterField<(KT, tags::Required)>,
+    VR: DeserializableFromIterField<(VT, tags::Required)>,
 {
-    type Item = (K2, V2);
+    type Item = (KR, VR);
 
-    fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, f: F) -> Result<()>
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
-        F: FnOnce() -> Self::Item,
+        F: Fn() -> Self::Item,
     {
         todo!()
     }
@@ -185,10 +192,14 @@ macro_rules! define_deser_req_fixed {
     ($ty:ty, $ttag:ty, $ltag:ty, $bits:ident) => {
         impl DeserializableFromIterField<($ttag, $ltag)> for $ty {
             type Item = $ty;
-            fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, _f: F) -> Result<()>
+            fn deser<'a, I, F>(
+                &mut self,
+                field: FieldData<&'a mut BytesIter<'a, I>>,
+                _f: F,
+            ) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
-                F: FnOnce() -> Self::Item,
+                F: Fn() -> Self::Item,
             {
                 if let FieldData::$bits(array) = field {
                     *self = <$ty>::from_le_bytes(array);
@@ -213,11 +224,36 @@ where
     U: DeserializableFromIterField<(T, tags::Required)>,
 {
     type Item = U;
-    fn deser<'a, I, F>(&mut self, field: FieldData<BytesIter<'a, I>>, f: F) -> Result<()>
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
-        F: FnOnce() -> Self::Item,
+        F: Fn() -> Self::Item,
     {
         todo!()
+    }
+}
+
+impl<T, U> DeserializableFromIterField<(T, tags::Repeated)> for Vec<U>
+where
+    T: FieldTypeTag + VariantTypeTag,
+    U: DeserializableFromIterField<(T, tags::Required)>,
+{
+    type Item = U;
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        match field {
+            FieldData::Variant(variant) => {
+                let mut new_val = (f)();
+                new_val = variant.to_native::<T>()?;
+                todo!()
+            }
+            FieldData::LengthDelimited(_) => {
+                todo!()
+            }
+            FieldData::Bits32(_) | FieldData::Bits64(_) => Err(ErrorKind::UnexpectedWireType)?,
+        }
     }
 }
