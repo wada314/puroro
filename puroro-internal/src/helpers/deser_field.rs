@@ -202,6 +202,34 @@ define_deser_scalar_fixed!(f64, tags::Double, tags::Required, Bits64);
 define_deser_scalar_fixed!(i64, tags::SFixed64, tags::Required, Bits64);
 define_deser_scalar_fixed!(u64, tags::Fixed64, tags::Required, Bits64);
 
+trait Bits32NativeType {
+    type NativeType;
+    fn from_le_bytes(bytes: [u8; 4]) -> Self::NativeType;
+}
+impl Bits32NativeType for tags::Float {
+    type NativeType = f32;
+    fn from_le_bytes(bytes: [u8; 4]) -> Self::NativeType {
+        f32::from_le_bytes(bytes)
+    }
+}
+impl<T, U> DeserializableFromIterField<(T, tags::Required)> for U
+where
+    T: Bits32NativeType<NativeType = U>,
+{
+    type Item = U;
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, _f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        if let FieldData::Bits32(array) = field {
+            *self = T::from_le_bytes(array);
+            Ok(())
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
 pub trait NotOptionaInNoPresenceDiscipline {}
 impl NotOptionaInNoPresenceDiscipline for tags::Int32 {}
 impl NotOptionaInNoPresenceDiscipline for tags::Int64 {}
