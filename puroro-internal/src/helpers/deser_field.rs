@@ -40,8 +40,8 @@ macro_rules! define_deser_scalar_variants {
                             .variants()
                             .last()
                             .transpose()?
-                            .ok_or(PuroroError::from(ErrorKind::ZeroLengthPackedField))
-                            .and_then(|variant| variant.to_native::<$ttag>())?;
+                            .ok_or(PuroroError::from(ErrorKind::ZeroLengthPackedField))?
+                            .to_native::<$ttag>()?;
                         Ok(())
                     }
                     _ => Err(ErrorKind::InvalidWireType)?,
