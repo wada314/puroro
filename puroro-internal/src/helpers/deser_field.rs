@@ -1,4 +1,4 @@
-use crate::deser::BytesIter;
+use crate::deser::{BytesIter, DeserializableMessageFromIter};
 use crate::tags::{self, VariantTypeTag};
 use crate::tags::{FieldLabelTag, FieldTypeAndLabelTag, FieldTypeTag};
 use crate::types::FieldData;
@@ -503,3 +503,38 @@ define_deser_repeated_ld!(Vec<u8>, tags::Bytes, bytes);
 define_deser_repeated_ld!(::bumpalo::collections::String<'bump>, tags::String, chars);
 #[cfg(feature = "puroro-bumpalo")]
 define_deser_repeated_ld!(::bumpalo::collections::Vec<'bump, u8>, tags::Bytes, bytes);
+
+macro_rules! define_deser_repeated_message {
+    () => {
+        define_deser_repeated_message!(Vec<T>);
+        #[cfg(feature = "puroro-bumpalo")]
+        define_deser_repeated_message!(::bumpalo::collections::Vec<'bump, T>);
+    };
+    ($vec:ty) => {
+        impl<'bump, T> DeserializableFromIterField<(tags::Message<T>, tags::Repeated)> for $vec
+        where
+            T: crate::deser::DeserializableMessageFromIter,
+        {
+            type Item = T;
+            fn deser<'a, I, F>(
+                &mut self,
+                field: FieldData<&'a mut BytesIter<'a, I>>,
+                f: F,
+            ) -> Result<()>
+            where
+                I: Iterator<Item = std::io::Result<u8>>,
+                F: Fn() -> Self::Item,
+            {
+                if let FieldData::LengthDelimited(bytes_iter) = field {
+                    let mut new_message = (f)();
+                    bytes_iter.deser_message(&mut new_message)?;
+                    self.push(new_message);
+                    Ok(())
+                } else {
+                    Err(ErrorKind::UnexpectedWireType)?
+                }
+            }
+        }
+    };
+}
+define_deser_repeated_message!();
