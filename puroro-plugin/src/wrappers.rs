@@ -22,7 +22,7 @@ pub use field::{
     Bits32FieldType, Bits64FieldType, FieldDescriptor, FieldLabel, FieldType,
     LengthDelimitedFieldType, NonTrivialFieldType, VariantFieldType, WireType,
 };
-pub use file::{DescriptorVisitor, FileDescriptor};
+pub use file::{DescriptorVisitor, FileDescriptor, ProtoSyntax};
 pub use message::MessageDescriptor;
 pub use r#enum::{EnumDescriptor, EnumValueDescriptor};
 
@@ -41,6 +41,19 @@ impl<'c> FileOrMessageRef<'c> {
                 package = message.package().to_string(),
                 name = message.name()
             ),
+        }
+    }
+
+    pub fn file_descriptor(&'c self) -> &'c FileDescriptor {
+        loop {
+            match self {
+                FileOrMessageRef::File(f) => {
+                    break *f;
+                }
+                FileOrMessageRef::Message(m) => {
+                    self = m.parent();
+                }
+            }
         }
     }
 }

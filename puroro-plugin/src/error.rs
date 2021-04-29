@@ -19,6 +19,8 @@ pub enum ErrorKind {
     UnknownTypeName { name: String },
     #[error(r#"The group feature is not yet supported. GIVE ME A DOCUMENT!!!"#)]
     GroupNotSupported,
+    #[error(r#"Unknown value for proto file's syntax: "{name}"."#)]
+    UnknownProtoSyntax { name: String },
     #[error(r#"An error from formatter: "{source}""#)]
     WriteError { source: std::fmt::Error },
     #[error(r#"An error from puroro: "{source}""#)]

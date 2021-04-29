@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 
+use crate::error::ErrorKind;
 use crate::google::protobuf::FileDescriptorProto;
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::Context;
@@ -44,6 +45,15 @@ impl<'c> FileDescriptor<'c> {
                     + ".rs"
             }
         })
+    }
+    pub fn syntax(&self) -> Result<ProtoSyntax> {
+        match self.proto.syntax.as_str() {
+            "proto2" => Ok(ProtoSyntax::Proto2),
+            "proto3" => Ok(ProtoSyntax::Proto3),
+            other => Err(ErrorKind::UnknownProtoSyntax {
+                name: other.to_string(),
+            })?,
+        }
     }
 
     pub fn messages(&'c self) -> impl Iterator<Item = &MessageDescriptor<'c>> {
@@ -123,6 +133,12 @@ impl Debug for FileDescriptor<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("FileDescriptor").finish()
     }
+}
+
+#[derive(Debug, Clone)]
+pub enum ProtoSyntax {
+    Proto2,
+    Proto3,
 }
 
 pub trait DescriptorVisitor<'c> {

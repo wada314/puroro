@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 
-use super::{EnumDescriptor, FieldDescriptor, FileOrMessageRef};
+use super::{EnumDescriptor, FieldDescriptor, FileDescriptor, FileOrMessageRef};
 use crate::google::protobuf::DescriptorProto;
 use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
 use crate::Context;
@@ -81,6 +81,19 @@ impl<'c> MessageDescriptor<'c> {
 
     pub fn name(&self) -> &str {
         &self.proto.name
+    }
+    pub fn parent(&'c self) -> &'c FileOrMessageRef<'c> {
+        &self.parent
+    }
+    pub fn file(&'c self) -> &'c FileDescriptor<'c> {
+        self.parent.file_descriptor()
+    }
+    pub fn is_map_entry(&self) -> bool {
+        if let Some(options) = self.proto.options {
+            options.map_entry
+        } else {
+            false
+        }
     }
     pub fn package(&'c self) -> &str {
         self.lazy_package

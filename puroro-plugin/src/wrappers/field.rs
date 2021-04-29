@@ -48,9 +48,18 @@ impl<'c> FieldDescriptor<'c> {
     pub fn number(&self) -> i32 {
         self.proto.number
     }
-    pub fn label(&self) -> Result<FieldLabel> {
+    pub fn label(&'c self) -> Result<FieldLabel> {
         match self.proto.label {
-            Ok(Label::LabelOptional) => Ok(FieldLabel::Optional),
+            Ok(Label::LabelOptional) => match self.message().file().syntax()? {
+                super::ProtoSyntax::Proto2 => Ok(FieldLabel::Optional2),
+                super::ProtoSyntax::Proto3 => {
+                    if self.proto.proto3_optional {
+                        Ok(FieldLabel::Optional2)
+                    } else {
+                        Ok(FieldLabel::Optional3)
+                    }
+                }
+            },
             Ok(Label::LabelRepeated) => Ok(FieldLabel::Repeated),
             Ok(Label::LabelRequired) => Ok(FieldLabel::Required),
             Err(id) => Err(ErrorKind::UnknownLabelId { id })?,
@@ -155,6 +164,10 @@ impl<'c> FieldDescriptor<'c> {
         self.parent.package()
     }
 
+    pub fn message(&'c self) -> &'c MessageDescriptor<'c> {
+        self.parent
+    }
+
     pub fn path_to_root_mod(&'c self) -> &str {
         self.parent.path_to_root_mod()
     }
@@ -202,7 +215,20 @@ impl<'c> FieldDescriptor<'c> {
                     WireType::Bits64(field_type) => field_type.native_type().into(),
                 };
                 Ok(match self.label()? {
-                    FieldLabel::Optional => {
+                    FieldLabel::Optional2 => {
+                        if let FieldType::Message(_) = self.type_()? {
+                            format!(
+                                "::std::option::Option<::std::boxed::Box<{name}>>",
+                                name = native_fully_qualified_type
+                            )
+                        } else {
+                            format!(
+                                "::std::option::Option<{name}>",
+                                name = native_fully_qualified_type
+                            )
+                        }
+                    }
+                    FieldLabel::Optional3 => {
                         if let FieldType::Message(_) = self.type_()? {
                             format!(
                                 "::std::option::Option<::std::boxed::Box<{name}>>",
@@ -212,16 +238,7 @@ impl<'c> FieldDescriptor<'c> {
                             native_fully_qualified_type.into_owned()
                         }
                     }
-                    FieldLabel::Required => {
-                        if let FieldType::Message(_) = self.type_()? {
-                            format!(
-                                "::std::boxed::Box<{name}>",
-                                name = native_fully_qualified_type
-                            )
-                        } else {
-                            native_fully_qualified_type.into_owned()
-                        }
-                    }
+                    FieldLabel::Required => native_fully_qualified_type.into_owned(),
                     FieldLabel::Repeated => {
                         format!(
                             "::std::vec::Vec<{name}>",
@@ -491,7 +508,8 @@ pub enum NonTrivialFieldType<'c> {
 
 #[derive(Debug, Clone, Hash)]
 pub enum FieldLabel {
-    Optional,
+    Optional2,
+    Optional3,
     Required,
     Repeated,
 }
