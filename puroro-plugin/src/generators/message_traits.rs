@@ -22,7 +22,7 @@ impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
             format!(
                 "\
 pub trait {name}Trait {{\n",
-                name = self.msg.native_bare_type_name()
+                name = self.msg.native_bare_type_name()?
             ),
             indent(iter(self.msg.fields().map(|field| -> Result<_> {
                 Ok((
@@ -30,8 +30,9 @@ pub trait {name}Trait {{\n",
                         // Associated Type for the message type
                         format!(
                             "type {camel_name}Type: {submsg_name}Trait;\n",
-                            camel_name = to_camel_case(field.native_name()),
-                            submsg_name = m.native_type_name_with_relative_path(field.package()),
+                            camel_name = to_camel_case(field.native_name()?),
+                            submsg_name =
+                                m.native_type_name_with_relative_path(field.package()?)?,
                         )
                     } else {
                         "".to_string()
@@ -42,7 +43,7 @@ pub trait {name}Trait {{\n",
                             // getter function for optional message field, wrapped by Option.
                             format!(
                                 "fn {name}(&'_ self) -> ::std::option::Option<{reftype}>;\n",
-                                name = field.native_name(),
+                                name = field.native_name()?,
                                 reftype = field.native_maybe_ref_type("'_")?,
                             )
                         }
@@ -50,7 +51,7 @@ pub trait {name}Trait {{\n",
                             // normal getter function.
                             format!(
                                 "fn {name}(&'_ self) -> {reftype};\n",
-                                name = field.native_name(),
+                                name = field.native_name()?,
                                 reftype = field.native_maybe_ref_type("'_")?,
                             )
                         }
@@ -58,7 +59,7 @@ pub trait {name}Trait {{\n",
                             // getter function with Optional.
                             format!(
                                 "fn {name}(&'_ self) -> ::std::option::Option<{reftype}>;\n",
-                                name = field.native_name(),
+                                name = field.native_name()?,
                                 reftype = field.native_maybe_ref_type("'_")?,
                             )
                         }
@@ -82,8 +83,8 @@ fn {name}_boxed_iter(&self)
 type {camel_name}Iter<'a>: Iterator<Item={reftype_lt_a}>;
 #[cfg(feature = \"puroro-nightly\")]
 fn {name}_iter(&self) -> Self::{camel_name}Iter<'_>;\n",
-                                name = field.native_name(),
-                                camel_name = to_camel_case(field.native_name()),
+                                name = field.native_name()?,
+                                camel_name = to_camel_case(field.native_name()?),
                                 reftype = field.native_maybe_ref_type("'_")?,
                                 reftype_lt_a = field.native_maybe_ref_type("'a")?,
                             )

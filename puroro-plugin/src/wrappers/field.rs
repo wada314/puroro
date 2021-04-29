@@ -43,7 +43,7 @@ impl<'c> FieldDescriptor<'c> {
         }
     }
     pub fn name(&self) -> Result<&str> {
-        Ok(&self.proto.name.ok_or(ErrorKind::InternalError {
+        Ok(self.proto.name.as_ref().ok_or(ErrorKind::InternalError {
             detail: "Empty field name".to_string(),
         })?)
     }
@@ -72,7 +72,7 @@ impl<'c> FieldDescriptor<'c> {
 
     pub fn type_(&'c self) -> Result<FieldType<'c>> {
         Ok(match &self.proto.type_ {
-            Ok(type_) => {
+            Some(Ok(type_)) => {
                 use crate::protos::google::protobuf::field_descriptor_proto::Type;
                 match type_ {
                     Type::TypeDouble => FieldType::Double,
@@ -95,8 +95,8 @@ impl<'c> FieldDescriptor<'c> {
                                 detail: format!(
                                     "The field desc for {}.{} says its `type` is `TYPE_MESSAGE`, \
                                     but we couldn't find the message named \"{}\" in the inputs.",
-                                    self.parent.fully_qualified_name(),
-                                    self.name(),
+                                    self.parent.fully_qualified_name()?,
+                                    self.name()?,
                                     self.fully_qualified_type_name()?
                                 ),
                             })?,
@@ -113,8 +113,8 @@ impl<'c> FieldDescriptor<'c> {
                             detail: format!(
                                 "The field desc for {}.{} says its `type` is `TYPE_ENUM`, \
                                     but we couldn't find the enum named \"{}\" in the inputs.",
-                                self.parent.fully_qualified_name(),
-                                self.name(),
+                                self.parent.fully_qualified_name()?,
+                                self.name()?,
                                 self.fully_qualified_type_name()?
                             ),
                         })?,
@@ -125,17 +125,17 @@ impl<'c> FieldDescriptor<'c> {
                     Type::TypeSint64 => FieldType::SInt64,
                 }
             }
-            Err(0) => match self
+            Some(Err(0)) | None => match self
                 .context
                 .fq_name_to_desc(self.fully_qualified_type_name()?)?
             {
                 Some(EnumOrMessageRef::Enum(e)) => FieldType::Enum(e),
                 Some(EnumOrMessageRef::Message(m)) => FieldType::Message(m),
                 _ => Err(ErrorKind::UnknownTypeName {
-                    name: self.proto.type_name.clone(),
+                    name: self.proto.type_name.clone().unwrap_or("".to_string()),
                 })?,
             },
-            Err(id) => Err(ErrorKind::UnknownFieldTypeId { id: *id })?,
+            Some(Err(id)) => Err(ErrorKind::UnknownFieldTypeId { id: *id })?,
         })
     }
 
@@ -164,7 +164,7 @@ impl<'c> FieldDescriptor<'c> {
         })
     }
 
-    pub fn package(&'c self) -> &str {
+    pub fn package(&'c self) -> Result<&str> {
         self.parent.package()
     }
 
@@ -172,20 +172,26 @@ impl<'c> FieldDescriptor<'c> {
         self.parent
     }
 
-    pub fn path_to_root_mod(&'c self) -> &str {
+    pub fn path_to_root_mod(&'c self) -> Result<&str> {
         self.parent.path_to_root_mod()
     }
 
     pub fn fully_qualified_type_name(&'c self) -> Result<&str> {
+        let type_name_in_proto = match self.proto.type_name.as_deref() {
+            None | Some("") => Err(ErrorKind::InternalError {
+                detail: "Empty field type name".to_string(),
+            })?,
+            Some(s) => s,
+        };
         Ok(self.lazy_fq_type_name.get_or_try_init(|| -> Result<_> {
             // If the type name starts with ".", then just return the remaining part.
-            if let Some(fq_name) = self.proto.type_name.strip_prefix('.') {
+            if let Some(fq_name) = type_name_in_proto.strip_prefix('.') {
                 return Ok(fq_name.to_string());
             }
             // If the type name is not fully-qualified, search the known types
             // with climbing up the package to the root package.
-            for package in self::iter_package_to_root(self.parent.package()) {
-                let fq_name_candidate = package.to_string() + "." + &self.proto.type_name;
+            for package in self::iter_package_to_root(self.parent.package()?) {
+                let fq_name_candidate = package.to_string() + "." + type_name_in_proto;
                 if let Some(_) = self.context.fq_name_to_desc(&fq_name_candidate)? {
                     return Ok(fq_name_candidate);
                 }
@@ -194,8 +200,8 @@ impl<'c> FieldDescriptor<'c> {
                 detail: format!(
                     "The type \"{}.{}\" was not found in the Context's type list. \
                     Maybe it is not an enum or a message?",
-                    self.parent.package(),
-                    &self.proto.type_name
+                    self.parent.package()?,
+                    type_name_in_proto,
                 ),
             })?
         })?)
@@ -210,10 +216,10 @@ impl<'c> FieldDescriptor<'c> {
                 // msg: xxx
                 let native_fully_qualified_type: Cow<'static, str> = match self.wire_type()? {
                     WireType::Variant(field_type) => {
-                        field_type.native_type(self.parent.path_to_root_mod())
+                        field_type.native_type(self.parent.path_to_root_mod()?)?
                     }
                     WireType::LengthDelimited(field_type) => {
-                        field_type.native_owned_type(self.parent.path_to_root_mod())
+                        field_type.native_owned_type(self.parent.path_to_root_mod()?)?
                     }
                     WireType::Bits32(field_type) => field_type.native_type().into(),
                     WireType::Bits64(field_type) => field_type.native_type().into(),
@@ -262,13 +268,13 @@ impl<'c> FieldDescriptor<'c> {
                 NonTrivialFieldType::Bytes => format!("&{lt} [u8]", lt = lifetime).into(),
                 NonTrivialFieldType::Enum(e) => format!(
                     "::std::result::Result<{name}, i32>",
-                    name = e.native_type_name_with_relative_path(self.package())
+                    name = e.native_type_name_with_relative_path(self.package()?)?
                 )
                 .into(),
                 NonTrivialFieldType::Message(m) => format!(
                     "&{lt} {name}",
                     lt = lifetime,
-                    name = m.native_type_name_with_relative_path(self.package())
+                    name = m.native_type_name_with_relative_path(self.package()?)?
                 )
                 .into(),
             },
@@ -282,10 +288,10 @@ impl<'c> FieldDescriptor<'c> {
             .get_or_try_init(lifetime, || -> Result<_> {
                 Ok(match self.wire_type()? {
                     WireType::Variant(field_type) => field_type
-                        .native_type(self.parent.path_to_root_mod())
+                        .native_type(self.parent.path_to_root_mod()?)?
                         .into_owned(),
                     WireType::LengthDelimited(field_type) => field_type
-                        .native_ref_type(self.parent.path_to_root_mod(), lifetime)
+                        .native_ref_type(self.parent.path_to_root_mod()?, lifetime)?
                         .into_owned(),
                     WireType::Bits32(field_type) => field_type.native_type().to_string(),
                     WireType::Bits64(field_type) => field_type.native_type().to_string(),
@@ -301,10 +307,10 @@ impl<'c> FieldDescriptor<'c> {
                 Ok(match self.wire_type()? {
                     WireType::Variant(field_type) => format!(
                         "&mut {name}",
-                        name = field_type.native_type(self.parent.path_to_root_mod())
+                        name = field_type.native_type(self.parent.path_to_root_mod()?)?
                     ),
                     WireType::LengthDelimited(field_type) => field_type
-                        .native_mut_ref_type(self.parent.path_to_root_mod())
+                        .native_mut_ref_type(self.parent.path_to_root_mod()?)?
                         .into_owned(),
                     WireType::Bits32(field_type) => {
                         format!("&mut {name}", name = field_type.native_type().to_string())
@@ -317,9 +323,10 @@ impl<'c> FieldDescriptor<'c> {
         )?)
     }
 
-    pub fn native_name(&'c self) -> &str {
-        self.lazy_native_name
-            .get_or_init(|| get_keyword_safe_ident(&to_lower_snake_case(self.name())))
+    pub fn native_name(&'c self) -> Result<&str> {
+        Ok(self.lazy_native_name.get_or_try_init(|| -> Result<_> {
+            Ok(get_keyword_safe_ident(&to_lower_snake_case(self.name()?)))
+        })?)
     }
 }
 
@@ -350,8 +357,8 @@ pub enum VariantFieldType<'c> {
     Enum(&'c super::EnumDescriptor<'c>),
 }
 impl<'c> VariantFieldType<'c> {
-    pub fn native_type(&self, path_to_root_mod: &str) -> Cow<'static, str> {
-        match self {
+    pub fn native_type(&self, path_to_root_mod: &str) -> Result<Cow<'static, str>> {
+        Ok(match self {
             VariantFieldType::Int32 | VariantFieldType::SInt32 => "i32".into(),
             VariantFieldType::Int64 | VariantFieldType::SInt64 => "i64".into(),
             VariantFieldType::UInt32 => "u32".into(),
@@ -359,13 +366,13 @@ impl<'c> VariantFieldType<'c> {
             VariantFieldType::Bool => "bool".into(),
             VariantFieldType::Enum(e) => format!(
                 "::std::result::Result<{name}, i32>",
-                name = e.native_fully_qualified_type_name(path_to_root_mod)
+                name = e.native_fully_qualified_type_name(path_to_root_mod)?
             )
             .into(),
-        }
+        })
     }
-    pub fn native_tag_type(&self, path_to_root_mod: &str) -> Cow<'static, str> {
-        match self {
+    pub fn native_tag_type(&self, path_to_root_mod: &str) -> Result<Cow<'static, str>> {
+        Ok(match self {
             VariantFieldType::Int32 => "::puroro_internal::tags::Int32".into(),
             VariantFieldType::Int64 => "::puroro_internal::tags::Int64".into(),
             VariantFieldType::UInt32 => "::puroro_internal::tags::UInt32".into(),
@@ -375,10 +382,10 @@ impl<'c> VariantFieldType<'c> {
             VariantFieldType::Bool => "::puroro_internal::tags::Bool".into(),
             VariantFieldType::Enum(e) => format!(
                 "::puroro_internal::tags::Enum<{name}>",
-                name = e.native_fully_qualified_type_name(path_to_root_mod)
+                name = e.native_fully_qualified_type_name(path_to_root_mod)?
             )
             .into(),
-        }
+        })
     }
 }
 
@@ -389,42 +396,46 @@ pub enum LengthDelimitedFieldType<'c> {
     Message(&'c super::MessageDescriptor<'c>),
 }
 impl<'c> LengthDelimitedFieldType<'c> {
-    pub fn native_owned_type(&self, path_to_root_mod: &str) -> Cow<'static, str> {
-        match self {
+    pub fn native_owned_type(&self, path_to_root_mod: &str) -> Result<Cow<'static, str>> {
+        Ok(match self {
             LengthDelimitedFieldType::String => "::std::string::String".into(),
             LengthDelimitedFieldType::Bytes => "::std::vec::Vec<u8>".into(),
             LengthDelimitedFieldType::Message(m) => {
-                m.native_fully_qualified_type_name(path_to_root_mod).into()
+                m.native_fully_qualified_type_name(path_to_root_mod)?.into()
             }
-        }
+        })
     }
-    pub fn native_ref_type(&self, path_to_root_mod: &str, lifetime: &str) -> Cow<'static, str> {
+    pub fn native_ref_type(
+        &self,
+        path_to_root_mod: &str,
+        lifetime: &str,
+    ) -> Result<Cow<'static, str>> {
         let lt: Cow<'static, str> = if lifetime.is_empty() {
             "".into()
         } else {
             format!("{} ", lifetime).into()
         };
-        match self {
+        Ok(match self {
             LengthDelimitedFieldType::String => format!("&{lt}str", lt = lt).into(),
             LengthDelimitedFieldType::Bytes => format!("&{lt}[u8]", lt = lt).into(),
             LengthDelimitedFieldType::Message(m) => format!(
                 "&{lt}{name}",
                 lt = lt,
-                name = m.native_fully_qualified_type_name(path_to_root_mod)
+                name = m.native_fully_qualified_type_name(path_to_root_mod)?
             )
             .into(),
-        }
+        })
     }
-    pub fn native_mut_ref_type(&self, path_to_root_mod: &str) -> Cow<'static, str> {
-        match self {
+    pub fn native_mut_ref_type(&self, path_to_root_mod: &str) -> Result<Cow<'static, str>> {
+        Ok(match self {
             LengthDelimitedFieldType::String => "&mut String".into(),
             LengthDelimitedFieldType::Bytes => "&mut Vec<u8>".into(),
             LengthDelimitedFieldType::Message(m) => format!(
                 "&mut {name}",
-                name = m.native_fully_qualified_type_name(path_to_root_mod)
+                name = m.native_fully_qualified_type_name(path_to_root_mod)?
             )
             .into(),
-        }
+        })
     }
 }
 

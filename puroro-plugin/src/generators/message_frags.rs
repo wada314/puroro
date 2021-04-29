@@ -30,7 +30,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         };
         Ok(format!(
             "{name}{postfix1}{postfix2}",
-            name = msg.native_bare_type_name(),
+            name = msg.native_bare_type_name()?,
             postfix1 = postfix1,
             postfix2 = postfix2,
         )
@@ -45,7 +45,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         cur_package: &'c str,
     ) -> Result<String> {
         let struct_name = self.struct_name(msg)?;
-        let mut struct_package_iter = msg.package().split('.').peekable();
+        let mut struct_package_iter = msg.package()?.split('.').peekable();
         let mut cur_package_iter = cur_package.split('.').peekable();
         while let (Some(p1), Some(p2)) = (struct_package_iter.peek(), cur_package_iter.peek()) {
             if *p1 == *p2 {
@@ -125,11 +125,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
                         NonTrivialFieldType::Enum(e) => format!(
                             "::std::result::Result<{type_}, i32>",
-                            type_ = e.native_fully_qualified_type_name(field.path_to_root_mod())
+                            type_ =
+                                e.native_fully_qualified_type_name(field.path_to_root_mod()?)?
                         )
                         .into(),
                         NonTrivialFieldType::Message(m) => {
-                            self.type_name_of_msg(m, field.package())?.into()
+                            self.type_name_of_msg(m, field.package()?)?.into()
                         }
                     },
                 };
@@ -174,11 +175,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                         NonTrivialFieldType::Bytes => "&'slice [u8]".into(),
                         NonTrivialFieldType::Enum(e) => format!(
                             "::std::result::Result<{type_}, i32>",
-                            type_ = e.native_fully_qualified_type_name(field.path_to_root_mod())
+                            type_ =
+                                e.native_fully_qualified_type_name(field.path_to_root_mod()?)?
                         )
                         .into(),
                         NonTrivialFieldType::Message(m) => self
-                            .struct_name_with_relative_path(m, field.package())?
+                            .struct_name_with_relative_path(m, field.package()?)?
                             .into(),
                     },
                 };

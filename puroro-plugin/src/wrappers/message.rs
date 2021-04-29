@@ -80,7 +80,7 @@ impl<'c> MessageDescriptor<'c> {
     }
 
     pub fn name(&self) -> Result<&str> {
-        Ok(&self.proto.name.ok_or(ErrorKind::InternalError {
+        Ok(self.proto.name.as_ref().ok_or(ErrorKind::InternalError {
             detail: "Empty message name".to_string(),
         })?)
     }

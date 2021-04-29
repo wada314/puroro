@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::fmt::Debug;
 
 use crate::error::ErrorKind;
@@ -47,10 +48,10 @@ impl<'c> FileDescriptor<'c> {
         })
     }
     pub fn syntax(&self) -> Result<ProtoSyntax> {
-        match self.proto.syntax.as_str() {
-            "proto2" | "" => Ok(ProtoSyntax::Proto2),
-            "proto3" => Ok(ProtoSyntax::Proto3),
-            other => Err(ErrorKind::UnknownProtoSyntax {
+        match self.proto.syntax.as_deref() {
+            Some("proto2") | Some("") | None => Ok(ProtoSyntax::Proto2),
+            Some("proto3") => Ok(ProtoSyntax::Proto3),
+            Some(other) => Err(ErrorKind::UnknownProtoSyntax {
                 name: other.to_string(),
             })?,
         }
@@ -78,8 +79,8 @@ impl<'c> FileDescriptor<'c> {
             })
             .iter()
     }
-    pub fn package(&'c self) -> &str {
-        &self.proto.package
+    pub fn package(&'c self) -> &'c str {
+        self.proto.package.as_deref().unwrap_or("")
     }
 
     /// Visit all `MessageDescriptor` and `EnumDescriptor` in this
@@ -107,10 +108,10 @@ impl<'c> FileDescriptor<'c> {
                 Task::HandleMsg(msg) => {
                     visitor.handle_msg(msg)?;
                     if msg.nested_messages().next().is_some() || msg.enums().next().is_some() {
-                        tasks.push(Task::ExitSubmodule(msg.name()));
+                        tasks.push(Task::ExitSubmodule(msg.name()?));
                         tasks.extend(msg.nested_messages().map(|submsg| Task::HandleMsg(submsg)));
                         tasks.extend(msg.enums().map(|enume| Task::HandleEnum(enume)));
-                        tasks.push(Task::EnterSubmodule(msg.name()));
+                        tasks.push(Task::EnterSubmodule(msg.name()?));
                     }
                 }
                 Task::HandleEnum(enume) => {
