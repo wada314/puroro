@@ -48,7 +48,7 @@ impl<'c> FileDescriptor<'c> {
     }
     pub fn syntax(&self) -> Result<ProtoSyntax> {
         match self.proto.syntax.as_str() {
-            "proto2" => Ok(ProtoSyntax::Proto2),
+            "proto2" | "" => Ok(ProtoSyntax::Proto2),
             "proto3" => Ok(ProtoSyntax::Proto3),
             other => Err(ErrorKind::UnknownProtoSyntax {
                 name: other.to_string(),
