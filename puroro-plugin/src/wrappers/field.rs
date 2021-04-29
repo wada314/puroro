@@ -42,27 +42,31 @@ impl<'c> FieldDescriptor<'c> {
             lazy_native_name: Default::default(),
         }
     }
-    pub fn name(&self) -> &str {
-        &self.proto.name
+    pub fn name(&self) -> Result<&str> {
+        Ok(&self.proto.name.ok_or(ErrorKind::InternalError {
+            detail: "Empty field name".to_string(),
+        })?)
     }
     pub fn number(&self) -> i32 {
-        self.proto.number
+        // TODO: maybe check the default value?
+        self.proto.number.unwrap_or_default()
     }
     pub fn label(&'c self) -> Result<FieldLabel> {
         match self.proto.label {
-            Ok(Label::LabelOptional) => match self.message().file().syntax()? {
+            Some(Ok(Label::LabelOptional)) => match self.message().file().syntax()? {
                 super::ProtoSyntax::Proto2 => Ok(FieldLabel::Optional2),
                 super::ProtoSyntax::Proto3 => {
-                    if self.proto.proto3_optional {
+                    if self.proto.proto3_optional.unwrap_or_default() {
                         Ok(FieldLabel::Optional2)
                     } else {
                         Ok(FieldLabel::Optional3)
                     }
                 }
             },
-            Ok(Label::LabelRepeated) => Ok(FieldLabel::Repeated),
-            Ok(Label::LabelRequired) => Ok(FieldLabel::Required),
-            Err(id) => Err(ErrorKind::UnknownLabelId { id })?,
+            Some(Ok(Label::LabelRepeated)) => Ok(FieldLabel::Repeated),
+            Some(Ok(Label::LabelRequired)) => Ok(FieldLabel::Required),
+            Some(Err(id)) => Err(ErrorKind::UnknownLabelId { id })?,
+            None => Err(ErrorKind::UnknownLabelId { id: 0 })?,
         }
     }
 

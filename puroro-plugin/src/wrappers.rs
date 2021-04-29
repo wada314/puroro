@@ -18,6 +18,7 @@ mod r#enum;
 mod field;
 mod file;
 mod message;
+use crate::Result;
 pub use field::{
     Bits32FieldType, Bits64FieldType, FieldDescriptor, FieldLabel, FieldType,
     LengthDelimitedFieldType, NonTrivialFieldType, VariantFieldType, WireType,
@@ -33,15 +34,15 @@ pub enum FileOrMessageRef<'c> {
     Message(&'c MessageDescriptor<'c>),
 }
 impl<'c> FileOrMessageRef<'c> {
-    pub fn package_for_child(&self) -> String {
-        match self {
+    pub fn package_for_child(&self) -> Result<String> {
+        Ok(match self {
             &FileOrMessageRef::File(file) => file.package().to_string(),
             &FileOrMessageRef::Message(message) => format!(
                 "{package}.{name}",
-                package = message.package().to_string(),
-                name = message.name()
+                package = message.package()?.to_string(),
+                name = message.name()?
             ),
-        }
+        })
     }
 
     pub fn file_descriptor(&'c self) -> &'c FileDescriptor {

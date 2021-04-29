@@ -74,7 +74,6 @@ impl ::puroro::DeserializableFromIter for GeneratedCodeInfo {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for GeneratedCodeInfo {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -187,7 +186,6 @@ impl<'bump> ::puroro::DeserializableFromIter for GeneratedCodeInfoBumpalo<'bump>
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for GeneratedCodeInfoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -251,22 +249,14 @@ pub trait GeneratedCodeInfoTrait {
     #[cfg(feature = "puroro-nightly")]
     fn annotation_iter(&self) -> Self::AnnotationIter<'_>;
 }
-pub trait GeneratedCodeInfoMutTrait {
-    fn for_each_annotation_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::generated_code_info::Annotation);
-    fn annotation_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::generated_code_info::Annotation>>;
-    // We need more! 
-}
 pub mod generated_code_info {
 
 #[derive(Debug, Clone)]
 pub struct Annotation {
     pub path: ::std::vec::Vec<i32>,
-    pub source_file: ::std::string::String,
-    pub begin: i32,
-    pub end: i32,
+    pub source_file: ::std::option::Option<::std::string::String>,
+    pub begin: ::std::option::Option<i32>,
+    pub end: ::std::option::Option<i32>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
 
@@ -372,7 +362,6 @@ impl ::puroro::DeserializableFromIter for Annotation {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for Annotation {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -427,13 +416,13 @@ impl AnnotationTrait for Annotation {
     fn path_iter(&self) -> Self::PathIter<'_> {
         self.path.iter().cloned()
     }
-    fn source_file(&self) -> &'_ str {
-        self.source_file.as_ref()
+    fn source_file(&self) -> ::std::option::Option<&'_ str> {
+        self.source_file.as_deref()
     }
-    fn begin(&self) -> i32 {
+    fn begin(&self) -> ::std::option::Option<i32> {
         self.begin.clone()
     }
-    fn end(&self) -> i32 {
+    fn end(&self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
 }
@@ -446,9 +435,9 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Annotation<> {
 #[derive(Debug, Clone)]
 pub struct AnnotationBumpalo<'bump> {
     pub path: ::bumpalo::collections::Vec<'bump, i32>,
-    pub source_file: ::bumpalo::collections::String<'bump>,
-    pub begin: i32,
-    pub end: i32,
+    pub source_file: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub begin: ::std::option::Option<i32>,
+    pub end: ::std::option::Option<i32>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -547,7 +536,6 @@ impl<'bump> ::puroro::DeserializableFromIter for AnnotationBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for AnnotationBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -603,13 +591,13 @@ impl<'bump> AnnotationTrait for AnnotationBumpalo<'bump> {
     fn path_iter(&self) -> Self::PathIter<'_> {
         self.path.iter().cloned()
     }
-    fn source_file(&self) -> &'_ str {
-        self.source_file.as_ref()
+    fn source_file(&self) -> ::std::option::Option<&'_ str> {
+        self.source_file.as_deref()
     }
-    fn begin(&self) -> i32 {
+    fn begin(&self) -> ::std::option::Option<i32> {
         self.begin.clone()
     }
-    fn end(&self) -> i32 {
+    fn end(&self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
 }
@@ -632,20 +620,9 @@ pub trait AnnotationTrait {
     type PathIter<'a>: Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn path_iter(&self) -> Self::PathIter<'_>;
-    fn source_file(&'_ self) -> &'_ str;
-    fn begin(&'_ self) -> i32;
-    fn end(&'_ self) -> i32;
-}
-pub trait AnnotationMutTrait {
-    fn for_each_path_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut i32);
-    fn path_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
-    // We need more! 
-    fn source_file_mut(&self) -> &mut String;
-    fn begin_mut(&self) -> &mut i32;
-    fn end_mut(&self) -> &mut i32;
+    fn source_file(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn begin(&'_ self) -> ::std::option::Option<i32>;
+    fn end(&'_ self) -> ::std::option::Option<i32>;
 }
 } // mod generated_code_info
 
@@ -720,7 +697,6 @@ impl ::puroro::DeserializableFromIter for SourceCodeInfo {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for SourceCodeInfo {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -834,7 +810,6 @@ impl<'bump> ::puroro::DeserializableFromIter for SourceCodeInfoBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for SourceCodeInfoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -898,22 +873,14 @@ pub trait SourceCodeInfoTrait {
     #[cfg(feature = "puroro-nightly")]
     fn location_iter(&self) -> Self::LocationIter<'_>;
 }
-pub trait SourceCodeInfoMutTrait {
-    fn for_each_location_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::source_code_info::Location);
-    fn location_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::source_code_info::Location>>;
-    // We need more! 
-}
 pub mod source_code_info {
 
 #[derive(Debug, Clone)]
 pub struct Location {
     pub path: ::std::vec::Vec<i32>,
     pub span: ::std::vec::Vec<i32>,
-    pub leading_comments: ::std::string::String,
-    pub trailing_comments: ::std::string::String,
+    pub leading_comments: ::std::option::Option<::std::string::String>,
+    pub trailing_comments: ::std::option::Option<::std::string::String>,
     pub leading_detached_comments: ::std::vec::Vec<::std::string::String>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -1020,7 +987,6 @@ impl ::puroro::DeserializableFromIter for Location {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for Location {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1095,11 +1061,11 @@ impl LocationTrait for Location {
     fn span_iter(&self) -> Self::SpanIter<'_> {
         self.span.iter().cloned()
     }
-    fn leading_comments(&self) -> &'_ str {
-        self.leading_comments.as_ref()
+    fn leading_comments(&self) -> ::std::option::Option<&'_ str> {
+        self.leading_comments.as_deref()
     }
-    fn trailing_comments(&self) -> &'_ str {
-        self.trailing_comments.as_ref()
+    fn trailing_comments(&self) -> ::std::option::Option<&'_ str> {
+        self.trailing_comments.as_deref()
     }
     fn for_each_leading_detached_comments<F>(&self, mut f: F)
     where
@@ -1131,8 +1097,8 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Location<> {
 pub struct LocationBumpalo<'bump> {
     pub path: ::bumpalo::collections::Vec<'bump, i32>,
     pub span: ::bumpalo::collections::Vec<'bump, i32>,
-    pub leading_comments: ::bumpalo::collections::String<'bump>,
-    pub trailing_comments: ::bumpalo::collections::String<'bump>,
+    pub leading_comments: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub trailing_comments: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub leading_detached_comments: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -1232,7 +1198,6 @@ impl<'bump> ::puroro::DeserializableFromIter for LocationBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for LocationBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -1308,11 +1273,11 @@ impl<'bump> LocationTrait for LocationBumpalo<'bump> {
     fn span_iter(&self) -> Self::SpanIter<'_> {
         self.span.iter().cloned()
     }
-    fn leading_comments(&self) -> &'_ str {
-        self.leading_comments.as_ref()
+    fn leading_comments(&self) -> ::std::option::Option<&'_ str> {
+        self.leading_comments.as_deref()
     }
-    fn trailing_comments(&self) -> &'_ str {
-        self.trailing_comments.as_ref()
+    fn trailing_comments(&self) -> ::std::option::Option<&'_ str> {
+        self.trailing_comments.as_deref()
     }
     fn for_each_leading_detached_comments<F>(&self, mut f: F)
     where
@@ -1362,8 +1327,8 @@ pub trait LocationTrait {
     type SpanIter<'a>: Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn span_iter(&self) -> Self::SpanIter<'_>;
-    fn leading_comments(&'_ self) -> &'_ str;
-    fn trailing_comments(&'_ self) -> &'_ str;
+    fn leading_comments(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn trailing_comments(&'_ self) -> ::std::option::Option<&'_ str>;
     fn for_each_leading_detached_comments<F>(&self, f: F)
     where
         F: FnMut(&'_ str);
@@ -1374,39 +1339,17 @@ pub trait LocationTrait {
     #[cfg(feature = "puroro-nightly")]
     fn leading_detached_comments_iter(&self) -> Self::LeadingDetachedCommentsIter<'_>;
 }
-pub trait LocationMutTrait {
-    fn for_each_path_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut i32);
-    fn path_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
-    // We need more! 
-    fn for_each_span_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut i32);
-    fn span_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
-    // We need more! 
-    fn leading_comments_mut(&self) -> &mut String;
-    fn trailing_comments_mut(&self) -> &mut String;
-    fn for_each_leading_detached_comments_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut String);
-    fn leading_detached_comments_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
-    // We need more! 
-}
 } // mod source_code_info
 
 #[derive(Debug, Clone)]
 pub struct UninterpretedOption {
     pub name: ::std::vec::Vec<uninterpreted_option::NamePart>,
-    pub identifier_value: ::std::string::String,
-    pub positive_int_value: u64,
-    pub negative_int_value: i64,
-    pub double_value: f64,
-    pub string_value: ::std::vec::Vec<u8>,
-    pub aggregate_value: ::std::string::String,
+    pub identifier_value: ::std::option::Option<::std::string::String>,
+    pub positive_int_value: ::std::option::Option<u64>,
+    pub negative_int_value: ::std::option::Option<i64>,
+    pub double_value: ::std::option::Option<f64>,
+    pub string_value: ::std::option::Option<::std::vec::Vec<u8>>,
+    pub aggregate_value: ::std::option::Option<::std::string::String>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
 
@@ -1527,7 +1470,6 @@ impl ::puroro::DeserializableFromIter for UninterpretedOption {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for UninterpretedOption {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1590,23 +1532,23 @@ impl UninterpretedOptionTrait for UninterpretedOption {
     fn name_iter(&self) -> Self::NameIter<'_> {
         self.name.iter()
     }
-    fn identifier_value(&self) -> &'_ str {
-        self.identifier_value.as_ref()
+    fn identifier_value(&self) -> ::std::option::Option<&'_ str> {
+        self.identifier_value.as_deref()
     }
-    fn positive_int_value(&self) -> u64 {
+    fn positive_int_value(&self) -> ::std::option::Option<u64> {
         self.positive_int_value.clone()
     }
-    fn negative_int_value(&self) -> i64 {
+    fn negative_int_value(&self) -> ::std::option::Option<i64> {
         self.negative_int_value.clone()
     }
-    fn double_value(&self) -> f64 {
+    fn double_value(&self) -> ::std::option::Option<f64> {
         self.double_value.clone()
     }
-    fn string_value(&self) -> &'_ [u8] {
-        self.string_value.as_ref()
+    fn string_value(&self) -> ::std::option::Option<&'_ [u8]> {
+        self.string_value.as_deref()
     }
-    fn aggregate_value(&self) -> &'_ str {
-        self.aggregate_value.as_ref()
+    fn aggregate_value(&self) -> ::std::option::Option<&'_ str> {
+        self.aggregate_value.as_deref()
     }
 }
 impl<'a> ::puroro_internal::helpers::FieldNew<'a> for UninterpretedOption<> {
@@ -1618,12 +1560,12 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for UninterpretedOption<> {
 #[derive(Debug, Clone)]
 pub struct UninterpretedOptionBumpalo<'bump> {
     pub name: ::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo<'bump>>,
-    pub identifier_value: ::bumpalo::collections::String<'bump>,
-    pub positive_int_value: u64,
-    pub negative_int_value: i64,
-    pub double_value: f64,
-    pub string_value: ::bumpalo::collections::Vec<'bump, u8>,
-    pub aggregate_value: ::bumpalo::collections::String<'bump>,
+    pub identifier_value: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub positive_int_value: ::std::option::Option<u64>,
+    pub negative_int_value: ::std::option::Option<i64>,
+    pub double_value: ::std::option::Option<f64>,
+    pub string_value: ::std::option::Option<::bumpalo::collections::Vec<'bump, u8>>,
+    pub aggregate_value: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1737,7 +1679,6 @@ impl<'bump> ::puroro::DeserializableFromIter for UninterpretedOptionBumpalo<'bum
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for UninterpretedOptionBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -1801,23 +1742,23 @@ impl<'bump> UninterpretedOptionTrait for UninterpretedOptionBumpalo<'bump> {
     fn name_iter(&self) -> Self::NameIter<'_> {
         self.name.iter()
     }
-    fn identifier_value(&self) -> &'_ str {
-        self.identifier_value.as_ref()
+    fn identifier_value(&self) -> ::std::option::Option<&'_ str> {
+        self.identifier_value.as_deref()
     }
-    fn positive_int_value(&self) -> u64 {
+    fn positive_int_value(&self) -> ::std::option::Option<u64> {
         self.positive_int_value.clone()
     }
-    fn negative_int_value(&self) -> i64 {
+    fn negative_int_value(&self) -> ::std::option::Option<i64> {
         self.negative_int_value.clone()
     }
-    fn double_value(&self) -> f64 {
+    fn double_value(&self) -> ::std::option::Option<f64> {
         self.double_value.clone()
     }
-    fn string_value(&self) -> &'_ [u8] {
-        self.string_value.as_ref()
+    fn string_value(&self) -> ::std::option::Option<&'_ [u8]> {
+        self.string_value.as_deref()
     }
-    fn aggregate_value(&self) -> &'_ str {
-        self.aggregate_value.as_ref()
+    fn aggregate_value(&self) -> ::std::option::Option<&'_ str> {
+        self.aggregate_value.as_deref()
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1840,26 +1781,12 @@ pub trait UninterpretedOptionTrait {
     type NameIter<'a>: Iterator<Item=&'a uninterpreted_option::NamePart>;
     #[cfg(feature = "puroro-nightly")]
     fn name_iter(&self) -> Self::NameIter<'_>;
-    fn identifier_value(&'_ self) -> &'_ str;
-    fn positive_int_value(&'_ self) -> u64;
-    fn negative_int_value(&'_ self) -> i64;
-    fn double_value(&'_ self) -> f64;
-    fn string_value(&'_ self) -> &'_ [u8];
-    fn aggregate_value(&'_ self) -> &'_ str;
-}
-pub trait UninterpretedOptionMutTrait {
-    fn for_each_name_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::uninterpreted_option::NamePart);
-    fn name_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::uninterpreted_option::NamePart>>;
-    // We need more! 
-    fn identifier_value_mut(&self) -> &mut String;
-    fn positive_int_value_mut(&self) -> &mut u64;
-    fn negative_int_value_mut(&self) -> &mut i64;
-    fn double_value_mut(&self) -> &mut f64;
-    fn string_value_mut(&self) -> &mut Vec<u8>;
-    fn aggregate_value_mut(&self) -> &mut String;
+    fn identifier_value(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn positive_int_value(&'_ self) -> ::std::option::Option<u64>;
+    fn negative_int_value(&'_ self) -> ::std::option::Option<i64>;
+    fn double_value(&'_ self) -> ::std::option::Option<f64>;
+    fn string_value(&'_ self) -> ::std::option::Option<&'_ [u8]>;
+    fn aggregate_value(&'_ self) -> ::std::option::Option<&'_ str>;
 }
 pub mod uninterpreted_option {
 
@@ -1947,7 +1874,6 @@ impl ::puroro::DeserializableFromIter for NamePart {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for NamePart {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -2065,7 +1991,6 @@ impl<'bump> ::puroro::DeserializableFromIter for NamePartBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for NamePartBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -2112,16 +2037,12 @@ pub trait NamePartTrait {
     fn name_part(&'_ self) -> &'_ str;
     fn is_extension(&'_ self) -> bool;
 }
-pub trait NamePartMutTrait {
-    fn name_part_mut(&self) -> &mut String;
-    fn is_extension_mut(&self) -> &mut bool;
-}
 } // mod uninterpreted_option
 
 #[derive(Debug, Clone)]
 pub struct MethodOptions {
-    pub deprecated: bool,
-    pub idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
+    pub deprecated: ::std::option::Option<bool>,
+    pub idempotency_level: ::std::option::Option<::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>>,
     pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -2216,7 +2137,6 @@ impl ::puroro::DeserializableFromIter for MethodOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for MethodOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2247,10 +2167,10 @@ impl ::puroro::Serializable for MethodOptions {
 }
 
 impl MethodOptionsTrait for MethodOptions {
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn idempotency_level(&self) -> ::std::result::Result<method_options::IdempotencyLevel, i32> {
+    fn idempotency_level(&self) -> ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> {
         self.idempotency_level.clone()
     }
     type UninterpretedOptionType = UninterpretedOption;
@@ -2282,8 +2202,8 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for MethodOptions<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct MethodOptionsBumpalo<'bump> {
-    pub deprecated: bool,
-    pub idempotency_level: ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>,
+    pub deprecated: ::std::option::Option<bool>,
+    pub idempotency_level: ::std::option::Option<::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -2371,7 +2291,6 @@ impl<'bump> ::puroro::DeserializableFromIter for MethodOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for MethodOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -2403,10 +2322,10 @@ impl<'bump> ::puroro::Serializable for MethodOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MethodOptionsTrait for MethodOptionsBumpalo<'bump> {
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn idempotency_level(&self) -> ::std::result::Result<method_options::IdempotencyLevel, i32> {
+    fn idempotency_level(&self) -> ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> {
         self.idempotency_level.clone()
     }
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
@@ -2440,8 +2359,8 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for MethodOptionsBumpalo
     }
 }
 pub trait MethodOptionsTrait {
-    fn deprecated(&'_ self) -> bool;
-    fn idempotency_level(&'_ self) -> ::std::result::Result<method_options::IdempotencyLevel, i32>;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool>;
+    fn idempotency_level(&'_ self) -> ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>>;
     type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
@@ -2452,16 +2371,6 @@ pub trait MethodOptionsTrait {
     type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
-}
-pub trait MethodOptionsMutTrait {
-    fn deprecated_mut(&self) -> &mut bool;
-    fn idempotency_level_mut(&self) -> &mut ::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>;
-    fn for_each_uninterpreted_option_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
-    fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! 
 }
 pub mod method_options {
 #[derive(Debug, Clone)]
@@ -2490,7 +2399,7 @@ impl ::std::convert::Into<i32> for IdempotencyLevel {
 
 #[derive(Debug, Clone)]
 pub struct ServiceOptions {
-    pub deprecated: bool,
+    pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -2573,7 +2482,6 @@ impl ::puroro::DeserializableFromIter for ServiceOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for ServiceOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2599,7 +2507,7 @@ impl ::puroro::Serializable for ServiceOptions {
 }
 
 impl ServiceOptionsTrait for ServiceOptions {
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
     type UninterpretedOptionType = UninterpretedOption;
@@ -2631,7 +2539,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for ServiceOptions<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct ServiceOptionsBumpalo<'bump> {
-    pub deprecated: bool,
+    pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -2707,7 +2615,6 @@ impl<'bump> ::puroro::DeserializableFromIter for ServiceOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for ServiceOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -2734,7 +2641,7 @@ impl<'bump> ::puroro::Serializable for ServiceOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ServiceOptionsTrait for ServiceOptionsBumpalo<'bump> {
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
@@ -2768,7 +2675,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ServiceOptionsBumpal
     }
 }
 pub trait ServiceOptionsTrait {
-    fn deprecated(&'_ self) -> bool;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool>;
     type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
@@ -2780,19 +2687,10 @@ pub trait ServiceOptionsTrait {
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
-pub trait ServiceOptionsMutTrait {
-    fn deprecated_mut(&self) -> &mut bool;
-    fn for_each_uninterpreted_option_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
-    fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! 
-}
 
 #[derive(Debug, Clone)]
 pub struct EnumValueOptions {
-    pub deprecated: bool,
+    pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -2875,7 +2773,6 @@ impl ::puroro::DeserializableFromIter for EnumValueOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for EnumValueOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2901,7 +2798,7 @@ impl ::puroro::Serializable for EnumValueOptions {
 }
 
 impl EnumValueOptionsTrait for EnumValueOptions {
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
     type UninterpretedOptionType = UninterpretedOption;
@@ -2933,7 +2830,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for EnumValueOptions<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct EnumValueOptionsBumpalo<'bump> {
-    pub deprecated: bool,
+    pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -3009,7 +2906,6 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumValueOptionsBumpalo<'bump> 
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for EnumValueOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -3036,7 +2932,7 @@ impl<'bump> ::puroro::Serializable for EnumValueOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumValueOptionsTrait for EnumValueOptionsBumpalo<'bump> {
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
@@ -3070,7 +2966,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumValueOptionsBump
     }
 }
 pub trait EnumValueOptionsTrait {
-    fn deprecated(&'_ self) -> bool;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool>;
     type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
@@ -3082,20 +2978,11 @@ pub trait EnumValueOptionsTrait {
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
-pub trait EnumValueOptionsMutTrait {
-    fn deprecated_mut(&self) -> &mut bool;
-    fn for_each_uninterpreted_option_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
-    fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! 
-}
 
 #[derive(Debug, Clone)]
 pub struct EnumOptions {
-    pub allow_alias: bool,
-    pub deprecated: bool,
+    pub allow_alias: ::std::option::Option<bool>,
+    pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -3190,7 +3077,6 @@ impl ::puroro::DeserializableFromIter for EnumOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for EnumOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -3221,10 +3107,10 @@ impl ::puroro::Serializable for EnumOptions {
 }
 
 impl EnumOptionsTrait for EnumOptions {
-    fn allow_alias(&self) -> bool {
+    fn allow_alias(&self) -> ::std::option::Option<bool> {
         self.allow_alias.clone()
     }
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
     type UninterpretedOptionType = UninterpretedOption;
@@ -3256,8 +3142,8 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for EnumOptions<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct EnumOptionsBumpalo<'bump> {
-    pub allow_alias: bool,
-    pub deprecated: bool,
+    pub allow_alias: ::std::option::Option<bool>,
+    pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -3345,7 +3231,6 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for EnumOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -3377,10 +3262,10 @@ impl<'bump> ::puroro::Serializable for EnumOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumOptionsTrait for EnumOptionsBumpalo<'bump> {
-    fn allow_alias(&self) -> bool {
+    fn allow_alias(&self) -> ::std::option::Option<bool> {
         self.allow_alias.clone()
     }
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
@@ -3414,8 +3299,8 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumOptionsBumpalo<'
     }
 }
 pub trait EnumOptionsTrait {
-    fn allow_alias(&'_ self) -> bool;
-    fn deprecated(&'_ self) -> bool;
+    fn allow_alias(&'_ self) -> ::std::option::Option<bool>;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool>;
     type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
@@ -3426,16 +3311,6 @@ pub trait EnumOptionsTrait {
     type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
-}
-pub trait EnumOptionsMutTrait {
-    fn allow_alias_mut(&self) -> &mut bool;
-    fn deprecated_mut(&self) -> &mut bool;
-    fn for_each_uninterpreted_option_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
-    fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! 
 }
 
 #[derive(Debug, Clone)]
@@ -3509,7 +3384,6 @@ impl ::puroro::DeserializableFromIter for OneofOptions {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for OneofOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -3623,7 +3497,6 @@ impl<'bump> ::puroro::DeserializableFromIter for OneofOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for OneofOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -3687,23 +3560,15 @@ pub trait OneofOptionsTrait {
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
-pub trait OneofOptionsMutTrait {
-    fn for_each_uninterpreted_option_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
-    fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! 
-}
 
 #[derive(Debug, Clone)]
 pub struct FieldOptions {
-    pub ctype: ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>,
-    pub packed: bool,
-    pub jstype: ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32>,
-    pub lazy: bool,
-    pub deprecated: bool,
-    pub weak: bool,
+    pub ctype: ::std::option::Option<::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>>,
+    pub packed: ::std::option::Option<bool>,
+    pub jstype: ::std::option::Option<::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32>>,
+    pub lazy: ::std::option::Option<bool>,
+    pub deprecated: ::std::option::Option<bool>,
+    pub weak: ::std::option::Option<bool>,
     pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -3846,7 +3711,6 @@ impl ::puroro::DeserializableFromIter for FieldOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for FieldOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -3897,22 +3761,22 @@ impl ::puroro::Serializable for FieldOptions {
 }
 
 impl FieldOptionsTrait for FieldOptions {
-    fn ctype(&self) -> ::std::result::Result<field_options::Ctype, i32> {
+    fn ctype(&self) -> ::std::option::Option<::std::result::Result<field_options::Ctype, i32>> {
         self.ctype.clone()
     }
-    fn packed(&self) -> bool {
+    fn packed(&self) -> ::std::option::Option<bool> {
         self.packed.clone()
     }
-    fn jstype(&self) -> ::std::result::Result<field_options::Jstype, i32> {
+    fn jstype(&self) -> ::std::option::Option<::std::result::Result<field_options::Jstype, i32>> {
         self.jstype.clone()
     }
-    fn lazy(&self) -> bool {
+    fn lazy(&self) -> ::std::option::Option<bool> {
         self.lazy.clone()
     }
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn weak(&self) -> bool {
+    fn weak(&self) -> ::std::option::Option<bool> {
         self.weak.clone()
     }
     type UninterpretedOptionType = UninterpretedOption;
@@ -3944,12 +3808,12 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for FieldOptions<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FieldOptionsBumpalo<'bump> {
-    pub ctype: ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>,
-    pub packed: bool,
-    pub jstype: ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32>,
-    pub lazy: bool,
-    pub deprecated: bool,
-    pub weak: bool,
+    pub ctype: ::std::option::Option<::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>>,
+    pub packed: ::std::option::Option<bool>,
+    pub jstype: ::std::option::Option<::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32>>,
+    pub lazy: ::std::option::Option<bool>,
+    pub deprecated: ::std::option::Option<bool>,
+    pub weak: ::std::option::Option<bool>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -4085,7 +3949,6 @@ impl<'bump> ::puroro::DeserializableFromIter for FieldOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for FieldOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -4137,22 +4000,22 @@ impl<'bump> ::puroro::Serializable for FieldOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FieldOptionsTrait for FieldOptionsBumpalo<'bump> {
-    fn ctype(&self) -> ::std::result::Result<field_options::Ctype, i32> {
+    fn ctype(&self) -> ::std::option::Option<::std::result::Result<field_options::Ctype, i32>> {
         self.ctype.clone()
     }
-    fn packed(&self) -> bool {
+    fn packed(&self) -> ::std::option::Option<bool> {
         self.packed.clone()
     }
-    fn jstype(&self) -> ::std::result::Result<field_options::Jstype, i32> {
+    fn jstype(&self) -> ::std::option::Option<::std::result::Result<field_options::Jstype, i32>> {
         self.jstype.clone()
     }
-    fn lazy(&self) -> bool {
+    fn lazy(&self) -> ::std::option::Option<bool> {
         self.lazy.clone()
     }
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn weak(&self) -> bool {
+    fn weak(&self) -> ::std::option::Option<bool> {
         self.weak.clone()
     }
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
@@ -4186,12 +4049,12 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FieldOptionsBumpalo<
     }
 }
 pub trait FieldOptionsTrait {
-    fn ctype(&'_ self) -> ::std::result::Result<field_options::Ctype, i32>;
-    fn packed(&'_ self) -> bool;
-    fn jstype(&'_ self) -> ::std::result::Result<field_options::Jstype, i32>;
-    fn lazy(&'_ self) -> bool;
-    fn deprecated(&'_ self) -> bool;
-    fn weak(&'_ self) -> bool;
+    fn ctype(&'_ self) -> ::std::option::Option<::std::result::Result<field_options::Ctype, i32>>;
+    fn packed(&'_ self) -> ::std::option::Option<bool>;
+    fn jstype(&'_ self) -> ::std::option::Option<::std::result::Result<field_options::Jstype, i32>>;
+    fn lazy(&'_ self) -> ::std::option::Option<bool>;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool>;
+    fn weak(&'_ self) -> ::std::option::Option<bool>;
     type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
@@ -4202,20 +4065,6 @@ pub trait FieldOptionsTrait {
     type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
-}
-pub trait FieldOptionsMutTrait {
-    fn ctype_mut(&self) -> &mut ::std::result::Result<super::super::google::protobuf::field_options::Ctype, i32>;
-    fn packed_mut(&self) -> &mut bool;
-    fn jstype_mut(&self) -> &mut ::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32>;
-    fn lazy_mut(&self) -> &mut bool;
-    fn deprecated_mut(&self) -> &mut bool;
-    fn weak_mut(&self) -> &mut bool;
-    fn for_each_uninterpreted_option_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
-    fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! 
 }
 pub mod field_options {
 #[derive(Debug, Clone)]
@@ -4266,10 +4115,10 @@ impl ::std::convert::Into<i32> for Ctype {
 
 #[derive(Debug, Clone)]
 pub struct MessageOptions {
-    pub message_set_wire_format: bool,
-    pub no_standard_descriptor_accessor: bool,
-    pub deprecated: bool,
-    pub map_entry: bool,
+    pub message_set_wire_format: ::std::option::Option<bool>,
+    pub no_standard_descriptor_accessor: ::std::option::Option<bool>,
+    pub deprecated: ::std::option::Option<bool>,
+    pub map_entry: ::std::option::Option<bool>,
     pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -4388,7 +4237,6 @@ impl ::puroro::DeserializableFromIter for MessageOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for MessageOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -4429,16 +4277,16 @@ impl ::puroro::Serializable for MessageOptions {
 }
 
 impl MessageOptionsTrait for MessageOptions {
-    fn message_set_wire_format(&self) -> bool {
+    fn message_set_wire_format(&self) -> ::std::option::Option<bool> {
         self.message_set_wire_format.clone()
     }
-    fn no_standard_descriptor_accessor(&self) -> bool {
+    fn no_standard_descriptor_accessor(&self) -> ::std::option::Option<bool> {
         self.no_standard_descriptor_accessor.clone()
     }
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn map_entry(&self) -> bool {
+    fn map_entry(&self) -> ::std::option::Option<bool> {
         self.map_entry.clone()
     }
     type UninterpretedOptionType = UninterpretedOption;
@@ -4470,10 +4318,10 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for MessageOptions<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct MessageOptionsBumpalo<'bump> {
-    pub message_set_wire_format: bool,
-    pub no_standard_descriptor_accessor: bool,
-    pub deprecated: bool,
-    pub map_entry: bool,
+    pub message_set_wire_format: ::std::option::Option<bool>,
+    pub no_standard_descriptor_accessor: ::std::option::Option<bool>,
+    pub deprecated: ::std::option::Option<bool>,
+    pub map_entry: ::std::option::Option<bool>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -4585,7 +4433,6 @@ impl<'bump> ::puroro::DeserializableFromIter for MessageOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for MessageOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -4627,16 +4474,16 @@ impl<'bump> ::puroro::Serializable for MessageOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MessageOptionsTrait for MessageOptionsBumpalo<'bump> {
-    fn message_set_wire_format(&self) -> bool {
+    fn message_set_wire_format(&self) -> ::std::option::Option<bool> {
         self.message_set_wire_format.clone()
     }
-    fn no_standard_descriptor_accessor(&self) -> bool {
+    fn no_standard_descriptor_accessor(&self) -> ::std::option::Option<bool> {
         self.no_standard_descriptor_accessor.clone()
     }
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn map_entry(&self) -> bool {
+    fn map_entry(&self) -> ::std::option::Option<bool> {
         self.map_entry.clone()
     }
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
@@ -4670,10 +4517,10 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for MessageOptionsBumpal
     }
 }
 pub trait MessageOptionsTrait {
-    fn message_set_wire_format(&'_ self) -> bool;
-    fn no_standard_descriptor_accessor(&'_ self) -> bool;
-    fn deprecated(&'_ self) -> bool;
-    fn map_entry(&'_ self) -> bool;
+    fn message_set_wire_format(&'_ self) -> ::std::option::Option<bool>;
+    fn no_standard_descriptor_accessor(&'_ self) -> ::std::option::Option<bool>;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool>;
+    fn map_entry(&'_ self) -> ::std::option::Option<bool>;
     type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
@@ -4685,41 +4532,29 @@ pub trait MessageOptionsTrait {
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
-pub trait MessageOptionsMutTrait {
-    fn message_set_wire_format_mut(&self) -> &mut bool;
-    fn no_standard_descriptor_accessor_mut(&self) -> &mut bool;
-    fn deprecated_mut(&self) -> &mut bool;
-    fn map_entry_mut(&self) -> &mut bool;
-    fn for_each_uninterpreted_option_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
-    fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! 
-}
 
 #[derive(Debug, Clone)]
 pub struct FileOptions {
-    pub java_package: ::std::string::String,
-    pub java_outer_classname: ::std::string::String,
-    pub java_multiple_files: bool,
-    pub java_generate_equals_and_hash: bool,
-    pub java_string_check_utf8: bool,
-    pub optimize_for: ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>,
-    pub go_package: ::std::string::String,
-    pub cc_generic_services: bool,
-    pub java_generic_services: bool,
-    pub py_generic_services: bool,
-    pub php_generic_services: bool,
-    pub deprecated: bool,
-    pub cc_enable_arenas: bool,
-    pub objc_class_prefix: ::std::string::String,
-    pub csharp_namespace: ::std::string::String,
-    pub swift_prefix: ::std::string::String,
-    pub php_class_prefix: ::std::string::String,
-    pub php_namespace: ::std::string::String,
-    pub php_metadata_namespace: ::std::string::String,
-    pub ruby_package: ::std::string::String,
+    pub java_package: ::std::option::Option<::std::string::String>,
+    pub java_outer_classname: ::std::option::Option<::std::string::String>,
+    pub java_multiple_files: ::std::option::Option<bool>,
+    pub java_generate_equals_and_hash: ::std::option::Option<bool>,
+    pub java_string_check_utf8: ::std::option::Option<bool>,
+    pub optimize_for: ::std::option::Option<::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>>,
+    pub go_package: ::std::option::Option<::std::string::String>,
+    pub cc_generic_services: ::std::option::Option<bool>,
+    pub java_generic_services: ::std::option::Option<bool>,
+    pub py_generic_services: ::std::option::Option<bool>,
+    pub php_generic_services: ::std::option::Option<bool>,
+    pub deprecated: ::std::option::Option<bool>,
+    pub cc_enable_arenas: ::std::option::Option<bool>,
+    pub objc_class_prefix: ::std::option::Option<::std::string::String>,
+    pub csharp_namespace: ::std::option::Option<::std::string::String>,
+    pub swift_prefix: ::std::option::Option<::std::string::String>,
+    pub php_class_prefix: ::std::option::Option<::std::string::String>,
+    pub php_namespace: ::std::option::Option<::std::string::String>,
+    pub php_metadata_namespace: ::std::option::Option<::std::string::String>,
+    pub ruby_package: ::std::option::Option<::std::string::String>,
     pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -4970,7 +4805,6 @@ impl ::puroro::DeserializableFromIter for FileOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for FileOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5071,65 +4905,65 @@ impl ::puroro::Serializable for FileOptions {
 }
 
 impl FileOptionsTrait for FileOptions {
-    fn java_package(&self) -> &'_ str {
-        self.java_package.as_ref()
+    fn java_package(&self) -> ::std::option::Option<&'_ str> {
+        self.java_package.as_deref()
     }
-    fn java_outer_classname(&self) -> &'_ str {
-        self.java_outer_classname.as_ref()
+    fn java_outer_classname(&self) -> ::std::option::Option<&'_ str> {
+        self.java_outer_classname.as_deref()
     }
-    fn java_multiple_files(&self) -> bool {
+    fn java_multiple_files(&self) -> ::std::option::Option<bool> {
         self.java_multiple_files.clone()
     }
-    fn java_generate_equals_and_hash(&self) -> bool {
+    fn java_generate_equals_and_hash(&self) -> ::std::option::Option<bool> {
         self.java_generate_equals_and_hash.clone()
     }
-    fn java_string_check_utf8(&self) -> bool {
+    fn java_string_check_utf8(&self) -> ::std::option::Option<bool> {
         self.java_string_check_utf8.clone()
     }
-    fn optimize_for(&self) -> ::std::result::Result<file_options::OptimizeMode, i32> {
+    fn optimize_for(&self) -> ::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> {
         self.optimize_for.clone()
     }
-    fn go_package(&self) -> &'_ str {
-        self.go_package.as_ref()
+    fn go_package(&self) -> ::std::option::Option<&'_ str> {
+        self.go_package.as_deref()
     }
-    fn cc_generic_services(&self) -> bool {
+    fn cc_generic_services(&self) -> ::std::option::Option<bool> {
         self.cc_generic_services.clone()
     }
-    fn java_generic_services(&self) -> bool {
+    fn java_generic_services(&self) -> ::std::option::Option<bool> {
         self.java_generic_services.clone()
     }
-    fn py_generic_services(&self) -> bool {
+    fn py_generic_services(&self) -> ::std::option::Option<bool> {
         self.py_generic_services.clone()
     }
-    fn php_generic_services(&self) -> bool {
+    fn php_generic_services(&self) -> ::std::option::Option<bool> {
         self.php_generic_services.clone()
     }
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn cc_enable_arenas(&self) -> bool {
+    fn cc_enable_arenas(&self) -> ::std::option::Option<bool> {
         self.cc_enable_arenas.clone()
     }
-    fn objc_class_prefix(&self) -> &'_ str {
-        self.objc_class_prefix.as_ref()
+    fn objc_class_prefix(&self) -> ::std::option::Option<&'_ str> {
+        self.objc_class_prefix.as_deref()
     }
-    fn csharp_namespace(&self) -> &'_ str {
-        self.csharp_namespace.as_ref()
+    fn csharp_namespace(&self) -> ::std::option::Option<&'_ str> {
+        self.csharp_namespace.as_deref()
     }
-    fn swift_prefix(&self) -> &'_ str {
-        self.swift_prefix.as_ref()
+    fn swift_prefix(&self) -> ::std::option::Option<&'_ str> {
+        self.swift_prefix.as_deref()
     }
-    fn php_class_prefix(&self) -> &'_ str {
-        self.php_class_prefix.as_ref()
+    fn php_class_prefix(&self) -> ::std::option::Option<&'_ str> {
+        self.php_class_prefix.as_deref()
     }
-    fn php_namespace(&self) -> &'_ str {
-        self.php_namespace.as_ref()
+    fn php_namespace(&self) -> ::std::option::Option<&'_ str> {
+        self.php_namespace.as_deref()
     }
-    fn php_metadata_namespace(&self) -> &'_ str {
-        self.php_metadata_namespace.as_ref()
+    fn php_metadata_namespace(&self) -> ::std::option::Option<&'_ str> {
+        self.php_metadata_namespace.as_deref()
     }
-    fn ruby_package(&self) -> &'_ str {
-        self.ruby_package.as_ref()
+    fn ruby_package(&self) -> ::std::option::Option<&'_ str> {
+        self.ruby_package.as_deref()
     }
     type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
@@ -5160,26 +4994,26 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for FileOptions<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FileOptionsBumpalo<'bump> {
-    pub java_package: ::bumpalo::collections::String<'bump>,
-    pub java_outer_classname: ::bumpalo::collections::String<'bump>,
-    pub java_multiple_files: bool,
-    pub java_generate_equals_and_hash: bool,
-    pub java_string_check_utf8: bool,
-    pub optimize_for: ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>,
-    pub go_package: ::bumpalo::collections::String<'bump>,
-    pub cc_generic_services: bool,
-    pub java_generic_services: bool,
-    pub py_generic_services: bool,
-    pub php_generic_services: bool,
-    pub deprecated: bool,
-    pub cc_enable_arenas: bool,
-    pub objc_class_prefix: ::bumpalo::collections::String<'bump>,
-    pub csharp_namespace: ::bumpalo::collections::String<'bump>,
-    pub swift_prefix: ::bumpalo::collections::String<'bump>,
-    pub php_class_prefix: ::bumpalo::collections::String<'bump>,
-    pub php_namespace: ::bumpalo::collections::String<'bump>,
-    pub php_metadata_namespace: ::bumpalo::collections::String<'bump>,
-    pub ruby_package: ::bumpalo::collections::String<'bump>,
+    pub java_package: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub java_outer_classname: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub java_multiple_files: ::std::option::Option<bool>,
+    pub java_generate_equals_and_hash: ::std::option::Option<bool>,
+    pub java_string_check_utf8: ::std::option::Option<bool>,
+    pub optimize_for: ::std::option::Option<::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>>,
+    pub go_package: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub cc_generic_services: ::std::option::Option<bool>,
+    pub java_generic_services: ::std::option::Option<bool>,
+    pub py_generic_services: ::std::option::Option<bool>,
+    pub php_generic_services: ::std::option::Option<bool>,
+    pub deprecated: ::std::option::Option<bool>,
+    pub cc_enable_arenas: ::std::option::Option<bool>,
+    pub objc_class_prefix: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub csharp_namespace: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub swift_prefix: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub php_class_prefix: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub php_namespace: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub php_metadata_namespace: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub ruby_package: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -5423,7 +5257,6 @@ impl<'bump> ::puroro::DeserializableFromIter for FileOptionsBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for FileOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -5525,65 +5358,65 @@ impl<'bump> ::puroro::Serializable for FileOptionsBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileOptionsTrait for FileOptionsBumpalo<'bump> {
-    fn java_package(&self) -> &'_ str {
-        self.java_package.as_ref()
+    fn java_package(&self) -> ::std::option::Option<&'_ str> {
+        self.java_package.as_deref()
     }
-    fn java_outer_classname(&self) -> &'_ str {
-        self.java_outer_classname.as_ref()
+    fn java_outer_classname(&self) -> ::std::option::Option<&'_ str> {
+        self.java_outer_classname.as_deref()
     }
-    fn java_multiple_files(&self) -> bool {
+    fn java_multiple_files(&self) -> ::std::option::Option<bool> {
         self.java_multiple_files.clone()
     }
-    fn java_generate_equals_and_hash(&self) -> bool {
+    fn java_generate_equals_and_hash(&self) -> ::std::option::Option<bool> {
         self.java_generate_equals_and_hash.clone()
     }
-    fn java_string_check_utf8(&self) -> bool {
+    fn java_string_check_utf8(&self) -> ::std::option::Option<bool> {
         self.java_string_check_utf8.clone()
     }
-    fn optimize_for(&self) -> ::std::result::Result<file_options::OptimizeMode, i32> {
+    fn optimize_for(&self) -> ::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> {
         self.optimize_for.clone()
     }
-    fn go_package(&self) -> &'_ str {
-        self.go_package.as_ref()
+    fn go_package(&self) -> ::std::option::Option<&'_ str> {
+        self.go_package.as_deref()
     }
-    fn cc_generic_services(&self) -> bool {
+    fn cc_generic_services(&self) -> ::std::option::Option<bool> {
         self.cc_generic_services.clone()
     }
-    fn java_generic_services(&self) -> bool {
+    fn java_generic_services(&self) -> ::std::option::Option<bool> {
         self.java_generic_services.clone()
     }
-    fn py_generic_services(&self) -> bool {
+    fn py_generic_services(&self) -> ::std::option::Option<bool> {
         self.py_generic_services.clone()
     }
-    fn php_generic_services(&self) -> bool {
+    fn php_generic_services(&self) -> ::std::option::Option<bool> {
         self.php_generic_services.clone()
     }
-    fn deprecated(&self) -> bool {
+    fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn cc_enable_arenas(&self) -> bool {
+    fn cc_enable_arenas(&self) -> ::std::option::Option<bool> {
         self.cc_enable_arenas.clone()
     }
-    fn objc_class_prefix(&self) -> &'_ str {
-        self.objc_class_prefix.as_ref()
+    fn objc_class_prefix(&self) -> ::std::option::Option<&'_ str> {
+        self.objc_class_prefix.as_deref()
     }
-    fn csharp_namespace(&self) -> &'_ str {
-        self.csharp_namespace.as_ref()
+    fn csharp_namespace(&self) -> ::std::option::Option<&'_ str> {
+        self.csharp_namespace.as_deref()
     }
-    fn swift_prefix(&self) -> &'_ str {
-        self.swift_prefix.as_ref()
+    fn swift_prefix(&self) -> ::std::option::Option<&'_ str> {
+        self.swift_prefix.as_deref()
     }
-    fn php_class_prefix(&self) -> &'_ str {
-        self.php_class_prefix.as_ref()
+    fn php_class_prefix(&self) -> ::std::option::Option<&'_ str> {
+        self.php_class_prefix.as_deref()
     }
-    fn php_namespace(&self) -> &'_ str {
-        self.php_namespace.as_ref()
+    fn php_namespace(&self) -> ::std::option::Option<&'_ str> {
+        self.php_namespace.as_deref()
     }
-    fn php_metadata_namespace(&self) -> &'_ str {
-        self.php_metadata_namespace.as_ref()
+    fn php_metadata_namespace(&self) -> ::std::option::Option<&'_ str> {
+        self.php_metadata_namespace.as_deref()
     }
-    fn ruby_package(&self) -> &'_ str {
-        self.ruby_package.as_ref()
+    fn ruby_package(&self) -> ::std::option::Option<&'_ str> {
+        self.ruby_package.as_deref()
     }
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
@@ -5616,26 +5449,26 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileOptionsBumpalo<'
     }
 }
 pub trait FileOptionsTrait {
-    fn java_package(&'_ self) -> &'_ str;
-    fn java_outer_classname(&'_ self) -> &'_ str;
-    fn java_multiple_files(&'_ self) -> bool;
-    fn java_generate_equals_and_hash(&'_ self) -> bool;
-    fn java_string_check_utf8(&'_ self) -> bool;
-    fn optimize_for(&'_ self) -> ::std::result::Result<file_options::OptimizeMode, i32>;
-    fn go_package(&'_ self) -> &'_ str;
-    fn cc_generic_services(&'_ self) -> bool;
-    fn java_generic_services(&'_ self) -> bool;
-    fn py_generic_services(&'_ self) -> bool;
-    fn php_generic_services(&'_ self) -> bool;
-    fn deprecated(&'_ self) -> bool;
-    fn cc_enable_arenas(&'_ self) -> bool;
-    fn objc_class_prefix(&'_ self) -> &'_ str;
-    fn csharp_namespace(&'_ self) -> &'_ str;
-    fn swift_prefix(&'_ self) -> &'_ str;
-    fn php_class_prefix(&'_ self) -> &'_ str;
-    fn php_namespace(&'_ self) -> &'_ str;
-    fn php_metadata_namespace(&'_ self) -> &'_ str;
-    fn ruby_package(&'_ self) -> &'_ str;
+    fn java_package(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn java_outer_classname(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn java_multiple_files(&'_ self) -> ::std::option::Option<bool>;
+    fn java_generate_equals_and_hash(&'_ self) -> ::std::option::Option<bool>;
+    fn java_string_check_utf8(&'_ self) -> ::std::option::Option<bool>;
+    fn optimize_for(&'_ self) -> ::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>>;
+    fn go_package(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn cc_generic_services(&'_ self) -> ::std::option::Option<bool>;
+    fn java_generic_services(&'_ self) -> ::std::option::Option<bool>;
+    fn py_generic_services(&'_ self) -> ::std::option::Option<bool>;
+    fn php_generic_services(&'_ self) -> ::std::option::Option<bool>;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool>;
+    fn cc_enable_arenas(&'_ self) -> ::std::option::Option<bool>;
+    fn objc_class_prefix(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn csharp_namespace(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn swift_prefix(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn php_class_prefix(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn php_namespace(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn php_metadata_namespace(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn ruby_package(&'_ self) -> ::std::option::Option<&'_ str>;
     type UninterpretedOptionType: UninterpretedOptionTrait;
     fn for_each_uninterpreted_option<F>(&self, f: F)
     where
@@ -5646,34 +5479,6 @@ pub trait FileOptionsTrait {
     type UninterpretedOptionIter<'a>: Iterator<Item=&'a UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
-}
-pub trait FileOptionsMutTrait {
-    fn java_package_mut(&self) -> &mut String;
-    fn java_outer_classname_mut(&self) -> &mut String;
-    fn java_multiple_files_mut(&self) -> &mut bool;
-    fn java_generate_equals_and_hash_mut(&self) -> &mut bool;
-    fn java_string_check_utf8_mut(&self) -> &mut bool;
-    fn optimize_for_mut(&self) -> &mut ::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>;
-    fn go_package_mut(&self) -> &mut String;
-    fn cc_generic_services_mut(&self) -> &mut bool;
-    fn java_generic_services_mut(&self) -> &mut bool;
-    fn py_generic_services_mut(&self) -> &mut bool;
-    fn php_generic_services_mut(&self) -> &mut bool;
-    fn deprecated_mut(&self) -> &mut bool;
-    fn cc_enable_arenas_mut(&self) -> &mut bool;
-    fn objc_class_prefix_mut(&self) -> &mut String;
-    fn csharp_namespace_mut(&self) -> &mut String;
-    fn swift_prefix_mut(&self) -> &mut String;
-    fn php_class_prefix_mut(&self) -> &mut String;
-    fn php_namespace_mut(&self) -> &mut String;
-    fn php_metadata_namespace_mut(&self) -> &mut String;
-    fn ruby_package_mut(&self) -> &mut String;
-    fn for_each_uninterpreted_option_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
-    fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! 
 }
 pub mod file_options {
 #[derive(Debug, Clone)]
@@ -5702,12 +5507,12 @@ impl ::std::convert::Into<i32> for OptimizeMode {
 
 #[derive(Debug, Clone)]
 pub struct MethodDescriptorProto {
-    pub name: ::std::string::String,
-    pub input_type: ::std::string::String,
-    pub output_type: ::std::string::String,
+    pub name: ::std::option::Option<::std::string::String>,
+    pub input_type: ::std::option::Option<::std::string::String>,
+    pub output_type: ::std::option::Option<::std::string::String>,
     pub options: ::std::option::Option<::std::boxed::Box<MethodOptions>>,
-    pub client_streaming: bool,
-    pub server_streaming: bool,
+    pub client_streaming: ::std::option::Option<bool>,
+    pub server_streaming: ::std::option::Option<bool>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
 
@@ -5819,7 +5624,6 @@ impl ::puroro::DeserializableFromIter for MethodDescriptorProto {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for MethodDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5859,23 +5663,23 @@ impl ::puroro::Serializable for MethodDescriptorProto {
 }
 
 impl MethodDescriptorProtoTrait for MethodDescriptorProto {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
-    fn input_type(&self) -> &'_ str {
-        self.input_type.as_ref()
+    fn input_type(&self) -> ::std::option::Option<&'_ str> {
+        self.input_type.as_deref()
     }
-    fn output_type(&self) -> &'_ str {
-        self.output_type.as_ref()
+    fn output_type(&self) -> ::std::option::Option<&'_ str> {
+        self.output_type.as_deref()
     }
     type OptionsType = MethodOptions;
     fn options(&self) -> ::std::option::Option<&'_ MethodOptions> {
         self.options.as_deref()
     }
-    fn client_streaming(&self) -> bool {
+    fn client_streaming(&self) -> ::std::option::Option<bool> {
         self.client_streaming.clone()
     }
-    fn server_streaming(&self) -> bool {
+    fn server_streaming(&self) -> ::std::option::Option<bool> {
         self.server_streaming.clone()
     }
 }
@@ -5887,12 +5691,12 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for MethodDescriptorProto<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct MethodDescriptorProtoBumpalo<'bump> {
-    pub name: ::bumpalo::collections::String<'bump>,
-    pub input_type: ::bumpalo::collections::String<'bump>,
-    pub output_type: ::bumpalo::collections::String<'bump>,
+    pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub input_type: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub output_type: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, MethodOptionsBumpalo<'bump>>>,
-    pub client_streaming: bool,
-    pub server_streaming: bool,
+    pub client_streaming: ::std::option::Option<bool>,
+    pub server_streaming: ::std::option::Option<bool>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5997,7 +5801,6 @@ impl<'bump> ::puroro::DeserializableFromIter for MethodDescriptorProtoBumpalo<'b
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for MethodDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -6038,23 +5841,23 @@ impl<'bump> ::puroro::Serializable for MethodDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MethodDescriptorProtoTrait for MethodDescriptorProtoBumpalo<'bump> {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
-    fn input_type(&self) -> &'_ str {
-        self.input_type.as_ref()
+    fn input_type(&self) -> ::std::option::Option<&'_ str> {
+        self.input_type.as_deref()
     }
-    fn output_type(&self) -> &'_ str {
-        self.output_type.as_ref()
+    fn output_type(&self) -> ::std::option::Option<&'_ str> {
+        self.output_type.as_deref()
     }
     type OptionsType = MethodOptionsBumpalo<'bump>;
     fn options(&self) -> ::std::option::Option<&'_ MethodOptions> {
         self.options.as_deref()
     }
-    fn client_streaming(&self) -> bool {
+    fn client_streaming(&self) -> ::std::option::Option<bool> {
         self.client_streaming.clone()
     }
-    fn server_streaming(&self) -> bool {
+    fn server_streaming(&self) -> ::std::option::Option<bool> {
         self.server_streaming.clone()
     }
 }
@@ -6068,26 +5871,18 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for MethodDescriptorProt
     }
 }
 pub trait MethodDescriptorProtoTrait {
-    fn name(&'_ self) -> &'_ str;
-    fn input_type(&'_ self) -> &'_ str;
-    fn output_type(&'_ self) -> &'_ str;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn input_type(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn output_type(&'_ self) -> ::std::option::Option<&'_ str>;
     type OptionsType: MethodOptionsTrait;
     fn options(&'_ self) -> ::std::option::Option<&'_ MethodOptions>;
-    fn client_streaming(&'_ self) -> bool;
-    fn server_streaming(&'_ self) -> bool;
-}
-pub trait MethodDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &mut String;
-    fn input_type_mut(&self) -> &mut String;
-    fn output_type_mut(&self) -> &mut String;
-    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::MethodOptions>;
-    fn client_streaming_mut(&self) -> &mut bool;
-    fn server_streaming_mut(&self) -> &mut bool;
+    fn client_streaming(&'_ self) -> ::std::option::Option<bool>;
+    fn server_streaming(&'_ self) -> ::std::option::Option<bool>;
 }
 
 #[derive(Debug, Clone)]
 pub struct ServiceDescriptorProto {
-    pub name: ::std::string::String,
+    pub name: ::std::option::Option<::std::string::String>,
     pub method: ::std::vec::Vec<MethodDescriptorProto>,
     pub options: ::std::option::Option<::std::boxed::Box<ServiceOptions>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
@@ -6171,7 +5966,6 @@ impl ::puroro::DeserializableFromIter for ServiceDescriptorProto {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for ServiceDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -6198,8 +5992,8 @@ impl ::puroro::Serializable for ServiceDescriptorProto {
 }
 
 impl ServiceDescriptorProtoTrait for ServiceDescriptorProto {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
     type MethodType = MethodDescriptorProto;
     fn for_each_method<F>(&self, mut f: F)
@@ -6234,7 +6028,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for ServiceDescriptorProto<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct ServiceDescriptorProtoBumpalo<'bump> {
-    pub name: ::bumpalo::collections::String<'bump>,
+    pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub method: ::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo<'bump>>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, ServiceOptionsBumpalo<'bump>>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
@@ -6311,7 +6105,6 @@ impl<'bump> ::puroro::DeserializableFromIter for ServiceDescriptorProtoBumpalo<'
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for ServiceDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -6339,8 +6132,8 @@ impl<'bump> ::puroro::Serializable for ServiceDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ServiceDescriptorProtoTrait for ServiceDescriptorProtoBumpalo<'bump> {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
     type MethodType = MethodDescriptorProtoBumpalo<'bump>;
     fn for_each_method<F>(&self, mut f: F)
@@ -6377,7 +6170,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ServiceDescriptorPro
     }
 }
 pub trait ServiceDescriptorProtoTrait {
-    fn name(&'_ self) -> &'_ str;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str>;
     type MethodType: MethodDescriptorProtoTrait;
     fn for_each_method<F>(&self, f: F)
     where
@@ -6391,21 +6184,11 @@ pub trait ServiceDescriptorProtoTrait {
     type OptionsType: ServiceOptionsTrait;
     fn options(&'_ self) -> ::std::option::Option<&'_ ServiceOptions>;
 }
-pub trait ServiceDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &mut String;
-    fn for_each_method_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::MethodDescriptorProto);
-    fn method_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::MethodDescriptorProto>>;
-    // We need more! 
-    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::ServiceOptions>;
-}
 
 #[derive(Debug, Clone)]
 pub struct EnumValueDescriptorProto {
-    pub name: ::std::string::String,
-    pub number: i32,
+    pub name: ::std::option::Option<::std::string::String>,
+    pub number: ::std::option::Option<i32>,
     pub options: ::std::option::Option<::std::boxed::Box<EnumValueOptions>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -6494,7 +6277,6 @@ impl ::puroro::DeserializableFromIter for EnumValueDescriptorProto {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for EnumValueDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -6523,10 +6305,10 @@ impl ::puroro::Serializable for EnumValueDescriptorProto {
 }
 
 impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProto {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
-    fn number(&self) -> i32 {
+    fn number(&self) -> ::std::option::Option<i32> {
         self.number.clone()
     }
     type OptionsType = EnumValueOptions;
@@ -6542,8 +6324,8 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for EnumValueDescriptorProto<>
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct EnumValueDescriptorProtoBumpalo<'bump> {
-    pub name: ::bumpalo::collections::String<'bump>,
-    pub number: i32,
+    pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub number: ::std::option::Option<i32>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, EnumValueOptionsBumpalo<'bump>>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -6625,7 +6407,6 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumValueDescriptorProtoBumpalo
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for EnumValueDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -6655,10 +6436,10 @@ impl<'bump> ::puroro::Serializable for EnumValueDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoBumpalo<'bump> {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
-    fn number(&self) -> i32 {
+    fn number(&self) -> ::std::option::Option<i32> {
         self.number.clone()
     }
     type OptionsType = EnumValueOptionsBumpalo<'bump>;
@@ -6676,20 +6457,15 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumValueDescriptorP
     }
 }
 pub trait EnumValueDescriptorProtoTrait {
-    fn name(&'_ self) -> &'_ str;
-    fn number(&'_ self) -> i32;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn number(&'_ self) -> ::std::option::Option<i32>;
     type OptionsType: EnumValueOptionsTrait;
     fn options(&'_ self) -> ::std::option::Option<&'_ EnumValueOptions>;
-}
-pub trait EnumValueDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &mut String;
-    fn number_mut(&self) -> &mut i32;
-    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::EnumValueOptions>;
 }
 
 #[derive(Debug, Clone)]
 pub struct EnumDescriptorProto {
-    pub name: ::std::string::String,
+    pub name: ::std::option::Option<::std::string::String>,
     pub value: ::std::vec::Vec<EnumValueDescriptorProto>,
     pub options: ::std::option::Option<::std::boxed::Box<EnumOptions>>,
     pub reserved_range: ::std::vec::Vec<enum_descriptor_proto::EnumReservedRange>,
@@ -6787,7 +6563,6 @@ impl ::puroro::DeserializableFromIter for EnumDescriptorProto {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for EnumDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -6820,8 +6595,8 @@ impl ::puroro::Serializable for EnumDescriptorProto {
 }
 
 impl EnumDescriptorProtoTrait for EnumDescriptorProto {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
     type ValueType = EnumValueDescriptorProto;
     fn for_each_value<F>(&self, mut f: F)
@@ -6895,7 +6670,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for EnumDescriptorProto<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct EnumDescriptorProtoBumpalo<'bump> {
-    pub name: ::bumpalo::collections::String<'bump>,
+    pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub value: ::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo<'bump>>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, EnumOptionsBumpalo<'bump>>>,
     pub reserved_range: ::bumpalo::collections::Vec<'bump, enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>>,
@@ -6986,7 +6761,6 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumDescriptorProtoBumpalo<'bum
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for EnumDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -7020,8 +6794,8 @@ impl<'bump> ::puroro::Serializable for EnumDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo<'bump> {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
     type ValueType = EnumValueDescriptorProtoBumpalo<'bump>;
     fn for_each_value<F>(&self, mut f: F)
@@ -7097,7 +6871,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumDescriptorProtoB
     }
 }
 pub trait EnumDescriptorProtoTrait {
-    fn name(&'_ self) -> &'_ str;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str>;
     type ValueType: EnumValueDescriptorProtoTrait;
     fn for_each_value<F>(&self, f: F)
     where
@@ -7130,34 +6904,12 @@ pub trait EnumDescriptorProtoTrait {
     #[cfg(feature = "puroro-nightly")]
     fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_>;
 }
-pub trait EnumDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &mut String;
-    fn for_each_value_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::EnumValueDescriptorProto);
-    fn value_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::EnumValueDescriptorProto>>;
-    // We need more! 
-    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::EnumOptions>;
-    fn for_each_reserved_range_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange);
-    fn reserved_range_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>>;
-    // We need more! 
-    fn for_each_reserved_name_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut String);
-    fn reserved_name_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
-    // We need more! 
-}
 pub mod enum_descriptor_proto {
 
 #[derive(Debug, Clone)]
 pub struct EnumReservedRange {
-    pub start: i32,
-    pub end: i32,
+    pub start: ::std::option::Option<i32>,
+    pub end: ::std::option::Option<i32>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
 
@@ -7245,7 +6997,6 @@ impl ::puroro::DeserializableFromIter for EnumReservedRange {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for EnumReservedRange {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -7273,10 +7024,10 @@ impl ::puroro::Serializable for EnumReservedRange {
 }
 
 impl EnumReservedRangeTrait for EnumReservedRange {
-    fn start(&self) -> i32 {
+    fn start(&self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
-    fn end(&self) -> i32 {
+    fn end(&self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
 }
@@ -7288,8 +7039,8 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for EnumReservedRange<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct EnumReservedRangeBumpalo<'bump> {
-    pub start: i32,
-    pub end: i32,
+    pub start: ::std::option::Option<i32>,
+    pub end: ::std::option::Option<i32>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -7370,7 +7121,6 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumReservedRangeBumpalo<'bump>
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for EnumReservedRangeBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -7399,10 +7149,10 @@ impl<'bump> ::puroro::Serializable for EnumReservedRangeBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumReservedRangeTrait for EnumReservedRangeBumpalo<'bump> {
-    fn start(&self) -> i32 {
+    fn start(&self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
-    fn end(&self) -> i32 {
+    fn end(&self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
 }
@@ -7416,18 +7166,14 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumReservedRangeBum
     }
 }
 pub trait EnumReservedRangeTrait {
-    fn start(&'_ self) -> i32;
-    fn end(&'_ self) -> i32;
-}
-pub trait EnumReservedRangeMutTrait {
-    fn start_mut(&self) -> &mut i32;
-    fn end_mut(&self) -> &mut i32;
+    fn start(&'_ self) -> ::std::option::Option<i32>;
+    fn end(&'_ self) -> ::std::option::Option<i32>;
 }
 } // mod enum_descriptor_proto
 
 #[derive(Debug, Clone)]
 pub struct OneofDescriptorProto {
-    pub name: ::std::string::String,
+    pub name: ::std::option::Option<::std::string::String>,
     pub options: ::std::option::Option<::std::boxed::Box<OneofOptions>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -7504,7 +7250,6 @@ impl ::puroro::DeserializableFromIter for OneofDescriptorProto {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for OneofDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -7528,8 +7273,8 @@ impl ::puroro::Serializable for OneofDescriptorProto {
 }
 
 impl OneofDescriptorProtoTrait for OneofDescriptorProto {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
     type OptionsType = OneofOptions;
     fn options(&self) -> ::std::option::Option<&'_ OneofOptions> {
@@ -7544,7 +7289,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for OneofDescriptorProto<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct OneofDescriptorProtoBumpalo<'bump> {
-    pub name: ::bumpalo::collections::String<'bump>,
+    pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo<'bump>>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -7614,7 +7359,6 @@ impl<'bump> ::puroro::DeserializableFromIter for OneofDescriptorProtoBumpalo<'bu
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for OneofDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -7639,8 +7383,8 @@ impl<'bump> ::puroro::Serializable for OneofDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> OneofDescriptorProtoTrait for OneofDescriptorProtoBumpalo<'bump> {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
     type OptionsType = OneofOptionsBumpalo<'bump>;
     fn options(&self) -> ::std::option::Option<&'_ OneofOptions> {
@@ -7657,28 +7401,24 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for OneofDescriptorProto
     }
 }
 pub trait OneofDescriptorProtoTrait {
-    fn name(&'_ self) -> &'_ str;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str>;
     type OptionsType: OneofOptionsTrait;
     fn options(&'_ self) -> ::std::option::Option<&'_ OneofOptions>;
-}
-pub trait OneofDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &mut String;
-    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::OneofOptions>;
 }
 
 #[derive(Debug, Clone)]
 pub struct FieldDescriptorProto {
-    pub name: ::std::string::String,
-    pub number: i32,
-    pub label: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>,
-    pub type_: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>,
-    pub type_name: ::std::string::String,
-    pub extendee: ::std::string::String,
-    pub default_value: ::std::string::String,
-    pub oneof_index: i32,
-    pub json_name: ::std::string::String,
+    pub name: ::std::option::Option<::std::string::String>,
+    pub number: ::std::option::Option<i32>,
+    pub label: ::std::option::Option<::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>>,
+    pub type_: ::std::option::Option<::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>>,
+    pub type_name: ::std::option::Option<::std::string::String>,
+    pub extendee: ::std::option::Option<::std::string::String>,
+    pub default_value: ::std::option::Option<::std::string::String>,
+    pub oneof_index: ::std::option::Option<i32>,
+    pub json_name: ::std::option::Option<::std::string::String>,
     pub options: ::std::option::Option<::std::boxed::Box<FieldOptions>>,
-    pub proto3_optional: bool,
+    pub proto3_optional: ::std::option::Option<bool>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
 
@@ -7838,7 +7578,6 @@ impl ::puroro::DeserializableFromIter for FieldDescriptorProto {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for FieldDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -7899,38 +7638,38 @@ impl ::puroro::Serializable for FieldDescriptorProto {
 }
 
 impl FieldDescriptorProtoTrait for FieldDescriptorProto {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
-    fn number(&self) -> i32 {
+    fn number(&self) -> ::std::option::Option<i32> {
         self.number.clone()
     }
-    fn label(&self) -> ::std::result::Result<field_descriptor_proto::Label, i32> {
+    fn label(&self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> {
         self.label.clone()
     }
-    fn type_(&self) -> ::std::result::Result<field_descriptor_proto::Type, i32> {
+    fn type_(&self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> {
         self.type_.clone()
     }
-    fn type_name(&self) -> &'_ str {
-        self.type_name.as_ref()
+    fn type_name(&self) -> ::std::option::Option<&'_ str> {
+        self.type_name.as_deref()
     }
-    fn extendee(&self) -> &'_ str {
-        self.extendee.as_ref()
+    fn extendee(&self) -> ::std::option::Option<&'_ str> {
+        self.extendee.as_deref()
     }
-    fn default_value(&self) -> &'_ str {
-        self.default_value.as_ref()
+    fn default_value(&self) -> ::std::option::Option<&'_ str> {
+        self.default_value.as_deref()
     }
-    fn oneof_index(&self) -> i32 {
+    fn oneof_index(&self) -> ::std::option::Option<i32> {
         self.oneof_index.clone()
     }
-    fn json_name(&self) -> &'_ str {
-        self.json_name.as_ref()
+    fn json_name(&self) -> ::std::option::Option<&'_ str> {
+        self.json_name.as_deref()
     }
     type OptionsType = FieldOptions;
     fn options(&self) -> ::std::option::Option<&'_ FieldOptions> {
         self.options.as_deref()
     }
-    fn proto3_optional(&self) -> bool {
+    fn proto3_optional(&self) -> ::std::option::Option<bool> {
         self.proto3_optional.clone()
     }
 }
@@ -7942,17 +7681,17 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for FieldDescriptorProto<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FieldDescriptorProtoBumpalo<'bump> {
-    pub name: ::bumpalo::collections::String<'bump>,
-    pub number: i32,
-    pub label: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>,
-    pub type_: ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>,
-    pub type_name: ::bumpalo::collections::String<'bump>,
-    pub extendee: ::bumpalo::collections::String<'bump>,
-    pub default_value: ::bumpalo::collections::String<'bump>,
-    pub oneof_index: i32,
-    pub json_name: ::bumpalo::collections::String<'bump>,
+    pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub number: ::std::option::Option<i32>,
+    pub label: ::std::option::Option<::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>>,
+    pub type_: ::std::option::Option<::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>>,
+    pub type_name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub extendee: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub default_value: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub oneof_index: ::std::option::Option<i32>,
+    pub json_name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, FieldOptionsBumpalo<'bump>>>,
-    pub proto3_optional: bool,
+    pub proto3_optional: ::std::option::Option<bool>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8105,7 +7844,6 @@ impl<'bump> ::puroro::DeserializableFromIter for FieldDescriptorProtoBumpalo<'bu
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for FieldDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -8167,38 +7905,38 @@ impl<'bump> ::puroro::Serializable for FieldDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FieldDescriptorProtoTrait for FieldDescriptorProtoBumpalo<'bump> {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
-    fn number(&self) -> i32 {
+    fn number(&self) -> ::std::option::Option<i32> {
         self.number.clone()
     }
-    fn label(&self) -> ::std::result::Result<field_descriptor_proto::Label, i32> {
+    fn label(&self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> {
         self.label.clone()
     }
-    fn type_(&self) -> ::std::result::Result<field_descriptor_proto::Type, i32> {
+    fn type_(&self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> {
         self.type_.clone()
     }
-    fn type_name(&self) -> &'_ str {
-        self.type_name.as_ref()
+    fn type_name(&self) -> ::std::option::Option<&'_ str> {
+        self.type_name.as_deref()
     }
-    fn extendee(&self) -> &'_ str {
-        self.extendee.as_ref()
+    fn extendee(&self) -> ::std::option::Option<&'_ str> {
+        self.extendee.as_deref()
     }
-    fn default_value(&self) -> &'_ str {
-        self.default_value.as_ref()
+    fn default_value(&self) -> ::std::option::Option<&'_ str> {
+        self.default_value.as_deref()
     }
-    fn oneof_index(&self) -> i32 {
+    fn oneof_index(&self) -> ::std::option::Option<i32> {
         self.oneof_index.clone()
     }
-    fn json_name(&self) -> &'_ str {
-        self.json_name.as_ref()
+    fn json_name(&self) -> ::std::option::Option<&'_ str> {
+        self.json_name.as_deref()
     }
     type OptionsType = FieldOptionsBumpalo<'bump>;
     fn options(&self) -> ::std::option::Option<&'_ FieldOptions> {
         self.options.as_deref()
     }
-    fn proto3_optional(&self) -> bool {
+    fn proto3_optional(&self) -> ::std::option::Option<bool> {
         self.proto3_optional.clone()
     }
 }
@@ -8212,31 +7950,18 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FieldDescriptorProto
     }
 }
 pub trait FieldDescriptorProtoTrait {
-    fn name(&'_ self) -> &'_ str;
-    fn number(&'_ self) -> i32;
-    fn label(&'_ self) -> ::std::result::Result<field_descriptor_proto::Label, i32>;
-    fn type_(&'_ self) -> ::std::result::Result<field_descriptor_proto::Type, i32>;
-    fn type_name(&'_ self) -> &'_ str;
-    fn extendee(&'_ self) -> &'_ str;
-    fn default_value(&'_ self) -> &'_ str;
-    fn oneof_index(&'_ self) -> i32;
-    fn json_name(&'_ self) -> &'_ str;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn number(&'_ self) -> ::std::option::Option<i32>;
+    fn label(&'_ self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>>;
+    fn type_(&'_ self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>>;
+    fn type_name(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn extendee(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn default_value(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn oneof_index(&'_ self) -> ::std::option::Option<i32>;
+    fn json_name(&'_ self) -> ::std::option::Option<&'_ str>;
     type OptionsType: FieldOptionsTrait;
     fn options(&'_ self) -> ::std::option::Option<&'_ FieldOptions>;
-    fn proto3_optional(&'_ self) -> bool;
-}
-pub trait FieldDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &mut String;
-    fn number_mut(&self) -> &mut i32;
-    fn label_mut(&self) -> &mut ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>;
-    fn type__mut(&self) -> &mut ::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Type, i32>;
-    fn type_name_mut(&self) -> &mut String;
-    fn extendee_mut(&self) -> &mut String;
-    fn default_value_mut(&self) -> &mut String;
-    fn oneof_index_mut(&self) -> &mut i32;
-    fn json_name_mut(&self) -> &mut String;
-    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::FieldOptions>;
-    fn proto3_optional_mut(&self) -> &mut bool;
+    fn proto3_optional(&'_ self) -> ::std::option::Option<bool>;
 }
 pub mod field_descriptor_proto {
 #[derive(Debug, Clone)]
@@ -8387,7 +8112,6 @@ impl ::puroro::DeserializableFromIter for ExtensionRangeOptions {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for ExtensionRangeOptions {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -8500,7 +8224,6 @@ impl<'bump> ::puroro::DeserializableFromIter for ExtensionRangeOptionsBumpalo<'b
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for ExtensionRangeOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -8564,18 +8287,10 @@ pub trait ExtensionRangeOptionsTrait {
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
-pub trait ExtensionRangeOptionsMutTrait {
-    fn for_each_uninterpreted_option_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::UninterpretedOption);
-    fn uninterpreted_option_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::UninterpretedOption>>;
-    // We need more! 
-}
 
 #[derive(Debug, Clone)]
 pub struct DescriptorProto {
-    pub name: ::std::string::String,
+    pub name: ::std::option::Option<::std::string::String>,
     pub field: ::std::vec::Vec<FieldDescriptorProto>,
     pub extension: ::std::vec::Vec<FieldDescriptorProto>,
     pub nested_type: ::std::vec::Vec<DescriptorProto>,
@@ -8708,7 +8423,6 @@ impl ::puroro::DeserializableFromIter for DescriptorProto {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for DescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -8756,8 +8470,8 @@ impl ::puroro::Serializable for DescriptorProto {
 }
 
 impl DescriptorProtoTrait for DescriptorProto {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
     type FieldType = FieldDescriptorProto;
     fn for_each_field<F>(&self, mut f: F)
@@ -8931,7 +8645,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for DescriptorProto<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct DescriptorProtoBumpalo<'bump> {
-    pub name: ::bumpalo::collections::String<'bump>,
+    pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub field: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>>,
     pub extension: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>>,
     pub nested_type: ::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>>,
@@ -9057,7 +8771,6 @@ impl<'bump> ::puroro::DeserializableFromIter for DescriptorProtoBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for DescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -9106,8 +8819,8 @@ impl<'bump> ::puroro::Serializable for DescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> DescriptorProtoTrait for DescriptorProtoBumpalo<'bump> {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
     type FieldType = FieldDescriptorProtoBumpalo<'bump>;
     fn for_each_field<F>(&self, mut f: F)
@@ -9283,7 +8996,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for DescriptorProtoBumpa
     }
 }
 pub trait DescriptorProtoTrait {
-    fn name(&'_ self) -> &'_ str;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str>;
     type FieldType: FieldDescriptorProtoTrait;
     fn for_each_field<F>(&self, f: F)
     where
@@ -9366,64 +9079,12 @@ pub trait DescriptorProtoTrait {
     #[cfg(feature = "puroro-nightly")]
     fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_>;
 }
-pub trait DescriptorProtoMutTrait {
-    fn name_mut(&self) -> &mut String;
-    fn for_each_field_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::FieldDescriptorProto);
-    fn field_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::FieldDescriptorProto>>;
-    // We need more! 
-    fn for_each_extension_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::FieldDescriptorProto);
-    fn extension_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::FieldDescriptorProto>>;
-    // We need more! 
-    fn for_each_nested_type_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::DescriptorProto);
-    fn nested_type_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::DescriptorProto>>;
-    // We need more! 
-    fn for_each_enum_type_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::EnumDescriptorProto);
-    fn enum_type_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::EnumDescriptorProto>>;
-    // We need more! 
-    fn for_each_extension_range_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::descriptor_proto::ExtensionRange);
-    fn extension_range_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::descriptor_proto::ExtensionRange>>;
-    // We need more! 
-    fn for_each_oneof_decl_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::OneofDescriptorProto);
-    fn oneof_decl_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::OneofDescriptorProto>>;
-    // We need more! 
-    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::MessageOptions>;
-    fn for_each_reserved_range_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::descriptor_proto::ReservedRange);
-    fn reserved_range_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::descriptor_proto::ReservedRange>>;
-    // We need more! 
-    fn for_each_reserved_name_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut String);
-    fn reserved_name_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
-    // We need more! 
-}
 pub mod descriptor_proto {
 
 #[derive(Debug, Clone)]
 pub struct ReservedRange {
-    pub start: i32,
-    pub end: i32,
+    pub start: ::std::option::Option<i32>,
+    pub end: ::std::option::Option<i32>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
 
@@ -9511,7 +9172,6 @@ impl ::puroro::DeserializableFromIter for ReservedRange {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for ReservedRange {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -9539,10 +9199,10 @@ impl ::puroro::Serializable for ReservedRange {
 }
 
 impl ReservedRangeTrait for ReservedRange {
-    fn start(&self) -> i32 {
+    fn start(&self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
-    fn end(&self) -> i32 {
+    fn end(&self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
 }
@@ -9554,8 +9214,8 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for ReservedRange<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct ReservedRangeBumpalo<'bump> {
-    pub start: i32,
-    pub end: i32,
+    pub start: ::std::option::Option<i32>,
+    pub end: ::std::option::Option<i32>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -9636,7 +9296,6 @@ impl<'bump> ::puroro::DeserializableFromIter for ReservedRangeBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for ReservedRangeBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -9665,10 +9324,10 @@ impl<'bump> ::puroro::Serializable for ReservedRangeBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ReservedRangeTrait for ReservedRangeBumpalo<'bump> {
-    fn start(&self) -> i32 {
+    fn start(&self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
-    fn end(&self) -> i32 {
+    fn end(&self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
 }
@@ -9682,18 +9341,14 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ReservedRangeBumpalo
     }
 }
 pub trait ReservedRangeTrait {
-    fn start(&'_ self) -> i32;
-    fn end(&'_ self) -> i32;
-}
-pub trait ReservedRangeMutTrait {
-    fn start_mut(&self) -> &mut i32;
-    fn end_mut(&self) -> &mut i32;
+    fn start(&'_ self) -> ::std::option::Option<i32>;
+    fn end(&'_ self) -> ::std::option::Option<i32>;
 }
 
 #[derive(Debug, Clone)]
 pub struct ExtensionRange {
-    pub start: i32,
-    pub end: i32,
+    pub start: ::std::option::Option<i32>,
+    pub end: ::std::option::Option<i32>,
     pub options: ::std::option::Option<::std::boxed::Box<super::ExtensionRangeOptions>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -9788,7 +9443,6 @@ impl ::puroro::DeserializableFromIter for ExtensionRange {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for ExtensionRange {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -9819,10 +9473,10 @@ impl ::puroro::Serializable for ExtensionRange {
 }
 
 impl ExtensionRangeTrait for ExtensionRange {
-    fn start(&self) -> i32 {
+    fn start(&self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
-    fn end(&self) -> i32 {
+    fn end(&self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
     type OptionsType = super::ExtensionRangeOptions;
@@ -9838,8 +9492,8 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for ExtensionRange<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct ExtensionRangeBumpalo<'bump> {
-    pub start: i32,
-    pub end: i32,
+    pub start: ::std::option::Option<i32>,
+    pub end: ::std::option::Option<i32>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo<'bump>>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -9927,7 +9581,6 @@ impl<'bump> ::puroro::DeserializableFromIter for ExtensionRangeBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for ExtensionRangeBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -9959,10 +9612,10 @@ impl<'bump> ::puroro::Serializable for ExtensionRangeBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ExtensionRangeTrait for ExtensionRangeBumpalo<'bump> {
-    fn start(&self) -> i32 {
+    fn start(&self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
-    fn end(&self) -> i32 {
+    fn end(&self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
     type OptionsType = super::ExtensionRangeOptionsBumpalo<'bump>;
@@ -9980,22 +9633,17 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ExtensionRangeBumpal
     }
 }
 pub trait ExtensionRangeTrait {
-    fn start(&'_ self) -> i32;
-    fn end(&'_ self) -> i32;
+    fn start(&'_ self) -> ::std::option::Option<i32>;
+    fn end(&'_ self) -> ::std::option::Option<i32>;
     type OptionsType: super::ExtensionRangeOptionsTrait;
     fn options(&'_ self) -> ::std::option::Option<&'_ super::ExtensionRangeOptions>;
-}
-pub trait ExtensionRangeMutTrait {
-    fn start_mut(&self) -> &mut i32;
-    fn end_mut(&self) -> &mut i32;
-    fn options_mut(&self) -> ::std::option::Option<&mut super::super::super::google::protobuf::ExtensionRangeOptions>;
 }
 } // mod descriptor_proto
 
 #[derive(Debug, Clone)]
 pub struct FileDescriptorProto {
-    pub name: ::std::string::String,
-    pub package: ::std::string::String,
+    pub name: ::std::option::Option<::std::string::String>,
+    pub package: ::std::option::Option<::std::string::String>,
     pub dependency: ::std::vec::Vec<::std::string::String>,
     pub public_dependency: ::std::vec::Vec<i32>,
     pub weak_dependency: ::std::vec::Vec<i32>,
@@ -10005,7 +9653,7 @@ pub struct FileDescriptorProto {
     pub extension: ::std::vec::Vec<FieldDescriptorProto>,
     pub options: ::std::option::Option<::std::boxed::Box<FileOptions>>,
     pub source_code_info: ::std::option::Option<::std::boxed::Box<SourceCodeInfo>>,
-    pub syntax: ::std::string::String,
+    pub syntax: ::std::option::Option<::std::string::String>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
 
@@ -10153,7 +9801,6 @@ impl ::puroro::DeserializableFromIter for FileDescriptorProto {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for FileDescriptorProto {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -10211,11 +9858,11 @@ impl ::puroro::Serializable for FileDescriptorProto {
 }
 
 impl FileDescriptorProtoTrait for FileDescriptorProto {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
-    fn package(&self) -> &'_ str {
-        self.package.as_ref()
+    fn package(&self) -> ::std::option::Option<&'_ str> {
+        self.package.as_deref()
     }
     fn for_each_dependency<F>(&self, mut f: F)
     where
@@ -10362,8 +10009,8 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
     fn source_code_info(&self) -> ::std::option::Option<&'_ SourceCodeInfo> {
         self.source_code_info.as_deref()
     }
-    fn syntax(&self) -> &'_ str {
-        self.syntax.as_ref()
+    fn syntax(&self) -> ::std::option::Option<&'_ str> {
+        self.syntax.as_deref()
     }
 }
 impl<'a> ::puroro_internal::helpers::FieldNew<'a> for FileDescriptorProto<> {
@@ -10374,8 +10021,8 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for FileDescriptorProto<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FileDescriptorProtoBumpalo<'bump> {
-    pub name: ::bumpalo::collections::String<'bump>,
-    pub package: ::bumpalo::collections::String<'bump>,
+    pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub package: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub dependency: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     pub public_dependency: ::bumpalo::collections::Vec<'bump, i32>,
     pub weak_dependency: ::bumpalo::collections::Vec<'bump, i32>,
@@ -10385,7 +10032,7 @@ pub struct FileDescriptorProtoBumpalo<'bump> {
     pub extension: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, FileOptionsBumpalo<'bump>>>,
     pub source_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, SourceCodeInfoBumpalo<'bump>>>,
-    pub syntax: ::bumpalo::collections::String<'bump>,
+    pub syntax: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -10526,7 +10173,6 @@ impl<'bump> ::puroro::DeserializableFromIter for FileDescriptorProtoBumpalo<'bum
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for FileDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -10585,11 +10231,11 @@ impl<'bump> ::puroro::Serializable for FileDescriptorProtoBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileDescriptorProtoTrait for FileDescriptorProtoBumpalo<'bump> {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
-    fn package(&self) -> &'_ str {
-        self.package.as_ref()
+    fn package(&self) -> ::std::option::Option<&'_ str> {
+        self.package.as_deref()
     }
     fn for_each_dependency<F>(&self, mut f: F)
     where
@@ -10736,8 +10382,8 @@ impl<'bump> FileDescriptorProtoTrait for FileDescriptorProtoBumpalo<'bump> {
     fn source_code_info(&self) -> ::std::option::Option<&'_ SourceCodeInfo> {
         self.source_code_info.as_deref()
     }
-    fn syntax(&self) -> &'_ str {
-        self.syntax.as_ref()
+    fn syntax(&self) -> ::std::option::Option<&'_ str> {
+        self.syntax.as_deref()
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -10750,8 +10396,8 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileDescriptorProtoB
     }
 }
 pub trait FileDescriptorProtoTrait {
-    fn name(&'_ self) -> &'_ str;
-    fn package(&'_ self) -> &'_ str;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn package(&'_ self) -> ::std::option::Option<&'_ str>;
     fn for_each_dependency<F>(&self, f: F)
     where
         F: FnMut(&'_ str);
@@ -10823,56 +10469,7 @@ pub trait FileDescriptorProtoTrait {
     fn options(&'_ self) -> ::std::option::Option<&'_ FileOptions>;
     type SourceCodeInfoType: SourceCodeInfoTrait;
     fn source_code_info(&'_ self) -> ::std::option::Option<&'_ SourceCodeInfo>;
-    fn syntax(&'_ self) -> &'_ str;
-}
-pub trait FileDescriptorProtoMutTrait {
-    fn name_mut(&self) -> &mut String;
-    fn package_mut(&self) -> &mut String;
-    fn for_each_dependency_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut String);
-    fn dependency_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
-    // We need more! 
-    fn for_each_public_dependency_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut i32);
-    fn public_dependency_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
-    // We need more! 
-    fn for_each_weak_dependency_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut i32);
-    fn weak_dependency_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut i32>>;
-    // We need more! 
-    fn for_each_message_type_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::DescriptorProto);
-    fn message_type_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::DescriptorProto>>;
-    // We need more! 
-    fn for_each_enum_type_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::EnumDescriptorProto);
-    fn enum_type_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::EnumDescriptorProto>>;
-    // We need more! 
-    fn for_each_service_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::ServiceDescriptorProto);
-    fn service_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::ServiceDescriptorProto>>;
-    // We need more! 
-    fn for_each_extension_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::FieldDescriptorProto);
-    fn extension_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::FieldDescriptorProto>>;
-    // We need more! 
-    fn options_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::FileOptions>;
-    fn source_code_info_mut(&self) -> ::std::option::Option<&mut super::super::google::protobuf::SourceCodeInfo>;
-    fn syntax_mut(&self) -> &mut String;
+    fn syntax(&'_ self) -> ::std::option::Option<&'_ str>;
 }
 
 #[derive(Debug, Clone)]
@@ -10946,7 +10543,6 @@ impl ::puroro::DeserializableFromIter for FileDescriptorSet {
             ::deser_from_iter(self, iter)
     }
 }
-
 
 impl ::puroro_internal::serializer::Serializable for FileDescriptorSet {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -11060,7 +10656,6 @@ impl<'bump> ::puroro::DeserializableFromIter for FileDescriptorSetBumpalo<'bump>
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for FileDescriptorSetBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -11123,14 +10718,6 @@ pub trait FileDescriptorSetTrait {
     type FileIter<'a>: Iterator<Item=&'a FileDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_>;
-}
-pub trait FileDescriptorSetMutTrait {
-    fn for_each_file_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::google::protobuf::FileDescriptorProto);
-    fn file_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::google::protobuf::FileDescriptorProto>>;
-    // We need more! 
 }
 
 pub mod compiler;

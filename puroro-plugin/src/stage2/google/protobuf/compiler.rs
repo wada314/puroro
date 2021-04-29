@@ -4,8 +4,8 @@
 
 #[derive(Debug, Clone)]
 pub struct CodeGeneratorResponse {
-    pub error: ::std::string::String,
-    pub supported_features: u64,
+    pub error: ::std::option::Option<::std::string::String>,
+    pub supported_features: ::std::option::Option<u64>,
     pub file: ::std::vec::Vec<code_generator_response::File>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -94,7 +94,6 @@ impl ::puroro::DeserializableFromIter for CodeGeneratorResponse {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for CodeGeneratorResponse {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -123,10 +122,10 @@ impl ::puroro::Serializable for CodeGeneratorResponse {
 }
 
 impl CodeGeneratorResponseTrait for CodeGeneratorResponse {
-    fn error(&self) -> &'_ str {
-        self.error.as_ref()
+    fn error(&self) -> ::std::option::Option<&'_ str> {
+        self.error.as_deref()
     }
-    fn supported_features(&self) -> u64 {
+    fn supported_features(&self) -> ::std::option::Option<u64> {
         self.supported_features.clone()
     }
     type FileType = code_generator_response::File;
@@ -158,8 +157,8 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for CodeGeneratorResponse<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct CodeGeneratorResponseBumpalo<'bump> {
-    pub error: ::bumpalo::collections::String<'bump>,
-    pub supported_features: u64,
+    pub error: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub supported_features: ::std::option::Option<u64>,
     pub file: ::bumpalo::collections::Vec<'bump, code_generator_response::FileBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -241,7 +240,6 @@ impl<'bump> ::puroro::DeserializableFromIter for CodeGeneratorResponseBumpalo<'b
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for CodeGeneratorResponseBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -271,10 +269,10 @@ impl<'bump> ::puroro::Serializable for CodeGeneratorResponseBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorResponseTrait for CodeGeneratorResponseBumpalo<'bump> {
-    fn error(&self) -> &'_ str {
-        self.error.as_ref()
+    fn error(&self) -> ::std::option::Option<&'_ str> {
+        self.error.as_deref()
     }
-    fn supported_features(&self) -> u64 {
+    fn supported_features(&self) -> ::std::option::Option<u64> {
         self.supported_features.clone()
     }
     type FileType = code_generator_response::FileBumpalo<'bump>;
@@ -308,8 +306,8 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRespons
     }
 }
 pub trait CodeGeneratorResponseTrait {
-    fn error(&'_ self) -> &'_ str;
-    fn supported_features(&'_ self) -> u64;
+    fn error(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn supported_features(&'_ self) -> ::std::option::Option<u64>;
     type FileType: code_generator_response::FileTrait;
     fn for_each_file<F>(&self, f: F)
     where
@@ -320,16 +318,6 @@ pub trait CodeGeneratorResponseTrait {
     type FileIter<'a>: Iterator<Item=&'a code_generator_response::File>;
     #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_>;
-}
-pub trait CodeGeneratorResponseMutTrait {
-    fn error_mut(&self) -> &mut String;
-    fn supported_features_mut(&self) -> &mut u64;
-    fn for_each_file_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::super::google::protobuf::compiler::code_generator_response::File);
-    fn file_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::super::google::protobuf::compiler::code_generator_response::File>>;
-    // We need more! 
 }
 pub mod code_generator_response {
 #[derive(Debug, Clone)]
@@ -355,9 +343,9 @@ impl ::std::convert::Into<i32> for Feature {
 
 #[derive(Debug, Clone)]
 pub struct File {
-    pub name: ::std::string::String,
-    pub insertion_point: ::std::string::String,
-    pub content: ::std::string::String,
+    pub name: ::std::option::Option<::std::string::String>,
+    pub insertion_point: ::std::option::Option<::std::string::String>,
+    pub content: ::std::option::Option<::std::string::String>,
     pub generated_code_info: ::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -446,7 +434,6 @@ impl ::puroro::DeserializableFromIter for File {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for File {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -476,14 +463,14 @@ impl ::puroro::Serializable for File {
 }
 
 impl FileTrait for File {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
-    fn insertion_point(&self) -> &'_ str {
-        self.insertion_point.as_ref()
+    fn insertion_point(&self) -> ::std::option::Option<&'_ str> {
+        self.insertion_point.as_deref()
     }
-    fn content(&self) -> &'_ str {
-        self.content.as_ref()
+    fn content(&self) -> ::std::option::Option<&'_ str> {
+        self.content.as_deref()
     }
     type GeneratedCodeInfoType = super::super::GeneratedCodeInfo;
     fn generated_code_info(&self) -> ::std::option::Option<&'_ super::super::GeneratedCodeInfo> {
@@ -498,9 +485,9 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for File<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct FileBumpalo<'bump> {
-    pub name: ::bumpalo::collections::String<'bump>,
-    pub insertion_point: ::bumpalo::collections::String<'bump>,
-    pub content: ::bumpalo::collections::String<'bump>,
+    pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub insertion_point: ::std::option::Option<::bumpalo::collections::String<'bump>>,
+    pub content: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub generated_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -582,7 +569,6 @@ impl<'bump> ::puroro::DeserializableFromIter for FileBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for FileBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -613,14 +599,14 @@ impl<'bump> ::puroro::Serializable for FileBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileTrait for FileBumpalo<'bump> {
-    fn name(&self) -> &'_ str {
-        self.name.as_ref()
+    fn name(&self) -> ::std::option::Option<&'_ str> {
+        self.name.as_deref()
     }
-    fn insertion_point(&self) -> &'_ str {
-        self.insertion_point.as_ref()
+    fn insertion_point(&self) -> ::std::option::Option<&'_ str> {
+        self.insertion_point.as_deref()
     }
-    fn content(&self) -> &'_ str {
-        self.content.as_ref()
+    fn content(&self) -> ::std::option::Option<&'_ str> {
+        self.content.as_deref()
     }
     type GeneratedCodeInfoType = super::super::GeneratedCodeInfoBumpalo<'bump>;
     fn generated_code_info(&self) -> ::std::option::Option<&'_ super::super::GeneratedCodeInfo> {
@@ -637,24 +623,18 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileBumpalo<'bump> {
     }
 }
 pub trait FileTrait {
-    fn name(&'_ self) -> &'_ str;
-    fn insertion_point(&'_ self) -> &'_ str;
-    fn content(&'_ self) -> &'_ str;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn insertion_point(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn content(&'_ self) -> ::std::option::Option<&'_ str>;
     type GeneratedCodeInfoType: super::super::GeneratedCodeInfoTrait;
     fn generated_code_info(&'_ self) -> ::std::option::Option<&'_ super::super::GeneratedCodeInfo>;
-}
-pub trait FileMutTrait {
-    fn name_mut(&self) -> &mut String;
-    fn insertion_point_mut(&self) -> &mut String;
-    fn content_mut(&self) -> &mut String;
-    fn generated_code_info_mut(&self) -> ::std::option::Option<&mut super::super::super::super::google::protobuf::GeneratedCodeInfo>;
 }
 } // mod code_generator_response
 
 #[derive(Debug, Clone)]
 pub struct CodeGeneratorRequest {
     pub file_to_generate: ::std::vec::Vec<::std::string::String>,
-    pub parameter: ::std::string::String,
+    pub parameter: ::std::option::Option<::std::string::String>,
     pub proto_file: ::std::vec::Vec<super::FileDescriptorProto>,
     pub compiler_version: ::std::option::Option<::std::boxed::Box<Version>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
@@ -744,7 +724,6 @@ impl ::puroro::DeserializableFromIter for CodeGeneratorRequest {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for CodeGeneratorRequest {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -793,8 +772,8 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
     fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_> {
         self.file_to_generate.iter().map(|v| v.as_ref())
     }
-    fn parameter(&self) -> &'_ str {
-        self.parameter.as_ref()
+    fn parameter(&self) -> ::std::option::Option<&'_ str> {
+        self.parameter.as_deref()
     }
     type ProtoFileType = super::FileDescriptorProto;
     fn for_each_proto_file<F>(&self, mut f: F)
@@ -830,7 +809,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for CodeGeneratorRequest<> {
 #[derive(Debug, Clone)]
 pub struct CodeGeneratorRequestBumpalo<'bump> {
     pub file_to_generate: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
-    pub parameter: ::bumpalo::collections::String<'bump>,
+    pub parameter: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub proto_file: ::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>>,
     pub compiler_version: ::std::option::Option<::bumpalo::boxed::Box<'bump, VersionBumpalo<'bump>>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
@@ -913,7 +892,6 @@ impl<'bump> ::puroro::DeserializableFromIter for CodeGeneratorRequestBumpalo<'bu
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for CodeGeneratorRequestBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -963,8 +941,8 @@ impl<'bump> CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo<'bump> {
     fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_> {
         self.file_to_generate.iter().map(|v| v.as_ref())
     }
-    fn parameter(&self) -> &'_ str {
-        self.parameter.as_ref()
+    fn parameter(&self) -> ::std::option::Option<&'_ str> {
+        self.parameter.as_deref()
     }
     type ProtoFileType = super::FileDescriptorProtoBumpalo<'bump>;
     fn for_each_proto_file<F>(&self, mut f: F)
@@ -1010,7 +988,7 @@ pub trait CodeGeneratorRequestTrait {
     type FileToGenerateIter<'a>: Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
     fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_>;
-    fn parameter(&'_ self) -> &'_ str;
+    fn parameter(&'_ self) -> ::std::option::Option<&'_ str>;
     type ProtoFileType: super::FileDescriptorProtoTrait;
     fn for_each_proto_file<F>(&self, f: F)
     where
@@ -1024,29 +1002,13 @@ pub trait CodeGeneratorRequestTrait {
     type CompilerVersionType: VersionTrait;
     fn compiler_version(&'_ self) -> ::std::option::Option<&'_ Version>;
 }
-pub trait CodeGeneratorRequestMutTrait {
-    fn for_each_file_to_generate_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut String);
-    fn file_to_generate_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut String>>;
-    // We need more! 
-    fn parameter_mut(&self) -> &mut String;
-    fn for_each_proto_file_mut<F>(&self, f: F)
-    where
-        F: FnMut(&mut super::super::super::google::protobuf::FileDescriptorProto);
-    fn proto_file_boxed_iter_mut(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&mut super::super::super::google::protobuf::FileDescriptorProto>>;
-    // We need more! 
-    fn compiler_version_mut(&self) -> ::std::option::Option<&mut super::super::super::google::protobuf::compiler::Version>;
-}
 
 #[derive(Debug, Clone)]
 pub struct Version {
-    pub major: i32,
-    pub minor: i32,
-    pub patch: i32,
-    pub suffix: ::std::string::String,
+    pub major: ::std::option::Option<i32>,
+    pub minor: ::std::option::Option<i32>,
+    pub patch: ::std::option::Option<i32>,
+    pub suffix: ::std::option::Option<::std::string::String>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
 
@@ -1152,7 +1114,6 @@ impl ::puroro::DeserializableFromIter for Version {
     }
 }
 
-
 impl ::puroro_internal::serializer::Serializable for Version {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1188,17 +1149,17 @@ impl ::puroro::Serializable for Version {
 }
 
 impl VersionTrait for Version {
-    fn major(&self) -> i32 {
+    fn major(&self) -> ::std::option::Option<i32> {
         self.major.clone()
     }
-    fn minor(&self) -> i32 {
+    fn minor(&self) -> ::std::option::Option<i32> {
         self.minor.clone()
     }
-    fn patch(&self) -> i32 {
+    fn patch(&self) -> ::std::option::Option<i32> {
         self.patch.clone()
     }
-    fn suffix(&self) -> &'_ str {
-        self.suffix.as_ref()
+    fn suffix(&self) -> ::std::option::Option<&'_ str> {
+        self.suffix.as_deref()
     }
 }
 impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Version<> {
@@ -1209,10 +1170,10 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Version<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct VersionBumpalo<'bump> {
-    pub major: i32,
-    pub minor: i32,
-    pub patch: i32,
-    pub suffix: ::bumpalo::collections::String<'bump>,
+    pub major: ::std::option::Option<i32>,
+    pub minor: ::std::option::Option<i32>,
+    pub patch: ::std::option::Option<i32>,
+    pub suffix: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1311,7 +1272,6 @@ impl<'bump> ::puroro::DeserializableFromIter for VersionBumpalo<'bump> {
             ::deser_from_iter(self, iter)
     }
 }
-
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::serializer::Serializable for VersionBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
@@ -1348,17 +1308,17 @@ impl<'bump> ::puroro::Serializable for VersionBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> VersionTrait for VersionBumpalo<'bump> {
-    fn major(&self) -> i32 {
+    fn major(&self) -> ::std::option::Option<i32> {
         self.major.clone()
     }
-    fn minor(&self) -> i32 {
+    fn minor(&self) -> ::std::option::Option<i32> {
         self.minor.clone()
     }
-    fn patch(&self) -> i32 {
+    fn patch(&self) -> ::std::option::Option<i32> {
         self.patch.clone()
     }
-    fn suffix(&self) -> &'_ str {
-        self.suffix.as_ref()
+    fn suffix(&self) -> ::std::option::Option<&'_ str> {
+        self.suffix.as_deref()
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1371,14 +1331,8 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for VersionBumpalo<'bump
     }
 }
 pub trait VersionTrait {
-    fn major(&'_ self) -> i32;
-    fn minor(&'_ self) -> i32;
-    fn patch(&'_ self) -> i32;
-    fn suffix(&'_ self) -> &'_ str;
-}
-pub trait VersionMutTrait {
-    fn major_mut(&self) -> &mut i32;
-    fn minor_mut(&self) -> &mut i32;
-    fn patch_mut(&self) -> &mut i32;
-    fn suffix_mut(&self) -> &mut String;
+    fn major(&'_ self) -> ::std::option::Option<i32>;
+    fn minor(&'_ self) -> ::std::option::Option<i32>;
+    fn patch(&'_ self) -> ::std::option::Option<i32>;
+    fn suffix(&'_ self) -> ::std::option::Option<&'_ str>;
 }

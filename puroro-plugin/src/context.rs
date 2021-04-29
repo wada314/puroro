@@ -81,10 +81,10 @@ impl<'c> Context<'c> {
                     fn handle_msg(&mut self, msg: &'d MessageDescriptor<'d>) -> Result<()> {
                         if let Some(_) = self
                             .0
-                            .insert(msg.fully_qualified_name(), EnumOrMessageRef::Message(msg))
+                            .insert(msg.fully_qualified_name()?, EnumOrMessageRef::Message(msg))
                         {
                             Err(ErrorKind::ConflictedName {
-                                name: msg.fully_qualified_name().to_string(),
+                                name: msg.fully_qualified_name()?.to_string(),
                             })?
                         }
                         Ok(())
@@ -93,10 +93,10 @@ impl<'c> Context<'c> {
                     fn handle_enum(&mut self, enume: &'d EnumDescriptor<'d>) -> Result<()> {
                         if let Some(_) = self
                             .0
-                            .insert(enume.fully_qualified_name(), EnumOrMessageRef::Enum(enume))
+                            .insert(enume.fully_qualified_name()?, EnumOrMessageRef::Enum(enume))
                         {
                             Err(ErrorKind::ConflictedName {
-                                name: enume.fully_qualified_name().to_string(),
+                                name: enume.fully_qualified_name()?.to_string(),
                             })?
                         }
                         Ok(())

@@ -4,7 +4,7 @@ use std::hash::Hash;
 use super::{EnumDescriptor, FieldDescriptor, FileDescriptor, FileOrMessageRef};
 use crate::google::protobuf::DescriptorProto;
 use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
-use crate::Context;
+use crate::{Context, ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 
 #[derive(Clone)]
@@ -79,8 +79,10 @@ impl<'c> MessageDescriptor<'c> {
             .iter()
     }
 
-    pub fn name(&self) -> &str {
-        &self.proto.name
+    pub fn name(&self) -> Result<&str> {
+        Ok(&self.proto.name.ok_or(ErrorKind::InternalError {
+            detail: "Empty message name".to_string(),
+        })?)
     }
     pub fn parent(&'c self) -> &'c FileOrMessageRef<'c> {
         &self.parent
@@ -90,34 +92,41 @@ impl<'c> MessageDescriptor<'c> {
     }
     pub fn is_map_entry(&self) -> bool {
         if let Some(options) = &self.proto.options {
-            options.map_entry
+            // TODO: Maybe need to check the default value?
+            options.map_entry.unwrap_or_default()
         } else {
             false
         }
     }
-    pub fn package(&'c self) -> &str {
-        self.lazy_package
-            .get_or_init(|| self.parent.package_for_child())
+    pub fn package(&'c self) -> Result<&str> {
+        Ok(self
+            .lazy_package
+            .get_or_try_init(|| -> Result<_> { self.parent.package_for_child() })?)
     }
-    pub fn path_to_root_mod(&'c self) -> &str {
-        self.lazy_path_to_root_mod.get_or_init(|| {
-            let depth = self.package().split('.').count();
-            if depth != 0 {
-                itertools::Itertools::intersperse(std::iter::repeat("super").take(depth), "::")
-                    .collect::<String>()
-            } else {
-                "self".to_string()
-            }
-        })
+    pub fn path_to_root_mod(&'c self) -> Result<&str> {
+        Ok(self
+            .lazy_path_to_root_mod
+            .get_or_try_init(|| -> Result<_> {
+                let depth = self.package()?.split('.').count();
+                if depth != 0 {
+                    Ok(itertools::Itertools::intersperse(
+                        std::iter::repeat("super").take(depth),
+                        "::",
+                    )
+                    .collect::<String>())
+                } else {
+                    Ok("self".to_string())
+                }
+            })?)
     }
-    pub fn fully_qualified_name(&'c self) -> &str {
-        self.lazy_fq_name.get_or_init(|| {
-            format!(
+    pub fn fully_qualified_name(&'c self) -> Result<&str> {
+        Ok(self.lazy_fq_name.get_or_try_init(|| -> Result<_> {
+            Ok(format!(
                 "{package}.{name}",
-                package = self.package(),
-                name = self.name()
-            )
-        })
+                package = self.package()?,
+                name = self.name()?
+            ))
+        })?)
     }
 
     /// Returns a Rust typename which can be used for struct definition:
@@ -128,14 +137,17 @@ impl<'c> MessageDescriptor<'c> {
     /// ```
     /// Returns a Rust typename without mod path,
     /// without distinguishing between repeated / optional labels.
-    pub fn native_bare_type_name(&self) -> &str {
-        self.lazy_native_bare_type_name
-            .get_or_init(|| get_keyword_safe_ident(&to_camel_case(self.name())))
+    pub fn native_bare_type_name(&self) -> Result<&str> {
+        Ok(self
+            .lazy_native_bare_type_name
+            .get_or_try_init(|| -> Result<_> {
+                Ok(get_keyword_safe_ident(&to_camel_case(self.name()?)))
+            })?)
     }
 
-    pub fn native_type_name_with_relative_path(&'c self, cur_package: &str) -> String {
-        let struct_name = self.native_bare_type_name();
-        let mut struct_package_iter = self.package().split('.').peekable();
+    pub fn native_type_name_with_relative_path(&'c self, cur_package: &str) -> Result<String> {
+        let struct_name = self.native_bare_type_name()?;
+        let mut struct_package_iter = self.package()?.split('.').peekable();
         let mut cur_package_iter = cur_package.split('.').peekable();
         while let (Some(p1), Some(p2)) = (struct_package_iter.peek(), cur_package_iter.peek()) {
             if *p1 == *p2 {
@@ -145,7 +157,7 @@ impl<'c> MessageDescriptor<'c> {
                 break;
             }
         }
-        format!(
+        Ok(format!(
             "{supers}{mods}{name}",
             name = struct_name,
             supers = std::iter::repeat("super::")
@@ -154,29 +166,31 @@ impl<'c> MessageDescriptor<'c> {
             mods = struct_package_iter
                 .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
                 .collect::<String>(),
-        )
+        ))
     }
 
-    pub fn native_fully_qualified_type_name(&'c self, path_to_root_mod: &str) -> String {
-        let native_type_name_from_root = self.lazy_native_type_name_from_root.get_or_init(|| {
-            let mod_path = itertools::Itertools::intersperse(
-                self.package()
-                    .split('.')
-                    .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
-                "::".to_string(),
-            )
-            .collect::<String>();
-            format!(
-                "{mod_path}::{bare_type}",
-                mod_path = mod_path,
-                bare_type = self.native_bare_type_name()
-            )
-        });
-        format!(
+    pub fn native_fully_qualified_type_name(&'c self, path_to_root_mod: &str) -> Result<String> {
+        let native_type_name_from_root =
+            self.lazy_native_type_name_from_root
+                .get_or_try_init(|| -> Result<_> {
+                    let mod_path = itertools::Itertools::intersperse(
+                        self.package()?
+                            .split('.')
+                            .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
+                        "::".to_string(),
+                    )
+                    .collect::<String>();
+                    Ok(format!(
+                        "{mod_path}::{bare_type}",
+                        mod_path = mod_path,
+                        bare_type = self.native_bare_type_name()?
+                    ))
+                })?;
+        Ok(format!(
             "{path_to_root_mod}::{type_name}",
             path_to_root_mod = path_to_root_mod,
             type_name = native_type_name_from_root
-        )
+        ))
     }
 }
 
@@ -188,7 +202,10 @@ impl Debug for MessageDescriptor<'_> {
 
 impl Hash for MessageDescriptor<'_> {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.parent.package_for_child().hash(state);
+        self.parent
+            .package_for_child()
+            .unwrap_or_default()
+            .hash(state);
         self.proto.name.hash(state);
     }
 }

@@ -50,8 +50,8 @@ fn main() -> Result<()> {
         .into_iter()
         .map(|(filename, content)| {
             let mut file = code_generator_response::File::default();
-            file.name = filename;
-            file.content = content;
+            file.name = Some(filename);
+            file.content = Some(content);
             file
         })
         .collect();
