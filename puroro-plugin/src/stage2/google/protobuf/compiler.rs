@@ -55,7 +55,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
             }
             15 => {
                 <::std::vec::Vec<code_generator_response::File> as DeserializableFieldFromIter<(
-                    tags::Message<super::super::super::google::protobuf::compiler::code_generator_response::File>, 
+                    tags::Message<code_generator_response::File>, 
                     tags::Repeated)>>
                 ::deser(&mut self.file, field, ::std::default::Default::default)?;
             }
@@ -183,9 +183,9 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
             }
             15 => {
                 <::bumpalo::collections::Vec<'bump, code_generator_response::FileBumpalo<'bump>> as DeserializableFieldFromIter<(
-                    tags::Message<super::super::super::google::protobuf::compiler::code_generator_response::File>, 
+                    tags::Message<code_generator_response::File>, 
                     tags::Repeated)>>
-                ::deser(&mut self.file, field, || super::super::super::google::protobuf::compiler::code_generator_response::File::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.file, field, || code_generator_response::File::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -364,7 +364,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for File {
             }
             16 => {
                 <::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>> as DeserializableFieldFromIter<(
-                    tags::Message<super::super::super::super::google::protobuf::GeneratedCodeInfo>, 
+                    tags::Message<super::super::GeneratedCodeInfo>, 
                     tags::Optional2)>>
                 ::deser(&mut self.generated_code_info, field, ::std::default::Default::default)?;
             }
@@ -488,9 +488,9 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileBump
             }
             16 => {
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>> as DeserializableFieldFromIter<(
-                    tags::Message<super::super::super::super::google::protobuf::GeneratedCodeInfo>, 
+                    tags::Message<super::super::GeneratedCodeInfo>, 
                     tags::Optional2)>>
-                ::deser(&mut self.generated_code_info, field, || ::bumpalo::boxed::Box::new_in(super::super::super::super::google::protobuf::GeneratedCodeInfo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.generated_code_info, field, || ::bumpalo::boxed::Box::new_in(super::super::GeneratedCodeInfo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -624,13 +624,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
             }
             15 => {
                 <::std::vec::Vec<super::FileDescriptorProto> as DeserializableFieldFromIter<(
-                    tags::Message<super::super::super::google::protobuf::FileDescriptorProto>, 
+                    tags::Message<super::FileDescriptorProto>, 
                     tags::Repeated)>>
                 ::deser(&mut self.proto_file, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<::std::boxed::Box<Version>> as DeserializableFieldFromIter<(
-                    tags::Message<super::super::super::google::protobuf::compiler::Version>, 
+                    tags::Message<Version>, 
                     tags::Optional2)>>
                 ::deser(&mut self.compiler_version, field, ::std::default::Default::default)?;
             }
@@ -781,15 +781,15 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
             }
             15 => {
                 <::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<(
-                    tags::Message<super::super::super::google::protobuf::FileDescriptorProto>, 
+                    tags::Message<super::FileDescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.proto_file, field, || super::super::super::google::protobuf::FileDescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.proto_file, field, || super::FileDescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, VersionBumpalo<'bump>>> as DeserializableFieldFromIter<(
-                    tags::Message<super::super::super::google::protobuf::compiler::Version>, 
+                    tags::Message<Version>, 
                     tags::Optional2)>>
-                ::deser(&mut self.compiler_version, field, || ::bumpalo::boxed::Box::new_in(super::super::super::google::protobuf::compiler::Version::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.compiler_version, field, || ::bumpalo::boxed::Box::new_in(Version::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
