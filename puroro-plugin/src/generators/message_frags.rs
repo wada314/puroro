@@ -17,6 +17,8 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         Self { context }
     }
 
+    /// A raw generated struct identifier.
+    /// e.g. "FieldDescriptorProto", "DescriptorProtoBumpalo"
     pub fn struct_name(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
         let postfix1 = match self.context.impl_type() {
             ImplType::Default => "",
@@ -35,6 +37,8 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         .into())
     }
 
+    /// A struct name with relative path from the given package.
+    /// Note this is still not a typename; the generic params are not bound.
     pub fn struct_name_with_relative_path(
         &self,
         msg: &'c MessageDescriptor<'c>,
@@ -63,6 +67,8 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         ))
     }
 
+    /// A type name of the struct with a relative path from the given package.
+    /// Includes generic param bounds if there is any.
     pub fn type_name_of_msg(
         &self,
         msg: &'c MessageDescriptor<'c>,
