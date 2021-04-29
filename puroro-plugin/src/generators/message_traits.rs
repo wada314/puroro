@@ -14,11 +14,7 @@ impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
         Self { context, msg }
     }
     pub fn print_msg_traits<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
-        (
-            func(|output| self.print_msg_base_trait(output)),
-            func(|output| self.print_msg_mutable_trait(output)),
-        )
-            .write_into(output)
+        (func(|output| self.print_msg_base_trait(output)),).write_into(output)
     }
 
     fn print_msg_base_trait<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
@@ -41,7 +37,8 @@ pub trait {name}Trait {{\n",
                         "".to_string()
                     },
                     match (field.label()?, field.type_()?) {
-                        (FieldLabel::Optional, FieldType::Message(_)) => {
+                        (FieldLabel::Optional2, FieldType::Message(_))
+                        | (FieldLabel::Optional3, FieldType::Message(_)) => {
                             // getter function for optional message field, wrapped by Option.
                             format!(
                                 "fn {name}(&'_ self) -> ::std::option::Option<{reftype}>;\n",
@@ -49,7 +46,9 @@ pub trait {name}Trait {{\n",
                                 reftype = field.native_maybe_ref_type("'_")?,
                             )
                         }
-                        (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
+                        (FieldLabel::Required, _)
+                        | (FieldLabel::Optional2, _)
+                        | (FieldLabel::Optional3, _) => {
                             // normal getter function.
                             format!(
                                 "fn {name}(&'_ self) -> {reftype};\n",
@@ -85,51 +84,6 @@ fn {name}_iter(&self) -> Self::{camel_name}Iter<'_>;\n",
                         }
                     },
                 ))
-            }))),
-            "}}\n",
-        )
-            .write_into(output)
-    }
-
-    fn print_msg_mutable_trait<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
-        (
-            format!(
-                "\
-pub trait {name}MutTrait {{\n",
-                name = self.msg.native_bare_type_name()
-            ),
-            indent(iter(self.msg.fields().map(|field| -> Result<_> {
-                Ok(match (field.label()?, field.type_()?) {
-                    (FieldLabel::Optional, FieldType::Message(_)) => {
-                        // getter function for optional message field, wrapped by Option.
-                        format!(
-                            "fn {name}_mut(&self) -> ::std::option::Option<{reftype}>;\n",
-                            name = field.native_name(),
-                            reftype = field.native_scalar_mut_ref_type_name("")?,
-                        )
-                    }
-                    (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
-                        // normal getter function.
-                        format!(
-                            "fn {name}_mut(&self) -> {reftype};\n",
-                            name = field.native_name(),
-                            reftype = field.native_scalar_mut_ref_type_name("")?,
-                        )
-                    }
-                    (FieldLabel::Repeated, _) => {
-                        format!(
-                            "\
-fn for_each_{name}_mut<F>(&self, f: F)
-where
-    F: FnMut({reftype});
-fn {name}_boxed_iter_mut(&self)
-    -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>;
-// We need more! \n",
-                            name = field.native_name(),
-                            reftype = field.native_scalar_mut_ref_type_name("")?,
-                        )
-                    }
-                })
             }))),
             "}}\n",
         )

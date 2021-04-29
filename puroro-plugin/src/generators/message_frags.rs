@@ -134,7 +134,22 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     },
                 };
                 match field.label()? {
-                    FieldLabel::Optional => {
+                    FieldLabel::Optional2 => {
+                        if matches!(field.type_()?, FieldType::Message(_)) {
+                            format!(
+                                "::std::option::Option<{boxed_type}>",
+                                boxed_type = self.box_type(scalar_type.as_ref()),
+                            )
+                            .into()
+                        } else {
+                            format!(
+                                "::std::option::Option<{scalar_type}>",
+                                scalar_type = scalar_type,
+                            )
+                            .into()
+                        }
+                    }
+                    FieldLabel::Optional3 => {
                         if matches!(field.type_()?, FieldType::Message(_)) {
                             format!(
                                 "::std::option::Option<{boxed_type}>",

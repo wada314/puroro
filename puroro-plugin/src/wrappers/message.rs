@@ -89,7 +89,7 @@ impl<'c> MessageDescriptor<'c> {
         self.parent.file_descriptor()
     }
     pub fn is_map_entry(&self) -> bool {
-        if let Some(options) = self.proto.options {
+        if let Some(options) = &self.proto.options {
             options.map_entry
         } else {
             false

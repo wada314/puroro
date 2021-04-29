@@ -478,7 +478,8 @@ impl{gp} {name}Trait for {struct_name}{gpb} {{\n",
                         "".to_string()
                     },
                     match (field.label()?, field.type_()?) {
-                        (FieldLabel::Optional, FieldType::Message(_)) => {
+                        (FieldLabel::Optional2, FieldType::Message(_))
+                        | (FieldLabel::Optional3, FieldType::Message(_)) => {
                             format!(
                                 "\
 fn {name}(&self) -> ::std::option::Option<{reftype}> {{
@@ -498,7 +499,9 @@ fn {name}(&self) -> {reftype} {{
                                 reftype = field.native_maybe_ref_type("'_")?,
                             )
                         }
-                        (FieldLabel::Required, _) | (FieldLabel::Optional, _) => {
+                        (FieldLabel::Required, _)
+                        | (FieldLabel::Optional2, _)
+                        | (FieldLabel::Optional3, _) => {
                             // normal getter function.
                             let process_ref = match field.type_()? {
                                 FieldType::String | FieldType::Bytes => ".as_ref()",

@@ -45,13 +45,14 @@ impl<'c> FileOrMessageRef<'c> {
     }
 
     pub fn file_descriptor(&'c self) -> &'c FileDescriptor {
+        let mut p = self;
         loop {
-            match self {
+            match p {
                 FileOrMessageRef::File(f) => {
                     break *f;
                 }
                 FileOrMessageRef::Message(m) => {
-                    self = m.parent();
+                    p = m.parent();
                 }
             }
         }
