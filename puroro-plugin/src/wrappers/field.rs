@@ -335,15 +335,7 @@ pub enum Bits32FieldType {
     Fixed32,
     SFixed32,
 }
-impl Bits32FieldType {
-    pub fn native_type(&self) -> &'static str {
-        match self {
-            Bits32FieldType::Float => "f32",
-            Bits32FieldType::Fixed32 => "u32",
-            Bits32FieldType::SFixed32 => "i32",
-        }
-    }
-}
+impl Bits32FieldType {}
 
 #[derive(Debug, Clone, Hash)]
 pub enum Bits64FieldType {
@@ -351,15 +343,7 @@ pub enum Bits64FieldType {
     Fixed64,
     SFixed64,
 }
-impl Bits64FieldType {
-    pub fn native_type(&self) -> &'static str {
-        match self {
-            Bits64FieldType::Double => "f64",
-            Bits64FieldType::Fixed64 => "u64",
-            Bits64FieldType::SFixed64 => "i64",
-        }
-    }
-}
+impl Bits64FieldType {}
 
 #[derive(Debug, Clone, Hash)]
 pub enum FieldType<'c> {
