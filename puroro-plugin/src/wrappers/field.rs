@@ -207,58 +207,6 @@ impl<'c> FieldDescriptor<'c> {
         })?)
     }
 
-    // Returns type name, which will suit for the struct's field definition.
-    pub fn native_owned_type_name(&'c self) -> Result<&str> {
-        Ok(self
-            .lazy_native_owned_type_name
-            .get_or_try_init(|| -> Result<_> {
-                // enum: Result<xxx, i32>
-                // msg: xxx
-                let native_fully_qualified_type: Cow<'static, str> = match self.wire_type()? {
-                    WireType::Variant(field_type) => {
-                        field_type.native_type(self.parent.path_to_root_mod()?)?
-                    }
-                    WireType::LengthDelimited(field_type) => {
-                        field_type.native_owned_type(self.parent.path_to_root_mod()?)?
-                    }
-                    WireType::Bits32(field_type) => field_type.native_type().into(),
-                    WireType::Bits64(field_type) => field_type.native_type().into(),
-                };
-                Ok(match self.label()? {
-                    FieldLabel::Optional2 => {
-                        if let FieldType::Message(_) = self.type_()? {
-                            format!(
-                                "::std::option::Option<::std::boxed::Box<{name}>>",
-                                name = native_fully_qualified_type
-                            )
-                        } else {
-                            format!(
-                                "::std::option::Option<{name}>",
-                                name = native_fully_qualified_type
-                            )
-                        }
-                    }
-                    FieldLabel::Optional3 => {
-                        if let FieldType::Message(_) = self.type_()? {
-                            format!(
-                                "::std::option::Option<::std::boxed::Box<{name}>>",
-                                name = native_fully_qualified_type
-                            )
-                        } else {
-                            native_fully_qualified_type.into_owned()
-                        }
-                    }
-                    FieldLabel::Required => native_fully_qualified_type.into_owned(),
-                    FieldLabel::Repeated => {
-                        format!(
-                            "::std::vec::Vec<{name}>",
-                            name = native_fully_qualified_type
-                        )
-                    }
-                })
-            })?)
-    }
-
     pub fn native_maybe_ref_type(&'c self, lifetime: &str) -> Result<Cow<'static, str>> {
         Ok(match self.type_()?.native_trivial_type_name() {
             Ok(name) => name.into(),
@@ -279,48 +227,6 @@ impl<'c> FieldDescriptor<'c> {
                 .into(),
             },
         })
-    }
-
-    // Returns a ref type name for required field.
-    pub fn native_scalar_ref_type_name(&'c self, lifetime: &'static str) -> Result<&str> {
-        Ok(self
-            .lazy_native_scalar_ref_type_name
-            .get_or_try_init(lifetime, || -> Result<_> {
-                Ok(match self.wire_type()? {
-                    WireType::Variant(field_type) => field_type
-                        .native_type(self.parent.path_to_root_mod()?)?
-                        .into_owned(),
-                    WireType::LengthDelimited(field_type) => field_type
-                        .native_ref_type(self.parent.path_to_root_mod()?, lifetime)?
-                        .into_owned(),
-                    WireType::Bits32(field_type) => field_type.native_type().to_string(),
-                    WireType::Bits64(field_type) => field_type.native_type().to_string(),
-                })
-            })?)
-    }
-
-    // Returns a mutable ref type name for required field.
-    pub fn native_scalar_mut_ref_type_name(&'c self, lifetime: &'static str) -> Result<&str> {
-        Ok(self.lazy_native_scalar_mut_ref_type_name.get_or_try_init(
-            lifetime,
-            || -> Result<_> {
-                Ok(match self.wire_type()? {
-                    WireType::Variant(field_type) => format!(
-                        "&mut {name}",
-                        name = field_type.native_type(self.parent.path_to_root_mod()?)?
-                    ),
-                    WireType::LengthDelimited(field_type) => field_type
-                        .native_mut_ref_type(self.parent.path_to_root_mod()?)?
-                        .into_owned(),
-                    WireType::Bits32(field_type) => {
-                        format!("&mut {name}", name = field_type.native_type().to_string())
-                    }
-                    WireType::Bits64(field_type) => {
-                        format!("&mut {name}", name = field_type.native_type().to_string())
-                    }
-                })
-            },
-        )?)
     }
 
     pub fn native_name(&'c self) -> Result<&str> {
@@ -357,20 +263,6 @@ pub enum VariantFieldType<'c> {
     Enum(&'c super::EnumDescriptor<'c>),
 }
 impl<'c> VariantFieldType<'c> {
-    pub fn native_type(&self, path_to_root_mod: &str) -> Result<Cow<'static, str>> {
-        Ok(match self {
-            VariantFieldType::Int32 | VariantFieldType::SInt32 => "i32".into(),
-            VariantFieldType::Int64 | VariantFieldType::SInt64 => "i64".into(),
-            VariantFieldType::UInt32 => "u32".into(),
-            VariantFieldType::UInt64 => "u64".into(),
-            VariantFieldType::Bool => "bool".into(),
-            VariantFieldType::Enum(e) => format!(
-                "::std::result::Result<{name}, i32>",
-                name = e.native_fully_qualified_type_name(path_to_root_mod)?
-            )
-            .into(),
-        })
-    }
     pub fn native_tag_type(&self, path_to_root_mod: &str) -> Result<Cow<'static, str>> {
         Ok(match self {
             VariantFieldType::Int32 => "::puroro_internal::tags::Int32".into(),
@@ -395,49 +287,7 @@ pub enum LengthDelimitedFieldType<'c> {
     Bytes,
     Message(&'c super::MessageDescriptor<'c>),
 }
-impl<'c> LengthDelimitedFieldType<'c> {
-    pub fn native_owned_type(&self, path_to_root_mod: &str) -> Result<Cow<'static, str>> {
-        Ok(match self {
-            LengthDelimitedFieldType::String => "::std::string::String".into(),
-            LengthDelimitedFieldType::Bytes => "::std::vec::Vec<u8>".into(),
-            LengthDelimitedFieldType::Message(m) => {
-                m.native_fully_qualified_type_name(path_to_root_mod)?.into()
-            }
-        })
-    }
-    pub fn native_ref_type(
-        &self,
-        path_to_root_mod: &str,
-        lifetime: &str,
-    ) -> Result<Cow<'static, str>> {
-        let lt: Cow<'static, str> = if lifetime.is_empty() {
-            "".into()
-        } else {
-            format!("{} ", lifetime).into()
-        };
-        Ok(match self {
-            LengthDelimitedFieldType::String => format!("&{lt}str", lt = lt).into(),
-            LengthDelimitedFieldType::Bytes => format!("&{lt}[u8]", lt = lt).into(),
-            LengthDelimitedFieldType::Message(m) => format!(
-                "&{lt}{name}",
-                lt = lt,
-                name = m.native_fully_qualified_type_name(path_to_root_mod)?
-            )
-            .into(),
-        })
-    }
-    pub fn native_mut_ref_type(&self, path_to_root_mod: &str) -> Result<Cow<'static, str>> {
-        Ok(match self {
-            LengthDelimitedFieldType::String => "&mut String".into(),
-            LengthDelimitedFieldType::Bytes => "&mut Vec<u8>".into(),
-            LengthDelimitedFieldType::Message(m) => format!(
-                "&mut {name}",
-                name = m.native_fully_qualified_type_name(path_to_root_mod)?
-            )
-            .into(),
-        })
-    }
-}
+impl<'c> LengthDelimitedFieldType<'c> {}
 
 #[derive(Debug, Clone, Hash)]
 pub enum Bits32FieldType {
