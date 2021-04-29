@@ -68,9 +68,8 @@ macro_rules! define_deser_scalar_variants {
                     _ => Err(ErrorKind::InvalidWireType)?,
                 }
             }
-            _ => Err(ErrorKind::InvalidWireType)?,
         }
-    }
+    };
 }
 define_deser_scalar_variants!(i32, tags::Int32, tags::Required);
 define_deser_scalar_variants!(i64, tags::Int64, tags::Required);
