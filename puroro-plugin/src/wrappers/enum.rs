@@ -18,7 +18,6 @@ pub struct EnumDescriptor<'c> {
     lazy_package: OnceCell<String>,
     lazy_fq_name: OnceCell<String>,
     lazy_native_bare_type_name: OnceCell<String>,
-    lazy_native_type_name_from_root: OnceCell<String>,
 }
 impl<'c> EnumDescriptor<'c> {
     pub fn new(
@@ -38,7 +37,6 @@ impl<'c> EnumDescriptor<'c> {
             lazy_package: Default::default(),
             lazy_fq_name: Default::default(),
             lazy_native_bare_type_name: Default::default(),
-            lazy_native_type_name_from_root: Default::default(),
         }
     }
     pub fn name(&self) -> Result<&str> {
@@ -101,32 +99,6 @@ impl<'c> EnumDescriptor<'c> {
             mods = struct_package_iter
                 .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
                 .collect::<String>(),
-        ))
-    }
-
-    /// Returns a Rust typename qualified with a mod path from an arbitral mod location,
-    /// without wrapped by Result<>, without distinguishing between repeated / optional labels.
-    pub fn native_fully_qualified_ident(&'c self, path_to_root_mod: &str) -> Result<String> {
-        let native_type_name_from_root =
-            self.lazy_native_type_name_from_root
-                .get_or_try_init(|| -> Result<_> {
-                    let mod_path = itertools::Itertools::intersperse(
-                        self.package()?
-                            .split('.')
-                            .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
-                        "::".to_string(),
-                    )
-                    .collect::<String>();
-                    Ok(format!(
-                        "{mod_path}::{bare_type}",
-                        mod_path = mod_path,
-                        bare_type = self.native_ident()?
-                    ))
-                })?;
-        Ok(format!(
-            "{path_to_root_mod}::{type_name}",
-            path_to_root_mod = path_to_root_mod,
-            type_name = native_type_name_from_root
         ))
     }
 }

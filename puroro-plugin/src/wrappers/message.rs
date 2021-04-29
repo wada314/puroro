@@ -103,22 +103,6 @@ impl<'c> MessageDescriptor<'c> {
             .lazy_package
             .get_or_try_init(|| -> Result<_> { self.parent.package_for_child() })?)
     }
-    pub fn path_to_root_mod(&'c self) -> Result<&str> {
-        Ok(self
-            .lazy_path_to_root_mod
-            .get_or_try_init(|| -> Result<_> {
-                let depth = self.package()?.split('.').count();
-                if depth != 0 {
-                    Ok(itertools::Itertools::intersperse(
-                        std::iter::repeat("super").take(depth),
-                        "::",
-                    )
-                    .collect::<String>())
-                } else {
-                    Ok("self".to_string())
-                }
-            })?)
-    }
     pub fn fully_qualified_name(&'c self) -> Result<&str> {
         Ok(self.lazy_fq_name.get_or_try_init(|| -> Result<_> {
             Ok(format!(
@@ -166,30 +150,6 @@ impl<'c> MessageDescriptor<'c> {
             mods = struct_package_iter
                 .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
                 .collect::<String>(),
-        ))
-    }
-
-    pub fn native_fully_qualified_ident(&'c self, path_to_root_mod: &str) -> Result<String> {
-        let native_type_name_from_root =
-            self.lazy_native_type_name_from_root
-                .get_or_try_init(|| -> Result<_> {
-                    let mod_path = itertools::Itertools::intersperse(
-                        self.package()?
-                            .split('.')
-                            .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
-                        "::".to_string(),
-                    )
-                    .collect::<String>();
-                    Ok(format!(
-                        "{mod_path}::{bare_type}",
-                        mod_path = mod_path,
-                        bare_type = self.native_ident()?
-                    ))
-                })?;
-        Ok(format!(
-            "{path_to_root_mod}::{type_name}",
-            path_to_root_mod = path_to_root_mod,
-            type_name = native_type_name_from_root
         ))
     }
 }

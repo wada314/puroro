@@ -236,7 +236,7 @@ serializer.serialize_variants_twice::<{tag}, _>(
         .cloned()
         .map(|v| Ok(v)))?;\n",
                             number = field.number(),
-                            tag = field_type.native_tag_type(self.msg.path_to_root_mod()?)?,
+                            tag = field_type.native_tag_type(self.msg.package()?)?,
                             name = field.native_name()?,
                         ),
 

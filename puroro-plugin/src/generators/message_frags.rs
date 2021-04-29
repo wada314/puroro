@@ -125,8 +125,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
                         NonTrivialFieldType::Enum(e) => format!(
                             "::std::result::Result<{type_}, i32>",
-                            type_ =
-                                e.native_fully_qualified_ident(field.path_to_root_mod()?)?
+                            type_ = e.native_ident_with_relative_path(field.package()?)?
                         )
                         .into(),
                         NonTrivialFieldType::Message(m) => {
@@ -175,8 +174,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                         NonTrivialFieldType::Bytes => "&'slice [u8]".into(),
                         NonTrivialFieldType::Enum(e) => format!(
                             "::std::result::Result<{type_}, i32>",
-                            type_ =
-                                e.native_fully_qualified_ident(field.path_to_root_mod()?)?
+                            type_ = e.native_ident_with_relative_path(field.package()?)?
                         )
                         .into(),
                         NonTrivialFieldType::Message(m) => self
@@ -213,12 +211,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             "|| ::bumpalo::boxed::Box::new_in({msg}::new_in(\
                                 self.puroro_internal.bumpalo()\
                            ), self.puroro_internal.bumpalo())",
-                            msg = m.native_fully_qualified_ident(field.path_to_root_mod()?)?,
+                            msg = m.native_ident_with_relative_path(field.package()?)?,
                         )
                         .into(),
                         FieldLabel::Required | FieldLabel::Repeated => format!(
                             "|| {msg}::new_in(self.puroro_internal.bumpalo())",
-                            msg = m.native_fully_qualified_ident(field.path_to_root_mod()?)?,
+                            msg = m.native_ident_with_relative_path(field.package()?)?,
                         )
                         .into(),
                     },

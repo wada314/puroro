@@ -184,13 +184,13 @@ impl<'c> FieldDescriptor<'c> {
             FieldType::Bytes => "Bytes".into(),
             FieldType::Enum(e) => format!(
                 "Enum<{}>",
-                e.native_fully_qualified_ident(self.path_to_root_mod()?)?
+                e.native_ident_with_relative_path(self.package()?)?,
             ),
             FieldType::Message(m) => format!(
                 "Message<{}>",
                 // TODO: Wrong! Need a type name depending on the implementation detail.
                 // e.g. super::DescriptorProtoBumpalo<'bump>
-                m.native_fully_qualified_ident(self.path_to_root_mod()?)?
+                m.native_ident_with_relative_path(self.package()?)?
             ),
         })
     }
@@ -210,10 +210,6 @@ impl<'c> FieldDescriptor<'c> {
 
     pub fn message(&'c self) -> &'c MessageDescriptor<'c> {
         self.parent
-    }
-
-    pub fn path_to_root_mod(&'c self) -> Result<&str> {
-        self.parent.path_to_root_mod()
     }
 
     pub fn fully_qualified_type_name(&'c self) -> Result<&str> {
@@ -303,7 +299,7 @@ pub enum VariantFieldType<'c> {
     Enum(&'c super::EnumDescriptor<'c>),
 }
 impl<'c> VariantFieldType<'c> {
-    pub fn native_tag_type(&self, path_to_root_mod: &str) -> Result<Cow<'static, str>> {
+    pub fn native_tag_type(&self, package: &str) -> Result<Cow<'static, str>> {
         Ok(match self {
             VariantFieldType::Int32 => "::puroro_internal::tags::Int32".into(),
             VariantFieldType::Int64 => "::puroro_internal::tags::Int64".into(),
@@ -314,7 +310,7 @@ impl<'c> VariantFieldType<'c> {
             VariantFieldType::Bool => "::puroro_internal::tags::Bool".into(),
             VariantFieldType::Enum(e) => format!(
                 "::puroro_internal::tags::Enum<{name}>",
-                name = e.native_fully_qualified_ident(path_to_root_mod)?
+                name = e.native_ident_with_relative_path(package)?,
             )
             .into(),
         })
