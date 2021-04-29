@@ -46,12 +46,18 @@ pub trait {name}Trait {{\n",
                                 reftype = field.native_maybe_ref_type("'_")?,
                             )
                         }
-                        (FieldLabel::Required, _)
-                        | (FieldLabel::Optional2, _)
-                        | (FieldLabel::Optional3, _) => {
+                        (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
                             // normal getter function.
                             format!(
                                 "fn {name}(&'_ self) -> {reftype};\n",
+                                name = field.native_name(),
+                                reftype = field.native_maybe_ref_type("'_")?,
+                            )
+                        }
+                        (FieldLabel::Optional2, _) => {
+                            // getter function with Optional.
+                            format!(
+                                "fn {name}(&'_ self) -> ::std::option::Option<{reftype}>;\n",
                                 name = field.native_name(),
                                 reftype = field.native_maybe_ref_type("'_")?,
                             )

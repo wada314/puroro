@@ -499,9 +499,7 @@ fn {name}(&self) -> {reftype} {{
                                 reftype = field.native_maybe_ref_type("'_")?,
                             )
                         }
-                        (FieldLabel::Required, _)
-                        | (FieldLabel::Optional2, _)
-                        | (FieldLabel::Optional3, _) => {
+                        (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
                             // normal getter function.
                             let process_ref = match field.type_()? {
                                 FieldType::String | FieldType::Bytes => ".as_ref()",
@@ -511,6 +509,23 @@ fn {name}(&self) -> {reftype} {{
                             format!(
                                 "\
 fn {name}(&self) -> {reftype} {{
+    self.{name}{process_ref}
+}}\n",
+                                name = field.native_name(),
+                                reftype = field.native_maybe_ref_type("'_")?,
+                                process_ref = process_ref,
+                            )
+                        }
+                        (FieldLabel::Optional2, _) => {
+                            // getter function with Option.
+                            let process_ref = match field.type_()? {
+                                FieldType::String | FieldType::Bytes => ".as_deref()",
+                                FieldType::Message(_) => "", // This should be catched by the arm above
+                                _ => ".clone()",
+                            };
+                            format!(
+                                "\
+fn {name}(&self) -> ::std::option::Option<{reftype}> {{
     self.{name}{process_ref}
 }}\n",
                                 name = field.native_name(),
