@@ -4,10 +4,18 @@ mod maybe_repeated_variant_field;
 pub use maybe_repeated_field::MaybeRepeatedField;
 pub use maybe_repeated_variant_field::MaybeRepeatedVariantField;
 
+use crate::tags;
 use crate::types::FieldData;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
+pub trait MapEntry {
+    type KeyTag: tags::FieldTypeTag;
+    type ValueTag: tags::FieldTypeTag;
+    type KeyType;
+    type ValueType;
+    fn into_tuple(self) -> (Self::KeyType, Self::ValueType);
+}
 pub trait FieldNew<'a>: Sized {
     fn new() -> Self;
     #[cfg(feature = "puroro-bumpalo")]

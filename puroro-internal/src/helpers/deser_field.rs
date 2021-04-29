@@ -5,6 +5,10 @@ use crate::types::FieldData;
 use crate::{variant, ErrorKind, PuroroError, Result};
 use std::collections::HashMap;
 use std::convert::{TryFrom, TryInto};
+use std::hash::Hash;
+use std::marker::PhantomData;
+
+use super::MapEntry;
 
 pub trait DeserializableFieldFromIter<T>
 where
@@ -198,21 +202,31 @@ where
     }
 }
 
-impl<KT, VT, KR, VR> DeserializableFieldFromIter<tags::Map<KT, VT>> for HashMap<KR, VR>
+impl<Entry> DeserializableFieldFromIter<tags::Map<Entry>>
+    for HashMap<Entry::KeyType, Entry::ValueType>
 where
-    KT: FieldTypeTag,
-    VT: FieldTypeTag,
-    KR: DeserializableFieldFromIter<(KT, tags::Required)>,
-    VR: DeserializableFieldFromIter<(VT, tags::Required)>,
+    Entry: MapEntry + crate::deser::DeserializableMessageFromIter,
+    Entry::KeyTag: FieldTypeTag,
+    Entry::ValueTag: FieldTypeTag,
+    Entry::KeyType: Hash + Eq + DeserializableFieldFromIter<(Entry::KeyTag, tags::Required)>,
+    Entry::ValueType: DeserializableFieldFromIter<(Entry::ValueTag, tags::Required)>,
 {
-    type Item = (KR, VR);
+    type Item = Entry;
 
     fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut BytesIter<'a, I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
     {
-        todo!()
+        if let FieldData::LengthDelimited(bytes_iter) = field {
+            let mut entry = (f)();
+            bytes_iter.deser_message(&mut entry)?;
+            let kv = entry.into_tuple();
+            self.insert(kv.0, kv.1);
+            Ok(())
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
     }
 }
 

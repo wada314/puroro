@@ -1,5 +1,7 @@
 use std::marker::PhantomData;
 
+use crate::helpers::MapEntry;
+
 pub trait FieldTypeTag {}
 pub trait VariantTypeTag: FieldTypeTag {}
 pub trait FieldLabelTag {}
@@ -24,7 +26,8 @@ pub struct Fixed32();
 pub struct Fixed64();
 // Map is a little special, they cannot have [repeated|optional|required]
 // labels. So `Map` is NOT a `FieldTypeTag`.
-pub struct Map<K, V>(PhantomData<(K, V)>);
+// The type `T` implies the entry submessage type.
+pub struct Map<T>(PhantomData<T>);
 
 impl FieldTypeTag for Int32 {}
 impl FieldTypeTag for Int64 {}
@@ -70,9 +73,10 @@ where
     L: FieldLabelTag,
 {
 }
-impl<K, V> FieldTypeAndLabelTag for Map<K, V>
+impl<T> FieldTypeAndLabelTag for Map<T>
 where
-    K: FieldTypeTag,
-    V: FieldTypeTag,
+    T: MapEntry,
+    T::KeyTag: FieldTypeTag,
+    T::ValueTag: FieldTypeTag,
 {
 }
