@@ -41,7 +41,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for GeneratedCodeIn
                 <::std::vec::Vec<generated_code_info::Annotation> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::generated_code_info::Annotation>, 
                     tags::Repeated)>>
-                ::deser(&mut self.annotation, field, std::default::Default::default)?;
+                ::deser(&mut self.annotation, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -266,25 +266,25 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Annotation {
                 <::std::vec::Vec<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Repeated)>>
-                ::deser(&mut self.path, field, std::default::Default::default)?;
+                ::deser(&mut self.path, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.source_file, field, std::default::Default::default)?;
+                ::deser(&mut self.source_file, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.begin, field, std::default::Default::default)?;
+                ::deser(&mut self.begin, field, ::std::default::Default::default)?;
             }
             4 => {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.end, field, std::default::Default::default)?;
+                ::deser(&mut self.end, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -575,7 +575,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for SourceCodeInfo 
                 <::std::vec::Vec<source_code_info::Location> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::source_code_info::Location>, 
                     tags::Repeated)>>
-                ::deser(&mut self.location, field, std::default::Default::default)?;
+                ::deser(&mut self.location, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -802,31 +802,31 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Location {
                 <::std::vec::Vec<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Repeated)>>
-                ::deser(&mut self.path, field, std::default::Default::default)?;
+                ::deser(&mut self.path, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::vec::Vec<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Repeated)>>
-                ::deser(&mut self.span, field, std::default::Default::default)?;
+                ::deser(&mut self.span, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.leading_comments, field, std::default::Default::default)?;
+                ::deser(&mut self.leading_comments, field, ::std::default::Default::default)?;
             }
             4 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.trailing_comments, field, std::default::Default::default)?;
+                ::deser(&mut self.trailing_comments, field, ::std::default::Default::default)?;
             }
             6 => {
                 <::std::vec::Vec<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Repeated)>>
-                ::deser(&mut self.leading_detached_comments, field, std::default::Default::default)?;
+                ::deser(&mut self.leading_detached_comments, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -1226,43 +1226,43 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for UninterpretedOp
                 <::std::vec::Vec<uninterpreted_option::NamePart> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::uninterpreted_option::NamePart>, 
                     tags::Repeated)>>
-                ::deser(&mut self.name, field, std::default::Default::default)?;
+                ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.identifier_value, field, std::default::Default::default)?;
+                ::deser(&mut self.identifier_value, field, ::std::default::Default::default)?;
             }
             4 => {
                 <::std::option::Option<u64> as DeserializableFieldFromIter<(
                     tags::UInt64, 
                     tags::Optional2)>>
-                ::deser(&mut self.positive_int_value, field, std::default::Default::default)?;
+                ::deser(&mut self.positive_int_value, field, ::std::default::Default::default)?;
             }
             5 => {
                 <::std::option::Option<i64> as DeserializableFieldFromIter<(
                     tags::Int64, 
                     tags::Optional2)>>
-                ::deser(&mut self.negative_int_value, field, std::default::Default::default)?;
+                ::deser(&mut self.negative_int_value, field, ::std::default::Default::default)?;
             }
             6 => {
                 <::std::option::Option<f64> as DeserializableFieldFromIter<(
                     tags::Double, 
                     tags::Optional2)>>
-                ::deser(&mut self.double_value, field, std::default::Default::default)?;
+                ::deser(&mut self.double_value, field, ::std::default::Default::default)?;
             }
             7 => {
                 <::std::option::Option<::std::vec::Vec<u8>> as DeserializableFieldFromIter<(
                     tags::Bytes, 
                     tags::Optional2)>>
-                ::deser(&mut self.string_value, field, std::default::Default::default)?;
+                ::deser(&mut self.string_value, field, ::std::default::Default::default)?;
             }
             8 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.aggregate_value, field, std::default::Default::default)?;
+                ::deser(&mut self.aggregate_value, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -1617,13 +1617,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for NamePart {
                 <::std::string::String as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Required)>>
-                ::deser(&mut self.name_part, field, std::default::Default::default)?;
+                ::deser(&mut self.name_part, field, ::std::default::Default::default)?;
             }
             2 => {
                 <bool as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Required)>>
-                ::deser(&mut self.is_extension, field, std::default::Default::default)?;
+                ::deser(&mut self.is_extension, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -1828,7 +1828,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MethodOptions {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.deprecated, field, std::default::Default::default)?;
+                ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             34 => {
                 <::std::option::Option<::std::result::Result<super::super::google::protobuf::method_options::IdempotencyLevel, i32>> as DeserializableFieldFromIter<(
@@ -1840,7 +1840,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MethodOptions {
                 <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::UninterpretedOption>, 
                     tags::Repeated)>>
-                ::deser(&mut self.uninterpreted_option, field, std::default::Default::default)?;
+                ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -2134,13 +2134,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ServiceOptions 
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.deprecated, field, std::default::Default::default)?;
+                ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             999 => {
                 <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::UninterpretedOption>, 
                     tags::Repeated)>>
-                ::deser(&mut self.uninterpreted_option, field, std::default::Default::default)?;
+                ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -2385,13 +2385,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumValueOption
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.deprecated, field, std::default::Default::default)?;
+                ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             999 => {
                 <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::UninterpretedOption>, 
                     tags::Repeated)>>
-                ::deser(&mut self.uninterpreted_option, field, std::default::Default::default)?;
+                ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -2638,19 +2638,19 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumOptions {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.allow_alias, field, std::default::Default::default)?;
+                ::deser(&mut self.allow_alias, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.deprecated, field, std::default::Default::default)?;
+                ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             999 => {
                 <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::UninterpretedOption>, 
                     tags::Repeated)>>
-                ::deser(&mut self.uninterpreted_option, field, std::default::Default::default)?;
+                ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -2918,7 +2918,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for OneofOptions {
                 <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::UninterpretedOption>, 
                     tags::Repeated)>>
-                ::deser(&mut self.uninterpreted_option, field, std::default::Default::default)?;
+                ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -3154,7 +3154,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FieldOptions {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.packed, field, std::default::Default::default)?;
+                ::deser(&mut self.packed, field, ::std::default::Default::default)?;
             }
             6 => {
                 <::std::option::Option<::std::result::Result<super::super::google::protobuf::field_options::Jstype, i32>> as DeserializableFieldFromIter<(
@@ -3166,25 +3166,25 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FieldOptions {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.lazy, field, std::default::Default::default)?;
+                ::deser(&mut self.lazy, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.deprecated, field, std::default::Default::default)?;
+                ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             10 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.weak, field, std::default::Default::default)?;
+                ::deser(&mut self.weak, field, ::std::default::Default::default)?;
             }
             999 => {
                 <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::UninterpretedOption>, 
                     tags::Repeated)>>
-                ::deser(&mut self.uninterpreted_option, field, std::default::Default::default)?;
+                ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -3606,31 +3606,31 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MessageOptions 
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.message_set_wire_format, field, std::default::Default::default)?;
+                ::deser(&mut self.message_set_wire_format, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.no_standard_descriptor_accessor, field, std::default::Default::default)?;
+                ::deser(&mut self.no_standard_descriptor_accessor, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.deprecated, field, std::default::Default::default)?;
+                ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             7 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.map_entry, field, std::default::Default::default)?;
+                ::deser(&mut self.map_entry, field, ::std::default::Default::default)?;
             }
             999 => {
                 <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::UninterpretedOption>, 
                     tags::Repeated)>>
-                ::deser(&mut self.uninterpreted_option, field, std::default::Default::default)?;
+                ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -3988,31 +3988,31 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileOptions {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.java_package, field, std::default::Default::default)?;
+                ::deser(&mut self.java_package, field, ::std::default::Default::default)?;
             }
             8 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.java_outer_classname, field, std::default::Default::default)?;
+                ::deser(&mut self.java_outer_classname, field, ::std::default::Default::default)?;
             }
             10 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.java_multiple_files, field, std::default::Default::default)?;
+                ::deser(&mut self.java_multiple_files, field, ::std::default::Default::default)?;
             }
             20 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.java_generate_equals_and_hash, field, std::default::Default::default)?;
+                ::deser(&mut self.java_generate_equals_and_hash, field, ::std::default::Default::default)?;
             }
             27 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.java_string_check_utf8, field, std::default::Default::default)?;
+                ::deser(&mut self.java_string_check_utf8, field, ::std::default::Default::default)?;
             }
             9 => {
                 <::std::option::Option<::std::result::Result<super::super::google::protobuf::file_options::OptimizeMode, i32>> as DeserializableFieldFromIter<(
@@ -4024,91 +4024,91 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileOptions {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.go_package, field, std::default::Default::default)?;
+                ::deser(&mut self.go_package, field, ::std::default::Default::default)?;
             }
             16 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.cc_generic_services, field, std::default::Default::default)?;
+                ::deser(&mut self.cc_generic_services, field, ::std::default::Default::default)?;
             }
             17 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.java_generic_services, field, std::default::Default::default)?;
+                ::deser(&mut self.java_generic_services, field, ::std::default::Default::default)?;
             }
             18 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.py_generic_services, field, std::default::Default::default)?;
+                ::deser(&mut self.py_generic_services, field, ::std::default::Default::default)?;
             }
             42 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.php_generic_services, field, std::default::Default::default)?;
+                ::deser(&mut self.php_generic_services, field, ::std::default::Default::default)?;
             }
             23 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.deprecated, field, std::default::Default::default)?;
+                ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             31 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.cc_enable_arenas, field, std::default::Default::default)?;
+                ::deser(&mut self.cc_enable_arenas, field, ::std::default::Default::default)?;
             }
             36 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.objc_class_prefix, field, std::default::Default::default)?;
+                ::deser(&mut self.objc_class_prefix, field, ::std::default::Default::default)?;
             }
             37 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.csharp_namespace, field, std::default::Default::default)?;
+                ::deser(&mut self.csharp_namespace, field, ::std::default::Default::default)?;
             }
             39 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.swift_prefix, field, std::default::Default::default)?;
+                ::deser(&mut self.swift_prefix, field, ::std::default::Default::default)?;
             }
             40 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.php_class_prefix, field, std::default::Default::default)?;
+                ::deser(&mut self.php_class_prefix, field, ::std::default::Default::default)?;
             }
             41 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.php_namespace, field, std::default::Default::default)?;
+                ::deser(&mut self.php_namespace, field, ::std::default::Default::default)?;
             }
             44 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.php_metadata_namespace, field, std::default::Default::default)?;
+                ::deser(&mut self.php_metadata_namespace, field, ::std::default::Default::default)?;
             }
             45 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.ruby_package, field, std::default::Default::default)?;
+                ::deser(&mut self.ruby_package, field, ::std::default::Default::default)?;
             }
             999 => {
                 <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::UninterpretedOption>, 
                     tags::Repeated)>>
-                ::deser(&mut self.uninterpreted_option, field, std::default::Default::default)?;
+                ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -4820,37 +4820,37 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MethodDescripto
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.name, field, std::default::Default::default)?;
+                ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.input_type, field, std::default::Default::default)?;
+                ::deser(&mut self.input_type, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.output_type, field, std::default::Default::default)?;
+                ::deser(&mut self.output_type, field, ::std::default::Default::default)?;
             }
             4 => {
                 <::std::option::Option<::std::boxed::Box<MethodOptions>> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::MethodOptions>, 
                     tags::Optional2)>>
-                ::deser(&mut self.options, field, std::default::Default::default)?;
+                ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             5 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.client_streaming, field, std::default::Default::default)?;
+                ::deser(&mut self.client_streaming, field, ::std::default::Default::default)?;
             }
             6 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.server_streaming, field, std::default::Default::default)?;
+                ::deser(&mut self.server_streaming, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -5145,19 +5145,19 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ServiceDescript
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.name, field, std::default::Default::default)?;
+                ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::vec::Vec<MethodDescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::MethodDescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.method, field, std::default::Default::default)?;
+                ::deser(&mut self.method, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<::std::boxed::Box<ServiceOptions>> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::ServiceOptions>, 
                     tags::Optional2)>>
-                ::deser(&mut self.options, field, std::default::Default::default)?;
+                ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -5424,19 +5424,19 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumValueDescri
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.name, field, std::default::Default::default)?;
+                ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.number, field, std::default::Default::default)?;
+                ::deser(&mut self.number, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<::std::boxed::Box<EnumValueOptions>> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::EnumValueOptions>, 
                     tags::Optional2)>>
-                ::deser(&mut self.options, field, std::default::Default::default)?;
+                ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -5668,31 +5668,31 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumDescriptorP
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.name, field, std::default::Default::default)?;
+                ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::vec::Vec<EnumValueDescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::EnumValueDescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.value, field, std::default::Default::default)?;
+                ::deser(&mut self.value, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<::std::boxed::Box<EnumOptions>> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::EnumOptions>, 
                     tags::Optional2)>>
-                ::deser(&mut self.options, field, std::default::Default::default)?;
+                ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             4 => {
                 <::std::vec::Vec<enum_descriptor_proto::EnumReservedRange> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::enum_descriptor_proto::EnumReservedRange>, 
                     tags::Repeated)>>
-                ::deser(&mut self.reserved_range, field, std::default::Default::default)?;
+                ::deser(&mut self.reserved_range, field, ::std::default::Default::default)?;
             }
             5 => {
                 <::std::vec::Vec<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Repeated)>>
-                ::deser(&mut self.reserved_name, field, std::default::Default::default)?;
+                ::deser(&mut self.reserved_name, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -6083,13 +6083,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumReservedRan
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.start, field, std::default::Default::default)?;
+                ::deser(&mut self.start, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.end, field, std::default::Default::default)?;
+                ::deser(&mut self.end, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -6296,13 +6296,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for OneofDescriptor
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.name, field, std::default::Default::default)?;
+                ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<::std::boxed::Box<OneofOptions>> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::OneofOptions>, 
                     tags::Optional2)>>
-                ::deser(&mut self.options, field, std::default::Default::default)?;
+                ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -6521,13 +6521,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FieldDescriptor
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.name, field, std::default::Default::default)?;
+                ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.number, field, std::default::Default::default)?;
+                ::deser(&mut self.number, field, ::std::default::Default::default)?;
             }
             4 => {
                 <::std::option::Option<::std::result::Result<super::super::google::protobuf::field_descriptor_proto::Label, i32>> as DeserializableFieldFromIter<(
@@ -6545,43 +6545,43 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FieldDescriptor
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.type_name, field, std::default::Default::default)?;
+                ::deser(&mut self.type_name, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.extendee, field, std::default::Default::default)?;
+                ::deser(&mut self.extendee, field, ::std::default::Default::default)?;
             }
             7 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.default_value, field, std::default::Default::default)?;
+                ::deser(&mut self.default_value, field, ::std::default::Default::default)?;
             }
             9 => {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.oneof_index, field, std::default::Default::default)?;
+                ::deser(&mut self.oneof_index, field, ::std::default::Default::default)?;
             }
             10 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.json_name, field, std::default::Default::default)?;
+                ::deser(&mut self.json_name, field, ::std::default::Default::default)?;
             }
             8 => {
                 <::std::option::Option<::std::boxed::Box<FieldOptions>> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::FieldOptions>, 
                     tags::Optional2)>>
-                ::deser(&mut self.options, field, std::default::Default::default)?;
+                ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             17 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<(
                     tags::Bool, 
                     tags::Optional2)>>
-                ::deser(&mut self.proto3_optional, field, std::default::Default::default)?;
+                ::deser(&mut self.proto3_optional, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -7065,7 +7065,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ExtensionRangeO
                 <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::UninterpretedOption>, 
                     tags::Repeated)>>
-                ::deser(&mut self.uninterpreted_option, field, std::default::Default::default)?;
+                ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -7301,61 +7301,61 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for DescriptorProto
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.name, field, std::default::Default::default)?;
+                ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::vec::Vec<FieldDescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::FieldDescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.field, field, std::default::Default::default)?;
+                ::deser(&mut self.field, field, ::std::default::Default::default)?;
             }
             6 => {
                 <::std::vec::Vec<FieldDescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::FieldDescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.extension, field, std::default::Default::default)?;
+                ::deser(&mut self.extension, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::vec::Vec<DescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::DescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.nested_type, field, std::default::Default::default)?;
+                ::deser(&mut self.nested_type, field, ::std::default::Default::default)?;
             }
             4 => {
                 <::std::vec::Vec<EnumDescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::EnumDescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.enum_type, field, std::default::Default::default)?;
+                ::deser(&mut self.enum_type, field, ::std::default::Default::default)?;
             }
             5 => {
                 <::std::vec::Vec<descriptor_proto::ExtensionRange> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::descriptor_proto::ExtensionRange>, 
                     tags::Repeated)>>
-                ::deser(&mut self.extension_range, field, std::default::Default::default)?;
+                ::deser(&mut self.extension_range, field, ::std::default::Default::default)?;
             }
             8 => {
                 <::std::vec::Vec<OneofDescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::OneofDescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.oneof_decl, field, std::default::Default::default)?;
+                ::deser(&mut self.oneof_decl, field, ::std::default::Default::default)?;
             }
             7 => {
                 <::std::option::Option<::std::boxed::Box<MessageOptions>> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::MessageOptions>, 
                     tags::Optional2)>>
-                ::deser(&mut self.options, field, std::default::Default::default)?;
+                ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             9 => {
                 <::std::vec::Vec<descriptor_proto::ReservedRange> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::descriptor_proto::ReservedRange>, 
                     tags::Repeated)>>
-                ::deser(&mut self.reserved_range, field, std::default::Default::default)?;
+                ::deser(&mut self.reserved_range, field, ::std::default::Default::default)?;
             }
             10 => {
                 <::std::vec::Vec<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Repeated)>>
-                ::deser(&mut self.reserved_name, field, std::default::Default::default)?;
+                ::deser(&mut self.reserved_name, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -8066,13 +8066,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ReservedRange {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.start, field, std::default::Default::default)?;
+                ::deser(&mut self.start, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.end, field, std::default::Default::default)?;
+                ::deser(&mut self.end, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -8280,19 +8280,19 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ExtensionRange 
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.start, field, std::default::Default::default)?;
+                ::deser(&mut self.start, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.end, field, std::default::Default::default)?;
+                ::deser(&mut self.end, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<::std::boxed::Box<super::ExtensionRangeOptions>> as DeserializableFieldFromIter<(
                     tags::Message<super::super::super::google::protobuf::ExtensionRangeOptions>, 
                     tags::Optional2)>>
-                ::deser(&mut self.options, field, std::default::Default::default)?;
+                ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -8543,73 +8543,73 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileDescriptorP
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.name, field, std::default::Default::default)?;
+                ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.package, field, std::default::Default::default)?;
+                ::deser(&mut self.package, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::vec::Vec<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Repeated)>>
-                ::deser(&mut self.dependency, field, std::default::Default::default)?;
+                ::deser(&mut self.dependency, field, ::std::default::Default::default)?;
             }
             10 => {
                 <::std::vec::Vec<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Repeated)>>
-                ::deser(&mut self.public_dependency, field, std::default::Default::default)?;
+                ::deser(&mut self.public_dependency, field, ::std::default::Default::default)?;
             }
             11 => {
                 <::std::vec::Vec<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Repeated)>>
-                ::deser(&mut self.weak_dependency, field, std::default::Default::default)?;
+                ::deser(&mut self.weak_dependency, field, ::std::default::Default::default)?;
             }
             4 => {
                 <::std::vec::Vec<DescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::DescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.message_type, field, std::default::Default::default)?;
+                ::deser(&mut self.message_type, field, ::std::default::Default::default)?;
             }
             5 => {
                 <::std::vec::Vec<EnumDescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::EnumDescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.enum_type, field, std::default::Default::default)?;
+                ::deser(&mut self.enum_type, field, ::std::default::Default::default)?;
             }
             6 => {
                 <::std::vec::Vec<ServiceDescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::ServiceDescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.service, field, std::default::Default::default)?;
+                ::deser(&mut self.service, field, ::std::default::Default::default)?;
             }
             7 => {
                 <::std::vec::Vec<FieldDescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::FieldDescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.extension, field, std::default::Default::default)?;
+                ::deser(&mut self.extension, field, ::std::default::Default::default)?;
             }
             8 => {
                 <::std::option::Option<::std::boxed::Box<FileOptions>> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::FileOptions>, 
                     tags::Optional2)>>
-                ::deser(&mut self.options, field, std::default::Default::default)?;
+                ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             9 => {
                 <::std::option::Option<::std::boxed::Box<SourceCodeInfo>> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::SourceCodeInfo>, 
                     tags::Optional2)>>
-                ::deser(&mut self.source_code_info, field, std::default::Default::default)?;
+                ::deser(&mut self.source_code_info, field, ::std::default::Default::default)?;
             }
             12 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.syntax, field, std::default::Default::default)?;
+                ::deser(&mut self.syntax, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -9321,7 +9321,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileDescriptorS
                 <::std::vec::Vec<FileDescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::google::protobuf::FileDescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.file, field, std::default::Default::default)?;
+                ::deser(&mut self.file, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
