@@ -1,12 +1,11 @@
-use crate::deser::{BytesIter, DeserializableMessageFromIter};
-use crate::tags::{self, VariantTypeTag};
-use crate::tags::{FieldLabelTag, FieldTypeAndLabelTag, FieldTypeTag};
+use crate::deser::BytesIter;
+use crate::tags;
+use crate::tags::{FieldTypeAndLabelTag, FieldTypeTag};
 use crate::types::FieldData;
-use crate::{variant, ErrorKind, PuroroError, Result};
+use crate::{ErrorKind, PuroroError, Result};
 use std::collections::HashMap;
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 use std::hash::Hash;
-use std::marker::PhantomData;
 
 use super::MapEntry;
 
