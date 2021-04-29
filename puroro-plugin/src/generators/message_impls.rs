@@ -150,6 +150,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
     {{
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
         use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
         match field_number {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
@@ -158,23 +159,26 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
             ),
             indent_n(
                 3,
-                iter(self.msg.fields().map(|field| -> Result<_> {
-                    Ok(format!(
-                        "\
+                (
+                    iter(self.msg.fields().map(|field| -> Result<_> {
+                        Ok(format!(
+                            "\
 {number} => {{
     <{type_} as DeserializableFieldFromIter<(
         tags::{type_tag}, 
         tags::{label_tag})>>
     ::deser(&mut self.{name}, field, {default_func})?;
 }}\n",
-                        number = field.number(),
-                        name = field.native_name()?,
-                        type_ = self.frag_gen.field_type_for(field)?,
-                        type_tag = field.type_tag()?,
-                        label_tag = field.label_tag()?,
-                        default_func = self.frag_gen.default_func_for(field)?,
-                    ))
-                })),
+                            number = field.number(),
+                            name = field.native_name()?,
+                            type_ = self.frag_gen.field_type_for(field)?,
+                            type_tag = field.type_tag()?,
+                            label_tag = field.label_tag()?,
+                            default_func = self.frag_gen.default_func_for(field)?,
+                        ))
+                    })),
+                    "_ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,\n",
+                ),
             ),
             "        \
         }}

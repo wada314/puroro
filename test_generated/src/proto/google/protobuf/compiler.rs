@@ -39,6 +39,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
         use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
         match field_number {
             1 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
@@ -58,6 +59,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
                     tags::Repeated)>>
                 ::deser(&mut self.file, field, std::default::Default::default)?;
             }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
         Ok(())
     }
@@ -165,6 +167,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
         use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
         match field_number {
             1 => {
                 <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<(
@@ -184,6 +187,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
                     tags::Repeated)>>
                 ::deser(&mut self.file, field, || super::super::super::google::protobuf::compiler::code_generator_response::File::new_in(self.puroro_internal.bumpalo()))?;
             }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
         Ok(())
     }
@@ -338,6 +342,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for File {
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
         use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
         match field_number {
             1 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
@@ -363,6 +368,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for File {
                     tags::Optional2)>>
                 ::deser(&mut self.generated_code_info, field, std::default::Default::default)?;
             }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
         Ok(())
     }
@@ -460,6 +466,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileBump
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
         use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
         match field_number {
             1 => {
                 <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<(
@@ -485,6 +492,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileBump
                     tags::Optional2)>>
                 ::deser(&mut self.generated_code_info, field, || ::bumpalo::boxed::Box::new_in(super::super::super::super::google::protobuf::GeneratedCodeInfo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
         Ok(())
     }
@@ -600,6 +608,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
         use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
         match field_number {
             1 => {
                 <::std::vec::Vec<::std::string::String> as DeserializableFieldFromIter<(
@@ -625,6 +634,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
                     tags::Optional2)>>
                 ::deser(&mut self.compiler_version, field, std::default::Default::default)?;
             }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
         Ok(())
     }
@@ -755,6 +765,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
         use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
         match field_number {
             1 => {
                 <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<(
@@ -780,6 +791,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
                     tags::Optional2)>>
                 ::deser(&mut self.compiler_version, field, || ::bumpalo::boxed::Box::new_in(super::super::super::google::protobuf::compiler::Version::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
         Ok(())
     }
@@ -944,6 +956,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Version {
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
         use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
         match field_number {
             1 => {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
@@ -969,6 +982,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Version {
                     tags::Optional2)>>
                 ::deser(&mut self.suffix, field, std::default::Default::default)?;
             }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
         Ok(())
     }
@@ -1071,6 +1085,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for VersionB
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
         use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
         match field_number {
             1 => {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
@@ -1096,6 +1111,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for VersionB
                     tags::Optional2)>>
                 ::deser(&mut self.suffix, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
         Ok(())
     }

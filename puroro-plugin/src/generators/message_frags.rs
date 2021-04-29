@@ -195,7 +195,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 AllocatorType::Default => match field.type_()? {
                     FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
                     FieldType::Enum(_) => "|| 0i32.try_into()".into(),
-                    _ => "std::default::Default::default".into(),
+                    _ => "::std::default::Default::default".into(),
                 },
                 AllocatorType::Bumpalo => match field.type_()? {
                     FieldType::String => {
