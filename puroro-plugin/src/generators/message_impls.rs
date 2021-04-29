@@ -162,10 +162,11 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
                     Ok(format!(
                         "\
 {number} => {{
-    <{type_} as DeserializableFieldFromIter<(tags::{type_tag}, tags::{label_tag})>>::deser(
-        &mut self.{name}, field, {default_func}
-    )?;
-}};",
+    <{type_} as DeserializableFieldFromIter<(
+        tags::{type_tag}, 
+        tags::{label_tag})>>
+    ::deser(&mut self.{name}, field, {default_func})?;
+}}\n",
                         number = field.number(),
                         name = field.native_name()?,
                         type_ = self.frag_gen.field_type_for(field)?,
