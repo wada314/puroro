@@ -32,15 +32,6 @@ pub trait MessageSerializer {
         field_number: usize,
         bytes: [u8; BYTES],
     ) -> Result<()>;
-
-    fn direct_write_ld_field<I>(
-        &mut self,
-        field_number: usize,
-        length: usize,
-        input: I,
-    ) -> Result<()>
-    where
-        I: Iterator<Item = IoResult<u8>>;
 }
 pub fn default_serializer<'a, W>(write: &'a mut W) -> impl MessageSerializer + 'a
 where
@@ -154,23 +145,6 @@ where
         RustUsize::to_variant(length)?.encode_bytes(&mut self.write)?;
         message.serialize(self)?;
 
-        Ok(())
-    }
-
-    fn direct_write_ld_field<I>(
-        &mut self,
-        field_number: usize,
-        length: usize,
-        input: I,
-    ) -> Result<()>
-    where
-        I: Iterator<Item = IoResult<u8>>,
-    {
-        self.write_field_number_and_wire_type(field_number, WireType::LengthDelimited)?;
-        RustUsize::to_variant(length)?.encode_bytes(&mut self.write)?;
-        for rbyte in input {
-            self.write.write_all(std::slice::from_ref(&rbyte?))?;
-        }
         Ok(())
     }
 
