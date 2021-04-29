@@ -30,7 +30,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         };
         Ok(format!(
             "{name}{postfix1}{postfix2}",
-            name = msg.native_bare_type_name()?,
+            name = msg.native_ident()?,
             postfix1 = postfix1,
             postfix2 = postfix2,
         )
@@ -126,7 +126,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                         NonTrivialFieldType::Enum(e) => format!(
                             "::std::result::Result<{type_}, i32>",
                             type_ =
-                                e.native_fully_qualified_type_name(field.path_to_root_mod()?)?
+                                e.native_fully_qualified_ident(field.path_to_root_mod()?)?
                         )
                         .into(),
                         NonTrivialFieldType::Message(m) => {
@@ -176,7 +176,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                         NonTrivialFieldType::Enum(e) => format!(
                             "::std::result::Result<{type_}, i32>",
                             type_ =
-                                e.native_fully_qualified_type_name(field.path_to_root_mod()?)?
+                                e.native_fully_qualified_ident(field.path_to_root_mod()?)?
                         )
                         .into(),
                         NonTrivialFieldType::Message(m) => self
@@ -213,12 +213,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             "|| ::bumpalo::boxed::Box::new_in({msg}::new_in(\
                                 self.puroro_internal.bumpalo()\
                            ), self.puroro_internal.bumpalo())",
-                            msg = m.native_fully_qualified_type_name(field.path_to_root_mod()?)?,
+                            msg = m.native_fully_qualified_ident(field.path_to_root_mod()?)?,
                         )
                         .into(),
                         FieldLabel::Required | FieldLabel::Repeated => format!(
                             "|| {msg}::new_in(self.puroro_internal.bumpalo())",
-                            msg = m.native_fully_qualified_type_name(field.path_to_root_mod()?)?,
+                            msg = m.native_fully_qualified_ident(field.path_to_root_mod()?)?,
                         )
                         .into(),
                     },

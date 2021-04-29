@@ -22,7 +22,7 @@ impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
             format!(
                 "\
 pub trait {name}Trait {{\n",
-                name = self.msg.native_bare_type_name()?
+                name = self.msg.native_ident()?
             ),
             indent(iter(self.msg.fields().map(|field| -> Result<_> {
                 Ok((
@@ -32,7 +32,7 @@ pub trait {name}Trait {{\n",
                             "type {camel_name}Type: {submsg_name}Trait;\n",
                             camel_name = to_camel_case(field.native_name()?),
                             submsg_name =
-                                m.native_type_name_with_relative_path(field.package()?)?,
+                                m.native_ident_with_relative_path(field.package()?)?,
                         )
                     } else {
                         "".to_string()

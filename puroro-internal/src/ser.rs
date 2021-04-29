@@ -3,7 +3,7 @@ use crate::{
     types::WireType,
     variant::{RustUsize, VariantType},
 };
-use std::io::{Result as IoResult, Write};
+use std::io::Write;
 
 pub trait MessageSerializer {
     fn serialize_variant<T: VariantType>(

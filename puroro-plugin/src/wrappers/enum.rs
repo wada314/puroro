@@ -64,7 +64,7 @@ impl<'c> EnumDescriptor<'c> {
         self.values.iter()
     }
 
-    /// Returns a Rust typename which can be used for enum definition:
+    /// Returns a Rust identifier which can be used for enum definition:
     /// ```
     /// pub enum HERE {
     ///     //...
@@ -72,7 +72,7 @@ impl<'c> EnumDescriptor<'c> {
     /// ```
     /// without mod path, without wrapped by Result<>,
     /// without distinguishing between repeated / optional labels.
-    pub fn native_bare_type_name(&self) -> Result<&str> {
+    pub fn native_ident(&self) -> Result<&str> {
         Ok(self
             .lazy_native_bare_type_name
             .get_or_try_init(|| -> Result<_> {
@@ -80,8 +80,8 @@ impl<'c> EnumDescriptor<'c> {
             })?)
     }
 
-    pub fn native_type_name_with_relative_path(&'c self, cur_package: &str) -> Result<String> {
-        let enum_name = self.native_bare_type_name()?;
+    pub fn native_ident_with_relative_path(&'c self, cur_package: &str) -> Result<String> {
+        let enum_name = self.native_ident()?;
         let mut struct_package_iter = self.package()?.split('.').peekable();
         let mut cur_package_iter = cur_package.split('.').peekable();
         while let (Some(p1), Some(p2)) = (struct_package_iter.peek(), cur_package_iter.peek()) {
@@ -106,7 +106,7 @@ impl<'c> EnumDescriptor<'c> {
 
     /// Returns a Rust typename qualified with a mod path from an arbitral mod location,
     /// without wrapped by Result<>, without distinguishing between repeated / optional labels.
-    pub fn native_fully_qualified_type_name(&'c self, path_to_root_mod: &str) -> Result<String> {
+    pub fn native_fully_qualified_ident(&'c self, path_to_root_mod: &str) -> Result<String> {
         let native_type_name_from_root =
             self.lazy_native_type_name_from_root
                 .get_or_try_init(|| -> Result<_> {
@@ -120,7 +120,7 @@ impl<'c> EnumDescriptor<'c> {
                     Ok(format!(
                         "{mod_path}::{bare_type}",
                         mod_path = mod_path,
-                        bare_type = self.native_bare_type_name()?
+                        bare_type = self.native_ident()?
                     ))
                 })?;
         Ok(format!(

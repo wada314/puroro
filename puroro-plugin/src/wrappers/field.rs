@@ -184,13 +184,13 @@ impl<'c> FieldDescriptor<'c> {
             FieldType::Bytes => "Bytes".into(),
             FieldType::Enum(e) => format!(
                 "Enum<{}>",
-                e.native_fully_qualified_type_name(self.path_to_root_mod()?)?
+                e.native_fully_qualified_ident(self.path_to_root_mod()?)?
             ),
             FieldType::Message(m) => format!(
                 "Message<{}>",
                 // TODO: Wrong! Need a type name depending on the implementation detail.
                 // e.g. super::DescriptorProtoBumpalo<'bump>
-                m.native_fully_qualified_type_name(self.path_to_root_mod()?)?
+                m.native_fully_qualified_ident(self.path_to_root_mod()?)?
             ),
         })
     }
@@ -256,13 +256,13 @@ impl<'c> FieldDescriptor<'c> {
                 NonTrivialFieldType::Bytes => format!("&{lt} [u8]", lt = lifetime).into(),
                 NonTrivialFieldType::Enum(e) => format!(
                     "::std::result::Result<{name}, i32>",
-                    name = e.native_type_name_with_relative_path(self.package()?)?
+                    name = e.native_ident_with_relative_path(self.package()?)?
                 )
                 .into(),
                 NonTrivialFieldType::Message(m) => format!(
                     "&{lt} {name}",
                     lt = lifetime,
-                    name = m.native_type_name_with_relative_path(self.package()?)?
+                    name = m.native_ident_with_relative_path(self.package()?)?
                 )
                 .into(),
             },
@@ -314,7 +314,7 @@ impl<'c> VariantFieldType<'c> {
             VariantFieldType::Bool => "::puroro_internal::tags::Bool".into(),
             VariantFieldType::Enum(e) => format!(
                 "::puroro_internal::tags::Enum<{name}>",
-                name = e.native_fully_qualified_type_name(path_to_root_mod)?
+                name = e.native_fully_qualified_ident(path_to_root_mod)?
             )
             .into(),
         })

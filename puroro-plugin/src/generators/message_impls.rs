@@ -313,7 +313,7 @@ impl{gp} ::puroro::Serializable for {name}{gpb} {{
 {cfg}
 impl{gp} {name}Trait for {struct_name}{gpb} {{\n",
                 struct_name = self.frag_gen.struct_name(self.msg)?,
-                name = self.msg.native_bare_type_name()?,
+                name = self.msg.native_ident()?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
                 gpb = self.frag_gen.struct_generic_params_bounds(&[]),
