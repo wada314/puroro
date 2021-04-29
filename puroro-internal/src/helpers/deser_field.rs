@@ -344,11 +344,16 @@ where
 // the both Optional2 and Optional3.
 macro_rules! define_deser_optional_message_field {
     ($ltag:ty) => {
-        impl<T> DeserializableFieldFromIter<(tags::Message<T>, $ltag)> for Option<Box<T>>
+        define_deser_optional_message_field!($ltag, Box<T>);
+        #[cfg(feature = "puroro-bumpalo")]
+        define_deser_optional_message_field!($ltag, ::bumpalo::boxed::Box<'bump, T>);
+    };
+    ($ltag:ty, $box:ty) => {
+        impl<'bump, T> DeserializableFieldFromIter<(tags::Message<T>, $ltag)> for Option<$box>
         where
             T: crate::deser::DeserializableMessageFromIter,
         {
-            type Item = Box<T>;
+            type Item = $box;
             fn deser<'a, I, F>(
                 &mut self,
                 field: FieldData<&'a mut BytesIter<'a, I>>,

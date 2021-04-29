@@ -189,6 +189,48 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
+    pub fn default_func_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+        Ok(match self.context.impl_type() {
+            ImplType::Default => match self.context.alloc_type() {
+                AllocatorType::Default => match field.type_()? {
+                    FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                    FieldType::Enum(_) => "|| 0i32.try_into()".into(),
+                    _ => "std::default::Default::default".into(),
+                },
+                AllocatorType::Bumpalo => match field.type_()? {
+                    FieldType::String => {
+                        "|| ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo())"
+                            .into()
+                    }
+                    FieldType::Bytes => {
+                        "|| ::bumpalo::collections::Vec::new_in(self.puroro_internal.bumpalo())"
+                            .into()
+                    }
+                    FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                    FieldType::Enum(_) => "|| 0i32.try_into()".into(),
+                    FieldType::Message(m) => match field.label()? {
+                        FieldLabel::Optional2 | FieldLabel::Optional3 => format!(
+                            "|| ::bumpalo::boxed::Box::new_in({msg}::new_in(\
+                                self.puroro_internal.bumpalo()\
+                           ), self.puroro_internal.bumpalo())",
+                            msg = m.native_fully_qualified_type_name(field.path_to_root_mod()?)?,
+                        )
+                        .into(),
+                        FieldLabel::Required | FieldLabel::Repeated => format!(
+                            "|| {msg}::new_in(self.puroro_internal.bumpalo())",
+                            msg = m.native_fully_qualified_type_name(field.path_to_root_mod()?)?,
+                        )
+                        .into(),
+                    },
+                    _ => "|| ::std::default::Default::default".into(),
+                },
+            },
+            ImplType::SliceRef => {
+                unimplemented!()
+            }
+        })
+    }
+
     pub fn struct_generic_params(&self, params: &[&'static str]) -> String {
         let iter = params
             .iter()

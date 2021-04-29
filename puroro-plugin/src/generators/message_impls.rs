@@ -148,9 +148,9 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {{
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        use ::puroro_internal::helpers::MaybeRepeatedVariantField;
-        match field {{\n",
+        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::tags;
+        match field_number {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
@@ -158,12 +158,22 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
             ),
             indent_n(
                 3,
-                (
-                    func(|output| self.print_msg_deser_deserializable_variant_arm(output)),
-                    func(|output| self.print_msg_deser_deserializable_length_delimited_arm(output)),
-                    func(|output| self.print_msg_deser_deserializable_bitsxx_arm(output, 32)),
-                    func(|output| self.print_msg_deser_deserializable_bitsxx_arm(output, 64)),
-                ),
+                iter(self.msg.fields().map(|field| -> Result<_> {
+                    Ok(format!(
+                        "\
+{number} => {{
+    <{type_} as DeserializableFieldFromIter<(tags::{type_tag}, tags::{label_tag})>>::deser(
+        &mut self.{name}, field, {default_func}
+    )?;
+}};",
+                        number = field.number(),
+                        name = field.native_name()?,
+                        type_ = self.frag_gen.field_type_for(field)?,
+                        type_tag = field.type_tag()?,
+                        label_tag = field.label_tag()?,
+                        default_func = self.frag_gen.default_func_for(field)?,
+                    ))
+                })),
             ),
             "        \
         }}
