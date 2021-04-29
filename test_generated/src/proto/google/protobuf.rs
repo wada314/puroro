@@ -59,8 +59,8 @@ impl ::puroro::DeserializableFromIter for GeneratedCodeInfo {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for GeneratedCodeInfo {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for GeneratedCodeInfo {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -73,8 +73,8 @@ impl ::puroro_internal::serializer::Serializable for GeneratedCodeInfo {
 
 impl ::puroro::Serializable for GeneratedCodeInfo {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -157,8 +157,8 @@ impl<'bump> ::puroro::DeserializableFromIter for GeneratedCodeInfoBumpalo<'bump>
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for GeneratedCodeInfoBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for GeneratedCodeInfoBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -171,8 +171,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for GeneratedCodeInfoBum
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for GeneratedCodeInfoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -302,8 +302,8 @@ impl ::puroro::DeserializableFromIter for Annotation {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for Annotation {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for Annotation {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -331,8 +331,8 @@ impl ::puroro_internal::serializer::Serializable for Annotation {
 
 impl ::puroro::Serializable for Annotation {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -447,8 +447,8 @@ impl<'bump> ::puroro::DeserializableFromIter for AnnotationBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for AnnotationBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for AnnotationBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -476,8 +476,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for AnnotationBumpalo<'b
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for AnnotationBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -593,8 +593,8 @@ impl ::puroro::DeserializableFromIter for SourceCodeInfo {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for SourceCodeInfo {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for SourceCodeInfo {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -607,8 +607,8 @@ impl ::puroro_internal::serializer::Serializable for SourceCodeInfo {
 
 impl ::puroro::Serializable for SourceCodeInfo {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -691,8 +691,8 @@ impl<'bump> ::puroro::DeserializableFromIter for SourceCodeInfoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for SourceCodeInfoBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for SourceCodeInfoBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -705,8 +705,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for SourceCodeInfoBumpal
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for SourceCodeInfoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -844,8 +844,8 @@ impl ::puroro::DeserializableFromIter for Location {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for Location {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for Location {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -874,8 +874,8 @@ impl ::puroro_internal::serializer::Serializable for Location {
 
 impl ::puroro::Serializable for Location {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -1033,8 +1033,8 @@ impl<'bump> ::puroro::DeserializableFromIter for LocationBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for LocationBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for LocationBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -1063,8 +1063,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for LocationBumpalo<'bum
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for LocationBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1280,8 +1280,8 @@ impl ::puroro::DeserializableFromIter for UninterpretedOption {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for UninterpretedOption {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for UninterpretedOption {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -1316,8 +1316,8 @@ impl ::puroro_internal::serializer::Serializable for UninterpretedOption {
 
 impl ::puroro::Serializable for UninterpretedOption {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -1466,8 +1466,8 @@ impl<'bump> ::puroro::DeserializableFromIter for UninterpretedOptionBumpalo<'bum
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for UninterpretedOptionBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for UninterpretedOptionBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -1502,8 +1502,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for UninterpretedOptionB
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for UninterpretedOptionBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1641,8 +1641,8 @@ impl ::puroro::DeserializableFromIter for NamePart {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for NamePart {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for NamePart {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -1660,8 +1660,8 @@ impl ::puroro_internal::serializer::Serializable for NamePart {
 
 impl ::puroro::Serializable for NamePart {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -1738,8 +1738,8 @@ impl<'bump> ::puroro::DeserializableFromIter for NamePartBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for NamePartBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for NamePartBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -1757,8 +1757,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for NamePartBumpalo<'bum
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for NamePartBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1858,8 +1858,8 @@ impl ::puroro::DeserializableFromIter for MethodOptions {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for MethodOptions {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for MethodOptions {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -1882,8 +1882,8 @@ impl ::puroro_internal::serializer::Serializable for MethodOptions {
 
 impl ::puroro::Serializable for MethodOptions {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -1988,8 +1988,8 @@ impl<'bump> ::puroro::DeserializableFromIter for MethodOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for MethodOptionsBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for MethodOptionsBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -2012,8 +2012,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for MethodOptionsBumpalo
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for MethodOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2158,8 +2158,8 @@ impl ::puroro::DeserializableFromIter for ServiceOptions {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for ServiceOptions {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for ServiceOptions {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -2177,8 +2177,8 @@ impl ::puroro_internal::serializer::Serializable for ServiceOptions {
 
 impl ::puroro::Serializable for ServiceOptions {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -2272,8 +2272,8 @@ impl<'bump> ::puroro::DeserializableFromIter for ServiceOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for ServiceOptionsBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for ServiceOptionsBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -2291,8 +2291,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for ServiceOptionsBumpal
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for ServiceOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2409,8 +2409,8 @@ impl ::puroro::DeserializableFromIter for EnumValueOptions {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for EnumValueOptions {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for EnumValueOptions {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -2428,8 +2428,8 @@ impl ::puroro_internal::serializer::Serializable for EnumValueOptions {
 
 impl ::puroro::Serializable for EnumValueOptions {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -2523,8 +2523,8 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumValueOptionsBumpalo<'bump> 
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for EnumValueOptionsBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for EnumValueOptionsBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -2542,8 +2542,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for EnumValueOptionsBump
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for EnumValueOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2668,8 +2668,8 @@ impl ::puroro::DeserializableFromIter for EnumOptions {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for EnumOptions {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for EnumOptions {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -2692,8 +2692,8 @@ impl ::puroro_internal::serializer::Serializable for EnumOptions {
 
 impl ::puroro::Serializable for EnumOptions {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -2798,8 +2798,8 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for EnumOptionsBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for EnumOptionsBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -2822,8 +2822,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for EnumOptionsBumpalo<'
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for EnumOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2936,8 +2936,8 @@ impl ::puroro::DeserializableFromIter for OneofOptions {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for OneofOptions {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for OneofOptions {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -2950,8 +2950,8 @@ impl ::puroro_internal::serializer::Serializable for OneofOptions {
 
 impl ::puroro::Serializable for OneofOptions {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -3034,8 +3034,8 @@ impl<'bump> ::puroro::DeserializableFromIter for OneofOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for OneofOptionsBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for OneofOptionsBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -3048,8 +3048,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for OneofOptionsBumpalo<
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for OneofOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3202,8 +3202,8 @@ impl ::puroro::DeserializableFromIter for FieldOptions {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for FieldOptions {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for FieldOptions {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -3246,8 +3246,8 @@ impl ::puroro_internal::serializer::Serializable for FieldOptions {
 
 impl ::puroro::Serializable for FieldOptions {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -3396,8 +3396,8 @@ impl<'bump> ::puroro::DeserializableFromIter for FieldOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for FieldOptionsBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for FieldOptionsBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -3440,8 +3440,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for FieldOptionsBumpalo<
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for FieldOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3648,8 +3648,8 @@ impl ::puroro::DeserializableFromIter for MessageOptions {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for MessageOptions {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for MessageOptions {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -3682,8 +3682,8 @@ impl ::puroro_internal::serializer::Serializable for MessageOptions {
 
 impl ::puroro::Serializable for MessageOptions {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -3810,8 +3810,8 @@ impl<'bump> ::puroro::DeserializableFromIter for MessageOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for MessageOptionsBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for MessageOptionsBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -3844,8 +3844,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for MessageOptionsBumpal
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for MessageOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -4126,8 +4126,8 @@ impl ::puroro::DeserializableFromIter for FileOptions {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for FileOptions {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for FileOptions {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -4220,8 +4220,8 @@ impl ::puroro_internal::serializer::Serializable for FileOptions {
 
 impl ::puroro::Serializable for FileOptions {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -4524,8 +4524,8 @@ impl<'bump> ::puroro::DeserializableFromIter for FileOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for FileOptionsBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for FileOptionsBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -4618,8 +4618,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for FileOptionsBumpalo<'
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for FileOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -4868,8 +4868,8 @@ impl ::puroro::DeserializableFromIter for MethodDescriptorProto {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for MethodDescriptorProto {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for MethodDescriptorProto {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -4901,8 +4901,8 @@ impl ::puroro_internal::serializer::Serializable for MethodDescriptorProto {
 
 impl ::puroro::Serializable for MethodDescriptorProto {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -5024,8 +5024,8 @@ impl<'bump> ::puroro::DeserializableFromIter for MethodDescriptorProtoBumpalo<'b
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for MethodDescriptorProtoBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for MethodDescriptorProtoBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -5057,8 +5057,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for MethodDescriptorProt
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for MethodDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5175,8 +5175,8 @@ impl ::puroro::DeserializableFromIter for ServiceDescriptorProto {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for ServiceDescriptorProto {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for ServiceDescriptorProto {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -5195,8 +5195,8 @@ impl ::puroro_internal::serializer::Serializable for ServiceDescriptorProto {
 
 impl ::puroro::Serializable for ServiceDescriptorProto {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -5302,8 +5302,8 @@ impl<'bump> ::puroro::DeserializableFromIter for ServiceDescriptorProtoBumpalo<'
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for ServiceDescriptorProtoBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for ServiceDescriptorProtoBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -5322,8 +5322,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for ServiceDescriptorPro
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for ServiceDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5454,8 +5454,8 @@ impl ::puroro::DeserializableFromIter for EnumValueDescriptorProto {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for EnumValueDescriptorProto {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for EnumValueDescriptorProto {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -5476,8 +5476,8 @@ impl ::puroro_internal::serializer::Serializable for EnumValueDescriptorProto {
 
 impl ::puroro::Serializable for EnumValueDescriptorProto {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -5566,8 +5566,8 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumValueDescriptorProtoBumpalo
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for EnumValueDescriptorProtoBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for EnumValueDescriptorProtoBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -5588,8 +5588,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for EnumValueDescriptorP
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for EnumValueDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5710,8 +5710,8 @@ impl ::puroro::DeserializableFromIter for EnumDescriptorProto {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for EnumDescriptorProto {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for EnumDescriptorProto {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -5736,8 +5736,8 @@ impl ::puroro_internal::serializer::Serializable for EnumDescriptorProto {
 
 impl ::puroro::Serializable for EnumDescriptorProto {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -5898,8 +5898,8 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumDescriptorProtoBumpalo<'bum
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for EnumDescriptorProtoBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for EnumDescriptorProtoBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -5924,8 +5924,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for EnumDescriptorProtoB
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for EnumDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6107,8 +6107,8 @@ impl ::puroro::DeserializableFromIter for EnumReservedRange {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for EnumReservedRange {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for EnumReservedRange {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -6128,8 +6128,8 @@ impl ::puroro_internal::serializer::Serializable for EnumReservedRange {
 
 impl ::puroro::Serializable for EnumReservedRange {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -6206,8 +6206,8 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumReservedRangeBumpalo<'bump>
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for EnumReservedRangeBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for EnumReservedRangeBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -6227,8 +6227,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for EnumReservedRangeBum
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for EnumReservedRangeBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6320,8 +6320,8 @@ impl ::puroro::DeserializableFromIter for OneofDescriptorProto {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for OneofDescriptorProto {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for OneofDescriptorProto {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -6337,8 +6337,8 @@ impl ::puroro_internal::serializer::Serializable for OneofDescriptorProto {
 
 impl ::puroro::Serializable for OneofDescriptorProto {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -6416,8 +6416,8 @@ impl<'bump> ::puroro::DeserializableFromIter for OneofDescriptorProtoBumpalo<'bu
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for OneofDescriptorProtoBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for OneofDescriptorProtoBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -6433,8 +6433,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for OneofDescriptorProto
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for OneofDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6599,8 +6599,8 @@ impl ::puroro::DeserializableFromIter for FieldDescriptorProto {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for FieldDescriptorProto {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for FieldDescriptorProto {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -6653,8 +6653,8 @@ impl ::puroro_internal::serializer::Serializable for FieldDescriptorProto {
 
 impl ::puroro::Serializable for FieldDescriptorProto {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -6831,8 +6831,8 @@ impl<'bump> ::puroro::DeserializableFromIter for FieldDescriptorProtoBumpalo<'bu
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for FieldDescriptorProtoBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for FieldDescriptorProtoBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -6885,8 +6885,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for FieldDescriptorProto
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for FieldDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -7083,8 +7083,8 @@ impl ::puroro::DeserializableFromIter for ExtensionRangeOptions {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for ExtensionRangeOptions {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for ExtensionRangeOptions {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -7097,8 +7097,8 @@ impl ::puroro_internal::serializer::Serializable for ExtensionRangeOptions {
 
 impl ::puroro::Serializable for ExtensionRangeOptions {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -7181,8 +7181,8 @@ impl<'bump> ::puroro::DeserializableFromIter for ExtensionRangeOptionsBumpalo<'b
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for ExtensionRangeOptionsBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for ExtensionRangeOptionsBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -7195,8 +7195,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for ExtensionRangeOption
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for ExtensionRangeOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -7373,8 +7373,8 @@ impl ::puroro::DeserializableFromIter for DescriptorProto {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for DescriptorProto {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for DescriptorProto {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -7414,8 +7414,8 @@ impl ::puroro_internal::serializer::Serializable for DescriptorProto {
 
 impl ::puroro::Serializable for DescriptorProto {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -7716,8 +7716,8 @@ impl<'bump> ::puroro::DeserializableFromIter for DescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for DescriptorProtoBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for DescriptorProtoBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -7757,8 +7757,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for DescriptorProtoBumpa
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for DescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8090,8 +8090,8 @@ impl ::puroro::DeserializableFromIter for ReservedRange {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for ReservedRange {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for ReservedRange {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -8111,8 +8111,8 @@ impl ::puroro_internal::serializer::Serializable for ReservedRange {
 
 impl ::puroro::Serializable for ReservedRange {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -8189,8 +8189,8 @@ impl<'bump> ::puroro::DeserializableFromIter for ReservedRangeBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for ReservedRangeBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for ReservedRangeBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -8210,8 +8210,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for ReservedRangeBumpalo
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for ReservedRangeBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8310,8 +8310,8 @@ impl ::puroro::DeserializableFromIter for ExtensionRange {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for ExtensionRange {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for ExtensionRange {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -8334,8 +8334,8 @@ impl ::puroro_internal::serializer::Serializable for ExtensionRange {
 
 impl ::puroro::Serializable for ExtensionRange {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -8424,8 +8424,8 @@ impl<'bump> ::puroro::DeserializableFromIter for ExtensionRangeBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for ExtensionRangeBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for ExtensionRangeBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -8448,8 +8448,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for ExtensionRangeBumpal
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for ExtensionRangeBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8627,8 +8627,8 @@ impl ::puroro::DeserializableFromIter for FileDescriptorProto {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for FileDescriptorProto {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for FileDescriptorProto {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -8678,8 +8678,8 @@ impl ::puroro_internal::serializer::Serializable for FileDescriptorProto {
 
 impl ::puroro::Serializable for FileDescriptorProto {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -8984,8 +8984,8 @@ impl<'bump> ::puroro::DeserializableFromIter for FileDescriptorProtoBumpalo<'bum
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for FileDescriptorProtoBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for FileDescriptorProtoBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -9035,8 +9035,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for FileDescriptorProtoB
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for FileDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -9339,8 +9339,8 @@ impl ::puroro::DeserializableFromIter for FileDescriptorSet {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for FileDescriptorSet {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for FileDescriptorSet {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -9353,8 +9353,8 @@ impl ::puroro_internal::serializer::Serializable for FileDescriptorSet {
 
 impl ::puroro::Serializable for FileDescriptorSet {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -9437,8 +9437,8 @@ impl<'bump> ::puroro::DeserializableFromIter for FileDescriptorSetBumpalo<'bump>
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for FileDescriptorSetBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for FileDescriptorSetBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -9451,8 +9451,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for FileDescriptorSetBum
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for FileDescriptorSetBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]

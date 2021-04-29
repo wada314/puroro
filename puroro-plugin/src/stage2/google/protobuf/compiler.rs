@@ -45,19 +45,19 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.error, field, std::default::Default::default)?;
+                ::deser(&mut self.error, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<u64> as DeserializableFieldFromIter<(
                     tags::UInt64, 
                     tags::Optional2)>>
-                ::deser(&mut self.supported_features, field, std::default::Default::default)?;
+                ::deser(&mut self.supported_features, field, ::std::default::Default::default)?;
             }
             15 => {
                 <::std::vec::Vec<code_generator_response::File> as DeserializableFieldFromIter<(
                     tags::Message<super::super::super::google::protobuf::compiler::code_generator_response::File>, 
                     tags::Repeated)>>
-                ::deser(&mut self.file, field, std::default::Default::default)?;
+                ::deser(&mut self.file, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -75,8 +75,8 @@ impl ::puroro::DeserializableFromIter for CodeGeneratorResponse {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for CodeGeneratorResponse {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for CodeGeneratorResponse {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -97,8 +97,8 @@ impl ::puroro_internal::serializer::Serializable for CodeGeneratorResponse {
 
 impl ::puroro::Serializable for CodeGeneratorResponse {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -203,8 +203,8 @@ impl<'bump> ::puroro::DeserializableFromIter for CodeGeneratorResponseBumpalo<'b
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for CodeGeneratorResponseBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for CodeGeneratorResponseBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -225,8 +225,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for CodeGeneratorRespons
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for CodeGeneratorResponseBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -348,25 +348,25 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for File {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.name, field, std::default::Default::default)?;
+                ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.insertion_point, field, std::default::Default::default)?;
+                ::deser(&mut self.insertion_point, field, ::std::default::Default::default)?;
             }
             15 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.content, field, std::default::Default::default)?;
+                ::deser(&mut self.content, field, ::std::default::Default::default)?;
             }
             16 => {
                 <::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>> as DeserializableFieldFromIter<(
                     tags::Message<super::super::super::super::google::protobuf::GeneratedCodeInfo>, 
                     tags::Optional2)>>
-                ::deser(&mut self.generated_code_info, field, std::default::Default::default)?;
+                ::deser(&mut self.generated_code_info, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -384,8 +384,8 @@ impl ::puroro::DeserializableFromIter for File {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for File {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for File {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -407,8 +407,8 @@ impl ::puroro_internal::serializer::Serializable for File {
 
 impl ::puroro::Serializable for File {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -508,8 +508,8 @@ impl<'bump> ::puroro::DeserializableFromIter for FileBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for FileBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for FileBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -531,8 +531,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for FileBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for FileBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -614,25 +614,25 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
                 <::std::vec::Vec<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Repeated)>>
-                ::deser(&mut self.file_to_generate, field, std::default::Default::default)?;
+                ::deser(&mut self.file_to_generate, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.parameter, field, std::default::Default::default)?;
+                ::deser(&mut self.parameter, field, ::std::default::Default::default)?;
             }
             15 => {
                 <::std::vec::Vec<super::FileDescriptorProto> as DeserializableFieldFromIter<(
                     tags::Message<super::super::super::google::protobuf::FileDescriptorProto>, 
                     tags::Repeated)>>
-                ::deser(&mut self.proto_file, field, std::default::Default::default)?;
+                ::deser(&mut self.proto_file, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<::std::boxed::Box<Version>> as DeserializableFieldFromIter<(
                     tags::Message<super::super::super::google::protobuf::compiler::Version>, 
                     tags::Optional2)>>
-                ::deser(&mut self.compiler_version, field, std::default::Default::default)?;
+                ::deser(&mut self.compiler_version, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -650,8 +650,8 @@ impl ::puroro::DeserializableFromIter for CodeGeneratorRequest {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for CodeGeneratorRequest {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for CodeGeneratorRequest {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -673,8 +673,8 @@ impl ::puroro_internal::serializer::Serializable for CodeGeneratorRequest {
 
 impl ::puroro::Serializable for CodeGeneratorRequest {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -807,8 +807,8 @@ impl<'bump> ::puroro::DeserializableFromIter for CodeGeneratorRequestBumpalo<'bu
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for CodeGeneratorRequestBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for CodeGeneratorRequestBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -830,8 +830,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for CodeGeneratorRequest
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for CodeGeneratorRequestBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -962,25 +962,25 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Version {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.major, field, std::default::Default::default)?;
+                ::deser(&mut self.major, field, ::std::default::Default::default)?;
             }
             2 => {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.minor, field, std::default::Default::default)?;
+                ::deser(&mut self.minor, field, ::std::default::Default::default)?;
             }
             3 => {
                 <::std::option::Option<i32> as DeserializableFieldFromIter<(
                     tags::Int32, 
                     tags::Optional2)>>
-                ::deser(&mut self.patch, field, std::default::Default::default)?;
+                ::deser(&mut self.patch, field, ::std::default::Default::default)?;
             }
             4 => {
                 <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<(
                     tags::String, 
                     tags::Optional2)>>
-                ::deser(&mut self.suffix, field, std::default::Default::default)?;
+                ::deser(&mut self.suffix, field, ::std::default::Default::default)?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -998,8 +998,8 @@ impl ::puroro::DeserializableFromIter for Version {
     }
 }
 
-impl ::puroro_internal::serializer::Serializable for Version {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl ::puroro_internal::ser::Serializable for Version {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -1027,8 +1027,8 @@ impl ::puroro_internal::serializer::Serializable for Version {
 
 impl ::puroro::Serializable for Version {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 
@@ -1127,8 +1127,8 @@ impl<'bump> ::puroro::DeserializableFromIter for VersionBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::serializer::Serializable for VersionBumpalo<'bump> {
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl<'bump> ::puroro_internal::ser::Serializable for VersionBumpalo<'bump> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
         use ::puroro_internal::helpers::MaybeRepeatedField;
@@ -1156,8 +1156,8 @@ impl<'bump> ::puroro_internal::serializer::Serializable for VersionBumpalo<'bump
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::Serializable for VersionBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]

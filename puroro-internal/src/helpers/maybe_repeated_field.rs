@@ -179,7 +179,7 @@ where
 // Manual implementation for message
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Box<T>
 where
-    T: crate::serializer::Serializable,
+    T: crate::ser::Serializable,
 {
     type Item = T;
     type Iter = std::iter::Once<&'a T>;
@@ -196,7 +196,7 @@ where
 #[cfg(feature = "puroro-bumpalo")]
 impl<'a, 'bump, T: 'a> MaybeRepeatedField<'a> for ::bumpalo::boxed::Box<'bump, T>
 where
-    T: crate::serializer::Serializable,
+    T: crate::ser::Serializable,
 {
     type Item = T;
     type Iter = std::iter::Once<&'a T>;
@@ -212,7 +212,7 @@ where
 }
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Vec<T>
 where
-    T: Default + crate::serializer::Serializable,
+    T: Default + crate::ser::Serializable,
 {
     type Item = T;
     type Iter = std::slice::Iter<'a, T>;
@@ -230,7 +230,7 @@ where
 #[cfg(feature = "puroro-bumpalo")]
 impl<'a, 'bump, T: 'a> MaybeRepeatedField<'a> for ::bumpalo::collections::Vec<'bump, T>
 where
-    T: Default + crate::serializer::Serializable,
+    T: Default + crate::ser::Serializable,
 {
     type Item = T;
     type Iter = std::slice::Iter<'a, T>;
@@ -247,7 +247,7 @@ where
 }
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Option<Box<T>>
 where
-    T: Default + crate::serializer::Serializable,
+    T: Default + crate::ser::Serializable,
 {
     type Item = T;
     type Iter = std::option::IntoIter<&'a T>;
@@ -265,7 +265,7 @@ where
 #[cfg(feature = "puroro-bumpalo")]
 impl<'a, T: 'a> MaybeRepeatedField<'a> for Option<::bumpalo::boxed::Box<'a, T>>
 where
-    T: Default + crate::serializer::Serializable,
+    T: Default + crate::ser::Serializable,
 {
     type Item = T;
     type Iter = std::option::IntoIter<&'a T>;

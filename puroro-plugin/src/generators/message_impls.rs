@@ -214,8 +214,8 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} ::puroro_internal::serializer::Serializable for {name}{gpb} {{
-    fn serialize<T: ::puroro_internal::serializer::MessageSerializer>(
+impl{gp} ::puroro_internal::ser::Serializable for {name}{gpb} {{
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
         use ::puroro_internal::helpers::MaybeRepeatedField;\n",
@@ -294,8 +294,8 @@ for item in self.{name}.iter_for_ser() {{
 {cfg}
 impl{gp} ::puroro::Serializable for {name}{gpb} {{
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {{
-        let mut serializer = ::puroro_internal::serializer::default_serializer(write);
-        <Self as ::puroro_internal::serializer::Serializable>::serialize(self, &mut serializer)
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }}
 }}\n",
             name = self.frag_gen.struct_name(self.msg)?,
