@@ -122,7 +122,7 @@ define_ser_required_fixed!(i64, tags::SFixed64);
 
 macro_rules! define_ser_optional2_field_using_required {
     ($ty:ty, $ttag:ty) => {
-        impl SerializableField<($ttag, tags::Optional2)> for Option<$ty> {
+        impl<'bump> SerializableField<($ttag, tags::Optional2)> for Option<$ty> {
             fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
             where
                 S: crate::ser::MessageSerializer,
@@ -140,6 +140,12 @@ macro_rules! define_ser_optional2_field_using_required {
     };
 }
 define_ser_optional2_field_using_required!(i32, tags::Int32);
+define_ser_optional2_field_using_required!(i64, tags::Int64);
+define_ser_optional2_field_using_required!(u32, tags::UInt32);
+define_ser_optional2_field_using_required!(u64, tags::UInt64);
+define_ser_optional2_field_using_required!(i32, tags::SInt32);
+define_ser_optional2_field_using_required!(i64, tags::SInt64);
+define_ser_optional2_field_using_required!(bool, tags::Bool);
 
 impl<T> SerializableField<(tags::Enum<T>, tags::Optional2)> for Option<std::result::Result<T, i32>>
 where
@@ -151,39 +157,73 @@ where
         S: crate::ser::MessageSerializer,
     {
         if let Some(e) = self {
-            serializer.serialize_variant::<tags::Int32>(field_number, enum_to_i32(e))?
+            <::std::result::Result<T, i32> as SerializableField<(
+                tags::Enum<T>,
+                tags::Required,
+            )>>::ser(e, serializer, field_number)?;
         }
         Ok(())
     }
 }
 
-impl SerializableField<(tags::String, tags::Optional2)> for Option<String> {
-    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
-    where
-        S: crate::ser::MessageSerializer,
-    {
-        if let Some(s) = self {
-            serializer.serialize_bytes_twice(field_number, s.bytes().map(|b| Ok(b)))?;
+define_ser_optional2_field_using_required!(String, tags::String);
+define_ser_optional2_field_using_required!(Vec<u8>, tags::Bytes);
+#[cfg(feature = "puroro-bumpalo")]
+define_ser_optional2_field_using_required!(::bumpalo::collections::String<'bump>, tags::String);
+#[cfg(feature = "puroro-bumpalo")]
+define_ser_optional2_field_using_required!(::bumpalo::collections::Vec<'bump, u8>, tags::Bytes);
+
+macro_rules! define_ser_optional_message {
+    ($box:ty, $ltag:ty) => {
+        impl<'bump, T> SerializableField<(tags::Message<T>, tags::Optional2)> for Option<$box>
+        where
+            T: Serializable,
+        {
+            fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+            where
+                S: crate::ser::MessageSerializer,
+            {
+                if let Some(bm) = self {
+                    <T as SerializableField<(tags::Message<T>, tags::Required)>>::ser(
+                        bm,
+                        serializer,
+                        field_number,
+                    )?;
+                }
+                Ok(())
+            }
         }
-        Ok(())
-    }
+    };
 }
+define_ser_optional_message!(Box<T>, tags::Optional2);
+#[cfg(feature = "puroro-bumpalo")]
+define_ser_optional_message!(::bumpalo::boxed::Box<'bump, T>, tags::Optional2);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Optional3 fields
 ///////////////////////////////////////////////////////////////////////////////
 
-impl SerializableField<(tags::Int32, tags::Optional3)> for i32 {
-    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
-    where
-        S: crate::ser::MessageSerializer,
-    {
-        if *self != 0 {
-            serializer.serialize_variant::<tags::Int32>(field_number, *self)?;
+macro_rules! define_ser_optional3_field_using_required {
+    ($ty:ty, $ttag:ty, $isdefault_f:expr) => {
+        impl SerializableField<($ttag, tags::Optional3)> for $ty {
+            fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+            where
+                S: crate::ser::MessageSerializer,
+            {
+                if ($isdefault_f)(self) {
+                    <$ty as SerializableField<($ttag, tags::Required)>>::ser(
+                        self,
+                        serializer,
+                        field_number,
+                    )?;
+                }
+                Ok(())
+            }
         }
-        Ok(())
-    }
+    };
 }
+define_ser_optional3_field_using_required!(i32, tags::Int32, |x: &i32| *x == 0);
+define_ser_optional3_field_using_required!(i64, tags::Int64, |x: &i64| *x == 0);
 
 impl<T> SerializableField<(tags::Enum<T>, tags::Optional3)> for std::result::Result<T, i32>
 where
