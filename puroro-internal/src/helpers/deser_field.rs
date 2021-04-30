@@ -1,4 +1,4 @@
-use crate::deser::BytesIter;
+use crate::deser::{BytesIter, DeserializableMessageFromIter};
 use crate::tags;
 use crate::tags::{FieldTypeAndLabelTag, FieldTypeTag};
 use crate::types::FieldData;
@@ -6,6 +6,7 @@ use crate::{ErrorKind, PuroroError, Result};
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::hash::Hash;
+use std::marker::PhantomData;
 
 use super::MapEntry;
 
@@ -243,14 +244,16 @@ where
     }
 }
 
-impl<Entry> DeserializableFieldFromIter<tags::Map<Entry>>
+impl<Entry> DeserializableFieldFromIter<(tags::Message<Entry>, tags::Repeated)>
     for HashMap<Entry::KeyType, Entry::ValueType>
 where
-    Entry: MapEntry + crate::deser::DeserializableMessageFromIter,
-    Entry::KeyTag: FieldTypeTag,
-    Entry::ValueTag: FieldTypeTag,
-    Entry::KeyType: Hash + Eq + DeserializableFieldFromIter<(Entry::KeyTag, tags::Required)>,
-    Entry::ValueType: DeserializableFieldFromIter<(Entry::ValueTag, tags::Required)>,
+    Entry: MapEntry,
+    (
+        Entry::KeyType,
+        Entry::ValueType,
+        PhantomData<(Entry::KeyTag, Entry::ValueTag, Entry)>,
+    ): DeserializableMessageFromIter,
+    Entry::KeyType: Hash + Eq,
 {
     type Item = Entry;
 
@@ -264,9 +267,9 @@ where
         F: Fn() -> Self::Item,
     {
         if let FieldData::LengthDelimited(bytes_iter) = field {
-            let mut entry = (f)();
-            bytes_iter.deser_message(&mut entry)?;
-            let kv = entry.into_tuple();
+            let entry = (f)();
+            let mut kv = entry.into_tuple();
+            bytes_iter.deser_message(&mut kv)?;
             self.insert(kv.0, kv.1);
             Ok(())
         } else {

@@ -11,13 +11,20 @@ use crate::tags;
 use crate::types::FieldData;
 use std::collections::HashMap;
 use std::convert::TryFrom;
+use std::marker::PhantomData;
 
 pub trait MapEntry {
     type KeyTag: tags::FieldTypeTag;
     type ValueTag: tags::FieldTypeTag;
     type KeyType;
     type ValueType;
-    fn into_tuple(self) -> (Self::KeyType, Self::ValueType);
+    fn into_tuple(
+        self,
+    ) -> (
+        Self::KeyType,
+        Self::ValueType,
+        PhantomData<(Self::KeyTag, Self::ValueTag, Self)>,
+    );
 }
 pub trait FieldNew<'a>: Sized {
     fn new() -> Self;

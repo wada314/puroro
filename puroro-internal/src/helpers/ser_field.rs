@@ -434,6 +434,8 @@ define_ser_repeated_fixed!(i64, tags::SFixed64);
 // Map field
 ///////////////////////////////////////////////////////////////////////////////
 
+// The code generator must implement `Serializable` for tuple
+// `(&K, &V, PhantomData(KeyTag, ValueTag, Entry))`.
 impl<Entry> SerializableField<(tags::Message<Entry>, tags::Repeated)>
     for HashMap<Entry::KeyType, Entry::ValueType>
 where
@@ -441,7 +443,7 @@ where
     for<'a> (
         &'a Entry::KeyType,
         &'a Entry::ValueType,
-        PhantomData<(Entry::KeyTag, Entry::ValueTag)>,
+        PhantomData<(Entry::KeyTag, Entry::ValueTag, Entry)>,
     ): Serializable,
 {
     fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
@@ -451,7 +453,7 @@ where
         for (k, v) in self {
             serializer.serialize_message_twice(
                 field_number,
-                &(k, v, PhantomData::<(Entry::KeyTag, Entry::ValueTag)>),
+                &(k, v, PhantomData::<(Entry::KeyTag, Entry::ValueTag, Entry)>),
             )?;
         }
         Ok(())
