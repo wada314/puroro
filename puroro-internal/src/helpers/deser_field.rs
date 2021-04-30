@@ -244,40 +244,6 @@ where
     }
 }
 
-impl<Entry> DeserializableFieldFromIter<(tags::Message<Entry>, tags::Repeated)>
-    for HashMap<Entry::KeyType, Entry::ValueType>
-where
-    Entry: MapEntry,
-    (
-        Entry::KeyType,
-        Entry::ValueType,
-        PhantomData<(Entry::KeyTag, Entry::ValueTag, Entry)>,
-    ): DeserializableMessageFromIter,
-    Entry::KeyType: Hash + Eq,
-{
-    type Item = Entry;
-
-    fn deser<'a, 'b, I, F>(
-        &mut self,
-        field: FieldData<&'a mut BytesIter<'b, I>>,
-        f: F,
-    ) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-        F: Fn() -> Self::Item,
-    {
-        if let FieldData::LengthDelimited(bytes_iter) = field {
-            let entry = (f)();
-            let mut kv = entry.into_tuple();
-            bytes_iter.deser_message(&mut kv)?;
-            self.insert(kv.0, kv.1);
-            Ok(())
-        } else {
-            Err(ErrorKind::UnexpectedWireType)?
-        }
-    }
-}
-
 macro_rules! define_deser_scalar_fixed {
     ($ty:ty, $ttag:ty, $ltag:ty, $bits:ident) => {
         impl DeserializableFieldFromIter<($ttag, $ltag)> for $ty {
@@ -611,3 +577,41 @@ macro_rules! define_deser_repeated_message {
     };
 }
 define_deser_repeated_message!();
+
+///////////////////////////////////////////////////////////////////////////////
+// Map field
+///////////////////////////////////////////////////////////////////////////////
+
+impl<Entry> DeserializableFieldFromIter<(tags::Message<Entry>, tags::Repeated)>
+    for HashMap<Entry::KeyType, Entry::ValueType>
+where
+    Entry: MapEntry,
+    (
+        Entry::KeyType,
+        Entry::ValueType,
+        PhantomData<(Entry::KeyTag, Entry::ValueTag, Entry)>,
+    ): DeserializableMessageFromIter,
+    Entry::KeyType: Hash + Eq,
+{
+    type Item = Entry;
+
+    fn deser<'a, 'b, I, F>(
+        &mut self,
+        field: FieldData<&'a mut BytesIter<'b, I>>,
+        f: F,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        if let FieldData::LengthDelimited(bytes_iter) = field {
+            let entry = (f)();
+            let mut kv = entry.into_tuple();
+            bytes_iter.deser_message(&mut kv)?;
+            self.insert(kv.0, kv.1);
+            Ok(())
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
