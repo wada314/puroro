@@ -3,7 +3,7 @@ use num_traits::Zero;
 use crate::ser::Serializable;
 use crate::tags;
 use crate::tags::FieldTypeAndLabelTag;
-use crate::{ErrorKind, Result};
+use crate::Result;
 
 pub trait SerializableField<T>
 where
@@ -290,41 +290,136 @@ define_ser_optional3_field_using_required!(i64, tags::SFixed64, |x: &i64| *x == 
 // Repeated fields
 ///////////////////////////////////////////////////////////////////////////////
 
-impl SerializableField<(tags::Int32, tags::Repeated)> for Vec<i32> {
-    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
-    where
-        S: crate::ser::MessageSerializer,
-    {
-        serializer
-            .serialize_variants_twice::<tags::Int32, _>(field_number, self.iter().map(|x| Ok(*x)))
-    }
-}
-
-impl<T> SerializableField<(tags::Enum<T>, tags::Repeated)> for Vec<std::result::Result<T, i32>>
-where
-    i32: From<T>,
-    T: Clone,
-{
-    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
-    where
-        S: crate::ser::MessageSerializer,
-    {
-        serializer.serialize_variants_twice::<tags::Int32, _>(
-            field_number,
-            self.iter().map(|e| Ok(enum_to_i32(e))),
-        )?;
-        Ok(())
-    }
-}
-
-impl SerializableField<(tags::String, tags::Repeated)> for Vec<String> {
-    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
-    where
-        S: crate::ser::MessageSerializer,
-    {
-        for s in self {
-            serializer.serialize_bytes_twice(field_number, s.bytes().map(|b| Ok(b)))?;
+macro_rules! define_ser_repeated_variant {
+    ($ty:ty, $ttag:ty) => {
+        define_ser_repeated_variant!($ty, $ttag, Vec<$ty>);
+        #[cfg(feature = "puroro-bumpalo")]
+        define_ser_repeated_variant!($ty, $ttag, ::bumpalo::collections::Vec<'bump, $ty>);
+    };
+    ($ty:ty, $ttag:ty, $vec:ty) => {
+        impl<'bump> SerializableField<($ttag, tags::Repeated)> for $vec {
+            fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+            where
+                S: crate::ser::MessageSerializer,
+            {
+                serializer
+                    .serialize_variants_twice::<$ttag, _>(field_number, self.iter().map(|x| Ok(*x)))
+            }
         }
-        Ok(())
-    }
+    };
 }
+define_ser_repeated_variant!(i32, tags::Int32);
+define_ser_repeated_variant!(i64, tags::Int64);
+define_ser_repeated_variant!(u32, tags::UInt32);
+define_ser_repeated_variant!(u64, tags::UInt64);
+define_ser_repeated_variant!(i32, tags::SInt32);
+define_ser_repeated_variant!(i64, tags::SInt64);
+define_ser_repeated_variant!(bool, tags::Bool);
+
+macro_rules! define_ser_repeated_enum {
+    ($vec:ty) => {
+        impl<'bump, T> SerializableField<(tags::Enum<T>, tags::Repeated)> for $vec
+        where
+            i32: From<T>,
+            T: Clone,
+        {
+            fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+            where
+                S: crate::ser::MessageSerializer,
+            {
+                serializer.serialize_variants_twice::<tags::Int32, _>(
+                    field_number,
+                    self.iter().map(|e| Ok(enum_to_i32(e))),
+                )?;
+                Ok(())
+            }
+        }
+    };
+}
+define_ser_repeated_enum!(Vec<std::result::Result<T, i32>>);
+#[cfg(feature = "puroro-bumpalo")]
+define_ser_repeated_enum!(::bumpalo::collections::Vec<'bump, std::result::Result<T, i32>>);
+
+macro_rules! define_ser_repeated_ld_using_required {
+    ($ty:ty, $ttag:ty) => {
+        define_ser_repeated_ld_using_required!($ty, $ttag, Vec<$ty>);
+        #[cfg(feature = "puroro-bumpalo")]
+        define_ser_repeated_ld_using_required!($ty, $ttag, ::bumpalo::collections::Vec<'bump, $ty>);
+    };
+    ($ty:ty, $ttag:ty, $vec:ty) => {
+        impl<'bump> SerializableField<($ttag, tags::Repeated)> for $vec {
+            fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+            where
+                S: crate::ser::MessageSerializer,
+            {
+                for x in self {
+                    <$ty as SerializableField<($ttag, tags::Required)>>::ser(
+                        x,
+                        serializer,
+                        field_number,
+                    )?;
+                }
+                Ok(())
+            }
+        }
+    };
+}
+define_ser_repeated_ld_using_required!(String, tags::String);
+define_ser_repeated_ld_using_required!(Vec<u8>, tags::Bytes);
+#[cfg(feature = "puroro-bumpalo")]
+define_ser_repeated_ld_using_required!(::bumpalo::collections::String<'bump>, tags::String);
+#[cfg(feature = "puroro-bumpalo")]
+define_ser_repeated_ld_using_required!(::bumpalo::collections::Vec<'bump, u8>, tags::Bytes);
+
+macro_rules! define_ser_repeated_message {
+    ($vec:ty) => {
+        impl<'bump, T> SerializableField<(tags::Message<T>, tags::Repeated)> for $vec
+        where
+            T: Serializable,
+        {
+            fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+            where
+                S: crate::ser::MessageSerializer,
+            {
+                for m in self {
+                    serializer.serialize_message_twice(field_number, m)?;
+                }
+                Ok(())
+            }
+        }
+    };
+}
+define_ser_repeated_message!(Vec<T>);
+#[cfg(feature = "puroro-bumpalo")]
+define_ser_repeated_message!(::bumpalo::collections::Vec<'bump, T>);
+
+macro_rules! define_ser_repeated_fixed {
+    ($ty:ty, $ttag:ty) => {
+        define_ser_repeated_fixed!($ty, $ttag, Vec<$ty>);
+        #[cfg(feature = "puroro-bumpalo")]
+        define_ser_repeated_fixed!($ty, $ttag, ::bumpalo::collections::Vec<'bump, $ty>);
+    };
+    ($ty:ty, $ttag:ty, $vec:ty) => {
+        impl<'bump> SerializableField<($ttag, tags::Repeated)> for $vec {
+            fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+            where
+                S: crate::ser::MessageSerializer,
+            {
+                for x in self {
+                    <$ty as SerializableField<($ttag, tags::Required)>>::ser(
+                        x,
+                        serializer,
+                        field_number,
+                    )?;
+                }
+                Ok(())
+            }
+        }
+    };
+}
+define_ser_repeated_fixed!(f32, tags::Float);
+define_ser_repeated_fixed!(f64, tags::Double);
+define_ser_repeated_fixed!(u32, tags::Fixed32);
+define_ser_repeated_fixed!(u64, tags::Fixed64);
+define_ser_repeated_fixed!(i32, tags::SFixed32);
+define_ser_repeated_fixed!(i64, tags::SFixed64);
