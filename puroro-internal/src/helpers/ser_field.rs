@@ -1,3 +1,4 @@
+use crate::ser::Serializable;
 use crate::tags;
 use crate::tags::FieldTypeAndLabelTag;
 use crate::{ErrorKind, Result};
@@ -21,6 +22,10 @@ where
         Err(i) => *i,
     }
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Required fields
+///////////////////////////////////////////////////////////////////////////////
 
 macro_rules! define_ser_required_variant {
     ($ty:ty, $ttag:ty) => {
@@ -78,6 +83,43 @@ define_ser_required_ld!(::bumpalo::collections::String<'bump>, tags::String, byt
 #[cfg(feature = "puroro-bumpalo")]
 define_ser_required_ld!(::bumpalo::collections::Vec<'bump, u8>, tags::Bytes, iter);
 
+impl<T> SerializableField<(tags::Message<T>, tags::Required)> for T
+where
+    T: Serializable,
+{
+    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    where
+        S: crate::ser::MessageSerializer,
+    {
+        serializer.serialize_message_twice(field_number, self)?;
+        Ok(())
+    }
+}
+
+macro_rules! define_ser_required_fixed {
+    ($ty:ty, $ttag:ty) => {
+        impl SerializableField<($ttag, tags::Required)> for $ty {
+            fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+            where
+                S: crate::ser::MessageSerializer,
+            {
+                serializer.serialize_fixed_bits(field_number, self.to_le_bytes())?;
+                Ok(())
+            }
+        }
+    };
+}
+define_ser_required_fixed!(f32, tags::Float);
+define_ser_required_fixed!(f64, tags::Double);
+define_ser_required_fixed!(u32, tags::Fixed32);
+define_ser_required_fixed!(u64, tags::Fixed64);
+define_ser_required_fixed!(i32, tags::SFixed32);
+define_ser_required_fixed!(i64, tags::SFixed64);
+
+///////////////////////////////////////////////////////////////////////////////
+// Optional2 fields
+///////////////////////////////////////////////////////////////////////////////
+
 macro_rules! define_ser_optional2_field_using_required {
     ($ty:ty, $ttag:ty) => {
         impl SerializableField<($ttag, tags::Optional2)> for Option<$ty> {
@@ -127,6 +169,10 @@ impl SerializableField<(tags::String, tags::Optional2)> for Option<String> {
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Optional3 fields
+///////////////////////////////////////////////////////////////////////////////
+
 impl SerializableField<(tags::Int32, tags::Optional3)> for i32 {
     fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
     where
@@ -167,6 +213,10 @@ impl SerializableField<(tags::String, tags::Optional3)> for String {
         Ok(())
     }
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Repeated fields
+///////////////////////////////////////////////////////////////////////////////
 
 impl SerializableField<(tags::Int32, tags::Repeated)> for Vec<i32> {
     fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
