@@ -9,6 +9,16 @@ use std::hash::Hash;
 
 use super::MapEntry;
 
+trait DoDefaultCheck {
+    const DO_DEFAULT_CHECK: bool = false;
+}
+impl DoDefaultCheck for tags::Optional3 {
+    const DO_DEFAULT_CHECK: bool = true;
+}
+impl DoDefaultCheck for tags::Required {}
+impl DoDefaultCheck for tags::Optional2 {}
+impl DoDefaultCheck for tags::Repeated {}
+
 pub trait DeserializableFieldFromIter<T>
 where
     T: FieldTypeAndLabelTag,
@@ -60,16 +70,26 @@ macro_rules! define_deser_scalar_variants {
             {
                 match field {
                     FieldData::Variant(variant) => {
-                        *self = variant.to_native::<$ttag>()?;
+                        if !<$ltag>::DO_DEFAULT_CHECK || !variant.is_zero() {
+                            *self = variant.to_native::<$ttag>()?;
+                        }
                         Ok(())
                     }
                     FieldData::LengthDelimited(bytes_iter) => {
-                        *self = bytes_iter
-                            .variants()
-                            .last()
-                            .transpose()?
-                            .ok_or(PuroroError::from(ErrorKind::ZeroLengthPackedField))?
-                            .to_native::<$ttag>()?;
+                        let mut variants = bytes_iter.variants().peekable();
+                        if let None = variants.peek() {
+                            Err(ErrorKind::ZeroLengthPackedField)?
+                        }
+                        let mut last_filtered_variant = None;
+                        for rv in variants {
+                            let v = rv?;
+                            if !<$ltag>::DO_DEFAULT_CHECK || !v.is_zero() {
+                                last_filtered_variant = Some(v)
+                            }
+                        }
+                        if let Some(v) = last_filtered_variant {
+                            *self = v.to_native::<$ttag>()?;
+                        }
                         Ok(())
                     }
                     _ => Err(ErrorKind::InvalidWireType)?,
@@ -85,7 +105,6 @@ define_deser_scalar_variants!(i64, tags::SInt64, tags::Required);
 define_deser_scalar_variants!(u32, tags::UInt32, tags::Required);
 define_deser_scalar_variants!(u64, tags::UInt64, tags::Required);
 define_deser_scalar_variants!(bool, tags::Bool, tags::Required);
-// TODO: Need fix: if the input value is 0 then I should not overwrite it.
 define_deser_scalar_variants!(i32, tags::Int32, tags::Optional3);
 define_deser_scalar_variants!(i64, tags::Int64, tags::Optional3);
 define_deser_scalar_variants!(i32, tags::SInt32, tags::Optional3);
@@ -116,7 +135,9 @@ macro_rules! define_deser_scalar_enum {
                     field,
                     Default::default,
                 )?;
-                *self = T::try_from(ival);
+                if !<$ltag>::DO_DEFAULT_CHECK || ival != 0 {
+                    *self = T::try_from(ival);
+                }
                 Ok(())
             }
         }
@@ -139,10 +160,22 @@ macro_rules! define_deser_scalar_ld {
                 F: Fn() -> Self::Item,
             {
                 if let FieldData::LengthDelimited(bytes_iter) = field {
-                    self.clear();
-                    self.reserve(bytes_iter.len());
-                    for rv in bytes_iter.$method() {
-                        self.push(rv?);
+                    let expected_len = bytes_iter.len();
+                    if <$ltag>::DO_DEFAULT_CHECK {
+                        let mut iter = bytes_iter.$method().peekable();
+                        if let Some(_) = iter.peek() {
+                            self.clear();
+                            self.reserve(expected_len);
+                            for rv in iter {
+                                self.push(rv?);
+                            }
+                        }
+                    } else {
+                        self.clear();
+                        self.reserve(expected_len);
+                        for rv in bytes_iter.$method() {
+                            self.push(rv?);
+                        }
                     }
                     Ok(())
                 } else {
@@ -256,7 +289,9 @@ macro_rules! define_deser_scalar_fixed {
                 F: Fn() -> Self::Item,
             {
                 if let FieldData::$bits(array) = field {
-                    *self = <$ty>::from_le_bytes(array);
+                    if !<$ltag>::DO_DEFAULT_CHECK || !array.iter().all(|x| *x == 0) {
+                        *self = <$ty>::from_le_bytes(array);
+                    }
                     Ok(())
                 } else {
                     Err(ErrorKind::UnexpectedWireType)?

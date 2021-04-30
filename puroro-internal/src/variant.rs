@@ -82,6 +82,10 @@ impl Variant {
         let encoded = (x >> 63) ^ (x << 1);
         Self(encoded.to_le_bytes())
     }
+
+    pub fn is_zero(&self) -> bool {
+        self.0.iter().all(|x| *x == 0)
+    }
 }
 
 macro_rules! define_convert_methods {
