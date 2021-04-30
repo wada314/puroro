@@ -85,6 +85,7 @@ define_deser_scalar_variants!(i64, tags::SInt64, tags::Required);
 define_deser_scalar_variants!(u32, tags::UInt32, tags::Required);
 define_deser_scalar_variants!(u64, tags::UInt64, tags::Required);
 define_deser_scalar_variants!(bool, tags::Bool, tags::Required);
+// TODO: Need fix: if the input value is 0 then I should not overwrite it.
 define_deser_scalar_variants!(i32, tags::Int32, tags::Optional3);
 define_deser_scalar_variants!(i64, tags::Int64, tags::Optional3);
 define_deser_scalar_variants!(i32, tags::SInt32, tags::Optional3);
