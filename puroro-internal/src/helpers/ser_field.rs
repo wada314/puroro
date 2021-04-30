@@ -1,9 +1,14 @@
+use std::collections::HashMap;
+use std::hash::Hash;
+
 use num_traits::Zero;
 
 use crate::ser::Serializable;
-use crate::tags;
 use crate::tags::FieldTypeAndLabelTag;
+use crate::tags::{self, FieldTypeTag};
 use crate::Result;
+
+use super::MapEntry;
 
 pub trait SerializableField<T>
 where
@@ -423,3 +428,24 @@ define_ser_repeated_fixed!(u32, tags::Fixed32);
 define_ser_repeated_fixed!(u64, tags::Fixed64);
 define_ser_repeated_fixed!(i32, tags::SFixed32);
 define_ser_repeated_fixed!(i64, tags::SFixed64);
+
+///////////////////////////////////////////////////////////////////////////////
+// Map field
+///////////////////////////////////////////////////////////////////////////////
+
+impl<Entry> SerializableField<tags::Map<Entry>> for HashMap<Entry::KeyType, Entry::ValueType>
+where
+    Entry: MapEntry + Serializable,
+    Entry::KeyTag: FieldTypeTag,
+    Entry::ValueTag: FieldTypeTag,
+    Entry::KeyType: Hash + Eq + SerializableField<(Entry::KeyTag, tags::Required)>,
+    Entry::ValueType: SerializableField<(Entry::ValueTag, tags::Required)>,
+{
+    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    where
+        S: crate::ser::MessageSerializer {
+        todo!()
+    }
+}
+
+
