@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::marker::PhantomData;
 
 use num_traits::Zero;
 
@@ -433,19 +434,26 @@ define_ser_repeated_fixed!(i64, tags::SFixed64);
 // Map field
 ///////////////////////////////////////////////////////////////////////////////
 
-impl<Entry> SerializableField<tags::Map<Entry>> for HashMap<Entry::KeyType, Entry::ValueType>
+impl<Entry> SerializableField<(tags::Message<Entry>, tags::Repeated)>
+    for HashMap<Entry::KeyType, Entry::ValueType>
 where
-    Entry: MapEntry + Serializable,
-    Entry::KeyTag: FieldTypeTag,
-    Entry::ValueTag: FieldTypeTag,
-    Entry::KeyType: Hash + Eq + SerializableField<(Entry::KeyTag, tags::Required)>,
-    Entry::ValueType: SerializableField<(Entry::ValueTag, tags::Required)>,
+    Entry: MapEntry,
+    for<'a> (
+        &'a Entry::KeyType,
+        &'a Entry::ValueType,
+        PhantomData<(Entry::KeyTag, Entry::ValueTag)>,
+    ): Serializable,
 {
     fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
     where
-        S: crate::ser::MessageSerializer {
-        todo!()
+        S: crate::ser::MessageSerializer,
+    {
+        for (k, v) in self {
+            serializer.serialize_message_twice(
+                field_number,
+                &(k, v, PhantomData::<(Entry::KeyTag, Entry::ValueTag)>),
+            )?;
+        }
+        Ok(())
     }
 }
-
-
