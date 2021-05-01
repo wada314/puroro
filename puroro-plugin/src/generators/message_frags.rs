@@ -203,7 +203,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                         )
                         .into(),
                     },
-                    _ => "|| ::std::default::Default::default".into(),
+                    _ => "::std::default::Default::default".into(),
                 },
             },
             ImplType::SliceRef => {
