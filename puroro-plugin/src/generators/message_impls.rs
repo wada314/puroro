@@ -2,9 +2,7 @@ use super::message_frags::MessageImplFragmentGenerator;
 use super::writer::{func, indent, indent_n, iter, IntoFragment};
 use crate::context::{AllocatorType, Context};
 use crate::utils::{to_camel_case, Indentor};
-use crate::wrappers::{
-    FieldLabel, FieldType, LengthDelimitedFieldType, MessageDescriptor, WireType,
-};
+use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
 use crate::Result;
 
 pub struct MessageImplCodeGenerator<'a, 'c> {

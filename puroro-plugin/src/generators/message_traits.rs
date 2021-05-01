@@ -5,6 +5,7 @@ use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
 use crate::Result;
 
 pub struct MessageTraitCodeGenerator<'a, 'c> {
+    #[allow(unused)]
     context: &'a Context<'c>,
     msg: &'c MessageDescriptor<'c>,
 }
@@ -31,8 +32,7 @@ pub trait {name}Trait {{\n",
                         format!(
                             "type {camel_name}Type: {submsg_name}Trait;\n",
                             camel_name = to_camel_case(field.native_name()?),
-                            submsg_name =
-                                m.native_ident_with_relative_path(field.package()?)?,
+                            submsg_name = m.native_ident_with_relative_path(field.package()?)?,
                         )
                     } else {
                         "".to_string()

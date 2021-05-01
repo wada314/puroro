@@ -165,23 +165,6 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 }
             }
             ImplType::SliceRef => {
-                let scalar_type: Cow<'static, str> = match field.type_()?.native_trivial_type_name()
-                {
-                    Ok(name) => name.into(),
-                    Err(nontrivial_type) => match nontrivial_type {
-                        NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                        NonTrivialFieldType::String => "Cow<'slice, str>".into(),
-                        NonTrivialFieldType::Bytes => "&'slice [u8]".into(),
-                        NonTrivialFieldType::Enum(e) => format!(
-                            "::std::result::Result<{type_}, i32>",
-                            type_ = e.native_ident_with_relative_path(field.package()?)?
-                        )
-                        .into(),
-                        NonTrivialFieldType::Message(m) => self
-                            .struct_name_with_relative_path(m, field.package()?)?
-                            .into(),
-                    },
-                };
                 unimplemented!()
             }
         })

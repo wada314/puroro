@@ -139,31 +139,6 @@ impl<'c> FieldDescriptor<'c> {
         })
     }
 
-    pub fn wire_type(&'c self) -> Result<WireType<'c>> {
-        Ok(match self.type_()? {
-            FieldType::Int32 => WireType::Variant(VariantFieldType::Int32),
-            FieldType::Int64 => WireType::Variant(VariantFieldType::Int64),
-            FieldType::UInt32 => WireType::Variant(VariantFieldType::UInt32),
-            FieldType::UInt64 => WireType::Variant(VariantFieldType::UInt64),
-            FieldType::SInt32 => WireType::Variant(VariantFieldType::SInt32),
-            FieldType::SInt64 => WireType::Variant(VariantFieldType::SInt64),
-            FieldType::Enum(e) => WireType::Variant(VariantFieldType::Enum(e)),
-            FieldType::Bool => WireType::Variant(VariantFieldType::Bool),
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => WireType::LengthDelimited(LengthDelimitedFieldType::String),
-            FieldType::Bytes => WireType::LengthDelimited(LengthDelimitedFieldType::Bytes),
-            FieldType::Message(m) => {
-                WireType::LengthDelimited(LengthDelimitedFieldType::Message(m))
-            }
-            FieldType::Float => WireType::Bits32(Bits32FieldType::Float),
-            FieldType::Fixed32 => WireType::Bits32(Bits32FieldType::Fixed32),
-            FieldType::SFixed32 => WireType::Bits32(Bits32FieldType::SFixed32),
-            FieldType::Double => WireType::Bits64(Bits64FieldType::Double),
-            FieldType::Fixed64 => WireType::Bits64(Bits64FieldType::Fixed64),
-            FieldType::SFixed64 => WireType::Bits64(Bits64FieldType::SFixed64),
-        })
-    }
-
     pub fn type_tag(&'c self) -> Result<String> {
         Ok(match self.type_()? {
             FieldType::Double => "Double".into(),
@@ -277,69 +252,6 @@ impl Debug for FieldDescriptor<'_> {
         f.debug_struct("FieldDescriptor").finish()
     }
 }
-
-#[derive(Debug, Clone, Hash)]
-pub enum WireType<'c> {
-    Variant(VariantFieldType<'c>),
-    LengthDelimited(LengthDelimitedFieldType<'c>),
-    Bits32(Bits32FieldType),
-    Bits64(Bits64FieldType),
-    //Group(GroupFieldType),
-}
-
-#[derive(Debug, Clone, Hash)]
-pub enum VariantFieldType<'c> {
-    Int32,
-    Int64,
-    UInt32,
-    UInt64,
-    SInt32,
-    SInt64,
-    Bool,
-    Enum(&'c super::EnumDescriptor<'c>),
-}
-impl<'c> VariantFieldType<'c> {
-    pub fn native_tag_type(&self, package: &str) -> Result<Cow<'static, str>> {
-        Ok(match self {
-            VariantFieldType::Int32 => "::puroro_internal::tags::Int32".into(),
-            VariantFieldType::Int64 => "::puroro_internal::tags::Int64".into(),
-            VariantFieldType::UInt32 => "::puroro_internal::tags::UInt32".into(),
-            VariantFieldType::UInt64 => "::puroro_internal::tags::UInt64".into(),
-            VariantFieldType::SInt32 => "::puroro_internal::tags::SInt32".into(),
-            VariantFieldType::SInt64 => "::puroro_internal::tags::UInt64".into(),
-            VariantFieldType::Bool => "::puroro_internal::tags::Bool".into(),
-            VariantFieldType::Enum(e) => format!(
-                "::puroro_internal::tags::Enum<{name}>",
-                name = e.native_ident_with_relative_path(package)?,
-            )
-            .into(),
-        })
-    }
-}
-
-#[derive(Debug, Clone, Hash)]
-pub enum LengthDelimitedFieldType<'c> {
-    String,
-    Bytes,
-    Message(&'c super::MessageDescriptor<'c>),
-}
-impl<'c> LengthDelimitedFieldType<'c> {}
-
-#[derive(Debug, Clone, Hash)]
-pub enum Bits32FieldType {
-    Float,
-    Fixed32,
-    SFixed32,
-}
-impl Bits32FieldType {}
-
-#[derive(Debug, Clone, Hash)]
-pub enum Bits64FieldType {
-    Double,
-    Fixed64,
-    SFixed64,
-}
-impl Bits64FieldType {}
 
 #[derive(Debug, Clone, Hash)]
 pub enum FieldType<'c> {
