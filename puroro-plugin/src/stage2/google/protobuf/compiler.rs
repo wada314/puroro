@@ -79,18 +79,20 @@ impl ::puroro_internal::ser::Serializable for CodeGeneratorResponse {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.error.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::UInt64, _>(
-            2, 
-            self.supported_features.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.file.iter_for_ser() {
-            serializer.serialize_message_twice(15, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.error, serializer, 1)?;
+        <::std::option::Option<u64> as SerializableField<
+                tags::UInt64, 
+                tags::Optional2>>
+            ::ser(&self.supported_features, serializer, 2)?;
+        <::std::vec::Vec<code_generator_response::File> as SerializableField<
+                tags::Message<code_generator_response::File>, 
+                tags::Repeated>>
+            ::ser(&self.file, serializer, 15)?;
         Ok(())
     }
 }
@@ -207,18 +209,20 @@ impl<'bump> ::puroro_internal::ser::Serializable for CodeGeneratorResponseBumpal
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.error.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::UInt64, _>(
-            2, 
-            self.supported_features.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.file.iter_for_ser() {
-            serializer.serialize_message_twice(15, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.error, serializer, 1)?;
+        <::std::option::Option<u64> as SerializableField<
+                tags::UInt64, 
+                tags::Optional2>>
+            ::ser(&self.supported_features, serializer, 2)?;
+        <::bumpalo::collections::Vec<'bump, code_generator_response::FileBumpalo<'bump>> as SerializableField<
+                tags::Message<code_generator_response::File>, 
+                tags::Repeated>>
+            ::ser(&self.file, serializer, 15)?;
         Ok(())
     }
 }
@@ -297,9 +301,9 @@ impl ::std::convert::TryFrom<i32> for Feature {
         }
     }
 }
-impl ::std::convert::Into<i32> for Feature {
-    fn into(self) -> i32 {
-        self as i32
+impl ::std::convert::From<Feature> for i32 {
+    fn from(val: Feature) -> i32 {
+        val as i32
     }
 }
 
@@ -388,19 +392,24 @@ impl ::puroro_internal::ser::Serializable for File {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.insertion_point.iter_for_ser() {
-            serializer.serialize_bytes_twice(2, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.content.iter_for_ser() {
-            serializer.serialize_bytes_twice(15, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.generated_code_info.iter_for_ser() {
-            serializer.serialize_message_twice(16, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.insertion_point, serializer, 2)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.content, serializer, 15)?;
+        <::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>> as SerializableField<
+                tags::Message<super::super::GeneratedCodeInfo>, 
+                tags::Optional2>>
+            ::ser(&self.generated_code_info, serializer, 16)?;
         Ok(())
     }
 }
@@ -512,19 +521,24 @@ impl<'bump> ::puroro_internal::ser::Serializable for FileBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.insertion_point.iter_for_ser() {
-            serializer.serialize_bytes_twice(2, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.content.iter_for_ser() {
-            serializer.serialize_bytes_twice(15, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.generated_code_info.iter_for_ser() {
-            serializer.serialize_message_twice(16, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.insertion_point, serializer, 2)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.content, serializer, 15)?;
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>> as SerializableField<
+                tags::Message<super::super::GeneratedCodeInfo>, 
+                tags::Optional2>>
+            ::ser(&self.generated_code_info, serializer, 16)?;
         Ok(())
     }
 }
@@ -654,19 +668,24 @@ impl ::puroro_internal::ser::Serializable for CodeGeneratorRequest {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.file_to_generate.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.parameter.iter_for_ser() {
-            serializer.serialize_bytes_twice(2, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.proto_file.iter_for_ser() {
-            serializer.serialize_message_twice(15, msg)?;
-        }
-        for msg in self.compiler_version.iter_for_ser() {
-            serializer.serialize_message_twice(3, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::vec::Vec<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Repeated>>
+            ::ser(&self.file_to_generate, serializer, 1)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.parameter, serializer, 2)?;
+        <::std::vec::Vec<super::FileDescriptorProto> as SerializableField<
+                tags::Message<super::FileDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.proto_file, serializer, 15)?;
+        <::std::option::Option<::std::boxed::Box<Version>> as SerializableField<
+                tags::Message<Version>, 
+                tags::Optional2>>
+            ::ser(&self.compiler_version, serializer, 3)?;
         Ok(())
     }
 }
@@ -811,19 +830,24 @@ impl<'bump> ::puroro_internal::ser::Serializable for CodeGeneratorRequestBumpalo
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.file_to_generate.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.parameter.iter_for_ser() {
-            serializer.serialize_bytes_twice(2, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.proto_file.iter_for_ser() {
-            serializer.serialize_message_twice(15, msg)?;
-        }
-        for msg in self.compiler_version.iter_for_ser() {
-            serializer.serialize_message_twice(3, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Repeated>>
+            ::ser(&self.file_to_generate, serializer, 1)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.parameter, serializer, 2)?;
+        <::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<super::FileDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.proto_file, serializer, 15)?;
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, VersionBumpalo<'bump>>> as SerializableField<
+                tags::Message<Version>, 
+                tags::Optional2>>
+            ::ser(&self.compiler_version, serializer, 3)?;
         Ok(())
     }
 }
@@ -1002,25 +1026,24 @@ impl ::puroro_internal::ser::Serializable for Version {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            1, 
-            self.major.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            2, 
-            self.minor.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            3, 
-            self.patch.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.suffix.iter_for_ser() {
-            serializer.serialize_bytes_twice(4, string.bytes().map(|b| Ok(b)))?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.major, serializer, 1)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.minor, serializer, 2)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.patch, serializer, 3)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.suffix, serializer, 4)?;
         Ok(())
     }
 }
@@ -1131,25 +1154,24 @@ impl<'bump> ::puroro_internal::ser::Serializable for VersionBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            1, 
-            self.major.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            2, 
-            self.minor.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            3, 
-            self.patch.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.suffix.iter_for_ser() {
-            serializer.serialize_bytes_twice(4, string.bytes().map(|b| Ok(b)))?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.major, serializer, 1)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.minor, serializer, 2)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.patch, serializer, 3)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.suffix, serializer, 4)?;
         Ok(())
     }
 }
