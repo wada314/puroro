@@ -218,7 +218,8 @@ impl{gp} ::puroro_internal::ser::Serializable for {name}{gpb} {{
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
-        use ::puroro_internal::helpers::MaybeRepeatedField;\n",
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
@@ -227,54 +228,18 @@ impl{gp} ::puroro_internal::ser::Serializable for {name}{gpb} {{
             indent_n(
                 2,
                 iter(self.msg.fields().map(|field| -> Result<_> {
-                    Ok(match field.wire_type()? {
-                        WireType::Variant(field_type) => format!(
-                            "\
-serializer.serialize_variants_twice::<{tag}, _>(
-    {number}, 
-    self.{name}.iter_for_ser()
-        .cloned()
-        .map(|v| Ok(v)))?;\n",
-                            number = field.number(),
-                            tag = field_type.native_tag_type(self.msg.package()?)?,
-                            name = field.native_name()?,
-                        ),
-
-                        WireType::LengthDelimited(field_type) => match field_type {
-                            LengthDelimitedFieldType::String => format!(
-                                "\
-for string in self.{name}.iter_for_ser() {{
-    serializer.serialize_bytes_twice({number}, string.bytes().map(|b| Ok(b)))?;
-}}\n",
-                                name = field.native_name()?,
-                                number = field.number()
-                            ),
-                            LengthDelimitedFieldType::Bytes => format!(
-                                "\
-for bytes in self.{name}.iter_for_ser() {{
-    serializer.serialize_bytes_twice({number}, bytes.iter().map(|b| Ok(*b)))?;
-}}\n",
-                                name = field.native_name()?,
-                                number = field.number()
-                            ),
-                            LengthDelimitedFieldType::Message(_) => format!(
-                                "\
-for msg in self.{name}.iter_for_ser() {{
-    serializer.serialize_message_twice({number}, msg)?;
-}}\n",
-                                number = field.number(),
-                                name = field.native_name()?,
-                            ),
-                        },
-                        WireType::Bits32(_) | WireType::Bits64(_) => format!(
-                            "\
-for item in self.{name}.iter_for_ser() {{
-    serializer.serialize_fixed_bits({number}, item.to_le_bytes())?;
-}}\n",
-                            name = field.native_name()?,
-                            number = field.number(),
-                        ),
-                    })
+                    Ok(format!(
+                        "\
+<{type_} as SerializableField<
+        tags::{type_tag}, 
+        tags::{label_tag}>>
+    ::ser(&self.{name}, serializer, {number})?;\n",
+                        number = field.number(),
+                        name = field.native_name()?,
+                        type_ = self.frag_gen.field_type_for(field)?,
+                        type_tag = field.type_tag()?,
+                        label_tag = field.label_tag()?,
+                    ))
                 })),
             ),
             "        \

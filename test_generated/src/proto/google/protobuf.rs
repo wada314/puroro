@@ -63,10 +63,12 @@ impl ::puroro_internal::ser::Serializable for GeneratedCodeInfo {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for msg in self.annotation.iter_for_ser() {
-            serializer.serialize_message_twice(1, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::vec::Vec<generated_code_info::Annotation> as SerializableField<
+                tags::Message<generated_code_info::Annotation>, 
+                tags::Repeated>>
+            ::ser(&self.annotation, serializer, 1)?;
         Ok(())
     }
 }
@@ -161,10 +163,12 @@ impl<'bump> ::puroro_internal::ser::Serializable for GeneratedCodeInfoBumpalo<'b
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for msg in self.annotation.iter_for_ser() {
-            serializer.serialize_message_twice(1, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo<'bump>> as SerializableField<
+                tags::Message<generated_code_info::Annotation>, 
+                tags::Repeated>>
+            ::ser(&self.annotation, serializer, 1)?;
         Ok(())
     }
 }
@@ -306,25 +310,24 @@ impl ::puroro_internal::ser::Serializable for Annotation {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            1, 
-            self.path.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.source_file.iter_for_ser() {
-            serializer.serialize_bytes_twice(2, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            3, 
-            self.begin.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            4, 
-            self.end.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::vec::Vec<i32> as SerializableField<
+                tags::Int32, 
+                tags::Repeated>>
+            ::ser(&self.path, serializer, 1)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.source_file, serializer, 2)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.begin, serializer, 3)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.end, serializer, 4)?;
         Ok(())
     }
 }
@@ -451,25 +454,24 @@ impl<'bump> ::puroro_internal::ser::Serializable for AnnotationBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            1, 
-            self.path.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.source_file.iter_for_ser() {
-            serializer.serialize_bytes_twice(2, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            3, 
-            self.begin.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            4, 
-            self.end.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::bumpalo::collections::Vec<'bump, i32> as SerializableField<
+                tags::Int32, 
+                tags::Repeated>>
+            ::ser(&self.path, serializer, 1)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.source_file, serializer, 2)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.begin, serializer, 3)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.end, serializer, 4)?;
         Ok(())
     }
 }
@@ -597,10 +599,12 @@ impl ::puroro_internal::ser::Serializable for SourceCodeInfo {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for msg in self.location.iter_for_ser() {
-            serializer.serialize_message_twice(1, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::vec::Vec<source_code_info::Location> as SerializableField<
+                tags::Message<source_code_info::Location>, 
+                tags::Repeated>>
+            ::ser(&self.location, serializer, 1)?;
         Ok(())
     }
 }
@@ -695,10 +699,12 @@ impl<'bump> ::puroro_internal::ser::Serializable for SourceCodeInfoBumpalo<'bump
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for msg in self.location.iter_for_ser() {
-            serializer.serialize_message_twice(1, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo<'bump>> as SerializableField<
+                tags::Message<source_code_info::Location>, 
+                tags::Repeated>>
+            ::ser(&self.location, serializer, 1)?;
         Ok(())
     }
 }
@@ -848,26 +854,28 @@ impl ::puroro_internal::ser::Serializable for Location {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            1, 
-            self.path.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            2, 
-            self.span.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.leading_comments.iter_for_ser() {
-            serializer.serialize_bytes_twice(3, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.trailing_comments.iter_for_ser() {
-            serializer.serialize_bytes_twice(4, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.leading_detached_comments.iter_for_ser() {
-            serializer.serialize_bytes_twice(6, string.bytes().map(|b| Ok(b)))?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::vec::Vec<i32> as SerializableField<
+                tags::Int32, 
+                tags::Repeated>>
+            ::ser(&self.path, serializer, 1)?;
+        <::std::vec::Vec<i32> as SerializableField<
+                tags::Int32, 
+                tags::Repeated>>
+            ::ser(&self.span, serializer, 2)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.leading_comments, serializer, 3)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.trailing_comments, serializer, 4)?;
+        <::std::vec::Vec<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Repeated>>
+            ::ser(&self.leading_detached_comments, serializer, 6)?;
         Ok(())
     }
 }
@@ -1037,26 +1045,28 @@ impl<'bump> ::puroro_internal::ser::Serializable for LocationBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            1, 
-            self.path.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            2, 
-            self.span.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.leading_comments.iter_for_ser() {
-            serializer.serialize_bytes_twice(3, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.trailing_comments.iter_for_ser() {
-            serializer.serialize_bytes_twice(4, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.leading_detached_comments.iter_for_ser() {
-            serializer.serialize_bytes_twice(6, string.bytes().map(|b| Ok(b)))?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::bumpalo::collections::Vec<'bump, i32> as SerializableField<
+                tags::Int32, 
+                tags::Repeated>>
+            ::ser(&self.path, serializer, 1)?;
+        <::bumpalo::collections::Vec<'bump, i32> as SerializableField<
+                tags::Int32, 
+                tags::Repeated>>
+            ::ser(&self.span, serializer, 2)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.leading_comments, serializer, 3)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.trailing_comments, serializer, 4)?;
+        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Repeated>>
+            ::ser(&self.leading_detached_comments, serializer, 6)?;
         Ok(())
     }
 }
@@ -1284,32 +1294,36 @@ impl ::puroro_internal::ser::Serializable for UninterpretedOption {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for msg in self.name.iter_for_ser() {
-            serializer.serialize_message_twice(2, msg)?;
-        }
-        for string in self.identifier_value.iter_for_ser() {
-            serializer.serialize_bytes_twice(3, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::UInt64, _>(
-            4, 
-            self.positive_int_value.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int64, _>(
-            5, 
-            self.negative_int_value.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for item in self.double_value.iter_for_ser() {
-            serializer.serialize_fixed_bits(6, item.to_le_bytes())?;
-        }
-        for bytes in self.string_value.iter_for_ser() {
-            serializer.serialize_bytes_twice(7, bytes.iter().map(|b| Ok(*b)))?;
-        }
-        for string in self.aggregate_value.iter_for_ser() {
-            serializer.serialize_bytes_twice(8, string.bytes().map(|b| Ok(b)))?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::vec::Vec<uninterpreted_option::NamePart> as SerializableField<
+                tags::Message<uninterpreted_option::NamePart>, 
+                tags::Repeated>>
+            ::ser(&self.name, serializer, 2)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.identifier_value, serializer, 3)?;
+        <::std::option::Option<u64> as SerializableField<
+                tags::UInt64, 
+                tags::Optional2>>
+            ::ser(&self.positive_int_value, serializer, 4)?;
+        <::std::option::Option<i64> as SerializableField<
+                tags::Int64, 
+                tags::Optional2>>
+            ::ser(&self.negative_int_value, serializer, 5)?;
+        <::std::option::Option<f64> as SerializableField<
+                tags::Double, 
+                tags::Optional2>>
+            ::ser(&self.double_value, serializer, 6)?;
+        <::std::option::Option<::std::vec::Vec<u8>> as SerializableField<
+                tags::Bytes, 
+                tags::Optional2>>
+            ::ser(&self.string_value, serializer, 7)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.aggregate_value, serializer, 8)?;
         Ok(())
     }
 }
@@ -1470,32 +1484,36 @@ impl<'bump> ::puroro_internal::ser::Serializable for UninterpretedOptionBumpalo<
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for msg in self.name.iter_for_ser() {
-            serializer.serialize_message_twice(2, msg)?;
-        }
-        for string in self.identifier_value.iter_for_ser() {
-            serializer.serialize_bytes_twice(3, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::UInt64, _>(
-            4, 
-            self.positive_int_value.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int64, _>(
-            5, 
-            self.negative_int_value.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for item in self.double_value.iter_for_ser() {
-            serializer.serialize_fixed_bits(6, item.to_le_bytes())?;
-        }
-        for bytes in self.string_value.iter_for_ser() {
-            serializer.serialize_bytes_twice(7, bytes.iter().map(|b| Ok(*b)))?;
-        }
-        for string in self.aggregate_value.iter_for_ser() {
-            serializer.serialize_bytes_twice(8, string.bytes().map(|b| Ok(b)))?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo<'bump>> as SerializableField<
+                tags::Message<uninterpreted_option::NamePart>, 
+                tags::Repeated>>
+            ::ser(&self.name, serializer, 2)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.identifier_value, serializer, 3)?;
+        <::std::option::Option<u64> as SerializableField<
+                tags::UInt64, 
+                tags::Optional2>>
+            ::ser(&self.positive_int_value, serializer, 4)?;
+        <::std::option::Option<i64> as SerializableField<
+                tags::Int64, 
+                tags::Optional2>>
+            ::ser(&self.negative_int_value, serializer, 5)?;
+        <::std::option::Option<f64> as SerializableField<
+                tags::Double, 
+                tags::Optional2>>
+            ::ser(&self.double_value, serializer, 6)?;
+        <::std::option::Option<::bumpalo::collections::Vec<'bump, u8>> as SerializableField<
+                tags::Bytes, 
+                tags::Optional2>>
+            ::ser(&self.string_value, serializer, 7)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.aggregate_value, serializer, 8)?;
         Ok(())
     }
 }
@@ -1645,15 +1663,16 @@ impl ::puroro_internal::ser::Serializable for NamePart {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name_part.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            2, 
-            self.is_extension.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::string::String as SerializableField<
+                tags::String, 
+                tags::Required>>
+            ::ser(&self.name_part, serializer, 1)?;
+        <bool as SerializableField<
+                tags::Bool, 
+                tags::Required>>
+            ::ser(&self.is_extension, serializer, 2)?;
         Ok(())
     }
 }
@@ -1742,15 +1761,16 @@ impl<'bump> ::puroro_internal::ser::Serializable for NamePartBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name_part.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            2, 
-            self.is_extension.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::bumpalo::collections::String<'bump> as SerializableField<
+                tags::String, 
+                tags::Required>>
+            ::ser(&self.name_part, serializer, 1)?;
+        <bool as SerializableField<
+                tags::Bool, 
+                tags::Required>>
+            ::ser(&self.is_extension, serializer, 2)?;
         Ok(())
     }
 }
@@ -1862,20 +1882,20 @@ impl ::puroro_internal::ser::Serializable for MethodOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            33, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Enum<method_options::IdempotencyLevel>, _>(
-            34, 
-            self.idempotency_level.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 33)?;
+        <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as SerializableField<
+                tags::Enum<method_options::IdempotencyLevel>, 
+                tags::Optional2>>
+            ::ser(&self.idempotency_level, serializer, 34)?;
+        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -1992,20 +2012,20 @@ impl<'bump> ::puroro_internal::ser::Serializable for MethodOptionsBumpalo<'bump>
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            33, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Enum<method_options::IdempotencyLevel>, _>(
-            34, 
-            self.idempotency_level.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 33)?;
+        <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as SerializableField<
+                tags::Enum<method_options::IdempotencyLevel>, 
+                tags::Optional2>>
+            ::ser(&self.idempotency_level, serializer, 34)?;
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -2086,9 +2106,9 @@ impl ::std::convert::TryFrom<i32> for IdempotencyLevel {
         }
     }
 }
-impl ::std::convert::Into<i32> for IdempotencyLevel {
-    fn into(self) -> i32 {
-        self as i32
+impl ::std::convert::From<IdempotencyLevel> for i32 {
+    fn from(val: IdempotencyLevel) -> i32 {
+        val as i32
     }
 }
 } // mod method_options
@@ -2162,15 +2182,16 @@ impl ::puroro_internal::ser::Serializable for ServiceOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            33, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 33)?;
+        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -2276,15 +2297,16 @@ impl<'bump> ::puroro_internal::ser::Serializable for ServiceOptionsBumpalo<'bump
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            33, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 33)?;
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -2413,15 +2435,16 @@ impl ::puroro_internal::ser::Serializable for EnumValueOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            1, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 1)?;
+        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -2527,15 +2550,16 @@ impl<'bump> ::puroro_internal::ser::Serializable for EnumValueOptionsBumpalo<'bu
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            1, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 1)?;
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -2672,20 +2696,20 @@ impl ::puroro_internal::ser::Serializable for EnumOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            2, 
-            self.allow_alias.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            3, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.allow_alias, serializer, 2)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 3)?;
+        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -2802,20 +2826,20 @@ impl<'bump> ::puroro_internal::ser::Serializable for EnumOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            2, 
-            self.allow_alias.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            3, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.allow_alias, serializer, 2)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 3)?;
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -2940,10 +2964,12 @@ impl ::puroro_internal::ser::Serializable for OneofOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -3038,10 +3064,12 @@ impl<'bump> ::puroro_internal::ser::Serializable for OneofOptionsBumpalo<'bump> 
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -3206,40 +3234,36 @@ impl ::puroro_internal::ser::Serializable for FieldOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Enum<field_options::Ctype>, _>(
-            1, 
-            self.ctype.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            2, 
-            self.packed.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Enum<field_options::Jstype>, _>(
-            6, 
-            self.jstype.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            5, 
-            self.lazy.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            3, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            10, 
-            self.weak.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as SerializableField<
+                tags::Enum<field_options::Ctype>, 
+                tags::Optional2>>
+            ::ser(&self.ctype, serializer, 1)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.packed, serializer, 2)?;
+        <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as SerializableField<
+                tags::Enum<field_options::Jstype>, 
+                tags::Optional2>>
+            ::ser(&self.jstype, serializer, 6)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.lazy, serializer, 5)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 3)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.weak, serializer, 10)?;
+        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -3400,40 +3424,36 @@ impl<'bump> ::puroro_internal::ser::Serializable for FieldOptionsBumpalo<'bump> 
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Enum<field_options::Ctype>, _>(
-            1, 
-            self.ctype.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            2, 
-            self.packed.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Enum<field_options::Jstype>, _>(
-            6, 
-            self.jstype.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            5, 
-            self.lazy.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            3, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            10, 
-            self.weak.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as SerializableField<
+                tags::Enum<field_options::Ctype>, 
+                tags::Optional2>>
+            ::ser(&self.ctype, serializer, 1)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.packed, serializer, 2)?;
+        <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as SerializableField<
+                tags::Enum<field_options::Jstype>, 
+                tags::Optional2>>
+            ::ser(&self.jstype, serializer, 6)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.lazy, serializer, 5)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 3)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.weak, serializer, 10)?;
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -3530,9 +3550,9 @@ impl ::std::convert::TryFrom<i32> for Jstype {
         }
     }
 }
-impl ::std::convert::Into<i32> for Jstype {
-    fn into(self) -> i32 {
-        self as i32
+impl ::std::convert::From<Jstype> for i32 {
+    fn from(val: Jstype) -> i32 {
+        val as i32
     }
 }
 #[derive(Debug, Clone)]
@@ -3552,9 +3572,9 @@ impl ::std::convert::TryFrom<i32> for Ctype {
         }
     }
 }
-impl ::std::convert::Into<i32> for Ctype {
-    fn into(self) -> i32 {
-        self as i32
+impl ::std::convert::From<Ctype> for i32 {
+    fn from(val: Ctype) -> i32 {
+        val as i32
     }
 }
 } // mod field_options
@@ -3652,30 +3672,28 @@ impl ::puroro_internal::ser::Serializable for MessageOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            1, 
-            self.message_set_wire_format.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            2, 
-            self.no_standard_descriptor_accessor.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            3, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            7, 
-            self.map_entry.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.message_set_wire_format, serializer, 1)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.no_standard_descriptor_accessor, serializer, 2)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 3)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.map_entry, serializer, 7)?;
+        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -3814,30 +3832,28 @@ impl<'bump> ::puroro_internal::ser::Serializable for MessageOptionsBumpalo<'bump
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            1, 
-            self.message_set_wire_format.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            2, 
-            self.no_standard_descriptor_accessor.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            3, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            7, 
-            self.map_entry.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.message_set_wire_format, serializer, 1)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.no_standard_descriptor_accessor, serializer, 2)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 3)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.map_entry, serializer, 7)?;
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -4130,90 +4146,92 @@ impl ::puroro_internal::ser::Serializable for FileOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.java_package.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.java_outer_classname.iter_for_ser() {
-            serializer.serialize_bytes_twice(8, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            10, 
-            self.java_multiple_files.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            20, 
-            self.java_generate_equals_and_hash.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            27, 
-            self.java_string_check_utf8.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Enum<file_options::OptimizeMode>, _>(
-            9, 
-            self.optimize_for.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.go_package.iter_for_ser() {
-            serializer.serialize_bytes_twice(11, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            16, 
-            self.cc_generic_services.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            17, 
-            self.java_generic_services.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            18, 
-            self.py_generic_services.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            42, 
-            self.php_generic_services.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            23, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            31, 
-            self.cc_enable_arenas.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.objc_class_prefix.iter_for_ser() {
-            serializer.serialize_bytes_twice(36, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.csharp_namespace.iter_for_ser() {
-            serializer.serialize_bytes_twice(37, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.swift_prefix.iter_for_ser() {
-            serializer.serialize_bytes_twice(39, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.php_class_prefix.iter_for_ser() {
-            serializer.serialize_bytes_twice(40, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.php_namespace.iter_for_ser() {
-            serializer.serialize_bytes_twice(41, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.php_metadata_namespace.iter_for_ser() {
-            serializer.serialize_bytes_twice(44, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.ruby_package.iter_for_ser() {
-            serializer.serialize_bytes_twice(45, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.java_package, serializer, 1)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.java_outer_classname, serializer, 8)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.java_multiple_files, serializer, 10)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.java_generate_equals_and_hash, serializer, 20)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.java_string_check_utf8, serializer, 27)?;
+        <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as SerializableField<
+                tags::Enum<file_options::OptimizeMode>, 
+                tags::Optional2>>
+            ::ser(&self.optimize_for, serializer, 9)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.go_package, serializer, 11)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.cc_generic_services, serializer, 16)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.java_generic_services, serializer, 17)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.py_generic_services, serializer, 18)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.php_generic_services, serializer, 42)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 23)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.cc_enable_arenas, serializer, 31)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.objc_class_prefix, serializer, 36)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.csharp_namespace, serializer, 37)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.swift_prefix, serializer, 39)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.php_class_prefix, serializer, 40)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.php_namespace, serializer, 41)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.php_metadata_namespace, serializer, 44)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.ruby_package, serializer, 45)?;
+        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -4528,90 +4546,92 @@ impl<'bump> ::puroro_internal::ser::Serializable for FileOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.java_package.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.java_outer_classname.iter_for_ser() {
-            serializer.serialize_bytes_twice(8, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            10, 
-            self.java_multiple_files.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            20, 
-            self.java_generate_equals_and_hash.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            27, 
-            self.java_string_check_utf8.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Enum<file_options::OptimizeMode>, _>(
-            9, 
-            self.optimize_for.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.go_package.iter_for_ser() {
-            serializer.serialize_bytes_twice(11, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            16, 
-            self.cc_generic_services.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            17, 
-            self.java_generic_services.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            18, 
-            self.py_generic_services.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            42, 
-            self.php_generic_services.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            23, 
-            self.deprecated.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            31, 
-            self.cc_enable_arenas.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.objc_class_prefix.iter_for_ser() {
-            serializer.serialize_bytes_twice(36, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.csharp_namespace.iter_for_ser() {
-            serializer.serialize_bytes_twice(37, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.swift_prefix.iter_for_ser() {
-            serializer.serialize_bytes_twice(39, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.php_class_prefix.iter_for_ser() {
-            serializer.serialize_bytes_twice(40, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.php_namespace.iter_for_ser() {
-            serializer.serialize_bytes_twice(41, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.php_metadata_namespace.iter_for_ser() {
-            serializer.serialize_bytes_twice(44, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.ruby_package.iter_for_ser() {
-            serializer.serialize_bytes_twice(45, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.java_package, serializer, 1)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.java_outer_classname, serializer, 8)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.java_multiple_files, serializer, 10)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.java_generate_equals_and_hash, serializer, 20)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.java_string_check_utf8, serializer, 27)?;
+        <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as SerializableField<
+                tags::Enum<file_options::OptimizeMode>, 
+                tags::Optional2>>
+            ::ser(&self.optimize_for, serializer, 9)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.go_package, serializer, 11)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.cc_generic_services, serializer, 16)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.java_generic_services, serializer, 17)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.py_generic_services, serializer, 18)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.php_generic_services, serializer, 42)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.deprecated, serializer, 23)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.cc_enable_arenas, serializer, 31)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.objc_class_prefix, serializer, 36)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.csharp_namespace, serializer, 37)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.swift_prefix, serializer, 39)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.php_class_prefix, serializer, 40)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.php_namespace, serializer, 41)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.php_metadata_namespace, serializer, 44)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.ruby_package, serializer, 45)?;
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -4764,9 +4784,9 @@ impl ::std::convert::TryFrom<i32> for OptimizeMode {
         }
     }
 }
-impl ::std::convert::Into<i32> for OptimizeMode {
-    fn into(self) -> i32 {
-        self as i32
+impl ::std::convert::From<OptimizeMode> for i32 {
+    fn from(val: OptimizeMode) -> i32 {
+        val as i32
     }
 }
 } // mod file_options
@@ -4872,29 +4892,32 @@ impl ::puroro_internal::ser::Serializable for MethodDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.input_type.iter_for_ser() {
-            serializer.serialize_bytes_twice(2, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.output_type.iter_for_ser() {
-            serializer.serialize_bytes_twice(3, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(4, msg)?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            5, 
-            self.client_streaming.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            6, 
-            self.server_streaming.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.input_type, serializer, 2)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.output_type, serializer, 3)?;
+        <::std::option::Option<::std::boxed::Box<MethodOptions>> as SerializableField<
+                tags::Message<MethodOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 4)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.client_streaming, serializer, 5)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.server_streaming, serializer, 6)?;
         Ok(())
     }
 }
@@ -5028,29 +5051,32 @@ impl<'bump> ::puroro_internal::ser::Serializable for MethodDescriptorProtoBumpal
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.input_type.iter_for_ser() {
-            serializer.serialize_bytes_twice(2, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.output_type.iter_for_ser() {
-            serializer.serialize_bytes_twice(3, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(4, msg)?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            5, 
-            self.client_streaming.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            6, 
-            self.server_streaming.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.input_type, serializer, 2)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.output_type, serializer, 3)?;
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, MethodOptionsBumpalo<'bump>>> as SerializableField<
+                tags::Message<MethodOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 4)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.client_streaming, serializer, 5)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.server_streaming, serializer, 6)?;
         Ok(())
     }
 }
@@ -5179,16 +5205,20 @@ impl ::puroro_internal::ser::Serializable for ServiceDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.method.iter_for_ser() {
-            serializer.serialize_message_twice(2, msg)?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(3, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::vec::Vec<MethodDescriptorProto> as SerializableField<
+                tags::Message<MethodDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.method, serializer, 2)?;
+        <::std::option::Option<::std::boxed::Box<ServiceOptions>> as SerializableField<
+                tags::Message<ServiceOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 3)?;
         Ok(())
     }
 }
@@ -5306,16 +5336,20 @@ impl<'bump> ::puroro_internal::ser::Serializable for ServiceDescriptorProtoBumpa
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.method.iter_for_ser() {
-            serializer.serialize_message_twice(2, msg)?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(3, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<MethodDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.method, serializer, 2)?;
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, ServiceOptionsBumpalo<'bump>>> as SerializableField<
+                tags::Message<ServiceOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 3)?;
         Ok(())
     }
 }
@@ -5458,18 +5492,20 @@ impl ::puroro_internal::ser::Serializable for EnumValueDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            2, 
-            self.number.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(3, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.number, serializer, 2)?;
+        <::std::option::Option<::std::boxed::Box<EnumValueOptions>> as SerializableField<
+                tags::Message<EnumValueOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 3)?;
         Ok(())
     }
 }
@@ -5570,18 +5606,20 @@ impl<'bump> ::puroro_internal::ser::Serializable for EnumValueDescriptorProtoBum
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            2, 
-            self.number.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(3, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.number, serializer, 2)?;
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumValueOptionsBumpalo<'bump>>> as SerializableField<
+                tags::Message<EnumValueOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 3)?;
         Ok(())
     }
 }
@@ -5714,22 +5752,28 @@ impl ::puroro_internal::ser::Serializable for EnumDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.value.iter_for_ser() {
-            serializer.serialize_message_twice(2, msg)?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(3, msg)?;
-        }
-        for msg in self.reserved_range.iter_for_ser() {
-            serializer.serialize_message_twice(4, msg)?;
-        }
-        for string in self.reserved_name.iter_for_ser() {
-            serializer.serialize_bytes_twice(5, string.bytes().map(|b| Ok(b)))?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::vec::Vec<EnumValueDescriptorProto> as SerializableField<
+                tags::Message<EnumValueDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.value, serializer, 2)?;
+        <::std::option::Option<::std::boxed::Box<EnumOptions>> as SerializableField<
+                tags::Message<EnumOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 3)?;
+        <::std::vec::Vec<enum_descriptor_proto::EnumReservedRange> as SerializableField<
+                tags::Message<enum_descriptor_proto::EnumReservedRange>, 
+                tags::Repeated>>
+            ::ser(&self.reserved_range, serializer, 4)?;
+        <::std::vec::Vec<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Repeated>>
+            ::ser(&self.reserved_name, serializer, 5)?;
         Ok(())
     }
 }
@@ -5902,22 +5946,28 @@ impl<'bump> ::puroro_internal::ser::Serializable for EnumDescriptorProtoBumpalo<
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.value.iter_for_ser() {
-            serializer.serialize_message_twice(2, msg)?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(3, msg)?;
-        }
-        for msg in self.reserved_range.iter_for_ser() {
-            serializer.serialize_message_twice(4, msg)?;
-        }
-        for string in self.reserved_name.iter_for_ser() {
-            serializer.serialize_bytes_twice(5, string.bytes().map(|b| Ok(b)))?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<EnumValueDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.value, serializer, 2)?;
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumOptionsBumpalo<'bump>>> as SerializableField<
+                tags::Message<EnumOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 3)?;
+        <::bumpalo::collections::Vec<'bump, enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>> as SerializableField<
+                tags::Message<enum_descriptor_proto::EnumReservedRange>, 
+                tags::Repeated>>
+            ::ser(&self.reserved_range, serializer, 4)?;
+        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Repeated>>
+            ::ser(&self.reserved_name, serializer, 5)?;
         Ok(())
     }
 }
@@ -6111,17 +6161,16 @@ impl ::puroro_internal::ser::Serializable for EnumReservedRange {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            1, 
-            self.start.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            2, 
-            self.end.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.start, serializer, 1)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.end, serializer, 2)?;
         Ok(())
     }
 }
@@ -6210,17 +6259,16 @@ impl<'bump> ::puroro_internal::ser::Serializable for EnumReservedRangeBumpalo<'b
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            1, 
-            self.start.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            2, 
-            self.end.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.start, serializer, 1)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.end, serializer, 2)?;
         Ok(())
     }
 }
@@ -6324,13 +6372,16 @@ impl ::puroro_internal::ser::Serializable for OneofDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(2, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::option::Option<::std::boxed::Box<OneofOptions>> as SerializableField<
+                tags::Message<OneofOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 2)?;
         Ok(())
     }
 }
@@ -6420,13 +6471,16 @@ impl<'bump> ::puroro_internal::ser::Serializable for OneofDescriptorProtoBumpalo
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(2, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo<'bump>>> as SerializableField<
+                tags::Message<OneofOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 2)?;
         Ok(())
     }
 }
@@ -6603,50 +6657,52 @@ impl ::puroro_internal::ser::Serializable for FieldDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            3, 
-            self.number.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Enum<field_descriptor_proto::Label>, _>(
-            4, 
-            self.label.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Enum<field_descriptor_proto::Type>, _>(
-            5, 
-            self.type_.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.type_name.iter_for_ser() {
-            serializer.serialize_bytes_twice(6, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.extendee.iter_for_ser() {
-            serializer.serialize_bytes_twice(2, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.default_value.iter_for_ser() {
-            serializer.serialize_bytes_twice(7, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            9, 
-            self.oneof_index.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.json_name.iter_for_ser() {
-            serializer.serialize_bytes_twice(10, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(8, msg)?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            17, 
-            self.proto3_optional.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.number, serializer, 3)?;
+        <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as SerializableField<
+                tags::Enum<field_descriptor_proto::Label>, 
+                tags::Optional2>>
+            ::ser(&self.label, serializer, 4)?;
+        <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as SerializableField<
+                tags::Enum<field_descriptor_proto::Type>, 
+                tags::Optional2>>
+            ::ser(&self.type_, serializer, 5)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.type_name, serializer, 6)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.extendee, serializer, 2)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.default_value, serializer, 7)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.oneof_index, serializer, 9)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.json_name, serializer, 10)?;
+        <::std::option::Option<::std::boxed::Box<FieldOptions>> as SerializableField<
+                tags::Message<FieldOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 8)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.proto3_optional, serializer, 17)?;
         Ok(())
     }
 }
@@ -6835,50 +6891,52 @@ impl<'bump> ::puroro_internal::ser::Serializable for FieldDescriptorProtoBumpalo
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            3, 
-            self.number.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Enum<field_descriptor_proto::Label>, _>(
-            4, 
-            self.label.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Enum<field_descriptor_proto::Type>, _>(
-            5, 
-            self.type_.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.type_name.iter_for_ser() {
-            serializer.serialize_bytes_twice(6, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.extendee.iter_for_ser() {
-            serializer.serialize_bytes_twice(2, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.default_value.iter_for_ser() {
-            serializer.serialize_bytes_twice(7, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            9, 
-            self.oneof_index.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for string in self.json_name.iter_for_ser() {
-            serializer.serialize_bytes_twice(10, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(8, msg)?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Bool, _>(
-            17, 
-            self.proto3_optional.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.number, serializer, 3)?;
+        <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as SerializableField<
+                tags::Enum<field_descriptor_proto::Label>, 
+                tags::Optional2>>
+            ::ser(&self.label, serializer, 4)?;
+        <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as SerializableField<
+                tags::Enum<field_descriptor_proto::Type>, 
+                tags::Optional2>>
+            ::ser(&self.type_, serializer, 5)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.type_name, serializer, 6)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.extendee, serializer, 2)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.default_value, serializer, 7)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.oneof_index, serializer, 9)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.json_name, serializer, 10)?;
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, FieldOptionsBumpalo<'bump>>> as SerializableField<
+                tags::Message<FieldOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 8)?;
+        <::std::option::Option<bool> as SerializableField<
+                tags::Bool, 
+                tags::Optional2>>
+            ::ser(&self.proto3_optional, serializer, 17)?;
         Ok(())
     }
 }
@@ -6967,9 +7025,9 @@ impl ::std::convert::TryFrom<i32> for Label {
         }
     }
 }
-impl ::std::convert::Into<i32> for Label {
-    fn into(self) -> i32 {
-        self as i32
+impl ::std::convert::From<Label> for i32 {
+    fn from(val: Label) -> i32 {
+        val as i32
     }
 }
 #[derive(Debug, Clone)]
@@ -7019,9 +7077,9 @@ impl ::std::convert::TryFrom<i32> for Type {
         }
     }
 }
-impl ::std::convert::Into<i32> for Type {
-    fn into(self) -> i32 {
-        self as i32
+impl ::std::convert::From<Type> for i32 {
+    fn from(val: Type) -> i32 {
+        val as i32
     }
 }
 } // mod field_descriptor_proto
@@ -7087,10 +7145,12 @@ impl ::puroro_internal::ser::Serializable for ExtensionRangeOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -7185,10 +7245,12 @@ impl<'bump> ::puroro_internal::ser::Serializable for ExtensionRangeOptionsBumpal
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for msg in self.uninterpreted_option.iter_for_ser() {
-            serializer.serialize_message_twice(999, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+                tags::Message<UninterpretedOption>, 
+                tags::Repeated>>
+            ::ser(&self.uninterpreted_option, serializer, 999)?;
         Ok(())
     }
 }
@@ -7377,37 +7439,48 @@ impl ::puroro_internal::ser::Serializable for DescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.field.iter_for_ser() {
-            serializer.serialize_message_twice(2, msg)?;
-        }
-        for msg in self.extension.iter_for_ser() {
-            serializer.serialize_message_twice(6, msg)?;
-        }
-        for msg in self.nested_type.iter_for_ser() {
-            serializer.serialize_message_twice(3, msg)?;
-        }
-        for msg in self.enum_type.iter_for_ser() {
-            serializer.serialize_message_twice(4, msg)?;
-        }
-        for msg in self.extension_range.iter_for_ser() {
-            serializer.serialize_message_twice(5, msg)?;
-        }
-        for msg in self.oneof_decl.iter_for_ser() {
-            serializer.serialize_message_twice(8, msg)?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(7, msg)?;
-        }
-        for msg in self.reserved_range.iter_for_ser() {
-            serializer.serialize_message_twice(9, msg)?;
-        }
-        for string in self.reserved_name.iter_for_ser() {
-            serializer.serialize_bytes_twice(10, string.bytes().map(|b| Ok(b)))?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::vec::Vec<FieldDescriptorProto> as SerializableField<
+                tags::Message<FieldDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.field, serializer, 2)?;
+        <::std::vec::Vec<FieldDescriptorProto> as SerializableField<
+                tags::Message<FieldDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.extension, serializer, 6)?;
+        <::std::vec::Vec<DescriptorProto> as SerializableField<
+                tags::Message<DescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.nested_type, serializer, 3)?;
+        <::std::vec::Vec<EnumDescriptorProto> as SerializableField<
+                tags::Message<EnumDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.enum_type, serializer, 4)?;
+        <::std::vec::Vec<descriptor_proto::ExtensionRange> as SerializableField<
+                tags::Message<descriptor_proto::ExtensionRange>, 
+                tags::Repeated>>
+            ::ser(&self.extension_range, serializer, 5)?;
+        <::std::vec::Vec<OneofDescriptorProto> as SerializableField<
+                tags::Message<OneofDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.oneof_decl, serializer, 8)?;
+        <::std::option::Option<::std::boxed::Box<MessageOptions>> as SerializableField<
+                tags::Message<MessageOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 7)?;
+        <::std::vec::Vec<descriptor_proto::ReservedRange> as SerializableField<
+                tags::Message<descriptor_proto::ReservedRange>, 
+                tags::Repeated>>
+            ::ser(&self.reserved_range, serializer, 9)?;
+        <::std::vec::Vec<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Repeated>>
+            ::ser(&self.reserved_name, serializer, 10)?;
         Ok(())
     }
 }
@@ -7720,37 +7793,48 @@ impl<'bump> ::puroro_internal::ser::Serializable for DescriptorProtoBumpalo<'bum
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for msg in self.field.iter_for_ser() {
-            serializer.serialize_message_twice(2, msg)?;
-        }
-        for msg in self.extension.iter_for_ser() {
-            serializer.serialize_message_twice(6, msg)?;
-        }
-        for msg in self.nested_type.iter_for_ser() {
-            serializer.serialize_message_twice(3, msg)?;
-        }
-        for msg in self.enum_type.iter_for_ser() {
-            serializer.serialize_message_twice(4, msg)?;
-        }
-        for msg in self.extension_range.iter_for_ser() {
-            serializer.serialize_message_twice(5, msg)?;
-        }
-        for msg in self.oneof_decl.iter_for_ser() {
-            serializer.serialize_message_twice(8, msg)?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(7, msg)?;
-        }
-        for msg in self.reserved_range.iter_for_ser() {
-            serializer.serialize_message_twice(9, msg)?;
-        }
-        for string in self.reserved_name.iter_for_ser() {
-            serializer.serialize_bytes_twice(10, string.bytes().map(|b| Ok(b)))?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<FieldDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.field, serializer, 2)?;
+        <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<FieldDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.extension, serializer, 6)?;
+        <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<DescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.nested_type, serializer, 3)?;
+        <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<EnumDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.enum_type, serializer, 4)?;
+        <::bumpalo::collections::Vec<'bump, descriptor_proto::ExtensionRangeBumpalo<'bump>> as SerializableField<
+                tags::Message<descriptor_proto::ExtensionRange>, 
+                tags::Repeated>>
+            ::ser(&self.extension_range, serializer, 5)?;
+        <::bumpalo::collections::Vec<'bump, OneofDescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<OneofDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.oneof_decl, serializer, 8)?;
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, MessageOptionsBumpalo<'bump>>> as SerializableField<
+                tags::Message<MessageOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 7)?;
+        <::bumpalo::collections::Vec<'bump, descriptor_proto::ReservedRangeBumpalo<'bump>> as SerializableField<
+                tags::Message<descriptor_proto::ReservedRange>, 
+                tags::Repeated>>
+            ::ser(&self.reserved_range, serializer, 9)?;
+        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Repeated>>
+            ::ser(&self.reserved_name, serializer, 10)?;
         Ok(())
     }
 }
@@ -8094,17 +8178,16 @@ impl ::puroro_internal::ser::Serializable for ReservedRange {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            1, 
-            self.start.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            2, 
-            self.end.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.start, serializer, 1)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.end, serializer, 2)?;
         Ok(())
     }
 }
@@ -8193,17 +8276,16 @@ impl<'bump> ::puroro_internal::ser::Serializable for ReservedRangeBumpalo<'bump>
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            1, 
-            self.start.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            2, 
-            self.end.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.start, serializer, 1)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.end, serializer, 2)?;
         Ok(())
     }
 }
@@ -8314,20 +8396,20 @@ impl ::puroro_internal::ser::Serializable for ExtensionRange {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            1, 
-            self.start.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            2, 
-            self.end.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(3, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.start, serializer, 1)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.end, serializer, 2)?;
+        <::std::option::Option<::std::boxed::Box<super::ExtensionRangeOptions>> as SerializableField<
+                tags::Message<super::ExtensionRangeOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 3)?;
         Ok(())
     }
 }
@@ -8428,20 +8510,20 @@ impl<'bump> ::puroro_internal::ser::Serializable for ExtensionRangeBumpalo<'bump
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            1, 
-            self.start.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            2, 
-            self.end.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(3, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.start, serializer, 1)?;
+        <::std::option::Option<i32> as SerializableField<
+                tags::Int32, 
+                tags::Optional2>>
+            ::ser(&self.end, serializer, 2)?;
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo<'bump>>> as SerializableField<
+                tags::Message<super::ExtensionRangeOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 3)?;
         Ok(())
     }
 }
@@ -8631,47 +8713,56 @@ impl ::puroro_internal::ser::Serializable for FileDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.package.iter_for_ser() {
-            serializer.serialize_bytes_twice(2, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.dependency.iter_for_ser() {
-            serializer.serialize_bytes_twice(3, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            10, 
-            self.public_dependency.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            11, 
-            self.weak_dependency.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.message_type.iter_for_ser() {
-            serializer.serialize_message_twice(4, msg)?;
-        }
-        for msg in self.enum_type.iter_for_ser() {
-            serializer.serialize_message_twice(5, msg)?;
-        }
-        for msg in self.service.iter_for_ser() {
-            serializer.serialize_message_twice(6, msg)?;
-        }
-        for msg in self.extension.iter_for_ser() {
-            serializer.serialize_message_twice(7, msg)?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(8, msg)?;
-        }
-        for msg in self.source_code_info.iter_for_ser() {
-            serializer.serialize_message_twice(9, msg)?;
-        }
-        for string in self.syntax.iter_for_ser() {
-            serializer.serialize_bytes_twice(12, string.bytes().map(|b| Ok(b)))?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.package, serializer, 2)?;
+        <::std::vec::Vec<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Repeated>>
+            ::ser(&self.dependency, serializer, 3)?;
+        <::std::vec::Vec<i32> as SerializableField<
+                tags::Int32, 
+                tags::Repeated>>
+            ::ser(&self.public_dependency, serializer, 10)?;
+        <::std::vec::Vec<i32> as SerializableField<
+                tags::Int32, 
+                tags::Repeated>>
+            ::ser(&self.weak_dependency, serializer, 11)?;
+        <::std::vec::Vec<DescriptorProto> as SerializableField<
+                tags::Message<DescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.message_type, serializer, 4)?;
+        <::std::vec::Vec<EnumDescriptorProto> as SerializableField<
+                tags::Message<EnumDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.enum_type, serializer, 5)?;
+        <::std::vec::Vec<ServiceDescriptorProto> as SerializableField<
+                tags::Message<ServiceDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.service, serializer, 6)?;
+        <::std::vec::Vec<FieldDescriptorProto> as SerializableField<
+                tags::Message<FieldDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.extension, serializer, 7)?;
+        <::std::option::Option<::std::boxed::Box<FileOptions>> as SerializableField<
+                tags::Message<FileOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 8)?;
+        <::std::option::Option<::std::boxed::Box<SourceCodeInfo>> as SerializableField<
+                tags::Message<SourceCodeInfo>, 
+                tags::Optional2>>
+            ::ser(&self.source_code_info, serializer, 9)?;
+        <::std::option::Option<::std::string::String> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.syntax, serializer, 12)?;
         Ok(())
     }
 }
@@ -8988,47 +9079,56 @@ impl<'bump> ::puroro_internal::ser::Serializable for FileDescriptorProtoBumpalo<
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for string in self.name.iter_for_ser() {
-            serializer.serialize_bytes_twice(1, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.package.iter_for_ser() {
-            serializer.serialize_bytes_twice(2, string.bytes().map(|b| Ok(b)))?;
-        }
-        for string in self.dependency.iter_for_ser() {
-            serializer.serialize_bytes_twice(3, string.bytes().map(|b| Ok(b)))?;
-        }
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            10, 
-            self.public_dependency.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        serializer.serialize_variants_twice::<::puroro_internal::tags::Int32, _>(
-            11, 
-            self.weak_dependency.iter_for_ser()
-                .cloned()
-                .map(|v| Ok(v)))?;
-        for msg in self.message_type.iter_for_ser() {
-            serializer.serialize_message_twice(4, msg)?;
-        }
-        for msg in self.enum_type.iter_for_ser() {
-            serializer.serialize_message_twice(5, msg)?;
-        }
-        for msg in self.service.iter_for_ser() {
-            serializer.serialize_message_twice(6, msg)?;
-        }
-        for msg in self.extension.iter_for_ser() {
-            serializer.serialize_message_twice(7, msg)?;
-        }
-        for msg in self.options.iter_for_ser() {
-            serializer.serialize_message_twice(8, msg)?;
-        }
-        for msg in self.source_code_info.iter_for_ser() {
-            serializer.serialize_message_twice(9, msg)?;
-        }
-        for string in self.syntax.iter_for_ser() {
-            serializer.serialize_bytes_twice(12, string.bytes().map(|b| Ok(b)))?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.name, serializer, 1)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.package, serializer, 2)?;
+        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Repeated>>
+            ::ser(&self.dependency, serializer, 3)?;
+        <::bumpalo::collections::Vec<'bump, i32> as SerializableField<
+                tags::Int32, 
+                tags::Repeated>>
+            ::ser(&self.public_dependency, serializer, 10)?;
+        <::bumpalo::collections::Vec<'bump, i32> as SerializableField<
+                tags::Int32, 
+                tags::Repeated>>
+            ::ser(&self.weak_dependency, serializer, 11)?;
+        <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<DescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.message_type, serializer, 4)?;
+        <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<EnumDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.enum_type, serializer, 5)?;
+        <::bumpalo::collections::Vec<'bump, ServiceDescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<ServiceDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.service, serializer, 6)?;
+        <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<FieldDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.extension, serializer, 7)?;
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, FileOptionsBumpalo<'bump>>> as SerializableField<
+                tags::Message<FileOptions>, 
+                tags::Optional2>>
+            ::ser(&self.options, serializer, 8)?;
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, SourceCodeInfoBumpalo<'bump>>> as SerializableField<
+                tags::Message<SourceCodeInfo>, 
+                tags::Optional2>>
+            ::ser(&self.source_code_info, serializer, 9)?;
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+                tags::String, 
+                tags::Optional2>>
+            ::ser(&self.syntax, serializer, 12)?;
         Ok(())
     }
 }
@@ -9343,10 +9443,12 @@ impl ::puroro_internal::ser::Serializable for FileDescriptorSet {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for msg in self.file.iter_for_ser() {
-            serializer.serialize_message_twice(1, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::std::vec::Vec<FileDescriptorProto> as SerializableField<
+                tags::Message<FileDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.file, serializer, 1)?;
         Ok(())
     }
 }
@@ -9441,10 +9543,12 @@ impl<'bump> ::puroro_internal::ser::Serializable for FileDescriptorSetBumpalo<'b
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::MaybeRepeatedField;
-        for msg in self.file.iter_for_ser() {
-            serializer.serialize_message_twice(1, msg)?;
-        }
+        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::tags;
+        <::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo<'bump>> as SerializableField<
+                tags::Message<FileDescriptorProto>, 
+                tags::Repeated>>
+            ::ser(&self.file, serializer, 1)?;
         Ok(())
     }
 }

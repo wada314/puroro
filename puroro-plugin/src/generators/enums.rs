@@ -50,9 +50,9 @@ impl ::std::convert::TryFrom<i32> for {name} {{
 }}\n",
         format!(
             "\
-impl ::std::convert::Into<i32> for {name} {{
-    fn into(self) -> i32 {{
-        self as i32
+impl ::std::convert::From<{name}> for i32 {{
+    fn from(val: {name}) -> i32 {{
+        val as i32
     }}
 }}\n",
             name = enume.native_ident()?
