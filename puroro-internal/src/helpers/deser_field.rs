@@ -583,6 +583,8 @@ define_deser_repeated_message!();
 // Map field
 ///////////////////////////////////////////////////////////////////////////////
 
+// The code generator must implement `DeserializableMessageFromIter` for tuple
+// `(&K, &V, PhantomData(KeyTag, ValueTag, Entry))`.
 impl<Entry> DeserializableFieldFromIter<tags::Message<Entry>, tags::Repeated>
     for HashMap<Entry::KeyType, Entry::ValueType>
 where
