@@ -105,25 +105,28 @@ impl InternalData for InternalDataForNormalStruct {}
 
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
-pub struct InternalDataForBumpaloStruct<'b> {
+pub struct InternalDataForBumpaloStruct<'bump> {
     // No hashmap implementation in bumpalo...
     unknown_fields: Option<
-        ::bumpalo::collections::Vec<'b, (usize, FieldData<::bumpalo::collections::Vec<'b, u8>>)>,
+        ::bumpalo::collections::Vec<
+            'bump,
+            (usize, FieldData<::bumpalo::collections::Vec<'bump, u8>>),
+        >,
     >,
-    bump: &'b ::bumpalo::Bump,
+    bump: &'bump ::bumpalo::Bump,
 }
 
 #[cfg(feature = "puroro-bumpalo")]
-impl<'b> InternalDataForBumpaloStruct<'b> {
-    pub fn new(bump: &'b ::bumpalo::Bump) -> Self {
+impl<'bump> InternalDataForBumpaloStruct<'bump> {
+    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             unknown_fields: None,
             bump,
         }
     }
 }
-impl<'b> InternalData for InternalDataForBumpaloStruct<'b> {
-    /// Note that the returned bumpalo lifetime is not `'b' but `'_`.
+impl<'bump> InternalData for InternalDataForBumpaloStruct<'bump> {
+    /// Note that the returned bumpalo lifetime is not `'bump' but `'_`.
     /// This is because I don't want to introduce the lifetime parameter
     /// `'b` into the trait's definition. The lifetime `'_` might be shorter
     /// than `'b`, but I believe it's not a problem.
