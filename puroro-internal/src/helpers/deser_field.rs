@@ -1,8 +1,8 @@
 use crate::deser::{BytesIter, DeserializableMessageFromIter};
 use crate::tags;
-use crate::tags::{FieldTypeAndLabelTag, FieldTypeTag};
+use crate::tags::FieldTypeAndLabelTag;
 use crate::types::FieldData;
-use crate::{ErrorKind, PuroroError, Result};
+use crate::{ErrorKind, Result};
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::hash::Hash;

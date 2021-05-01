@@ -1,12 +1,11 @@
 use std::collections::HashMap;
-use std::hash::Hash;
 use std::marker::PhantomData;
 
 use num_traits::Zero;
 
 use crate::ser::Serializable;
+use crate::tags;
 use crate::tags::FieldTypeAndLabelTag;
-use crate::tags::{self, FieldTypeTag};
 use crate::Result;
 
 use super::MapEntry;
