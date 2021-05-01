@@ -1,6 +1,6 @@
 use crate::deser::{BytesIter, DeserializableMessageFromIter};
-use crate::tags::{self, FieldLabelTag, FieldTypeTag};
-use crate::tags::FieldTypeAndLabelTag;
+use crate::tags;
+use crate::tags::{FieldLabelTag, FieldTypeTag};
 use crate::types::FieldData;
 use crate::{ErrorKind, Result};
 use std::collections::HashMap;
