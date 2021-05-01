@@ -170,7 +170,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
                             number = field.number(),
                             name = field.native_name()?,
                             type_ = self.frag_gen.field_type_for(field)?,
-                            type_tag = field.type_tag()?,
+                            type_tag = self.frag_gen.type_tag_for(field)?,
                             label_tag = field.label_tag()?,
                             default_func = self.frag_gen.default_func_for(field)?,
                         ))
@@ -235,7 +235,7 @@ impl{gp} ::puroro_internal::ser::Serializable for {name}{gpb} {{
                         number = field.number(),
                         name = field.native_name()?,
                         type_ = self.frag_gen.field_type_for(field)?,
-                        type_tag = field.type_tag()?,
+                        type_tag = self.frag_gen.type_tag_for(field)?,
                         label_tag = field.label_tag()?,
                     ))
                 })),

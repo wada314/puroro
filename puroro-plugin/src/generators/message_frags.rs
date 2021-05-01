@@ -170,6 +170,34 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
+    pub fn type_tag_for(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+        Ok(match field.type_()? {
+            FieldType::Double => "Double".into(),
+            FieldType::Float => "Float".into(),
+            FieldType::Int32 => "Int32".into(),
+            FieldType::Int64 => "Int64".into(),
+            FieldType::UInt32 => "UInt32".into(),
+            FieldType::UInt64 => "UInt64".into(),
+            FieldType::SInt32 => "SInt32".into(),
+            FieldType::SInt64 => "SInt64".into(),
+            FieldType::Fixed32 => "Fixed32".into(),
+            FieldType::Fixed64 => "Fixed64".into(),
+            FieldType::SFixed32 => "SFixed32".into(),
+            FieldType::SFixed64 => "SFixed64".into(),
+            FieldType::Bool => "Bool".into(),
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => "String".into(),
+            FieldType::Bytes => "Bytes".into(),
+            FieldType::Enum(e) => format!(
+                "Enum<{}>",
+                e.native_ident_with_relative_path(field.package()?)?,
+            ),
+            FieldType::Message(m) => {
+                format!("Message<{}>", self.type_name_of_msg(m, field.package()?)?)
+            }
+        })
+    }
+
     pub fn default_func_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
         Ok(match self.context.impl_type() {
             ImplType::Default => match self.context.alloc_type() {

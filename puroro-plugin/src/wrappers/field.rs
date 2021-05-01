@@ -139,37 +139,6 @@ impl<'c> FieldDescriptor<'c> {
         })
     }
 
-    pub fn type_tag(&'c self) -> Result<String> {
-        Ok(match self.type_()? {
-            FieldType::Double => "Double".into(),
-            FieldType::Float => "Float".into(),
-            FieldType::Int32 => "Int32".into(),
-            FieldType::Int64 => "Int64".into(),
-            FieldType::UInt32 => "UInt32".into(),
-            FieldType::UInt64 => "UInt64".into(),
-            FieldType::SInt32 => "SInt32".into(),
-            FieldType::SInt64 => "SInt64".into(),
-            FieldType::Fixed32 => "Fixed32".into(),
-            FieldType::Fixed64 => "Fixed64".into(),
-            FieldType::SFixed32 => "SFixed32".into(),
-            FieldType::SFixed64 => "SFixed64".into(),
-            FieldType::Bool => "Bool".into(),
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => "String".into(),
-            FieldType::Bytes => "Bytes".into(),
-            FieldType::Enum(e) => format!(
-                "Enum<{}>",
-                e.native_ident_with_relative_path(self.package()?)?,
-            ),
-            FieldType::Message(m) => format!(
-                "Message<{}>",
-                // TODO: Wrong! Need a type name depending on the implementation detail.
-                // e.g. super::DescriptorProtoBumpalo<'bump>
-                m.native_ident_with_relative_path(self.package()?)?
-            ),
-        })
-    }
-
     pub fn label_tag(&'c self) -> Result<&'static str> {
         Ok(match self.label()? {
             FieldLabel::Optional2 => "Optional2",
