@@ -112,58 +112,74 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
-    pub fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+    pub fn field_scalar_item_type_for(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+    ) -> Result<Cow<'c, str>> {
         Ok(match self.context.impl_type() {
-            ImplType::Default => {
-                let scalar_type: Cow<'static, str> = match field.type_()?.native_trivial_type_name()
-                {
-                    Ok(name) => name.into(),
-                    Err(nontrivial_type) => match nontrivial_type {
-                        NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                        NonTrivialFieldType::String => self.string_type().into(),
-                        NonTrivialFieldType::Bytes => self.vec_type("u8").into(),
-
-                        NonTrivialFieldType::Enum(e) => format!(
-                            "::std::result::Result<{type_}, i32>",
-                            type_ = e.native_ident_with_relative_path(field.package()?)?
-                        )
-                        .into(),
-                        NonTrivialFieldType::Message(m) => {
-                            self.type_name_of_msg(m, field.package()?)?.into()
-                        }
-                    },
-                };
-                match field.label()? {
-                    FieldLabel::Optional2 => {
-                        if matches!(field.type_()?, FieldType::Message(_)) {
-                            format!(
-                                "::std::option::Option<{boxed_type}>",
-                                boxed_type = self.box_type(scalar_type.as_ref()),
-                            )
-                            .into()
-                        } else {
-                            format!(
-                                "::std::option::Option<{scalar_type}>",
-                                scalar_type = scalar_type,
-                            )
-                            .into()
-                        }
+            ImplType::Default => match field.type_()?.native_trivial_type_name() {
+                Ok(name) => name.into(),
+                Err(nontrivial_type) => match nontrivial_type {
+                    NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                    NonTrivialFieldType::String => self.string_type().into(),
+                    NonTrivialFieldType::Bytes => self.vec_type("u8").into(),
+                    NonTrivialFieldType::Enum(e) => format!(
+                        "::std::result::Result<{type_}, i32>",
+                        type_ = e.native_ident_with_relative_path(field.package()?)?
+                    )
+                    .into(),
+                    NonTrivialFieldType::Message(m) => {
+                        self.type_name_of_msg(m, field.package()?)?.into()
                     }
-                    FieldLabel::Optional3 => {
-                        if matches!(field.type_()?, FieldType::Message(_)) {
-                            format!(
-                                "::std::option::Option<{boxed_type}>",
-                                boxed_type = self.box_type(scalar_type.as_ref()),
-                            )
-                            .into()
-                        } else {
-                            scalar_type.into()
-                        }
-                    }
-                    FieldLabel::Required => scalar_type.into(),
-                    FieldLabel::Repeated => self.vec_type(scalar_type.as_ref()).into(),
-                }
+                },
+            },
+            ImplType::SliceRef => {
+                unimplemented!()
             }
+        })
+    }
+
+    pub fn field_scalar_item_ref_type_for(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+        lifetime: &str,
+    ) -> Result<Cow<'c, str>> {
+        todo!()
+    }
+
+    pub fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+        let scalar_type = self.field_scalar_item_type_for(field)?;
+        Ok(match self.context.impl_type() {
+            ImplType::Default => match field.label()? {
+                FieldLabel::Optional2 => {
+                    if matches!(field.type_()?, FieldType::Message(_)) {
+                        format!(
+                            "::std::option::Option<{boxed_type}>",
+                            boxed_type = self.box_type(scalar_type.as_ref()),
+                        )
+                        .into()
+                    } else {
+                        format!(
+                            "::std::option::Option<{scalar_type}>",
+                            scalar_type = scalar_type,
+                        )
+                        .into()
+                    }
+                }
+                FieldLabel::Optional3 => {
+                    if matches!(field.type_()?, FieldType::Message(_)) {
+                        format!(
+                            "::std::option::Option<{boxed_type}>",
+                            boxed_type = self.box_type(scalar_type.as_ref()),
+                        )
+                        .into()
+                    } else {
+                        scalar_type.into()
+                    }
+                }
+                FieldLabel::Required => scalar_type.into(),
+                FieldLabel::Repeated => self.vec_type(scalar_type.as_ref()).into(),
+            },
             ImplType::SliceRef => {
                 unimplemented!()
             }
@@ -221,7 +237,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                         FieldLabel::Optional2 | FieldLabel::Optional3 => format!(
                             "|| ::bumpalo::boxed::Box::new_in({msg}::new_in(\
                                 self.puroro_internal.bumpalo()\
-                           ), self.puroro_internal.bumpalo())",
+                            ), self.puroro_internal.bumpalo())",
                             msg = m.native_ident_with_relative_path(field.package()?)?,
                         )
                         .into(),
