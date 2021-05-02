@@ -5,7 +5,6 @@ use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonTrivialFieldType,
 };
 use crate::{ErrorKind, Result};
-use ::itertools::Itertools;
 
 pub struct MessageTraitCodeGenerator<'a, 'c> {
     #[allow(unused)]
@@ -29,7 +28,8 @@ pub trait {name}Trait {{\n",
                 name = self.msg.native_ident()?
             ),
             indent((
-                // associated types for fields' msg types
+                // associated types for fields' msg types.
+                // e.g. "type MyMessageTrait"
                 iter(
                     self.msg
                         .fields()
@@ -134,4 +134,14 @@ fn {name}_iter(&self) -> Self::{camel_name}Iter<'_>;\n",
             },
         })
     }
+}
+
+enum GetterMethods {
+    ScalarField(String),
+    OptionalField(String),
+    RepeatedField {
+        for_each: String,
+        boxed_iter: String,
+        nightly_iter: String,
+    },
 }

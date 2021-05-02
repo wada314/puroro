@@ -1,10 +1,13 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 
-use super::{EnumDescriptor, FieldDescriptor, FileDescriptor, FileOrMessageRef};
+use super::{
+    EnumDescriptor, FieldDescriptor, FieldLabel, FieldType, FileDescriptor, FileOrMessageRef,
+};
 use crate::google::protobuf::DescriptorProto;
 use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
 use crate::{Context, ErrorKind, Result};
+use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
 
 #[derive(Clone)]
@@ -151,6 +154,37 @@ impl<'c> MessageDescriptor<'c> {
                 .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
                 .collect::<String>(),
         ))
+    }
+
+    pub fn unique_msgs_from_fields(
+        &'c self,
+    ) -> Result<impl Iterator<Item = &'c MessageDescriptor<'c>>> {
+        Ok(self
+            .fields()
+            .filter_map(|field| {
+                if let Ok(FieldType::Message(m)) = field.type_() {
+                    Some(m)
+                } else {
+                    None
+                }
+            })
+            .unique_by(|msg| msg.fully_qualified_name().unwrap_or_default()))
+    }
+
+    pub fn unique_repeated_msgs_from_fields(
+        &'c self,
+    ) -> Result<impl Iterator<Item = &'c MessageDescriptor<'c>>> {
+        Ok(self
+            .fields()
+            .filter_map(|field| {
+                if let Ok(FieldType::Message(m)) = field.type_() {
+                    if let Ok(FieldLabel::Repeated) = field.label() {
+                        return Some(m);
+                    }
+                }
+                None
+            })
+            .unique_by(|msg| msg.fully_qualified_name().unwrap_or_default()))
     }
 }
 

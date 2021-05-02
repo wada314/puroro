@@ -1,4 +1,5 @@
 use super::message_frags::MessageImplFragmentGenerator;
+use super::message_traits::MessageTraitCodeGenerator;
 use super::writer::{func, indent, indent_n, iter, IntoFragment};
 use crate::context::{AllocatorType, Context};
 use crate::utils::{to_camel_case, Indentor};
@@ -9,6 +10,7 @@ pub struct MessageImplCodeGenerator<'a, 'c> {
     context: &'a Context<'c>,
     msg: &'c MessageDescriptor<'c>,
     frag_gen: MessageImplFragmentGenerator<'a, 'c>,
+    traits_gen: MessageTraitCodeGenerator<'a, 'c>,
 }
 
 impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
@@ -17,6 +19,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             context,
             msg,
             frag_gen: MessageImplFragmentGenerator::new(context),
+            traits_gen: MessageTraitCodeGenerator::new(context, msg),
         }
     }
 
