@@ -1,8 +1,11 @@
 use super::writer::{func, indent, iter, IntoFragment};
 use crate::context::Context;
 use crate::utils::{to_camel_case, Indentor};
-use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
-use crate::Result;
+use crate::wrappers::{
+    FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonTrivialFieldType,
+};
+use crate::{ErrorKind, Result};
+use ::itertools::Itertools;
 
 pub struct MessageTraitCodeGenerator<'a, 'c> {
     #[allow(unused)]
@@ -25,48 +28,45 @@ impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
 pub trait {name}Trait {{\n",
                 name = self.msg.native_ident()?
             ),
-            indent(iter(self.msg.fields().map(|field| -> Result<_> {
-                let submsg_type = if let FieldType::Message(m) = field.type_()? {
-                    format!(
-                        "{camel_name}Type",
-                        camel_name = to_camel_case(field.native_name()?),
-                    )
-                } else {
-                    "".to_string()
-                };
-                Ok((
-                    if let FieldType::Message(m) = field.type_()? {
-                        // Associated Type for the message type
-                        format!(
-                            "type {submsg_type}: {submsg_name}Trait;\n",
-                            submsg_type = submsg_type,
-                            submsg_name = m.native_ident_with_relative_path(field.package()?)?,
-                        )
-                    } else {
-                        "".to_string()
-                    },
-                    match (field.label()?, field.type_()?) {
-                        (FieldLabel::Optional2, FieldType::Message(_))
+            indent((
+                // associated types for fields' msg types
+                iter(
+                    self.msg
+                        .fields()
+                        .filter_map(|field| {
+                            if let Ok(FieldType::Message(m)) = field.type_() {
+                                Some((field, m))
+                            } else {
+                                None
+                            }
+                        })
+                        .unique_by(|(_, msg)| msg.fully_qualified_name().unwrap_or_default())
+                        .map(|(field, msg)| {
+                            Ok(format!(
+                                "type {new_name}: {msg_trait};\n",
+                                new_name = self.associated_msg_type_ident(msg)?,
+                                msg_trait = format!(
+                                    "{name}Trait",
+                                    name = msg.native_ident_with_relative_path(field.package()?)?
+                                )
+                            ))
+                        }),
+                ),
+                iter(self.msg.fields().map(|field| -> Result<_> {
+                    Ok((match (field.label()?, field.type_()?) {
+                        (FieldLabel::Optional2, _)
                         | (FieldLabel::Optional3, FieldType::Message(_)) => {
-                            // getter function for optional message field, wrapped by Option.
+                            // getter function for optional field, wrapped by Option.
                             format!(
                                 "fn {name}(&'_ self) -> ::std::option::Option<{reftype}>;\n",
                                 name = field.native_name()?,
-                                reftype = field.native_maybe_ref_type("'_")?,
+                                reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
                             )
                         }
                         (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
                             // normal getter function.
                             format!(
                                 "fn {name}(&'_ self) -> {reftype};\n",
-                                name = field.native_name()?,
-                                reftype = field.native_maybe_ref_type("'_")?,
-                            )
-                        }
-                        (FieldLabel::Optional2, _) => {
-                            // getter function with Optional.
-                            format!(
-                                "fn {name}(&'_ self) -> ::std::option::Option<{reftype}>;\n",
                                 name = field.native_name()?,
                                 reftype = field.native_maybe_ref_type("'_")?,
                             )
@@ -93,15 +93,45 @@ type {camel_name}Iter<'a>: Iterator<Item={reftype_lt_a}>;
 fn {name}_iter(&self) -> Self::{camel_name}Iter<'_>;\n",
                                 name = field.native_name()?,
                                 camel_name = to_camel_case(field.native_name()?),
-                                reftype = field.native_maybe_ref_type("'_")?,
-                                reftype_lt_a = field.native_maybe_ref_type("'a")?,
+                                reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
+                                reftype_lt_a = self.scalar_maybe_ref_type_name(field, "'a")?,
                             )
                         }
-                    },
-                ))
-            }))),
+                    },))
+                })),
+            )),
             "}}\n",
         )
             .write_into(output)
+    }
+
+    pub fn associated_msg_type_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
+        Ok(format!("{}Type", msg.native_ident()?))
+    }
+
+    pub fn scalar_maybe_ref_type_name(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+        lifetime: &str,
+    ) -> Result<String> {
+        Ok(match field.type_()?.native_trivial_type_name() {
+            Ok(name) => name.into(),
+            Err(nontrivial_type) => match nontrivial_type {
+                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                NonTrivialFieldType::String => format!("&{lt} str", lt = lifetime).into(),
+                NonTrivialFieldType::Bytes => format!("&{lt} [u8]", lt = lifetime).into(),
+                NonTrivialFieldType::Enum(e) => format!(
+                    "::std::result::Result<{type_}, i32>",
+                    type_ = e.native_ident_with_relative_path(field.package()?)?
+                )
+                .into(),
+                NonTrivialFieldType::Message(m) => format!(
+                    "&{lt} Self::{name}",
+                    lt = lifetime,
+                    name = self.associated_msg_type_ident(m)?
+                )
+                .into(),
+            },
+        })
     }
 }
