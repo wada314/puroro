@@ -139,12 +139,22 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    pub fn field_scalar_item_ref_type_for(
+    pub fn field_scalar_item_maybe_ref_type_for(
         &self,
         field: &'c FieldDescriptor<'c>,
         lifetime: &str,
     ) -> Result<Cow<'c, str>> {
-        todo!()
+        Ok(match field.type_()? {
+            FieldType::Message(_) => format!(
+                "&{lt} {name}",
+                lt = lifetime,
+                name = self.field_scalar_item_type_for(field)?
+            )
+            .into(),
+            FieldType::String => format!("&{lt} str", lt = lifetime).into(),
+            FieldType::Bytes => format!("&{lt} [u8]", lt = lifetime).into(),
+            _ => self.field_scalar_item_type_for(field)?.into(),
+        })
     }
 
     pub fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {

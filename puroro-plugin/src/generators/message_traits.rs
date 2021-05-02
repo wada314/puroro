@@ -26,12 +26,20 @@ pub trait {name}Trait {{\n",
                 name = self.msg.native_ident()?
             ),
             indent(iter(self.msg.fields().map(|field| -> Result<_> {
+                let submsg_type = if let FieldType::Message(m) = field.type_()? {
+                    format!(
+                        "{camel_name}Type",
+                        camel_name = to_camel_case(field.native_name()?),
+                    )
+                } else {
+                    "".to_string()
+                };
                 Ok((
                     if let FieldType::Message(m) = field.type_()? {
                         // Associated Type for the message type
                         format!(
-                            "type {camel_name}Type: {submsg_name}Trait;\n",
-                            camel_name = to_camel_case(field.native_name()?),
+                            "type {submsg_type}: {submsg_name}Trait;\n",
+                            submsg_type = submsg_type,
                             submsg_name = m.native_ident_with_relative_path(field.package()?)?,
                         )
                     } else {
