@@ -14,7 +14,10 @@ pub trait Serializable: Sized {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> Result<()>;
 }
 
-pub trait Message {}
+pub trait Message<'bump> {
+    type InternalData: InternalData<'bump>;
+    fn puroro_internal_data(&self) -> &Self::InternalData;
+}
 pub trait Enum {}
 
 pub trait InternalData<'bump> {
