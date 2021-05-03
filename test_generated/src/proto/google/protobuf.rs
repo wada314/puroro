@@ -94,22 +94,20 @@ impl ::puroro::Serializable for GeneratedCodeInfo {
 
 impl GeneratedCodeInfoTrait for GeneratedCodeInfo {
     type AnnotationType = generated_code_info::Annotation;
-    type AnnotationType = generated_code_info::Annotation;
+    #[cfg(feature = "puroro-nightly")]
+    type AnnotationIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::AnnotationType>;
     fn for_each_annotation<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::generated_code_info::Annotation)
-    {
+        F: FnMut(&'_ Self::AnnotationType) {
         for item in (self.annotation).iter() {
             (f)(item);
         }
     }
-    fn annotation_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::generated_code_info::Annotation>>
-    {
+    fn annotation_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::AnnotationType>> {
         ::std::boxed::Box::new(self.annotation.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type AnnotationIter<'a> = impl Iterator<Item=&'a self::generated_code_info::Annotation>;
     #[cfg(feature = "puroro-nightly")]
     fn annotation_iter(&self) -> Self::AnnotationIter<'_> {
         self.annotation.iter()
@@ -195,22 +193,20 @@ impl<'bump> ::puroro::Serializable for GeneratedCodeInfoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> GeneratedCodeInfoTrait for GeneratedCodeInfoBumpalo<'bump> {
     type AnnotationType = generated_code_info::AnnotationBumpalo<'bump>;
-    type AnnotationType = generated_code_info::AnnotationBumpalo<'bump>;
+    #[cfg(feature = "puroro-nightly")]
+    type AnnotationIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::AnnotationType>;
     fn for_each_annotation<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::generated_code_info::Annotation)
-    {
+        F: FnMut(&'_ Self::AnnotationType) {
         for item in (self.annotation).iter() {
             (f)(item);
         }
     }
-    fn annotation_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::generated_code_info::Annotation>>
-    {
+    fn annotation_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::AnnotationType>> {
         ::std::boxed::Box::new(self.annotation.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type AnnotationIter<'a> = impl Iterator<Item=&'a self::generated_code_info::Annotation>;
     #[cfg(feature = "puroro-nightly")]
     fn annotation_iter(&self) -> Self::AnnotationIter<'_> {
         self.annotation.iter()
@@ -356,32 +352,31 @@ impl ::puroro::Serializable for Annotation {
 }
 
 impl AnnotationTrait for Annotation {
+    #[cfg(feature = "puroro-nightly")]
+    type PathIter<'a> = impl ::std::iter::Iterator<Item = i32>;
     fn for_each_path<F>(&self, mut f: F)
     where
-        F: FnMut(i32)
-    {
+        F: FnMut(i32) {
         for item in (self.path).iter().cloned() {
             (f)(item);
         }
     }
-    fn path_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
-    {
+    fn path_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    type PathIter<'a> = impl Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn path_iter(&self) -> Self::PathIter<'_> {
         self.path.iter().cloned()
     }
-    fn source_file(&self) -> ::std::option::Option<&'_ str> {
+    fn source_file(&'_ self) -> ::std::option::Option<&'_ str> {
         self.source_file.as_deref()
     }
-    fn begin(&self) -> ::std::option::Option<i32> {
+    fn begin(&'_ self) -> ::std::option::Option<i32> {
         self.begin.clone()
     }
-    fn end(&self) -> ::std::option::Option<i32> {
+    fn end(&'_ self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
 }
@@ -500,32 +495,31 @@ impl<'bump> ::puroro::Serializable for AnnotationBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> AnnotationTrait for AnnotationBumpalo<'bump> {
+    #[cfg(feature = "puroro-nightly")]
+    type PathIter<'a> = impl ::std::iter::Iterator<Item = i32>;
     fn for_each_path<F>(&self, mut f: F)
     where
-        F: FnMut(i32)
-    {
+        F: FnMut(i32) {
         for item in (self.path).iter().cloned() {
             (f)(item);
         }
     }
-    fn path_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
-    {
+    fn path_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    type PathIter<'a> = impl Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn path_iter(&self) -> Self::PathIter<'_> {
         self.path.iter().cloned()
     }
-    fn source_file(&self) -> ::std::option::Option<&'_ str> {
+    fn source_file(&'_ self) -> ::std::option::Option<&'_ str> {
         self.source_file.as_deref()
     }
-    fn begin(&self) -> ::std::option::Option<i32> {
+    fn begin(&'_ self) -> ::std::option::Option<i32> {
         self.begin.clone()
     }
-    fn end(&self) -> ::std::option::Option<i32> {
+    fn end(&'_ self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
 }
@@ -632,22 +626,20 @@ impl ::puroro::Serializable for SourceCodeInfo {
 
 impl SourceCodeInfoTrait for SourceCodeInfo {
     type LocationType = source_code_info::Location;
-    type LocationType = source_code_info::Location;
+    #[cfg(feature = "puroro-nightly")]
+    type LocationIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::LocationType>;
     fn for_each_location<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::source_code_info::Location)
-    {
+        F: FnMut(&'_ Self::LocationType) {
         for item in (self.location).iter() {
             (f)(item);
         }
     }
-    fn location_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::source_code_info::Location>>
-    {
+    fn location_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::LocationType>> {
         ::std::boxed::Box::new(self.location.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type LocationIter<'a> = impl Iterator<Item=&'a self::source_code_info::Location>;
     #[cfg(feature = "puroro-nightly")]
     fn location_iter(&self) -> Self::LocationIter<'_> {
         self.location.iter()
@@ -733,22 +725,20 @@ impl<'bump> ::puroro::Serializable for SourceCodeInfoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> SourceCodeInfoTrait for SourceCodeInfoBumpalo<'bump> {
     type LocationType = source_code_info::LocationBumpalo<'bump>;
-    type LocationType = source_code_info::LocationBumpalo<'bump>;
+    #[cfg(feature = "puroro-nightly")]
+    type LocationIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::LocationType>;
     fn for_each_location<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::source_code_info::Location)
-    {
+        F: FnMut(&'_ Self::LocationType) {
         for item in (self.location).iter() {
             (f)(item);
         }
     }
-    fn location_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::source_code_info::Location>>
-    {
+    fn location_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::LocationType>> {
         ::std::boxed::Box::new(self.location.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type LocationIter<'a> = impl Iterator<Item=&'a self::source_code_info::Location>;
     #[cfg(feature = "puroro-nightly")]
     fn location_iter(&self) -> Self::LocationIter<'_> {
         self.location.iter()
@@ -923,65 +913,62 @@ impl ::puroro::Serializable for Location {
 }
 
 impl LocationTrait for Location {
+    #[cfg(feature = "puroro-nightly")]
+    type PathIter<'a> = impl ::std::iter::Iterator<Item = i32>;
+    #[cfg(feature = "puroro-nightly")]
+    type SpanIter<'a> = impl ::std::iter::Iterator<Item = i32>;
+    #[cfg(feature = "puroro-nightly")]
+    type LeadingDetachedCommentsIter<'a> = impl ::std::iter::Iterator<Item = &'a str>;
     fn for_each_path<F>(&self, mut f: F)
     where
-        F: FnMut(i32)
-    {
+        F: FnMut(i32) {
         for item in (self.path).iter().cloned() {
             (f)(item);
         }
     }
-    fn path_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
-    {
+    fn path_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    type PathIter<'a> = impl Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn path_iter(&self) -> Self::PathIter<'_> {
         self.path.iter().cloned()
     }
     fn for_each_span<F>(&self, mut f: F)
     where
-        F: FnMut(i32)
-    {
+        F: FnMut(i32) {
         for item in (self.span).iter().cloned() {
             (f)(item);
         }
     }
-    fn span_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
-    {
+    fn span_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.span.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    type SpanIter<'a> = impl Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn span_iter(&self) -> Self::SpanIter<'_> {
         self.span.iter().cloned()
     }
-    fn leading_comments(&self) -> ::std::option::Option<&'_ str> {
+    fn leading_comments(&'_ self) -> ::std::option::Option<&'_ str> {
         self.leading_comments.as_deref()
     }
-    fn trailing_comments(&self) -> ::std::option::Option<&'_ str> {
+    fn trailing_comments(&'_ self) -> ::std::option::Option<&'_ str> {
         self.trailing_comments.as_deref()
     }
     fn for_each_leading_detached_comments<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ str)
-    {
+        F: FnMut(&'_ str) {
         for item in (self.leading_detached_comments).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn leading_detached_comments_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
-    {
+    fn leading_detached_comments_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.leading_detached_comments.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
-    type LeadingDetachedCommentsIter<'a> = impl Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
     fn leading_detached_comments_iter(&self) -> Self::LeadingDetachedCommentsIter<'_> {
         self.leading_detached_comments.iter().map(|v| v.as_ref())
@@ -1114,65 +1101,62 @@ impl<'bump> ::puroro::Serializable for LocationBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> LocationTrait for LocationBumpalo<'bump> {
+    #[cfg(feature = "puroro-nightly")]
+    type PathIter<'a> = impl ::std::iter::Iterator<Item = i32>;
+    #[cfg(feature = "puroro-nightly")]
+    type SpanIter<'a> = impl ::std::iter::Iterator<Item = i32>;
+    #[cfg(feature = "puroro-nightly")]
+    type LeadingDetachedCommentsIter<'a> = impl ::std::iter::Iterator<Item = &'a str>;
     fn for_each_path<F>(&self, mut f: F)
     where
-        F: FnMut(i32)
-    {
+        F: FnMut(i32) {
         for item in (self.path).iter().cloned() {
             (f)(item);
         }
     }
-    fn path_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
-    {
+    fn path_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    type PathIter<'a> = impl Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn path_iter(&self) -> Self::PathIter<'_> {
         self.path.iter().cloned()
     }
     fn for_each_span<F>(&self, mut f: F)
     where
-        F: FnMut(i32)
-    {
+        F: FnMut(i32) {
         for item in (self.span).iter().cloned() {
             (f)(item);
         }
     }
-    fn span_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
-    {
+    fn span_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.span.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    type SpanIter<'a> = impl Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn span_iter(&self) -> Self::SpanIter<'_> {
         self.span.iter().cloned()
     }
-    fn leading_comments(&self) -> ::std::option::Option<&'_ str> {
+    fn leading_comments(&'_ self) -> ::std::option::Option<&'_ str> {
         self.leading_comments.as_deref()
     }
-    fn trailing_comments(&self) -> ::std::option::Option<&'_ str> {
+    fn trailing_comments(&'_ self) -> ::std::option::Option<&'_ str> {
         self.trailing_comments.as_deref()
     }
     fn for_each_leading_detached_comments<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ str)
-    {
+        F: FnMut(&'_ str) {
         for item in (self.leading_detached_comments).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn leading_detached_comments_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
-    {
+    fn leading_detached_comments_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.leading_detached_comments.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
-    type LeadingDetachedCommentsIter<'a> = impl Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
     fn leading_detached_comments_iter(&self) -> Self::LeadingDetachedCommentsIter<'_> {
         self.leading_detached_comments.iter().map(|v| v.as_ref())
@@ -1359,42 +1343,40 @@ impl ::puroro::Serializable for UninterpretedOption {
 
 impl UninterpretedOptionTrait for UninterpretedOption {
     type NamePartType = uninterpreted_option::NamePart;
-    type NameType = uninterpreted_option::NamePart;
+    #[cfg(feature = "puroro-nightly")]
+    type NameIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::NamePartType>;
     fn for_each_name<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::uninterpreted_option::NamePart)
-    {
+        F: FnMut(&'_ Self::NamePartType) {
         for item in (self.name).iter() {
             (f)(item);
         }
     }
-    fn name_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::uninterpreted_option::NamePart>>
-    {
+    fn name_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::NamePartType>> {
         ::std::boxed::Box::new(self.name.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type NameIter<'a> = impl Iterator<Item=&'a self::uninterpreted_option::NamePart>;
     #[cfg(feature = "puroro-nightly")]
     fn name_iter(&self) -> Self::NameIter<'_> {
         self.name.iter()
     }
-    fn identifier_value(&self) -> ::std::option::Option<&'_ str> {
+    fn identifier_value(&'_ self) -> ::std::option::Option<&'_ str> {
         self.identifier_value.as_deref()
     }
-    fn positive_int_value(&self) -> ::std::option::Option<u64> {
+    fn positive_int_value(&'_ self) -> ::std::option::Option<u64> {
         self.positive_int_value.clone()
     }
-    fn negative_int_value(&self) -> ::std::option::Option<i64> {
+    fn negative_int_value(&'_ self) -> ::std::option::Option<i64> {
         self.negative_int_value.clone()
     }
-    fn double_value(&self) -> ::std::option::Option<f64> {
+    fn double_value(&'_ self) -> ::std::option::Option<f64> {
         self.double_value.clone()
     }
-    fn string_value(&self) -> ::std::option::Option<&'_ [u8]> {
+    fn string_value(&'_ self) -> ::std::option::Option<&'_ [u8]> {
         self.string_value.as_deref()
     }
-    fn aggregate_value(&self) -> ::std::option::Option<&'_ str> {
+    fn aggregate_value(&'_ self) -> ::std::option::Option<&'_ str> {
         self.aggregate_value.as_deref()
     }
 }
@@ -1550,42 +1532,40 @@ impl<'bump> ::puroro::Serializable for UninterpretedOptionBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> UninterpretedOptionTrait for UninterpretedOptionBumpalo<'bump> {
     type NamePartType = uninterpreted_option::NamePartBumpalo<'bump>;
-    type NameType = uninterpreted_option::NamePartBumpalo<'bump>;
+    #[cfg(feature = "puroro-nightly")]
+    type NameIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::NamePartType>;
     fn for_each_name<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::uninterpreted_option::NamePart)
-    {
+        F: FnMut(&'_ Self::NamePartType) {
         for item in (self.name).iter() {
             (f)(item);
         }
     }
-    fn name_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::uninterpreted_option::NamePart>>
-    {
+    fn name_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::NamePartType>> {
         ::std::boxed::Box::new(self.name.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type NameIter<'a> = impl Iterator<Item=&'a self::uninterpreted_option::NamePart>;
     #[cfg(feature = "puroro-nightly")]
     fn name_iter(&self) -> Self::NameIter<'_> {
         self.name.iter()
     }
-    fn identifier_value(&self) -> ::std::option::Option<&'_ str> {
+    fn identifier_value(&'_ self) -> ::std::option::Option<&'_ str> {
         self.identifier_value.as_deref()
     }
-    fn positive_int_value(&self) -> ::std::option::Option<u64> {
+    fn positive_int_value(&'_ self) -> ::std::option::Option<u64> {
         self.positive_int_value.clone()
     }
-    fn negative_int_value(&self) -> ::std::option::Option<i64> {
+    fn negative_int_value(&'_ self) -> ::std::option::Option<i64> {
         self.negative_int_value.clone()
     }
-    fn double_value(&self) -> ::std::option::Option<f64> {
+    fn double_value(&'_ self) -> ::std::option::Option<f64> {
         self.double_value.clone()
     }
-    fn string_value(&self) -> ::std::option::Option<&'_ [u8]> {
+    fn string_value(&'_ self) -> ::std::option::Option<&'_ [u8]> {
         self.string_value.as_deref()
     }
-    fn aggregate_value(&self) -> ::std::option::Option<&'_ str> {
+    fn aggregate_value(&'_ self) -> ::std::option::Option<&'_ str> {
         self.aggregate_value.as_deref()
     }
 }
@@ -1695,10 +1675,10 @@ impl ::puroro::Serializable for NamePart {
 }
 
 impl NamePartTrait for NamePart {
-    fn name_part(&self) -> &'_ str {
+    fn name_part(&'_ self) -> &'_ str {
         self.name_part.as_ref()
     }
-    fn is_extension(&self) -> bool {
+    fn is_extension(&'_ self) -> bool {
         self.is_extension.clone()
     }
 }
@@ -1793,10 +1773,10 @@ impl<'bump> ::puroro::Serializable for NamePartBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> NamePartTrait for NamePartBumpalo<'bump> {
-    fn name_part(&self) -> &'_ str {
+    fn name_part(&'_ self) -> &'_ str {
         self.name_part.as_ref()
     }
-    fn is_extension(&self) -> bool {
+    fn is_extension(&'_ self) -> bool {
         self.is_extension.clone()
     }
 }
@@ -1929,28 +1909,26 @@ impl ::puroro::Serializable for MethodOptions {
 
 impl MethodOptionsTrait for MethodOptions {
     type UninterpretedOptionType = UninterpretedOption;
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn idempotency_level(&self) -> ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> {
+    fn idempotency_level(&'_ self) -> ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> {
         self.idempotency_level.clone()
     }
-    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2060,28 +2038,26 @@ impl<'bump> ::puroro::Serializable for MethodOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MethodOptionsTrait for MethodOptionsBumpalo<'bump> {
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn idempotency_level(&self) -> ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> {
+    fn idempotency_level(&'_ self) -> ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> {
         self.idempotency_level.clone()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2226,25 +2202,23 @@ impl ::puroro::Serializable for ServiceOptions {
 
 impl ServiceOptionsTrait for ServiceOptions {
     type UninterpretedOptionType = UninterpretedOption;
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2342,25 +2316,23 @@ impl<'bump> ::puroro::Serializable for ServiceOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ServiceOptionsTrait for ServiceOptionsBumpalo<'bump> {
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2481,25 +2453,23 @@ impl ::puroro::Serializable for EnumValueOptions {
 
 impl EnumValueOptionsTrait for EnumValueOptions {
     type UninterpretedOptionType = UninterpretedOption;
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2597,25 +2567,23 @@ impl<'bump> ::puroro::Serializable for EnumValueOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumValueOptionsTrait for EnumValueOptionsBumpalo<'bump> {
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2749,28 +2717,26 @@ impl ::puroro::Serializable for EnumOptions {
 
 impl EnumOptionsTrait for EnumOptions {
     type UninterpretedOptionType = UninterpretedOption;
-    fn allow_alias(&self) -> ::std::option::Option<bool> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn allow_alias(&'_ self) -> ::std::option::Option<bool> {
         self.allow_alias.clone()
     }
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -2880,28 +2846,26 @@ impl<'bump> ::puroro::Serializable for EnumOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumOptionsTrait for EnumOptionsBumpalo<'bump> {
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
-    fn allow_alias(&self) -> ::std::option::Option<bool> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn allow_alias(&'_ self) -> ::std::option::Option<bool> {
         self.allow_alias.clone()
     }
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -3009,22 +2973,20 @@ impl ::puroro::Serializable for OneofOptions {
 
 impl OneofOptionsTrait for OneofOptions {
     type UninterpretedOptionType = UninterpretedOption;
-    type UninterpretedOptionType = UninterpretedOption;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -3110,22 +3072,20 @@ impl<'bump> ::puroro::Serializable for OneofOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> OneofOptionsTrait for OneofOptionsBumpalo<'bump> {
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
-    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -3311,40 +3271,38 @@ impl ::puroro::Serializable for FieldOptions {
 
 impl FieldOptionsTrait for FieldOptions {
     type UninterpretedOptionType = UninterpretedOption;
-    fn ctype(&self) -> ::std::option::Option<::std::result::Result<field_options::Ctype, i32>> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn ctype(&'_ self) -> ::std::option::Option<::std::result::Result<field_options::Ctype, i32>> {
         self.ctype.clone()
     }
-    fn packed(&self) -> ::std::option::Option<bool> {
+    fn packed(&'_ self) -> ::std::option::Option<bool> {
         self.packed.clone()
     }
-    fn jstype(&self) -> ::std::option::Option<::std::result::Result<field_options::Jstype, i32>> {
+    fn jstype(&'_ self) -> ::std::option::Option<::std::result::Result<field_options::Jstype, i32>> {
         self.jstype.clone()
     }
-    fn lazy(&self) -> ::std::option::Option<bool> {
+    fn lazy(&'_ self) -> ::std::option::Option<bool> {
         self.lazy.clone()
     }
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn weak(&self) -> ::std::option::Option<bool> {
+    fn weak(&'_ self) -> ::std::option::Option<bool> {
         self.weak.clone()
     }
-    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -3502,40 +3460,38 @@ impl<'bump> ::puroro::Serializable for FieldOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FieldOptionsTrait for FieldOptionsBumpalo<'bump> {
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
-    fn ctype(&self) -> ::std::option::Option<::std::result::Result<field_options::Ctype, i32>> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn ctype(&'_ self) -> ::std::option::Option<::std::result::Result<field_options::Ctype, i32>> {
         self.ctype.clone()
     }
-    fn packed(&self) -> ::std::option::Option<bool> {
+    fn packed(&'_ self) -> ::std::option::Option<bool> {
         self.packed.clone()
     }
-    fn jstype(&self) -> ::std::option::Option<::std::result::Result<field_options::Jstype, i32>> {
+    fn jstype(&'_ self) -> ::std::option::Option<::std::result::Result<field_options::Jstype, i32>> {
         self.jstype.clone()
     }
-    fn lazy(&self) -> ::std::option::Option<bool> {
+    fn lazy(&'_ self) -> ::std::option::Option<bool> {
         self.lazy.clone()
     }
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn weak(&self) -> ::std::option::Option<bool> {
+    fn weak(&'_ self) -> ::std::option::Option<bool> {
         self.weak.clone()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -3741,34 +3697,32 @@ impl ::puroro::Serializable for MessageOptions {
 
 impl MessageOptionsTrait for MessageOptions {
     type UninterpretedOptionType = UninterpretedOption;
-    fn message_set_wire_format(&self) -> ::std::option::Option<bool> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn message_set_wire_format(&'_ self) -> ::std::option::Option<bool> {
         self.message_set_wire_format.clone()
     }
-    fn no_standard_descriptor_accessor(&self) -> ::std::option::Option<bool> {
+    fn no_standard_descriptor_accessor(&'_ self) -> ::std::option::Option<bool> {
         self.no_standard_descriptor_accessor.clone()
     }
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn map_entry(&self) -> ::std::option::Option<bool> {
+    fn map_entry(&'_ self) -> ::std::option::Option<bool> {
         self.map_entry.clone()
     }
-    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -3902,34 +3856,32 @@ impl<'bump> ::puroro::Serializable for MessageOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MessageOptionsTrait for MessageOptionsBumpalo<'bump> {
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
-    fn message_set_wire_format(&self) -> ::std::option::Option<bool> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn message_set_wire_format(&'_ self) -> ::std::option::Option<bool> {
         self.message_set_wire_format.clone()
     }
-    fn no_standard_descriptor_accessor(&self) -> ::std::option::Option<bool> {
+    fn no_standard_descriptor_accessor(&'_ self) -> ::std::option::Option<bool> {
         self.no_standard_descriptor_accessor.clone()
     }
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn map_entry(&self) -> ::std::option::Option<bool> {
+    fn map_entry(&'_ self) -> ::std::option::Option<bool> {
         self.map_entry.clone()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -4297,82 +4249,80 @@ impl ::puroro::Serializable for FileOptions {
 
 impl FileOptionsTrait for FileOptions {
     type UninterpretedOptionType = UninterpretedOption;
-    fn java_package(&self) -> ::std::option::Option<&'_ str> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn java_package(&'_ self) -> ::std::option::Option<&'_ str> {
         self.java_package.as_deref()
     }
-    fn java_outer_classname(&self) -> ::std::option::Option<&'_ str> {
+    fn java_outer_classname(&'_ self) -> ::std::option::Option<&'_ str> {
         self.java_outer_classname.as_deref()
     }
-    fn java_multiple_files(&self) -> ::std::option::Option<bool> {
+    fn java_multiple_files(&'_ self) -> ::std::option::Option<bool> {
         self.java_multiple_files.clone()
     }
-    fn java_generate_equals_and_hash(&self) -> ::std::option::Option<bool> {
+    fn java_generate_equals_and_hash(&'_ self) -> ::std::option::Option<bool> {
         self.java_generate_equals_and_hash.clone()
     }
-    fn java_string_check_utf8(&self) -> ::std::option::Option<bool> {
+    fn java_string_check_utf8(&'_ self) -> ::std::option::Option<bool> {
         self.java_string_check_utf8.clone()
     }
-    fn optimize_for(&self) -> ::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> {
+    fn optimize_for(&'_ self) -> ::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> {
         self.optimize_for.clone()
     }
-    fn go_package(&self) -> ::std::option::Option<&'_ str> {
+    fn go_package(&'_ self) -> ::std::option::Option<&'_ str> {
         self.go_package.as_deref()
     }
-    fn cc_generic_services(&self) -> ::std::option::Option<bool> {
+    fn cc_generic_services(&'_ self) -> ::std::option::Option<bool> {
         self.cc_generic_services.clone()
     }
-    fn java_generic_services(&self) -> ::std::option::Option<bool> {
+    fn java_generic_services(&'_ self) -> ::std::option::Option<bool> {
         self.java_generic_services.clone()
     }
-    fn py_generic_services(&self) -> ::std::option::Option<bool> {
+    fn py_generic_services(&'_ self) -> ::std::option::Option<bool> {
         self.py_generic_services.clone()
     }
-    fn php_generic_services(&self) -> ::std::option::Option<bool> {
+    fn php_generic_services(&'_ self) -> ::std::option::Option<bool> {
         self.php_generic_services.clone()
     }
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn cc_enable_arenas(&self) -> ::std::option::Option<bool> {
+    fn cc_enable_arenas(&'_ self) -> ::std::option::Option<bool> {
         self.cc_enable_arenas.clone()
     }
-    fn objc_class_prefix(&self) -> ::std::option::Option<&'_ str> {
+    fn objc_class_prefix(&'_ self) -> ::std::option::Option<&'_ str> {
         self.objc_class_prefix.as_deref()
     }
-    fn csharp_namespace(&self) -> ::std::option::Option<&'_ str> {
+    fn csharp_namespace(&'_ self) -> ::std::option::Option<&'_ str> {
         self.csharp_namespace.as_deref()
     }
-    fn swift_prefix(&self) -> ::std::option::Option<&'_ str> {
+    fn swift_prefix(&'_ self) -> ::std::option::Option<&'_ str> {
         self.swift_prefix.as_deref()
     }
-    fn php_class_prefix(&self) -> ::std::option::Option<&'_ str> {
+    fn php_class_prefix(&'_ self) -> ::std::option::Option<&'_ str> {
         self.php_class_prefix.as_deref()
     }
-    fn php_namespace(&self) -> ::std::option::Option<&'_ str> {
+    fn php_namespace(&'_ self) -> ::std::option::Option<&'_ str> {
         self.php_namespace.as_deref()
     }
-    fn php_metadata_namespace(&self) -> ::std::option::Option<&'_ str> {
+    fn php_metadata_namespace(&'_ self) -> ::std::option::Option<&'_ str> {
         self.php_metadata_namespace.as_deref()
     }
-    fn ruby_package(&self) -> ::std::option::Option<&'_ str> {
+    fn ruby_package(&'_ self) -> ::std::option::Option<&'_ str> {
         self.ruby_package.as_deref()
     }
-    type UninterpretedOptionType = UninterpretedOption;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -4698,82 +4648,80 @@ impl<'bump> ::puroro::Serializable for FileOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileOptionsTrait for FileOptionsBumpalo<'bump> {
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
-    fn java_package(&self) -> ::std::option::Option<&'_ str> {
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
+    fn java_package(&'_ self) -> ::std::option::Option<&'_ str> {
         self.java_package.as_deref()
     }
-    fn java_outer_classname(&self) -> ::std::option::Option<&'_ str> {
+    fn java_outer_classname(&'_ self) -> ::std::option::Option<&'_ str> {
         self.java_outer_classname.as_deref()
     }
-    fn java_multiple_files(&self) -> ::std::option::Option<bool> {
+    fn java_multiple_files(&'_ self) -> ::std::option::Option<bool> {
         self.java_multiple_files.clone()
     }
-    fn java_generate_equals_and_hash(&self) -> ::std::option::Option<bool> {
+    fn java_generate_equals_and_hash(&'_ self) -> ::std::option::Option<bool> {
         self.java_generate_equals_and_hash.clone()
     }
-    fn java_string_check_utf8(&self) -> ::std::option::Option<bool> {
+    fn java_string_check_utf8(&'_ self) -> ::std::option::Option<bool> {
         self.java_string_check_utf8.clone()
     }
-    fn optimize_for(&self) -> ::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> {
+    fn optimize_for(&'_ self) -> ::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> {
         self.optimize_for.clone()
     }
-    fn go_package(&self) -> ::std::option::Option<&'_ str> {
+    fn go_package(&'_ self) -> ::std::option::Option<&'_ str> {
         self.go_package.as_deref()
     }
-    fn cc_generic_services(&self) -> ::std::option::Option<bool> {
+    fn cc_generic_services(&'_ self) -> ::std::option::Option<bool> {
         self.cc_generic_services.clone()
     }
-    fn java_generic_services(&self) -> ::std::option::Option<bool> {
+    fn java_generic_services(&'_ self) -> ::std::option::Option<bool> {
         self.java_generic_services.clone()
     }
-    fn py_generic_services(&self) -> ::std::option::Option<bool> {
+    fn py_generic_services(&'_ self) -> ::std::option::Option<bool> {
         self.py_generic_services.clone()
     }
-    fn php_generic_services(&self) -> ::std::option::Option<bool> {
+    fn php_generic_services(&'_ self) -> ::std::option::Option<bool> {
         self.php_generic_services.clone()
     }
-    fn deprecated(&self) -> ::std::option::Option<bool> {
+    fn deprecated(&'_ self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    fn cc_enable_arenas(&self) -> ::std::option::Option<bool> {
+    fn cc_enable_arenas(&'_ self) -> ::std::option::Option<bool> {
         self.cc_enable_arenas.clone()
     }
-    fn objc_class_prefix(&self) -> ::std::option::Option<&'_ str> {
+    fn objc_class_prefix(&'_ self) -> ::std::option::Option<&'_ str> {
         self.objc_class_prefix.as_deref()
     }
-    fn csharp_namespace(&self) -> ::std::option::Option<&'_ str> {
+    fn csharp_namespace(&'_ self) -> ::std::option::Option<&'_ str> {
         self.csharp_namespace.as_deref()
     }
-    fn swift_prefix(&self) -> ::std::option::Option<&'_ str> {
+    fn swift_prefix(&'_ self) -> ::std::option::Option<&'_ str> {
         self.swift_prefix.as_deref()
     }
-    fn php_class_prefix(&self) -> ::std::option::Option<&'_ str> {
+    fn php_class_prefix(&'_ self) -> ::std::option::Option<&'_ str> {
         self.php_class_prefix.as_deref()
     }
-    fn php_namespace(&self) -> ::std::option::Option<&'_ str> {
+    fn php_namespace(&'_ self) -> ::std::option::Option<&'_ str> {
         self.php_namespace.as_deref()
     }
-    fn php_metadata_namespace(&self) -> ::std::option::Option<&'_ str> {
+    fn php_metadata_namespace(&'_ self) -> ::std::option::Option<&'_ str> {
         self.php_metadata_namespace.as_deref()
     }
-    fn ruby_package(&self) -> ::std::option::Option<&'_ str> {
+    fn ruby_package(&'_ self) -> ::std::option::Option<&'_ str> {
         self.ruby_package.as_deref()
     }
-    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -4962,23 +4910,22 @@ impl ::puroro::Serializable for MethodDescriptorProto {
 
 impl MethodDescriptorProtoTrait for MethodDescriptorProto {
     type MethodOptionsType = MethodOptions;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    fn input_type(&self) -> ::std::option::Option<&'_ str> {
+    fn input_type(&'_ self) -> ::std::option::Option<&'_ str> {
         self.input_type.as_deref()
     }
-    fn output_type(&self) -> ::std::option::Option<&'_ str> {
+    fn output_type(&'_ self) -> ::std::option::Option<&'_ str> {
         self.output_type.as_deref()
     }
-    type OptionsType = MethodOptions;
-    fn options(&self) -> ::std::option::Option<&'_ self::MethodOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::MethodOptionsType> {
         self.options.as_deref()
     }
-    fn client_streaming(&self) -> ::std::option::Option<bool> {
+    fn client_streaming(&'_ self) -> ::std::option::Option<bool> {
         self.client_streaming.clone()
     }
-    fn server_streaming(&self) -> ::std::option::Option<bool> {
+    fn server_streaming(&'_ self) -> ::std::option::Option<bool> {
         self.server_streaming.clone()
     }
 }
@@ -5122,23 +5069,22 @@ impl<'bump> ::puroro::Serializable for MethodDescriptorProtoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MethodDescriptorProtoTrait for MethodDescriptorProtoBumpalo<'bump> {
     type MethodOptionsType = MethodOptionsBumpalo<'bump>;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    fn input_type(&self) -> ::std::option::Option<&'_ str> {
+    fn input_type(&'_ self) -> ::std::option::Option<&'_ str> {
         self.input_type.as_deref()
     }
-    fn output_type(&self) -> ::std::option::Option<&'_ str> {
+    fn output_type(&'_ self) -> ::std::option::Option<&'_ str> {
         self.output_type.as_deref()
     }
-    type OptionsType = MethodOptionsBumpalo<'bump>;
-    fn options(&self) -> ::std::option::Option<&'_ self::MethodOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::MethodOptionsType> {
         self.options.as_deref()
     }
-    fn client_streaming(&self) -> ::std::option::Option<bool> {
+    fn client_streaming(&'_ self) -> ::std::option::Option<bool> {
         self.client_streaming.clone()
     }
-    fn server_streaming(&self) -> ::std::option::Option<bool> {
+    fn server_streaming(&'_ self) -> ::std::option::Option<bool> {
         self.server_streaming.clone()
     }
 }
@@ -5272,31 +5218,28 @@ impl ::puroro::Serializable for ServiceDescriptorProto {
 impl ServiceDescriptorProtoTrait for ServiceDescriptorProto {
     type MethodDescriptorProtoType = MethodDescriptorProto;
     type ServiceOptionsType = ServiceOptions;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    #[cfg(feature = "puroro-nightly")]
+    type MethodIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::MethodDescriptorProtoType>;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type MethodType = MethodDescriptorProto;
     fn for_each_method<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::MethodDescriptorProto)
-    {
+        F: FnMut(&'_ Self::MethodDescriptorProtoType) {
         for item in (self.method).iter() {
             (f)(item);
         }
     }
-    fn method_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::MethodDescriptorProto>>
-    {
+    fn method_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::MethodDescriptorProtoType>> {
         ::std::boxed::Box::new(self.method.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type MethodIter<'a> = impl Iterator<Item=&'a self::MethodDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn method_iter(&self) -> Self::MethodIter<'_> {
         self.method.iter()
     }
-    type OptionsType = ServiceOptions;
-    fn options(&self) -> ::std::option::Option<&'_ self::ServiceOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::ServiceOptionsType> {
         self.options.as_deref()
     }
 }
@@ -5405,31 +5348,28 @@ impl<'bump> ::puroro::Serializable for ServiceDescriptorProtoBumpalo<'bump> {
 impl<'bump> ServiceDescriptorProtoTrait for ServiceDescriptorProtoBumpalo<'bump> {
     type MethodDescriptorProtoType = MethodDescriptorProtoBumpalo<'bump>;
     type ServiceOptionsType = ServiceOptionsBumpalo<'bump>;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    #[cfg(feature = "puroro-nightly")]
+    type MethodIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::MethodDescriptorProtoType>;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type MethodType = MethodDescriptorProtoBumpalo<'bump>;
     fn for_each_method<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::MethodDescriptorProto)
-    {
+        F: FnMut(&'_ Self::MethodDescriptorProtoType) {
         for item in (self.method).iter() {
             (f)(item);
         }
     }
-    fn method_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::MethodDescriptorProto>>
-    {
+    fn method_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::MethodDescriptorProtoType>> {
         ::std::boxed::Box::new(self.method.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type MethodIter<'a> = impl Iterator<Item=&'a self::MethodDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn method_iter(&self) -> Self::MethodIter<'_> {
         self.method.iter()
     }
-    type OptionsType = ServiceOptionsBumpalo<'bump>;
-    fn options(&self) -> ::std::option::Option<&'_ self::ServiceOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::ServiceOptionsType> {
         self.options.as_deref()
     }
 }
@@ -5553,14 +5493,13 @@ impl ::puroro::Serializable for EnumValueDescriptorProto {
 
 impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProto {
     type EnumValueOptionsType = EnumValueOptions;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    fn number(&self) -> ::std::option::Option<i32> {
+    fn number(&'_ self) -> ::std::option::Option<i32> {
         self.number.clone()
     }
-    type OptionsType = EnumValueOptions;
-    fn options(&self) -> ::std::option::Option<&'_ self::EnumValueOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::EnumValueOptionsType> {
         self.options.as_deref()
     }
 }
@@ -5668,14 +5607,13 @@ impl<'bump> ::puroro::Serializable for EnumValueDescriptorProtoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoBumpalo<'bump> {
     type EnumValueOptionsType = EnumValueOptionsBumpalo<'bump>;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    fn number(&self) -> ::std::option::Option<i32> {
+    fn number(&'_ self) -> ::std::option::Option<i32> {
         self.number.clone()
     }
-    type OptionsType = EnumValueOptionsBumpalo<'bump>;
-    fn options(&self) -> ::std::option::Option<&'_ self::EnumValueOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::EnumValueOptionsType> {
         self.options.as_deref()
     }
 }
@@ -5853,68 +5791,62 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProto {
     type EnumValueDescriptorProtoType = EnumValueDescriptorProto;
     type EnumOptionsType = EnumOptions;
     type EnumReservedRangeType = enum_descriptor_proto::EnumReservedRange;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    #[cfg(feature = "puroro-nightly")]
+    type ValueIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::EnumValueDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedRangeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::EnumReservedRangeType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedNameIter<'a> = impl ::std::iter::Iterator<Item = &'a str>;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type ValueType = EnumValueDescriptorProto;
     fn for_each_value<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::EnumValueDescriptorProto)
-    {
+        F: FnMut(&'_ Self::EnumValueDescriptorProtoType) {
         for item in (self.value).iter() {
             (f)(item);
         }
     }
-    fn value_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::EnumValueDescriptorProto>>
-    {
+    fn value_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::EnumValueDescriptorProtoType>> {
         ::std::boxed::Box::new(self.value.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ValueIter<'a> = impl Iterator<Item=&'a self::EnumValueDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn value_iter(&self) -> Self::ValueIter<'_> {
         self.value.iter()
     }
-    type OptionsType = EnumOptions;
-    fn options(&self) -> ::std::option::Option<&'_ self::EnumOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::EnumOptionsType> {
         self.options.as_deref()
     }
-    type ReservedRangeType = enum_descriptor_proto::EnumReservedRange;
     fn for_each_reserved_range<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::enum_descriptor_proto::EnumReservedRange)
-    {
+        F: FnMut(&'_ Self::EnumReservedRangeType) {
         for item in (self.reserved_range).iter() {
             (f)(item);
         }
     }
-    fn reserved_range_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::enum_descriptor_proto::EnumReservedRange>>
-    {
+    fn reserved_range_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::EnumReservedRangeType>> {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ReservedRangeIter<'a> = impl Iterator<Item=&'a self::enum_descriptor_proto::EnumReservedRange>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
         self.reserved_range.iter()
     }
     fn for_each_reserved_name<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ str)
-    {
+        F: FnMut(&'_ str) {
         for item in (self.reserved_name).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn reserved_name_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
-    {
+    fn reserved_name_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
-    type ReservedNameIter<'a> = impl Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_> {
         self.reserved_name.iter().map(|v| v.as_ref())
@@ -6050,68 +5982,62 @@ impl<'bump> EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo<'bump> {
     type EnumValueDescriptorProtoType = EnumValueDescriptorProtoBumpalo<'bump>;
     type EnumOptionsType = EnumOptionsBumpalo<'bump>;
     type EnumReservedRangeType = enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    #[cfg(feature = "puroro-nightly")]
+    type ValueIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::EnumValueDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedRangeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::EnumReservedRangeType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedNameIter<'a> = impl ::std::iter::Iterator<Item = &'a str>;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type ValueType = EnumValueDescriptorProtoBumpalo<'bump>;
     fn for_each_value<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::EnumValueDescriptorProto)
-    {
+        F: FnMut(&'_ Self::EnumValueDescriptorProtoType) {
         for item in (self.value).iter() {
             (f)(item);
         }
     }
-    fn value_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::EnumValueDescriptorProto>>
-    {
+    fn value_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::EnumValueDescriptorProtoType>> {
         ::std::boxed::Box::new(self.value.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ValueIter<'a> = impl Iterator<Item=&'a self::EnumValueDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn value_iter(&self) -> Self::ValueIter<'_> {
         self.value.iter()
     }
-    type OptionsType = EnumOptionsBumpalo<'bump>;
-    fn options(&self) -> ::std::option::Option<&'_ self::EnumOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::EnumOptionsType> {
         self.options.as_deref()
     }
-    type ReservedRangeType = enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>;
     fn for_each_reserved_range<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::enum_descriptor_proto::EnumReservedRange)
-    {
+        F: FnMut(&'_ Self::EnumReservedRangeType) {
         for item in (self.reserved_range).iter() {
             (f)(item);
         }
     }
-    fn reserved_range_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::enum_descriptor_proto::EnumReservedRange>>
-    {
+    fn reserved_range_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::EnumReservedRangeType>> {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ReservedRangeIter<'a> = impl Iterator<Item=&'a self::enum_descriptor_proto::EnumReservedRange>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
         self.reserved_range.iter()
     }
     fn for_each_reserved_name<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ str)
-    {
+        F: FnMut(&'_ str) {
         for item in (self.reserved_name).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn reserved_name_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
-    {
+    fn reserved_name_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
-    type ReservedNameIter<'a> = impl Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_> {
         self.reserved_name.iter().map(|v| v.as_ref())
@@ -6223,10 +6149,10 @@ impl ::puroro::Serializable for EnumReservedRange {
 }
 
 impl EnumReservedRangeTrait for EnumReservedRange {
-    fn start(&self) -> ::std::option::Option<i32> {
+    fn start(&'_ self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
-    fn end(&self) -> ::std::option::Option<i32> {
+    fn end(&'_ self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
 }
@@ -6321,10 +6247,10 @@ impl<'bump> ::puroro::Serializable for EnumReservedRangeBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumReservedRangeTrait for EnumReservedRangeBumpalo<'bump> {
-    fn start(&self) -> ::std::option::Option<i32> {
+    fn start(&'_ self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
-    fn end(&self) -> ::std::option::Option<i32> {
+    fn end(&'_ self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
 }
@@ -6436,11 +6362,10 @@ impl ::puroro::Serializable for OneofDescriptorProto {
 
 impl OneofDescriptorProtoTrait for OneofDescriptorProto {
     type OneofOptionsType = OneofOptions;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type OptionsType = OneofOptions;
-    fn options(&self) -> ::std::option::Option<&'_ self::OneofOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::OneofOptionsType> {
         self.options.as_deref()
     }
 }
@@ -6536,11 +6461,10 @@ impl<'bump> ::puroro::Serializable for OneofDescriptorProtoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> OneofDescriptorProtoTrait for OneofDescriptorProtoBumpalo<'bump> {
     type OneofOptionsType = OneofOptionsBumpalo<'bump>;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type OptionsType = OneofOptionsBumpalo<'bump>;
-    fn options(&self) -> ::std::option::Option<&'_ self::OneofOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::OneofOptionsType> {
         self.options.as_deref()
     }
 }
@@ -6768,38 +6692,37 @@ impl ::puroro::Serializable for FieldDescriptorProto {
 
 impl FieldDescriptorProtoTrait for FieldDescriptorProto {
     type FieldOptionsType = FieldOptions;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    fn number(&self) -> ::std::option::Option<i32> {
+    fn number(&'_ self) -> ::std::option::Option<i32> {
         self.number.clone()
     }
-    fn label(&self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> {
+    fn label(&'_ self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> {
         self.label.clone()
     }
-    fn type_(&self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> {
+    fn type_(&'_ self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> {
         self.type_.clone()
     }
-    fn type_name(&self) -> ::std::option::Option<&'_ str> {
+    fn type_name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.type_name.as_deref()
     }
-    fn extendee(&self) -> ::std::option::Option<&'_ str> {
+    fn extendee(&'_ self) -> ::std::option::Option<&'_ str> {
         self.extendee.as_deref()
     }
-    fn default_value(&self) -> ::std::option::Option<&'_ str> {
+    fn default_value(&'_ self) -> ::std::option::Option<&'_ str> {
         self.default_value.as_deref()
     }
-    fn oneof_index(&self) -> ::std::option::Option<i32> {
+    fn oneof_index(&'_ self) -> ::std::option::Option<i32> {
         self.oneof_index.clone()
     }
-    fn json_name(&self) -> ::std::option::Option<&'_ str> {
+    fn json_name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.json_name.as_deref()
     }
-    type OptionsType = FieldOptions;
-    fn options(&self) -> ::std::option::Option<&'_ self::FieldOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::FieldOptionsType> {
         self.options.as_deref()
     }
-    fn proto3_optional(&self) -> ::std::option::Option<bool> {
+    fn proto3_optional(&'_ self) -> ::std::option::Option<bool> {
         self.proto3_optional.clone()
     }
 }
@@ -7003,38 +6926,37 @@ impl<'bump> ::puroro::Serializable for FieldDescriptorProtoBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FieldDescriptorProtoTrait for FieldDescriptorProtoBumpalo<'bump> {
     type FieldOptionsType = FieldOptionsBumpalo<'bump>;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    fn number(&self) -> ::std::option::Option<i32> {
+    fn number(&'_ self) -> ::std::option::Option<i32> {
         self.number.clone()
     }
-    fn label(&self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> {
+    fn label(&'_ self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> {
         self.label.clone()
     }
-    fn type_(&self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> {
+    fn type_(&'_ self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> {
         self.type_.clone()
     }
-    fn type_name(&self) -> ::std::option::Option<&'_ str> {
+    fn type_name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.type_name.as_deref()
     }
-    fn extendee(&self) -> ::std::option::Option<&'_ str> {
+    fn extendee(&'_ self) -> ::std::option::Option<&'_ str> {
         self.extendee.as_deref()
     }
-    fn default_value(&self) -> ::std::option::Option<&'_ str> {
+    fn default_value(&'_ self) -> ::std::option::Option<&'_ str> {
         self.default_value.as_deref()
     }
-    fn oneof_index(&self) -> ::std::option::Option<i32> {
+    fn oneof_index(&'_ self) -> ::std::option::Option<i32> {
         self.oneof_index.clone()
     }
-    fn json_name(&self) -> ::std::option::Option<&'_ str> {
+    fn json_name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.json_name.as_deref()
     }
-    type OptionsType = FieldOptionsBumpalo<'bump>;
-    fn options(&self) -> ::std::option::Option<&'_ self::FieldOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::FieldOptionsType> {
         self.options.as_deref()
     }
-    fn proto3_optional(&self) -> ::std::option::Option<bool> {
+    fn proto3_optional(&'_ self) -> ::std::option::Option<bool> {
         self.proto3_optional.clone()
     }
 }
@@ -7216,22 +7138,20 @@ impl ::puroro::Serializable for ExtensionRangeOptions {
 
 impl ExtensionRangeOptionsTrait for ExtensionRangeOptions {
     type UninterpretedOptionType = UninterpretedOption;
-    type UninterpretedOptionType = UninterpretedOption;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -7317,22 +7237,20 @@ impl<'bump> ::puroro::Serializable for ExtensionRangeOptionsBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ExtensionRangeOptionsTrait for ExtensionRangeOptionsBumpalo<'bump> {
     type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
-    type UninterpretedOptionType = UninterpretedOptionBumpalo<'bump>;
+    #[cfg(feature = "puroro-nightly")]
+    type UninterpretedOptionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::UninterpretedOptionType>;
     fn for_each_uninterpreted_option<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::UninterpretedOption)
-    {
+        F: FnMut(&'_ Self::UninterpretedOptionType) {
         for item in (self.uninterpreted_option).iter() {
             (f)(item);
         }
     }
-    fn uninterpreted_option_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::UninterpretedOption>>
-    {
+    fn uninterpreted_option_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type UninterpretedOptionIter<'a> = impl Iterator<Item=&'a self::UninterpretedOption>;
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -7625,168 +7543,152 @@ impl DescriptorProtoTrait for DescriptorProto {
     type OneofDescriptorProtoType = OneofDescriptorProto;
     type MessageOptionsType = MessageOptions;
     type ReservedRangeType = descriptor_proto::ReservedRange;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    #[cfg(feature = "puroro-nightly")]
+    type FieldIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::FieldDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::FieldDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type NestedTypeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::DescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type EnumTypeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::EnumDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionRangeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::ExtensionRangeType>;
+    #[cfg(feature = "puroro-nightly")]
+    type OneofDeclIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::OneofDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedRangeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::ReservedRangeType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedNameIter<'a> = impl ::std::iter::Iterator<Item = &'a str>;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type FieldType = FieldDescriptorProto;
     fn for_each_field<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::FieldDescriptorProto)
-    {
+        F: FnMut(&'_ Self::FieldDescriptorProtoType) {
         for item in (self.field).iter() {
             (f)(item);
         }
     }
-    fn field_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::FieldDescriptorProto>>
-    {
+    fn field_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FieldDescriptorProtoType>> {
         ::std::boxed::Box::new(self.field.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type FieldIter<'a> = impl Iterator<Item=&'a self::FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn field_iter(&self) -> Self::FieldIter<'_> {
         self.field.iter()
     }
-    type ExtensionType = FieldDescriptorProto;
     fn for_each_extension<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::FieldDescriptorProto)
-    {
+        F: FnMut(&'_ Self::FieldDescriptorProtoType) {
         for item in (self.extension).iter() {
             (f)(item);
         }
     }
-    fn extension_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::FieldDescriptorProto>>
-    {
+    fn extension_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FieldDescriptorProtoType>> {
         ::std::boxed::Box::new(self.extension.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionIter<'a> = impl Iterator<Item=&'a self::FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
     }
-    type NestedTypeType = DescriptorProto;
     fn for_each_nested_type<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::DescriptorProto)
-    {
+        F: FnMut(&'_ Self::DescriptorProtoType) {
         for item in (self.nested_type).iter() {
             (f)(item);
         }
     }
-    fn nested_type_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::DescriptorProto>>
-    {
+    fn nested_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::DescriptorProtoType>> {
         ::std::boxed::Box::new(self.nested_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type NestedTypeIter<'a> = impl Iterator<Item=&'a self::DescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn nested_type_iter(&self) -> Self::NestedTypeIter<'_> {
         self.nested_type.iter()
     }
-    type EnumTypeType = EnumDescriptorProto;
     fn for_each_enum_type<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::EnumDescriptorProto)
-    {
+        F: FnMut(&'_ Self::EnumDescriptorProtoType) {
         for item in (self.enum_type).iter() {
             (f)(item);
         }
     }
-    fn enum_type_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::EnumDescriptorProto>>
-    {
+    fn enum_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::EnumDescriptorProtoType>> {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type EnumTypeIter<'a> = impl Iterator<Item=&'a self::EnumDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
     }
-    type ExtensionRangeType = descriptor_proto::ExtensionRange;
     fn for_each_extension_range<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::descriptor_proto::ExtensionRange)
-    {
+        F: FnMut(&'_ Self::ExtensionRangeType) {
         for item in (self.extension_range).iter() {
             (f)(item);
         }
     }
-    fn extension_range_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::descriptor_proto::ExtensionRange>>
-    {
+    fn extension_range_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::ExtensionRangeType>> {
         ::std::boxed::Box::new(self.extension_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionRangeIter<'a> = impl Iterator<Item=&'a self::descriptor_proto::ExtensionRange>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_range_iter(&self) -> Self::ExtensionRangeIter<'_> {
         self.extension_range.iter()
     }
-    type OneofDeclType = OneofDescriptorProto;
     fn for_each_oneof_decl<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::OneofDescriptorProto)
-    {
+        F: FnMut(&'_ Self::OneofDescriptorProtoType) {
         for item in (self.oneof_decl).iter() {
             (f)(item);
         }
     }
-    fn oneof_decl_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::OneofDescriptorProto>>
-    {
+    fn oneof_decl_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::OneofDescriptorProtoType>> {
         ::std::boxed::Box::new(self.oneof_decl.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type OneofDeclIter<'a> = impl Iterator<Item=&'a self::OneofDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn oneof_decl_iter(&self) -> Self::OneofDeclIter<'_> {
         self.oneof_decl.iter()
     }
-    type OptionsType = MessageOptions;
-    fn options(&self) -> ::std::option::Option<&'_ self::MessageOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::MessageOptionsType> {
         self.options.as_deref()
     }
-    type ReservedRangeType = descriptor_proto::ReservedRange;
     fn for_each_reserved_range<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::descriptor_proto::ReservedRange)
-    {
+        F: FnMut(&'_ Self::ReservedRangeType) {
         for item in (self.reserved_range).iter() {
             (f)(item);
         }
     }
-    fn reserved_range_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::descriptor_proto::ReservedRange>>
-    {
+    fn reserved_range_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::ReservedRangeType>> {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ReservedRangeIter<'a> = impl Iterator<Item=&'a self::descriptor_proto::ReservedRange>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
         self.reserved_range.iter()
     }
     fn for_each_reserved_name<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ str)
-    {
+        F: FnMut(&'_ str) {
         for item in (self.reserved_name).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn reserved_name_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
-    {
+    fn reserved_name_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
-    type ReservedNameIter<'a> = impl Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_> {
         self.reserved_name.iter().map(|v| v.as_ref())
@@ -7986,168 +7888,152 @@ impl<'bump> DescriptorProtoTrait for DescriptorProtoBumpalo<'bump> {
     type OneofDescriptorProtoType = OneofDescriptorProtoBumpalo<'bump>;
     type MessageOptionsType = MessageOptionsBumpalo<'bump>;
     type ReservedRangeType = descriptor_proto::ReservedRangeBumpalo<'bump>;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    #[cfg(feature = "puroro-nightly")]
+    type FieldIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::FieldDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::FieldDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type NestedTypeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::DescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type EnumTypeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::EnumDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionRangeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::ExtensionRangeType>;
+    #[cfg(feature = "puroro-nightly")]
+    type OneofDeclIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::OneofDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedRangeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::ReservedRangeType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ReservedNameIter<'a> = impl ::std::iter::Iterator<Item = &'a str>;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type FieldType = FieldDescriptorProtoBumpalo<'bump>;
     fn for_each_field<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::FieldDescriptorProto)
-    {
+        F: FnMut(&'_ Self::FieldDescriptorProtoType) {
         for item in (self.field).iter() {
             (f)(item);
         }
     }
-    fn field_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::FieldDescriptorProto>>
-    {
+    fn field_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FieldDescriptorProtoType>> {
         ::std::boxed::Box::new(self.field.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type FieldIter<'a> = impl Iterator<Item=&'a self::FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn field_iter(&self) -> Self::FieldIter<'_> {
         self.field.iter()
     }
-    type ExtensionType = FieldDescriptorProtoBumpalo<'bump>;
     fn for_each_extension<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::FieldDescriptorProto)
-    {
+        F: FnMut(&'_ Self::FieldDescriptorProtoType) {
         for item in (self.extension).iter() {
             (f)(item);
         }
     }
-    fn extension_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::FieldDescriptorProto>>
-    {
+    fn extension_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FieldDescriptorProtoType>> {
         ::std::boxed::Box::new(self.extension.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionIter<'a> = impl Iterator<Item=&'a self::FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
     }
-    type NestedTypeType = DescriptorProtoBumpalo<'bump>;
     fn for_each_nested_type<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::DescriptorProto)
-    {
+        F: FnMut(&'_ Self::DescriptorProtoType) {
         for item in (self.nested_type).iter() {
             (f)(item);
         }
     }
-    fn nested_type_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::DescriptorProto>>
-    {
+    fn nested_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::DescriptorProtoType>> {
         ::std::boxed::Box::new(self.nested_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type NestedTypeIter<'a> = impl Iterator<Item=&'a self::DescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn nested_type_iter(&self) -> Self::NestedTypeIter<'_> {
         self.nested_type.iter()
     }
-    type EnumTypeType = EnumDescriptorProtoBumpalo<'bump>;
     fn for_each_enum_type<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::EnumDescriptorProto)
-    {
+        F: FnMut(&'_ Self::EnumDescriptorProtoType) {
         for item in (self.enum_type).iter() {
             (f)(item);
         }
     }
-    fn enum_type_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::EnumDescriptorProto>>
-    {
+    fn enum_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::EnumDescriptorProtoType>> {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type EnumTypeIter<'a> = impl Iterator<Item=&'a self::EnumDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
     }
-    type ExtensionRangeType = descriptor_proto::ExtensionRangeBumpalo<'bump>;
     fn for_each_extension_range<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::descriptor_proto::ExtensionRange)
-    {
+        F: FnMut(&'_ Self::ExtensionRangeType) {
         for item in (self.extension_range).iter() {
             (f)(item);
         }
     }
-    fn extension_range_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::descriptor_proto::ExtensionRange>>
-    {
+    fn extension_range_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::ExtensionRangeType>> {
         ::std::boxed::Box::new(self.extension_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionRangeIter<'a> = impl Iterator<Item=&'a self::descriptor_proto::ExtensionRange>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_range_iter(&self) -> Self::ExtensionRangeIter<'_> {
         self.extension_range.iter()
     }
-    type OneofDeclType = OneofDescriptorProtoBumpalo<'bump>;
     fn for_each_oneof_decl<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::OneofDescriptorProto)
-    {
+        F: FnMut(&'_ Self::OneofDescriptorProtoType) {
         for item in (self.oneof_decl).iter() {
             (f)(item);
         }
     }
-    fn oneof_decl_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::OneofDescriptorProto>>
-    {
+    fn oneof_decl_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::OneofDescriptorProtoType>> {
         ::std::boxed::Box::new(self.oneof_decl.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type OneofDeclIter<'a> = impl Iterator<Item=&'a self::OneofDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn oneof_decl_iter(&self) -> Self::OneofDeclIter<'_> {
         self.oneof_decl.iter()
     }
-    type OptionsType = MessageOptionsBumpalo<'bump>;
-    fn options(&self) -> ::std::option::Option<&'_ self::MessageOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::MessageOptionsType> {
         self.options.as_deref()
     }
-    type ReservedRangeType = descriptor_proto::ReservedRangeBumpalo<'bump>;
     fn for_each_reserved_range<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::descriptor_proto::ReservedRange)
-    {
+        F: FnMut(&'_ Self::ReservedRangeType) {
         for item in (self.reserved_range).iter() {
             (f)(item);
         }
     }
-    fn reserved_range_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::descriptor_proto::ReservedRange>>
-    {
+    fn reserved_range_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::ReservedRangeType>> {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ReservedRangeIter<'a> = impl Iterator<Item=&'a self::descriptor_proto::ReservedRange>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
         self.reserved_range.iter()
     }
     fn for_each_reserved_name<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ str)
-    {
+        F: FnMut(&'_ str) {
         for item in (self.reserved_name).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn reserved_name_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
-    {
+    fn reserved_name_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
-    type ReservedNameIter<'a> = impl Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
     fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_> {
         self.reserved_name.iter().map(|v| v.as_ref())
@@ -8259,10 +8145,10 @@ impl ::puroro::Serializable for ReservedRange {
 }
 
 impl ReservedRangeTrait for ReservedRange {
-    fn start(&self) -> ::std::option::Option<i32> {
+    fn start(&'_ self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
-    fn end(&self) -> ::std::option::Option<i32> {
+    fn end(&'_ self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
 }
@@ -8357,10 +8243,10 @@ impl<'bump> ::puroro::Serializable for ReservedRangeBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ReservedRangeTrait for ReservedRangeBumpalo<'bump> {
-    fn start(&self) -> ::std::option::Option<i32> {
+    fn start(&'_ self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
-    fn end(&self) -> ::std::option::Option<i32> {
+    fn end(&'_ self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
 }
@@ -8484,14 +8370,13 @@ impl ::puroro::Serializable for ExtensionRange {
 
 impl ExtensionRangeTrait for ExtensionRange {
     type ExtensionRangeOptionsType = super::ExtensionRangeOptions;
-    fn start(&self) -> ::std::option::Option<i32> {
+    fn start(&'_ self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
-    fn end(&self) -> ::std::option::Option<i32> {
+    fn end(&'_ self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
-    type OptionsType = super::ExtensionRangeOptions;
-    fn options(&self) -> ::std::option::Option<&'_ self::super::ExtensionRangeOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::ExtensionRangeOptionsType> {
         self.options.as_deref()
     }
 }
@@ -8599,14 +8484,13 @@ impl<'bump> ::puroro::Serializable for ExtensionRangeBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ExtensionRangeTrait for ExtensionRangeBumpalo<'bump> {
     type ExtensionRangeOptionsType = super::ExtensionRangeOptionsBumpalo<'bump>;
-    fn start(&self) -> ::std::option::Option<i32> {
+    fn start(&'_ self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
-    fn end(&self) -> ::std::option::Option<i32> {
+    fn end(&'_ self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
-    type OptionsType = super::ExtensionRangeOptionsBumpalo<'bump>;
-    fn options(&self) -> ::std::option::Option<&'_ self::super::ExtensionRangeOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::ExtensionRangeOptionsType> {
         self.options.as_deref()
     }
 }
@@ -8914,158 +8798,145 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
     type FieldDescriptorProtoType = FieldDescriptorProto;
     type FileOptionsType = FileOptions;
     type SourceCodeInfoType = SourceCodeInfo;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    #[cfg(feature = "puroro-nightly")]
+    type DependencyIter<'a> = impl ::std::iter::Iterator<Item = &'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    type PublicDependencyIter<'a> = impl ::std::iter::Iterator<Item = i32>;
+    #[cfg(feature = "puroro-nightly")]
+    type WeakDependencyIter<'a> = impl ::std::iter::Iterator<Item = i32>;
+    #[cfg(feature = "puroro-nightly")]
+    type MessageTypeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::DescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type EnumTypeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::EnumDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ServiceIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::ServiceDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::FieldDescriptorProtoType>;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    fn package(&self) -> ::std::option::Option<&'_ str> {
+    fn package(&'_ self) -> ::std::option::Option<&'_ str> {
         self.package.as_deref()
     }
     fn for_each_dependency<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ str)
-    {
+        F: FnMut(&'_ str) {
         for item in (self.dependency).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn dependency_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
-    {
+    fn dependency_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.dependency.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
-    type DependencyIter<'a> = impl Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
     fn dependency_iter(&self) -> Self::DependencyIter<'_> {
         self.dependency.iter().map(|v| v.as_ref())
     }
     fn for_each_public_dependency<F>(&self, mut f: F)
     where
-        F: FnMut(i32)
-    {
+        F: FnMut(i32) {
         for item in (self.public_dependency).iter().cloned() {
             (f)(item);
         }
     }
-    fn public_dependency_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
-    {
+    fn public_dependency_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.public_dependency.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    type PublicDependencyIter<'a> = impl Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn public_dependency_iter(&self) -> Self::PublicDependencyIter<'_> {
         self.public_dependency.iter().cloned()
     }
     fn for_each_weak_dependency<F>(&self, mut f: F)
     where
-        F: FnMut(i32)
-    {
+        F: FnMut(i32) {
         for item in (self.weak_dependency).iter().cloned() {
             (f)(item);
         }
     }
-    fn weak_dependency_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
-    {
+    fn weak_dependency_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.weak_dependency.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    type WeakDependencyIter<'a> = impl Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn weak_dependency_iter(&self) -> Self::WeakDependencyIter<'_> {
         self.weak_dependency.iter().cloned()
     }
-    type MessageTypeType = DescriptorProto;
     fn for_each_message_type<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::DescriptorProto)
-    {
+        F: FnMut(&'_ Self::DescriptorProtoType) {
         for item in (self.message_type).iter() {
             (f)(item);
         }
     }
-    fn message_type_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::DescriptorProto>>
-    {
+    fn message_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::DescriptorProtoType>> {
         ::std::boxed::Box::new(self.message_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type MessageTypeIter<'a> = impl Iterator<Item=&'a self::DescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn message_type_iter(&self) -> Self::MessageTypeIter<'_> {
         self.message_type.iter()
     }
-    type EnumTypeType = EnumDescriptorProto;
     fn for_each_enum_type<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::EnumDescriptorProto)
-    {
+        F: FnMut(&'_ Self::EnumDescriptorProtoType) {
         for item in (self.enum_type).iter() {
             (f)(item);
         }
     }
-    fn enum_type_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::EnumDescriptorProto>>
-    {
+    fn enum_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::EnumDescriptorProtoType>> {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type EnumTypeIter<'a> = impl Iterator<Item=&'a self::EnumDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
     }
-    type ServiceType = ServiceDescriptorProto;
     fn for_each_service<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::ServiceDescriptorProto)
-    {
+        F: FnMut(&'_ Self::ServiceDescriptorProtoType) {
         for item in (self.service).iter() {
             (f)(item);
         }
     }
-    fn service_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::ServiceDescriptorProto>>
-    {
+    fn service_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::ServiceDescriptorProtoType>> {
         ::std::boxed::Box::new(self.service.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ServiceIter<'a> = impl Iterator<Item=&'a self::ServiceDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn service_iter(&self) -> Self::ServiceIter<'_> {
         self.service.iter()
     }
-    type ExtensionType = FieldDescriptorProto;
     fn for_each_extension<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::FieldDescriptorProto)
-    {
+        F: FnMut(&'_ Self::FieldDescriptorProtoType) {
         for item in (self.extension).iter() {
             (f)(item);
         }
     }
-    fn extension_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::FieldDescriptorProto>>
-    {
+    fn extension_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FieldDescriptorProtoType>> {
         ::std::boxed::Box::new(self.extension.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionIter<'a> = impl Iterator<Item=&'a self::FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
     }
-    type OptionsType = FileOptions;
-    fn options(&self) -> ::std::option::Option<&'_ self::FileOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::FileOptionsType> {
         self.options.as_deref()
     }
-    type SourceCodeInfoType = SourceCodeInfo;
-    fn source_code_info(&self) -> ::std::option::Option<&'_ self::SourceCodeInfo> {
+    fn source_code_info(&'_ self) -> ::std::option::Option<&'_ Self::SourceCodeInfoType> {
         self.source_code_info.as_deref()
     }
-    fn syntax(&self) -> ::std::option::Option<&'_ str> {
+    fn syntax(&'_ self) -> ::std::option::Option<&'_ str> {
         self.syntax.as_deref()
     }
 }
@@ -9286,158 +9157,145 @@ impl<'bump> FileDescriptorProtoTrait for FileDescriptorProtoBumpalo<'bump> {
     type FieldDescriptorProtoType = FieldDescriptorProtoBumpalo<'bump>;
     type FileOptionsType = FileOptionsBumpalo<'bump>;
     type SourceCodeInfoType = SourceCodeInfoBumpalo<'bump>;
-    fn name(&self) -> ::std::option::Option<&'_ str> {
+    #[cfg(feature = "puroro-nightly")]
+    type DependencyIter<'a> = impl ::std::iter::Iterator<Item = &'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    type PublicDependencyIter<'a> = impl ::std::iter::Iterator<Item = i32>;
+    #[cfg(feature = "puroro-nightly")]
+    type WeakDependencyIter<'a> = impl ::std::iter::Iterator<Item = i32>;
+    #[cfg(feature = "puroro-nightly")]
+    type MessageTypeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::DescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type EnumTypeIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::EnumDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ServiceIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::ServiceDescriptorProtoType>;
+    #[cfg(feature = "puroro-nightly")]
+    type ExtensionIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::FieldDescriptorProtoType>;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    fn package(&self) -> ::std::option::Option<&'_ str> {
+    fn package(&'_ self) -> ::std::option::Option<&'_ str> {
         self.package.as_deref()
     }
     fn for_each_dependency<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ str)
-    {
+        F: FnMut(&'_ str) {
         for item in (self.dependency).iter().map(|v| v.as_ref()) {
             (f)(item);
         }
     }
-    fn dependency_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>
-    {
+    fn dependency_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.dependency.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
-    type DependencyIter<'a> = impl Iterator<Item=&'a str>;
     #[cfg(feature = "puroro-nightly")]
     fn dependency_iter(&self) -> Self::DependencyIter<'_> {
         self.dependency.iter().map(|v| v.as_ref())
     }
     fn for_each_public_dependency<F>(&self, mut f: F)
     where
-        F: FnMut(i32)
-    {
+        F: FnMut(i32) {
         for item in (self.public_dependency).iter().cloned() {
             (f)(item);
         }
     }
-    fn public_dependency_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
-    {
+    fn public_dependency_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.public_dependency.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    type PublicDependencyIter<'a> = impl Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn public_dependency_iter(&self) -> Self::PublicDependencyIter<'_> {
         self.public_dependency.iter().cloned()
     }
     fn for_each_weak_dependency<F>(&self, mut f: F)
     where
-        F: FnMut(i32)
-    {
+        F: FnMut(i32) {
         for item in (self.weak_dependency).iter().cloned() {
             (f)(item);
         }
     }
-    fn weak_dependency_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=i32>>
-    {
+    fn weak_dependency_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.weak_dependency.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    type WeakDependencyIter<'a> = impl Iterator<Item=i32>;
     #[cfg(feature = "puroro-nightly")]
     fn weak_dependency_iter(&self) -> Self::WeakDependencyIter<'_> {
         self.weak_dependency.iter().cloned()
     }
-    type MessageTypeType = DescriptorProtoBumpalo<'bump>;
     fn for_each_message_type<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::DescriptorProto)
-    {
+        F: FnMut(&'_ Self::DescriptorProtoType) {
         for item in (self.message_type).iter() {
             (f)(item);
         }
     }
-    fn message_type_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::DescriptorProto>>
-    {
+    fn message_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::DescriptorProtoType>> {
         ::std::boxed::Box::new(self.message_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type MessageTypeIter<'a> = impl Iterator<Item=&'a self::DescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn message_type_iter(&self) -> Self::MessageTypeIter<'_> {
         self.message_type.iter()
     }
-    type EnumTypeType = EnumDescriptorProtoBumpalo<'bump>;
     fn for_each_enum_type<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::EnumDescriptorProto)
-    {
+        F: FnMut(&'_ Self::EnumDescriptorProtoType) {
         for item in (self.enum_type).iter() {
             (f)(item);
         }
     }
-    fn enum_type_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::EnumDescriptorProto>>
-    {
+    fn enum_type_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::EnumDescriptorProtoType>> {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type EnumTypeIter<'a> = impl Iterator<Item=&'a self::EnumDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
     }
-    type ServiceType = ServiceDescriptorProtoBumpalo<'bump>;
     fn for_each_service<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::ServiceDescriptorProto)
-    {
+        F: FnMut(&'_ Self::ServiceDescriptorProtoType) {
         for item in (self.service).iter() {
             (f)(item);
         }
     }
-    fn service_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::ServiceDescriptorProto>>
-    {
+    fn service_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::ServiceDescriptorProtoType>> {
         ::std::boxed::Box::new(self.service.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ServiceIter<'a> = impl Iterator<Item=&'a self::ServiceDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn service_iter(&self) -> Self::ServiceIter<'_> {
         self.service.iter()
     }
-    type ExtensionType = FieldDescriptorProtoBumpalo<'bump>;
     fn for_each_extension<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::FieldDescriptorProto)
-    {
+        F: FnMut(&'_ Self::FieldDescriptorProtoType) {
         for item in (self.extension).iter() {
             (f)(item);
         }
     }
-    fn extension_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::FieldDescriptorProto>>
-    {
+    fn extension_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FieldDescriptorProtoType>> {
         ::std::boxed::Box::new(self.extension.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type ExtensionIter<'a> = impl Iterator<Item=&'a self::FieldDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
     }
-    type OptionsType = FileOptionsBumpalo<'bump>;
-    fn options(&self) -> ::std::option::Option<&'_ self::FileOptions> {
+    fn options(&'_ self) -> ::std::option::Option<&'_ Self::FileOptionsType> {
         self.options.as_deref()
     }
-    type SourceCodeInfoType = SourceCodeInfoBumpalo<'bump>;
-    fn source_code_info(&self) -> ::std::option::Option<&'_ self::SourceCodeInfo> {
+    fn source_code_info(&'_ self) -> ::std::option::Option<&'_ Self::SourceCodeInfoType> {
         self.source_code_info.as_deref()
     }
-    fn syntax(&self) -> ::std::option::Option<&'_ str> {
+    fn syntax(&'_ self) -> ::std::option::Option<&'_ str> {
         self.syntax.as_deref()
     }
 }
@@ -9543,22 +9401,20 @@ impl ::puroro::Serializable for FileDescriptorSet {
 
 impl FileDescriptorSetTrait for FileDescriptorSet {
     type FileDescriptorProtoType = FileDescriptorProto;
-    type FileType = FileDescriptorProto;
+    #[cfg(feature = "puroro-nightly")]
+    type FileIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::FileDescriptorProtoType>;
     fn for_each_file<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::FileDescriptorProto)
-    {
+        F: FnMut(&'_ Self::FileDescriptorProtoType) {
         for item in (self.file).iter() {
             (f)(item);
         }
     }
-    fn file_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::FileDescriptorProto>>
-    {
+    fn file_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileDescriptorProtoType>> {
         ::std::boxed::Box::new(self.file.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a> = impl Iterator<Item=&'a self::FileDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_> {
         self.file.iter()
@@ -9644,22 +9500,20 @@ impl<'bump> ::puroro::Serializable for FileDescriptorSetBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileDescriptorSetTrait for FileDescriptorSetBumpalo<'bump> {
     type FileDescriptorProtoType = FileDescriptorProtoBumpalo<'bump>;
-    type FileType = FileDescriptorProtoBumpalo<'bump>;
+    #[cfg(feature = "puroro-nightly")]
+    type FileIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::FileDescriptorProtoType>;
     fn for_each_file<F>(&self, mut f: F)
     where
-        F: FnMut(&'_ self::FileDescriptorProto)
-    {
+        F: FnMut(&'_ Self::FileDescriptorProtoType) {
         for item in (self.file).iter() {
             (f)(item);
         }
     }
-    fn file_boxed_iter(&self) ->
-        ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ self::FileDescriptorProto>>
-    {
+    fn file_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileDescriptorProtoType>> {
         ::std::boxed::Box::new(self.file.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a> = impl Iterator<Item=&'a self::FileDescriptorProto>;
     #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_> {
         self.file.iter()

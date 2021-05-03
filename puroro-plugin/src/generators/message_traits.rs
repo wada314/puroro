@@ -53,7 +53,7 @@ type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>;\n",
                 ),
                 iter(self.msg.fields().map(|field| -> Result<Fragment<W>> {
                     // getter method decls
-                    Ok(match self.generate_getter_method_decls(field)? {
+                    Ok(match self.generate_getter_method_decls(field, false)? {
                         GetterMethods::ScalarField(decl) | GetterMethods::OptionalField(decl) => {
                             format!("{decl};\n", decl = decl).into()
                         }
@@ -78,6 +78,7 @@ type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>;\n",
     pub fn generate_getter_method_decls(
         &self,
         field: &'c FieldDescriptor<'c>,
+        has_body: bool,
     ) -> Result<GetterMethods> {
         Ok(match (field.label()?, field.type_()?) {
             (FieldLabel::Optional2, _) | (FieldLabel::Optional3, FieldType::Message(_)) => {
@@ -90,11 +91,12 @@ type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>;\n",
             (FieldLabel::Repeated, _) => GetterMethods::RepeatedField {
                 for_each: format!(
                     "\
-fn for_each_{name}<F>(&self, f: F)
+fn for_each_{name}<F>(&self, {maybe_mut}f: F)
 where
     F: FnMut({reftype})",
                     name = field.native_name()?,
                     reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
+                    maybe_mut = if has_body { "mut " } else { "" }
                 ),
                 boxed_iter: format!(
                     "\

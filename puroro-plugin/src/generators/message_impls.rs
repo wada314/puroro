@@ -1,5 +1,5 @@
 use super::message_frags::MessageImplFragmentGenerator;
-use super::message_traits::MessageTraitCodeGenerator;
+use super::message_traits::{GetterMethods, MessageTraitCodeGenerator};
 use super::writer::{func, indent, indent_n, iter, IntoFragment};
 use crate::context::{AllocatorType, Context};
 use crate::utils::{to_camel_case, Indentor};
@@ -288,119 +288,95 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                 iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
                     // typedefs for message types
                     Ok(format!(
-                        "type {assoc_type_name} = {actual_type_name}{gpb};\n",
-                        assoc_type_name = self.traits_gen.associated_msg_type_ident(msg)?,
+                        "type {assoc_type_ident} = {actual_type_name}{gpb};\n",
+                        assoc_type_ident = self.traits_gen.associated_msg_type_ident(msg)?,
                         actual_type_name = self
                             .frag_gen
                             .struct_name_with_relative_path(msg, self.msg.package()?)?,
                         gpb = self.frag_gen.struct_generic_params_bounds(&[]),
                     ))
                 })),
+                iter(
+                    // typedefs for repeated field iterators
+                    self.msg
+                        .fields()
+                        .filter(|field| matches!(field.label(), Ok(FieldLabel::Repeated)))
+                        .map(|field| {
+                            Ok(format!(
+                                "\
+#[cfg(feature = \"puroro-nightly\")]
+type {iter_ident}<'a> = impl ::std::iter::Iterator<Item = {reftype}>;\n",
+                                iter_ident = self.traits_gen.associated_iter_type_ident(field)?,
+                                reftype =
+                                    self.traits_gen.scalar_maybe_ref_type_name(field, "'a")?
+                            ))
+                        }),
+                ),
                 iter(self.msg.fields().map(|field| -> Result<_> {
-                    Ok((
-                        if let FieldType::Message(m) = field.type_()? {
-                            // Associated Type for the message type
-                            format!(
-                                "type {camel_name}Type = {submsg_type};\n",
-                                camel_name = to_camel_case(field.native_name()?),
-                                submsg_type =
-                                    self.frag_gen.type_name_of_msg(m, field.package()?)?,
-                            )
-                        } else {
-                            "".to_string()
-                        },
-                        match (field.label()?, field.type_()?) {
-                            (FieldLabel::Optional2, FieldType::Message(_))
-                            | (FieldLabel::Optional3, FieldType::Message(_)) => {
+                    Ok(
+                        match self.traits_gen.generate_getter_method_decls(field, true)? {
+                            GetterMethods::ScalarField(decl) => {
+                                let transform = match field.type_()? {
+                                    FieldType::String
+                                    | FieldType::Bytes
+                                    | FieldType::Message(_) => ".as_ref()",
+                                    _ => ".clone()",
+                                };
+
                                 format!(
-                                    "\
-fn {name}(&self) -> ::std::option::Option<{reftype}> {{
-    self.{name}.as_deref()
-}}\n",
-                                    name = field.native_name()?,
-                                    reftype = field.native_maybe_ref_type("'_")?,
+                                    "{decl} {{\n    self.{ident}{transform}\n}}\n",
+                                    decl = decl,
+                                    ident = field.native_name()?,
+                                    transform = transform,
                                 )
                             }
-                            (FieldLabel::Required, FieldType::Message(_)) => {
-                                format!(
-                                    "\
-fn {name}(&self) -> {reftype} {{
-    &self.{name}
-}}\n",
-                                    name = field.native_name()?,
-                                    reftype = field.native_maybe_ref_type("'_")?,
-                                )
-                            }
-                            (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
-                                // normal getter function.
-                                let process_ref = match field.type_()? {
-                                    FieldType::String | FieldType::Bytes => ".as_ref()",
-                                    FieldType::Message(_) => "", // This should be catched by the arm above
+                            GetterMethods::OptionalField(decl) => {
+                                let transform = match field.type_()? {
+                                    FieldType::String
+                                    | FieldType::Bytes
+                                    | FieldType::Message(_) => ".as_deref()",
                                     _ => ".clone()",
                                 };
                                 format!(
-                                    "\
-fn {name}(&self) -> {reftype} {{
-    self.{name}{process_ref}
-}}\n",
-                                    name = field.native_name()?,
-                                    reftype = field.native_maybe_ref_type("'_")?,
-                                    process_ref = process_ref,
+                                    "{decl} {{\n    self.{ident}{transform}\n}}\n",
+                                    decl = decl,
+                                    ident = field.native_name()?,
+                                    transform = transform,
                                 )
                             }
-                            (FieldLabel::Optional2, _) => {
-                                // getter function with Option.
-                                let process_ref = match field.type_()? {
-                                    FieldType::String | FieldType::Bytes => ".as_deref()",
-                                    FieldType::Message(_) => "", // This should be catched by the arm above
-                                    _ => ".clone()",
-                                };
-                                format!(
-                                    "\
-fn {name}(&self) -> ::std::option::Option<{reftype}> {{
-    self.{name}{process_ref}
-}}\n",
-                                    name = field.native_name()?,
-                                    reftype = field.native_maybe_ref_type("'_")?,
-                                    process_ref = process_ref,
-                                )
-                            }
-                            (FieldLabel::Repeated, _) => {
-                                let process_iter = match field.type_()? {
+                            GetterMethods::RepeatedField {
+                                for_each,
+                                boxed_iter,
+                                iter,
+                            } => {
+                                let transform_iter = match field.type_()? {
                                     FieldType::Message(_) => "",
                                     FieldType::String | FieldType::Bytes => ".map(|v| v.as_ref())",
                                     _ => ".cloned()",
                                 };
                                 format!(
                                     "\
-fn for_each_{name}<F>(&self, mut f: F)
-where
-    F: FnMut({reftype})
-{{
-    for item in (self.{name}).iter(){process_iter} {{
+{for_each} {{
+    for item in (self.{ident}).iter(){transform_iter} {{
         (f)(item);
     }}
 }}
-fn {name}_boxed_iter(&self) ->
-    ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>
-{{
-    ::std::boxed::Box::new(self.{name}.iter(){process_iter})
+{boxed_iter} {{
+    ::std::boxed::Box::new(self.{ident}.iter(){transform_iter})
 }}
 #[cfg(feature = \"puroro-nightly\")]
-type {camel_name}Iter<'a> = impl Iterator<Item={reftype_lt_a}>;
-#[cfg(feature = \"puroro-nightly\")]
-fn {name}_iter(&self) -> Self::{camel_name}Iter<'_> {{
-    self.{name}.iter(){process_iter}
+{iter} {{
+    self.{ident}.iter(){transform_iter}
 }}\n",
-                                    name = field.native_name()?,
-                                    camel_name = to_camel_case(field.native_name()?),
-                                    reftype = field.native_maybe_ref_type("'_")?,
-                                    process_iter = process_iter,
-                                    reftype_lt_a = field.native_maybe_ref_type("'a")?,
+                                    for_each = for_each,
+                                    boxed_iter = boxed_iter,
+                                    iter = iter,
+                                    ident = field.native_name()?,
+                                    transform_iter = transform_iter
                                 )
                             }
                         },
-                    ))
+                    )
                 })),
             )),
             "}}\n",
