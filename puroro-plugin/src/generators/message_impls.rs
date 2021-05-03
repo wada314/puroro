@@ -149,7 +149,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {{
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
@@ -166,7 +166,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
                         Ok(format!(
                             "\
 {number} => {{
-    <{type_} as DeserializableFieldFromIter<
+    <{type_} as FieldDeserFromIter<
         tags::{type_tag}, 
         tags::{label_tag}>>
     ::deser(&mut self.{name}, field, {default_func})?;
@@ -220,7 +220,7 @@ impl{gp} ::puroro_internal::ser::Serializable for {name}{gpb} {{
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
@@ -232,7 +232,7 @@ impl{gp} ::puroro_internal::ser::Serializable for {name}{gpb} {{
                 iter(self.msg.fields().map(|field| -> Result<_> {
                     Ok(format!(
                         "\
-<{type_} as SerializableField<
+<{type_} as FieldSer<
         tags::{type_tag}, 
         tags::{label_tag}>>
     ::ser(&self.{name}, serializer, {number})?;\n",

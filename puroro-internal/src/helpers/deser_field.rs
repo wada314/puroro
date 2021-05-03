@@ -20,7 +20,7 @@ impl DoDefaultCheck for tags::Required {}
 impl DoDefaultCheck for tags::Optional2 {}
 impl DoDefaultCheck for tags::Repeated {}
 
-pub trait DeserializableFieldFromIter<TypeTag, LabelTag>
+pub trait FieldDeserFromIter<TypeTag, LabelTag>
 where
     TypeTag: FieldTypeTag,
     LabelTag: FieldLabelTag,
@@ -59,7 +59,7 @@ where
 
 macro_rules! define_deser_scalar_variants {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
-        impl DeserializableFieldFromIter<$ttag, $ltag> for $ty {
+        impl FieldDeserFromIter<$ttag, $ltag> for $ty {
             type Item = $ty;
             fn deser<'a, 'b, I, F>(
                 &mut self,
@@ -117,7 +117,7 @@ define_deser_scalar_variants!(bool, tags::Bool, tags::Optional3);
 
 macro_rules! define_deser_scalar_enum {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
-        impl<T> DeserializableFieldFromIter<$ttag, $ltag> for $ty
+        impl<T> FieldDeserFromIter<$ttag, $ltag> for $ty
         where
             T: TryFrom<i32, Error = i32>,
         {
@@ -132,7 +132,7 @@ macro_rules! define_deser_scalar_enum {
                 F: Fn() -> Self::Item,
             {
                 let mut ival = 0i32;
-                <i32 as DeserializableFieldFromIter<tags::Int32, tags::Required>>::deser(
+                <i32 as FieldDeserFromIter<tags::Int32, tags::Required>>::deser(
                     &mut ival,
                     field,
                     Default::default,
@@ -150,7 +150,7 @@ define_deser_scalar_enum!(std::result::Result<T, i32>, tags::Enum<T>, tags::Opti
 
 macro_rules! define_deser_scalar_ld {
     ($ty:ty, $ttag:ty, $ltag:ty, $method:ident) => {
-        impl<'bump> DeserializableFieldFromIter<$ttag, $ltag> for $ty {
+        impl<'bump> FieldDeserFromIter<$ttag, $ltag> for $ty {
             type Item = $ty;
             fn deser<'a, 'b, I, F>(
                 &mut self,
@@ -223,7 +223,7 @@ define_deser_scalar_ld!(
 // Unlike C++ implementation, the required message field in Rust is not
 // wrapped by `Option` (and neither `Box`).
 // We don't need to worry about the recursive struct when the field is required.
-impl<T> DeserializableFieldFromIter<tags::Message<T>, tags::Required> for T
+impl<T> FieldDeserFromIter<tags::Message<T>, tags::Required> for T
 where
     T: crate::deser::DeserializableMessageFromIter,
 {
@@ -247,7 +247,7 @@ where
 
 macro_rules! define_deser_scalar_fixed {
     ($ty:ty, $ttag:ty, $ltag:ty, $bits:ident) => {
-        impl DeserializableFieldFromIter<$ttag, $ltag> for $ty {
+        impl FieldDeserFromIter<$ttag, $ltag> for $ty {
             type Item = $ty;
             fn deser<'a, 'b, I, F>(
                 &mut self,
@@ -289,7 +289,7 @@ define_deser_scalar_fixed!(u64, tags::Fixed64, tags::Optional3, Bits64);
 
 macro_rules! define_deser_optional_fields_from_scalar {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
-        impl<'bump> DeserializableFieldFromIter<$ttag, $ltag> for Option<$ty> {
+        impl<'bump> FieldDeserFromIter<$ttag, $ltag> for Option<$ty> {
             type Item = $ty;
             fn deser<'a, 'b, I, F>(
                 &mut self,
@@ -300,7 +300,7 @@ macro_rules! define_deser_optional_fields_from_scalar {
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
             {
-                <Self::Item as DeserializableFieldFromIter<$ttag, tags::Required>>::deser(
+                <Self::Item as FieldDeserFromIter<$ttag, tags::Required>>::deser(
                     self.get_or_insert_with(f),
                     field,
                     || unreachable!(),
@@ -338,8 +338,7 @@ define_deser_optional_fields_from_scalar!(i64, tags::SFixed64, tags::Optional2);
 define_deser_optional_fields_from_scalar!(u64, tags::Fixed64, tags::Optional2);
 
 // Enum, essentially same with the macro above but needs a generic type parameter.
-impl<T> DeserializableFieldFromIter<tags::Enum<T>, tags::Optional2>
-    for Option<std::result::Result<T, i32>>
+impl<T> FieldDeserFromIter<tags::Enum<T>, tags::Optional2> for Option<std::result::Result<T, i32>>
 where
     T: TryFrom<i32, Error = i32>,
 {
@@ -353,7 +352,7 @@ where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
     {
-        <Self::Item as DeserializableFieldFromIter<tags::Enum<T>, tags::Required>>::deser(
+        <Self::Item as FieldDeserFromIter<tags::Enum<T>, tags::Required>>::deser(
             self.get_or_insert_with(f),
             field,
             || unreachable!(),
@@ -370,7 +369,7 @@ macro_rules! define_deser_optional_message_field {
         define_deser_optional_message_field!($ltag, ::bumpalo::boxed::Box<'bump, T>);
     };
     ($ltag:ty, $box:ty) => {
-        impl<'bump, T> DeserializableFieldFromIter<tags::Message<T>, $ltag> for Option<$box>
+        impl<'bump, T> FieldDeserFromIter<tags::Message<T>, $ltag> for Option<$box>
         where
             T: crate::deser::DeserializableMessageFromIter,
         {
@@ -384,7 +383,7 @@ macro_rules! define_deser_optional_message_field {
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
             {
-                <T as DeserializableFieldFromIter<tags::Message<T>, tags::Required>>::deser(
+                <T as FieldDeserFromIter<tags::Message<T>, tags::Required>>::deser(
                     self.get_or_insert_with(f), // <- Auto deref works at here!
                     field,
                     || unreachable!(),
@@ -411,7 +410,7 @@ macro_rules! define_deser_repeated_variants {
         );
     };
     ($scalar:ty, $ttag:ty, $vec:ty) => {
-        impl<'bump> DeserializableFieldFromIter<$ttag, tags::Repeated> for $vec {
+        impl<'bump> FieldDeserFromIter<$ttag, tags::Repeated> for $vec {
             type Item = $scalar;
             fn deser<'a, 'b, I, F>(
                 &mut self,
@@ -465,7 +464,7 @@ macro_rules! define_deser_repeated_enum {
         );
     };
     ($vec:ty) => {
-        impl<'bump, T> DeserializableFieldFromIter<tags::Enum<T>, tags::Repeated> for $vec
+        impl<'bump, T> FieldDeserFromIter<tags::Enum<T>, tags::Repeated> for $vec
         where
             T: TryFrom<i32, Error = i32>,
         {
@@ -511,7 +510,7 @@ macro_rules! define_deser_repeated_ld {
         );
     };
     ($scalar:ty, $ttag:ty, $method:ident, $vec:ty) => {
-        impl<'bump> DeserializableFieldFromIter<$ttag, tags::Repeated> for $vec {
+        impl<'bump> FieldDeserFromIter<$ttag, tags::Repeated> for $vec {
             type Item = $scalar;
             fn deser<'a, 'b, I, F>(
                 &mut self,
@@ -551,7 +550,7 @@ macro_rules! define_deser_repeated_message {
         define_deser_repeated_message!(::bumpalo::collections::Vec<'bump, T>);
     };
     ($vec:ty) => {
-        impl<'bump, T> DeserializableFieldFromIter<tags::Message<T>, tags::Repeated> for $vec
+        impl<'bump, T> FieldDeserFromIter<tags::Message<T>, tags::Repeated> for $vec
         where
             T: crate::deser::DeserializableMessageFromIter,
         {
@@ -585,7 +584,7 @@ define_deser_repeated_message!();
 
 // The code generator must implement `DeserializableMessageFromIter` for tuple
 // `(&K, &V, PhantomData(KeyTag, ValueTag, Entry))`.
-impl<Entry> DeserializableFieldFromIter<tags::Message<Entry>, tags::Repeated>
+impl<Entry> FieldDeserFromIter<tags::Message<Entry>, tags::Repeated>
     for HashMap<Entry::KeyType, Entry::ValueType>
 where
     Entry: MapEntry,

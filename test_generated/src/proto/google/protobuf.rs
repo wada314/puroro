@@ -46,13 +46,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for GeneratedCodeIn
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::vec::Vec<generated_code_info::Annotation> as DeserializableFieldFromIter<
+                <::std::vec::Vec<generated_code_info::Annotation> as FieldDeserFromIter<
                     tags::Message<generated_code_info::Annotation>, 
                     tags::Repeated>>
                 ::deser(&mut self.annotation, field, ::std::default::Default::default)?;
@@ -77,9 +77,9 @@ impl ::puroro_internal::ser::Serializable for GeneratedCodeInfo {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::vec::Vec<generated_code_info::Annotation> as SerializableField<
+        <::std::vec::Vec<generated_code_info::Annotation> as FieldSer<
                 tags::Message<generated_code_info::Annotation>, 
                 tags::Repeated>>
             ::ser(&self.annotation, serializer, 1)?;
@@ -146,13 +146,13 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Generate
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<generated_code_info::AnnotationBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.annotation, field, || generated_code_info::AnnotationBumpalo::new_in(self.puroro_internal.bumpalo()))?;
@@ -177,9 +177,9 @@ impl<'bump> ::puroro_internal::ser::Serializable for GeneratedCodeInfoBumpalo<'b
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo<'bump>> as FieldSer<
                 tags::Message<generated_code_info::AnnotationBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.annotation, serializer, 1)?;
@@ -278,31 +278,31 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Annotation {
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::vec::Vec<i32> as DeserializableFieldFromIter<
+                <::std::vec::Vec<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Repeated>>
                 ::deser(&mut self.path, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.source_file, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.begin, field, ::std::default::Default::default)?;
             }
             4 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.end, field, ::std::default::Default::default)?;
@@ -327,21 +327,21 @@ impl ::puroro_internal::ser::Serializable for Annotation {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::vec::Vec<i32> as SerializableField<
+        <::std::vec::Vec<i32> as FieldSer<
                 tags::Int32, 
                 tags::Repeated>>
             ::ser(&self.path, serializer, 1)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.source_file, serializer, 2)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.begin, serializer, 3)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.end, serializer, 4)?;
@@ -422,31 +422,31 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Annotati
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::bumpalo::collections::Vec<'bump, i32> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Repeated>>
                 ::deser(&mut self.path, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.source_file, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.begin, field, ::std::default::Default::default)?;
             }
             4 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.end, field, ::std::default::Default::default)?;
@@ -471,21 +471,21 @@ impl<'bump> ::puroro_internal::ser::Serializable for AnnotationBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::bumpalo::collections::Vec<'bump, i32> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, i32> as FieldSer<
                 tags::Int32, 
                 tags::Repeated>>
             ::ser(&self.path, serializer, 1)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.source_file, serializer, 2)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.begin, serializer, 3)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.end, serializer, 4)?;
@@ -584,13 +584,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for SourceCodeInfo 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::vec::Vec<source_code_info::Location> as DeserializableFieldFromIter<
+                <::std::vec::Vec<source_code_info::Location> as FieldDeserFromIter<
                     tags::Message<source_code_info::Location>, 
                     tags::Repeated>>
                 ::deser(&mut self.location, field, ::std::default::Default::default)?;
@@ -615,9 +615,9 @@ impl ::puroro_internal::ser::Serializable for SourceCodeInfo {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::vec::Vec<source_code_info::Location> as SerializableField<
+        <::std::vec::Vec<source_code_info::Location> as FieldSer<
                 tags::Message<source_code_info::Location>, 
                 tags::Repeated>>
             ::ser(&self.location, serializer, 1)?;
@@ -684,13 +684,13 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for SourceCo
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<source_code_info::LocationBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.location, field, || source_code_info::LocationBumpalo::new_in(self.puroro_internal.bumpalo()))?;
@@ -715,9 +715,9 @@ impl<'bump> ::puroro_internal::ser::Serializable for SourceCodeInfoBumpalo<'bump
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo<'bump>> as FieldSer<
                 tags::Message<source_code_info::LocationBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.location, serializer, 1)?;
@@ -837,37 +837,37 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Location {
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::vec::Vec<i32> as DeserializableFieldFromIter<
+                <::std::vec::Vec<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Repeated>>
                 ::deser(&mut self.path, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::vec::Vec<i32> as DeserializableFieldFromIter<
+                <::std::vec::Vec<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Repeated>>
                 ::deser(&mut self.span, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.leading_comments, field, ::std::default::Default::default)?;
             }
             4 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.trailing_comments, field, ::std::default::Default::default)?;
             }
             6 => {
-                <::std::vec::Vec<::std::string::String> as DeserializableFieldFromIter<
+                <::std::vec::Vec<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Repeated>>
                 ::deser(&mut self.leading_detached_comments, field, ::std::default::Default::default)?;
@@ -892,25 +892,25 @@ impl ::puroro_internal::ser::Serializable for Location {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::vec::Vec<i32> as SerializableField<
+        <::std::vec::Vec<i32> as FieldSer<
                 tags::Int32, 
                 tags::Repeated>>
             ::ser(&self.path, serializer, 1)?;
-        <::std::vec::Vec<i32> as SerializableField<
+        <::std::vec::Vec<i32> as FieldSer<
                 tags::Int32, 
                 tags::Repeated>>
             ::ser(&self.span, serializer, 2)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.leading_comments, serializer, 3)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.trailing_comments, serializer, 4)?;
-        <::std::vec::Vec<::std::string::String> as SerializableField<
+        <::std::vec::Vec<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Repeated>>
             ::ser(&self.leading_detached_comments, serializer, 6)?;
@@ -1026,37 +1026,37 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Location
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::bumpalo::collections::Vec<'bump, i32> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Repeated>>
                 ::deser(&mut self.path, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::bumpalo::collections::Vec<'bump, i32> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Repeated>>
                 ::deser(&mut self.span, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.leading_comments, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             4 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.trailing_comments, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             6 => {
-                <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Repeated>>
                 ::deser(&mut self.leading_detached_comments, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
@@ -1081,25 +1081,25 @@ impl<'bump> ::puroro_internal::ser::Serializable for LocationBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::bumpalo::collections::Vec<'bump, i32> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, i32> as FieldSer<
                 tags::Int32, 
                 tags::Repeated>>
             ::ser(&self.path, serializer, 1)?;
-        <::bumpalo::collections::Vec<'bump, i32> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, i32> as FieldSer<
                 tags::Int32, 
                 tags::Repeated>>
             ::ser(&self.span, serializer, 2)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.leading_comments, serializer, 3)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.trailing_comments, serializer, 4)?;
-        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Repeated>>
             ::ser(&self.leading_detached_comments, serializer, 6)?;
@@ -1249,49 +1249,49 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for UninterpretedOp
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             2 => {
-                <::std::vec::Vec<uninterpreted_option::NamePart> as DeserializableFieldFromIter<
+                <::std::vec::Vec<uninterpreted_option::NamePart> as FieldDeserFromIter<
                     tags::Message<uninterpreted_option::NamePart>, 
                     tags::Repeated>>
                 ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.identifier_value, field, ::std::default::Default::default)?;
             }
             4 => {
-                <::std::option::Option<u64> as DeserializableFieldFromIter<
+                <::std::option::Option<u64> as FieldDeserFromIter<
                     tags::UInt64, 
                     tags::Optional2>>
                 ::deser(&mut self.positive_int_value, field, ::std::default::Default::default)?;
             }
             5 => {
-                <::std::option::Option<i64> as DeserializableFieldFromIter<
+                <::std::option::Option<i64> as FieldDeserFromIter<
                     tags::Int64, 
                     tags::Optional2>>
                 ::deser(&mut self.negative_int_value, field, ::std::default::Default::default)?;
             }
             6 => {
-                <::std::option::Option<f64> as DeserializableFieldFromIter<
+                <::std::option::Option<f64> as FieldDeserFromIter<
                     tags::Double, 
                     tags::Optional2>>
                 ::deser(&mut self.double_value, field, ::std::default::Default::default)?;
             }
             7 => {
-                <::std::option::Option<::std::vec::Vec<u8>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::vec::Vec<u8>> as FieldDeserFromIter<
                     tags::Bytes, 
                     tags::Optional2>>
                 ::deser(&mut self.string_value, field, ::std::default::Default::default)?;
             }
             8 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.aggregate_value, field, ::std::default::Default::default)?;
@@ -1316,33 +1316,33 @@ impl ::puroro_internal::ser::Serializable for UninterpretedOption {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::vec::Vec<uninterpreted_option::NamePart> as SerializableField<
+        <::std::vec::Vec<uninterpreted_option::NamePart> as FieldSer<
                 tags::Message<uninterpreted_option::NamePart>, 
                 tags::Repeated>>
             ::ser(&self.name, serializer, 2)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.identifier_value, serializer, 3)?;
-        <::std::option::Option<u64> as SerializableField<
+        <::std::option::Option<u64> as FieldSer<
                 tags::UInt64, 
                 tags::Optional2>>
             ::ser(&self.positive_int_value, serializer, 4)?;
-        <::std::option::Option<i64> as SerializableField<
+        <::std::option::Option<i64> as FieldSer<
                 tags::Int64, 
                 tags::Optional2>>
             ::ser(&self.negative_int_value, serializer, 5)?;
-        <::std::option::Option<f64> as SerializableField<
+        <::std::option::Option<f64> as FieldSer<
                 tags::Double, 
                 tags::Optional2>>
             ::ser(&self.double_value, serializer, 6)?;
-        <::std::option::Option<::std::vec::Vec<u8>> as SerializableField<
+        <::std::option::Option<::std::vec::Vec<u8>> as FieldSer<
                 tags::Bytes, 
                 tags::Optional2>>
             ::ser(&self.string_value, serializer, 7)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.aggregate_value, serializer, 8)?;
@@ -1439,49 +1439,49 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Uninterp
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             2 => {
-                <::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<uninterpreted_option::NamePartBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.name, field, || uninterpreted_option::NamePartBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.identifier_value, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             4 => {
-                <::std::option::Option<u64> as DeserializableFieldFromIter<
+                <::std::option::Option<u64> as FieldDeserFromIter<
                     tags::UInt64, 
                     tags::Optional2>>
                 ::deser(&mut self.positive_int_value, field, ::std::default::Default::default)?;
             }
             5 => {
-                <::std::option::Option<i64> as DeserializableFieldFromIter<
+                <::std::option::Option<i64> as FieldDeserFromIter<
                     tags::Int64, 
                     tags::Optional2>>
                 ::deser(&mut self.negative_int_value, field, ::std::default::Default::default)?;
             }
             6 => {
-                <::std::option::Option<f64> as DeserializableFieldFromIter<
+                <::std::option::Option<f64> as FieldDeserFromIter<
                     tags::Double, 
                     tags::Optional2>>
                 ::deser(&mut self.double_value, field, ::std::default::Default::default)?;
             }
             7 => {
-                <::std::option::Option<::bumpalo::collections::Vec<'bump, u8>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::Vec<'bump, u8>> as FieldDeserFromIter<
                     tags::Bytes, 
                     tags::Optional2>>
                 ::deser(&mut self.string_value, field, || ::bumpalo::collections::Vec::new_in(self.puroro_internal.bumpalo()))?;
             }
             8 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.aggregate_value, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
@@ -1506,33 +1506,33 @@ impl<'bump> ::puroro_internal::ser::Serializable for UninterpretedOptionBumpalo<
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo<'bump>> as FieldSer<
                 tags::Message<uninterpreted_option::NamePartBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.name, serializer, 2)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.identifier_value, serializer, 3)?;
-        <::std::option::Option<u64> as SerializableField<
+        <::std::option::Option<u64> as FieldSer<
                 tags::UInt64, 
                 tags::Optional2>>
             ::ser(&self.positive_int_value, serializer, 4)?;
-        <::std::option::Option<i64> as SerializableField<
+        <::std::option::Option<i64> as FieldSer<
                 tags::Int64, 
                 tags::Optional2>>
             ::ser(&self.negative_int_value, serializer, 5)?;
-        <::std::option::Option<f64> as SerializableField<
+        <::std::option::Option<f64> as FieldSer<
                 tags::Double, 
                 tags::Optional2>>
             ::ser(&self.double_value, serializer, 6)?;
-        <::std::option::Option<::bumpalo::collections::Vec<'bump, u8>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::Vec<'bump, u8>> as FieldSer<
                 tags::Bytes, 
                 tags::Optional2>>
             ::ser(&self.string_value, serializer, 7)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.aggregate_value, serializer, 8)?;
@@ -1634,19 +1634,19 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for NamePart {
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::string::String as DeserializableFieldFromIter<
+                <::std::string::String as FieldDeserFromIter<
                     tags::String, 
                     tags::Required>>
                 ::deser(&mut self.name_part, field, ::std::default::Default::default)?;
             }
             2 => {
-                <bool as DeserializableFieldFromIter<
+                <bool as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Required>>
                 ::deser(&mut self.is_extension, field, ::std::default::Default::default)?;
@@ -1671,13 +1671,13 @@ impl ::puroro_internal::ser::Serializable for NamePart {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::string::String as SerializableField<
+        <::std::string::String as FieldSer<
                 tags::String, 
                 tags::Required>>
             ::ser(&self.name_part, serializer, 1)?;
-        <bool as SerializableField<
+        <bool as FieldSer<
                 tags::Bool, 
                 tags::Required>>
             ::ser(&self.is_extension, serializer, 2)?;
@@ -1733,19 +1733,19 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for NamePart
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::bumpalo::collections::String<'bump> as DeserializableFieldFromIter<
+                <::bumpalo::collections::String<'bump> as FieldDeserFromIter<
                     tags::String, 
                     tags::Required>>
                 ::deser(&mut self.name_part, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             2 => {
-                <bool as DeserializableFieldFromIter<
+                <bool as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Required>>
                 ::deser(&mut self.is_extension, field, ::std::default::Default::default)?;
@@ -1770,13 +1770,13 @@ impl<'bump> ::puroro_internal::ser::Serializable for NamePartBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::bumpalo::collections::String<'bump> as SerializableField<
+        <::bumpalo::collections::String<'bump> as FieldSer<
                 tags::String, 
                 tags::Required>>
             ::ser(&self.name_part, serializer, 1)?;
-        <bool as SerializableField<
+        <bool as FieldSer<
                 tags::Bool, 
                 tags::Required>>
             ::ser(&self.is_extension, serializer, 2)?;
@@ -1860,25 +1860,25 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MethodOptions {
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             33 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             34 => {
-                <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as FieldDeserFromIter<
                     tags::Enum<method_options::IdempotencyLevel>, 
                     tags::Optional2>>
                 ::deser(&mut self.idempotency_level, field, || 0i32.try_into())?;
             }
             999 => {
-                <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<
+                <::std::vec::Vec<UninterpretedOption> as FieldDeserFromIter<
                     tags::Message<UninterpretedOption>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
@@ -1903,17 +1903,17 @@ impl ::puroro_internal::ser::Serializable for MethodOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 33)?;
-        <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as SerializableField<
+        <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as FieldSer<
                 tags::Enum<method_options::IdempotencyLevel>, 
                 tags::Optional2>>
             ::ser(&self.idempotency_level, serializer, 34)?;
-        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+        <::std::vec::Vec<UninterpretedOption> as FieldSer<
                 tags::Message<UninterpretedOption>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -1990,25 +1990,25 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MethodOp
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             33 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             34 => {
-                <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as FieldDeserFromIter<
                     tags::Enum<method_options::IdempotencyLevel>, 
                     tags::Optional2>>
                 ::deser(&mut self.idempotency_level, field, || 0i32.try_into())?;
             }
             999 => {
-                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
@@ -2033,17 +2033,17 @@ impl<'bump> ::puroro_internal::ser::Serializable for MethodOptionsBumpalo<'bump>
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 33)?;
-        <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as SerializableField<
+        <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as FieldSer<
                 tags::Enum<method_options::IdempotencyLevel>, 
                 tags::Optional2>>
             ::ser(&self.idempotency_level, serializer, 34)?;
-        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldSer<
                 tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -2166,19 +2166,19 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ServiceOptions 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             33 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             999 => {
-                <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<
+                <::std::vec::Vec<UninterpretedOption> as FieldDeserFromIter<
                     tags::Message<UninterpretedOption>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
@@ -2203,13 +2203,13 @@ impl ::puroro_internal::ser::Serializable for ServiceOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 33)?;
-        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+        <::std::vec::Vec<UninterpretedOption> as FieldSer<
                 tags::Message<UninterpretedOption>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -2281,19 +2281,19 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for ServiceO
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             33 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             999 => {
-                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
@@ -2318,13 +2318,13 @@ impl<'bump> ::puroro_internal::ser::Serializable for ServiceOptionsBumpalo<'bump
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 33)?;
-        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldSer<
                 tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -2420,19 +2420,19 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumValueOption
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             999 => {
-                <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<
+                <::std::vec::Vec<UninterpretedOption> as FieldDeserFromIter<
                     tags::Message<UninterpretedOption>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
@@ -2457,13 +2457,13 @@ impl ::puroro_internal::ser::Serializable for EnumValueOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 1)?;
-        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+        <::std::vec::Vec<UninterpretedOption> as FieldSer<
                 tags::Message<UninterpretedOption>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -2535,19 +2535,19 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumValu
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             999 => {
-                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
@@ -2572,13 +2572,13 @@ impl<'bump> ::puroro_internal::ser::Serializable for EnumValueOptionsBumpalo<'bu
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 1)?;
-        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldSer<
                 tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -2677,25 +2677,25 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumOptions {
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             2 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.allow_alias, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             999 => {
-                <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<
+                <::std::vec::Vec<UninterpretedOption> as FieldDeserFromIter<
                     tags::Message<UninterpretedOption>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
@@ -2720,17 +2720,17 @@ impl ::puroro_internal::ser::Serializable for EnumOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.allow_alias, serializer, 2)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 3)?;
-        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+        <::std::vec::Vec<UninterpretedOption> as FieldSer<
                 tags::Message<UninterpretedOption>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -2807,25 +2807,25 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumOpti
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             2 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.allow_alias, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             999 => {
-                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
@@ -2850,17 +2850,17 @@ impl<'bump> ::puroro_internal::ser::Serializable for EnumOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.allow_alias, serializer, 2)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 3)?;
-        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldSer<
                 tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -2956,13 +2956,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for OneofOptions {
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             999 => {
-                <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<
+                <::std::vec::Vec<UninterpretedOption> as FieldDeserFromIter<
                     tags::Message<UninterpretedOption>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
@@ -2987,9 +2987,9 @@ impl ::puroro_internal::ser::Serializable for OneofOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+        <::std::vec::Vec<UninterpretedOption> as FieldSer<
                 tags::Message<UninterpretedOption>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -3056,13 +3056,13 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for OneofOpt
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             999 => {
-                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
@@ -3087,9 +3087,9 @@ impl<'bump> ::puroro_internal::ser::Serializable for OneofOptionsBumpalo<'bump> 
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldSer<
                 tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -3197,49 +3197,49 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FieldOptions {
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as FieldDeserFromIter<
                     tags::Enum<field_options::Ctype>, 
                     tags::Optional2>>
                 ::deser(&mut self.ctype, field, || 0i32.try_into())?;
             }
             2 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.packed, field, ::std::default::Default::default)?;
             }
             6 => {
-                <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as FieldDeserFromIter<
                     tags::Enum<field_options::Jstype>, 
                     tags::Optional2>>
                 ::deser(&mut self.jstype, field, || 0i32.try_into())?;
             }
             5 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.lazy, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             10 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.weak, field, ::std::default::Default::default)?;
             }
             999 => {
-                <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<
+                <::std::vec::Vec<UninterpretedOption> as FieldDeserFromIter<
                     tags::Message<UninterpretedOption>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
@@ -3264,33 +3264,33 @@ impl ::puroro_internal::ser::Serializable for FieldOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as SerializableField<
+        <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as FieldSer<
                 tags::Enum<field_options::Ctype>, 
                 tags::Optional2>>
             ::ser(&self.ctype, serializer, 1)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.packed, serializer, 2)?;
-        <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as SerializableField<
+        <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as FieldSer<
                 tags::Enum<field_options::Jstype>, 
                 tags::Optional2>>
             ::ser(&self.jstype, serializer, 6)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.lazy, serializer, 5)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 3)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.weak, serializer, 10)?;
-        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+        <::std::vec::Vec<UninterpretedOption> as FieldSer<
                 tags::Message<UninterpretedOption>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -3387,49 +3387,49 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FieldOpt
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as FieldDeserFromIter<
                     tags::Enum<field_options::Ctype>, 
                     tags::Optional2>>
                 ::deser(&mut self.ctype, field, || 0i32.try_into())?;
             }
             2 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.packed, field, ::std::default::Default::default)?;
             }
             6 => {
-                <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as FieldDeserFromIter<
                     tags::Enum<field_options::Jstype>, 
                     tags::Optional2>>
                 ::deser(&mut self.jstype, field, || 0i32.try_into())?;
             }
             5 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.lazy, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             10 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.weak, field, ::std::default::Default::default)?;
             }
             999 => {
-                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
@@ -3454,33 +3454,33 @@ impl<'bump> ::puroro_internal::ser::Serializable for FieldOptionsBumpalo<'bump> 
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as SerializableField<
+        <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as FieldSer<
                 tags::Enum<field_options::Ctype>, 
                 tags::Optional2>>
             ::ser(&self.ctype, serializer, 1)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.packed, serializer, 2)?;
-        <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as SerializableField<
+        <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as FieldSer<
                 tags::Enum<field_options::Jstype>, 
                 tags::Optional2>>
             ::ser(&self.jstype, serializer, 6)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.lazy, serializer, 5)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 3)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.weak, serializer, 10)?;
-        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldSer<
                 tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -3646,37 +3646,37 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MessageOptions 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.message_set_wire_format, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.no_standard_descriptor_accessor, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             7 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.map_entry, field, ::std::default::Default::default)?;
             }
             999 => {
-                <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<
+                <::std::vec::Vec<UninterpretedOption> as FieldDeserFromIter<
                     tags::Message<UninterpretedOption>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
@@ -3701,25 +3701,25 @@ impl ::puroro_internal::ser::Serializable for MessageOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.message_set_wire_format, serializer, 1)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.no_standard_descriptor_accessor, serializer, 2)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 3)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.map_entry, serializer, 7)?;
-        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+        <::std::vec::Vec<UninterpretedOption> as FieldSer<
                 tags::Message<UninterpretedOption>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -3806,37 +3806,37 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MessageO
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.message_set_wire_format, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.no_standard_descriptor_accessor, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             7 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.map_entry, field, ::std::default::Default::default)?;
             }
             999 => {
-                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
@@ -3861,25 +3861,25 @@ impl<'bump> ::puroro_internal::ser::Serializable for MessageOptionsBumpalo<'bump
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.message_set_wire_format, serializer, 1)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.no_standard_descriptor_accessor, serializer, 2)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 3)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.map_entry, serializer, 7)?;
-        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldSer<
                 tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -4041,133 +4041,133 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileOptions {
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.java_package, field, ::std::default::Default::default)?;
             }
             8 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.java_outer_classname, field, ::std::default::Default::default)?;
             }
             10 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.java_multiple_files, field, ::std::default::Default::default)?;
             }
             20 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.java_generate_equals_and_hash, field, ::std::default::Default::default)?;
             }
             27 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.java_string_check_utf8, field, ::std::default::Default::default)?;
             }
             9 => {
-                <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as FieldDeserFromIter<
                     tags::Enum<file_options::OptimizeMode>, 
                     tags::Optional2>>
                 ::deser(&mut self.optimize_for, field, || 0i32.try_into())?;
             }
             11 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.go_package, field, ::std::default::Default::default)?;
             }
             16 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.cc_generic_services, field, ::std::default::Default::default)?;
             }
             17 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.java_generic_services, field, ::std::default::Default::default)?;
             }
             18 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.py_generic_services, field, ::std::default::Default::default)?;
             }
             42 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.php_generic_services, field, ::std::default::Default::default)?;
             }
             23 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             31 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.cc_enable_arenas, field, ::std::default::Default::default)?;
             }
             36 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.objc_class_prefix, field, ::std::default::Default::default)?;
             }
             37 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.csharp_namespace, field, ::std::default::Default::default)?;
             }
             39 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.swift_prefix, field, ::std::default::Default::default)?;
             }
             40 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.php_class_prefix, field, ::std::default::Default::default)?;
             }
             41 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.php_namespace, field, ::std::default::Default::default)?;
             }
             44 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.php_metadata_namespace, field, ::std::default::Default::default)?;
             }
             45 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.ruby_package, field, ::std::default::Default::default)?;
             }
             999 => {
-                <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<
+                <::std::vec::Vec<UninterpretedOption> as FieldDeserFromIter<
                     tags::Message<UninterpretedOption>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
@@ -4192,89 +4192,89 @@ impl ::puroro_internal::ser::Serializable for FileOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.java_package, serializer, 1)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.java_outer_classname, serializer, 8)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.java_multiple_files, serializer, 10)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.java_generate_equals_and_hash, serializer, 20)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.java_string_check_utf8, serializer, 27)?;
-        <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as SerializableField<
+        <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as FieldSer<
                 tags::Enum<file_options::OptimizeMode>, 
                 tags::Optional2>>
             ::ser(&self.optimize_for, serializer, 9)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.go_package, serializer, 11)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.cc_generic_services, serializer, 16)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.java_generic_services, serializer, 17)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.py_generic_services, serializer, 18)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.php_generic_services, serializer, 42)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 23)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.cc_enable_arenas, serializer, 31)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.objc_class_prefix, serializer, 36)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.csharp_namespace, serializer, 37)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.swift_prefix, serializer, 39)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.php_class_prefix, serializer, 40)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.php_namespace, serializer, 41)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.php_metadata_namespace, serializer, 44)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.ruby_package, serializer, 45)?;
-        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+        <::std::vec::Vec<UninterpretedOption> as FieldSer<
                 tags::Message<UninterpretedOption>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -4441,133 +4441,133 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileOpti
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.java_package, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             8 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.java_outer_classname, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             10 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.java_multiple_files, field, ::std::default::Default::default)?;
             }
             20 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.java_generate_equals_and_hash, field, ::std::default::Default::default)?;
             }
             27 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.java_string_check_utf8, field, ::std::default::Default::default)?;
             }
             9 => {
-                <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as FieldDeserFromIter<
                     tags::Enum<file_options::OptimizeMode>, 
                     tags::Optional2>>
                 ::deser(&mut self.optimize_for, field, || 0i32.try_into())?;
             }
             11 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.go_package, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             16 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.cc_generic_services, field, ::std::default::Default::default)?;
             }
             17 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.java_generic_services, field, ::std::default::Default::default)?;
             }
             18 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.py_generic_services, field, ::std::default::Default::default)?;
             }
             42 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.php_generic_services, field, ::std::default::Default::default)?;
             }
             23 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.deprecated, field, ::std::default::Default::default)?;
             }
             31 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.cc_enable_arenas, field, ::std::default::Default::default)?;
             }
             36 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.objc_class_prefix, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             37 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.csharp_namespace, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             39 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.swift_prefix, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             40 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.php_class_prefix, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             41 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.php_namespace, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             44 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.php_metadata_namespace, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             45 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.ruby_package, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             999 => {
-                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
@@ -4592,89 +4592,89 @@ impl<'bump> ::puroro_internal::ser::Serializable for FileOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.java_package, serializer, 1)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.java_outer_classname, serializer, 8)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.java_multiple_files, serializer, 10)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.java_generate_equals_and_hash, serializer, 20)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.java_string_check_utf8, serializer, 27)?;
-        <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as SerializableField<
+        <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as FieldSer<
                 tags::Enum<file_options::OptimizeMode>, 
                 tags::Optional2>>
             ::ser(&self.optimize_for, serializer, 9)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.go_package, serializer, 11)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.cc_generic_services, serializer, 16)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.java_generic_services, serializer, 17)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.py_generic_services, serializer, 18)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.php_generic_services, serializer, 42)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.deprecated, serializer, 23)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.cc_enable_arenas, serializer, 31)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.objc_class_prefix, serializer, 36)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.csharp_namespace, serializer, 37)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.swift_prefix, serializer, 39)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.php_class_prefix, serializer, 40)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.php_namespace, serializer, 41)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.php_metadata_namespace, serializer, 44)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.ruby_package, serializer, 45)?;
-        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldSer<
                 tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -4854,43 +4854,43 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MethodDescripto
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.input_type, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.output_type, field, ::std::default::Default::default)?;
             }
             4 => {
-                <::std::option::Option<::std::boxed::Box<MethodOptions>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::boxed::Box<MethodOptions>> as FieldDeserFromIter<
                     tags::Message<MethodOptions>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             5 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.client_streaming, field, ::std::default::Default::default)?;
             }
             6 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.server_streaming, field, ::std::default::Default::default)?;
@@ -4915,29 +4915,29 @@ impl ::puroro_internal::ser::Serializable for MethodDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.input_type, serializer, 2)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.output_type, serializer, 3)?;
-        <::std::option::Option<::std::boxed::Box<MethodOptions>> as SerializableField<
+        <::std::option::Option<::std::boxed::Box<MethodOptions>> as FieldSer<
                 tags::Message<MethodOptions>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 4)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.client_streaming, serializer, 5)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.server_streaming, serializer, 6)?;
@@ -5014,43 +5014,43 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MethodDe
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             2 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.input_type, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.output_type, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             4 => {
-                <::std::option::Option<::bumpalo::boxed::Box<'bump, MethodOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::boxed::Box<'bump, MethodOptionsBumpalo<'bump>>> as FieldDeserFromIter<
                     tags::Message<MethodOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(MethodOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             5 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.client_streaming, field, ::std::default::Default::default)?;
             }
             6 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.server_streaming, field, ::std::default::Default::default)?;
@@ -5075,29 +5075,29 @@ impl<'bump> ::puroro_internal::ser::Serializable for MethodDescriptorProtoBumpal
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.input_type, serializer, 2)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.output_type, serializer, 3)?;
-        <::std::option::Option<::bumpalo::boxed::Box<'bump, MethodOptionsBumpalo<'bump>>> as SerializableField<
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, MethodOptionsBumpalo<'bump>>> as FieldSer<
                 tags::Message<MethodOptionsBumpalo<'bump>>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 4)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.client_streaming, serializer, 5)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.server_streaming, serializer, 6)?;
@@ -5194,25 +5194,25 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ServiceDescript
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::vec::Vec<MethodDescriptorProto> as DeserializableFieldFromIter<
+                <::std::vec::Vec<MethodDescriptorProto> as FieldDeserFromIter<
                     tags::Message<MethodDescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.method, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<::std::boxed::Box<ServiceOptions>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::boxed::Box<ServiceOptions>> as FieldDeserFromIter<
                     tags::Message<ServiceOptions>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, ::std::default::Default::default)?;
@@ -5237,17 +5237,17 @@ impl ::puroro_internal::ser::Serializable for ServiceDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::vec::Vec<MethodDescriptorProto> as SerializableField<
+        <::std::vec::Vec<MethodDescriptorProto> as FieldSer<
                 tags::Message<MethodDescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.method, serializer, 2)?;
-        <::std::option::Option<::std::boxed::Box<ServiceOptions>> as SerializableField<
+        <::std::option::Option<::std::boxed::Box<ServiceOptions>> as FieldSer<
                 tags::Message<ServiceOptions>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 3)?;
@@ -5325,25 +5325,25 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for ServiceD
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             2 => {
-                <::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<MethodDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.method, field, || MethodDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
-                <::std::option::Option<::bumpalo::boxed::Box<'bump, ServiceOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::boxed::Box<'bump, ServiceOptionsBumpalo<'bump>>> as FieldDeserFromIter<
                     tags::Message<ServiceOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(ServiceOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
@@ -5368,17 +5368,17 @@ impl<'bump> ::puroro_internal::ser::Serializable for ServiceDescriptorProtoBumpa
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo<'bump>> as FieldSer<
                 tags::Message<MethodDescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.method, serializer, 2)?;
-        <::std::option::Option<::bumpalo::boxed::Box<'bump, ServiceOptionsBumpalo<'bump>>> as SerializableField<
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, ServiceOptionsBumpalo<'bump>>> as FieldSer<
                 tags::Message<ServiceOptionsBumpalo<'bump>>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 3)?;
@@ -5472,25 +5472,25 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumValueDescri
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.number, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<::std::boxed::Box<EnumValueOptions>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::boxed::Box<EnumValueOptions>> as FieldDeserFromIter<
                     tags::Message<EnumValueOptions>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, ::std::default::Default::default)?;
@@ -5515,17 +5515,17 @@ impl ::puroro_internal::ser::Serializable for EnumValueDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.number, serializer, 2)?;
-        <::std::option::Option<::std::boxed::Box<EnumValueOptions>> as SerializableField<
+        <::std::option::Option<::std::boxed::Box<EnumValueOptions>> as FieldSer<
                 tags::Message<EnumValueOptions>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 3)?;
@@ -5587,25 +5587,25 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumValu
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             2 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.number, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumValueOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumValueOptionsBumpalo<'bump>>> as FieldDeserFromIter<
                     tags::Message<EnumValueOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(EnumValueOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
@@ -5630,17 +5630,17 @@ impl<'bump> ::puroro_internal::ser::Serializable for EnumValueDescriptorProtoBum
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.number, serializer, 2)?;
-        <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumValueOptionsBumpalo<'bump>>> as SerializableField<
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumValueOptionsBumpalo<'bump>>> as FieldSer<
                 tags::Message<EnumValueOptionsBumpalo<'bump>>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 3)?;
@@ -5753,37 +5753,37 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumDescriptorP
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::vec::Vec<EnumValueDescriptorProto> as DeserializableFieldFromIter<
+                <::std::vec::Vec<EnumValueDescriptorProto> as FieldDeserFromIter<
                     tags::Message<EnumValueDescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.value, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<::std::boxed::Box<EnumOptions>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::boxed::Box<EnumOptions>> as FieldDeserFromIter<
                     tags::Message<EnumOptions>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             4 => {
-                <::std::vec::Vec<enum_descriptor_proto::EnumReservedRange> as DeserializableFieldFromIter<
+                <::std::vec::Vec<enum_descriptor_proto::EnumReservedRange> as FieldDeserFromIter<
                     tags::Message<enum_descriptor_proto::EnumReservedRange>, 
                     tags::Repeated>>
                 ::deser(&mut self.reserved_range, field, ::std::default::Default::default)?;
             }
             5 => {
-                <::std::vec::Vec<::std::string::String> as DeserializableFieldFromIter<
+                <::std::vec::Vec<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Repeated>>
                 ::deser(&mut self.reserved_name, field, ::std::default::Default::default)?;
@@ -5808,25 +5808,25 @@ impl ::puroro_internal::ser::Serializable for EnumDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::vec::Vec<EnumValueDescriptorProto> as SerializableField<
+        <::std::vec::Vec<EnumValueDescriptorProto> as FieldSer<
                 tags::Message<EnumValueDescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.value, serializer, 2)?;
-        <::std::option::Option<::std::boxed::Box<EnumOptions>> as SerializableField<
+        <::std::option::Option<::std::boxed::Box<EnumOptions>> as FieldSer<
                 tags::Message<EnumOptions>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 3)?;
-        <::std::vec::Vec<enum_descriptor_proto::EnumReservedRange> as SerializableField<
+        <::std::vec::Vec<enum_descriptor_proto::EnumReservedRange> as FieldSer<
                 tags::Message<enum_descriptor_proto::EnumReservedRange>, 
                 tags::Repeated>>
             ::ser(&self.reserved_range, serializer, 4)?;
-        <::std::vec::Vec<::std::string::String> as SerializableField<
+        <::std::vec::Vec<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Repeated>>
             ::ser(&self.reserved_name, serializer, 5)?;
@@ -5945,37 +5945,37 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumDesc
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             2 => {
-                <::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<EnumValueDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.value, field, || EnumValueDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
-                <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumOptionsBumpalo<'bump>>> as FieldDeserFromIter<
                     tags::Message<EnumOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(EnumOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             4 => {
-                <::bumpalo::collections::Vec<'bump, enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.reserved_range, field, || enum_descriptor_proto::EnumReservedRangeBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             5 => {
-                <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Repeated>>
                 ::deser(&mut self.reserved_name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
@@ -6000,25 +6000,25 @@ impl<'bump> ::puroro_internal::ser::Serializable for EnumDescriptorProtoBumpalo<
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo<'bump>> as FieldSer<
                 tags::Message<EnumValueDescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.value, serializer, 2)?;
-        <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumOptionsBumpalo<'bump>>> as SerializableField<
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumOptionsBumpalo<'bump>>> as FieldSer<
                 tags::Message<EnumOptionsBumpalo<'bump>>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 3)?;
-        <::bumpalo::collections::Vec<'bump, enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>> as FieldSer<
                 tags::Message<enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.reserved_range, serializer, 4)?;
-        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Repeated>>
             ::ser(&self.reserved_name, serializer, 5)?;
@@ -6146,19 +6146,19 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumReservedRan
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.start, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.end, field, ::std::default::Default::default)?;
@@ -6183,13 +6183,13 @@ impl ::puroro_internal::ser::Serializable for EnumReservedRange {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.start, serializer, 1)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.end, serializer, 2)?;
@@ -6245,19 +6245,19 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumRese
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.start, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.end, field, ::std::default::Default::default)?;
@@ -6282,13 +6282,13 @@ impl<'bump> ::puroro_internal::ser::Serializable for EnumReservedRangeBumpalo<'b
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.start, serializer, 1)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.end, serializer, 2)?;
@@ -6360,19 +6360,19 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for OneofDescriptor
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<::std::boxed::Box<OneofOptions>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::boxed::Box<OneofOptions>> as FieldDeserFromIter<
                     tags::Message<OneofOptions>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, ::std::default::Default::default)?;
@@ -6397,13 +6397,13 @@ impl ::puroro_internal::ser::Serializable for OneofDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::option::Option<::std::boxed::Box<OneofOptions>> as SerializableField<
+        <::std::option::Option<::std::boxed::Box<OneofOptions>> as FieldSer<
                 tags::Message<OneofOptions>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 2)?;
@@ -6460,19 +6460,19 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for OneofDes
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             2 => {
-                <::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo<'bump>>> as FieldDeserFromIter<
                     tags::Message<OneofOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(OneofOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
@@ -6497,13 +6497,13 @@ impl<'bump> ::puroro_internal::ser::Serializable for OneofDescriptorProtoBumpalo
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo<'bump>>> as SerializableField<
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo<'bump>>> as FieldSer<
                 tags::Message<OneofOptionsBumpalo<'bump>>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 2)?;
@@ -6602,73 +6602,73 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FieldDescriptor
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.number, field, ::std::default::Default::default)?;
             }
             4 => {
-                <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as FieldDeserFromIter<
                     tags::Enum<field_descriptor_proto::Label>, 
                     tags::Optional2>>
                 ::deser(&mut self.label, field, || 0i32.try_into())?;
             }
             5 => {
-                <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as FieldDeserFromIter<
                     tags::Enum<field_descriptor_proto::Type>, 
                     tags::Optional2>>
                 ::deser(&mut self.type_, field, || 0i32.try_into())?;
             }
             6 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.type_name, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.extendee, field, ::std::default::Default::default)?;
             }
             7 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.default_value, field, ::std::default::Default::default)?;
             }
             9 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.oneof_index, field, ::std::default::Default::default)?;
             }
             10 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.json_name, field, ::std::default::Default::default)?;
             }
             8 => {
-                <::std::option::Option<::std::boxed::Box<FieldOptions>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::boxed::Box<FieldOptions>> as FieldDeserFromIter<
                     tags::Message<FieldOptions>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             17 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.proto3_optional, field, ::std::default::Default::default)?;
@@ -6693,49 +6693,49 @@ impl ::puroro_internal::ser::Serializable for FieldDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.number, serializer, 3)?;
-        <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as SerializableField<
+        <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as FieldSer<
                 tags::Enum<field_descriptor_proto::Label>, 
                 tags::Optional2>>
             ::ser(&self.label, serializer, 4)?;
-        <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as SerializableField<
+        <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as FieldSer<
                 tags::Enum<field_descriptor_proto::Type>, 
                 tags::Optional2>>
             ::ser(&self.type_, serializer, 5)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.type_name, serializer, 6)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.extendee, serializer, 2)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.default_value, serializer, 7)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.oneof_index, serializer, 9)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.json_name, serializer, 10)?;
-        <::std::option::Option<::std::boxed::Box<FieldOptions>> as SerializableField<
+        <::std::option::Option<::std::boxed::Box<FieldOptions>> as FieldSer<
                 tags::Message<FieldOptions>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 8)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.proto3_optional, serializer, 17)?;
@@ -6837,73 +6837,73 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FieldDes
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.number, field, ::std::default::Default::default)?;
             }
             4 => {
-                <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as FieldDeserFromIter<
                     tags::Enum<field_descriptor_proto::Label>, 
                     tags::Optional2>>
                 ::deser(&mut self.label, field, || 0i32.try_into())?;
             }
             5 => {
-                <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as FieldDeserFromIter<
                     tags::Enum<field_descriptor_proto::Type>, 
                     tags::Optional2>>
                 ::deser(&mut self.type_, field, || 0i32.try_into())?;
             }
             6 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.type_name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             2 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.extendee, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             7 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.default_value, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             9 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.oneof_index, field, ::std::default::Default::default)?;
             }
             10 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.json_name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             8 => {
-                <::std::option::Option<::bumpalo::boxed::Box<'bump, FieldOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::boxed::Box<'bump, FieldOptionsBumpalo<'bump>>> as FieldDeserFromIter<
                     tags::Message<FieldOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(FieldOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             17 => {
-                <::std::option::Option<bool> as DeserializableFieldFromIter<
+                <::std::option::Option<bool> as FieldDeserFromIter<
                     tags::Bool, 
                     tags::Optional2>>
                 ::deser(&mut self.proto3_optional, field, ::std::default::Default::default)?;
@@ -6928,49 +6928,49 @@ impl<'bump> ::puroro_internal::ser::Serializable for FieldDescriptorProtoBumpalo
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.number, serializer, 3)?;
-        <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as SerializableField<
+        <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as FieldSer<
                 tags::Enum<field_descriptor_proto::Label>, 
                 tags::Optional2>>
             ::ser(&self.label, serializer, 4)?;
-        <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as SerializableField<
+        <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as FieldSer<
                 tags::Enum<field_descriptor_proto::Type>, 
                 tags::Optional2>>
             ::ser(&self.type_, serializer, 5)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.type_name, serializer, 6)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.extendee, serializer, 2)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.default_value, serializer, 7)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.oneof_index, serializer, 9)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.json_name, serializer, 10)?;
-        <::std::option::Option<::bumpalo::boxed::Box<'bump, FieldOptionsBumpalo<'bump>>> as SerializableField<
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, FieldOptionsBumpalo<'bump>>> as FieldSer<
                 tags::Message<FieldOptionsBumpalo<'bump>>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 8)?;
-        <::std::option::Option<bool> as SerializableField<
+        <::std::option::Option<bool> as FieldSer<
                 tags::Bool, 
                 tags::Optional2>>
             ::ser(&self.proto3_optional, serializer, 17)?;
@@ -7151,13 +7151,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ExtensionRangeO
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             999 => {
-                <::std::vec::Vec<UninterpretedOption> as DeserializableFieldFromIter<
+                <::std::vec::Vec<UninterpretedOption> as FieldDeserFromIter<
                     tags::Message<UninterpretedOption>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, ::std::default::Default::default)?;
@@ -7182,9 +7182,9 @@ impl ::puroro_internal::ser::Serializable for ExtensionRangeOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::vec::Vec<UninterpretedOption> as SerializableField<
+        <::std::vec::Vec<UninterpretedOption> as FieldSer<
                 tags::Message<UninterpretedOption>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -7251,13 +7251,13 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Extensio
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             999 => {
-                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
@@ -7282,9 +7282,9 @@ impl<'bump> ::puroro_internal::ser::Serializable for ExtensionRangeOptionsBumpal
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldSer<
                 tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.uninterpreted_option, serializer, 999)?;
@@ -7470,67 +7470,67 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for DescriptorProto
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::vec::Vec<FieldDescriptorProto> as DeserializableFieldFromIter<
+                <::std::vec::Vec<FieldDescriptorProto> as FieldDeserFromIter<
                     tags::Message<FieldDescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.field, field, ::std::default::Default::default)?;
             }
             6 => {
-                <::std::vec::Vec<FieldDescriptorProto> as DeserializableFieldFromIter<
+                <::std::vec::Vec<FieldDescriptorProto> as FieldDeserFromIter<
                     tags::Message<FieldDescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.extension, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::vec::Vec<DescriptorProto> as DeserializableFieldFromIter<
+                <::std::vec::Vec<DescriptorProto> as FieldDeserFromIter<
                     tags::Message<DescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.nested_type, field, ::std::default::Default::default)?;
             }
             4 => {
-                <::std::vec::Vec<EnumDescriptorProto> as DeserializableFieldFromIter<
+                <::std::vec::Vec<EnumDescriptorProto> as FieldDeserFromIter<
                     tags::Message<EnumDescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.enum_type, field, ::std::default::Default::default)?;
             }
             5 => {
-                <::std::vec::Vec<descriptor_proto::ExtensionRange> as DeserializableFieldFromIter<
+                <::std::vec::Vec<descriptor_proto::ExtensionRange> as FieldDeserFromIter<
                     tags::Message<descriptor_proto::ExtensionRange>, 
                     tags::Repeated>>
                 ::deser(&mut self.extension_range, field, ::std::default::Default::default)?;
             }
             8 => {
-                <::std::vec::Vec<OneofDescriptorProto> as DeserializableFieldFromIter<
+                <::std::vec::Vec<OneofDescriptorProto> as FieldDeserFromIter<
                     tags::Message<OneofDescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.oneof_decl, field, ::std::default::Default::default)?;
             }
             7 => {
-                <::std::option::Option<::std::boxed::Box<MessageOptions>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::boxed::Box<MessageOptions>> as FieldDeserFromIter<
                     tags::Message<MessageOptions>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             9 => {
-                <::std::vec::Vec<descriptor_proto::ReservedRange> as DeserializableFieldFromIter<
+                <::std::vec::Vec<descriptor_proto::ReservedRange> as FieldDeserFromIter<
                     tags::Message<descriptor_proto::ReservedRange>, 
                     tags::Repeated>>
                 ::deser(&mut self.reserved_range, field, ::std::default::Default::default)?;
             }
             10 => {
-                <::std::vec::Vec<::std::string::String> as DeserializableFieldFromIter<
+                <::std::vec::Vec<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Repeated>>
                 ::deser(&mut self.reserved_name, field, ::std::default::Default::default)?;
@@ -7555,45 +7555,45 @@ impl ::puroro_internal::ser::Serializable for DescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::vec::Vec<FieldDescriptorProto> as SerializableField<
+        <::std::vec::Vec<FieldDescriptorProto> as FieldSer<
                 tags::Message<FieldDescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.field, serializer, 2)?;
-        <::std::vec::Vec<FieldDescriptorProto> as SerializableField<
+        <::std::vec::Vec<FieldDescriptorProto> as FieldSer<
                 tags::Message<FieldDescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.extension, serializer, 6)?;
-        <::std::vec::Vec<DescriptorProto> as SerializableField<
+        <::std::vec::Vec<DescriptorProto> as FieldSer<
                 tags::Message<DescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.nested_type, serializer, 3)?;
-        <::std::vec::Vec<EnumDescriptorProto> as SerializableField<
+        <::std::vec::Vec<EnumDescriptorProto> as FieldSer<
                 tags::Message<EnumDescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.enum_type, serializer, 4)?;
-        <::std::vec::Vec<descriptor_proto::ExtensionRange> as SerializableField<
+        <::std::vec::Vec<descriptor_proto::ExtensionRange> as FieldSer<
                 tags::Message<descriptor_proto::ExtensionRange>, 
                 tags::Repeated>>
             ::ser(&self.extension_range, serializer, 5)?;
-        <::std::vec::Vec<OneofDescriptorProto> as SerializableField<
+        <::std::vec::Vec<OneofDescriptorProto> as FieldSer<
                 tags::Message<OneofDescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.oneof_decl, serializer, 8)?;
-        <::std::option::Option<::std::boxed::Box<MessageOptions>> as SerializableField<
+        <::std::option::Option<::std::boxed::Box<MessageOptions>> as FieldSer<
                 tags::Message<MessageOptions>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 7)?;
-        <::std::vec::Vec<descriptor_proto::ReservedRange> as SerializableField<
+        <::std::vec::Vec<descriptor_proto::ReservedRange> as FieldSer<
                 tags::Message<descriptor_proto::ReservedRange>, 
                 tags::Repeated>>
             ::ser(&self.reserved_range, serializer, 9)?;
-        <::std::vec::Vec<::std::string::String> as SerializableField<
+        <::std::vec::Vec<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Repeated>>
             ::ser(&self.reserved_name, serializer, 10)?;
@@ -7816,67 +7816,67 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Descript
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             2 => {
-                <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<FieldDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.field, field, || FieldDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             6 => {
-                <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<FieldDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.extension, field, || FieldDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
-                <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<DescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.nested_type, field, || DescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             4 => {
-                <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<EnumDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.enum_type, field, || EnumDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             5 => {
-                <::bumpalo::collections::Vec<'bump, descriptor_proto::ExtensionRangeBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, descriptor_proto::ExtensionRangeBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<descriptor_proto::ExtensionRangeBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.extension_range, field, || descriptor_proto::ExtensionRangeBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             8 => {
-                <::bumpalo::collections::Vec<'bump, OneofDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, OneofDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<OneofDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.oneof_decl, field, || OneofDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             7 => {
-                <::std::option::Option<::bumpalo::boxed::Box<'bump, MessageOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::boxed::Box<'bump, MessageOptionsBumpalo<'bump>>> as FieldDeserFromIter<
                     tags::Message<MessageOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(MessageOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             9 => {
-                <::bumpalo::collections::Vec<'bump, descriptor_proto::ReservedRangeBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, descriptor_proto::ReservedRangeBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<descriptor_proto::ReservedRangeBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.reserved_range, field, || descriptor_proto::ReservedRangeBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             10 => {
-                <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Repeated>>
                 ::deser(&mut self.reserved_name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
@@ -7901,45 +7901,45 @@ impl<'bump> ::puroro_internal::ser::Serializable for DescriptorProtoBumpalo<'bum
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as FieldSer<
                 tags::Message<FieldDescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.field, serializer, 2)?;
-        <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as FieldSer<
                 tags::Message<FieldDescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.extension, serializer, 6)?;
-        <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as FieldSer<
                 tags::Message<DescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.nested_type, serializer, 3)?;
-        <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as FieldSer<
                 tags::Message<EnumDescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.enum_type, serializer, 4)?;
-        <::bumpalo::collections::Vec<'bump, descriptor_proto::ExtensionRangeBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, descriptor_proto::ExtensionRangeBumpalo<'bump>> as FieldSer<
                 tags::Message<descriptor_proto::ExtensionRangeBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.extension_range, serializer, 5)?;
-        <::bumpalo::collections::Vec<'bump, OneofDescriptorProtoBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, OneofDescriptorProtoBumpalo<'bump>> as FieldSer<
                 tags::Message<OneofDescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.oneof_decl, serializer, 8)?;
-        <::std::option::Option<::bumpalo::boxed::Box<'bump, MessageOptionsBumpalo<'bump>>> as SerializableField<
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, MessageOptionsBumpalo<'bump>>> as FieldSer<
                 tags::Message<MessageOptionsBumpalo<'bump>>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 7)?;
-        <::bumpalo::collections::Vec<'bump, descriptor_proto::ReservedRangeBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, descriptor_proto::ReservedRangeBumpalo<'bump>> as FieldSer<
                 tags::Message<descriptor_proto::ReservedRangeBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.reserved_range, serializer, 9)?;
-        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Repeated>>
             ::ser(&self.reserved_name, serializer, 10)?;
@@ -8161,19 +8161,19 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ReservedRange {
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.start, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.end, field, ::std::default::Default::default)?;
@@ -8198,13 +8198,13 @@ impl ::puroro_internal::ser::Serializable for ReservedRange {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.start, serializer, 1)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.end, serializer, 2)?;
@@ -8260,19 +8260,19 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Reserved
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.start, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.end, field, ::std::default::Default::default)?;
@@ -8297,13 +8297,13 @@ impl<'bump> ::puroro_internal::ser::Serializable for ReservedRangeBumpalo<'bump>
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.start, serializer, 1)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.end, serializer, 2)?;
@@ -8377,25 +8377,25 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ExtensionRange 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.start, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.end, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<::std::boxed::Box<super::ExtensionRangeOptions>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::boxed::Box<super::ExtensionRangeOptions>> as FieldDeserFromIter<
                     tags::Message<super::ExtensionRangeOptions>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, ::std::default::Default::default)?;
@@ -8420,17 +8420,17 @@ impl ::puroro_internal::ser::Serializable for ExtensionRange {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.start, serializer, 1)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.end, serializer, 2)?;
-        <::std::option::Option<::std::boxed::Box<super::ExtensionRangeOptions>> as SerializableField<
+        <::std::option::Option<::std::boxed::Box<super::ExtensionRangeOptions>> as FieldSer<
                 tags::Message<super::ExtensionRangeOptions>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 3)?;
@@ -8492,25 +8492,25 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Extensio
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.start, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<i32> as DeserializableFieldFromIter<
+                <::std::option::Option<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Optional2>>
                 ::deser(&mut self.end, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo<'bump>>> as FieldDeserFromIter<
                     tags::Message<super::ExtensionRangeOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(super::ExtensionRangeOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
@@ -8535,17 +8535,17 @@ impl<'bump> ::puroro_internal::ser::Serializable for ExtensionRangeBumpalo<'bump
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.start, serializer, 1)?;
-        <::std::option::Option<i32> as SerializableField<
+        <::std::option::Option<i32> as FieldSer<
                 tags::Int32, 
                 tags::Optional2>>
             ::ser(&self.end, serializer, 2)?;
-        <::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo<'bump>>> as SerializableField<
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo<'bump>>> as FieldSer<
                 tags::Message<super::ExtensionRangeOptionsBumpalo<'bump>>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 3)?;
@@ -8719,79 +8719,79 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileDescriptorP
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, ::std::default::Default::default)?;
             }
             2 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.package, field, ::std::default::Default::default)?;
             }
             3 => {
-                <::std::vec::Vec<::std::string::String> as DeserializableFieldFromIter<
+                <::std::vec::Vec<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Repeated>>
                 ::deser(&mut self.dependency, field, ::std::default::Default::default)?;
             }
             10 => {
-                <::std::vec::Vec<i32> as DeserializableFieldFromIter<
+                <::std::vec::Vec<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Repeated>>
                 ::deser(&mut self.public_dependency, field, ::std::default::Default::default)?;
             }
             11 => {
-                <::std::vec::Vec<i32> as DeserializableFieldFromIter<
+                <::std::vec::Vec<i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Repeated>>
                 ::deser(&mut self.weak_dependency, field, ::std::default::Default::default)?;
             }
             4 => {
-                <::std::vec::Vec<DescriptorProto> as DeserializableFieldFromIter<
+                <::std::vec::Vec<DescriptorProto> as FieldDeserFromIter<
                     tags::Message<DescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.message_type, field, ::std::default::Default::default)?;
             }
             5 => {
-                <::std::vec::Vec<EnumDescriptorProto> as DeserializableFieldFromIter<
+                <::std::vec::Vec<EnumDescriptorProto> as FieldDeserFromIter<
                     tags::Message<EnumDescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.enum_type, field, ::std::default::Default::default)?;
             }
             6 => {
-                <::std::vec::Vec<ServiceDescriptorProto> as DeserializableFieldFromIter<
+                <::std::vec::Vec<ServiceDescriptorProto> as FieldDeserFromIter<
                     tags::Message<ServiceDescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.service, field, ::std::default::Default::default)?;
             }
             7 => {
-                <::std::vec::Vec<FieldDescriptorProto> as DeserializableFieldFromIter<
+                <::std::vec::Vec<FieldDescriptorProto> as FieldDeserFromIter<
                     tags::Message<FieldDescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.extension, field, ::std::default::Default::default)?;
             }
             8 => {
-                <::std::option::Option<::std::boxed::Box<FileOptions>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::boxed::Box<FileOptions>> as FieldDeserFromIter<
                     tags::Message<FileOptions>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, ::std::default::Default::default)?;
             }
             9 => {
-                <::std::option::Option<::std::boxed::Box<SourceCodeInfo>> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::boxed::Box<SourceCodeInfo>> as FieldDeserFromIter<
                     tags::Message<SourceCodeInfo>, 
                     tags::Optional2>>
                 ::deser(&mut self.source_code_info, field, ::std::default::Default::default)?;
             }
             12 => {
-                <::std::option::Option<::std::string::String> as DeserializableFieldFromIter<
+                <::std::option::Option<::std::string::String> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.syntax, field, ::std::default::Default::default)?;
@@ -8816,53 +8816,53 @@ impl ::puroro_internal::ser::Serializable for FileDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.package, serializer, 2)?;
-        <::std::vec::Vec<::std::string::String> as SerializableField<
+        <::std::vec::Vec<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Repeated>>
             ::ser(&self.dependency, serializer, 3)?;
-        <::std::vec::Vec<i32> as SerializableField<
+        <::std::vec::Vec<i32> as FieldSer<
                 tags::Int32, 
                 tags::Repeated>>
             ::ser(&self.public_dependency, serializer, 10)?;
-        <::std::vec::Vec<i32> as SerializableField<
+        <::std::vec::Vec<i32> as FieldSer<
                 tags::Int32, 
                 tags::Repeated>>
             ::ser(&self.weak_dependency, serializer, 11)?;
-        <::std::vec::Vec<DescriptorProto> as SerializableField<
+        <::std::vec::Vec<DescriptorProto> as FieldSer<
                 tags::Message<DescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.message_type, serializer, 4)?;
-        <::std::vec::Vec<EnumDescriptorProto> as SerializableField<
+        <::std::vec::Vec<EnumDescriptorProto> as FieldSer<
                 tags::Message<EnumDescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.enum_type, serializer, 5)?;
-        <::std::vec::Vec<ServiceDescriptorProto> as SerializableField<
+        <::std::vec::Vec<ServiceDescriptorProto> as FieldSer<
                 tags::Message<ServiceDescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.service, serializer, 6)?;
-        <::std::vec::Vec<FieldDescriptorProto> as SerializableField<
+        <::std::vec::Vec<FieldDescriptorProto> as FieldSer<
                 tags::Message<FieldDescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.extension, serializer, 7)?;
-        <::std::option::Option<::std::boxed::Box<FileOptions>> as SerializableField<
+        <::std::option::Option<::std::boxed::Box<FileOptions>> as FieldSer<
                 tags::Message<FileOptions>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 8)?;
-        <::std::option::Option<::std::boxed::Box<SourceCodeInfo>> as SerializableField<
+        <::std::option::Option<::std::boxed::Box<SourceCodeInfo>> as FieldSer<
                 tags::Message<SourceCodeInfo>, 
                 tags::Optional2>>
             ::ser(&self.source_code_info, serializer, 9)?;
-        <::std::option::Option<::std::string::String> as SerializableField<
+        <::std::option::Option<::std::string::String> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.syntax, serializer, 12)?;
@@ -9079,79 +9079,79 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileDesc
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             2 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.package, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
-                <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Repeated>>
                 ::deser(&mut self.dependency, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
             }
             10 => {
-                <::bumpalo::collections::Vec<'bump, i32> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Repeated>>
                 ::deser(&mut self.public_dependency, field, ::std::default::Default::default)?;
             }
             11 => {
-                <::bumpalo::collections::Vec<'bump, i32> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, i32> as FieldDeserFromIter<
                     tags::Int32, 
                     tags::Repeated>>
                 ::deser(&mut self.weak_dependency, field, ::std::default::Default::default)?;
             }
             4 => {
-                <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<DescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.message_type, field, || DescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             5 => {
-                <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<EnumDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.enum_type, field, || EnumDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             6 => {
-                <::bumpalo::collections::Vec<'bump, ServiceDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, ServiceDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<ServiceDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.service, field, || ServiceDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             7 => {
-                <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<FieldDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.extension, field, || FieldDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             8 => {
-                <::std::option::Option<::bumpalo::boxed::Box<'bump, FileOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::boxed::Box<'bump, FileOptionsBumpalo<'bump>>> as FieldDeserFromIter<
                     tags::Message<FileOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
                 ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(FileOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             9 => {
-                <::std::option::Option<::bumpalo::boxed::Box<'bump, SourceCodeInfoBumpalo<'bump>>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::boxed::Box<'bump, SourceCodeInfoBumpalo<'bump>>> as FieldDeserFromIter<
                     tags::Message<SourceCodeInfoBumpalo<'bump>>, 
                     tags::Optional2>>
                 ::deser(&mut self.source_code_info, field, || ::bumpalo::boxed::Box::new_in(SourceCodeInfoBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             12 => {
-                <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
+                <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
                 ::deser(&mut self.syntax, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
@@ -9176,53 +9176,53 @@ impl<'bump> ::puroro_internal::ser::Serializable for FileDescriptorProtoBumpalo<
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.name, serializer, 1)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.package, serializer, 2)?;
-        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Repeated>>
             ::ser(&self.dependency, serializer, 3)?;
-        <::bumpalo::collections::Vec<'bump, i32> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, i32> as FieldSer<
                 tags::Int32, 
                 tags::Repeated>>
             ::ser(&self.public_dependency, serializer, 10)?;
-        <::bumpalo::collections::Vec<'bump, i32> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, i32> as FieldSer<
                 tags::Int32, 
                 tags::Repeated>>
             ::ser(&self.weak_dependency, serializer, 11)?;
-        <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as FieldSer<
                 tags::Message<DescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.message_type, serializer, 4)?;
-        <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as FieldSer<
                 tags::Message<EnumDescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.enum_type, serializer, 5)?;
-        <::bumpalo::collections::Vec<'bump, ServiceDescriptorProtoBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, ServiceDescriptorProtoBumpalo<'bump>> as FieldSer<
                 tags::Message<ServiceDescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.service, serializer, 6)?;
-        <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as FieldSer<
                 tags::Message<FieldDescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.extension, serializer, 7)?;
-        <::std::option::Option<::bumpalo::boxed::Box<'bump, FileOptionsBumpalo<'bump>>> as SerializableField<
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, FileOptionsBumpalo<'bump>>> as FieldSer<
                 tags::Message<FileOptionsBumpalo<'bump>>, 
                 tags::Optional2>>
             ::ser(&self.options, serializer, 8)?;
-        <::std::option::Option<::bumpalo::boxed::Box<'bump, SourceCodeInfoBumpalo<'bump>>> as SerializableField<
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, SourceCodeInfoBumpalo<'bump>>> as FieldSer<
                 tags::Message<SourceCodeInfoBumpalo<'bump>>, 
                 tags::Optional2>>
             ::ser(&self.source_code_info, serializer, 9)?;
-        <::std::option::Option<::bumpalo::collections::String<'bump>> as SerializableField<
+        <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldSer<
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.syntax, serializer, 12)?;
@@ -9440,13 +9440,13 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileDescriptorS
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::std::vec::Vec<FileDescriptorProto> as DeserializableFieldFromIter<
+                <::std::vec::Vec<FileDescriptorProto> as FieldDeserFromIter<
                     tags::Message<FileDescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.file, field, ::std::default::Default::default)?;
@@ -9471,9 +9471,9 @@ impl ::puroro_internal::ser::Serializable for FileDescriptorSet {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::vec::Vec<FileDescriptorProto> as SerializableField<
+        <::std::vec::Vec<FileDescriptorProto> as FieldSer<
                 tags::Message<FileDescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.file, serializer, 1)?;
@@ -9540,13 +9540,13 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileDesc
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
-        use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::FieldDeserFromIter;
         use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
             1 => {
-                <::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
+                <::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<FileDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.file, field, || FileDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
@@ -9571,9 +9571,9 @@ impl<'bump> ::puroro_internal::ser::Serializable for FileDescriptorSetBumpalo<'b
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        use ::puroro_internal::helpers::SerializableField;
+        use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo<'bump>> as SerializableField<
+        <::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo<'bump>> as FieldSer<
                 tags::Message<FileDescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.file, serializer, 1)?;

@@ -9,7 +9,7 @@ use crate::Result;
 
 use super::MapEntry;
 
-pub trait SerializableField<TypeTag, LabelTag>
+pub trait FieldSer<TypeTag, LabelTag>
 where
     TypeTag: FieldTypeTag,
     LabelTag: FieldLabelTag,
@@ -36,7 +36,7 @@ where
 
 macro_rules! define_ser_required_variant {
     ($ty:ty, $ttag:ty) => {
-        impl SerializableField<$ttag, tags::Required> for $ty {
+        impl FieldSer<$ttag, tags::Required> for $ty {
             fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
             where
                 S: crate::ser::MessageSerializer,
@@ -55,7 +55,7 @@ define_ser_required_variant!(u32, tags::UInt32);
 define_ser_required_variant!(u64, tags::UInt64);
 define_ser_required_variant!(bool, tags::Bool);
 
-impl<T> SerializableField<tags::Enum<T>, tags::Required> for std::result::Result<T, i32>
+impl<T> FieldSer<tags::Enum<T>, tags::Required> for std::result::Result<T, i32>
 where
     i32: From<T>,
     T: Clone,
@@ -71,7 +71,7 @@ where
 
 macro_rules! define_ser_required_ld {
     ($ty:ty, $ttag:ty, $func:ident) => {
-        impl<'bump> SerializableField<$ttag, tags::Required> for $ty {
+        impl<'bump> FieldSer<$ttag, tags::Required> for $ty {
             fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
             where
                 S: crate::ser::MessageSerializer,
@@ -90,7 +90,7 @@ define_ser_required_ld!(::bumpalo::collections::String<'bump>, tags::String, byt
 #[cfg(feature = "puroro-bumpalo")]
 define_ser_required_ld!(::bumpalo::collections::Vec<'bump, u8>, tags::Bytes, iter);
 
-impl<T> SerializableField<tags::Message<T>, tags::Required> for T
+impl<T> FieldSer<tags::Message<T>, tags::Required> for T
 where
     T: Serializable,
 {
@@ -105,7 +105,7 @@ where
 
 macro_rules! define_ser_required_fixed {
     ($ty:ty, $ttag:ty) => {
-        impl SerializableField<$ttag, tags::Required> for $ty {
+        impl FieldSer<$ttag, tags::Required> for $ty {
             fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
             where
                 S: crate::ser::MessageSerializer,
@@ -129,17 +129,13 @@ define_ser_required_fixed!(i64, tags::SFixed64);
 
 macro_rules! define_ser_optional2_field_using_required {
     ($ty:ty, $ttag:ty) => {
-        impl<'bump> SerializableField<$ttag, tags::Optional2> for Option<$ty> {
+        impl<'bump> FieldSer<$ttag, tags::Optional2> for Option<$ty> {
             fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
             where
                 S: crate::ser::MessageSerializer,
             {
                 if let Some(x) = self {
-                    <$ty as SerializableField<$ttag, tags::Required>>::ser(
-                        x,
-                        serializer,
-                        field_number,
-                    )?;
+                    <$ty as FieldSer<$ttag, tags::Required>>::ser(x, serializer, field_number)?;
                 }
                 Ok(())
             }
@@ -154,7 +150,7 @@ define_ser_optional2_field_using_required!(i32, tags::SInt32);
 define_ser_optional2_field_using_required!(i64, tags::SInt64);
 define_ser_optional2_field_using_required!(bool, tags::Bool);
 
-impl<T> SerializableField<tags::Enum<T>, tags::Optional2> for Option<std::result::Result<T, i32>>
+impl<T> FieldSer<tags::Enum<T>, tags::Optional2> for Option<std::result::Result<T, i32>>
 where
     i32: From<T>,
     T: Clone,
@@ -164,10 +160,11 @@ where
         S: crate::ser::MessageSerializer,
     {
         if let Some(e) = self {
-            <::std::result::Result<T, i32> as SerializableField<
-                tags::Enum<T>,
-                tags::Required,
-            >>::ser(e, serializer, field_number)?;
+            <::std::result::Result<T, i32> as FieldSer<tags::Enum<T>, tags::Required>>::ser(
+                e,
+                serializer,
+                field_number,
+            )?;
         }
         Ok(())
     }
@@ -182,7 +179,7 @@ define_ser_optional2_field_using_required!(::bumpalo::collections::Vec<'bump, u8
 
 macro_rules! define_ser_optional_message {
     ($box:ty, $ltag:ty) => {
-        impl<'bump, T> SerializableField<tags::Message<T>, $ltag> for Option<$box>
+        impl<'bump, T> FieldSer<tags::Message<T>, $ltag> for Option<$box>
         where
             T: Serializable,
         {
@@ -191,7 +188,7 @@ macro_rules! define_ser_optional_message {
                 S: crate::ser::MessageSerializer,
             {
                 if let Some(bm) = self {
-                    <T as SerializableField<tags::Message<T>, tags::Required>>::ser(
+                    <T as FieldSer<tags::Message<T>, tags::Required>>::ser(
                         bm,
                         serializer,
                         field_number,
@@ -219,17 +216,13 @@ define_ser_optional2_field_using_required!(i64, tags::SFixed64);
 
 macro_rules! define_ser_optional3_field_using_required {
     ($ty:ty, $ttag:ty, $isdefault_f:expr) => {
-        impl<'bump> SerializableField<$ttag, tags::Optional3> for $ty {
+        impl<'bump> FieldSer<$ttag, tags::Optional3> for $ty {
             fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
             where
                 S: crate::ser::MessageSerializer,
             {
                 if !($isdefault_f)(self) {
-                    <$ty as SerializableField<$ttag, tags::Required>>::ser(
-                        self,
-                        serializer,
-                        field_number,
-                    )?;
+                    <$ty as FieldSer<$ttag, tags::Required>>::ser(self, serializer, field_number)?;
                 }
                 Ok(())
             }
@@ -244,7 +237,7 @@ define_ser_optional3_field_using_required!(i32, tags::SInt32, |x: &i32| *x == 0)
 define_ser_optional3_field_using_required!(i64, tags::SInt64, |x: &i64| *x == 0);
 define_ser_optional3_field_using_required!(bool, tags::Bool, |x: &bool| !*x);
 
-impl<T> SerializableField<tags::Enum<T>, tags::Optional3> for std::result::Result<T, i32>
+impl<T> FieldSer<tags::Enum<T>, tags::Optional3> for std::result::Result<T, i32>
 where
     i32: From<T>,
     T: Clone,
@@ -255,10 +248,11 @@ where
     {
         let i = enum_to_i32(self);
         if i != 0 {
-            <::std::result::Result<T, i32> as SerializableField<
-                tags::Enum<T>,
-                tags::Required,
-            >>::ser(self, serializer, field_number)?;
+            <::std::result::Result<T, i32> as FieldSer<tags::Enum<T>, tags::Required>>::ser(
+                self,
+                serializer,
+                field_number,
+            )?;
         }
         Ok(())
     }
@@ -302,7 +296,7 @@ macro_rules! define_ser_repeated_variant {
         define_ser_repeated_variant!($ty, $ttag, ::bumpalo::collections::Vec<'bump, $ty>);
     };
     ($ty:ty, $ttag:ty, $vec:ty) => {
-        impl<'bump> SerializableField<$ttag, tags::Repeated> for $vec {
+        impl<'bump> FieldSer<$ttag, tags::Repeated> for $vec {
             fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
             where
                 S: crate::ser::MessageSerializer,
@@ -323,7 +317,7 @@ define_ser_repeated_variant!(bool, tags::Bool);
 
 macro_rules! define_ser_repeated_enum {
     ($vec:ty) => {
-        impl<'bump, T> SerializableField<tags::Enum<T>, tags::Repeated> for $vec
+        impl<'bump, T> FieldSer<tags::Enum<T>, tags::Repeated> for $vec
         where
             i32: From<T>,
             T: Clone,
@@ -352,17 +346,13 @@ macro_rules! define_ser_repeated_ld_using_required {
         define_ser_repeated_ld_using_required!($ty, $ttag, ::bumpalo::collections::Vec<'bump, $ty>);
     };
     ($ty:ty, $ttag:ty, $vec:ty) => {
-        impl<'bump> SerializableField<$ttag, tags::Repeated> for $vec {
+        impl<'bump> FieldSer<$ttag, tags::Repeated> for $vec {
             fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
             where
                 S: crate::ser::MessageSerializer,
             {
                 for x in self {
-                    <$ty as SerializableField<$ttag, tags::Required>>::ser(
-                        x,
-                        serializer,
-                        field_number,
-                    )?;
+                    <$ty as FieldSer<$ttag, tags::Required>>::ser(x, serializer, field_number)?;
                 }
                 Ok(())
             }
@@ -378,7 +368,7 @@ define_ser_repeated_ld_using_required!(::bumpalo::collections::Vec<'bump, u8>, t
 
 macro_rules! define_ser_repeated_message {
     ($vec:ty) => {
-        impl<'bump, T> SerializableField<tags::Message<T>, tags::Repeated> for $vec
+        impl<'bump, T> FieldSer<tags::Message<T>, tags::Repeated> for $vec
         where
             T: Serializable,
         {
@@ -405,17 +395,13 @@ macro_rules! define_ser_repeated_fixed {
         define_ser_repeated_fixed!($ty, $ttag, ::bumpalo::collections::Vec<'bump, $ty>);
     };
     ($ty:ty, $ttag:ty, $vec:ty) => {
-        impl<'bump> SerializableField<$ttag, tags::Repeated> for $vec {
+        impl<'bump> FieldSer<$ttag, tags::Repeated> for $vec {
             fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
             where
                 S: crate::ser::MessageSerializer,
             {
                 for x in self {
-                    <$ty as SerializableField<$ttag, tags::Required>>::ser(
-                        x,
-                        serializer,
-                        field_number,
-                    )?;
+                    <$ty as FieldSer<$ttag, tags::Required>>::ser(x, serializer, field_number)?;
                 }
                 Ok(())
             }
@@ -435,7 +421,7 @@ define_ser_repeated_fixed!(i64, tags::SFixed64);
 
 // The code generator must implement `Serializable` for tuple
 // `(&K, &V, PhantomData(KeyTag, ValueTag, Entry))`.
-impl<Entry> SerializableField<tags::Message<Entry>, tags::Repeated>
+impl<Entry> FieldSer<tags::Message<Entry>, tags::Repeated>
     for HashMap<Entry::KeyType, Entry::ValueType>
 where
     Entry: MapEntry,
