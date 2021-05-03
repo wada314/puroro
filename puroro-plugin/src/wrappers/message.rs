@@ -170,22 +170,6 @@ impl<'c> MessageDescriptor<'c> {
             })
             .unique_by(|msg| msg.fully_qualified_name().unwrap_or_default()))
     }
-
-    pub fn unique_repeated_msgs_from_fields(
-        &'c self,
-    ) -> Result<impl Iterator<Item = &'c MessageDescriptor<'c>>> {
-        Ok(self
-            .fields()
-            .filter_map(|field| {
-                if let Ok(FieldType::Message(m)) = field.type_() {
-                    if let Ok(FieldLabel::Repeated) = field.label() {
-                        return Some(m);
-                    }
-                }
-                None
-            })
-            .unique_by(|msg| msg.fully_qualified_name().unwrap_or_default()))
-    }
 }
 
 impl Debug for MessageDescriptor<'_> {
