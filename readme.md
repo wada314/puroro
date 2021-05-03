@@ -16,6 +16,7 @@
     - Other implementations
         - SliceRef -- A viewer over a `&[u8]` slice
         - Append -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
+    - Naming of the other implementations. Consider using a type generator class
     - RPCs / services
 
 ## subcrates
