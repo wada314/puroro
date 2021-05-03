@@ -230,12 +230,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             "|| ::bumpalo::boxed::Box::new_in({msg}::new_in(\
                                 self.puroro_internal.bumpalo()\
                             ), self.puroro_internal.bumpalo())",
-                            msg = m.native_ident_with_relative_path(field.package()?)?,
+                            msg = self.struct_name_with_relative_path(m, field.package()?)?,
                         )
                         .into(),
                         FieldLabel::Required | FieldLabel::Repeated => format!(
                             "|| {msg}::new_in(self.puroro_internal.bumpalo())",
-                            msg = m.native_ident_with_relative_path(field.package()?)?,
+                            msg = self.struct_name_with_relative_path(m, field.package()?)?,
                         )
                         .into(),
                     },

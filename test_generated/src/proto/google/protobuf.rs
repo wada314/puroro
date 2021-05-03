@@ -152,7 +152,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Generate
                 <::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<generated_code_info::AnnotationBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.annotation, field, || self::generated_code_info::Annotation::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.annotation, field, || generated_code_info::AnnotationBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -684,7 +684,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for SourceCo
                 <::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<source_code_info::LocationBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.location, field, || self::source_code_info::Location::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.location, field, || source_code_info::LocationBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -1431,7 +1431,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Uninterp
                 <::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<uninterpreted_option::NamePartBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.name, field, || self::uninterpreted_option::NamePart::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.name, field, || uninterpreted_option::NamePartBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
                 <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
@@ -1989,7 +1989,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MethodOp
                 <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.uninterpreted_option, field, || self::UninterpretedOption::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -2271,7 +2271,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for ServiceO
                 <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.uninterpreted_option, field, || self::UninterpretedOption::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -2522,7 +2522,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumValu
                 <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.uninterpreted_option, field, || self::UninterpretedOption::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -2797,7 +2797,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumOpti
                 <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.uninterpreted_option, field, || self::UninterpretedOption::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -3031,7 +3031,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for OneofOpt
                 <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.uninterpreted_option, field, || self::UninterpretedOption::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -3395,7 +3395,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FieldOpt
                 <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.uninterpreted_option, field, || self::UninterpretedOption::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -3799,7 +3799,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MessageO
                 <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.uninterpreted_option, field, || self::UninterpretedOption::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -4527,7 +4527,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileOpti
                 <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.uninterpreted_option, field, || self::UninterpretedOption::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -4996,7 +4996,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MethodDe
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, MethodOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
                     tags::Message<MethodOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(self::MethodOptions::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(MethodOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             5 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<
@@ -5292,13 +5292,13 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for ServiceD
                 <::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<MethodDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.method, field, || self::MethodDescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.method, field, || MethodDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, ServiceOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
                     tags::Message<ServiceOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(self::ServiceOptions::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(ServiceOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -5558,7 +5558,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumValu
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumValueOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
                     tags::Message<EnumValueOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(self::EnumValueOptions::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(EnumValueOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -5905,19 +5905,19 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumDesc
                 <::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<EnumValueDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.value, field, || self::EnumValueDescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.value, field, || EnumValueDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
                     tags::Message<EnumOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(self::EnumOptions::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(EnumOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             4 => {
                 <::bumpalo::collections::Vec<'bump, enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.reserved_range, field, || self::enum_descriptor_proto::EnumReservedRange::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.reserved_range, field, || enum_descriptor_proto::EnumReservedRangeBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             5 => {
                 <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
@@ -6416,7 +6416,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for OneofDes
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
                     tags::Message<OneofOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(self::OneofOptions::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(OneofOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -6839,7 +6839,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FieldDes
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, FieldOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
                     tags::Message<FieldOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(self::FieldOptions::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(FieldOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             17 => {
                 <::std::option::Option<bool> as DeserializableFieldFromIter<
@@ -7196,7 +7196,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Extensio
                 <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<UninterpretedOptionBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.uninterpreted_option, field, || self::UninterpretedOption::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.uninterpreted_option, field, || UninterpretedOptionBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -7757,49 +7757,49 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Descript
                 <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<FieldDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.field, field, || self::FieldDescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.field, field, || FieldDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             6 => {
                 <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<FieldDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.extension, field, || self::FieldDescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.extension, field, || FieldDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             3 => {
                 <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<DescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.nested_type, field, || self::DescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.nested_type, field, || DescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             4 => {
                 <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<EnumDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.enum_type, field, || self::EnumDescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.enum_type, field, || EnumDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             5 => {
                 <::bumpalo::collections::Vec<'bump, descriptor_proto::ExtensionRangeBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<descriptor_proto::ExtensionRangeBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.extension_range, field, || self::descriptor_proto::ExtensionRange::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.extension_range, field, || descriptor_proto::ExtensionRangeBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             8 => {
                 <::bumpalo::collections::Vec<'bump, OneofDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<OneofDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.oneof_decl, field, || self::OneofDescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.oneof_decl, field, || OneofDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             7 => {
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, MessageOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
                     tags::Message<MessageOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(self::MessageOptions::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(MessageOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             9 => {
                 <::bumpalo::collections::Vec<'bump, descriptor_proto::ReservedRangeBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<descriptor_proto::ReservedRangeBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.reserved_range, field, || self::descriptor_proto::ReservedRange::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.reserved_range, field, || descriptor_proto::ReservedRangeBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             10 => {
                 <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
@@ -8435,7 +8435,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Extensio
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
                     tags::Message<super::ExtensionRangeOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(self::super::ExtensionRangeOptions::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(super::ExtensionRangeOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -9031,37 +9031,37 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileDesc
                 <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<DescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.message_type, field, || self::DescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.message_type, field, || DescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             5 => {
                 <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<EnumDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.enum_type, field, || self::EnumDescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.enum_type, field, || EnumDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             6 => {
                 <::bumpalo::collections::Vec<'bump, ServiceDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<ServiceDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.service, field, || self::ServiceDescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.service, field, || ServiceDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             7 => {
                 <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<FieldDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.extension, field, || self::FieldDescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.extension, field, || FieldDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             8 => {
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, FileOptionsBumpalo<'bump>>> as DeserializableFieldFromIter<
                     tags::Message<FileOptionsBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(self::FileOptions::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.options, field, || ::bumpalo::boxed::Box::new_in(FileOptionsBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             9 => {
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, SourceCodeInfoBumpalo<'bump>>> as DeserializableFieldFromIter<
                     tags::Message<SourceCodeInfoBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.source_code_info, field, || ::bumpalo::boxed::Box::new_in(self::SourceCodeInfo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.source_code_info, field, || ::bumpalo::boxed::Box::new_in(SourceCodeInfoBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
             }
             12 => {
                 <::std::option::Option<::bumpalo::collections::String<'bump>> as DeserializableFieldFromIter<
@@ -9459,7 +9459,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileDesc
                 <::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo<'bump>> as DeserializableFieldFromIter<
                     tags::Message<FileDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.file, field, || self::FileDescriptorProto::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.file, field, || FileDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
