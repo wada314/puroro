@@ -19,6 +19,7 @@
         - SliceRef -- A viewer over a `&[u8]` slice
         - Append -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
     - Naming of the other implementations. Consider using a type generator class
+    - Support the `allocator_api`. Waiting for the `String` support
     - RPCs / services
 
 ## subcrates

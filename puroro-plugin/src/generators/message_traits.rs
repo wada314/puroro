@@ -86,7 +86,7 @@ type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>
             (FieldLabel::Optional2, _) | (FieldLabel::Optional3, FieldType::Message(_)) => {
                 GetterMethods::OptionalField(format!(
                     "fn {name}(&'_ self) -> ::std::option::Option<{reftype}>",
-                    name = field.native_name()?,
+                    name = field.native_ident()?,
                     reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
                 ))
             }
@@ -96,7 +96,7 @@ type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>
 fn for_each_{name}<F>(&self, {maybe_mut}f: F)
 where
     F: FnMut({reftype})",
-                    name = field.native_name()?,
+                    name = field.native_ident()?,
                     reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
                     maybe_mut = if has_body { "mut " } else { "" }
                 ),
@@ -104,21 +104,21 @@ where
                     "\
 fn {name}_boxed_iter(&self)
     -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>",
-                    name = field.native_name()?,
+                    name = field.native_ident()?,
                     reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
                 ),
                 iter: format!(
                     "\
 #[cfg(feature = \"puroro-nightly\")]
 fn {name}_iter(&self) -> Self::{iter_name}<'_>",
-                    name = field.native_name()?,
+                    name = field.native_ident()?,
                     iter_name = self.associated_iter_type_ident(field)?,
                 ),
             },
             (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
                 GetterMethods::ScalarField(format!(
                     "fn {name}(&'_ self) -> {reftype}",
-                    name = field.native_name()?,
+                    name = field.native_ident()?,
                     reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
                 ))
             }
@@ -138,7 +138,7 @@ fn {name}_iter(&self) -> Self::{iter_name}<'_>",
         Ok(format!("{}Type", msg.native_ident()?))
     }
     pub fn associated_iter_type_ident(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
-        Ok(format!("{}Iter", to_camel_case(field.native_name()?)))
+        Ok(format!("{}Iter", to_camel_case(field.native_ident()?)))
     }
 
     pub fn scalar_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {

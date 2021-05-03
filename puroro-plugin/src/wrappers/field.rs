@@ -187,29 +187,7 @@ impl<'c> FieldDescriptor<'c> {
         })?)
     }
 
-    pub fn native_maybe_ref_type(&'c self, lifetime: &str) -> Result<Cow<'static, str>> {
-        Ok(match self.type_()?.native_trivial_type_name() {
-            Ok(name) => name.into(),
-            Err(nontrivial_type) => match nontrivial_type {
-                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                NonTrivialFieldType::String => format!("&{lt} str", lt = lifetime).into(),
-                NonTrivialFieldType::Bytes => format!("&{lt} [u8]", lt = lifetime).into(),
-                NonTrivialFieldType::Enum(e) => format!(
-                    "::std::result::Result<{name}, i32>",
-                    name = e.native_ident_with_relative_path(self.package()?)?
-                )
-                .into(),
-                NonTrivialFieldType::Message(m) => format!(
-                    "&{lt} {name}",
-                    lt = lifetime,
-                    name = m.native_ident_with_relative_path(self.package()?)?
-                )
-                .into(),
-            },
-        })
-    }
-
-    pub fn native_name(&'c self) -> Result<&str> {
+    pub fn native_ident(&'c self) -> Result<&str> {
         Ok(self.lazy_native_name.get_or_try_init(|| -> Result<_> {
             Ok(get_keyword_safe_ident(&to_lower_snake_case(self.name()?)))
         })?)

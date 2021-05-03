@@ -54,7 +54,7 @@ pub struct {name}{gp} {{\n",
                     Ok(format!(
                         "{vis}{name}: {type_},\n",
                         vis = self.frag_gen.field_visibility(),
-                        name = field.native_name()?,
+                        name = field.native_ident()?,
                         type_ = self.frag_gen.field_type_for(field)?,
                     ))
                 })),
@@ -91,12 +91,12 @@ impl{gp} {name}{gpb} {{
                             AllocatorType::Default => {
                                 format!(
                                     "{name}: ::puroro_internal::helpers::FieldNew::new(),\n",
-                                    name = field.native_name()?
+                                    name = field.native_ident()?
                                 )
                             }
                             AllocatorType::Bumpalo => format!(
                                 "{name}: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),\n",
-                                name = field.native_name()?
+                                name = field.native_ident()?
                             ),
                         })
                     })),
@@ -172,7 +172,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
     ::deser(&mut self.{name}, field, {default_func})?;
 }}\n",
                             number = field.number(),
-                            name = field.native_name()?,
+                            name = field.native_ident()?,
                             type_ = self.frag_gen.field_type_for(field)?,
                             type_tag = self.frag_gen.type_tag_for(field)?,
                             label_tag = field.label_tag()?,
@@ -237,7 +237,7 @@ impl{gp} ::puroro_internal::ser::Serializable for {name}{gpb} {{
         tags::{label_tag}>>
     ::ser(&self.{name}, serializer, {number})?;\n",
                         number = field.number(),
-                        name = field.native_name()?,
+                        name = field.native_ident()?,
                         type_ = self.frag_gen.field_type_for(field)?,
                         type_tag = self.frag_gen.type_tag_for(field)?,
                         label_tag = field.label_tag()?,
@@ -327,7 +327,7 @@ type {iter_ident}<'a> = impl ::std::iter::Iterator<Item = {reftype}>;\n",
                                 format!(
                                     "{decl} {{\n    self.{ident}{transform}\n}}\n",
                                     decl = decl,
-                                    ident = field.native_name()?,
+                                    ident = field.native_ident()?,
                                     transform = transform,
                                 )
                             }
@@ -341,7 +341,7 @@ type {iter_ident}<'a> = impl ::std::iter::Iterator<Item = {reftype}>;\n",
                                 format!(
                                     "{decl} {{\n    self.{ident}{transform}\n}}\n",
                                     decl = decl,
-                                    ident = field.native_name()?,
+                                    ident = field.native_ident()?,
                                     transform = transform,
                                 )
                             }
@@ -372,7 +372,7 @@ type {iter_ident}<'a> = impl ::std::iter::Iterator<Item = {reftype}>;\n",
                                     for_each = for_each,
                                     boxed_iter = boxed_iter,
                                     iter = iter,
-                                    ident = field.native_name()?,
+                                    ident = field.native_ident()?,
                                     transform_iter = transform_iter
                                 )
                             }
