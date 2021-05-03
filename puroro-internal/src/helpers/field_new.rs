@@ -1,15 +1,15 @@
 use std::convert::TryFrom;
 
-pub trait FieldNew<'a>: Sized {
+pub trait FieldNew<'bump>: Sized {
     fn new() -> Self;
     #[cfg(feature = "puroro-bumpalo")]
-    fn new_in_bumpalo(_bump: &'a ::bumpalo::Bump) -> Self {
+    fn new_in_bumpalo(_bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new()
     }
 }
 macro_rules! impl_field_new {
     ($type:ty) => {
-        impl<'a> FieldNew<'a> for $type {
+        impl<'bump> FieldNew<'bump> for $type {
             fn new() -> Self {
                 Default::default()
             }
@@ -24,17 +24,17 @@ impl_field_new!(f32);
 impl_field_new!(f64);
 impl_field_new!(bool);
 impl_field_new!(::std::string::String);
-impl<'a, T> FieldNew<'a> for ::std::vec::Vec<T> {
+impl<'bump, T> FieldNew<'bump> for ::std::vec::Vec<T> {
     fn new() -> Self {
         ::std::vec::Vec::new()
     }
 }
-impl<'a, T> FieldNew<'a> for ::std::option::Option<T> {
+impl<'bump, T> FieldNew<'bump> for ::std::option::Option<T> {
     fn new() -> Self {
         None
     }
 }
-impl<'a, T> FieldNew<'a> for ::std::result::Result<T, i32>
+impl<'bump, T> FieldNew<'bump> for ::std::result::Result<T, i32>
 where
     T: TryFrom<i32, Error = i32>,
 {
