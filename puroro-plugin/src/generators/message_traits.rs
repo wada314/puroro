@@ -27,61 +27,35 @@ impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
 pub trait {name}Trait {{\n",
                 name = self.msg.native_ident()?
             ),
-            indent((
-                // associated types for fields' msg types.
-                // e.g. "type MyMessageTrait"
-                iter(
-                    self.msg
-                        .fields()
-                        .filter_map(|field| {
-                            if let Ok(FieldType::Message(m)) = field.type_() {
-                                Some((field, m))
-                            } else {
-                                None
-                            }
-                        })
-                        .unique_by(|(_, msg)| msg.fully_qualified_name().unwrap_or_default())
-                        .map(|(field, msg)| {
-                            Ok(format!(
-                                "type {new_name}: {msg_trait};\n",
-                                new_name = self.associated_msg_type_ident(msg)?,
-                                msg_trait = format!(
-                                    "{name}Trait",
-                                    name = msg.native_ident_with_relative_path(field.package()?)?
-                                )
-                            ))
-                        }),
-                ),
-                iter(self.msg.fields().map(|field| -> Result<_> {
-                    Ok((match (field.label()?, field.type_()?) {
-                        (FieldLabel::Optional2, _)
-                        | (FieldLabel::Optional3, FieldType::Message(_)) => {
-                            // getter function for optional field, wrapped by Option.
-                            format!(
-                                "fn {name}(&'_ self) -> ::std::option::Option<{reftype}>;\n",
-                                name = field.native_name()?,
-                                reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
-                            )
-                        }
-                        (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
-                            // normal getter function.
-                            format!(
-                                "fn {name}(&'_ self) -> {reftype};\n",
-                                name = field.native_name()?,
-                                reftype = field.native_maybe_ref_type("'_")?,
-                            )
-                        }
-                        (FieldLabel::Repeated, _) => {
-                            // for_each_***:
-                            // A generic getter function for repeated field.
-                            // Because of some current Rust language limitations we can only
-                            // use an internal iterator, which reminds me Rust @ 2013.
-                            // https://doc.rust-lang.org/0.6/std/list.html#function-iter
-                            // ***_boxed_iter:
-                            // Another restricted getter function. Returns an iterator,
-                            // but it is wrapped by `Box`.
-                            format!(
-                                "\
+            indent((iter(self.msg.fields().map(|field| -> Result<_> {
+                Ok((match (field.label()?, field.type_()?) {
+                    (FieldLabel::Optional2, _) | (FieldLabel::Optional3, FieldType::Message(_)) => {
+                        // getter function for optional field, wrapped by Option.
+                        format!(
+                            "fn {name}(&'_ self) -> ::std::option::Option<{reftype}>;\n",
+                            name = field.native_name()?,
+                            reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
+                        )
+                    }
+                    (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
+                        // normal getter function.
+                        format!(
+                            "fn {name}(&'_ self) -> {reftype};\n",
+                            name = field.native_name()?,
+                            reftype = field.native_maybe_ref_type("'_")?,
+                        )
+                    }
+                    (FieldLabel::Repeated, _) => {
+                        // for_each_***:
+                        // A generic getter function for repeated field.
+                        // Because of some current Rust language limitations we can only
+                        // use an internal iterator, which reminds me Rust @ 2013.
+                        // https://doc.rust-lang.org/0.6/std/list.html#function-iter
+                        // ***_boxed_iter:
+                        // Another restricted getter function. Returns an iterator,
+                        // but it is wrapped by `Box`.
+                        format!(
+                            "\
 fn for_each_{name}<F>(&self, f: F)
 where
     F: FnMut({reftype});
@@ -91,18 +65,32 @@ fn {name}_boxed_iter(&self)
 type {camel_name}Iter<'a>: Iterator<Item={reftype_lt_a}>;
 #[cfg(feature = \"puroro-nightly\")]
 fn {name}_iter(&self) -> Self::{camel_name}Iter<'_>;\n",
-                                name = field.native_name()?,
-                                camel_name = to_camel_case(field.native_name()?),
-                                reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
-                                reftype_lt_a = self.scalar_maybe_ref_type_name(field, "'a")?,
-                            )
-                        }
-                    },))
-                })),
-            )),
+                            name = field.native_name()?,
+                            camel_name = to_camel_case(field.native_name()?),
+                            reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
+                            reftype_lt_a = self.scalar_maybe_ref_type_name(field, "'a")?,
+                        )
+                    }
+                },))
+            })),)),
             "}}\n",
         )
             .write_into(output)
+    }
+
+    pub fn generate_getter_method_decls(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+    ) -> Result<GetterMethods> {
+        Ok(match (field.label()?, field.type_()?) {
+            (FieldLabel::Optional2, _) | (FieldLabel::Optional3, FieldType::Message(_)) => {
+                GetterMethods::OptionalField(format!(
+                    "fn {name}(&'_ self) -> ::std::option::Option<{reftype}>",
+                    name = field.native_name()?,
+                    reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
+                ))
+            }
+        })
     }
 
     pub fn associated_msg_type_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
