@@ -1,9 +1,7 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 
-use super::{
-    EnumDescriptor, FieldDescriptor, FieldLabel, FieldType, FileDescriptor, FileOrMessageRef,
-};
+use super::{EnumDescriptor, FieldDescriptor, FieldType, FileDescriptor, FileOrMessageRef};
 use crate::google::protobuf::DescriptorProto;
 use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
 use crate::{Context, ErrorKind, Result};
@@ -95,7 +93,7 @@ impl<'c> MessageDescriptor<'c> {
     }
     pub fn is_map_entry(&self) -> bool {
         if let Some(options) = &self.proto.options {
-            // TODO: Maybe need to check the default value?
+            // TODO: Maybe need to check the [default="***"] value?
             options.map_entry.unwrap_or_default()
         } else {
             false

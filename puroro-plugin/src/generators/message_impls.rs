@@ -2,7 +2,7 @@ use super::message_frags::MessageImplFragmentGenerator;
 use super::message_traits::{GetterMethods, MessageTraitCodeGenerator};
 use super::writer::{func, indent, indent_n, iter, IntoFragment};
 use crate::context::{AllocatorType, Context};
-use crate::utils::{to_camel_case, Indentor};
+use crate::utils::Indentor;
 use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
 use crate::Result;
 
