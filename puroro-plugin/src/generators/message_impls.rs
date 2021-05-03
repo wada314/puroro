@@ -150,7 +150,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
         I: Iterator<Item = ::std::io::Result<u8>>
     {{
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {{\n",

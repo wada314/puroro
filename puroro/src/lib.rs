@@ -16,3 +16,8 @@ pub trait Serializable: Sized {
 
 pub trait Message {}
 pub trait Enum {}
+
+pub trait InternalData<'bump> {
+    #[cfg(feature = "puroro-bumpalo")]
+    fn bumpalo(&self) -> &'bump ::bumpalo::Bump;
+}

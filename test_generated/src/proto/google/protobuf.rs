@@ -47,7 +47,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for GeneratedCodeIn
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -147,7 +147,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Generate
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -279,7 +279,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Annotation {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -423,7 +423,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Annotati
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -585,7 +585,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for SourceCodeInfo 
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -685,7 +685,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for SourceCo
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -838,7 +838,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Location {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -1027,7 +1027,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Location
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -1250,7 +1250,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for UninterpretedOp
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -1440,7 +1440,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Uninterp
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -1635,7 +1635,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for NamePart {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -1734,7 +1734,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for NamePart
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -1861,7 +1861,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MethodOptions {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -1991,7 +1991,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MethodOp
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -2167,7 +2167,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ServiceOptions 
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -2282,7 +2282,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for ServiceO
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -2421,7 +2421,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumValueOption
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -2536,7 +2536,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumValu
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -2678,7 +2678,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumOptions {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -2808,7 +2808,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumOpti
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -2957,7 +2957,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for OneofOptions {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -3057,7 +3057,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for OneofOpt
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -3198,7 +3198,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FieldOptions {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -3388,7 +3388,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FieldOpt
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -3647,7 +3647,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MessageOptions 
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -3807,7 +3807,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MessageO
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -4042,7 +4042,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileOptions {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -4442,7 +4442,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileOpti
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -4855,7 +4855,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MethodDescripto
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -5015,7 +5015,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MethodDe
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -5195,7 +5195,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ServiceDescript
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -5326,7 +5326,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for ServiceD
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -5473,7 +5473,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumValueDescri
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -5588,7 +5588,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumValu
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -5754,7 +5754,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumDescriptorP
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -5946,7 +5946,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumDesc
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -6147,7 +6147,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumReservedRan
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -6246,7 +6246,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumRese
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -6361,7 +6361,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for OneofDescriptor
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -6461,7 +6461,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for OneofDes
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -6603,7 +6603,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FieldDescriptor
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -6838,7 +6838,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FieldDes
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -7152,7 +7152,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ExtensionRangeO
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -7252,7 +7252,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Extensio
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -7471,7 +7471,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for DescriptorProto
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -7817,7 +7817,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Descript
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -8162,7 +8162,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ReservedRange {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -8261,7 +8261,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Reserved
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -8378,7 +8378,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ExtensionRange 
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -8493,7 +8493,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Extensio
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -8720,7 +8720,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileDescriptorP
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -9080,7 +9080,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileDesc
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -9441,7 +9441,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileDescriptorS
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -9541,7 +9541,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileDesc
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro_internal::helpers::InternalData;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {

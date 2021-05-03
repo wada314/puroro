@@ -1,6 +1,8 @@
+pub mod field_clone;
 pub mod field_deser;
 pub mod field_new;
 pub mod field_ser;
+pub use field_clone::FieldClone;
 pub use field_deser::FieldDeserFromIter;
 pub use field_new::FieldNew;
 pub use field_ser::FieldSer;
@@ -9,6 +11,7 @@ use crate::tags;
 use crate::types::FieldData;
 use std::collections::HashMap;
 use std::marker::PhantomData;
+use ::puroro::InternalData;
 
 pub trait MapEntry {
     type KeyTag: tags::FieldTypeTag;
@@ -24,13 +27,6 @@ pub trait MapEntry {
     );
 }
 
-pub trait InternalData<'bump> {
-    #[cfg(feature = "puroro-bumpalo")]
-    fn bumpalo(&self) -> &'bump bumpalo::Bump {
-        panic!("The Bumpalo data field is only available for a Bumpalo struct!")
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct InternalDataForNormalStruct {
     unknown_fields: Option<HashMap<usize, FieldData<Vec<u8>>>>,
@@ -42,7 +38,12 @@ impl InternalDataForNormalStruct {
         }
     }
 }
-impl<'bump> InternalData<'bump> for InternalDataForNormalStruct {}
+impl<'bump> InternalData<'bump> for InternalDataForNormalStruct {
+    #[cfg(feature = "puroro-bumpalo")]
+    fn bumpalo(&self) -> &'bump bumpalo::Bump {
+        panic!("The Bumpalo data field is only available for a Bumpalo struct!")
+    }
+}
 
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
