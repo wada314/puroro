@@ -90,11 +90,45 @@ fn {name}_iter(&self) -> Self::{camel_name}Iter<'_>;\n",
                     reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
                 ))
             }
+            (FieldLabel::Repeated, _) => GetterMethods::RepeatedField {
+                for_each: format!(
+                    "\
+fn for_each_{name}<F>(&self, f: F)
+where
+    F: FnMut({reftype})",
+                    name = field.native_name()?,
+                    reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
+                ),
+                boxed_iter: format!(
+                    "\
+fn {name}_boxed_iter(&self)
+    -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>",
+                    name = field.native_name()?,
+                    reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
+                ),
+                iter: format!(
+                    "\
+#[cfg(feature = \"puroro-nightly
+fn {name}_iter(&self) -> Self::{iter_name}<'_>;\n",
+                    name = field.native_name()?,
+                    iter_name = self.associated_iter_type_ident(field)?,
+                ),
+            },
+            (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
+                GetterMethods::ScalarField(format!(
+                    "fn {name}(&'_ self) -> {reftype}",
+                    name = field.native_name()?,
+                    reftype = field.native_maybe_ref_type("'_")?,
+                ))
+            }
         })
     }
 
     pub fn associated_msg_type_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
         Ok(format!("{}Type", msg.native_ident()?))
+    }
+    pub fn associated_iter_type_ident(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+        Ok(format!("{}Iter", to_camel_case(field.native_name()?)))
     }
 
     pub fn scalar_maybe_ref_type_name(
@@ -130,6 +164,6 @@ enum GetterMethods {
     RepeatedField {
         for_each: String,
         boxed_iter: String,
-        nightly_iter: String,
+        iter: String,
     },
 }
