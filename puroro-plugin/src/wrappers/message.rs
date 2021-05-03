@@ -145,7 +145,7 @@ impl<'c> MessageDescriptor<'c> {
             }
         }
         Ok(format!(
-            "{supers}{mods}{name}",
+            "self::{supers}{mods}{name}",
             name = struct_name,
             supers = std::iter::repeat("super::")
                 .take(cur_package_iter.count())
