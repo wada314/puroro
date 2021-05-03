@@ -4,7 +4,8 @@
 pub trait CodeGeneratorResponseTrait {
     type FileType: self::code_generator_response::FileTrait;
     #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a>: ::std::iter::Iterator<Item=&'a self::code_generator_response::File>;
+    type FileIter<'a>: ::std::iter::Iterator<Item=&'a Self::FileType>
+        where Self::FileType: 'a;
     fn error(&'_ self) -> ::std::option::Option<&'_ str>;
     fn supported_features(&'_ self) -> ::std::option::Option<u64>;
     fn for_each_file<F>(&self, f: F)
@@ -52,6 +53,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -181,6 +183,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -350,6 +353,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for File {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -479,6 +483,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileBump
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -584,9 +589,11 @@ pub trait CodeGeneratorRequestTrait {
     type FileDescriptorProtoType: self::super::FileDescriptorProtoTrait;
     type VersionType: self::VersionTrait;
     #[cfg(feature = "puroro-nightly")]
-    type FileToGenerateIter<'a>: ::std::iter::Iterator<Item=&'a str>;
+    type FileToGenerateIter<'a>: ::std::iter::Iterator<Item=&'a str>
+        where str: 'a;
     #[cfg(feature = "puroro-nightly")]
-    type ProtoFileIter<'a>: ::std::iter::Iterator<Item=&'a self::super::FileDescriptorProto>;
+    type ProtoFileIter<'a>: ::std::iter::Iterator<Item=&'a Self::FileDescriptorProtoType>
+        where Self::FileDescriptorProtoType: 'a;
     fn for_each_file_to_generate<F>(&self, f: F)
     where
         F: FnMut(&'_ str);
@@ -643,6 +650,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -803,6 +811,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -979,6 +988,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Version {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {
@@ -1107,6 +1117,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for VersionB
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::DeserializableFieldFromIter;
+        use ::puroro_internal::helpers::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
         match field_number {

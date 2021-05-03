@@ -83,9 +83,9 @@ impl<'bump> FieldNew<'bump> for ::bumpalo::collections::String<'bump> {
     }
 }
 
-pub trait InternalData {
+pub trait InternalData<'bump> {
     #[cfg(feature = "puroro-bumpalo")]
-    fn bumpalo(&self) -> &bumpalo::Bump {
+    fn bumpalo(&self) -> &'bump bumpalo::Bump {
         panic!("The Bumpalo data field is only available for a Bumpalo struct!")
     }
 }
@@ -101,7 +101,7 @@ impl InternalDataForNormalStruct {
         }
     }
 }
-impl InternalData for InternalDataForNormalStruct {}
+impl<'bump> InternalData<'bump> for InternalDataForNormalStruct {}
 
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
@@ -125,12 +125,12 @@ impl<'bump> InternalDataForBumpaloStruct<'bump> {
         }
     }
 }
-impl<'bump> InternalData for InternalDataForBumpaloStruct<'bump> {
+impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
     /// Note that the returned bumpalo lifetime is not `'bump' but `'_`.
     /// This is because I don't want to introduce the lifetime parameter
     /// `'b` into the trait's definition. The lifetime `'_` might be shorter
     /// than `'b`, but I believe it's not a problem.
-    fn bumpalo(&self) -> &bumpalo::Bump {
+    fn bumpalo(&self) -> &'bump bumpalo::Bump {
         self.bump
     }
 }

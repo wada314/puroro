@@ -45,9 +45,11 @@ pub trait {trait_ident} {{\n",
                             Ok(format!(
                                 "\
 #[cfg(feature = \"puroro-nightly\")]
-type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>;\n",
+type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>
+    where {scalartype}: 'a;\n",
                                 iter_ident = self.associated_iter_type_ident(field)?,
-                                reftype = field.native_maybe_ref_type("'a")?,
+                                reftype = self.scalar_maybe_ref_type_name(field, "'a")?,
+                                scalartype = self.scalar_type_name(field)?,
                             ))
                         }),
                 ),
@@ -117,7 +119,7 @@ fn {name}_iter(&self) -> Self::{iter_name}<'_>",
                 GetterMethods::ScalarField(format!(
                     "fn {name}(&'_ self) -> {reftype}",
                     name = field.native_name()?,
-                    reftype = field.native_maybe_ref_type("'_")?,
+                    reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
                 ))
             }
         })
@@ -137,6 +139,25 @@ fn {name}_iter(&self) -> Self::{iter_name}<'_>",
     }
     pub fn associated_iter_type_ident(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
         Ok(format!("{}Iter", to_camel_case(field.native_name()?)))
+    }
+
+    pub fn scalar_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+        Ok(match field.type_()?.native_trivial_type_name() {
+            Ok(name) => name.into(),
+            Err(nontrivial_type) => match nontrivial_type {
+                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                NonTrivialFieldType::String => format!("str").into(),
+                NonTrivialFieldType::Bytes => format!("[u8]").into(),
+                NonTrivialFieldType::Enum(e) => format!(
+                    "::std::result::Result<{type_}, i32>",
+                    type_ = e.native_ident_with_relative_path(field.package()?)?
+                )
+                .into(),
+                NonTrivialFieldType::Message(m) => {
+                    format!("Self::{name}", name = self.associated_msg_type_ident(m)?).into()
+                }
+            },
+        })
     }
 
     pub fn scalar_maybe_ref_type_name(
