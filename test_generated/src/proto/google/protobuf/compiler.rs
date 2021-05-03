@@ -1,6 +1,20 @@
 #![allow(unused_variables)]
 #![allow(unused_imports)]
 
+pub trait CodeGeneratorResponseTrait {
+    type FileType: code_generator_response::FileTrait;
+    #[cfg(feature = "puroro-nightly")]
+    type FileIter<'a>: ::std::iter::Iterator<Item=&'a code_generator_response::File>;
+    fn error(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn supported_features(&'_ self) -> ::std::option::Option<u64>;
+    fn for_each_file<F>(&self, f: F)
+    where
+        F: FnMut(&'_ Self::FileType);
+    fn file_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileType>>;
+    #[cfg(feature = "puroro-nightly")]
+    fn file_iter(&self) -> Self::FileIter<'_>;
+}
 
 #[derive(Debug, Clone)]
 pub struct CodeGeneratorResponse {
@@ -271,20 +285,6 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRespons
         Self::new_in(bump)
     }
 }
-pub trait CodeGeneratorResponseTrait {
-    fn error(&'_ self) -> ::std::option::Option<&'_ str>;
-    fn supported_features(&'_ self) -> ::std::option::Option<u64>;
-    type FileType: code_generator_response::FileTrait;
-    fn for_each_file<F>(&self, f: F)
-    where
-        F: FnMut(&'_ code_generator_response::File);
-    fn file_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ code_generator_response::File>>;
-    #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a>: Iterator<Item=&'a code_generator_response::File>;
-    #[cfg(feature = "puroro-nightly")]
-    fn file_iter(&self) -> Self::FileIter<'_>;
-}
 pub mod code_generator_response {
 #[derive(Debug, Clone)]
 pub enum Feature {
@@ -305,6 +305,13 @@ impl ::std::convert::From<Feature> for i32 {
     fn from(val: Feature) -> i32 {
         val as i32
     }
+}
+pub trait FileTrait {
+    type GeneratedCodeInfoType: super::super::GeneratedCodeInfoTrait;
+    fn name(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn insertion_point(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn content(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn generated_code_info(&'_ self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfoType>;
 }
 
 #[derive(Debug, Clone)]
@@ -574,14 +581,31 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileBumpalo<'bump> {
         Self::new_in(bump)
     }
 }
-pub trait FileTrait {
-    fn name(&'_ self) -> ::std::option::Option<&'_ str>;
-    fn insertion_point(&'_ self) -> ::std::option::Option<&'_ str>;
-    fn content(&'_ self) -> ::std::option::Option<&'_ str>;
-    type GeneratedCodeInfoType: super::super::GeneratedCodeInfoTrait;
-    fn generated_code_info(&'_ self) -> ::std::option::Option<&'_ super::super::GeneratedCodeInfo>;
-}
 } // mod code_generator_response
+pub trait CodeGeneratorRequestTrait {
+    type FileDescriptorProtoType: super::FileDescriptorProtoTrait;
+    type VersionType: VersionTrait;
+    #[cfg(feature = "puroro-nightly")]
+    type FileToGenerateIter<'a>: ::std::iter::Iterator<Item=&'a str>;
+    #[cfg(feature = "puroro-nightly")]
+    type ProtoFileIter<'a>: ::std::iter::Iterator<Item=&'a super::FileDescriptorProto>;
+    fn for_each_file_to_generate<F>(&self, f: F)
+    where
+        F: FnMut(&'_ str);
+    fn file_to_generate_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>;
+    #[cfg(feature = "puroro-nightly")]
+    fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_>;
+    fn parameter(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn for_each_proto_file<F>(&self, f: F)
+    where
+        F: FnMut(&'_ Self::FileDescriptorProtoType);
+    fn proto_file_boxed_iter(&self)
+        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileDescriptorProtoType>>;
+    #[cfg(feature = "puroro-nightly")]
+    fn proto_file_iter(&self) -> Self::ProtoFileIter<'_>;
+    fn compiler_version(&'_ self) -> ::std::option::Option<&'_ Self::VersionType>;
+}
 
 #[derive(Debug, Clone)]
 pub struct CodeGeneratorRequest {
@@ -916,29 +940,11 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRequest
         Self::new_in(bump)
     }
 }
-pub trait CodeGeneratorRequestTrait {
-    fn for_each_file_to_generate<F>(&self, f: F)
-    where
-        F: FnMut(&'_ str);
-    fn file_to_generate_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>;
-    #[cfg(feature = "puroro-nightly")]
-    type FileToGenerateIter<'a>: Iterator<Item=&'a str>;
-    #[cfg(feature = "puroro-nightly")]
-    fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_>;
-    fn parameter(&'_ self) -> ::std::option::Option<&'_ str>;
-    type ProtoFileType: super::FileDescriptorProtoTrait;
-    fn for_each_proto_file<F>(&self, f: F)
-    where
-        F: FnMut(&'_ super::FileDescriptorProto);
-    fn proto_file_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ super::FileDescriptorProto>>;
-    #[cfg(feature = "puroro-nightly")]
-    type ProtoFileIter<'a>: Iterator<Item=&'a super::FileDescriptorProto>;
-    #[cfg(feature = "puroro-nightly")]
-    fn proto_file_iter(&self) -> Self::ProtoFileIter<'_>;
-    type CompilerVersionType: VersionTrait;
-    fn compiler_version(&'_ self) -> ::std::option::Option<&'_ Version>;
+pub trait VersionTrait {
+    fn major(&'_ self) -> ::std::option::Option<i32>;
+    fn minor(&'_ self) -> ::std::option::Option<i32>;
+    fn patch(&'_ self) -> ::std::option::Option<i32>;
+    fn suffix(&'_ self) -> ::std::option::Option<&'_ str>;
 }
 
 #[derive(Debug, Clone)]
@@ -1205,10 +1211,4 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for VersionBumpalo<'bump
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
     }
-}
-pub trait VersionTrait {
-    fn major(&'_ self) -> ::std::option::Option<i32>;
-    fn minor(&'_ self) -> ::std::option::Option<i32>;
-    fn patch(&'_ self) -> ::std::option::Option<i32>;
-    fn suffix(&'_ self) -> ::std::option::Option<&'_ str>;
 }

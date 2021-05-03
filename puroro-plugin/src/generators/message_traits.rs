@@ -1,4 +1,4 @@
-use super::writer::{func, indent, iter, IntoFragment};
+use super::writer::{func, indent, iter, Fragment, IntoFragment};
 use crate::context::Context;
 use crate::utils::{to_camel_case, Indentor};
 use crate::wrappers::{
@@ -24,55 +24,52 @@ impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
         (
             format!(
                 "\
-pub trait {name}Trait {{\n",
-                name = self.msg.native_ident()?
+pub trait {trait_ident} {{\n",
+                trait_ident = self.trait_ident(self.msg)?,
             ),
-            indent((iter(self.msg.fields().map(|field| -> Result<_> {
-                Ok((match (field.label()?, field.type_()?) {
-                    (FieldLabel::Optional2, _) | (FieldLabel::Optional3, FieldType::Message(_)) => {
-                        // getter function for optional field, wrapped by Option.
-                        format!(
-                            "fn {name}(&'_ self) -> ::std::option::Option<{reftype}>;\n",
-                            name = field.native_name()?,
-                            reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
-                        )
-                    }
-                    (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
-                        // normal getter function.
-                        format!(
-                            "fn {name}(&'_ self) -> {reftype};\n",
-                            name = field.native_name()?,
-                            reftype = field.native_maybe_ref_type("'_")?,
-                        )
-                    }
-                    (FieldLabel::Repeated, _) => {
-                        // for_each_***:
-                        // A generic getter function for repeated field.
-                        // Because of some current Rust language limitations we can only
-                        // use an internal iterator, which reminds me Rust @ 2013.
-                        // https://doc.rust-lang.org/0.6/std/list.html#function-iter
-                        // ***_boxed_iter:
-                        // Another restricted getter function. Returns an iterator,
-                        // but it is wrapped by `Box`.
-                        format!(
-                            "\
-fn for_each_{name}<F>(&self, f: F)
-where
-    F: FnMut({reftype});
-fn {name}_boxed_iter(&self)
-    -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>;
+            indent((
+                iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
+                    // typedefs for message types
+                    Ok(format!(
+                        "type {type_name}: {trait_rel_ident};\n",
+                        type_name = self.associated_msg_type_ident(msg)?,
+                        trait_rel_ident = self.trait_relative_ident(msg)?,
+                    ))
+                })),
+                iter(
+                    // typedefs for iterator types
+                    self.msg
+                        .fields()
+                        .filter(|field| matches!(field.label(), Ok(FieldLabel::Repeated)))
+                        .map(|field| {
+                            Ok(format!(
+                                "\
 #[cfg(feature = \"puroro-nightly\")]
-type {camel_name}Iter<'a>: Iterator<Item={reftype_lt_a}>;
-#[cfg(feature = \"puroro-nightly\")]
-fn {name}_iter(&self) -> Self::{camel_name}Iter<'_>;\n",
-                            name = field.native_name()?,
-                            camel_name = to_camel_case(field.native_name()?),
-                            reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
-                            reftype_lt_a = self.scalar_maybe_ref_type_name(field, "'a")?,
+type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>;\n",
+                                iter_ident = self.associated_iter_type_ident(field)?,
+                                reftype = field.native_maybe_ref_type("'a")?,
+                            ))
+                        }),
+                ),
+                iter(self.msg.fields().map(|field| -> Result<Fragment<W>> {
+                    // getter method decls
+                    Ok(match self.generate_getter_method_decls(field)? {
+                        GetterMethods::ScalarField(decl) | GetterMethods::OptionalField(decl) => {
+                            format!("{decl};\n", decl = decl).into()
+                        }
+                        GetterMethods::RepeatedField {
+                            for_each,
+                            boxed_iter,
+                            iter,
+                        } => (
+                            format!("{decl};\n", decl = for_each),
+                            format!("{decl};\n", decl = boxed_iter),
+                            format!("{decl};\n", decl = iter),
                         )
-                    }
-                },))
-            })),)),
+                            .into(),
+                    })
+                })),
+            )),
             "}}\n",
         )
             .write_into(output)
@@ -108,8 +105,8 @@ fn {name}_boxed_iter(&self)
                 ),
                 iter: format!(
                     "\
-#[cfg(feature = \"puroro-nightly
-fn {name}_iter(&self) -> Self::{iter_name}<'_>;\n",
+#[cfg(feature = \"puroro-nightly\")]
+fn {name}_iter(&self) -> Self::{iter_name}<'_>",
                     name = field.native_name()?,
                     iter_name = self.associated_iter_type_ident(field)?,
                 ),
@@ -124,6 +121,15 @@ fn {name}_iter(&self) -> Self::{iter_name}<'_>;\n",
         })
     }
 
+    pub fn trait_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
+        Ok(format!("{}Trait", msg.native_ident()?))
+    }
+    pub fn trait_relative_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
+        Ok(format!(
+            "{}Trait",
+            msg.native_ident_with_relative_path(self.msg.package()?)?
+        ))
+    }
     pub fn associated_msg_type_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
         Ok(format!("{}Type", msg.native_ident()?))
     }
@@ -158,7 +164,7 @@ fn {name}_iter(&self) -> Self::{iter_name}<'_>;\n",
     }
 }
 
-enum GetterMethods {
+pub enum GetterMethods {
     ScalarField(String),
     OptionalField(String),
     RepeatedField {

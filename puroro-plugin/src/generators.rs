@@ -27,9 +27,9 @@ impl<'c> DescriptorVisitor<'c> for Visitor<'c> {
         let bumpalo_impl_gen = MessageImplCodeGenerator::new(&self.bumpalo_context, msg);
         let trait_gen = MessageTraitCodeGenerator::new(&self.context, msg);
 
+        trait_gen.print_msg_traits(&mut self.output)?;
         normal_impl_gen.print_msg(&mut self.output)?;
         bumpalo_impl_gen.print_msg(&mut self.output)?;
-        trait_gen.print_msg_traits(&mut self.output)?;
         Ok(())
     }
 
