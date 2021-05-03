@@ -1,9 +1,9 @@
-pub mod deser_field;
+pub mod field_deser;
 pub mod field_new;
-pub mod ser_field;
-pub use deser_field::FieldDeserFromIter;
+pub mod field_ser;
+pub use field_deser::FieldDeserFromIter;
 pub use field_new::FieldNew;
-pub use ser_field::FieldSer;
+pub use field_ser::FieldSer;
 
 use crate::tags;
 use crate::types::FieldData;
