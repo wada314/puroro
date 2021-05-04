@@ -215,17 +215,22 @@ impl<'bump> ::puroro::Serializable for MsgBumpalo<'bump> {
     }
 }
 trait Hoge {
-    type RsubmsgType<'a>;
-    type RsubmsgIter<'a>: ::std::iter::Iterator<Item = &'a Self::RsubmsgType<'a>> 
-    where Self::RsubmsgType<'a>: 'a, Self: 'a;
-    fn rsubmsg_iter(&self) -> Self::RsubmsgIter<'_>;
+    type RsubmsgType;
+    type RsubmsgIter<'a, 'b: 'a>: ::std::iter::Iterator//<Item = &'a Self::RsubmsgType>
+    //where Self::RsubmsgType: 'a;
+    ;
+    //fn rsubmsg_iter(&self) -> Self::RsubmsgIter<'_>;
 }
 impl<'bump> Hoge for MsgBumpalo<'bump> {
-    type RsubmsgType<'a> = msg::SubMsgBumpalo<'bump>;
-    type RsubmsgIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::RsubmsgType<'a>>;
-    fn rsubmsg_iter(&self) -> Self::RsubmsgIter<'_> {
+    type RsubmsgType = msg::SubMsgBumpalo<'bump>;
+    //type RsubmsgIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::RsubmsgType>;
+    //type RsubmsgIter<'a> where 'bump: 'a, Self::RsubmsgType: 'a
+    //    = std::slice::Iter<'a, Self::RsubmsgType>;
+    type RsubmsgIter<'a, 'b: 'a>
+        = std::slice::Iter<'a, msg::SubMsgBumpalo<'b>>;
+    /*fn rsubmsg_iter(&self) -> Self::RsubmsgIter<'_> {
         self.rsubmsg.iter()
-    }
+    }*/
 }
 
 #[cfg(feature = "puroro-bumpalo2")]
