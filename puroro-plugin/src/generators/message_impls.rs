@@ -139,6 +139,7 @@ impl{gp} ::std::default::Default for {name}{gpb} {{
 impl{gp} ::std::clone::Clone for {name}{gpb} {{
     fn clone(&self) -> Self {{
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),

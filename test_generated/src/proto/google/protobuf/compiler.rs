@@ -45,6 +45,7 @@ impl ::std::default::Default for CodeGeneratorResponse {
 impl ::std::clone::Clone for CodeGeneratorResponse {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             error: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.error),
             supported_features: <::std::option::Option<u64> as FieldClone>::clone(&self.supported_features),
@@ -187,6 +188,7 @@ impl<'bump> CodeGeneratorResponseBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for CodeGeneratorResponseBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             error: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.error, self.puroro_internal.bumpalo()),
             supported_features: <::std::option::Option<u64> as FieldClone>::clone_in_bumpalo(&self.supported_features, self.puroro_internal.bumpalo()),
@@ -369,6 +371,7 @@ impl ::std::default::Default for File {
 impl ::std::clone::Clone for File {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             insertion_point: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.insertion_point),
@@ -512,6 +515,7 @@ impl<'bump> FileBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for FileBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             insertion_point: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.insertion_point, self.puroro_internal.bumpalo()),
@@ -692,6 +696,7 @@ impl ::std::default::Default for CodeGeneratorRequest {
 impl ::std::clone::Clone for CodeGeneratorRequest {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             file_to_generate: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.file_to_generate),
             parameter: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.parameter),
@@ -866,6 +871,7 @@ impl<'bump> CodeGeneratorRequestBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for CodeGeneratorRequestBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             file_to_generate: <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.file_to_generate, self.puroro_internal.bumpalo()),
             parameter: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.parameter, self.puroro_internal.bumpalo()),
@@ -1056,6 +1062,7 @@ impl ::std::default::Default for Version {
 impl ::std::clone::Clone for Version {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             major: <::std::option::Option<i32> as FieldClone>::clone(&self.major),
             minor: <::std::option::Option<i32> as FieldClone>::clone(&self.minor),
@@ -1198,6 +1205,7 @@ impl<'bump> VersionBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for VersionBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             major: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.major, self.puroro_internal.bumpalo()),
             minor: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.minor, self.puroro_internal.bumpalo()),

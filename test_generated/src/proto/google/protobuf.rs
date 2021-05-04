@@ -39,6 +39,7 @@ impl ::std::default::Default for GeneratedCodeInfo {
 impl ::std::clone::Clone for GeneratedCodeInfo {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             annotation: <::std::vec::Vec<generated_code_info::Annotation> as FieldClone>::clone(&self.annotation),
         puroro_internal: self.puroro_internal.clone(),
@@ -149,6 +150,7 @@ impl<'bump> GeneratedCodeInfoBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for GeneratedCodeInfoBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             annotation: <::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.annotation, self.puroro_internal.bumpalo()),
         puroro_internal: self.puroro_internal.clone(),
@@ -291,6 +293,7 @@ impl ::std::default::Default for Annotation {
 impl ::std::clone::Clone for Annotation {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             path: <::std::vec::Vec<i32> as FieldClone>::clone(&self.path),
             source_file: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.source_file),
@@ -448,6 +451,7 @@ impl<'bump> AnnotationBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for AnnotationBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             path: <::bumpalo::collections::Vec<'bump, i32> as FieldClone>::clone_in_bumpalo(&self.path, self.puroro_internal.bumpalo()),
             source_file: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.source_file, self.puroro_internal.bumpalo()),
@@ -623,6 +627,7 @@ impl ::std::default::Default for SourceCodeInfo {
 impl ::std::clone::Clone for SourceCodeInfo {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             location: <::std::vec::Vec<source_code_info::Location> as FieldClone>::clone(&self.location),
         puroro_internal: self.puroro_internal.clone(),
@@ -733,6 +738,7 @@ impl<'bump> SourceCodeInfoBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for SourceCodeInfoBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             location: <::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.location, self.puroro_internal.bumpalo()),
         puroro_internal: self.puroro_internal.clone(),
@@ -896,6 +902,7 @@ impl ::std::default::Default for Location {
 impl ::std::clone::Clone for Location {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             path: <::std::vec::Vec<i32> as FieldClone>::clone(&self.path),
             span: <::std::vec::Vec<i32> as FieldClone>::clone(&self.span),
@@ -1099,6 +1106,7 @@ impl<'bump> LocationBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for LocationBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             path: <::bumpalo::collections::Vec<'bump, i32> as FieldClone>::clone_in_bumpalo(&self.path, self.puroro_internal.bumpalo()),
             span: <::bumpalo::collections::Vec<'bump, i32> as FieldClone>::clone_in_bumpalo(&self.span, self.puroro_internal.bumpalo()),
@@ -1336,6 +1344,7 @@ impl ::std::default::Default for UninterpretedOption {
 impl ::std::clone::Clone for UninterpretedOption {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::vec::Vec<uninterpreted_option::NamePart> as FieldClone>::clone(&self.name),
             identifier_value: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.identifier_value),
@@ -1542,6 +1551,7 @@ impl<'bump> UninterpretedOptionBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for UninterpretedOptionBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             identifier_value: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.identifier_value, self.puroro_internal.bumpalo()),
@@ -1753,6 +1763,7 @@ impl ::std::default::Default for NamePart {
 impl ::std::clone::Clone for NamePart {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name_part: <::std::string::String as FieldClone>::clone(&self.name_part),
             is_extension: <bool as FieldClone>::clone(&self.is_extension),
@@ -1863,6 +1874,7 @@ impl<'bump> NamePartBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for NamePartBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name_part: <::bumpalo::collections::String<'bump> as FieldClone>::clone_in_bumpalo(&self.name_part, self.puroro_internal.bumpalo()),
             is_extension: <bool as FieldClone>::clone_in_bumpalo(&self.is_extension, self.puroro_internal.bumpalo()),
@@ -2001,6 +2013,7 @@ impl ::std::default::Default for MethodOptions {
 impl ::std::clone::Clone for MethodOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
             idempotency_level: <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as FieldClone>::clone(&self.idempotency_level),
@@ -2143,6 +2156,7 @@ impl<'bump> MethodOptionsBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for MethodOptionsBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
             idempotency_level: <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as FieldClone>::clone_in_bumpalo(&self.idempotency_level, self.puroro_internal.bumpalo()),
@@ -2331,6 +2345,7 @@ impl ::std::default::Default for ServiceOptions {
 impl ::std::clone::Clone for ServiceOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
@@ -2457,6 +2472,7 @@ impl<'bump> ServiceOptionsBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for ServiceOptionsBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
@@ -2607,6 +2623,7 @@ impl ::std::default::Default for EnumValueOptions {
 impl ::std::clone::Clone for EnumValueOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
@@ -2733,6 +2750,7 @@ impl<'bump> EnumValueOptionsBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for EnumValueOptionsBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
@@ -2886,6 +2904,7 @@ impl ::std::default::Default for EnumOptions {
 impl ::std::clone::Clone for EnumOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             allow_alias: <::std::option::Option<bool> as FieldClone>::clone(&self.allow_alias),
             deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
@@ -3028,6 +3047,7 @@ impl<'bump> EnumOptionsBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for EnumOptionsBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             allow_alias: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.allow_alias, self.puroro_internal.bumpalo()),
             deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
@@ -3189,6 +3209,7 @@ impl ::std::default::Default for OneofOptions {
 impl ::std::clone::Clone for OneofOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
         puroro_internal: self.puroro_internal.clone(),
@@ -3299,6 +3320,7 @@ impl<'bump> OneofOptionsBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for OneofOptionsBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
         puroro_internal: self.puroro_internal.clone(),
@@ -3450,6 +3472,7 @@ impl ::std::default::Default for FieldOptions {
 impl ::std::clone::Clone for FieldOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             ctype: <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as FieldClone>::clone(&self.ctype),
             packed: <::std::option::Option<bool> as FieldClone>::clone(&self.packed),
@@ -3656,6 +3679,7 @@ impl<'bump> FieldOptionsBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for FieldOptionsBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             ctype: <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as FieldClone>::clone_in_bumpalo(&self.ctype, self.puroro_internal.bumpalo()),
             packed: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.packed, self.puroro_internal.bumpalo()),
@@ -3931,6 +3955,7 @@ impl ::std::default::Default for MessageOptions {
 impl ::std::clone::Clone for MessageOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             message_set_wire_format: <::std::option::Option<bool> as FieldClone>::clone(&self.message_set_wire_format),
             no_standard_descriptor_accessor: <::std::option::Option<bool> as FieldClone>::clone(&self.no_standard_descriptor_accessor),
@@ -4105,6 +4130,7 @@ impl<'bump> MessageOptionsBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for MessageOptionsBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             message_set_wire_format: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.message_set_wire_format, self.puroro_internal.bumpalo()),
             no_standard_descriptor_accessor: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.no_standard_descriptor_accessor, self.puroro_internal.bumpalo()),
@@ -4354,6 +4380,7 @@ impl ::std::default::Default for FileOptions {
 impl ::std::clone::Clone for FileOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             java_package: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.java_package),
             java_outer_classname: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.java_outer_classname),
@@ -4784,6 +4811,7 @@ impl<'bump> FileOptionsBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for FileOptionsBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             java_package: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.java_package, self.puroro_internal.bumpalo()),
             java_outer_classname: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.java_outer_classname, self.puroro_internal.bumpalo()),
@@ -5227,6 +5255,7 @@ impl ::std::default::Default for MethodDescriptorProto {
 impl ::std::clone::Clone for MethodDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             input_type: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.input_type),
@@ -5402,6 +5431,7 @@ impl<'bump> MethodDescriptorProtoBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for MethodDescriptorProtoBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             input_type: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.input_type, self.puroro_internal.bumpalo()),
@@ -5597,6 +5627,7 @@ impl ::std::default::Default for ServiceDescriptorProto {
 impl ::std::clone::Clone for ServiceDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             method: <::std::vec::Vec<MethodDescriptorProto> as FieldClone>::clone(&self.method),
@@ -5740,6 +5771,7 @@ impl<'bump> ServiceDescriptorProtoBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for ServiceDescriptorProtoBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             method: <::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.method, self.puroro_internal.bumpalo()),
@@ -5899,6 +5931,7 @@ impl ::std::default::Default for EnumValueDescriptorProto {
 impl ::std::clone::Clone for EnumValueDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             number: <::std::option::Option<i32> as FieldClone>::clone(&self.number),
@@ -6026,6 +6059,7 @@ impl<'bump> EnumValueDescriptorProtoBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for EnumValueDescriptorProtoBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             number: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.number, self.puroro_internal.bumpalo()),
@@ -6204,6 +6238,7 @@ impl ::std::default::Default for EnumDescriptorProto {
 impl ::std::clone::Clone for EnumDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             value: <::std::vec::Vec<EnumValueDescriptorProto> as FieldClone>::clone(&self.value),
@@ -6410,6 +6445,7 @@ impl<'bump> EnumDescriptorProtoBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for EnumDescriptorProtoBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             value: <::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.value, self.puroro_internal.bumpalo()),
@@ -6625,6 +6661,7 @@ impl ::std::default::Default for EnumReservedRange {
 impl ::std::clone::Clone for EnumReservedRange {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             start: <::std::option::Option<i32> as FieldClone>::clone(&self.start),
             end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
@@ -6735,6 +6772,7 @@ impl<'bump> EnumReservedRangeBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for EnumReservedRangeBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             start: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.start, self.puroro_internal.bumpalo()),
             end: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.end, self.puroro_internal.bumpalo()),
@@ -6861,6 +6899,7 @@ impl ::std::default::Default for OneofDescriptorProto {
 impl ::std::clone::Clone for OneofDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             options: <::std::option::Option<::std::boxed::Box<OneofOptions>> as FieldClone>::clone(&self.options),
@@ -6972,6 +7011,7 @@ impl<'bump> OneofDescriptorProtoBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for OneofDescriptorProtoBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             options: <::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
@@ -7125,6 +7165,7 @@ impl ::std::default::Default for FieldDescriptorProto {
 impl ::std::clone::Clone for FieldDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             number: <::std::option::Option<i32> as FieldClone>::clone(&self.number),
@@ -7380,6 +7421,7 @@ impl<'bump> FieldDescriptorProtoBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for FieldDescriptorProtoBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             number: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.number, self.puroro_internal.bumpalo()),
@@ -7714,6 +7756,7 @@ impl ::std::default::Default for ExtensionRangeOptions {
 impl ::std::clone::Clone for ExtensionRangeOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
         puroro_internal: self.puroro_internal.clone(),
@@ -7824,6 +7867,7 @@ impl<'bump> ExtensionRangeOptionsBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for ExtensionRangeOptionsBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
         puroro_internal: self.puroro_internal.clone(),
@@ -8053,6 +8097,7 @@ impl ::std::default::Default for DescriptorProto {
 impl ::std::clone::Clone for DescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             field: <::std::vec::Vec<FieldDescriptorProto> as FieldClone>::clone(&self.field),
@@ -8418,6 +8463,7 @@ impl<'bump> DescriptorProtoBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for DescriptorProtoBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             field: <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.field, self.puroro_internal.bumpalo()),
@@ -8782,6 +8828,7 @@ impl ::std::default::Default for ReservedRange {
 impl ::std::clone::Clone for ReservedRange {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             start: <::std::option::Option<i32> as FieldClone>::clone(&self.start),
             end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
@@ -8892,6 +8939,7 @@ impl<'bump> ReservedRangeBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for ReservedRangeBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             start: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.start, self.puroro_internal.bumpalo()),
             end: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.end, self.puroro_internal.bumpalo()),
@@ -9020,6 +9068,7 @@ impl ::std::default::Default for ExtensionRange {
 impl ::std::clone::Clone for ExtensionRange {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             start: <::std::option::Option<i32> as FieldClone>::clone(&self.start),
             end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
@@ -9147,6 +9196,7 @@ impl<'bump> ExtensionRangeBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for ExtensionRangeBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             start: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.start, self.puroro_internal.bumpalo()),
             end: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.end, self.puroro_internal.bumpalo()),
@@ -9386,6 +9436,7 @@ impl ::std::default::Default for FileDescriptorProto {
 impl ::std::clone::Clone for FileDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             package: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.package),
@@ -9767,6 +9818,7 @@ impl<'bump> FileDescriptorProtoBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for FileDescriptorProtoBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             package: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.package, self.puroro_internal.bumpalo()),
@@ -10149,6 +10201,7 @@ impl ::std::default::Default for FileDescriptorSet {
 impl ::std::clone::Clone for FileDescriptorSet {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             file: <::std::vec::Vec<FileDescriptorProto> as FieldClone>::clone(&self.file),
         puroro_internal: self.puroro_internal.clone(),
@@ -10259,6 +10312,7 @@ impl<'bump> FileDescriptorSetBumpalo<'bump> {
 impl<'bump> ::std::clone::Clone for FileDescriptorSetBumpalo<'bump> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
         Self {
             file: <::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.file, self.puroro_internal.bumpalo()),
         puroro_internal: self.puroro_internal.clone(),
