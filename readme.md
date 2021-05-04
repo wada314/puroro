@@ -1,4 +1,6 @@
-# puroro, protocol buffer implementation for rust
+# puroro, a protocol buffer implementation for rust
+
+This library is under development and it is very possible to make breaking changes in near future.
 
 ## TODOs
 - proto2
@@ -17,8 +19,8 @@
     - Deserializer from a slice
     - Required field checker
     - Other implementations
-        - SliceRef -- A viewer over a `&[u8]` slice
-        - Append -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
+        - SliceRef (name TBD) -- A viewer over a `&[u8]` slice
+        - Append (name TBD) -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
     - Naming of the other implementations. Consider using a type generator class
     - Support the `allocator_api`. Waiting for the `String` support
     - RPCs / services
@@ -32,6 +34,10 @@
 
 ## Sample command
 Keep in mind that protoc command not work properly with Windows path separator "\\". Use "/" instead.
+
+The below is a sample command for Windows OS.
+Please replace the ".exe" below into your OS's one.
+
 ```
 $ protoc <protofile-path> --plugin=protoc-gen-rust=./target/debug/puroro-plugin.exe --rust_out=<output-dir> --proto_path=<protofile-dir>
 ```
