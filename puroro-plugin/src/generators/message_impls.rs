@@ -159,7 +159,7 @@ impl{gp} ::std::clone::Clone for {name}{gpb} {{
                     ))
                 })),
             ),
-            "        \
+            "            \
             puroro_internal: self.puroro_internal.clone(),
         }}
     }}
@@ -392,7 +392,6 @@ type {iter_ident}<'a> = impl ::std::iter::Iterator<Item = {reftype}>;\n",
 {boxed_iter} {{
     ::std::boxed::Box::new(self.{ident}.iter(){transform_iter})
 }}
-#[cfg(feature = \"puroro-nightly\")]
 {iter} {{
     self.{ident}.iter(){transform_iter}
 }}\n",

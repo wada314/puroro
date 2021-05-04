@@ -50,7 +50,7 @@ impl ::std::clone::Clone for CodeGeneratorResponse {
             error: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.error),
             supported_features: <::std::option::Option<u64> as FieldClone>::clone(&self.supported_features),
             file: <::std::vec::Vec<code_generator_response::File> as FieldClone>::clone(&self.file),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -155,7 +155,6 @@ impl CodeGeneratorResponseTrait for CodeGeneratorResponse {
         ::std::boxed::Box::new(self.file.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_> {
         self.file.iter()
     }
@@ -193,7 +192,7 @@ impl<'bump> ::std::clone::Clone for CodeGeneratorResponseBumpalo<'bump> {
             error: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.error, self.puroro_internal.bumpalo()),
             supported_features: <::std::option::Option<u64> as FieldClone>::clone_in_bumpalo(&self.supported_features, self.puroro_internal.bumpalo()),
             file: <::bumpalo::collections::Vec<'bump, code_generator_response::FileBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.file, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -298,7 +297,6 @@ impl<'bump> CodeGeneratorResponseTrait for CodeGeneratorResponseBumpalo<'bump> {
         ::std::boxed::Box::new(self.file.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_> {
         self.file.iter()
     }
@@ -377,7 +375,7 @@ impl ::std::clone::Clone for File {
             insertion_point: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.insertion_point),
             content: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.content),
             generated_code_info: <::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>> as FieldClone>::clone(&self.generated_code_info),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -521,7 +519,7 @@ impl<'bump> ::std::clone::Clone for FileBumpalo<'bump> {
             insertion_point: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.insertion_point, self.puroro_internal.bumpalo()),
             content: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.content, self.puroro_internal.bumpalo()),
             generated_code_info: <::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.generated_code_info, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -702,7 +700,7 @@ impl ::std::clone::Clone for CodeGeneratorRequest {
             parameter: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.parameter),
             proto_file: <::std::vec::Vec<super::FileDescriptorProto> as FieldClone>::clone(&self.proto_file),
             compiler_version: <::std::option::Option<::std::boxed::Box<Version>> as FieldClone>::clone(&self.compiler_version),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -814,7 +812,6 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
         ::std::boxed::Box::new(self.file_to_generate.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_> {
         self.file_to_generate.iter().map(|v| v.as_ref())
     }
@@ -832,7 +829,6 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileDescriptorProtoType>> {
         ::std::boxed::Box::new(self.proto_file.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn proto_file_iter(&self) -> Self::ProtoFileIter<'_> {
         self.proto_file.iter()
@@ -877,7 +873,7 @@ impl<'bump> ::std::clone::Clone for CodeGeneratorRequestBumpalo<'bump> {
             parameter: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.parameter, self.puroro_internal.bumpalo()),
             proto_file: <::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.proto_file, self.puroro_internal.bumpalo()),
             compiler_version: <::std::option::Option<::bumpalo::boxed::Box<'bump, VersionBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.compiler_version, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -989,7 +985,6 @@ impl<'bump> CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo<'bump> {
         ::std::boxed::Box::new(self.file_to_generate.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_> {
         self.file_to_generate.iter().map(|v| v.as_ref())
     }
@@ -1007,7 +1002,6 @@ impl<'bump> CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileDescriptorProtoType>> {
         ::std::boxed::Box::new(self.proto_file.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn proto_file_iter(&self) -> Self::ProtoFileIter<'_> {
         self.proto_file.iter()
@@ -1068,7 +1062,7 @@ impl ::std::clone::Clone for Version {
             minor: <::std::option::Option<i32> as FieldClone>::clone(&self.minor),
             patch: <::std::option::Option<i32> as FieldClone>::clone(&self.patch),
             suffix: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.suffix),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -1211,7 +1205,7 @@ impl<'bump> ::std::clone::Clone for VersionBumpalo<'bump> {
             minor: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.minor, self.puroro_internal.bumpalo()),
             patch: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.patch, self.puroro_internal.bumpalo()),
             suffix: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.suffix, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }

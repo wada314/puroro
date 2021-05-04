@@ -16,5 +16,5 @@ puroro-nightly = []
 puroro-bumpalo = ["bumpalo"]
 default = [
     "puroro-nightly", 
-#    "puroro-bumpalo",
+    "puroro-bumpalo",
 ]

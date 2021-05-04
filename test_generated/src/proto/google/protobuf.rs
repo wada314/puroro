@@ -42,7 +42,7 @@ impl ::std::clone::Clone for GeneratedCodeInfo {
         use ::puroro::InternalData;
         Self {
             annotation: <::std::vec::Vec<generated_code_info::Annotation> as FieldClone>::clone(&self.annotation),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -121,7 +121,6 @@ impl GeneratedCodeInfoTrait for GeneratedCodeInfo {
         ::std::boxed::Box::new(self.annotation.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn annotation_iter(&self) -> Self::AnnotationIter<'_> {
         self.annotation.iter()
     }
@@ -153,7 +152,7 @@ impl<'bump> ::std::clone::Clone for GeneratedCodeInfoBumpalo<'bump> {
         use ::puroro::InternalData;
         Self {
             annotation: <::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.annotation, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -232,7 +231,6 @@ impl<'bump> GeneratedCodeInfoTrait for GeneratedCodeInfoBumpalo<'bump> {
         ::std::boxed::Box::new(self.annotation.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn annotation_iter(&self) -> Self::AnnotationIter<'_> {
         self.annotation.iter()
     }
@@ -299,7 +297,7 @@ impl ::std::clone::Clone for Annotation {
             source_file: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.source_file),
             begin: <::std::option::Option<i32> as FieldClone>::clone(&self.begin),
             end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -407,7 +405,6 @@ impl AnnotationTrait for Annotation {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn path_iter(&self) -> Self::PathIter<'_> {
         self.path.iter().cloned()
     }
@@ -457,7 +454,7 @@ impl<'bump> ::std::clone::Clone for AnnotationBumpalo<'bump> {
             source_file: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.source_file, self.puroro_internal.bumpalo()),
             begin: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.begin, self.puroro_internal.bumpalo()),
             end: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.end, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -565,7 +562,6 @@ impl<'bump> AnnotationTrait for AnnotationBumpalo<'bump> {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn path_iter(&self) -> Self::PathIter<'_> {
         self.path.iter().cloned()
     }
@@ -630,7 +626,7 @@ impl ::std::clone::Clone for SourceCodeInfo {
         use ::puroro::InternalData;
         Self {
             location: <::std::vec::Vec<source_code_info::Location> as FieldClone>::clone(&self.location),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -709,7 +705,6 @@ impl SourceCodeInfoTrait for SourceCodeInfo {
         ::std::boxed::Box::new(self.location.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn location_iter(&self) -> Self::LocationIter<'_> {
         self.location.iter()
     }
@@ -741,7 +736,7 @@ impl<'bump> ::std::clone::Clone for SourceCodeInfoBumpalo<'bump> {
         use ::puroro::InternalData;
         Self {
             location: <::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.location, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -819,7 +814,6 @@ impl<'bump> SourceCodeInfoTrait for SourceCodeInfoBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::LocationType>> {
         ::std::boxed::Box::new(self.location.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn location_iter(&self) -> Self::LocationIter<'_> {
         self.location.iter()
@@ -909,7 +903,7 @@ impl ::std::clone::Clone for Location {
             leading_comments: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.leading_comments),
             trailing_comments: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.trailing_comments),
             leading_detached_comments: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.leading_detached_comments),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -1031,7 +1025,6 @@ impl LocationTrait for Location {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn path_iter(&self) -> Self::PathIter<'_> {
         self.path.iter().cloned()
     }
@@ -1046,7 +1039,6 @@ impl LocationTrait for Location {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.span.iter().cloned())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn span_iter(&self) -> Self::SpanIter<'_> {
         self.span.iter().cloned()
@@ -1068,7 +1060,6 @@ impl LocationTrait for Location {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.leading_detached_comments.iter().map(|v| v.as_ref()))
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn leading_detached_comments_iter(&self) -> Self::LeadingDetachedCommentsIter<'_> {
         self.leading_detached_comments.iter().map(|v| v.as_ref())
@@ -1113,7 +1104,7 @@ impl<'bump> ::std::clone::Clone for LocationBumpalo<'bump> {
             leading_comments: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.leading_comments, self.puroro_internal.bumpalo()),
             trailing_comments: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.trailing_comments, self.puroro_internal.bumpalo()),
             leading_detached_comments: <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.leading_detached_comments, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -1235,7 +1226,6 @@ impl<'bump> LocationTrait for LocationBumpalo<'bump> {
         ::std::boxed::Box::new(self.path.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn path_iter(&self) -> Self::PathIter<'_> {
         self.path.iter().cloned()
     }
@@ -1250,7 +1240,6 @@ impl<'bump> LocationTrait for LocationBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.span.iter().cloned())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn span_iter(&self) -> Self::SpanIter<'_> {
         self.span.iter().cloned()
@@ -1272,7 +1261,6 @@ impl<'bump> LocationTrait for LocationBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.leading_detached_comments.iter().map(|v| v.as_ref()))
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn leading_detached_comments_iter(&self) -> Self::LeadingDetachedCommentsIter<'_> {
         self.leading_detached_comments.iter().map(|v| v.as_ref())
@@ -1353,7 +1341,7 @@ impl ::std::clone::Clone for UninterpretedOption {
             double_value: <::std::option::Option<f64> as FieldClone>::clone(&self.double_value),
             string_value: <::std::option::Option<::std::vec::Vec<u8>> as FieldClone>::clone(&self.string_value),
             aggregate_value: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.aggregate_value),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -1492,7 +1480,6 @@ impl UninterpretedOptionTrait for UninterpretedOption {
         ::std::boxed::Box::new(self.name.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn name_iter(&self) -> Self::NameIter<'_> {
         self.name.iter()
     }
@@ -1560,7 +1547,7 @@ impl<'bump> ::std::clone::Clone for UninterpretedOptionBumpalo<'bump> {
             double_value: <::std::option::Option<f64> as FieldClone>::clone_in_bumpalo(&self.double_value, self.puroro_internal.bumpalo()),
             string_value: <::std::option::Option<::bumpalo::collections::Vec<'bump, u8>> as FieldClone>::clone_in_bumpalo(&self.string_value, self.puroro_internal.bumpalo()),
             aggregate_value: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.aggregate_value, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -1699,7 +1686,6 @@ impl<'bump> UninterpretedOptionTrait for UninterpretedOptionBumpalo<'bump> {
         ::std::boxed::Box::new(self.name.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn name_iter(&self) -> Self::NameIter<'_> {
         self.name.iter()
     }
@@ -1767,7 +1753,7 @@ impl ::std::clone::Clone for NamePart {
         Self {
             name_part: <::std::string::String as FieldClone>::clone(&self.name_part),
             is_extension: <bool as FieldClone>::clone(&self.is_extension),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -1878,7 +1864,7 @@ impl<'bump> ::std::clone::Clone for NamePartBumpalo<'bump> {
         Self {
             name_part: <::bumpalo::collections::String<'bump> as FieldClone>::clone_in_bumpalo(&self.name_part, self.puroro_internal.bumpalo()),
             is_extension: <bool as FieldClone>::clone_in_bumpalo(&self.is_extension, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -2018,7 +2004,7 @@ impl ::std::clone::Clone for MethodOptions {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
             idempotency_level: <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as FieldClone>::clone(&self.idempotency_level),
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -2123,7 +2109,6 @@ impl MethodOptionsTrait for MethodOptions {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -2161,7 +2146,7 @@ impl<'bump> ::std::clone::Clone for MethodOptionsBumpalo<'bump> {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
             idempotency_level: <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as FieldClone>::clone_in_bumpalo(&self.idempotency_level, self.puroro_internal.bumpalo()),
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -2266,7 +2251,6 @@ impl<'bump> MethodOptionsTrait for MethodOptionsBumpalo<'bump> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -2349,7 +2333,7 @@ impl ::std::clone::Clone for ServiceOptions {
         Self {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -2441,7 +2425,6 @@ impl ServiceOptionsTrait for ServiceOptions {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -2476,7 +2459,7 @@ impl<'bump> ::std::clone::Clone for ServiceOptionsBumpalo<'bump> {
         Self {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -2568,7 +2551,6 @@ impl<'bump> ServiceOptionsTrait for ServiceOptionsBumpalo<'bump> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -2627,7 +2609,7 @@ impl ::std::clone::Clone for EnumValueOptions {
         Self {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -2719,7 +2701,6 @@ impl EnumValueOptionsTrait for EnumValueOptions {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -2754,7 +2735,7 @@ impl<'bump> ::std::clone::Clone for EnumValueOptionsBumpalo<'bump> {
         Self {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -2846,7 +2827,6 @@ impl<'bump> EnumValueOptionsTrait for EnumValueOptionsBumpalo<'bump> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -2909,7 +2889,7 @@ impl ::std::clone::Clone for EnumOptions {
             allow_alias: <::std::option::Option<bool> as FieldClone>::clone(&self.allow_alias),
             deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -3014,7 +2994,6 @@ impl EnumOptionsTrait for EnumOptions {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -3052,7 +3031,7 @@ impl<'bump> ::std::clone::Clone for EnumOptionsBumpalo<'bump> {
             allow_alias: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.allow_alias, self.puroro_internal.bumpalo()),
             deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -3157,7 +3136,6 @@ impl<'bump> EnumOptionsTrait for EnumOptionsBumpalo<'bump> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -3212,7 +3190,7 @@ impl ::std::clone::Clone for OneofOptions {
         use ::puroro::InternalData;
         Self {
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -3291,7 +3269,6 @@ impl OneofOptionsTrait for OneofOptions {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -3323,7 +3300,7 @@ impl<'bump> ::std::clone::Clone for OneofOptionsBumpalo<'bump> {
         use ::puroro::InternalData;
         Self {
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -3401,7 +3378,6 @@ impl<'bump> OneofOptionsTrait for OneofOptionsBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -3481,7 +3457,7 @@ impl ::std::clone::Clone for FieldOptions {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
             weak: <::std::option::Option<bool> as FieldClone>::clone(&self.weak),
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -3638,7 +3614,6 @@ impl FieldOptionsTrait for FieldOptions {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -3688,7 +3663,7 @@ impl<'bump> ::std::clone::Clone for FieldOptionsBumpalo<'bump> {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
             weak: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.weak, self.puroro_internal.bumpalo()),
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -3845,7 +3820,6 @@ impl<'bump> FieldOptionsTrait for FieldOptionsBumpalo<'bump> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -3962,7 +3936,7 @@ impl ::std::clone::Clone for MessageOptions {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
             map_entry: <::std::option::Option<bool> as FieldClone>::clone(&self.map_entry),
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -4093,7 +4067,6 @@ impl MessageOptionsTrait for MessageOptions {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -4137,7 +4110,7 @@ impl<'bump> ::std::clone::Clone for MessageOptionsBumpalo<'bump> {
             deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
             map_entry: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.map_entry, self.puroro_internal.bumpalo()),
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -4267,7 +4240,6 @@ impl<'bump> MessageOptionsTrait for MessageOptionsBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -4403,7 +4375,7 @@ impl ::std::clone::Clone for FileOptions {
             php_metadata_namespace: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.php_metadata_namespace),
             ruby_package: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.ruby_package),
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -4742,7 +4714,6 @@ impl FileOptionsTrait for FileOptions {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -4834,7 +4805,7 @@ impl<'bump> ::std::clone::Clone for FileOptionsBumpalo<'bump> {
             php_metadata_namespace: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.php_metadata_namespace, self.puroro_internal.bumpalo()),
             ruby_package: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.ruby_package, self.puroro_internal.bumpalo()),
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -5173,7 +5144,6 @@ impl<'bump> FileOptionsTrait for FileOptionsBumpalo<'bump> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -5263,7 +5233,7 @@ impl ::std::clone::Clone for MethodDescriptorProto {
             options: <::std::option::Option<::std::boxed::Box<MethodOptions>> as FieldClone>::clone(&self.options),
             client_streaming: <::std::option::Option<bool> as FieldClone>::clone(&self.client_streaming),
             server_streaming: <::std::option::Option<bool> as FieldClone>::clone(&self.server_streaming),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -5439,7 +5409,7 @@ impl<'bump> ::std::clone::Clone for MethodDescriptorProtoBumpalo<'bump> {
             options: <::std::option::Option<::bumpalo::boxed::Box<'bump, MethodOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
             client_streaming: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.client_streaming, self.puroro_internal.bumpalo()),
             server_streaming: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.server_streaming, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -5632,7 +5602,7 @@ impl ::std::clone::Clone for ServiceDescriptorProto {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             method: <::std::vec::Vec<MethodDescriptorProto> as FieldClone>::clone(&self.method),
             options: <::std::option::Option<::std::boxed::Box<ServiceOptions>> as FieldClone>::clone(&self.options),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -5735,7 +5705,6 @@ impl ServiceDescriptorProtoTrait for ServiceDescriptorProto {
         ::std::boxed::Box::new(self.method.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn method_iter(&self) -> Self::MethodIter<'_> {
         self.method.iter()
     }
@@ -5776,7 +5745,7 @@ impl<'bump> ::std::clone::Clone for ServiceDescriptorProtoBumpalo<'bump> {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             method: <::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.method, self.puroro_internal.bumpalo()),
             options: <::std::option::Option<::bumpalo::boxed::Box<'bump, ServiceOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -5879,7 +5848,6 @@ impl<'bump> ServiceDescriptorProtoTrait for ServiceDescriptorProtoBumpalo<'bump>
         ::std::boxed::Box::new(self.method.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn method_iter(&self) -> Self::MethodIter<'_> {
         self.method.iter()
     }
@@ -5936,7 +5904,7 @@ impl ::std::clone::Clone for EnumValueDescriptorProto {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             number: <::std::option::Option<i32> as FieldClone>::clone(&self.number),
             options: <::std::option::Option<::std::boxed::Box<EnumValueOptions>> as FieldClone>::clone(&self.options),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -6064,7 +6032,7 @@ impl<'bump> ::std::clone::Clone for EnumValueDescriptorProtoBumpalo<'bump> {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             number: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.number, self.puroro_internal.bumpalo()),
             options: <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumValueOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -6245,7 +6213,7 @@ impl ::std::clone::Clone for EnumDescriptorProto {
             options: <::std::option::Option<::std::boxed::Box<EnumOptions>> as FieldClone>::clone(&self.options),
             reserved_range: <::std::vec::Vec<enum_descriptor_proto::EnumReservedRange> as FieldClone>::clone(&self.reserved_range),
             reserved_name: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.reserved_name),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -6373,7 +6341,6 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProto {
         ::std::boxed::Box::new(self.value.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn value_iter(&self) -> Self::ValueIter<'_> {
         self.value.iter()
     }
@@ -6392,7 +6359,6 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProto {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
         self.reserved_range.iter()
     }
@@ -6407,7 +6373,6 @@ impl EnumDescriptorProtoTrait for EnumDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_> {
         self.reserved_name.iter().map(|v| v.as_ref())
@@ -6452,7 +6417,7 @@ impl<'bump> ::std::clone::Clone for EnumDescriptorProtoBumpalo<'bump> {
             options: <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
             reserved_range: <::bumpalo::collections::Vec<'bump, enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.reserved_range, self.puroro_internal.bumpalo()),
             reserved_name: <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.reserved_name, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -6580,7 +6545,6 @@ impl<'bump> EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo<'bump> {
         ::std::boxed::Box::new(self.value.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn value_iter(&self) -> Self::ValueIter<'_> {
         self.value.iter()
     }
@@ -6599,7 +6563,6 @@ impl<'bump> EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo<'bump> {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
         self.reserved_range.iter()
     }
@@ -6614,7 +6577,6 @@ impl<'bump> EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_> {
         self.reserved_name.iter().map(|v| v.as_ref())
@@ -6665,7 +6627,7 @@ impl ::std::clone::Clone for EnumReservedRange {
         Self {
             start: <::std::option::Option<i32> as FieldClone>::clone(&self.start),
             end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -6776,7 +6738,7 @@ impl<'bump> ::std::clone::Clone for EnumReservedRangeBumpalo<'bump> {
         Self {
             start: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.start, self.puroro_internal.bumpalo()),
             end: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.end, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -6903,7 +6865,7 @@ impl ::std::clone::Clone for OneofDescriptorProto {
         Self {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             options: <::std::option::Option<::std::boxed::Box<OneofOptions>> as FieldClone>::clone(&self.options),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -7015,7 +6977,7 @@ impl<'bump> ::std::clone::Clone for OneofDescriptorProtoBumpalo<'bump> {
         Self {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             options: <::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -7178,7 +7140,7 @@ impl ::std::clone::Clone for FieldDescriptorProto {
             json_name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.json_name),
             options: <::std::option::Option<::std::boxed::Box<FieldOptions>> as FieldClone>::clone(&self.options),
             proto3_optional: <::std::option::Option<bool> as FieldClone>::clone(&self.proto3_optional),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -7434,7 +7396,7 @@ impl<'bump> ::std::clone::Clone for FieldDescriptorProtoBumpalo<'bump> {
             json_name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.json_name, self.puroro_internal.bumpalo()),
             options: <::std::option::Option<::bumpalo::boxed::Box<'bump, FieldOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
             proto3_optional: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.proto3_optional, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -7759,7 +7721,7 @@ impl ::std::clone::Clone for ExtensionRangeOptions {
         use ::puroro::InternalData;
         Self {
             uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -7838,7 +7800,6 @@ impl ExtensionRangeOptionsTrait for ExtensionRangeOptions {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
     }
@@ -7870,7 +7831,7 @@ impl<'bump> ::std::clone::Clone for ExtensionRangeOptionsBumpalo<'bump> {
         use ::puroro::InternalData;
         Self {
             uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -7948,7 +7909,6 @@ impl<'bump> ExtensionRangeOptionsTrait for ExtensionRangeOptionsBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::UninterpretedOptionType>> {
         ::std::boxed::Box::new(self.uninterpreted_option.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_> {
         self.uninterpreted_option.iter()
@@ -8109,7 +8069,7 @@ impl ::std::clone::Clone for DescriptorProto {
             options: <::std::option::Option<::std::boxed::Box<MessageOptions>> as FieldClone>::clone(&self.options),
             reserved_range: <::std::vec::Vec<descriptor_proto::ReservedRange> as FieldClone>::clone(&self.reserved_range),
             reserved_name: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.reserved_name),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -8301,7 +8261,6 @@ impl DescriptorProtoTrait for DescriptorProto {
         ::std::boxed::Box::new(self.field.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn field_iter(&self) -> Self::FieldIter<'_> {
         self.field.iter()
     }
@@ -8316,7 +8275,6 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FieldDescriptorProtoType>> {
         ::std::boxed::Box::new(self.extension.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
@@ -8333,7 +8291,6 @@ impl DescriptorProtoTrait for DescriptorProto {
         ::std::boxed::Box::new(self.nested_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn nested_type_iter(&self) -> Self::NestedTypeIter<'_> {
         self.nested_type.iter()
     }
@@ -8348,7 +8305,6 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::EnumDescriptorProtoType>> {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
@@ -8365,7 +8321,6 @@ impl DescriptorProtoTrait for DescriptorProto {
         ::std::boxed::Box::new(self.extension_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn extension_range_iter(&self) -> Self::ExtensionRangeIter<'_> {
         self.extension_range.iter()
     }
@@ -8380,7 +8335,6 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::OneofDescriptorProtoType>> {
         ::std::boxed::Box::new(self.oneof_decl.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn oneof_decl_iter(&self) -> Self::OneofDeclIter<'_> {
         self.oneof_decl.iter()
@@ -8400,7 +8354,6 @@ impl DescriptorProtoTrait for DescriptorProto {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
         self.reserved_range.iter()
     }
@@ -8415,7 +8368,6 @@ impl DescriptorProtoTrait for DescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_> {
         self.reserved_name.iter().map(|v| v.as_ref())
@@ -8475,7 +8427,7 @@ impl<'bump> ::std::clone::Clone for DescriptorProtoBumpalo<'bump> {
             options: <::std::option::Option<::bumpalo::boxed::Box<'bump, MessageOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
             reserved_range: <::bumpalo::collections::Vec<'bump, descriptor_proto::ReservedRangeBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.reserved_range, self.puroro_internal.bumpalo()),
             reserved_name: <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.reserved_name, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -8667,7 +8619,6 @@ impl<'bump> DescriptorProtoTrait for DescriptorProtoBumpalo<'bump> {
         ::std::boxed::Box::new(self.field.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn field_iter(&self) -> Self::FieldIter<'_> {
         self.field.iter()
     }
@@ -8682,7 +8633,6 @@ impl<'bump> DescriptorProtoTrait for DescriptorProtoBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FieldDescriptorProtoType>> {
         ::std::boxed::Box::new(self.extension.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
@@ -8699,7 +8649,6 @@ impl<'bump> DescriptorProtoTrait for DescriptorProtoBumpalo<'bump> {
         ::std::boxed::Box::new(self.nested_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn nested_type_iter(&self) -> Self::NestedTypeIter<'_> {
         self.nested_type.iter()
     }
@@ -8714,7 +8663,6 @@ impl<'bump> DescriptorProtoTrait for DescriptorProtoBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::EnumDescriptorProtoType>> {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
@@ -8731,7 +8679,6 @@ impl<'bump> DescriptorProtoTrait for DescriptorProtoBumpalo<'bump> {
         ::std::boxed::Box::new(self.extension_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn extension_range_iter(&self) -> Self::ExtensionRangeIter<'_> {
         self.extension_range.iter()
     }
@@ -8746,7 +8693,6 @@ impl<'bump> DescriptorProtoTrait for DescriptorProtoBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::OneofDescriptorProtoType>> {
         ::std::boxed::Box::new(self.oneof_decl.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn oneof_decl_iter(&self) -> Self::OneofDeclIter<'_> {
         self.oneof_decl.iter()
@@ -8766,7 +8712,6 @@ impl<'bump> DescriptorProtoTrait for DescriptorProtoBumpalo<'bump> {
         ::std::boxed::Box::new(self.reserved_range.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn reserved_range_iter(&self) -> Self::ReservedRangeIter<'_> {
         self.reserved_range.iter()
     }
@@ -8781,7 +8726,6 @@ impl<'bump> DescriptorProtoTrait for DescriptorProtoBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.reserved_name.iter().map(|v| v.as_ref()))
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_> {
         self.reserved_name.iter().map(|v| v.as_ref())
@@ -8832,7 +8776,7 @@ impl ::std::clone::Clone for ReservedRange {
         Self {
             start: <::std::option::Option<i32> as FieldClone>::clone(&self.start),
             end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -8943,7 +8887,7 @@ impl<'bump> ::std::clone::Clone for ReservedRangeBumpalo<'bump> {
         Self {
             start: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.start, self.puroro_internal.bumpalo()),
             end: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.end, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -9073,7 +9017,7 @@ impl ::std::clone::Clone for ExtensionRange {
             start: <::std::option::Option<i32> as FieldClone>::clone(&self.start),
             end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
             options: <::std::option::Option<::std::boxed::Box<super::ExtensionRangeOptions>> as FieldClone>::clone(&self.options),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -9201,7 +9145,7 @@ impl<'bump> ::std::clone::Clone for ExtensionRangeBumpalo<'bump> {
             start: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.start, self.puroro_internal.bumpalo()),
             end: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.end, self.puroro_internal.bumpalo()),
             options: <::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -9450,7 +9394,7 @@ impl ::std::clone::Clone for FileDescriptorProto {
             options: <::std::option::Option<::std::boxed::Box<FileOptions>> as FieldClone>::clone(&self.options),
             source_code_info: <::std::option::Option<::std::boxed::Box<SourceCodeInfo>> as FieldClone>::clone(&self.source_code_info),
             syntax: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.syntax),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -9662,7 +9606,6 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         ::std::boxed::Box::new(self.dependency.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn dependency_iter(&self) -> Self::DependencyIter<'_> {
         self.dependency.iter().map(|v| v.as_ref())
     }
@@ -9677,7 +9620,6 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.public_dependency.iter().cloned())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn public_dependency_iter(&self) -> Self::PublicDependencyIter<'_> {
         self.public_dependency.iter().cloned()
@@ -9694,7 +9636,6 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         ::std::boxed::Box::new(self.weak_dependency.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn weak_dependency_iter(&self) -> Self::WeakDependencyIter<'_> {
         self.weak_dependency.iter().cloned()
     }
@@ -9709,7 +9650,6 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::DescriptorProtoType>> {
         ::std::boxed::Box::new(self.message_type.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn message_type_iter(&self) -> Self::MessageTypeIter<'_> {
         self.message_type.iter()
@@ -9726,7 +9666,6 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
     }
@@ -9742,7 +9681,6 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         ::std::boxed::Box::new(self.service.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn service_iter(&self) -> Self::ServiceIter<'_> {
         self.service.iter()
     }
@@ -9757,7 +9695,6 @@ impl FileDescriptorProtoTrait for FileDescriptorProto {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FieldDescriptorProtoType>> {
         ::std::boxed::Box::new(self.extension.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
@@ -9832,7 +9769,7 @@ impl<'bump> ::std::clone::Clone for FileDescriptorProtoBumpalo<'bump> {
             options: <::std::option::Option<::bumpalo::boxed::Box<'bump, FileOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
             source_code_info: <::std::option::Option<::bumpalo::boxed::Box<'bump, SourceCodeInfoBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.source_code_info, self.puroro_internal.bumpalo()),
             syntax: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.syntax, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -10044,7 +9981,6 @@ impl<'bump> FileDescriptorProtoTrait for FileDescriptorProtoBumpalo<'bump> {
         ::std::boxed::Box::new(self.dependency.iter().map(|v| v.as_ref()))
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn dependency_iter(&self) -> Self::DependencyIter<'_> {
         self.dependency.iter().map(|v| v.as_ref())
     }
@@ -10059,7 +9995,6 @@ impl<'bump> FileDescriptorProtoTrait for FileDescriptorProtoBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=i32>> {
         ::std::boxed::Box::new(self.public_dependency.iter().cloned())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn public_dependency_iter(&self) -> Self::PublicDependencyIter<'_> {
         self.public_dependency.iter().cloned()
@@ -10076,7 +10011,6 @@ impl<'bump> FileDescriptorProtoTrait for FileDescriptorProtoBumpalo<'bump> {
         ::std::boxed::Box::new(self.weak_dependency.iter().cloned())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn weak_dependency_iter(&self) -> Self::WeakDependencyIter<'_> {
         self.weak_dependency.iter().cloned()
     }
@@ -10091,7 +10025,6 @@ impl<'bump> FileDescriptorProtoTrait for FileDescriptorProtoBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::DescriptorProtoType>> {
         ::std::boxed::Box::new(self.message_type.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn message_type_iter(&self) -> Self::MessageTypeIter<'_> {
         self.message_type.iter()
@@ -10108,7 +10041,6 @@ impl<'bump> FileDescriptorProtoTrait for FileDescriptorProtoBumpalo<'bump> {
         ::std::boxed::Box::new(self.enum_type.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn enum_type_iter(&self) -> Self::EnumTypeIter<'_> {
         self.enum_type.iter()
     }
@@ -10124,7 +10056,6 @@ impl<'bump> FileDescriptorProtoTrait for FileDescriptorProtoBumpalo<'bump> {
         ::std::boxed::Box::new(self.service.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn service_iter(&self) -> Self::ServiceIter<'_> {
         self.service.iter()
     }
@@ -10139,7 +10070,6 @@ impl<'bump> FileDescriptorProtoTrait for FileDescriptorProtoBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FieldDescriptorProtoType>> {
         ::std::boxed::Box::new(self.extension.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn extension_iter(&self) -> Self::ExtensionIter<'_> {
         self.extension.iter()
@@ -10204,7 +10134,7 @@ impl ::std::clone::Clone for FileDescriptorSet {
         use ::puroro::InternalData;
         Self {
             file: <::std::vec::Vec<FileDescriptorProto> as FieldClone>::clone(&self.file),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -10283,7 +10213,6 @@ impl FileDescriptorSetTrait for FileDescriptorSet {
         ::std::boxed::Box::new(self.file.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_> {
         self.file.iter()
     }
@@ -10315,7 +10244,7 @@ impl<'bump> ::std::clone::Clone for FileDescriptorSetBumpalo<'bump> {
         use ::puroro::InternalData;
         Self {
             file: <::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.file, self.puroro_internal.bumpalo()),
-        puroro_internal: self.puroro_internal.clone(),
+            puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -10393,7 +10322,6 @@ impl<'bump> FileDescriptorSetTrait for FileDescriptorSetBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileDescriptorProtoType>> {
         ::std::boxed::Box::new(self.file.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_> {
         self.file.iter()

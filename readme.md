@@ -10,7 +10,8 @@
     - OneOfs
     - Anys, and other well-known types
     - Unit tests
-    - Document!!
+    - Write document!!
+    - Print comments in the generated files
     - Mutable interface
     - Keep unknown fields
     - Deserializer from a slice
@@ -21,6 +22,7 @@
     - Naming of the other implementations. Consider using a type generator class
     - Support the `allocator_api`. Waiting for the `String` support
     - RPCs / services
+    - Deserializer vulnerbility: Need to limit the recursion depth
 
 ## subcrates
 
