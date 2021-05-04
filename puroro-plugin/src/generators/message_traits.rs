@@ -46,7 +46,7 @@ pub trait {trait_ident} {{\n",
                                 "\
 #[cfg(feature = \"puroro-nightly\")]
 type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>
-    where {scalartype}: 'a;\n",
+    where Self: 'a, {scalartype}: 'a;\n",
                                 iter_ident = self.associated_iter_type_ident(field)?,
                                 reftype = self.scalar_maybe_ref_type_name(field, "'a")?,
                                 scalartype = self.scalar_type_name(field)?,

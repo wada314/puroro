@@ -4,7 +4,8 @@
 pub trait MsgTrait {
     type SubMsgType: self::msg::SubMsgTrait;
     #[cfg(feature = "puroro-nightly")]
-    type RsubmsgIter<'a>: ::std::iter::Iterator<Item=&'a Self::SubMsgType> where Self::SubMsgType: 'a;
+    type RsubmsgIter<'a>: ::std::iter::Iterator<Item=&'a Self::SubMsgType>
+        where Self: 'a, Self::SubMsgType: 'a;
     fn for_each_rsubmsg<F>(&self, f: F)
     where
         F: FnMut(&'_ Self::SubMsgType);
@@ -60,6 +61,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Msg {
         use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             6 => {
                 <::std::vec::Vec<msg::SubMsg> as FieldDeserFromIter<
@@ -107,7 +109,8 @@ impl ::puroro::Serializable for Msg {
 impl MsgTrait for Msg {
     type SubMsgType = msg::SubMsg;
     #[cfg(feature = "puroro-nightly")]
-    type RsubmsgIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::SubMsgType>;
+    type RsubmsgIter<'a> where Self: 'a = 
+        impl ::std::iter::Iterator<Item = &'a Self::SubMsgType>;
     fn for_each_rsubmsg<F>(&self, mut f: F)
     where
         F: FnMut(&'_ Self::SubMsgType) {
@@ -170,13 +173,13 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MsgBumpa
         use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
-        let bumpalo = self.puroro_internal.bumpalo();
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             6 => {
                 <::bumpalo::collections::Vec<'bump, msg::SubMsgBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<msg::SubMsgBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.rsubmsg, field, || msg::SubMsgBumpalo::new_in(bumpalo))?;
+                ::deser(&mut self.rsubmsg, field, || msg::SubMsgBumpalo::new_in(puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -214,31 +217,12 @@ impl<'bump> ::puroro::Serializable for MsgBumpalo<'bump> {
         <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
-trait Hoge {
-    type RsubmsgType;
-    type RsubmsgIter<'a>: ::std::iter::Iterator//<Item = &'a Self::RsubmsgType>
-    //where Self::RsubmsgType: 'a;
-    where Self: 'a
-    ;
-    //fn rsubmsg_iter(&self) -> Self::RsubmsgIter<'_>;
-}
-impl<'bump> Hoge for MsgBumpalo<'bump> {
-    type RsubmsgType = msg::SubMsgBumpalo<'bump>;
-    //type RsubmsgIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::RsubmsgType>;
-    //type RsubmsgIter<'a> where 'bump: 'a, Self::RsubmsgType: 'a
-    //    = std::slice::Iter<'a, Self::RsubmsgType>;
-    type RsubmsgIter<'a> where Self: 'a
-        = std::slice::Iter<'a, msg::SubMsgBumpalo<'bump>>;
-    /*fn rsubmsg_iter(&self) -> Self::RsubmsgIter<'_> {
-        self.rsubmsg.iter()
-    }*/
-}
-
-#[cfg(feature = "puroro-bumpalo2")]
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MsgTrait for MsgBumpalo<'bump> {
     type SubMsgType = msg::SubMsgBumpalo<'bump>;
     #[cfg(feature = "puroro-nightly")]
-    type RsubmsgIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::SubMsgType>;
+    type RsubmsgIter<'a> where Self: 'a = 
+        impl ::std::iter::Iterator<Item = &'a Self::SubMsgType>;
     fn for_each_rsubmsg<F>(&self, mut f: F)
     where
         F: FnMut(&'_ Self::SubMsgType) {
@@ -311,6 +295,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for SubMsg {
         use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -390,6 +375,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for SubMsgBu
         use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -486,6 +472,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for SubSubMsg {
         use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             1 => {
                 <i64 as FieldDeserFromIter<
@@ -581,6 +568,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for SubSubMs
         use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             1 => {
                 <i64 as FieldDeserFromIter<

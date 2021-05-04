@@ -216,25 +216,24 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 },
                 AllocatorType::Bumpalo => match field.type_()? {
                     FieldType::String => {
-                        "|| ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo())"
+                        "|| ::bumpalo::collections::String::new_in(puroro_internal.bumpalo())"
                             .into()
                     }
                     FieldType::Bytes => {
-                        "|| ::bumpalo::collections::Vec::new_in(self.puroro_internal.bumpalo())"
-                            .into()
+                        "|| ::bumpalo::collections::Vec::new_in(puroro_internal.bumpalo())".into()
                     }
                     FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
                     FieldType::Enum(_) => "|| 0i32.try_into()".into(),
                     FieldType::Message(m) => match field.label()? {
                         FieldLabel::Optional2 | FieldLabel::Optional3 => format!(
                             "|| ::bumpalo::boxed::Box::new_in({msg}::new_in(\
-                                self.puroro_internal.bumpalo()\
-                            ), self.puroro_internal.bumpalo())",
+                                puroro_internal.bumpalo()\
+                            ), puroro_internal.bumpalo())",
                             msg = self.struct_name_with_relative_path(m, field.package()?)?,
                         )
                         .into(),
                         FieldLabel::Required | FieldLabel::Repeated => format!(
-                            "|| {msg}::new_in(self.puroro_internal.bumpalo())",
+                            "|| {msg}::new_in(puroro_internal.bumpalo())",
                             msg = self.struct_name_with_relative_path(m, field.package()?)?,
                         )
                         .into(),

@@ -190,6 +190,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
         use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
@@ -333,7 +334,8 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                             Ok(format!(
                                 "\
 #[cfg(feature = \"puroro-nightly\")]
-type {iter_ident}<'a> = impl ::std::iter::Iterator<Item = {reftype}>;\n",
+type {iter_ident}<'a> where Self: 'a = 
+    impl ::std::iter::Iterator<Item = {reftype}>;\n",
                                 iter_ident = self.traits_gen.associated_iter_type_ident(field)?,
                                 reftype =
                                     self.traits_gen.scalar_maybe_ref_type_name(field, "'a")?
