@@ -4,7 +4,8 @@
 pub trait CodeGeneratorResponseTrait {
     type FileType: self::code_generator_response::FileTrait;
     #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a>: ::std::iter::Iterator<Item=&'a self::code_generator_response::File>;
+    type FileIter<'a>: ::std::iter::Iterator<Item=&'a Self::FileType>
+        where Self: 'a, Self::FileType: 'a;
     fn error(&'_ self) -> ::std::option::Option<&'_ str>;
     fn supported_features(&'_ self) -> ::std::option::Option<u64>;
     fn for_each_file<F>(&self, f: F)
@@ -16,7 +17,7 @@ pub trait CodeGeneratorResponseTrait {
     fn file_iter(&self) -> Self::FileIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CodeGeneratorResponse {
     pub error: ::std::option::Option<::std::string::String>,
     pub supported_features: ::std::option::Option<u64>,
@@ -41,6 +42,19 @@ impl ::std::default::Default for CodeGeneratorResponse {
     }
 }
 
+impl ::std::clone::Clone for CodeGeneratorResponse {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
+        Self {
+            error: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.error),
+            supported_features: <::std::option::Option<u64> as FieldClone>::clone(&self.supported_features),
+            file: <::std::vec::Vec<code_generator_response::File> as FieldClone>::clone(&self.file),
+            puroro_internal: self.puroro_internal.clone(),
+        }
+    }
+}
+
 impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorResponse {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -52,8 +66,10 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             1 => {
                 <::std::option::Option<::std::string::String> as FieldDeserFromIter<
@@ -121,7 +137,8 @@ impl ::puroro::Serializable for CodeGeneratorResponse {
 impl CodeGeneratorResponseTrait for CodeGeneratorResponse {
     type FileType = code_generator_response::File;
     #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::FileType>;
+    type FileIter<'a> where Self: 'a = 
+        impl ::std::iter::Iterator<Item = &'a Self::FileType>;
     fn error(&'_ self) -> ::std::option::Option<&'_ str> {
         self.error.as_deref()
     }
@@ -140,7 +157,6 @@ impl CodeGeneratorResponseTrait for CodeGeneratorResponse {
         ::std::boxed::Box::new(self.file.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_> {
         self.file.iter()
     }
@@ -151,7 +167,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for CodeGeneratorResponse<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CodeGeneratorResponseBumpalo<'bump> {
     pub error: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub supported_features: ::std::option::Option<u64>,
@@ -170,6 +186,19 @@ impl<'bump> CodeGeneratorResponseBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for CodeGeneratorResponseBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
+        Self {
+            error: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.error, self.puroro_internal.bumpalo()),
+            supported_features: <::std::option::Option<u64> as FieldClone>::clone_in_bumpalo(&self.supported_features, self.puroro_internal.bumpalo()),
+            file: <::bumpalo::collections::Vec<'bump, code_generator_response::FileBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.file, self.puroro_internal.bumpalo()),
+            puroro_internal: self.puroro_internal.clone(),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorResponseBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -181,14 +210,16 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             1 => {
                 <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
-                ::deser(&mut self.error, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.error, field, || ::bumpalo::collections::String::new_in(puroro_internal.bumpalo()))?;
             }
             2 => {
                 <::std::option::Option<u64> as FieldDeserFromIter<
@@ -200,7 +231,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
                 <::bumpalo::collections::Vec<'bump, code_generator_response::FileBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<code_generator_response::FileBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.file, field, || code_generator_response::FileBumpalo::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.file, field, || code_generator_response::FileBumpalo::new_in(puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -250,7 +281,8 @@ impl<'bump> ::puroro::Serializable for CodeGeneratorResponseBumpalo<'bump> {
 impl<'bump> CodeGeneratorResponseTrait for CodeGeneratorResponseBumpalo<'bump> {
     type FileType = code_generator_response::FileBumpalo<'bump>;
     #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::FileType>;
+    type FileIter<'a> where Self: 'a = 
+        impl ::std::iter::Iterator<Item = &'a Self::FileType>;
     fn error(&'_ self) -> ::std::option::Option<&'_ str> {
         self.error.as_deref()
     }
@@ -268,7 +300,6 @@ impl<'bump> CodeGeneratorResponseTrait for CodeGeneratorResponseBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileType>> {
         ::std::boxed::Box::new(self.file.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn file_iter(&self) -> Self::FileIter<'_> {
         self.file.iter()
@@ -312,7 +343,7 @@ pub trait FileTrait {
     fn generated_code_info(&'_ self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfoType>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct File {
     pub name: ::std::option::Option<::std::string::String>,
     pub insertion_point: ::std::option::Option<::std::string::String>,
@@ -339,6 +370,20 @@ impl ::std::default::Default for File {
     }
 }
 
+impl ::std::clone::Clone for File {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
+        Self {
+            name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
+            insertion_point: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.insertion_point),
+            content: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.content),
+            generated_code_info: <::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>> as FieldClone>::clone(&self.generated_code_info),
+            puroro_internal: self.puroro_internal.clone(),
+        }
+    }
+}
+
 impl ::puroro_internal::deser::DeserializableMessageFromIter for File {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -350,8 +395,10 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for File {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             1 => {
                 <::std::option::Option<::std::string::String> as FieldDeserFromIter<
@@ -447,7 +494,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for File<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FileBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub insertion_point: ::std::option::Option<::bumpalo::collections::String<'bump>>,
@@ -468,6 +515,20 @@ impl<'bump> FileBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for FileBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
+        Self {
+            name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
+            insertion_point: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.insertion_point, self.puroro_internal.bumpalo()),
+            content: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.content, self.puroro_internal.bumpalo()),
+            generated_code_info: <::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.generated_code_info, self.puroro_internal.bumpalo()),
+            puroro_internal: self.puroro_internal.clone(),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -479,32 +540,34 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileBump
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             1 => {
                 <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
-                ::deser(&mut self.name, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.name, field, || ::bumpalo::collections::String::new_in(puroro_internal.bumpalo()))?;
             }
             2 => {
                 <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
-                ::deser(&mut self.insertion_point, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.insertion_point, field, || ::bumpalo::collections::String::new_in(puroro_internal.bumpalo()))?;
             }
             15 => {
                 <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
-                ::deser(&mut self.content, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.content, field, || ::bumpalo::collections::String::new_in(puroro_internal.bumpalo()))?;
             }
             16 => {
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>> as FieldDeserFromIter<
                     tags::Message<super::super::GeneratedCodeInfoBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.generated_code_info, field, || ::bumpalo::boxed::Box::new_in(super::super::GeneratedCodeInfoBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.generated_code_info, field, || ::bumpalo::boxed::Box::new_in(super::super::GeneratedCodeInfoBumpalo::new_in(puroro_internal.bumpalo()), puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -584,9 +647,11 @@ pub trait CodeGeneratorRequestTrait {
     type FileDescriptorProtoType: self::super::FileDescriptorProtoTrait;
     type VersionType: self::VersionTrait;
     #[cfg(feature = "puroro-nightly")]
-    type FileToGenerateIter<'a>: ::std::iter::Iterator<Item=&'a str>;
+    type FileToGenerateIter<'a>: ::std::iter::Iterator<Item=&'a str>
+        where Self: 'a, str: 'a;
     #[cfg(feature = "puroro-nightly")]
-    type ProtoFileIter<'a>: ::std::iter::Iterator<Item=&'a self::super::FileDescriptorProto>;
+    type ProtoFileIter<'a>: ::std::iter::Iterator<Item=&'a Self::FileDescriptorProtoType>
+        where Self: 'a, Self::FileDescriptorProtoType: 'a;
     fn for_each_file_to_generate<F>(&self, f: F)
     where
         F: FnMut(&'_ str);
@@ -605,7 +670,7 @@ pub trait CodeGeneratorRequestTrait {
     fn compiler_version(&'_ self) -> ::std::option::Option<&'_ Self::VersionType>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CodeGeneratorRequest {
     pub file_to_generate: ::std::vec::Vec<::std::string::String>,
     pub parameter: ::std::option::Option<::std::string::String>,
@@ -632,6 +697,20 @@ impl ::std::default::Default for CodeGeneratorRequest {
     }
 }
 
+impl ::std::clone::Clone for CodeGeneratorRequest {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
+        Self {
+            file_to_generate: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.file_to_generate),
+            parameter: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.parameter),
+            proto_file: <::std::vec::Vec<super::FileDescriptorProto> as FieldClone>::clone(&self.proto_file),
+            compiler_version: <::std::option::Option<::std::boxed::Box<Version>> as FieldClone>::clone(&self.compiler_version),
+            puroro_internal: self.puroro_internal.clone(),
+        }
+    }
+}
+
 impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRequest {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -643,8 +722,10 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             1 => {
                 <::std::vec::Vec<::std::string::String> as FieldDeserFromIter<
@@ -723,9 +804,11 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
     type FileDescriptorProtoType = super::FileDescriptorProto;
     type VersionType = Version;
     #[cfg(feature = "puroro-nightly")]
-    type FileToGenerateIter<'a> = impl ::std::iter::Iterator<Item = &'a str>;
+    type FileToGenerateIter<'a> where Self: 'a = 
+        impl ::std::iter::Iterator<Item = &'a str>;
     #[cfg(feature = "puroro-nightly")]
-    type ProtoFileIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::FileDescriptorProtoType>;
+    type ProtoFileIter<'a> where Self: 'a = 
+        impl ::std::iter::Iterator<Item = &'a Self::FileDescriptorProtoType>;
     fn for_each_file_to_generate<F>(&self, mut f: F)
     where
         F: FnMut(&'_ str) {
@@ -737,7 +820,6 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.file_to_generate.iter().map(|v| v.as_ref()))
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_> {
         self.file_to_generate.iter().map(|v| v.as_ref())
@@ -757,7 +839,6 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
         ::std::boxed::Box::new(self.proto_file.iter())
     }
     #[cfg(feature = "puroro-nightly")]
-    #[cfg(feature = "puroro-nightly")]
     fn proto_file_iter(&self) -> Self::ProtoFileIter<'_> {
         self.proto_file.iter()
     }
@@ -771,7 +852,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for CodeGeneratorRequest<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CodeGeneratorRequestBumpalo<'bump> {
     pub file_to_generate: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     pub parameter: ::std::option::Option<::bumpalo::collections::String<'bump>>,
@@ -792,6 +873,20 @@ impl<'bump> CodeGeneratorRequestBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for CodeGeneratorRequestBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
+        Self {
+            file_to_generate: <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.file_to_generate, self.puroro_internal.bumpalo()),
+            parameter: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.parameter, self.puroro_internal.bumpalo()),
+            proto_file: <::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.proto_file, self.puroro_internal.bumpalo()),
+            compiler_version: <::std::option::Option<::bumpalo::boxed::Box<'bump, VersionBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.compiler_version, self.puroro_internal.bumpalo()),
+            puroro_internal: self.puroro_internal.clone(),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRequestBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -803,32 +898,34 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             1 => {
                 <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Repeated>>
-                ::deser(&mut self.file_to_generate, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.file_to_generate, field, || ::bumpalo::collections::String::new_in(puroro_internal.bumpalo()))?;
             }
             2 => {
                 <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
-                ::deser(&mut self.parameter, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.parameter, field, || ::bumpalo::collections::String::new_in(puroro_internal.bumpalo()))?;
             }
             15 => {
                 <::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<super::FileDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.proto_file, field, || super::FileDescriptorProtoBumpalo::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.proto_file, field, || super::FileDescriptorProtoBumpalo::new_in(puroro_internal.bumpalo()))?;
             }
             3 => {
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, VersionBumpalo<'bump>>> as FieldDeserFromIter<
                     tags::Message<VersionBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.compiler_version, field, || ::bumpalo::boxed::Box::new_in(VersionBumpalo::new_in(self.puroro_internal.bumpalo()), self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.compiler_version, field, || ::bumpalo::boxed::Box::new_in(VersionBumpalo::new_in(puroro_internal.bumpalo()), puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -883,9 +980,11 @@ impl<'bump> CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo<'bump> {
     type FileDescriptorProtoType = super::FileDescriptorProtoBumpalo<'bump>;
     type VersionType = VersionBumpalo<'bump>;
     #[cfg(feature = "puroro-nightly")]
-    type FileToGenerateIter<'a> = impl ::std::iter::Iterator<Item = &'a str>;
+    type FileToGenerateIter<'a> where Self: 'a = 
+        impl ::std::iter::Iterator<Item = &'a str>;
     #[cfg(feature = "puroro-nightly")]
-    type ProtoFileIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::FileDescriptorProtoType>;
+    type ProtoFileIter<'a> where Self: 'a = 
+        impl ::std::iter::Iterator<Item = &'a Self::FileDescriptorProtoType>;
     fn for_each_file_to_generate<F>(&self, mut f: F)
     where
         F: FnMut(&'_ str) {
@@ -897,7 +996,6 @@ impl<'bump> CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
         ::std::boxed::Box::new(self.file_to_generate.iter().map(|v| v.as_ref()))
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_> {
         self.file_to_generate.iter().map(|v| v.as_ref())
@@ -916,7 +1014,6 @@ impl<'bump> CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo<'bump> {
         -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileDescriptorProtoType>> {
         ::std::boxed::Box::new(self.proto_file.iter())
     }
-    #[cfg(feature = "puroro-nightly")]
     #[cfg(feature = "puroro-nightly")]
     fn proto_file_iter(&self) -> Self::ProtoFileIter<'_> {
         self.proto_file.iter()
@@ -941,7 +1038,7 @@ pub trait VersionTrait {
     fn suffix(&'_ self) -> ::std::option::Option<&'_ str>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Version {
     pub major: ::std::option::Option<i32>,
     pub minor: ::std::option::Option<i32>,
@@ -968,6 +1065,20 @@ impl ::std::default::Default for Version {
     }
 }
 
+impl ::std::clone::Clone for Version {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
+        Self {
+            major: <::std::option::Option<i32> as FieldClone>::clone(&self.major),
+            minor: <::std::option::Option<i32> as FieldClone>::clone(&self.minor),
+            patch: <::std::option::Option<i32> as FieldClone>::clone(&self.patch),
+            suffix: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.suffix),
+            puroro_internal: self.puroro_internal.clone(),
+        }
+    }
+}
+
 impl ::puroro_internal::deser::DeserializableMessageFromIter for Version {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -979,8 +1090,10 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Version {
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             1 => {
                 <::std::option::Option<i32> as FieldDeserFromIter<
@@ -1075,7 +1188,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Version<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct VersionBumpalo<'bump> {
     pub major: ::std::option::Option<i32>,
     pub minor: ::std::option::Option<i32>,
@@ -1096,6 +1209,20 @@ impl<'bump> VersionBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for VersionBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
+        Self {
+            major: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.major, self.puroro_internal.bumpalo()),
+            minor: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.minor, self.puroro_internal.bumpalo()),
+            patch: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.patch, self.puroro_internal.bumpalo()),
+            suffix: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.suffix, self.puroro_internal.bumpalo()),
+            puroro_internal: self.puroro_internal.clone(),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for VersionBumpalo<'bump> {
     fn met_field<'a, 'b, I>(
         &mut self,
@@ -1107,8 +1234,10 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for VersionB
         I: Iterator<Item = ::std::io::Result<u8>>
     {
         use ::puroro_internal::helpers::FieldDeserFromIter;
+        use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
         match field_number {
             1 => {
                 <::std::option::Option<i32> as FieldDeserFromIter<
@@ -1132,7 +1261,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for VersionB
                 <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldDeserFromIter<
                     tags::String, 
                     tags::Optional2>>
-                ::deser(&mut self.suffix, field, || ::bumpalo::collections::String::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.suffix, field, || ::bumpalo::collections::String::new_in(puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
