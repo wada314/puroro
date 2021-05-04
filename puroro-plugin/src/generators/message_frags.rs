@@ -276,6 +276,21 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             AllocatorType::Bumpalo => "fn new_in(bump: &'bump ::bumpalo::Bump) -> Self",
         }
     }
+    pub fn field_clone(&self, field_ident: &str, field_type: &str) -> String {
+        match self.context.alloc_type() {
+            AllocatorType::Default => format!(
+                "<{field_type} as FieldClone>::clone(&self.{field_ident})",
+                field_ident = field_ident,
+                field_type = field_type
+            ),
+            AllocatorType::Bumpalo => format!(
+                "<{field_type} as FieldClone>::clone_in_bumpalo(\
+                    &self.{field_ident}, self.puroro_internal.bumpalo())",
+                field_ident = field_ident,
+                field_type = field_type
+            ),
+        }
+    }
 
     pub fn box_type(&self, item: &str) -> String {
         match self.context.alloc_type() {

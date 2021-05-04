@@ -27,10 +27,10 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
         (
             func(|output| self.print_msg_struct(output)),
             func(|output| self.print_msg_new(output)),
+            func(|output| self.print_msg_clone(output)),
             (
                 func(|output| self.print_msg_deser_from_iter(output)),
-                func(|output| self.print_msg_ser_serializable(output)),
-                func(|output| self.print_msg_puroro_serializable(output)),
+                func(|output| self.print_msg_ser(output)),
             ),
             func(|output| self.print_msg_trait_impl(output)),
             func(|output| self.print_msg_field_new_impl(output)),
@@ -43,7 +43,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             format!(
                 "\
 {cfg}
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct {name}{gp} {{\n",
                 name = self.frag_gen.struct_name(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
@@ -131,6 +131,42 @@ impl{gp} ::std::default::Default for {name}{gpb} {{
             .write_into(output)
     }
 
+    pub fn print_msg_clone<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+        (
+            format!(
+                "\
+{cfg}
+impl{gp} ::std::clone::Clone for {name}{gpb} {{
+    fn clone(&self) -> Self {{
+        use ::puroro_internal::helpers::FieldClone;
+        Self {{\n",
+                name = self.frag_gen.struct_name(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params(&[]),
+                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+            ),
+            indent_n(
+                3,
+                iter(self.msg.fields().map(|field| {
+                    Ok(format!(
+                        "{ident}: {clone},\n",
+                        ident = field.native_ident()?,
+                        clone = self.frag_gen.field_clone(
+                            field.native_ident()?,
+                            &self.frag_gen.field_type_for(field)?
+                        ),
+                    ))
+                })),
+            ),
+            "        \
+            puroro_internal: self.puroro_internal.clone(),
+        }}
+    }}
+}}\n",
+        )
+            .write_into(output)
+    }
+
     pub fn print_msg_deser_from_iter<W: std::fmt::Write>(
         &self,
         output: &mut Indentor<W>,
@@ -208,10 +244,7 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
             .write_into(output)
     }
 
-    pub fn print_msg_ser_serializable<W: std::fmt::Write>(
-        &self,
-        output: &mut Indentor<W>,
-    ) -> Result<()> {
+    pub fn print_msg_ser<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
             format!(
                 "\
@@ -248,16 +281,8 @@ impl{gp} ::puroro_internal::ser::Serializable for {name}{gpb} {{
         Ok(())
     }}
 }}\n",
-        )
-            .write_into(output)
-    }
-
-    pub fn print_msg_puroro_serializable<W: std::fmt::Write>(
-        &self,
-        output: &mut Indentor<W>,
-    ) -> Result<()> {
-        (format!(
-            "\
+            format!(
+                "\
 {cfg}
 impl{gp} ::puroro::Serializable for {name}{gpb} {{
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {{
@@ -265,11 +290,12 @@ impl{gp} ::puroro::Serializable for {name}{gpb} {{
         <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }}
 }}\n",
-            name = self.frag_gen.struct_name(self.msg)?,
-            cfg = self.frag_gen.cfg_condition(),
-            gp = self.frag_gen.struct_generic_params(&[]),
-            gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-        ),)
+                name = self.frag_gen.struct_name(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params(&[]),
+                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+            ),
+        )
             .write_into(output)
     }
 

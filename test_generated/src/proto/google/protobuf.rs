@@ -15,7 +15,7 @@ pub trait GeneratedCodeInfoTrait {
     fn annotation_iter(&self) -> Self::AnnotationIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct GeneratedCodeInfo {
     pub annotation: ::std::vec::Vec<generated_code_info::Annotation>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
@@ -33,6 +33,16 @@ impl GeneratedCodeInfo {
 impl ::std::default::Default for GeneratedCodeInfo {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for GeneratedCodeInfo {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            annotation: <::std::vec::Vec<generated_code_info::Annotation> as FieldClone>::clone(&self.annotation),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -121,7 +131,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for GeneratedCodeInfo<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct GeneratedCodeInfoBumpalo<'bump> {
     pub annotation: ::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
@@ -132,6 +142,16 @@ impl<'bump> GeneratedCodeInfoBumpalo<'bump> {
         Self {
             annotation: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for GeneratedCodeInfoBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            annotation: <::bumpalo::collections::Vec<'bump, generated_code_info::AnnotationBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.annotation, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -241,7 +261,7 @@ pub trait AnnotationTrait {
     fn end(&'_ self) -> ::std::option::Option<i32>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Annotation {
     pub path: ::std::vec::Vec<i32>,
     pub source_file: ::std::option::Option<::std::string::String>,
@@ -265,6 +285,19 @@ impl Annotation {
 impl ::std::default::Default for Annotation {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for Annotation {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            path: <::std::vec::Vec<i32> as FieldClone>::clone(&self.path),
+            source_file: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.source_file),
+            begin: <::std::option::Option<i32> as FieldClone>::clone(&self.begin),
+            end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -391,7 +424,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Annotation<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct AnnotationBumpalo<'bump> {
     pub path: ::bumpalo::collections::Vec<'bump, i32>,
     pub source_file: ::std::option::Option<::bumpalo::collections::String<'bump>>,
@@ -408,6 +441,19 @@ impl<'bump> AnnotationBumpalo<'bump> {
             begin: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             end: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for AnnotationBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            path: <::bumpalo::collections::Vec<'bump, i32> as FieldClone>::clone_in_bumpalo(&self.path, self.puroro_internal.bumpalo()),
+            source_file: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.source_file, self.puroro_internal.bumpalo()),
+            begin: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.begin, self.puroro_internal.bumpalo()),
+            end: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.end, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -553,7 +599,7 @@ pub trait SourceCodeInfoTrait {
     fn location_iter(&self) -> Self::LocationIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct SourceCodeInfo {
     pub location: ::std::vec::Vec<source_code_info::Location>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
@@ -571,6 +617,16 @@ impl SourceCodeInfo {
 impl ::std::default::Default for SourceCodeInfo {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for SourceCodeInfo {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            location: <::std::vec::Vec<source_code_info::Location> as FieldClone>::clone(&self.location),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -659,7 +715,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for SourceCodeInfo<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct SourceCodeInfoBumpalo<'bump> {
     pub location: ::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
@@ -670,6 +726,16 @@ impl<'bump> SourceCodeInfoBumpalo<'bump> {
         Self {
             location: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for SourceCodeInfoBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            location: <::bumpalo::collections::Vec<'bump, source_code_info::LocationBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.location, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -798,7 +864,7 @@ pub trait LocationTrait {
     fn leading_detached_comments_iter(&self) -> Self::LeadingDetachedCommentsIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Location {
     pub path: ::std::vec::Vec<i32>,
     pub span: ::std::vec::Vec<i32>,
@@ -824,6 +890,20 @@ impl Location {
 impl ::std::default::Default for Location {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for Location {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            path: <::std::vec::Vec<i32> as FieldClone>::clone(&self.path),
+            span: <::std::vec::Vec<i32> as FieldClone>::clone(&self.span),
+            leading_comments: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.leading_comments),
+            trailing_comments: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.trailing_comments),
+            leading_detached_comments: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.leading_detached_comments),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -993,7 +1073,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Location<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct LocationBumpalo<'bump> {
     pub path: ::bumpalo::collections::Vec<'bump, i32>,
     pub span: ::bumpalo::collections::Vec<'bump, i32>,
@@ -1012,6 +1092,20 @@ impl<'bump> LocationBumpalo<'bump> {
             trailing_comments: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             leading_detached_comments: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for LocationBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            path: <::bumpalo::collections::Vec<'bump, i32> as FieldClone>::clone_in_bumpalo(&self.path, self.puroro_internal.bumpalo()),
+            span: <::bumpalo::collections::Vec<'bump, i32> as FieldClone>::clone_in_bumpalo(&self.span, self.puroro_internal.bumpalo()),
+            leading_comments: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.leading_comments, self.puroro_internal.bumpalo()),
+            trailing_comments: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.trailing_comments, self.puroro_internal.bumpalo()),
+            leading_detached_comments: <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.leading_detached_comments, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -1206,7 +1300,7 @@ pub trait UninterpretedOptionTrait {
     fn aggregate_value(&'_ self) -> ::std::option::Option<&'_ str>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct UninterpretedOption {
     pub name: ::std::vec::Vec<uninterpreted_option::NamePart>,
     pub identifier_value: ::std::option::Option<::std::string::String>,
@@ -1236,6 +1330,22 @@ impl UninterpretedOption {
 impl ::std::default::Default for UninterpretedOption {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for UninterpretedOption {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::vec::Vec<uninterpreted_option::NamePart> as FieldClone>::clone(&self.name),
+            identifier_value: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.identifier_value),
+            positive_int_value: <::std::option::Option<u64> as FieldClone>::clone(&self.positive_int_value),
+            negative_int_value: <::std::option::Option<i64> as FieldClone>::clone(&self.negative_int_value),
+            double_value: <::std::option::Option<f64> as FieldClone>::clone(&self.double_value),
+            string_value: <::std::option::Option<::std::vec::Vec<u8>> as FieldClone>::clone(&self.string_value),
+            aggregate_value: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.aggregate_value),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -1402,7 +1512,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for UninterpretedOption<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct UninterpretedOptionBumpalo<'bump> {
     pub name: ::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo<'bump>>,
     pub identifier_value: ::std::option::Option<::bumpalo::collections::String<'bump>>,
@@ -1425,6 +1535,22 @@ impl<'bump> UninterpretedOptionBumpalo<'bump> {
             string_value: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             aggregate_value: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for UninterpretedOptionBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::bumpalo::collections::Vec<'bump, uninterpreted_option::NamePartBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
+            identifier_value: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.identifier_value, self.puroro_internal.bumpalo()),
+            positive_int_value: <::std::option::Option<u64> as FieldClone>::clone_in_bumpalo(&self.positive_int_value, self.puroro_internal.bumpalo()),
+            negative_int_value: <::std::option::Option<i64> as FieldClone>::clone_in_bumpalo(&self.negative_int_value, self.puroro_internal.bumpalo()),
+            double_value: <::std::option::Option<f64> as FieldClone>::clone_in_bumpalo(&self.double_value, self.puroro_internal.bumpalo()),
+            string_value: <::std::option::Option<::bumpalo::collections::Vec<'bump, u8>> as FieldClone>::clone_in_bumpalo(&self.string_value, self.puroro_internal.bumpalo()),
+            aggregate_value: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.aggregate_value, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -1601,7 +1727,7 @@ pub trait NamePartTrait {
     fn is_extension(&'_ self) -> bool;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct NamePart {
     pub name_part: ::std::string::String,
     pub is_extension: bool,
@@ -1621,6 +1747,17 @@ impl NamePart {
 impl ::std::default::Default for NamePart {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for NamePart {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name_part: <::std::string::String as FieldClone>::clone(&self.name_part),
+            is_extension: <bool as FieldClone>::clone(&self.is_extension),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -1706,7 +1843,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for NamePart<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct NamePartBumpalo<'bump> {
     pub name_part: ::bumpalo::collections::String<'bump>,
     pub is_extension: bool,
@@ -1719,6 +1856,17 @@ impl<'bump> NamePartBumpalo<'bump> {
             name_part: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             is_extension: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for NamePartBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name_part: <::bumpalo::collections::String<'bump> as FieldClone>::clone_in_bumpalo(&self.name_part, self.puroro_internal.bumpalo()),
+            is_extension: <bool as FieldClone>::clone_in_bumpalo(&self.is_extension, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -1825,7 +1973,7 @@ pub trait MethodOptionsTrait {
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct MethodOptions {
     pub deprecated: ::std::option::Option<bool>,
     pub idempotency_level: ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>>,
@@ -1847,6 +1995,18 @@ impl MethodOptions {
 impl ::std::default::Default for MethodOptions {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for MethodOptions {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
+            idempotency_level: <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as FieldClone>::clone(&self.idempotency_level),
+            uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -1961,7 +2121,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for MethodOptions<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct MethodOptionsBumpalo<'bump> {
     pub deprecated: ::std::option::Option<bool>,
     pub idempotency_level: ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>>,
@@ -1976,6 +2136,18 @@ impl<'bump> MethodOptionsBumpalo<'bump> {
             idempotency_level: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for MethodOptionsBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
+            idempotency_level: <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as FieldClone>::clone_in_bumpalo(&self.idempotency_level, self.puroro_internal.bumpalo()),
+            uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -2133,7 +2305,7 @@ pub trait ServiceOptionsTrait {
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ServiceOptions {
     pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
@@ -2153,6 +2325,17 @@ impl ServiceOptions {
 impl ::std::default::Default for ServiceOptions {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for ServiceOptions {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
+            uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -2254,7 +2437,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for ServiceOptions<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ServiceOptionsBumpalo<'bump> {
     pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
@@ -2267,6 +2450,17 @@ impl<'bump> ServiceOptionsBumpalo<'bump> {
             deprecated: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for ServiceOptionsBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
+            uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -2387,7 +2581,7 @@ pub trait EnumValueOptionsTrait {
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct EnumValueOptions {
     pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
@@ -2407,6 +2601,17 @@ impl EnumValueOptions {
 impl ::std::default::Default for EnumValueOptions {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for EnumValueOptions {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
+            uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -2508,7 +2713,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for EnumValueOptions<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct EnumValueOptionsBumpalo<'bump> {
     pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
@@ -2521,6 +2726,17 @@ impl<'bump> EnumValueOptionsBumpalo<'bump> {
             deprecated: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for EnumValueOptionsBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
+            uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -2642,7 +2858,7 @@ pub trait EnumOptionsTrait {
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct EnumOptions {
     pub allow_alias: ::std::option::Option<bool>,
     pub deprecated: ::std::option::Option<bool>,
@@ -2664,6 +2880,18 @@ impl EnumOptions {
 impl ::std::default::Default for EnumOptions {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for EnumOptions {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            allow_alias: <::std::option::Option<bool> as FieldClone>::clone(&self.allow_alias),
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
+            uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -2778,7 +3006,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for EnumOptions<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct EnumOptionsBumpalo<'bump> {
     pub allow_alias: ::std::option::Option<bool>,
     pub deprecated: ::std::option::Option<bool>,
@@ -2793,6 +3021,18 @@ impl<'bump> EnumOptionsBumpalo<'bump> {
             deprecated: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for EnumOptionsBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            allow_alias: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.allow_alias, self.puroro_internal.bumpalo()),
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
+            uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -2925,7 +3165,7 @@ pub trait OneofOptionsTrait {
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct OneofOptions {
     pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
@@ -2943,6 +3183,16 @@ impl OneofOptions {
 impl ::std::default::Default for OneofOptions {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for OneofOptions {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -3031,7 +3281,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for OneofOptions<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct OneofOptionsBumpalo<'bump> {
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
@@ -3042,6 +3292,16 @@ impl<'bump> OneofOptionsBumpalo<'bump> {
         Self {
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for OneofOptionsBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -3154,7 +3414,7 @@ pub trait FieldOptionsTrait {
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FieldOptions {
     pub ctype: ::std::option::Option<::std::result::Result<field_options::Ctype, i32>>,
     pub packed: ::std::option::Option<bool>,
@@ -3184,6 +3444,22 @@ impl FieldOptions {
 impl ::std::default::Default for FieldOptions {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for FieldOptions {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            ctype: <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as FieldClone>::clone(&self.ctype),
+            packed: <::std::option::Option<bool> as FieldClone>::clone(&self.packed),
+            jstype: <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as FieldClone>::clone(&self.jstype),
+            lazy: <::std::option::Option<bool> as FieldClone>::clone(&self.lazy),
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
+            weak: <::std::option::Option<bool> as FieldClone>::clone(&self.weak),
+            uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -3350,7 +3626,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for FieldOptions<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FieldOptionsBumpalo<'bump> {
     pub ctype: ::std::option::Option<::std::result::Result<field_options::Ctype, i32>>,
     pub packed: ::std::option::Option<bool>,
@@ -3373,6 +3649,22 @@ impl<'bump> FieldOptionsBumpalo<'bump> {
             weak: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for FieldOptionsBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            ctype: <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as FieldClone>::clone_in_bumpalo(&self.ctype, self.puroro_internal.bumpalo()),
+            packed: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.packed, self.puroro_internal.bumpalo()),
+            jstype: <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as FieldClone>::clone_in_bumpalo(&self.jstype, self.puroro_internal.bumpalo()),
+            lazy: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.lazy, self.puroro_internal.bumpalo()),
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
+            weak: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.weak, self.puroro_internal.bumpalo()),
+            uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -3607,7 +3899,7 @@ pub trait MessageOptionsTrait {
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct MessageOptions {
     pub message_set_wire_format: ::std::option::Option<bool>,
     pub no_standard_descriptor_accessor: ::std::option::Option<bool>,
@@ -3633,6 +3925,20 @@ impl MessageOptions {
 impl ::std::default::Default for MessageOptions {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for MessageOptions {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            message_set_wire_format: <::std::option::Option<bool> as FieldClone>::clone(&self.message_set_wire_format),
+            no_standard_descriptor_accessor: <::std::option::Option<bool> as FieldClone>::clone(&self.no_standard_descriptor_accessor),
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
+            map_entry: <::std::option::Option<bool> as FieldClone>::clone(&self.map_entry),
+            uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -3773,7 +4079,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for MessageOptions<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct MessageOptionsBumpalo<'bump> {
     pub message_set_wire_format: ::std::option::Option<bool>,
     pub no_standard_descriptor_accessor: ::std::option::Option<bool>,
@@ -3792,6 +4098,20 @@ impl<'bump> MessageOptionsBumpalo<'bump> {
             map_entry: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for MessageOptionsBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            message_set_wire_format: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.message_set_wire_format, self.puroro_internal.bumpalo()),
+            no_standard_descriptor_accessor: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.no_standard_descriptor_accessor, self.puroro_internal.bumpalo()),
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
+            map_entry: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.map_entry, self.puroro_internal.bumpalo()),
+            uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -3970,7 +4290,7 @@ pub trait FileOptionsTrait {
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FileOptions {
     pub java_package: ::std::option::Option<::std::string::String>,
     pub java_outer_classname: ::std::option::Option<::std::string::String>,
@@ -4028,6 +4348,36 @@ impl FileOptions {
 impl ::std::default::Default for FileOptions {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for FileOptions {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            java_package: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.java_package),
+            java_outer_classname: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.java_outer_classname),
+            java_multiple_files: <::std::option::Option<bool> as FieldClone>::clone(&self.java_multiple_files),
+            java_generate_equals_and_hash: <::std::option::Option<bool> as FieldClone>::clone(&self.java_generate_equals_and_hash),
+            java_string_check_utf8: <::std::option::Option<bool> as FieldClone>::clone(&self.java_string_check_utf8),
+            optimize_for: <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as FieldClone>::clone(&self.optimize_for),
+            go_package: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.go_package),
+            cc_generic_services: <::std::option::Option<bool> as FieldClone>::clone(&self.cc_generic_services),
+            java_generic_services: <::std::option::Option<bool> as FieldClone>::clone(&self.java_generic_services),
+            py_generic_services: <::std::option::Option<bool> as FieldClone>::clone(&self.py_generic_services),
+            php_generic_services: <::std::option::Option<bool> as FieldClone>::clone(&self.php_generic_services),
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone(&self.deprecated),
+            cc_enable_arenas: <::std::option::Option<bool> as FieldClone>::clone(&self.cc_enable_arenas),
+            objc_class_prefix: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.objc_class_prefix),
+            csharp_namespace: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.csharp_namespace),
+            swift_prefix: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.swift_prefix),
+            php_class_prefix: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.php_class_prefix),
+            php_namespace: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.php_namespace),
+            php_metadata_namespace: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.php_metadata_namespace),
+            ruby_package: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.ruby_package),
+            uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -4376,7 +4726,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for FileOptions<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FileOptionsBumpalo<'bump> {
     pub java_package: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub java_outer_classname: ::std::option::Option<::bumpalo::collections::String<'bump>>,
@@ -4427,6 +4777,36 @@ impl<'bump> FileOptionsBumpalo<'bump> {
             ruby_package: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for FileOptionsBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            java_package: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.java_package, self.puroro_internal.bumpalo()),
+            java_outer_classname: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.java_outer_classname, self.puroro_internal.bumpalo()),
+            java_multiple_files: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.java_multiple_files, self.puroro_internal.bumpalo()),
+            java_generate_equals_and_hash: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.java_generate_equals_and_hash, self.puroro_internal.bumpalo()),
+            java_string_check_utf8: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.java_string_check_utf8, self.puroro_internal.bumpalo()),
+            optimize_for: <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as FieldClone>::clone_in_bumpalo(&self.optimize_for, self.puroro_internal.bumpalo()),
+            go_package: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.go_package, self.puroro_internal.bumpalo()),
+            cc_generic_services: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.cc_generic_services, self.puroro_internal.bumpalo()),
+            java_generic_services: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.java_generic_services, self.puroro_internal.bumpalo()),
+            py_generic_services: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.py_generic_services, self.puroro_internal.bumpalo()),
+            php_generic_services: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.php_generic_services, self.puroro_internal.bumpalo()),
+            deprecated: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.deprecated, self.puroro_internal.bumpalo()),
+            cc_enable_arenas: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.cc_enable_arenas, self.puroro_internal.bumpalo()),
+            objc_class_prefix: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.objc_class_prefix, self.puroro_internal.bumpalo()),
+            csharp_namespace: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.csharp_namespace, self.puroro_internal.bumpalo()),
+            swift_prefix: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.swift_prefix, self.puroro_internal.bumpalo()),
+            php_class_prefix: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.php_class_prefix, self.puroro_internal.bumpalo()),
+            php_namespace: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.php_namespace, self.puroro_internal.bumpalo()),
+            php_metadata_namespace: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.php_metadata_namespace, self.puroro_internal.bumpalo()),
+            ruby_package: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.ruby_package, self.puroro_internal.bumpalo()),
+            uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -4813,7 +5193,7 @@ pub trait MethodDescriptorProtoTrait {
     fn server_streaming(&'_ self) -> ::std::option::Option<bool>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct MethodDescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub input_type: ::std::option::Option<::std::string::String>,
@@ -4841,6 +5221,21 @@ impl MethodDescriptorProto {
 impl ::std::default::Default for MethodDescriptorProto {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for MethodDescriptorProto {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
+            input_type: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.input_type),
+            output_type: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.output_type),
+            options: <::std::option::Option<::std::boxed::Box<MethodOptions>> as FieldClone>::clone(&self.options),
+            client_streaming: <::std::option::Option<bool> as FieldClone>::clone(&self.client_streaming),
+            server_streaming: <::std::option::Option<bool> as FieldClone>::clone(&self.server_streaming),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -4979,7 +5374,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for MethodDescriptorProto<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct MethodDescriptorProtoBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub input_type: ::std::option::Option<::bumpalo::collections::String<'bump>>,
@@ -5000,6 +5395,21 @@ impl<'bump> MethodDescriptorProtoBumpalo<'bump> {
             client_streaming: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             server_streaming: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for MethodDescriptorProtoBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
+            input_type: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.input_type, self.puroro_internal.bumpalo()),
+            output_type: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.output_type, self.puroro_internal.bumpalo()),
+            options: <::std::option::Option<::bumpalo::boxed::Box<'bump, MethodOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
+            client_streaming: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.client_streaming, self.puroro_internal.bumpalo()),
+            server_streaming: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.server_streaming, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -5159,7 +5569,7 @@ pub trait ServiceDescriptorProtoTrait {
     fn options(&'_ self) -> ::std::option::Option<&'_ Self::ServiceOptionsType>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ServiceDescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub method: ::std::vec::Vec<MethodDescriptorProto>,
@@ -5181,6 +5591,18 @@ impl ServiceDescriptorProto {
 impl ::std::default::Default for ServiceDescriptorProto {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for ServiceDescriptorProto {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
+            method: <::std::vec::Vec<MethodDescriptorProto> as FieldClone>::clone(&self.method),
+            options: <::std::option::Option<::std::boxed::Box<ServiceOptions>> as FieldClone>::clone(&self.options),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -5296,7 +5718,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for ServiceDescriptorProto<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ServiceDescriptorProtoBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub method: ::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo<'bump>>,
@@ -5311,6 +5733,18 @@ impl<'bump> ServiceDescriptorProtoBumpalo<'bump> {
             method: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for ServiceDescriptorProtoBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
+            method: <::bumpalo::collections::Vec<'bump, MethodDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.method, self.puroro_internal.bumpalo()),
+            options: <::std::option::Option<::bumpalo::boxed::Box<'bump, ServiceOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -5437,7 +5871,7 @@ pub trait EnumValueDescriptorProtoTrait {
     fn options(&'_ self) -> ::std::option::Option<&'_ Self::EnumValueOptionsType>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct EnumValueDescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub number: ::std::option::Option<i32>,
@@ -5459,6 +5893,18 @@ impl EnumValueDescriptorProto {
 impl ::std::default::Default for EnumValueDescriptorProto {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for EnumValueDescriptorProto {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
+            number: <::std::option::Option<i32> as FieldClone>::clone(&self.number),
+            options: <::std::option::Option<::std::boxed::Box<EnumValueOptions>> as FieldClone>::clone(&self.options),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -5558,7 +6004,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for EnumValueDescriptorProto<>
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct EnumValueDescriptorProtoBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub number: ::std::option::Option<i32>,
@@ -5573,6 +6019,18 @@ impl<'bump> EnumValueDescriptorProtoBumpalo<'bump> {
             number: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for EnumValueDescriptorProtoBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
+            number: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.number, self.puroro_internal.bumpalo()),
+            options: <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumValueOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -5714,7 +6172,7 @@ pub trait EnumDescriptorProtoTrait {
     fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct EnumDescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub value: ::std::vec::Vec<EnumValueDescriptorProto>,
@@ -5740,6 +6198,20 @@ impl EnumDescriptorProto {
 impl ::std::default::Default for EnumDescriptorProto {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for EnumDescriptorProto {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
+            value: <::std::vec::Vec<EnumValueDescriptorProto> as FieldClone>::clone(&self.value),
+            options: <::std::option::Option<::std::boxed::Box<EnumOptions>> as FieldClone>::clone(&self.options),
+            reserved_range: <::std::vec::Vec<enum_descriptor_proto::EnumReservedRange> as FieldClone>::clone(&self.reserved_range),
+            reserved_name: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.reserved_name),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -5912,7 +6384,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for EnumDescriptorProto<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct EnumDescriptorProtoBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub value: ::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo<'bump>>,
@@ -5931,6 +6403,20 @@ impl<'bump> EnumDescriptorProtoBumpalo<'bump> {
             reserved_range: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             reserved_name: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for EnumDescriptorProtoBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
+            value: <::bumpalo::collections::Vec<'bump, EnumValueDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.value, self.puroro_internal.bumpalo()),
+            options: <::std::option::Option<::bumpalo::boxed::Box<'bump, EnumOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
+            reserved_range: <::bumpalo::collections::Vec<'bump, enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.reserved_range, self.puroro_internal.bumpalo()),
+            reserved_name: <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.reserved_name, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -6113,7 +6599,7 @@ pub trait EnumReservedRangeTrait {
     fn end(&'_ self) -> ::std::option::Option<i32>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct EnumReservedRange {
     pub start: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
@@ -6133,6 +6619,17 @@ impl EnumReservedRange {
 impl ::std::default::Default for EnumReservedRange {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for EnumReservedRange {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            start: <::std::option::Option<i32> as FieldClone>::clone(&self.start),
+            end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -6218,7 +6715,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for EnumReservedRange<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct EnumReservedRangeBumpalo<'bump> {
     pub start: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
@@ -6231,6 +6728,17 @@ impl<'bump> EnumReservedRangeBumpalo<'bump> {
             start: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             end: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for EnumReservedRangeBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            start: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.start, self.puroro_internal.bumpalo()),
+            end: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.end, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -6327,7 +6835,7 @@ pub trait OneofDescriptorProtoTrait {
     fn options(&'_ self) -> ::std::option::Option<&'_ Self::OneofOptionsType>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct OneofDescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub options: ::std::option::Option<::std::boxed::Box<OneofOptions>>,
@@ -6347,6 +6855,17 @@ impl OneofDescriptorProto {
 impl ::std::default::Default for OneofDescriptorProto {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for OneofDescriptorProto {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
+            options: <::std::option::Option<::std::boxed::Box<OneofOptions>> as FieldClone>::clone(&self.options),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -6433,7 +6952,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for OneofDescriptorProto<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct OneofDescriptorProtoBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo<'bump>>>,
@@ -6446,6 +6965,17 @@ impl<'bump> OneofDescriptorProtoBumpalo<'bump> {
             name: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for OneofDescriptorProtoBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
+            options: <::std::option::Option<::bumpalo::boxed::Box<'bump, OneofOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -6551,7 +7081,7 @@ pub trait FieldDescriptorProtoTrait {
     fn proto3_optional(&'_ self) -> ::std::option::Option<bool>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FieldDescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub number: ::std::option::Option<i32>,
@@ -6589,6 +7119,26 @@ impl FieldDescriptorProto {
 impl ::std::default::Default for FieldDescriptorProto {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for FieldDescriptorProto {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
+            number: <::std::option::Option<i32> as FieldClone>::clone(&self.number),
+            label: <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as FieldClone>::clone(&self.label),
+            type_: <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as FieldClone>::clone(&self.type_),
+            type_name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.type_name),
+            extendee: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.extendee),
+            default_value: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.default_value),
+            oneof_index: <::std::option::Option<i32> as FieldClone>::clone(&self.oneof_index),
+            json_name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.json_name),
+            options: <::std::option::Option<::std::boxed::Box<FieldOptions>> as FieldClone>::clone(&self.options),
+            proto3_optional: <::std::option::Option<bool> as FieldClone>::clone(&self.proto3_optional),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -6792,7 +7342,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for FieldDescriptorProto<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FieldDescriptorProtoBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub number: ::std::option::Option<i32>,
@@ -6823,6 +7373,26 @@ impl<'bump> FieldDescriptorProtoBumpalo<'bump> {
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             proto3_optional: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for FieldDescriptorProtoBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
+            number: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.number, self.puroro_internal.bumpalo()),
+            label: <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as FieldClone>::clone_in_bumpalo(&self.label, self.puroro_internal.bumpalo()),
+            type_: <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as FieldClone>::clone_in_bumpalo(&self.type_, self.puroro_internal.bumpalo()),
+            type_name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.type_name, self.puroro_internal.bumpalo()),
+            extendee: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.extendee, self.puroro_internal.bumpalo()),
+            default_value: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.default_value, self.puroro_internal.bumpalo()),
+            oneof_index: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.oneof_index, self.puroro_internal.bumpalo()),
+            json_name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.json_name, self.puroro_internal.bumpalo()),
+            options: <::std::option::Option<::bumpalo::boxed::Box<'bump, FieldOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
+            proto3_optional: <::std::option::Option<bool> as FieldClone>::clone_in_bumpalo(&self.proto3_optional, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -7120,7 +7690,7 @@ pub trait ExtensionRangeOptionsTrait {
     fn uninterpreted_option_iter(&self) -> Self::UninterpretedOptionIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ExtensionRangeOptions {
     pub uninterpreted_option: ::std::vec::Vec<UninterpretedOption>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
@@ -7138,6 +7708,16 @@ impl ExtensionRangeOptions {
 impl ::std::default::Default for ExtensionRangeOptions {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for ExtensionRangeOptions {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            uninterpreted_option: <::std::vec::Vec<UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -7226,7 +7806,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for ExtensionRangeOptions<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ExtensionRangeOptionsBumpalo<'bump> {
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
@@ -7237,6 +7817,16 @@ impl<'bump> ExtensionRangeOptionsBumpalo<'bump> {
         Self {
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for ExtensionRangeOptionsBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            uninterpreted_option: <::bumpalo::collections::Vec<'bump, UninterpretedOptionBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.uninterpreted_option, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -7421,7 +8011,7 @@ pub trait DescriptorProtoTrait {
     fn reserved_name_iter(&self) -> Self::ReservedNameIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct DescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub field: ::std::vec::Vec<FieldDescriptorProto>,
@@ -7457,6 +8047,25 @@ impl DescriptorProto {
 impl ::std::default::Default for DescriptorProto {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for DescriptorProto {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
+            field: <::std::vec::Vec<FieldDescriptorProto> as FieldClone>::clone(&self.field),
+            extension: <::std::vec::Vec<FieldDescriptorProto> as FieldClone>::clone(&self.extension),
+            nested_type: <::std::vec::Vec<DescriptorProto> as FieldClone>::clone(&self.nested_type),
+            enum_type: <::std::vec::Vec<EnumDescriptorProto> as FieldClone>::clone(&self.enum_type),
+            extension_range: <::std::vec::Vec<descriptor_proto::ExtensionRange> as FieldClone>::clone(&self.extension_range),
+            oneof_decl: <::std::vec::Vec<OneofDescriptorProto> as FieldClone>::clone(&self.oneof_decl),
+            options: <::std::option::Option<::std::boxed::Box<MessageOptions>> as FieldClone>::clone(&self.options),
+            reserved_range: <::std::vec::Vec<descriptor_proto::ReservedRange> as FieldClone>::clone(&self.reserved_range),
+            reserved_name: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.reserved_name),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -7773,7 +8382,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for DescriptorProto<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct DescriptorProtoBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub field: ::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>>,
@@ -7802,6 +8411,25 @@ impl<'bump> DescriptorProtoBumpalo<'bump> {
             reserved_range: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             reserved_name: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for DescriptorProtoBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
+            field: <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.field, self.puroro_internal.bumpalo()),
+            extension: <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.extension, self.puroro_internal.bumpalo()),
+            nested_type: <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.nested_type, self.puroro_internal.bumpalo()),
+            enum_type: <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.enum_type, self.puroro_internal.bumpalo()),
+            extension_range: <::bumpalo::collections::Vec<'bump, descriptor_proto::ExtensionRangeBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.extension_range, self.puroro_internal.bumpalo()),
+            oneof_decl: <::bumpalo::collections::Vec<'bump, OneofDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.oneof_decl, self.puroro_internal.bumpalo()),
+            options: <::std::option::Option<::bumpalo::boxed::Box<'bump, MessageOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
+            reserved_range: <::bumpalo::collections::Vec<'bump, descriptor_proto::ReservedRangeBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.reserved_range, self.puroro_internal.bumpalo()),
+            reserved_name: <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.reserved_name, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -8128,7 +8756,7 @@ pub trait ReservedRangeTrait {
     fn end(&'_ self) -> ::std::option::Option<i32>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ReservedRange {
     pub start: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
@@ -8148,6 +8776,17 @@ impl ReservedRange {
 impl ::std::default::Default for ReservedRange {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for ReservedRange {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            start: <::std::option::Option<i32> as FieldClone>::clone(&self.start),
+            end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -8233,7 +8872,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for ReservedRange<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ReservedRangeBumpalo<'bump> {
     pub start: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
@@ -8246,6 +8885,17 @@ impl<'bump> ReservedRangeBumpalo<'bump> {
             start: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             end: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for ReservedRangeBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            start: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.start, self.puroro_internal.bumpalo()),
+            end: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.end, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -8342,7 +8992,7 @@ pub trait ExtensionRangeTrait {
     fn options(&'_ self) -> ::std::option::Option<&'_ Self::ExtensionRangeOptionsType>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ExtensionRange {
     pub start: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
@@ -8364,6 +9014,18 @@ impl ExtensionRange {
 impl ::std::default::Default for ExtensionRange {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for ExtensionRange {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            start: <::std::option::Option<i32> as FieldClone>::clone(&self.start),
+            end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
+            options: <::std::option::Option<::std::boxed::Box<super::ExtensionRangeOptions>> as FieldClone>::clone(&self.options),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -8463,7 +9125,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for ExtensionRange<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ExtensionRangeBumpalo<'bump> {
     pub start: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
@@ -8478,6 +9140,18 @@ impl<'bump> ExtensionRangeBumpalo<'bump> {
             end: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for ExtensionRangeBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            start: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.start, self.puroro_internal.bumpalo()),
+            end: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.end, self.puroro_internal.bumpalo()),
+            options: <::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -8666,7 +9340,7 @@ pub trait FileDescriptorProtoTrait {
     fn syntax(&'_ self) -> ::std::option::Option<&'_ str>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FileDescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub package: ::std::option::Option<::std::string::String>,
@@ -8706,6 +9380,27 @@ impl FileDescriptorProto {
 impl ::std::default::Default for FileDescriptorProto {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for FileDescriptorProto {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
+            package: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.package),
+            dependency: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.dependency),
+            public_dependency: <::std::vec::Vec<i32> as FieldClone>::clone(&self.public_dependency),
+            weak_dependency: <::std::vec::Vec<i32> as FieldClone>::clone(&self.weak_dependency),
+            message_type: <::std::vec::Vec<DescriptorProto> as FieldClone>::clone(&self.message_type),
+            enum_type: <::std::vec::Vec<EnumDescriptorProto> as FieldClone>::clone(&self.enum_type),
+            service: <::std::vec::Vec<ServiceDescriptorProto> as FieldClone>::clone(&self.service),
+            extension: <::std::vec::Vec<FieldDescriptorProto> as FieldClone>::clone(&self.extension),
+            options: <::std::option::Option<::std::boxed::Box<FileOptions>> as FieldClone>::clone(&self.options),
+            source_code_info: <::std::option::Option<::std::boxed::Box<SourceCodeInfo>> as FieldClone>::clone(&self.source_code_info),
+            syntax: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.syntax),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -9032,7 +9727,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for FileDescriptorProto<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FileDescriptorProtoBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub package: ::std::option::Option<::bumpalo::collections::String<'bump>>,
@@ -9065,6 +9760,27 @@ impl<'bump> FileDescriptorProtoBumpalo<'bump> {
             source_code_info: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             syntax: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for FileDescriptorProtoBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
+            package: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.package, self.puroro_internal.bumpalo()),
+            dependency: <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.dependency, self.puroro_internal.bumpalo()),
+            public_dependency: <::bumpalo::collections::Vec<'bump, i32> as FieldClone>::clone_in_bumpalo(&self.public_dependency, self.puroro_internal.bumpalo()),
+            weak_dependency: <::bumpalo::collections::Vec<'bump, i32> as FieldClone>::clone_in_bumpalo(&self.weak_dependency, self.puroro_internal.bumpalo()),
+            message_type: <::bumpalo::collections::Vec<'bump, DescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.message_type, self.puroro_internal.bumpalo()),
+            enum_type: <::bumpalo::collections::Vec<'bump, EnumDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.enum_type, self.puroro_internal.bumpalo()),
+            service: <::bumpalo::collections::Vec<'bump, ServiceDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.service, self.puroro_internal.bumpalo()),
+            extension: <::bumpalo::collections::Vec<'bump, FieldDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.extension, self.puroro_internal.bumpalo()),
+            options: <::std::option::Option<::bumpalo::boxed::Box<'bump, FileOptionsBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.options, self.puroro_internal.bumpalo()),
+            source_code_info: <::std::option::Option<::bumpalo::boxed::Box<'bump, SourceCodeInfoBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.source_code_info, self.puroro_internal.bumpalo()),
+            syntax: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.syntax, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -9409,7 +10125,7 @@ pub trait FileDescriptorSetTrait {
     fn file_iter(&self) -> Self::FileIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FileDescriptorSet {
     pub file: ::std::vec::Vec<FileDescriptorProto>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
@@ -9427,6 +10143,16 @@ impl FileDescriptorSet {
 impl ::std::default::Default for FileDescriptorSet {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for FileDescriptorSet {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            file: <::std::vec::Vec<FileDescriptorProto> as FieldClone>::clone(&self.file),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -9515,7 +10241,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for FileDescriptorSet<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FileDescriptorSetBumpalo<'bump> {
     pub file: ::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo<'bump>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
@@ -9526,6 +10252,16 @@ impl<'bump> FileDescriptorSetBumpalo<'bump> {
         Self {
             file: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for FileDescriptorSetBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            file: <::bumpalo::collections::Vec<'bump, FileDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.file, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }

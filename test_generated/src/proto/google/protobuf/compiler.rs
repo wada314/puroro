@@ -17,7 +17,7 @@ pub trait CodeGeneratorResponseTrait {
     fn file_iter(&self) -> Self::FileIter<'_>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CodeGeneratorResponse {
     pub error: ::std::option::Option<::std::string::String>,
     pub supported_features: ::std::option::Option<u64>,
@@ -39,6 +39,18 @@ impl CodeGeneratorResponse {
 impl ::std::default::Default for CodeGeneratorResponse {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for CodeGeneratorResponse {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            error: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.error),
+            supported_features: <::std::option::Option<u64> as FieldClone>::clone(&self.supported_features),
+            file: <::std::vec::Vec<code_generator_response::File> as FieldClone>::clone(&self.file),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -153,7 +165,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for CodeGeneratorResponse<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CodeGeneratorResponseBumpalo<'bump> {
     pub error: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub supported_features: ::std::option::Option<u64>,
@@ -168,6 +180,18 @@ impl<'bump> CodeGeneratorResponseBumpalo<'bump> {
             supported_features: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             file: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for CodeGeneratorResponseBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            error: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.error, self.puroro_internal.bumpalo()),
+            supported_features: <::std::option::Option<u64> as FieldClone>::clone_in_bumpalo(&self.supported_features, self.puroro_internal.bumpalo()),
+            file: <::bumpalo::collections::Vec<'bump, code_generator_response::FileBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.file, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -315,7 +339,7 @@ pub trait FileTrait {
     fn generated_code_info(&'_ self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfoType>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct File {
     pub name: ::std::option::Option<::std::string::String>,
     pub insertion_point: ::std::option::Option<::std::string::String>,
@@ -339,6 +363,19 @@ impl File {
 impl ::std::default::Default for File {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for File {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
+            insertion_point: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.insertion_point),
+            content: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.content),
+            generated_code_info: <::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>> as FieldClone>::clone(&self.generated_code_info),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -451,7 +488,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for File<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FileBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub insertion_point: ::std::option::Option<::bumpalo::collections::String<'bump>>,
@@ -468,6 +505,19 @@ impl<'bump> FileBumpalo<'bump> {
             content: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             generated_code_info: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for FileBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
+            insertion_point: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.insertion_point, self.puroro_internal.bumpalo()),
+            content: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.content, self.puroro_internal.bumpalo()),
+            generated_code_info: <::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.generated_code_info, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -612,7 +662,7 @@ pub trait CodeGeneratorRequestTrait {
     fn compiler_version(&'_ self) -> ::std::option::Option<&'_ Self::VersionType>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CodeGeneratorRequest {
     pub file_to_generate: ::std::vec::Vec<::std::string::String>,
     pub parameter: ::std::option::Option<::std::string::String>,
@@ -636,6 +686,19 @@ impl CodeGeneratorRequest {
 impl ::std::default::Default for CodeGeneratorRequest {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for CodeGeneratorRequest {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            file_to_generate: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.file_to_generate),
+            parameter: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.parameter),
+            proto_file: <::std::vec::Vec<super::FileDescriptorProto> as FieldClone>::clone(&self.proto_file),
+            compiler_version: <::std::option::Option<::std::boxed::Box<Version>> as FieldClone>::clone(&self.compiler_version),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -779,7 +842,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for CodeGeneratorRequest<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CodeGeneratorRequestBumpalo<'bump> {
     pub file_to_generate: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     pub parameter: ::std::option::Option<::bumpalo::collections::String<'bump>>,
@@ -796,6 +859,19 @@ impl<'bump> CodeGeneratorRequestBumpalo<'bump> {
             proto_file: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             compiler_version: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for CodeGeneratorRequestBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            file_to_generate: <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.file_to_generate, self.puroro_internal.bumpalo()),
+            parameter: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.parameter, self.puroro_internal.bumpalo()),
+            proto_file: <::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.proto_file, self.puroro_internal.bumpalo()),
+            compiler_version: <::std::option::Option<::bumpalo::boxed::Box<'bump, VersionBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.compiler_version, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
@@ -950,7 +1026,7 @@ pub trait VersionTrait {
     fn suffix(&'_ self) -> ::std::option::Option<&'_ str>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Version {
     pub major: ::std::option::Option<i32>,
     pub minor: ::std::option::Option<i32>,
@@ -974,6 +1050,19 @@ impl Version {
 impl ::std::default::Default for Version {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl ::std::clone::Clone for Version {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            major: <::std::option::Option<i32> as FieldClone>::clone(&self.major),
+            minor: <::std::option::Option<i32> as FieldClone>::clone(&self.minor),
+            patch: <::std::option::Option<i32> as FieldClone>::clone(&self.patch),
+            suffix: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.suffix),
+        puroro_internal: self.puroro_internal.clone(),
+        }
     }
 }
 
@@ -1085,7 +1174,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Version<> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct VersionBumpalo<'bump> {
     pub major: ::std::option::Option<i32>,
     pub minor: ::std::option::Option<i32>,
@@ -1102,6 +1191,19 @@ impl<'bump> VersionBumpalo<'bump> {
             patch: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             suffix: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+        }
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::std::clone::Clone for VersionBumpalo<'bump> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        Self {
+            major: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.major, self.puroro_internal.bumpalo()),
+            minor: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.minor, self.puroro_internal.bumpalo()),
+            patch: <::std::option::Option<i32> as FieldClone>::clone_in_bumpalo(&self.patch, self.puroro_internal.bumpalo()),
+            suffix: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.suffix, self.puroro_internal.bumpalo()),
+        puroro_internal: self.puroro_internal.clone(),
         }
     }
 }
