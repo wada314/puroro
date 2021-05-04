@@ -4,8 +4,7 @@
 pub trait MsgTrait {
     type SubMsgType: self::msg::SubMsgTrait;
     #[cfg(feature = "puroro-nightly")]
-    type RsubmsgIter<'a>: ::std::iter::Iterator<Item=&'a Self::SubMsgType>
-        where Self::SubMsgType: 'a;
+    type RsubmsgIter<'a>: ::std::iter::Iterator<Item=&'a Self::SubMsgType> where Self::SubMsgType: 'a;
     fn for_each_rsubmsg<F>(&self, f: F)
     where
         F: FnMut(&'_ Self::SubMsgType);
@@ -171,12 +170,13 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MsgBumpa
         use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
+        let bumpalo = self.puroro_internal.bumpalo();
         match field_number {
             6 => {
                 <::bumpalo::collections::Vec<'bump, msg::SubMsgBumpalo<'bump>> as FieldDeserFromIter<
                     tags::Message<msg::SubMsgBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.rsubmsg, field, || msg::SubMsgBumpalo::new_in(self.puroro_internal.bumpalo()))?;
+                ::deser(&mut self.rsubmsg, field, || msg::SubMsgBumpalo::new_in(bumpalo))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -214,7 +214,21 @@ impl<'bump> ::puroro::Serializable for MsgBumpalo<'bump> {
         <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
     }
 }
-#[cfg(feature = "puroro-bumpalo")]
+trait Hoge {
+    type RsubmsgType<'a>;
+    type RsubmsgIter<'a>: ::std::iter::Iterator<Item = &'a Self::RsubmsgType<'a>> 
+    where Self::RsubmsgType<'a>: 'a, Self: 'a;
+    fn rsubmsg_iter(&self) -> Self::RsubmsgIter<'_>;
+}
+impl<'bump> Hoge for MsgBumpalo<'bump> {
+    type RsubmsgType<'a> = msg::SubMsgBumpalo<'bump>;
+    type RsubmsgIter<'a> = impl ::std::iter::Iterator<Item = &'a Self::RsubmsgType<'a>>;
+    fn rsubmsg_iter(&self) -> Self::RsubmsgIter<'_> {
+        self.rsubmsg.iter()
+    }
+}
+
+#[cfg(feature = "puroro-bumpalo2")]
 impl<'bump> MsgTrait for MsgBumpalo<'bump> {
     type SubMsgType = msg::SubMsgBumpalo<'bump>;
     #[cfg(feature = "puroro-nightly")]
