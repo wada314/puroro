@@ -14,7 +14,10 @@ This library is under development and it is very possible to make breaking chang
     - Unit tests
     - Write document!!
     - Print comments in the generated files
-    - Mutable interface
+    - More usable message traits
+        - Mutable interface
+        - Repeated field accessing interface
+        - Map interface
     - Keep unknown fields
     - Deserializer from a slice
     - Required field checker

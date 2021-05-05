@@ -11,10 +11,11 @@ use crate::{ErrorKind, Result};
 
 pub struct MessageImplFragmentGenerator<'a, 'c> {
     context: &'a Context<'c>,
+    msg: &'c MessageDescriptor<'c>,
 }
 impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
-    pub fn new(context: &'a Context<'c>) -> Self {
-        Self { context }
+    pub fn new(context: &'a Context<'c>, msg: &'c MessageDescriptor<'c>) -> Self {
+        Self { context, msg }
     }
 
     /// A raw generated struct identifier.
@@ -42,11 +43,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     pub fn struct_ident_with_relative_path(
         &self,
         msg: &'c MessageDescriptor<'c>,
-        cur_package: &'c str,
     ) -> Result<String> {
         let struct_name = self.struct_ident(msg)?;
         let mut struct_package_iter = msg.package()?.split('.').peekable();
-        let mut cur_package_iter = cur_package.split('.').peekable();
+        let mut cur_package_iter = self.msg.package()?.split('.').peekable();
         while let (Some(p1), Some(p2)) = (struct_package_iter.peek(), cur_package_iter.peek()) {
             if *p1 == *p2 {
                 struct_package_iter.next();
@@ -67,25 +67,21 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         ))
     }
 
-    /// A type name of the struct with a relative path from the given package.
+    /// A type name of the struct with a relative path from the current msg.
     /// Includes generic param bounds if there is any.
-    pub fn type_name_of_msg(
-        &self,
-        msg: &'c MessageDescriptor<'c>,
-        cur_package: &'c str,
-    ) -> Result<String> {
+    pub fn type_name_of_msg(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
         let generic_args_iter = match self.context.alloc_type() {
             AllocatorType::Default => None,
             AllocatorType::Bumpalo => Some("'bump"),
         }
         .into_iter();
         if generic_args_iter.clone().count() == 0 {
-            Ok(self.struct_ident_with_relative_path(msg, cur_package)?)
+            Ok(self.struct_ident_with_relative_path(msg)?)
         } else {
             let generic_args = Itertools::intersperse(generic_args_iter, ", ").collect::<String>();
             Ok(format!(
                 "{name}<{gargs}>",
-                name = self.struct_ident_with_relative_path(msg, cur_package)?,
+                name = self.struct_ident_with_relative_path(msg)?,
                 gargs = generic_args,
             ))
         }
@@ -128,9 +124,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                         type_ = e.native_ident_with_relative_path(field.package()?)?
                     )
                     .into(),
-                    NonTrivialFieldType::Message(m) => {
-                        self.type_name_of_msg(m, field.package()?)?.into()
-                    }
+                    NonTrivialFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
                 },
             },
             ImplType::SliceRef => {
@@ -140,6 +134,19 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     }
 
     pub fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+        if let FieldType::Message(m) = field.type_()? {
+            if m.is_map_entry() {
+                // Special treatment for map field
+                let (key_field, value_field) = m.key_value_of_map_entry()?;
+                return Ok(format!(
+                    "::std::collections::HashMap<{key}, {value}>",
+                    key = self.field_type_for(key_field)?,
+                    value = self.field_type_for(value_field)?,
+                )
+                .into());
+            }
+        }
+        // Non-map normal fields
         let scalar_type = self.field_scalar_item_type_for(field)?;
         Ok(match self.context.impl_type() {
             ImplType::Default => match field.label()? {
@@ -198,10 +205,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             FieldType::Bytes => "Bytes".into(),
             FieldType::Enum(e) => format!(
                 "Enum<{}>",
-                e.native_ident_with_relative_path(field.package()?)?,
+                e.native_ident_with_relative_path(self.msg.package()?)?,
             ),
             FieldType::Message(m) => {
-                format!("Message<{}>", self.type_name_of_msg(m, field.package()?)?)
+                format!("Message<{}>", self.type_name_of_msg(m,)?)
             }
         })
     }
@@ -233,12 +240,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             "|| ::bumpalo::boxed::Box::new_in({msg}::new_in(\
                                 puroro_internal.bumpalo()\
                             ), puroro_internal.bumpalo())",
-                            msg = self.struct_ident_with_relative_path(m, field.package()?)?,
+                            msg = self.struct_ident_with_relative_path(m)?,
                         )
                         .into(),
                         FieldLabel::Required | FieldLabel::Repeated => format!(
                             "|| {msg}::new_in(puroro_internal.bumpalo())",
-                            msg = self.struct_ident_with_relative_path(m, field.package()?)?,
+                            msg = self.struct_ident_with_relative_path(m)?,
                         )
                         .into(),
                     },

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 /// We need this JUST ONLY for `::bumpalo::boxed::Box`, because it doesn't have
 /// the reference to the bumpalo instance so it cannot clone themself.
 pub trait FieldClone<'bump>: Sized {
@@ -62,6 +64,7 @@ define_field_clone!(String);
 define_field_clone!(std::result::Result<T, i32>, <T: Clone>);
 define_field_clone!(Box<T>, <T: Clone>);
 define_field_clone!(Vec<T>, <T: Clone>);
+define_field_clone!(HashMap<K, V>, <K: Clone, V: Clone>);
 #[cfg(feature = "puroro-bumpalo")]
 define_field_clone!(::bumpalo::collections::Vec<'bump, T>, <T: Clone>);
 #[cfg(feature = "puroro-bumpalo")]

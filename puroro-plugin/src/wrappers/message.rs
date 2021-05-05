@@ -157,8 +157,28 @@ impl<'c> MessageDescriptor<'c> {
     pub fn unique_msgs_from_fields(
         &'c self,
     ) -> Result<impl Iterator<Item = &'c MessageDescriptor<'c>>> {
+        // Not only the fields directly owned by this message,
+        // we need to cehck the fields of the map field's keys and value fields.
+        let maps_fields = self
+            .fields()
+            .filter_map(|field| match field.type_() {
+                Ok(FieldType::Message(m)) if m.is_map_entry() => Some(m),
+                _ => None,
+            })
+            .flat_map(|msg| {
+                match msg.key_value_of_map_entry() {
+                    Ok((key_field, value_field)) => {
+                        Some(std::array::IntoIter::new([key_field, value_field]))
+                    }
+                    _ => None,
+                }
+                .into_iter()
+                .flatten()
+            });
+
         Ok(self
             .fields()
+            .chain(maps_fields)
             .filter_map(|field| {
                 if let Ok(FieldType::Message(m)) = field.type_() {
                     Some(m)
@@ -167,6 +187,25 @@ impl<'c> MessageDescriptor<'c> {
                 }
             })
             .unique_by(|msg| msg.fully_qualified_name().unwrap_or_default()))
+    }
+
+    pub fn key_value_of_map_entry(
+        &'c self,
+    ) -> Result<(&'c FieldDescriptor<'c>, &'c FieldDescriptor<'c>)> {
+        debug_assert!(self.is_map_entry());
+        let key_field =
+            self.fields()
+                .find(|field| field.number() == 1)
+                .ok_or(ErrorKind::InvalidMapEntry {
+                    name: self.fully_qualified_name()?.to_string(),
+                })?;
+        let value_field =
+            self.fields()
+                .find(|field| field.number() == 2)
+                .ok_or(ErrorKind::InvalidMapEntry {
+                    name: self.fully_qualified_name()?.to_string(),
+                })?;
+        Ok((key_field, value_field))
     }
 }
 

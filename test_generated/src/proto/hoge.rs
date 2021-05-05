@@ -3,21 +3,16 @@
 
 pub trait MsgTrait {
     type TheMapEntryType: self::msg::TheMapEntryTrait;
+    type SubMsgType: self::msg::SubMsgTrait;
     #[cfg(feature = "puroro-nightly")]
     type TheMapIter<'a>: ::std::iter::Iterator<Item=&'a Self::TheMapEntryType>
         where Self: 'a, Self::TheMapEntryType: 'a;
-    fn for_each_the_map<F>(&self, f: F)
-    where
-        F: FnMut(&'_ Self::TheMapEntryType);
-    fn the_map_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::TheMapEntryType>>;
-    #[cfg(feature = "puroro-nightly")]
-    fn the_map_iter(&self) -> Self::TheMapIter<'_>;
+    fn the_map(&self) -> &::std::collections::HashMap<str, Self::SubMsgType>;
 }
 
 #[derive(Debug)]
 pub struct Msg {
-    pub the_map: ::std::vec::Vec<self::msg::TheMapEntry>,
+    pub the_map: ::std::collections::HashMap<::std::string::String, ::std::option::Option<::std::boxed::Box<self::msg::SubMsg>>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
 
@@ -41,7 +36,7 @@ impl ::std::clone::Clone for Msg {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            the_map: <::std::vec::Vec<self::msg::TheMapEntry> as FieldClone>::clone(&self.the_map),
+            the_map: <::std::collections::HashMap<::std::string::String, ::std::option::Option<::std::boxed::Box<self::msg::SubMsg>>> as FieldClone>::clone(&self.the_map),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -64,7 +59,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Msg {
         let puroro_internal = &self.puroro_internal;
         match field_number {
             8 => {
-                <::std::vec::Vec<self::msg::TheMapEntry> as FieldDeserFromIter<
+                <::std::collections::HashMap<::std::string::String, ::std::option::Option<::std::boxed::Box<self::msg::SubMsg>>> as FieldDeserFromIter<
                     tags::Message<self::msg::TheMapEntry>, 
                     tags::Repeated>>
                 ::deser(&mut self.the_map, field, ::std::default::Default::default)?;
@@ -91,7 +86,7 @@ impl ::puroro_internal::ser::Serializable for Msg {
     {
         use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::std::vec::Vec<self::msg::TheMapEntry> as FieldSer<
+        <::std::collections::HashMap<::std::string::String, ::std::option::Option<::std::boxed::Box<self::msg::SubMsg>>> as FieldSer<
                 tags::Message<self::msg::TheMapEntry>, 
                 tags::Repeated>>
             ::ser(&self.the_map, serializer, 8)?;
@@ -108,23 +103,12 @@ impl ::puroro::Serializable for Msg {
 
 impl MsgTrait for Msg {
     type TheMapEntryType = self::msg::TheMapEntry;
+    type SubMsgType = self::msg::SubMsg;
     #[cfg(feature = "puroro-nightly")]
     type TheMapIter<'a> where Self: 'a = 
         impl ::std::iter::Iterator<Item = &'a Self::TheMapEntryType>;
-    fn for_each_the_map<F>(&self, mut f: F)
-    where
-        F: FnMut(&'_ Self::TheMapEntryType) {
-        for item in (self.the_map).iter() {
-            (f)(item);
-        }
-    }
-    fn the_map_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::TheMapEntryType>> {
-        ::std::boxed::Box::new(self.the_map.iter())
-    }
-    #[cfg(feature = "puroro-nightly")]
-    fn the_map_iter(&self) -> Self::TheMapIter<'_> {
-        self.the_map.iter()
+    fn the_map(&self) -> &::std::collections::HashMap<str, Self::SubMsgType> {
+        &self.the_map
     }
 }
 impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Msg<> {
@@ -135,7 +119,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Msg<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug)]
 pub struct MsgBumpalo<'bump> {
-    pub the_map: ::bumpalo::collections::Vec<'bump, self::msg::TheMapEntryBumpalo<'bump>>,
+    pub the_map: ::std::collections::HashMap<::bumpalo::collections::String<'bump>, ::std::option::Option<::bumpalo::boxed::Box<'bump, self::msg::SubMsgBumpalo<'bump>>>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -153,7 +137,7 @@ impl<'bump> ::std::clone::Clone for MsgBumpalo<'bump> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            the_map: <::bumpalo::collections::Vec<'bump, self::msg::TheMapEntryBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.the_map, self.puroro_internal.bumpalo()),
+            the_map: <::std::collections::HashMap<::bumpalo::collections::String<'bump>, ::std::option::Option<::bumpalo::boxed::Box<'bump, self::msg::SubMsgBumpalo<'bump>>>> as FieldClone>::clone_in_bumpalo(&self.the_map, self.puroro_internal.bumpalo()),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -176,7 +160,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MsgBumpa
         let puroro_internal = &self.puroro_internal;
         match field_number {
             8 => {
-                <::bumpalo::collections::Vec<'bump, self::msg::TheMapEntryBumpalo<'bump>> as FieldDeserFromIter<
+                <::std::collections::HashMap<::bumpalo::collections::String<'bump>, ::std::option::Option<::bumpalo::boxed::Box<'bump, self::msg::SubMsgBumpalo<'bump>>>> as FieldDeserFromIter<
                     tags::Message<self::msg::TheMapEntryBumpalo<'bump>>, 
                     tags::Repeated>>
                 ::deser(&mut self.the_map, field, || self::msg::TheMapEntryBumpalo::new_in(puroro_internal.bumpalo()))?;
@@ -203,7 +187,7 @@ impl<'bump> ::puroro_internal::ser::Serializable for MsgBumpalo<'bump> {
     {
         use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
-        <::bumpalo::collections::Vec<'bump, self::msg::TheMapEntryBumpalo<'bump>> as FieldSer<
+        <::std::collections::HashMap<::bumpalo::collections::String<'bump>, ::std::option::Option<::bumpalo::boxed::Box<'bump, self::msg::SubMsgBumpalo<'bump>>>> as FieldSer<
                 tags::Message<self::msg::TheMapEntryBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.the_map, serializer, 8)?;
@@ -220,23 +204,12 @@ impl<'bump> ::puroro::Serializable for MsgBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MsgTrait for MsgBumpalo<'bump> {
     type TheMapEntryType = self::msg::TheMapEntryBumpalo<'bump>;
+    type SubMsgType = self::msg::SubMsgBumpalo<'bump>;
     #[cfg(feature = "puroro-nightly")]
     type TheMapIter<'a> where Self: 'a = 
         impl ::std::iter::Iterator<Item = &'a Self::TheMapEntryType>;
-    fn for_each_the_map<F>(&self, mut f: F)
-    where
-        F: FnMut(&'_ Self::TheMapEntryType) {
-        for item in (self.the_map).iter() {
-            (f)(item);
-        }
-    }
-    fn the_map_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::TheMapEntryType>> {
-        ::std::boxed::Box::new(self.the_map.iter())
-    }
-    #[cfg(feature = "puroro-nightly")]
-    fn the_map_iter(&self) -> Self::TheMapIter<'_> {
-        self.the_map.iter()
+    fn the_map(&self) -> &::std::collections::HashMap<str, Self::SubMsgType> {
+        &self.the_map
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -251,8 +224,8 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for MsgBumpalo<'bump> {
 pub mod msg {
 pub trait TheMapEntryTrait {
     type SubMsgType: self::SubMsgTrait;
-    fn key(&'_ self) -> &'_ str;
-    fn value(&'_ self) -> ::std::option::Option<&'_ Self::SubMsgType>;
+    fn key(&self) -> &'_ str;
+    fn value(&self) -> ::std::option::Option<&'_ Self::SubMsgType>;
 }
 
 #[derive(Debug)]
@@ -386,10 +359,10 @@ impl ::puroro::Serializable for TheMapEntry {
 
 impl TheMapEntryTrait for TheMapEntry {
     type SubMsgType = self::SubMsg;
-    fn key(&'_ self) -> &'_ str {
+    fn key(&self) -> &'_ str {
         self.key.as_ref()
     }
-    fn value(&'_ self) -> ::std::option::Option<&'_ Self::SubMsgType> {
+    fn value(&self) -> ::std::option::Option<&'_ Self::SubMsgType> {
         self.value.as_deref()
     }
 }
@@ -524,10 +497,10 @@ impl<'bump> ::puroro::Serializable for TheMapEntryBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> TheMapEntryTrait for TheMapEntryBumpalo<'bump> {
     type SubMsgType = self::SubMsgBumpalo<'bump>;
-    fn key(&'_ self) -> &'_ str {
+    fn key(&self) -> &'_ str {
         self.key.as_ref()
     }
-    fn value(&'_ self) -> ::std::option::Option<&'_ Self::SubMsgType> {
+    fn value(&self) -> ::std::option::Option<&'_ Self::SubMsgType> {
         self.value.as_deref()
     }
 }

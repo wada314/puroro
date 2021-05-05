@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::convert::TryFrom;
 
 pub trait FieldNew<'bump>: Sized {
@@ -24,14 +25,19 @@ impl_field_new!(f32);
 impl_field_new!(f64);
 impl_field_new!(bool);
 impl_field_new!(::std::string::String);
-impl<'bump, T> FieldNew<'bump> for ::std::vec::Vec<T> {
+impl<'bump, T> FieldNew<'bump> for Vec<T> {
     fn new() -> Self {
-        ::std::vec::Vec::new()
+        Default::default()
     }
 }
-impl<'bump, T> FieldNew<'bump> for ::std::option::Option<T> {
+impl<'bump, T> FieldNew<'bump> for Option<T> {
     fn new() -> Self {
-        None
+        Default::default()
+    }
+}
+impl<'bump, K, V> FieldNew<'bump> for HashMap<K, V> {
+    fn new() -> Self {
+        Default::default()
     }
 }
 impl<'bump, T> FieldNew<'bump> for ::std::result::Result<T, i32>

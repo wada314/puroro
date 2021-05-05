@@ -18,7 +18,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
         Self {
             context,
             msg,
-            frag_gen: MessageImplFragmentGenerator::new(context),
+            frag_gen: MessageImplFragmentGenerator::new(context, msg),
             traits_gen: MessageTraitCodeGenerator::new(context, msg),
         }
     }
@@ -320,9 +320,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                     Ok(format!(
                         "type {assoc_type_ident} = {actual_type_name}{gpb};\n",
                         assoc_type_ident = self.traits_gen.associated_msg_type_ident(msg)?,
-                        actual_type_name = self
-                            .frag_gen
-                            .struct_ident_with_relative_path(msg, self.msg.package()?)?,
+                        actual_type_name = self.frag_gen.struct_ident_with_relative_path(msg)?,
                         gpb = self.frag_gen.struct_generic_params_bounds(&[]),
                     ))
                 })),
@@ -405,6 +403,13 @@ type {iter_ident}<'a> where Self: 'a =
                                     transform_iter = transform_iter
                                 )
                             }
+                            GetterMethods::MapField(decl) => {
+                                format!(
+                                    "{decl} {{\n    &self.{ident}\n}}\n",
+                                    decl = decl,
+                                    ident = field.native_ident()?,
+                                )
+                            }
                         },
                     )
                 })),
@@ -418,16 +423,7 @@ type {iter_ident}<'a> where Self: 'a =
         if !self.msg.is_map_entry() {
             return Ok(());
         }
-        let key_field = self.msg.fields().find(|field| field.number() == 1).ok_or(
-            ErrorKind::InvalidMapEntry {
-                name: self.msg.fully_qualified_name()?.to_string(),
-            },
-        )?;
-        let value_field = self.msg.fields().find(|field| field.number() == 2).ok_or(
-            ErrorKind::InvalidMapEntry {
-                name: self.msg.fully_qualified_name()?.to_string(),
-            },
-        )?;
+        let (key_field, value_field) = self.msg.key_value_of_map_entry()?;
         (format!(
             "\
 {cfg}
@@ -455,9 +451,7 @@ impl{gp} ::puroro_internal::helpers::MapEntry for {entry_type} {{
         Ok(())
     }}
 }}\n",
-            entry_type = self
-                .frag_gen
-                .type_name_of_msg(self.msg, self.msg.package()?)?,
+            entry_type = self.frag_gen.type_name_of_msg(self.msg)?,
             cfg = self.frag_gen.cfg_condition(),
             gp = self.frag_gen.struct_generic_params(&[]),
             key_type = self.frag_gen.field_type_for(key_field)?,

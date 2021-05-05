@@ -56,9 +56,9 @@ type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>
                 iter(self.msg.fields().map(|field| -> Result<Fragment<W>> {
                     // getter method decls
                     Ok(match self.generate_getter_method_decls(field, false)? {
-                        GetterMethods::ScalarField(decl) | GetterMethods::OptionalField(decl) => {
-                            format!("{decl};\n", decl = decl).into()
-                        }
+                        GetterMethods::ScalarField(decl)
+                        | GetterMethods::OptionalField(decl)
+                        | GetterMethods::MapField(decl) => format!("{decl};\n", decl = decl).into(),
                         GetterMethods::RepeatedField {
                             for_each,
                             boxed_iter,
@@ -83,9 +83,20 @@ type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>
         has_body: bool,
     ) -> Result<GetterMethods> {
         Ok(match (field.label()?, field.type_()?) {
+            (FieldLabel::Repeated, FieldType::Message(m)) if m.is_map_entry() => {
+                // Map.
+                let (key_field, value_field) = m.key_value_of_map_entry()?;
+                GetterMethods::MapField(format!(
+                    "\
+fn {ident}(&self) -> &::std::collections::HashMap<{key}, {value}>",
+                    ident = field.native_ident()?,
+                    key = self.scalar_type_name(key_field)?,
+                    value = self.scalar_type_name(value_field)?,
+                ))
+            }
             (FieldLabel::Optional2, _) | (FieldLabel::Optional3, FieldType::Message(_)) => {
                 GetterMethods::OptionalField(format!(
-                    "fn {name}(&'_ self) -> ::std::option::Option<{reftype}>",
+                    "fn {name}(&self) -> ::std::option::Option<{reftype}>",
                     name = field.native_ident()?,
                     reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
                 ))
@@ -117,7 +128,7 @@ fn {name}_iter(&self) -> Self::{iter_name}<'_>",
             },
             (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
                 GetterMethods::ScalarField(format!(
-                    "fn {name}(&'_ self) -> {reftype}",
+                    "fn {name}(&self) -> {reftype}",
                     name = field.native_ident()?,
                     reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
                 ))
@@ -150,7 +161,7 @@ fn {name}_iter(&self) -> Self::{iter_name}<'_>",
                 NonTrivialFieldType::Bytes => format!("[u8]").into(),
                 NonTrivialFieldType::Enum(e) => format!(
                     "::std::result::Result<{type_}, i32>",
-                    type_ = e.native_ident_with_relative_path(field.package()?)?
+                    type_ = e.native_ident_with_relative_path(self.msg.package()?)?
                 )
                 .into(),
                 NonTrivialFieldType::Message(m) => {
@@ -195,4 +206,5 @@ pub enum GetterMethods {
         boxed_iter: String,
         iter: String,
     },
+    MapField(String),
 }
