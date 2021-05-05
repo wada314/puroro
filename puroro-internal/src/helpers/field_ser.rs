@@ -419,27 +419,20 @@ define_ser_repeated_fixed!(i64, tags::SFixed64);
 // Map field
 ///////////////////////////////////////////////////////////////////////////////
 
-// The code generator must implement `Serializable` for tuple
-// `(&K, &V, PhantomData(KeyTag, ValueTag, Entry))`.
+// The code generator must implement `::puroro_internal::ser::Serializable` for tuple
+// `(&K, &V, PhantomData<Entry>)`.
 impl<Entry> FieldSer<tags::Message<Entry>, tags::Repeated>
     for HashMap<Entry::KeyType, Entry::ValueType>
 where
     Entry: MapEntry,
-    for<'a> (
-        &'a Entry::KeyType,
-        &'a Entry::ValueType,
-        PhantomData<(Entry::KeyTag, Entry::ValueTag, Entry)>,
-    ): Serializable,
+    for<'a> (&'a Entry::KeyType, &'a Entry::ValueType, PhantomData<Entry>): Serializable,
 {
     fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
     where
         S: crate::ser::MessageSerializer,
     {
         for (k, v) in self {
-            serializer.serialize_message_twice(
-                field_number,
-                &(k, v, PhantomData::<(Entry::KeyTag, Entry::ValueTag, Entry)>),
-            )?;
+            serializer.serialize_message_twice(field_number, &(k, v, PhantomData::<Entry>))?;
         }
         Ok(())
     }

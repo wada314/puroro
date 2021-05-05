@@ -21,6 +21,8 @@ pub enum ErrorKind {
     GroupNotSupported,
     #[error(r#"Unknown value for proto file's syntax: "{name}"."#)]
     UnknownProtoSyntax { name: String },
+    #[error(r#"The type "{name}" is marked as a map entry type, but it doesn't fulfill the requirement."#)]
+    InvalidMapEntry { name: String },
     #[error(r#"An error from formatter: "{source}""#)]
     WriteError { source: std::fmt::Error },
     #[error(r#"An error from puroro: "{source}""#)]

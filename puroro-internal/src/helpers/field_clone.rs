@@ -1,5 +1,5 @@
 /// We need this JUST ONLY for `::bumpalo::boxed::Box`, because it doesn't have
-/// the reference to the bumpalo instance.
+/// the reference to the bumpalo instance so it cannot clone themself.
 pub trait FieldClone<'bump>: Sized {
     fn clone(&self) -> Self;
     #[cfg(feature = "puroro-bumpalo")]

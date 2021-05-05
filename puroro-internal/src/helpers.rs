@@ -9,22 +9,16 @@ pub use field_ser::FieldSer;
 
 use crate::tags;
 use crate::types::FieldData;
+use ::puroro::InternalData;
 use std::collections::HashMap;
 use std::marker::PhantomData;
-use ::puroro::InternalData;
 
 pub trait MapEntry {
     type KeyTag: tags::FieldTypeTag;
     type ValueTag: tags::FieldTypeTag;
     type KeyType;
     type ValueType;
-    fn into_tuple(
-        self,
-    ) -> (
-        Self::KeyType,
-        Self::ValueType,
-        PhantomData<(Self::KeyTag, Self::ValueTag, Self)>,
-    );
+    fn into_tuple(self) -> (Self::KeyType, Self::ValueType, PhantomData<Self>);
 }
 
 #[derive(Debug, Clone)]

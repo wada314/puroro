@@ -4,7 +4,7 @@ use super::writer::{func, indent, indent_n, iter, IntoFragment};
 use crate::context::{AllocatorType, Context};
 use crate::utils::Indentor;
 use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
-use crate::Result;
+use crate::{ErrorKind, Result};
 
 pub struct MessageImplCodeGenerator<'a, 'c> {
     context: &'a Context<'c>,
@@ -30,6 +30,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             func(|output| self.print_msg_clone(output)),
             (
                 func(|output| self.print_msg_deser_from_iter(output)),
+                func(|output| self.maybe_print_map_entry_ser_deser(output)),
                 func(|output| self.print_msg_ser(output)),
             ),
             func(|output| self.print_msg_trait_impl(output)),
@@ -243,6 +244,93 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
                 gpb = self.frag_gen.struct_generic_params_bounds(&[]),
             ),
         )
+            .write_into(output)
+    }
+
+    pub fn maybe_print_map_entry_ser_deser<W: std::fmt::Write>(
+        &self,
+        output: &mut Indentor<W>,
+    ) -> Result<()> {
+        if !self.msg.is_map_entry() {
+            return Ok(());
+        }
+        let key_field = self.msg.fields().nth(0).ok_or(ErrorKind::InvalidMapEntry {
+            name: self.msg.fully_qualified_name()?.to_string(),
+        })?;
+        let value_field = self.msg.fields().nth(1).ok_or(ErrorKind::InvalidMapEntry {
+            name: self.msg.fully_qualified_name()?.to_string(),
+        })?;
+        (format!(
+            "\
+{cfg}
+impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for 
+    ({key_type}, {value_type}, ::std::marker::PhantomData<{entry_type}>)
+{{
+    fn met_field<'a, 'b, I>(
+        &mut self,
+        field: ::puroro_internal::types::FieldData<
+            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
+        field_number: usize,
+    ) -> ::puroro::Result<()> 
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>
+    {{
+        use ::puroro_internal::helpers::FieldDeserFromIter;
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        match field_number {{
+            1 => {{
+                <{key_type} as FieldDeserFromIter<
+                    tags::{key_type_tag}, 
+                    tags::{key_label_tag}>>
+                ::deser(&mut self.0, field, {key_default_func})?;
+            }}
+            2 => {{
+                <{value_type} as FieldDeserFromIter<
+                    tags::{value_type_tag}, 
+                    tags::{value_label_tag}>>
+                ::deser(&mut self.0, field, {value_default_func})?;
+            }}
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
+        }}
+    }}
+}}
+
+{cfg}
+impl{gp} ::puroro_internal::ser::Serializable for 
+    ({key_type}, {value_type}, ::std::marker::PhantomData<({entry_type})>)
+{{
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {{
+        use ::puroro_internal::helpers::FieldSer;
+        use ::puroro_internal::tags;
+        <{key_type} as FieldSer<
+            tags::{key_type_tag}, 
+            tags::{key_label_tag}>>
+            ::ser(&self.0, serializer, 1)?;
+        <{value_type} as FieldSer<
+            tags::{value_type_tag}, 
+            tags::{value_label_tag}>>
+            ::ser(&self.0, serializer, 1)?;
+    }}
+}}\n",
+            entry_type = self
+                .frag_gen
+                .type_name_of_msg(self.msg, self.msg.package()?)?,
+            cfg = self.frag_gen.cfg_condition(),
+            gp = self.frag_gen.struct_generic_params(&[]),
+            key_type = self.frag_gen.field_type_for(key_field)?,
+            key_type_tag = self.frag_gen.type_tag_for(key_field)?,
+            key_label_tag = key_field.label_tag()?,
+            key_default_func = self.frag_gen.default_func_for(key_field)?,
+            value_type = self.frag_gen.field_type_for(value_field)?,
+            value_type_tag = self.frag_gen.type_tag_for(value_field)?,
+            value_label_tag = value_field.label_tag()?,
+            value_default_func = self.frag_gen.default_func_for(value_field)?,
+        ),)
             .write_into(output)
     }
 
