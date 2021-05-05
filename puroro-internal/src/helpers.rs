@@ -7,18 +7,22 @@ pub use field_deser::FieldDeserFromIter;
 pub use field_new::FieldNew;
 pub use field_ser::FieldSer;
 
+use crate::ser::MessageSerializer;
 use crate::tags;
 use crate::types::FieldData;
+use crate::Result;
 use ::puroro::InternalData;
 use std::collections::HashMap;
-use std::marker::PhantomData;
 
 pub trait MapEntry {
-    type KeyTag: tags::FieldTypeTag;
-    type ValueTag: tags::FieldTypeTag;
     type KeyType;
     type ValueType;
-    fn into_tuple(self) -> (Self::KeyType, Self::ValueType, PhantomData<Self>);
+    fn into_tuple(self) -> (Self::KeyType, Self::ValueType);
+    fn ser_kv<T: MessageSerializer>(
+        key: &Self::KeyType,
+        value: &Self::ValueType,
+        serializer: &mut T,
+    ) -> Result<()>;
 }
 
 #[derive(Debug, Clone)]

@@ -5,6 +5,10 @@ use crate::{
 };
 use std::io::Write;
 
+pub trait Serializable {
+    fn serialize<T: MessageSerializer>(&self, serializer: &mut T) -> Result<()>;
+}
+
 pub trait MessageSerializer {
     fn serialize_variant<T: VariantType>(
         &mut self,
@@ -40,9 +44,6 @@ where
     MessageSerializerImpl::new(write)
 }
 
-pub trait Serializable {
-    fn serialize<T: MessageSerializer>(&self, serializer: &mut T) -> Result<()>;
-}
 struct MessageSerializerImpl<'a, W>
 where
     W: std::io::Write,

@@ -582,13 +582,10 @@ define_deser_repeated_message!();
 // Map field
 ///////////////////////////////////////////////////////////////////////////////
 
-// The code generator must implement `DeserializableMessageFromIter` for tuple
-// `(&K, &V, PhantomData<Entry>)`.
 impl<Entry> FieldDeserFromIter<tags::Message<Entry>, tags::Repeated>
     for HashMap<Entry::KeyType, Entry::ValueType>
 where
-    Entry: MapEntry,
-    (Entry::KeyType, Entry::ValueType, PhantomData<Entry>): DeserializableMessageFromIter,
+    Entry: MapEntry + DeserializableMessageFromIter,
     Entry::KeyType: Hash + Eq,
 {
     type Item = Entry;
@@ -603,9 +600,9 @@ where
         F: Fn() -> Self::Item,
     {
         if let FieldData::LengthDelimited(bytes_iter) = field {
-            let entry = (f)();
-            let mut kv = entry.into_tuple();
-            bytes_iter.deser_message(&mut kv)?;
+            let mut entry = (f)();
+            bytes_iter.deser_message(&mut entry)?;
+            let kv = entry.into_tuple();
             self.insert(kv.0, kv.1);
             Ok(())
         } else {

@@ -66,17 +66,3 @@ impl VariantTypeTag for SInt32 {}
 impl VariantTypeTag for SInt64 {}
 impl VariantTypeTag for Bool {}
 impl<T> VariantTypeTag for Enum<T> {}
-
-impl<T, L> FieldTypeAndLabelTag for (T, L)
-where
-    T: FieldTypeTag,
-    L: FieldLabelTag,
-{
-}
-impl<T> FieldTypeAndLabelTag for Map<T>
-where
-    T: MapEntry,
-    T::KeyTag: FieldTypeTag,
-    T::ValueTag: FieldTypeTag,
-{
-}

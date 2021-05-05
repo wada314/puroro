@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 
 use num_traits::Zero;
 
-use crate::ser::Serializable;
+use crate::ser::{MessageSerializer, Serializable};
 use crate::tags::{self, FieldLabelTag, FieldTypeTag};
 use crate::Result;
 
@@ -419,8 +419,6 @@ define_ser_repeated_fixed!(i64, tags::SFixed64);
 // Map field
 ///////////////////////////////////////////////////////////////////////////////
 
-// The code generator must implement `::puroro_internal::ser::Serializable` for tuple
-// `(&K, &V, PhantomData<Entry>)`.
 impl<Entry> FieldSer<tags::Message<Entry>, tags::Repeated>
     for HashMap<Entry::KeyType, Entry::ValueType>
 where
@@ -431,8 +429,16 @@ where
     where
         S: crate::ser::MessageSerializer,
     {
-        for (k, v) in self {
-            serializer.serialize_message_twice(field_number, &(k, v, PhantomData::<Entry>))?;
+        struct SerializableMapEntry<'a, Entry: MapEntry>(&'a Entry::KeyType, &'a Entry::ValueType);
+        impl<'a, Entry: MapEntry> crate::ser::Serializable for SerializableMapEntry<'a, Entry> {
+            fn serialize<T: MessageSerializer>(&self, serializer: &mut T) -> Result<()> {
+                Entry::ser_kv(self.0, self.1, serializer)
+            }
+        }
+        // I believe I can ignore the unknown fields of the map entry..
+        for (key, value) in self {
+            let entry = SerializableMapEntry::<Entry>(key, value);
+            serializer.serialize_message_twice(field_number, &entry)?;
         }
         Ok(())
     }

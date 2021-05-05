@@ -334,58 +334,28 @@ impl ::puroro::DeserializableFromIter for TheMapEntry {
     }
 }
 
-impl ::puroro_internal::deser::DeserializableMessageFromIter for 
-    (::std::string::String, ::std::option::Option<::std::boxed::Box<self::SubMsg>>, ::std::marker::PhantomData<self::TheMapEntry>)
-{
-    fn met_field<'a, 'b, I>(
-        &mut self,
-        field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> 
-    where
-        I: Iterator<Item = ::std::io::Result<u8>>
-    {
-        use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro::InternalData;
-        use ::puroro_internal::tags;
-        use ::std::convert::TryInto;
-        let puroro_internal = &self.puroro_internal;
-        match field_number {
-            1 => {
-                <::std::string::String as FieldDeserFromIter<
-                    tags::String, 
-                    tags::Optional3>>
-                ::deser(&mut self.0, field, ::std::default::Default::default)?;
-            }
-            2 => {
-                <::std::option::Option<::std::boxed::Box<self::SubMsg>> as FieldDeserFromIter<
-                    tags::Message<self::SubMsg>, 
-                    tags::Optional3>>
-                ::deser(&mut self.0, field, ::std::default::Default::default)?;
-            }
-            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
-        }
+impl ::puroro_internal::helpers::MapEntry for self::TheMapEntry {
+    type KeyType = ::std::string::String;
+    type ValueType = ::std::option::Option<::std::boxed::Box<self::SubMsg>>;
+    fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {
+        (self.key, self.value)
     }
-}
-
-
-impl ::puroro_internal::ser::Serializable for 
-    (::std::string::String, ::std::option::Option<::std::boxed::Box<self::SubMsg>>, ::std::marker::PhantomData<(self::TheMapEntry)>)
-{
-    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+    fn ser_kv<T: ::puroro_internal::ser::MessageSerializer>(
+        key: &Self::KeyType,
+        value: &Self::ValueType,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
         <::std::string::String as FieldSer<
             tags::String, 
             tags::Optional3>>
-            ::ser(&self.0, serializer, 1)?;
+            ::ser(key, serializer, 1)?;
         <::std::option::Option<::std::boxed::Box<self::SubMsg>> as FieldSer<
             tags::Message<self::SubMsg>, 
             tags::Optional3>>
-            ::ser(&self.0, serializer, 1)?;
+            ::ser(value, serializer, 2)?;
+        Ok(())
     }
 }
 
@@ -502,58 +472,28 @@ impl<'bump> ::puroro::DeserializableFromIter for TheMapEntryBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for 
-    (::bumpalo::collections::String<'bump>, ::std::option::Option<::bumpalo::boxed::Box<'bump, self::SubMsgBumpalo<'bump>>>, ::std::marker::PhantomData<self::TheMapEntryBumpalo<'bump>>)
-{
-    fn met_field<'a, 'b, I>(
-        &mut self,
-        field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
-        field_number: usize,
-    ) -> ::puroro::Result<()> 
-    where
-        I: Iterator<Item = ::std::io::Result<u8>>
-    {
-        use ::puroro_internal::helpers::FieldDeserFromIter;
-        use ::puroro::InternalData;
-        use ::puroro_internal::tags;
-        use ::std::convert::TryInto;
-        let puroro_internal = &self.puroro_internal;
-        match field_number {
-            1 => {
-                <::bumpalo::collections::String<'bump> as FieldDeserFromIter<
-                    tags::String, 
-                    tags::Optional3>>
-                ::deser(&mut self.0, field, || ::bumpalo::collections::String::new_in(puroro_internal.bumpalo()))?;
-            }
-            2 => {
-                <::std::option::Option<::bumpalo::boxed::Box<'bump, self::SubMsgBumpalo<'bump>>> as FieldDeserFromIter<
-                    tags::Message<self::SubMsgBumpalo<'bump>>, 
-                    tags::Optional3>>
-                ::deser(&mut self.0, field, || ::bumpalo::boxed::Box::new_in(self::SubMsgBumpalo::new_in(puroro_internal.bumpalo()), puroro_internal.bumpalo()))?;
-            }
-            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
-        }
+impl<'bump> ::puroro_internal::helpers::MapEntry for self::TheMapEntryBumpalo<'bump> {
+    type KeyType = ::bumpalo::collections::String<'bump>;
+    type ValueType = ::std::option::Option<::bumpalo::boxed::Box<'bump, self::SubMsgBumpalo<'bump>>>;
+    fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {
+        (self.key, self.value)
     }
-}
-
-#[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::ser::Serializable for 
-    (::bumpalo::collections::String<'bump>, ::std::option::Option<::bumpalo::boxed::Box<'bump, self::SubMsgBumpalo<'bump>>>, ::std::marker::PhantomData<(self::TheMapEntryBumpalo<'bump>)>)
-{
-    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
-        &self, serializer: &mut T) -> ::puroro::Result<()>
-    {
+    fn ser_kv<T: ::puroro_internal::ser::MessageSerializer>(
+        key: &Self::KeyType,
+        value: &Self::ValueType,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {
         use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;
         <::bumpalo::collections::String<'bump> as FieldSer<
             tags::String, 
             tags::Optional3>>
-            ::ser(&self.0, serializer, 1)?;
+            ::ser(key, serializer, 1)?;
         <::std::option::Option<::bumpalo::boxed::Box<'bump, self::SubMsgBumpalo<'bump>>> as FieldSer<
             tags::Message<self::SubMsgBumpalo<'bump>>, 
             tags::Optional3>>
-            ::ser(&self.0, serializer, 1)?;
+            ::ser(value, serializer, 2)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
