@@ -44,8 +44,8 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
                 "\
 {cfg}
 #[derive(Debug)]
-pub struct {name}{gp} {{\n",
-                name = self.frag_gen.struct_ident(self.msg)?,
+pub struct {ident}{gp} {{\n",
+                ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
             ),
@@ -74,10 +74,10 @@ pub struct {name}{gp} {{\n",
             format!(
                 "\
 {cfg}
-impl{gp} {name}{gpb} {{
+impl{gp} {ident}{gpb} {{
     pub {new_decl} {{
         Self {{\n",
-                name = self.frag_gen.struct_ident(self.msg)?,
+                ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
                 gpb = self.frag_gen.struct_generic_params_bounds(&[]),
@@ -114,12 +114,12 @@ impl{gp} {name}{gpb} {{
                 format!(
                     "\
 {cfg}
-impl{gp} ::std::default::Default for {name}{gpb} {{
+impl{gp} ::std::default::Default for {ident}{gpb} {{
     fn default() -> Self {{
         Self::new()
     }}
 }}\n",
-                    name = self.frag_gen.struct_ident(self.msg)?,
+                    ident = self.frag_gen.struct_ident(self.msg)?,
                     cfg = self.frag_gen.cfg_condition(),
                     gp = self.frag_gen.struct_generic_params(&[]),
                     gpb = self.frag_gen.struct_generic_params_bounds(&[]),
@@ -136,12 +136,12 @@ impl{gp} ::std::default::Default for {name}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} ::std::clone::Clone for {name}{gpb} {{
+impl{gp} ::std::clone::Clone for {ident}{gpb} {{
     fn clone(&self) -> Self {{
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {{\n",
-                name = self.frag_gen.struct_ident(self.msg)?,
+                ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
                 gpb = self.frag_gen.struct_generic_params_bounds(&[]),
@@ -176,7 +176,7 @@ impl{gp} ::std::clone::Clone for {name}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb} {{
+impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb} {{
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
@@ -192,7 +192,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
         use ::std::convert::TryInto;
         let puroro_internal = &self.puroro_internal;
         match field_number {{\n",
-                name = self.frag_gen.struct_ident(self.msg)?,
+                ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
                 gpb = self.frag_gen.struct_generic_params_bounds(&[]),
@@ -207,10 +207,10 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {name}{gpb}
     <{type_} as FieldDeserFromIter<
         tags::{type_tag}, 
         tags::{label_tag}>>
-    ::deser(&mut self.{name}, field, {default_func})?;
+    ::deser(&mut self.{ident}, field, {default_func})?;
 }}\n",
                             number = field.number(),
-                            name = field.native_ident()?,
+                            ident = field.native_ident()?,
                             type_ = self.frag_gen.field_type_for(field)?,
                             type_tag = self.frag_gen.type_tag_for(field)?,
                             label_tag = field.label_tag()?,
@@ -251,13 +251,13 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} ::puroro_internal::ser::Serializable for {name}{gpb} {{
+impl{gp} ::puroro_internal::ser::Serializable for {ident}{gpb} {{
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
         use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;\n",
-                name = self.frag_gen.struct_ident(self.msg)?,
+                ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
                 gpb = self.frag_gen.struct_generic_params_bounds(&[]),
@@ -270,9 +270,9 @@ impl{gp} ::puroro_internal::ser::Serializable for {name}{gpb} {{
 <{type_} as FieldSer<
         tags::{type_tag}, 
         tags::{label_tag}>>
-    ::ser(&self.{name}, serializer, {number})?;\n",
+    ::ser(&self.{ident}, serializer, {number})?;\n",
                         number = field.number(),
-                        name = field.native_ident()?,
+                        ident = field.native_ident()?,
                         type_ = self.frag_gen.field_type_for(field)?,
                         type_tag = self.frag_gen.type_tag_for(field)?,
                         label_tag = field.label_tag()?,
