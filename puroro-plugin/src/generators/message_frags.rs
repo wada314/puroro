@@ -19,7 +19,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
     /// A raw generated struct identifier.
     /// e.g. "FieldDescriptorProto", "DescriptorProtoBumpalo"
-    pub fn struct_name(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
+    pub fn struct_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
         let postfix1 = match self.context.impl_type() {
             ImplType::Default => "",
             ImplType::SliceRef => "SliceRef",
@@ -37,14 +37,14 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         .into())
     }
 
-    /// A struct name with relative path from the given package.
+    /// A struct ident with relative path from the given package.
     /// Note this is still not a typename; the generic params are not bound.
-    pub fn struct_name_with_relative_path(
+    pub fn struct_ident_with_relative_path(
         &self,
         msg: &'c MessageDescriptor<'c>,
         cur_package: &'c str,
     ) -> Result<String> {
-        let struct_name = self.struct_name(msg)?;
+        let struct_name = self.struct_ident(msg)?;
         let mut struct_package_iter = msg.package()?.split('.').peekable();
         let mut cur_package_iter = cur_package.split('.').peekable();
         while let (Some(p1), Some(p2)) = (struct_package_iter.peek(), cur_package_iter.peek()) {
@@ -56,7 +56,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             }
         }
         Ok(format!(
-            "{supers}{mods}{name}",
+            "self::{supers}{mods}{name}",
             name = struct_name,
             supers = std::iter::repeat("super::")
                 .take(cur_package_iter.count())
@@ -80,12 +80,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
         .into_iter();
         if generic_args_iter.clone().count() == 0 {
-            Ok(self.struct_name_with_relative_path(msg, cur_package)?)
+            Ok(self.struct_ident_with_relative_path(msg, cur_package)?)
         } else {
             let generic_args = Itertools::intersperse(generic_args_iter, ", ").collect::<String>();
             Ok(format!(
                 "{name}<{gargs}>",
-                name = self.struct_name_with_relative_path(msg, cur_package)?,
+                name = self.struct_ident_with_relative_path(msg, cur_package)?,
                 gargs = generic_args,
             ))
         }
@@ -215,6 +215,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     _ => "::std::default::Default::default".into(),
                 },
                 AllocatorType::Bumpalo => match field.type_()? {
+                    // Before this place, a local var puroro_internal is bound.
+                    // let puroro_internal = &self.puroro_internal;
+                    // We need this proxy var to tell the borrow checker that we are splitting
+                    // the `self`.
                     FieldType::String => {
                         "|| ::bumpalo::collections::String::new_in(puroro_internal.bumpalo())"
                             .into()
@@ -229,12 +233,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             "|| ::bumpalo::boxed::Box::new_in({msg}::new_in(\
                                 puroro_internal.bumpalo()\
                             ), puroro_internal.bumpalo())",
-                            msg = self.struct_name_with_relative_path(m, field.package()?)?,
+                            msg = self.struct_ident_with_relative_path(m, field.package()?)?,
                         )
                         .into(),
                         FieldLabel::Required | FieldLabel::Repeated => format!(
                             "|| {msg}::new_in(puroro_internal.bumpalo())",
-                            msg = self.struct_name_with_relative_path(m, field.package()?)?,
+                            msg = self.struct_ident_with_relative_path(m, field.package()?)?,
                         )
                         .into(),
                     },
