@@ -286,6 +286,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             AllocatorType::Bumpalo => "fn new_in(bump: &'bump ::bumpalo::Bump) -> Self",
         }
     }
+
     pub fn field_clone(&self, field_ident: &str, field_type: &str) -> String {
         match self.context.alloc_type() {
             AllocatorType::Default => format!(
@@ -300,6 +301,25 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 field_type = field_type
             ),
         }
+    }
+
+    pub fn field_take_or_init(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+        Ok(match self.context.alloc_type() {
+            AllocatorType::Default => format!(
+                "<{field_type} as FieldTakeOrInit<{taken_type}>>\
+                    ::take_or_init(self.{ident})",
+                ident = field.native_ident()?,
+                field_type = self.field_type_for(field)?,
+                taken_type = self.field_scalar_item_type_for(field)?,
+            ),
+            AllocatorType::Bumpalo => format!(
+                "<{field_type} as FieldTakeOrInit<{taken_type}>>\
+                    ::take_or_init_in_bumpalo(self.{ident}, self.puroro_internal.bumpalo())",
+                ident = field.native_ident()?,
+                field_type = self.field_type_for(field)?,
+                taken_type = self.field_scalar_item_type_for(field)?,
+            ),
+        })
     }
 
     pub fn box_type(&self, item: &str) -> String {

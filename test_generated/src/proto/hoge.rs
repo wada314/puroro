@@ -304,9 +304,6 @@ impl ::puroro::DeserializableFromIter for TheMapEntry {
 impl ::puroro_internal::helpers::MapEntry for self::TheMapEntry {
     type KeyType = ::std::string::String;
     type ValueType = self::SubMsg;
-    fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {
-        (self.key, self.value)
-    }
     fn ser_kv<T: ::puroro_internal::ser::MessageSerializer>(
         key: &Self::KeyType,
         value: &Self::ValueType,
@@ -323,6 +320,13 @@ impl ::puroro_internal::helpers::MapEntry for self::TheMapEntry {
             tags::Required>>
             ::ser(value, serializer, 2)?;
         Ok(())
+    }
+    fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {
+        use ::puroro_internal::helpers::FieldTakeOrInit;
+        (
+            <::std::string::String as FieldTakeOrInit<::std::string::String>>::take_or_init(self.key), 
+            <::std::option::Option<::std::boxed::Box<self::SubMsg>> as FieldTakeOrInit<self::SubMsg>>::take_or_init(self.value),
+        )
     }
 }
 
@@ -442,9 +446,6 @@ impl<'bump> ::puroro::DeserializableFromIter for TheMapEntryBumpalo<'bump> {
 impl<'bump> ::puroro_internal::helpers::MapEntry for self::TheMapEntryBumpalo<'bump> {
     type KeyType = ::bumpalo::collections::String<'bump>;
     type ValueType = self::SubMsgBumpalo<'bump>;
-    fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {
-        (self.key, self.value)
-    }
     fn ser_kv<T: ::puroro_internal::ser::MessageSerializer>(
         key: &Self::KeyType,
         value: &Self::ValueType,
@@ -461,6 +462,13 @@ impl<'bump> ::puroro_internal::helpers::MapEntry for self::TheMapEntryBumpalo<'b
             tags::Required>>
             ::ser(value, serializer, 2)?;
         Ok(())
+    }
+    fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {
+        use ::puroro_internal::helpers::FieldTakeOrInit;
+        (
+            <::bumpalo::collections::String<'bump> as FieldTakeOrInit<::bumpalo::collections::String<'bump>>>::take_or_init_in_bumpalo(self.key, self.puroro_internal.bumpalo()), 
+            <::std::option::Option<::bumpalo::boxed::Box<'bump, self::SubMsgBumpalo<'bump>>> as FieldTakeOrInit<self::SubMsgBumpalo<'bump>>>::take_or_init_in_bumpalo(self.value, self.puroro_internal.bumpalo()),
+        )
     }
 }
 #[cfg(feature = "puroro-bumpalo")]

@@ -4,31 +4,32 @@ This library is under development and it is very possible to make breaking chang
 
 ## TODOs
 - proto2
-    - Groups, at least correctly ignore it (where's document!?)
-    - default
-    - extensions
+    - [ ] Groups, at least correctly ignore it (where's document!?)
+    - [ ] default
+    - [ ] extensions
 - proto2 & 3
-    - Maps
-    - OneOfs
-    - Anys, and other well-known types
-    - Unit tests
-    - Write document!!
-    - Print comments in the generated files
-    - More usable message traits
-        - Mutable interface
-        - Repeated field accessing interface
-        - Map interface
-    - Keep unknown fields
-    - Deserializer from a slice
-    - Required field checker
-    - Other implementations
-        - Bumpalo -- Most implementations are done. Needs maps support.
-        - SliceRef (name TBD) -- A viewer over a `&[u8]` slice
-        - Append (name TBD) -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
-    - Naming of the other implementations. Consider using a type generator class
-    - Support the `allocator_api`. Waiting for the `String` support
-    - RPCs / services
-    - Deserializer vulnerbility: Need to limit the recursion depth
+    - [x] Maps
+        - [ ] A Bumpalo implementation needs improvement because `bumpalo::boxed::Box` does not support moving out the value like `std::boxed::Box` does.
+    - [ ] OneOfs
+    - [ ] Anys, and other well-known types
+    - [ ] Unit tests
+    - [ ] Write document!!
+    - [ ] Print comments in the generated files
+    - [ ] More usable message traits
+        - [ ] Mutable interface
+        - [ ] Repeated field interface
+        - [ ] Map interface
+    - [ ] Keep unknown fields
+    - [ ] Deserializer from a slice
+    - [ ] Required field checker
+    - [ ] Other implementations
+        - [x] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
+        - [ ] SliceRef (name TBD) -- A viewer over a `&[u8]` slice
+        - [ ] Append (name TBD) -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
+    - [ ] Naming of the other implementations. Consider using a type generator class
+    - [ ] Support the `allocator_api`. Waiting for the `String` support
+    - [ ] RPCs / services
+    - [ ] Deserializer vulnerbility: Need to limit the recursion depth
 
 ## subcrates
 

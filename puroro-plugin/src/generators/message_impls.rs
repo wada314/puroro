@@ -252,7 +252,7 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} ::puroro_internal::ser::Serializable for {ident}{gpb} {{
+impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
@@ -396,9 +396,6 @@ type {type_ident} = {type_name};
 impl{gp} ::puroro_internal::helpers::MapEntry for {entry_type} {{
     type KeyType = {key_type};
     type ValueType = {value_type};
-    fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {{
-        (self.key, self.value)
-    }}
     fn ser_kv<T: ::puroro_internal::ser::MessageSerializer>(
         key: &Self::KeyType,
         value: &Self::ValueType,
@@ -416,14 +413,23 @@ impl{gp} ::puroro_internal::helpers::MapEntry for {entry_type} {{
             ::ser(value, serializer, 2)?;
         Ok(())
     }}
+    fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {{
+        use ::puroro_internal::helpers::FieldTakeOrInit;
+        (
+            {take_key}, 
+            {take_value},
+        )
+    }}
 }}\n",
             entry_type = self.frag_gen.type_name_of_msg(self.msg)?,
             cfg = self.frag_gen.cfg_condition(),
             gp = self.frag_gen.struct_generic_params(&[]),
             key_type = self.frag_gen.field_scalar_item_type_for(key_field)?,
             key_type_tag = self.frag_gen.type_tag_for(key_field)?,
+            take_key = self.frag_gen.field_take_or_init(key_field)?,
             value_type = self.frag_gen.field_scalar_item_type_for(value_field)?,
             value_type_tag = self.frag_gen.type_tag_for(value_field)?,
+            take_value = self.frag_gen.field_take_or_init(value_field)?,
         ),)
             .write_into(output)
     }
