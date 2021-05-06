@@ -142,11 +142,14 @@ impl<'c> MessageDescriptor<'c> {
                 break;
             }
         }
+        let num_super = cur_package_iter.count();
+        let maybe_self = if num_super == 0 { "self::" } else { "" };
         Ok(format!(
-            "self::{supers}{mods}{name}",
+            "{maybe_self}{supers}{mods}{name}",
             name = struct_name,
+            maybe_self = maybe_self,
             supers = std::iter::repeat("super::")
-                .take(cur_package_iter.count())
+                .take(num_super)
                 .collect::<String>(),
             mods = struct_package_iter
                 .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")

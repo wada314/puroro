@@ -2,19 +2,11 @@
 #![allow(unused_imports)]
 
 pub trait CodeGeneratorResponseTrait {
-    type FileType: self::code_generator_response::FileTrait;
-    #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a>: ::std::iter::Iterator<Item=&'a Self::FileType>
-        where Self: 'a, Self::FileType: 'a;
-    fn error(&'_ self) -> ::std::option::Option<&'_ str>;
-    fn supported_features(&'_ self) -> ::std::option::Option<u64>;
-    fn for_each_file<F>(&self, f: F)
-    where
-        F: FnMut(&'_ Self::FileType);
-    fn file_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileType>>;
-    #[cfg(feature = "puroro-nightly")]
-    fn file_iter(&self) -> Self::FileIter<'_>;
+    type File_Type: self::code_generator_response::FileTrait;
+    fn error(&self) -> ::std::option::Option<&'_ str>;
+    fn supported_features(&self) -> ::std::option::Option<u64>;
+    type File_RepeatedType: ::puroro::RepeatedField<Self::File_Type>;
+    fn file(&self) -> &Self::File_RepeatedType;
 }
 
 #[derive(Debug)]
@@ -135,30 +127,16 @@ impl ::puroro::Serializable for CodeGeneratorResponse {
 }
 
 impl CodeGeneratorResponseTrait for CodeGeneratorResponse {
-    type FileType = self::code_generator_response::File;
-    #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a> where Self: 'a = 
-        impl ::std::iter::Iterator<Item = &'a Self::FileType>;
-    fn error(&'_ self) -> ::std::option::Option<&'_ str> {
+    type File_Type = self::code_generator_response::File;
+    fn error(&self) -> ::std::option::Option<&'_ str> {
         self.error.as_deref()
     }
-    fn supported_features(&'_ self) -> ::std::option::Option<u64> {
+    fn supported_features(&self) -> ::std::option::Option<u64> {
         self.supported_features.clone()
     }
-    fn for_each_file<F>(&self, mut f: F)
-    where
-        F: FnMut(&'_ Self::FileType) {
-        for item in (self.file).iter() {
-            (f)(item);
-        }
-    }
-    fn file_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileType>> {
-        ::std::boxed::Box::new(self.file.iter())
-    }
-    #[cfg(feature = "puroro-nightly")]
-    fn file_iter(&self) -> Self::FileIter<'_> {
-        self.file.iter()
+    type File_RepeatedType = ::std::vec::Vec<self::code_generator_response::File>;
+    fn file(&self) -> &Self::File_RepeatedType {
+        &self.file
     }
 }
 impl<'a> ::puroro_internal::helpers::FieldNew<'a> for CodeGeneratorResponse<> {
@@ -279,30 +257,16 @@ impl<'bump> ::puroro::Serializable for CodeGeneratorResponseBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorResponseTrait for CodeGeneratorResponseBumpalo<'bump> {
-    type FileType = self::code_generator_response::FileBumpalo<'bump>;
-    #[cfg(feature = "puroro-nightly")]
-    type FileIter<'a> where Self: 'a = 
-        impl ::std::iter::Iterator<Item = &'a Self::FileType>;
-    fn error(&'_ self) -> ::std::option::Option<&'_ str> {
+    type File_Type = self::code_generator_response::FileBumpalo<'bump>;
+    fn error(&self) -> ::std::option::Option<&'_ str> {
         self.error.as_deref()
     }
-    fn supported_features(&'_ self) -> ::std::option::Option<u64> {
+    fn supported_features(&self) -> ::std::option::Option<u64> {
         self.supported_features.clone()
     }
-    fn for_each_file<F>(&self, mut f: F)
-    where
-        F: FnMut(&'_ Self::FileType) {
-        for item in (self.file).iter() {
-            (f)(item);
-        }
-    }
-    fn file_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileType>> {
-        ::std::boxed::Box::new(self.file.iter())
-    }
-    #[cfg(feature = "puroro-nightly")]
-    fn file_iter(&self) -> Self::FileIter<'_> {
-        self.file.iter()
+    type File_RepeatedType = ::bumpalo::collections::Vec<'bump, self::code_generator_response::FileBumpalo<'bump>>;
+    fn file(&self) -> &Self::File_RepeatedType {
+        &self.file
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -336,11 +300,11 @@ impl ::std::convert::From<Feature> for i32 {
     }
 }
 pub trait FileTrait {
-    type GeneratedCodeInfoType: self::super::super::GeneratedCodeInfoTrait;
-    fn name(&'_ self) -> ::std::option::Option<&'_ str>;
-    fn insertion_point(&'_ self) -> ::std::option::Option<&'_ str>;
-    fn content(&'_ self) -> ::std::option::Option<&'_ str>;
-    fn generated_code_info(&'_ self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfoType>;
+    type GeneratedCodeInfo_Type: super::super::GeneratedCodeInfoTrait;
+    fn name(&self) -> ::std::option::Option<&'_ str>;
+    fn insertion_point(&self) -> ::std::option::Option<&'_ str>;
+    fn content(&self) -> ::std::option::Option<&'_ str>;
+    fn generated_code_info(&self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfo_Type>;
 }
 
 #[derive(Debug)]
@@ -474,17 +438,17 @@ impl ::puroro::Serializable for File {
 }
 
 impl FileTrait for File {
-    type GeneratedCodeInfoType = self::super::super::GeneratedCodeInfo;
-    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
+    type GeneratedCodeInfo_Type = self::super::super::GeneratedCodeInfo;
+    fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    fn insertion_point(&'_ self) -> ::std::option::Option<&'_ str> {
+    fn insertion_point(&self) -> ::std::option::Option<&'_ str> {
         self.insertion_point.as_deref()
     }
-    fn content(&'_ self) -> ::std::option::Option<&'_ str> {
+    fn content(&self) -> ::std::option::Option<&'_ str> {
         self.content.as_deref()
     }
-    fn generated_code_info(&'_ self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfoType> {
+    fn generated_code_info(&self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfo_Type> {
         self.generated_code_info.as_deref()
     }
 }
@@ -619,17 +583,17 @@ impl<'bump> ::puroro::Serializable for FileBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileTrait for FileBumpalo<'bump> {
-    type GeneratedCodeInfoType = self::super::super::GeneratedCodeInfoBumpalo<'bump>;
-    fn name(&'_ self) -> ::std::option::Option<&'_ str> {
+    type GeneratedCodeInfo_Type = self::super::super::GeneratedCodeInfoBumpalo<'bump>;
+    fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    fn insertion_point(&'_ self) -> ::std::option::Option<&'_ str> {
+    fn insertion_point(&self) -> ::std::option::Option<&'_ str> {
         self.insertion_point.as_deref()
     }
-    fn content(&'_ self) -> ::std::option::Option<&'_ str> {
+    fn content(&self) -> ::std::option::Option<&'_ str> {
         self.content.as_deref()
     }
-    fn generated_code_info(&'_ self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfoType> {
+    fn generated_code_info(&self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfo_Type> {
         self.generated_code_info.as_deref()
     }
 }
@@ -644,30 +608,14 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileBumpalo<'bump> {
 }
 } // mod code_generator_response
 pub trait CodeGeneratorRequestTrait {
-    type FileDescriptorProtoType: self::super::FileDescriptorProtoTrait;
-    type VersionType: self::VersionTrait;
-    #[cfg(feature = "puroro-nightly")]
-    type FileToGenerateIter<'a>: ::std::iter::Iterator<Item=&'a str>
-        where Self: 'a, str: 'a;
-    #[cfg(feature = "puroro-nightly")]
-    type ProtoFileIter<'a>: ::std::iter::Iterator<Item=&'a Self::FileDescriptorProtoType>
-        where Self: 'a, Self::FileDescriptorProtoType: 'a;
-    fn for_each_file_to_generate<F>(&self, f: F)
-    where
-        F: FnMut(&'_ str);
-    fn file_to_generate_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>>;
-    #[cfg(feature = "puroro-nightly")]
-    fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_>;
-    fn parameter(&'_ self) -> ::std::option::Option<&'_ str>;
-    fn for_each_proto_file<F>(&self, f: F)
-    where
-        F: FnMut(&'_ Self::FileDescriptorProtoType);
-    fn proto_file_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileDescriptorProtoType>>;
-    #[cfg(feature = "puroro-nightly")]
-    fn proto_file_iter(&self) -> Self::ProtoFileIter<'_>;
-    fn compiler_version(&'_ self) -> ::std::option::Option<&'_ Self::VersionType>;
+    type FileDescriptorProto_Type: super::FileDescriptorProtoTrait;
+    type Version_Type: self::VersionTrait;
+    type FileToGenerate_RepeatedType: ::puroro::RepeatedField<str>;
+    fn file_to_generate(&self) -> &Self::FileToGenerate_RepeatedType;
+    fn parameter(&self) -> ::std::option::Option<&'_ str>;
+    type ProtoFile_RepeatedType: ::puroro::RepeatedField<Self::FileDescriptorProto_Type>;
+    fn proto_file(&self) -> &Self::ProtoFile_RepeatedType;
+    fn compiler_version(&self) -> ::std::option::Option<&'_ Self::Version_Type>;
 }
 
 #[derive(Debug)]
@@ -801,48 +749,20 @@ impl ::puroro::Serializable for CodeGeneratorRequest {
 }
 
 impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
-    type FileDescriptorProtoType = self::super::FileDescriptorProto;
-    type VersionType = self::Version;
-    #[cfg(feature = "puroro-nightly")]
-    type FileToGenerateIter<'a> where Self: 'a = 
-        impl ::std::iter::Iterator<Item = &'a str>;
-    #[cfg(feature = "puroro-nightly")]
-    type ProtoFileIter<'a> where Self: 'a = 
-        impl ::std::iter::Iterator<Item = &'a Self::FileDescriptorProtoType>;
-    fn for_each_file_to_generate<F>(&self, mut f: F)
-    where
-        F: FnMut(&'_ str) {
-        for item in (self.file_to_generate).iter().map(|v| v.as_ref()) {
-            (f)(item);
-        }
+    type FileDescriptorProto_Type = self::super::FileDescriptorProto;
+    type Version_Type = self::Version;
+    type FileToGenerate_RepeatedType = ::std::vec::Vec<::std::string::String>;
+    fn file_to_generate(&self) -> &Self::FileToGenerate_RepeatedType {
+        &self.file_to_generate
     }
-    fn file_to_generate_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
-        ::std::boxed::Box::new(self.file_to_generate.iter().map(|v| v.as_ref()))
-    }
-    #[cfg(feature = "puroro-nightly")]
-    fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_> {
-        self.file_to_generate.iter().map(|v| v.as_ref())
-    }
-    fn parameter(&'_ self) -> ::std::option::Option<&'_ str> {
+    fn parameter(&self) -> ::std::option::Option<&'_ str> {
         self.parameter.as_deref()
     }
-    fn for_each_proto_file<F>(&self, mut f: F)
-    where
-        F: FnMut(&'_ Self::FileDescriptorProtoType) {
-        for item in (self.proto_file).iter() {
-            (f)(item);
-        }
+    type ProtoFile_RepeatedType = ::std::vec::Vec<self::super::FileDescriptorProto>;
+    fn proto_file(&self) -> &Self::ProtoFile_RepeatedType {
+        &self.proto_file
     }
-    fn proto_file_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileDescriptorProtoType>> {
-        ::std::boxed::Box::new(self.proto_file.iter())
-    }
-    #[cfg(feature = "puroro-nightly")]
-    fn proto_file_iter(&self) -> Self::ProtoFileIter<'_> {
-        self.proto_file.iter()
-    }
-    fn compiler_version(&'_ self) -> ::std::option::Option<&'_ Self::VersionType> {
+    fn compiler_version(&self) -> ::std::option::Option<&'_ Self::Version_Type> {
         self.compiler_version.as_deref()
     }
 }
@@ -977,48 +897,20 @@ impl<'bump> ::puroro::Serializable for CodeGeneratorRequestBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo<'bump> {
-    type FileDescriptorProtoType = self::super::FileDescriptorProtoBumpalo<'bump>;
-    type VersionType = self::VersionBumpalo<'bump>;
-    #[cfg(feature = "puroro-nightly")]
-    type FileToGenerateIter<'a> where Self: 'a = 
-        impl ::std::iter::Iterator<Item = &'a str>;
-    #[cfg(feature = "puroro-nightly")]
-    type ProtoFileIter<'a> where Self: 'a = 
-        impl ::std::iter::Iterator<Item = &'a Self::FileDescriptorProtoType>;
-    fn for_each_file_to_generate<F>(&self, mut f: F)
-    where
-        F: FnMut(&'_ str) {
-        for item in (self.file_to_generate).iter().map(|v| v.as_ref()) {
-            (f)(item);
-        }
+    type FileDescriptorProto_Type = self::super::FileDescriptorProtoBumpalo<'bump>;
+    type Version_Type = self::VersionBumpalo<'bump>;
+    type FileToGenerate_RepeatedType = ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>;
+    fn file_to_generate(&self) -> &Self::FileToGenerate_RepeatedType {
+        &self.file_to_generate
     }
-    fn file_to_generate_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ str>> {
-        ::std::boxed::Box::new(self.file_to_generate.iter().map(|v| v.as_ref()))
-    }
-    #[cfg(feature = "puroro-nightly")]
-    fn file_to_generate_iter(&self) -> Self::FileToGenerateIter<'_> {
-        self.file_to_generate.iter().map(|v| v.as_ref())
-    }
-    fn parameter(&'_ self) -> ::std::option::Option<&'_ str> {
+    fn parameter(&self) -> ::std::option::Option<&'_ str> {
         self.parameter.as_deref()
     }
-    fn for_each_proto_file<F>(&self, mut f: F)
-    where
-        F: FnMut(&'_ Self::FileDescriptorProtoType) {
-        for item in (self.proto_file).iter() {
-            (f)(item);
-        }
+    type ProtoFile_RepeatedType = ::bumpalo::collections::Vec<'bump, self::super::FileDescriptorProtoBumpalo<'bump>>;
+    fn proto_file(&self) -> &Self::ProtoFile_RepeatedType {
+        &self.proto_file
     }
-    fn proto_file_boxed_iter(&self)
-        -> ::std::boxed::Box<dyn '_ + Iterator<Item=&'_ Self::FileDescriptorProtoType>> {
-        ::std::boxed::Box::new(self.proto_file.iter())
-    }
-    #[cfg(feature = "puroro-nightly")]
-    fn proto_file_iter(&self) -> Self::ProtoFileIter<'_> {
-        self.proto_file.iter()
-    }
-    fn compiler_version(&'_ self) -> ::std::option::Option<&'_ Self::VersionType> {
+    fn compiler_version(&self) -> ::std::option::Option<&'_ Self::Version_Type> {
         self.compiler_version.as_deref()
     }
 }
@@ -1032,10 +924,10 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRequest
     }
 }
 pub trait VersionTrait {
-    fn major(&'_ self) -> ::std::option::Option<i32>;
-    fn minor(&'_ self) -> ::std::option::Option<i32>;
-    fn patch(&'_ self) -> ::std::option::Option<i32>;
-    fn suffix(&'_ self) -> ::std::option::Option<&'_ str>;
+    fn major(&self) -> ::std::option::Option<i32>;
+    fn minor(&self) -> ::std::option::Option<i32>;
+    fn patch(&self) -> ::std::option::Option<i32>;
+    fn suffix(&self) -> ::std::option::Option<&'_ str>;
 }
 
 #[derive(Debug)]
@@ -1169,16 +1061,16 @@ impl ::puroro::Serializable for Version {
 }
 
 impl VersionTrait for Version {
-    fn major(&'_ self) -> ::std::option::Option<i32> {
+    fn major(&self) -> ::std::option::Option<i32> {
         self.major.clone()
     }
-    fn minor(&'_ self) -> ::std::option::Option<i32> {
+    fn minor(&self) -> ::std::option::Option<i32> {
         self.minor.clone()
     }
-    fn patch(&'_ self) -> ::std::option::Option<i32> {
+    fn patch(&self) -> ::std::option::Option<i32> {
         self.patch.clone()
     }
-    fn suffix(&'_ self) -> ::std::option::Option<&'_ str> {
+    fn suffix(&self) -> ::std::option::Option<&'_ str> {
         self.suffix.as_deref()
     }
 }
@@ -1313,16 +1205,16 @@ impl<'bump> ::puroro::Serializable for VersionBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> VersionTrait for VersionBumpalo<'bump> {
-    fn major(&'_ self) -> ::std::option::Option<i32> {
+    fn major(&self) -> ::std::option::Option<i32> {
         self.major.clone()
     }
-    fn minor(&'_ self) -> ::std::option::Option<i32> {
+    fn minor(&self) -> ::std::option::Option<i32> {
         self.minor.clone()
     }
-    fn patch(&'_ self) -> ::std::option::Option<i32> {
+    fn patch(&self) -> ::std::option::Option<i32> {
         self.patch.clone()
     }
-    fn suffix(&'_ self) -> ::std::option::Option<&'_ str> {
+    fn suffix(&self) -> ::std::option::Option<&'_ str> {
         self.suffix.as_deref()
     }
 }

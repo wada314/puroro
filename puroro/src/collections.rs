@@ -22,6 +22,7 @@ pub trait RepeatedField<T: ?Sized> {
 
 impl<T, U> RepeatedField<T> for Vec<U>
 where
+    T: ?Sized,
     U: Borrow<T>,
 {
     fn for_each<F>(&self, f: F)
@@ -50,6 +51,7 @@ where
 
 impl<'bump, T, U> RepeatedField<T> for ::bumpalo::collections::Vec<'bump, U>
 where
+    T: ?Sized,
     U: Borrow<T>,
 {
     fn for_each<F>(&self, f: F)
