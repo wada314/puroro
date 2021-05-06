@@ -423,7 +423,6 @@ impl<Entry> FieldSer<tags::Message<Entry>, tags::Repeated>
     for HashMap<Entry::KeyType, Entry::ValueType>
 where
     Entry: MapEntry,
-    for<'a> (&'a Entry::KeyType, &'a Entry::ValueType, PhantomData<Entry>): Serializable,
 {
     fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
     where

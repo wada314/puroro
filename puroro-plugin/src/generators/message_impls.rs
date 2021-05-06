@@ -324,94 +324,60 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                         gpb = self.frag_gen.struct_generic_params_bounds(&[]),
                     ))
                 })),
-                iter(
-                    // typedefs for repeated field iterators
-                    self.msg
-                        .fields()
-                        .filter(|field| matches!(field.label(), Ok(FieldLabel::Repeated)))
-                        .map(|field| {
-                            Ok(format!(
-                                "\
-#[cfg(feature = \"puroro-nightly\")]
-type {iter_ident}<'a> where Self: 'a = 
-    impl ::std::iter::Iterator<Item = {reftype}>;\n",
-                                iter_ident = self.traits_gen.associated_iter_type_ident(field)?,
-                                reftype =
-                                    self.traits_gen.scalar_maybe_ref_type_name(field, "'a")?
-                            ))
-                        }),
-                ),
                 iter(self.msg.fields().map(|field| -> Result<_> {
-                    Ok(
-                        match self.traits_gen.generate_getter_method_decls(field, true)? {
-                            GetterMethods::ScalarField(decl) => {
-                                let transform = match field.type_()? {
-                                    FieldType::String
-                                    | FieldType::Bytes
-                                    | FieldType::Message(_) => ".as_ref()",
-                                    _ => ".clone()",
-                                };
+                    Ok(match self.traits_gen.generate_getter_method_decls(field)? {
+                        GetterMethods::ScalarField(decl) => {
+                            let transform = match field.type_()? {
+                                FieldType::String | FieldType::Bytes | FieldType::Message(_) => {
+                                    ".as_ref()"
+                                }
+                                _ => ".clone()",
+                            };
 
-                                format!(
-                                    "{decl} {{\n    self.{ident}{transform}\n}}\n",
-                                    decl = decl,
-                                    ident = field.native_ident()?,
-                                    transform = transform,
-                                )
-                            }
-                            GetterMethods::OptionalField(decl) => {
-                                let transform = match field.type_()? {
-                                    FieldType::String
-                                    | FieldType::Bytes
-                                    | FieldType::Message(_) => ".as_deref()",
-                                    _ => ".clone()",
-                                };
-                                format!(
-                                    "{decl} {{\n    self.{ident}{transform}\n}}\n",
-                                    decl = decl,
-                                    ident = field.native_ident()?,
-                                    transform = transform,
-                                )
-                            }
-                            GetterMethods::RepeatedField {
-                                for_each,
-                                boxed_iter,
-                                iter,
-                            } => {
-                                let transform_iter = match field.type_()? {
-                                    FieldType::Message(_) => "",
-                                    FieldType::String | FieldType::Bytes => ".map(|v| v.as_ref())",
-                                    _ => ".cloned()",
-                                };
-                                format!(
-                                    "\
-{for_each} {{
-    for item in (self.{ident}).iter(){transform_iter} {{
-        (f)(item);
-    }}
-}}
-{boxed_iter} {{
-    ::std::boxed::Box::new(self.{ident}.iter(){transform_iter})
-}}
-{iter} {{
-    self.{ident}.iter(){transform_iter}
+                            format!(
+                                "{decl} {{\n    self.{ident}{transform}\n}}\n",
+                                decl = decl,
+                                ident = field.native_ident()?,
+                                transform = transform,
+                            )
+                        }
+                        GetterMethods::OptionalField(decl) => {
+                            let transform = match field.type_()? {
+                                FieldType::String | FieldType::Bytes | FieldType::Message(_) => {
+                                    ".as_deref()"
+                                }
+                                _ => ".clone()",
+                            };
+                            format!(
+                                "{decl} {{\n    self.{ident}{transform}\n}}\n",
+                                decl = decl,
+                                ident = field.native_ident()?,
+                                transform = transform,
+                            )
+                        }
+                        GetterMethods::RepeatedField {
+                            type_ident,
+                            type_bound: _,
+                            get_decl,
+                        }
+                        | GetterMethods::MapField {
+                            type_ident,
+                            type_bound: _,
+                            get_decl,
+                        } => {
+                            format!(
+                                "\
+type {type_ident} = {type_name};
+{get_decl} {{
+    &self.{ident}
 }}\n",
-                                    for_each = for_each,
-                                    boxed_iter = boxed_iter,
-                                    iter = iter,
-                                    ident = field.native_ident()?,
-                                    transform_iter = transform_iter
-                                )
-                            }
-                            GetterMethods::MapField(decl) => {
-                                format!(
-                                    "{decl} {{\n    &self.{ident}\n}}\n",
-                                    decl = decl,
-                                    ident = field.native_ident()?,
-                                )
-                            }
-                        },
-                    )
+                                type_ident = type_ident,
+                                type_name = self.frag_gen.field_type_for(field)?,
+                                get_decl = get_decl,
+                                ident = field.native_ident()?,
+                            )
+                        }
+                    })
                 })),
             )),
             "}}\n",

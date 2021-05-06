@@ -22,6 +22,7 @@ This library is under development and it is very possible to make breaking chang
     - Deserializer from a slice
     - Required field checker
     - Other implementations
+        - Bumpalo -- Most implementations are done. Needs maps support.
         - SliceRef (name TBD) -- A viewer over a `&[u8]` slice
         - Append (name TBD) -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
     - Naming of the other implementations. Consider using a type generator class

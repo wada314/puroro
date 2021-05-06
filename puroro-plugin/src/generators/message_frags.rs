@@ -140,8 +140,8 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 let (key_field, value_field) = m.key_value_of_map_entry()?;
                 return Ok(format!(
                     "::std::collections::HashMap<{key}, {value}>",
-                    key = self.field_type_for(key_field)?,
-                    value = self.field_type_for(value_field)?,
+                    key = self.field_scalar_item_type_for(key_field)?,
+                    value = self.field_scalar_item_type_for(value_field)?,
                 )
                 .into());
             }

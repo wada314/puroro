@@ -36,39 +36,29 @@ pub trait {trait_ident} {{\n",
                         trait_rel_ident = self.trait_relative_ident(msg)?,
                     ))
                 })),
-                iter(
-                    // typedefs for iterator types
-                    self.msg
-                        .fields()
-                        .filter(|field| matches!(field.label(), Ok(FieldLabel::Repeated)))
-                        .map(|field| {
-                            Ok(format!(
-                                "\
-#[cfg(feature = \"puroro-nightly\")]
-type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>
-    where Self: 'a, {scalartype}: 'a;\n",
-                                iter_ident = self.associated_iter_type_ident(field)?,
-                                reftype = self.scalar_maybe_ref_type_name(field, "'a")?,
-                                scalartype = self.scalar_type_name(field)?,
-                            ))
-                        }),
-                ),
-                iter(self.msg.fields().map(|field| -> Result<Fragment<W>> {
+                iter(self.msg.fields().map(|field| -> Result<String> {
                     // getter method decls
-                    Ok(match self.generate_getter_method_decls(field, false)? {
-                        GetterMethods::ScalarField(decl)
-                        | GetterMethods::OptionalField(decl)
-                        | GetterMethods::MapField(decl) => format!("{decl};\n", decl = decl).into(),
+                    Ok(match self.generate_getter_method_decls(field)? {
+                        GetterMethods::ScalarField(decl) | GetterMethods::OptionalField(decl) => {
+                            format!("{decl};\n", decl = decl)
+                        }
                         GetterMethods::RepeatedField {
-                            for_each,
-                            boxed_iter,
-                            iter,
-                        } => (
-                            format!("{decl};\n", decl = for_each),
-                            format!("{decl};\n", decl = boxed_iter),
-                            format!("{decl};\n", decl = iter),
-                        )
-                            .into(),
+                            type_ident,
+                            type_bound,
+                            get_decl,
+                        }
+                        | GetterMethods::MapField {
+                            type_ident,
+                            type_bound,
+                            get_decl,
+                        } => {
+                            format!(
+                                "type {type_ident}: {type_bound};\n{get_decl};\n",
+                                type_ident = type_ident,
+                                type_bound = type_bound,
+                                get_decl = get_decl
+                            )
+                        }
                     })
                 })),
             )),
@@ -80,19 +70,25 @@ type {iter_ident}<'a>: ::std::iter::Iterator<Item={reftype}>
     pub fn generate_getter_method_decls(
         &self,
         field: &'c FieldDescriptor<'c>,
-        has_body: bool,
     ) -> Result<GetterMethods> {
         Ok(match (field.label()?, field.type_()?) {
             (FieldLabel::Repeated, FieldType::Message(m)) if m.is_map_entry() => {
                 // Map.
                 let (key_field, value_field) = m.key_value_of_map_entry()?;
-                GetterMethods::MapField(format!(
-                    "\
-fn {ident}(&self) -> &::std::collections::HashMap<{key}, {value}>",
-                    ident = field.native_ident()?,
-                    key = self.scalar_type_name(key_field)?,
-                    value = self.scalar_type_name(value_field)?,
-                ))
+                let type_ident = format!("{}Type", to_camel_case(field.native_ident()?));
+                GetterMethods::MapField {
+                    type_ident: type_ident.clone(),
+                    type_bound: format!(
+                        "::puroro::MapField<{key}, {value}>",
+                        key = self.scalar_deref_type_name(key_field)?,
+                        value = self.scalar_deref_type_name(value_field)?,
+                    ),
+                    get_decl: format!(
+                        "fn {ident}(&self) -> &Self::{type_ident}",
+                        ident = field.native_ident()?,
+                        type_ident = type_ident,
+                    ),
+                }
             }
             (FieldLabel::Optional2, _) | (FieldLabel::Optional3, FieldType::Message(_)) => {
                 GetterMethods::OptionalField(format!(
@@ -101,31 +97,21 @@ fn {ident}(&self) -> &::std::collections::HashMap<{key}, {value}>",
                     reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
                 ))
             }
-            (FieldLabel::Repeated, _) => GetterMethods::RepeatedField {
-                for_each: format!(
-                    "\
-fn for_each_{name}<F>(&self, {maybe_mut}f: F)
-where
-    F: FnMut({reftype})",
-                    name = field.native_ident()?,
-                    reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
-                    maybe_mut = if has_body { "mut " } else { "" }
-                ),
-                boxed_iter: format!(
-                    "\
-fn {name}_boxed_iter(&self)
-    -> ::std::boxed::Box<dyn '_ + Iterator<Item={reftype}>>",
-                    name = field.native_ident()?,
-                    reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
-                ),
-                iter: format!(
-                    "\
-#[cfg(feature = \"puroro-nightly\")]
-fn {name}_iter(&self) -> Self::{iter_name}<'_>",
-                    name = field.native_ident()?,
-                    iter_name = self.associated_iter_type_ident(field)?,
-                ),
-            },
+            (FieldLabel::Repeated, _) => {
+                let type_ident = format!("{}Type", to_camel_case(field.native_ident()?));
+                GetterMethods::RepeatedField {
+                    type_ident: type_ident.clone(),
+                    type_bound: format!(
+                        "::puroro::RepeatedField<{value}>",
+                        value = self.scalar_deref_type_name(field)?,
+                    ),
+                    get_decl: format!(
+                        "fn {ident}(&self) -> &Self::{type_ident}",
+                        ident = field.native_ident()?,
+                        type_ident = type_ident,
+                    ),
+                }
+            }
             (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
                 GetterMethods::ScalarField(format!(
                     "fn {name}(&self) -> {reftype}",
@@ -152,7 +138,7 @@ fn {name}_iter(&self) -> Self::{iter_name}<'_>",
         Ok(format!("{}Iter", to_camel_case(field.native_ident()?)))
     }
 
-    pub fn scalar_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+    pub fn scalar_deref_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
         Ok(match field.type_()?.native_trivial_type_name() {
             Ok(name) => name.into(),
             Err(nontrivial_type) => match nontrivial_type {
@@ -202,9 +188,13 @@ pub enum GetterMethods {
     ScalarField(String),
     OptionalField(String),
     RepeatedField {
-        for_each: String,
-        boxed_iter: String,
-        iter: String,
+        type_ident: String,
+        type_bound: String,
+        get_decl: String,
     },
-    MapField(String),
+    MapField {
+        type_ident: String,
+        type_bound: String,
+        get_decl: String,
+    },
 }
