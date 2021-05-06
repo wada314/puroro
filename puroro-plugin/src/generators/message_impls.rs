@@ -252,7 +252,7 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} ::puroro_internal::ser::Serializable for {ident}{gpb} {{
+impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{

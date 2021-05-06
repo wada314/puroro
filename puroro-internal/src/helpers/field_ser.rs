@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 
 use num_traits::Zero;
 
-use crate::ser::{MessageSerializer, Serializable};
+use crate::ser::{MessageSerializer, SerializableMessage};
 use crate::tags::{self, FieldLabelTag, FieldTypeTag};
 use crate::Result;
 
@@ -92,7 +92,7 @@ define_ser_required_ld!(::bumpalo::collections::Vec<'bump, u8>, tags::Bytes, ite
 
 impl<T> FieldSer<tags::Message<T>, tags::Required> for T
 where
-    T: Serializable,
+    T: SerializableMessage,
 {
     fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
     where
@@ -181,7 +181,7 @@ macro_rules! define_ser_optional_message {
     ($box:ty, $ltag:ty) => {
         impl<'bump, T> FieldSer<tags::Message<T>, $ltag> for Option<$box>
         where
-            T: Serializable,
+            T: SerializableMessage,
         {
             fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
             where
@@ -370,7 +370,7 @@ macro_rules! define_ser_repeated_message {
     ($vec:ty) => {
         impl<'bump, T> FieldSer<tags::Message<T>, tags::Repeated> for $vec
         where
-            T: Serializable,
+            T: SerializableMessage,
         {
             fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
             where
@@ -429,7 +429,7 @@ where
         S: crate::ser::MessageSerializer,
     {
         struct SerializableMapEntry<'a, Entry: MapEntry>(&'a Entry::KeyType, &'a Entry::ValueType);
-        impl<'a, Entry: MapEntry> crate::ser::Serializable for SerializableMapEntry<'a, Entry> {
+        impl<'a, Entry: MapEntry> crate::ser::SerializableMessage for SerializableMapEntry<'a, Entry> {
             fn serialize<T: MessageSerializer>(&self, serializer: &mut T) -> Result<()> {
                 Entry::ser_kv(self.0, self.1, serializer)
             }

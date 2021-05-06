@@ -5,7 +5,7 @@ use crate::{
 };
 use std::io::Write;
 
-pub trait Serializable {
+pub trait SerializableMessage {
     fn serialize<T: MessageSerializer>(&self, serializer: &mut T) -> Result<()>;
 }
 
@@ -25,7 +25,7 @@ pub trait MessageSerializer {
     where
         I: Clone + Iterator<Item = Result<u8>>;
 
-    fn serialize_message_twice<T: Serializable>(
+    fn serialize_message_twice<T: SerializableMessage>(
         &mut self,
         field_number: usize,
         message: &T,
@@ -132,7 +132,7 @@ where
         Ok(())
     }
 
-    fn serialize_message_twice<T: Serializable>(
+    fn serialize_message_twice<T: SerializableMessage>(
         &mut self,
         field_number: usize,
         message: &T,

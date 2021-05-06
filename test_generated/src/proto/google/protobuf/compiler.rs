@@ -97,7 +97,7 @@ impl ::puroro::DeserializableFromIter for CodeGeneratorResponse {
     }
 }
 
-impl ::puroro_internal::ser::Serializable for CodeGeneratorResponse {
+impl ::puroro_internal::ser::SerializableMessage for CodeGeneratorResponse {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -122,7 +122,7 @@ impl ::puroro_internal::ser::Serializable for CodeGeneratorResponse {
 impl ::puroro::Serializable for CodeGeneratorResponse {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 
@@ -227,7 +227,7 @@ impl<'bump> ::puroro::DeserializableFromIter for CodeGeneratorResponseBumpalo<'b
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::ser::Serializable for CodeGeneratorResponseBumpalo<'bump> {
+impl<'bump> ::puroro_internal::ser::SerializableMessage for CodeGeneratorResponseBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -252,7 +252,7 @@ impl<'bump> ::puroro_internal::ser::Serializable for CodeGeneratorResponseBumpal
 impl<'bump> ::puroro::Serializable for CodeGeneratorResponseBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -404,7 +404,7 @@ impl ::puroro::DeserializableFromIter for File {
     }
 }
 
-impl ::puroro_internal::ser::Serializable for File {
+impl ::puroro_internal::ser::SerializableMessage for File {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -433,7 +433,7 @@ impl ::puroro_internal::ser::Serializable for File {
 impl ::puroro::Serializable for File {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 
@@ -549,7 +549,7 @@ impl<'bump> ::puroro::DeserializableFromIter for FileBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::ser::Serializable for FileBumpalo<'bump> {
+impl<'bump> ::puroro_internal::ser::SerializableMessage for FileBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -578,7 +578,7 @@ impl<'bump> ::puroro_internal::ser::Serializable for FileBumpalo<'bump> {
 impl<'bump> ::puroro::Serializable for FileBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -715,7 +715,7 @@ impl ::puroro::DeserializableFromIter for CodeGeneratorRequest {
     }
 }
 
-impl ::puroro_internal::ser::Serializable for CodeGeneratorRequest {
+impl ::puroro_internal::ser::SerializableMessage for CodeGeneratorRequest {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -744,7 +744,7 @@ impl ::puroro_internal::ser::Serializable for CodeGeneratorRequest {
 impl ::puroro::Serializable for CodeGeneratorRequest {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 
@@ -863,7 +863,7 @@ impl<'bump> ::puroro::DeserializableFromIter for CodeGeneratorRequestBumpalo<'bu
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::ser::Serializable for CodeGeneratorRequestBumpalo<'bump> {
+impl<'bump> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRequestBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -892,7 +892,7 @@ impl<'bump> ::puroro_internal::ser::Serializable for CodeGeneratorRequestBumpalo
 impl<'bump> ::puroro::Serializable for CodeGeneratorRequestBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1027,7 +1027,7 @@ impl ::puroro::DeserializableFromIter for Version {
     }
 }
 
-impl ::puroro_internal::ser::Serializable for Version {
+impl ::puroro_internal::ser::SerializableMessage for Version {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -1056,7 +1056,7 @@ impl ::puroro_internal::ser::Serializable for Version {
 impl ::puroro::Serializable for Version {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 
@@ -1171,7 +1171,7 @@ impl<'bump> ::puroro::DeserializableFromIter for VersionBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> ::puroro_internal::ser::Serializable for VersionBumpalo<'bump> {
+impl<'bump> ::puroro_internal::ser::SerializableMessage for VersionBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -1200,7 +1200,7 @@ impl<'bump> ::puroro_internal::ser::Serializable for VersionBumpalo<'bump> {
 impl<'bump> ::puroro::Serializable for VersionBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
