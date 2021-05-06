@@ -84,6 +84,8 @@ pub trait MapField<K: ?Sized, V: ?Sized> {
 
 impl<K, V, L, W> MapField<K, V> for HashMap<L, W>
 where
+    K: ?Sized,
+    V: ?Sized,
     L: Hash + Eq + Borrow<K>,
     W: Borrow<V>,
 {

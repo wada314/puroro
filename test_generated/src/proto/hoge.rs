@@ -303,7 +303,7 @@ impl ::puroro::DeserializableFromIter for TheMapEntry {
 
 impl ::puroro_internal::helpers::MapEntry for self::TheMapEntry {
     type KeyType = ::std::string::String;
-    type ValueType = ::std::option::Option<::std::boxed::Box<self::SubMsg>>;
+    type ValueType = self::SubMsg;
     fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {
         (self.key, self.value)
     }
@@ -316,11 +316,11 @@ impl ::puroro_internal::helpers::MapEntry for self::TheMapEntry {
         use ::puroro_internal::tags;
         <::std::string::String as FieldSer<
             tags::String, 
-            tags::Optional3>>
+            tags::Required>>
             ::ser(key, serializer, 1)?;
-        <::std::option::Option<::std::boxed::Box<self::SubMsg>> as FieldSer<
+        <self::SubMsg as FieldSer<
             tags::Message<self::SubMsg>, 
-            tags::Optional3>>
+            tags::Required>>
             ::ser(value, serializer, 2)?;
         Ok(())
     }
@@ -441,7 +441,7 @@ impl<'bump> ::puroro::DeserializableFromIter for TheMapEntryBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::helpers::MapEntry for self::TheMapEntryBumpalo<'bump> {
     type KeyType = ::bumpalo::collections::String<'bump>;
-    type ValueType = ::std::option::Option<::bumpalo::boxed::Box<'bump, self::SubMsgBumpalo<'bump>>>;
+    type ValueType = self::SubMsgBumpalo<'bump>;
     fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {
         (self.key, self.value)
     }
@@ -454,11 +454,11 @@ impl<'bump> ::puroro_internal::helpers::MapEntry for self::TheMapEntryBumpalo<'b
         use ::puroro_internal::tags;
         <::bumpalo::collections::String<'bump> as FieldSer<
             tags::String, 
-            tags::Optional3>>
+            tags::Required>>
             ::ser(key, serializer, 1)?;
-        <::std::option::Option<::bumpalo::boxed::Box<'bump, self::SubMsgBumpalo<'bump>>> as FieldSer<
+        <self::SubMsgBumpalo<'bump> as FieldSer<
             tags::Message<self::SubMsgBumpalo<'bump>>, 
-            tags::Optional3>>
+            tags::Required>>
             ::ser(value, serializer, 2)?;
         Ok(())
     }

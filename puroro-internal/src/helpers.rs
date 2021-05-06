@@ -15,6 +15,10 @@ use ::puroro::InternalData;
 use std::collections::HashMap;
 
 pub trait MapEntry {
+    // Note: `KeyType` (or `ValueType`) != the message's `key` (or `value`) field type.
+    // The latter may be wrapped by `Option` or `Box<>` depend on the label or the type,
+    // but the `KeyType` must be a bare type which will be used for the `HashMap`'s
+    // generic param.
     type KeyType;
     type ValueType;
     fn into_tuple(self) -> (Self::KeyType, Self::ValueType);

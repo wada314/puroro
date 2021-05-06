@@ -408,11 +408,11 @@ impl{gp} ::puroro_internal::helpers::MapEntry for {entry_type} {{
         use ::puroro_internal::tags;
         <{key_type} as FieldSer<
             tags::{key_type_tag}, 
-            tags::{key_label_tag}>>
+            tags::Required>>
             ::ser(key, serializer, 1)?;
         <{value_type} as FieldSer<
             tags::{value_type_tag}, 
-            tags::{value_label_tag}>>
+            tags::Required>>
             ::ser(value, serializer, 2)?;
         Ok(())
     }}
@@ -420,12 +420,10 @@ impl{gp} ::puroro_internal::helpers::MapEntry for {entry_type} {{
             entry_type = self.frag_gen.type_name_of_msg(self.msg)?,
             cfg = self.frag_gen.cfg_condition(),
             gp = self.frag_gen.struct_generic_params(&[]),
-            key_type = self.frag_gen.field_type_for(key_field)?,
+            key_type = self.frag_gen.field_scalar_item_type_for(key_field)?,
             key_type_tag = self.frag_gen.type_tag_for(key_field)?,
-            key_label_tag = key_field.label_tag()?,
-            value_type = self.frag_gen.field_type_for(value_field)?,
+            value_type = self.frag_gen.field_scalar_item_type_for(value_field)?,
             value_type_tag = self.frag_gen.type_tag_for(value_field)?,
-            value_label_tag = value_field.label_tag()?,
         ),)
             .write_into(output)
     }
