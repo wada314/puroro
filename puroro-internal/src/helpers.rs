@@ -10,7 +10,6 @@ pub use field_ser::FieldSer;
 pub use field_take_or_init::FieldTakeOrInit;
 
 use crate::ser::MessageSerializer;
-use crate::tags;
 use crate::types::FieldData;
 use crate::Result;
 use ::puroro::InternalData;
@@ -81,6 +80,7 @@ impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct InternalDataForSliceViewStruct<'slice> {
     pub slice: &'slice [u8],
     pub parse_pos: usize,

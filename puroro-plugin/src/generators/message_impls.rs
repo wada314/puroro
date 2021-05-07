@@ -1,7 +1,7 @@
 use super::message_frags::MessageImplFragmentGenerator;
 use super::message_traits::{GetterMethods, MessageTraitCodeGenerator};
 use super::writer::{func, indent, indent_n, iter, IntoFragment};
-use crate::context::{AllocatorType, Context};
+use crate::context::{AllocatorType, Context, ImplType};
 use crate::utils::Indentor;
 use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
 use crate::{ErrorKind, Result};
@@ -173,6 +173,9 @@ impl{gp} ::std::clone::Clone for {ident}{gpb} {{
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
+        if !self.frag_gen.is_deser_from_iter_available() {
+            return Ok(());
+        }
         (
             format!(
                 "\
@@ -249,8 +252,10 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
 
     pub fn print_msg_ser<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
-            format!(
-                "\
+            match self.context.impl_type() {
+                ImplType::Default => (
+                    format!(
+                        "\
 {cfg}
 impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
@@ -258,32 +263,51 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
     {{
         use ::puroro_internal::helpers::FieldSer;
         use ::puroro_internal::tags;\n",
-                ident = self.frag_gen.struct_ident(self.msg)?,
-                cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(&[]),
-                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-            ),
-            indent_n(
-                2,
-                iter(self.msg.fields().map(|field| -> Result<_> {
-                    Ok(format!(
-                        "\
+                        ident = self.frag_gen.struct_ident(self.msg)?,
+                        cfg = self.frag_gen.cfg_condition(),
+                        gp = self.frag_gen.struct_generic_params(&[]),
+                        gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+                    ),
+                    indent_n::<_, W>(
+                        2,
+                        iter(self.msg.fields().map(|field| -> Result<_> {
+                            Ok(format!(
+                                "\
 <{type_} as FieldSer<
         tags::{type_tag}, 
         tags::{label_tag}>>
     ::ser(&self.{ident}, serializer, {number})?;\n",
-                        number = field.number(),
-                        ident = field.native_ident()?,
-                        type_ = self.frag_gen.field_type_for(field)?,
-                        type_tag = self.frag_gen.type_tag_for(field)?,
-                        label_tag = field.label_tag()?,
-                    ))
-                })),
-            ),
-            "        \
+                                number = field.number(),
+                                ident = field.native_ident()?,
+                                type_ = self.frag_gen.field_type_for(field)?,
+                                type_tag = self.frag_gen.type_tag_for(field)?,
+                                label_tag = field.label_tag()?,
+                            ))
+                        })),
+                    ),
+                    "        \
         Ok(())
     }}
 }}\n",
+                )
+                    .into(),
+                ImplType::SliceView { .. } => (format!(
+                    "\
+{cfg}
+impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {{
+        serializer.serialize_raw_bytes(self.puroro_internal.slice)
+    }}
+}}\n",
+                    ident = self.frag_gen.struct_ident(self.msg)?,
+                    cfg = self.frag_gen.cfg_condition(),
+                    gp = self.frag_gen.struct_generic_params(&[]),
+                    gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+                ),)
+                    .into(),
+            },
             format!(
                 "\
 {cfg}

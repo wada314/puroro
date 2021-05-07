@@ -36,6 +36,8 @@ pub trait MessageSerializer {
         field_number: usize,
         bytes: [u8; BYTES],
     ) -> Result<()>;
+
+    fn serialize_raw_bytes(&mut self, bytes: &[u8]) -> Result<()>;
 }
 pub fn default_serializer<'a, W>(write: &'a mut W) -> impl MessageSerializer + 'a
 where
@@ -156,6 +158,11 @@ where
     ) -> Result<()> {
         self.write_field_number_and_wire_type(field_number, WireType::Bits32)?;
         self.write.write_all(&bytes)?;
+        Ok(())
+    }
+
+    fn serialize_raw_bytes(&mut self, bytes: &[u8]) -> Result<()> {
+        self.write.write_all(bytes)?;
         Ok(())
     }
 }
