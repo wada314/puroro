@@ -80,3 +80,21 @@ impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
         self.bump
     }
 }
+
+pub struct InternalDataForSliceViewStruct<'slice> {
+    pub slice: &'slice [u8],
+    pub parse_pos: usize,
+}
+impl<'slice> InternalDataForSliceViewStruct<'slice> {
+    pub fn new(slice: &'slice [u8]) -> Self {
+        Self {
+            slice,
+            parse_pos: 0,
+        }
+    }
+}
+impl<'bump, 'slice> InternalData<'bump> for InternalDataForSliceViewStruct<'slice> {
+    fn bumpalo(&self) -> &'bump bumpalo::Bump {
+        panic!("The Bumpalo data field is only available for a Bumpalo struct!")
+    }
+}

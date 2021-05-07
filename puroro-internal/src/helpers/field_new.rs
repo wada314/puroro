@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
+use crate::types::{SliceRefRepeatedField, SliceRefScalarField};
+
 pub trait FieldNew<'bump>: Sized {
     fn new() -> Self;
     #[cfg(feature = "puroro-bumpalo")]
@@ -64,5 +66,16 @@ impl<'bump> FieldNew<'bump> for ::bumpalo::collections::String<'bump> {
     }
     fn new_in_bumpalo(bump: &'bump bumpalo::Bump) -> Self {
         ::bumpalo::collections::String::new_in(bump)
+    }
+}
+
+impl<'bump, 'slice, T> FieldNew<'bump> for SliceRefScalarField<'slice, T> {
+    fn new() -> Self {
+        SliceRefScalarField::Unchecked
+    }
+}
+impl<'bump, 'slice, T> FieldNew<'bump> for SliceRefRepeatedField<'slice, T> {
+    fn new() -> Self {
+        SliceRefRepeatedField::Unchecked
     }
 }

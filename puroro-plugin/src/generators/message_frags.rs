@@ -23,7 +23,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     pub fn struct_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
         let postfix1 = match self.context.impl_type() {
             ImplType::Default => "",
-            ImplType::SliceView => "SliceView",
+            ImplType::SliceView { check_utf8: _ } => "SliceView",
         };
         let postfix2 = match self.context.alloc_type() {
             AllocatorType::Default => "",
@@ -96,7 +96,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
     pub fn is_default_available(&self) -> bool {
         match (self.context.impl_type(), self.context.alloc_type()) {
-            (ImplType::SliceView, _) | (_, AllocatorType::Bumpalo) => false,
+            (ImplType::SliceView { check_utf8: _ }, _) | (_, AllocatorType::Bumpalo) => false,
             _ => true,
         }
     }
@@ -104,7 +104,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     pub fn field_visibility(&self) -> &'static str {
         match self.context.impl_type() {
             ImplType::Default => "pub ",
-            ImplType::SliceView => "",
+            ImplType::SliceView { check_utf8: _ } => "",
         }
     }
 
@@ -127,61 +127,80 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     NonTrivialFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
                 },
             },
-            ImplType::SliceView => {
+            ImplType::SliceView { check_utf8: _ } => {
                 unimplemented!()
             }
         })
     }
 
     pub fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
-        if let FieldType::Message(m) = field.type_()? {
-            if m.is_map_entry() {
-                // Special treatment for map field
-                let (key_field, value_field) = m.key_value_of_map_entry()?;
-                return Ok(format!(
-                    "::std::collections::HashMap<{key}, {value}>",
-                    key = self.field_scalar_item_type_for(key_field)?,
-                    value = self.field_scalar_item_type_for(value_field)?,
-                )
-                .into());
-            }
-        }
-        // Non-map normal fields
         let scalar_type = self.field_scalar_item_type_for(field)?;
         Ok(match self.context.impl_type() {
-            ImplType::Default => match field.label()? {
-                FieldLabel::Optional2 => {
-                    if matches!(field.type_()?, FieldType::Message(_)) {
-                        format!(
-                            "::std::option::Option<{boxed_type}>",
-                            boxed_type = self.box_type(scalar_type.as_ref()),
+            ImplType::Default => {
+                if let FieldType::Message(m) = field.type_()? {
+                    if m.is_map_entry() {
+                        // Special treatment for map field
+                        let (key_field, value_field) = m.key_value_of_map_entry()?;
+                        return Ok(format!(
+                            "::std::collections::HashMap<{key}, {value}>",
+                            key = self.field_scalar_item_type_for(key_field)?,
+                            value = self.field_scalar_item_type_for(value_field)?,
                         )
-                        .into()
-                    } else {
-                        format!(
-                            "::std::option::Option<{scalar_type}>",
-                            scalar_type = scalar_type,
-                        )
-                        .into()
+                        .into());
                     }
                 }
-                FieldLabel::Optional3 => {
-                    if matches!(field.type_()?, FieldType::Message(_)) {
-                        format!(
-                            "::std::option::Option<{boxed_type}>",
-                            boxed_type = self.box_type(scalar_type.as_ref()),
-                        )
-                        .into()
-                    } else {
-                        scalar_type.into()
+                // Non-map normal fields
+                match field.label()? {
+                    FieldLabel::Optional2 => {
+                        if matches!(field.type_()?, FieldType::Message(_)) {
+                            format!(
+                                "::std::option::Option<{boxed_type}>",
+                                boxed_type = self.box_type(scalar_type.as_ref()),
+                            )
+                            .into()
+                        } else {
+                            format!(
+                                "::std::option::Option<{scalar_type}>",
+                                scalar_type = scalar_type,
+                            )
+                            .into()
+                        }
                     }
+                    FieldLabel::Optional3 => {
+                        if matches!(field.type_()?, FieldType::Message(_)) {
+                            format!(
+                                "::std::option::Option<{boxed_type}>",
+                                boxed_type = self.box_type(scalar_type.as_ref()),
+                            )
+                            .into()
+                        } else {
+                            scalar_type.into()
+                        }
+                    }
+                    FieldLabel::Required => scalar_type.into(),
+                    FieldLabel::Repeated => self.vec_type(scalar_type.as_ref()).into(),
                 }
-                FieldLabel::Required => scalar_type.into(),
-                FieldLabel::Repeated => self.vec_type(scalar_type.as_ref()).into(),
-            },
-            ImplType::SliceView => {
-                unimplemented!()
             }
+            ImplType::SliceView { check_utf8: _ } => match field.label()? {
+                FieldLabel::Repeated => format!(
+                    "::puroro_internal::types::SliceRefRepeatedField<{field_type}>",
+                    field_type = if matches!(field.type_()?, FieldType::Message(_)) {
+                        self.box_type(scalar_type.as_ref())
+                    } else {
+                        scalar_type.into_owned()
+                    }
+                )
+                .into(),
+                _ => format!(
+                    "::puroro_internal::types::SliceRefScalarField<{field_type}>",
+                    field_type = if matches!(field.type_()?, FieldType::Message(_)) {
+                        self.box_type(scalar_type.as_ref())
+                    } else {
+                        scalar_type.into_owned()
+                    }
+                )
+                .into(),
+            },
         })
     }
 
@@ -252,7 +271,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     _ => "::std::default::Default::default".into(),
                 },
             },
-            ImplType::SliceView => {
+            ImplType::SliceView { check_utf8: _ } => {
                 unimplemented!()
             }
         })
@@ -262,10 +281,20 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         let iter = params
             .iter()
             .cloned()
-            .chain(match self.context.alloc_type() {
-                AllocatorType::Default => None.into_iter(),
-                AllocatorType::Bumpalo => Some("'bump").into_iter(),
-            });
+            .chain(
+                match self.context.alloc_type() {
+                    AllocatorType::Default => None,
+                    AllocatorType::Bumpalo => Some("'bump"),
+                }
+                .into_iter(),
+            )
+            .chain(
+                match self.context.impl_type() {
+                    ImplType::Default => None,
+                    ImplType::SliceView { check_utf8: _ } => Some("'slice"),
+                }
+                .into_iter(),
+            );
         if iter.clone().count() == 0 {
             "".to_string()
         } else {
@@ -281,9 +310,17 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     }
 
     pub fn new_method_declaration(&self) -> &'static str {
-        match self.context.alloc_type() {
-            AllocatorType::Default => "fn new() -> Self",
-            AllocatorType::Bumpalo => "fn new_in(bump: &'bump ::bumpalo::Bump) -> Self",
+        match (self.context.impl_type(), self.context.alloc_type()) {
+            (ImplType::Default, AllocatorType::Default) => "fn new() -> Self",
+            (ImplType::Default, AllocatorType::Bumpalo) => {
+                "fn new_in(bump: &'bump ::bumpalo::Bump) -> Self"
+            }
+            (ImplType::SliceView { .. }, AllocatorType::Default) => {
+                "fn from_slice(slice: &'slice [u8]) -> Self"
+            }
+            _ => {
+                unimplemented!()
+            }
         }
     }
 
@@ -355,13 +392,17 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     }
 
     pub fn internal_field_init_value(&self) -> &'static str {
-        match self.context.alloc_type() {
-            AllocatorType::Default => {
+        match (self.context.impl_type(), self.context.alloc_type()) {
+            (ImplType::Default, AllocatorType::Default) => {
                 "::puroro_internal::helpers::InternalDataForNormalStruct::new()"
             }
-            AllocatorType::Bumpalo => {
+            (ImplType::Default, AllocatorType::Bumpalo) => {
                 "::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump)"
             }
+            (ImplType::SliceView { .. }, AllocatorType::Default) => {
+                "::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice)"
+            }
+            _ => unimplemented!(),
         }
     }
 }
