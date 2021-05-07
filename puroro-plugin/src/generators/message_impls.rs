@@ -30,8 +30,8 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             func(|output| self.print_msg_clone(output)),
             (
                 func(|output| self.print_msg_deser_from_iter(output)),
-                func(|output| self.print_map_entry_impl(output)),
                 func(|output| self.print_msg_ser(output)),
+                func(|output| self.print_map_entry_impl(output)),
             ),
             func(|output| self.print_msg_trait_impl(output)),
             func(|output| self.print_msg_field_new_impl(output)),

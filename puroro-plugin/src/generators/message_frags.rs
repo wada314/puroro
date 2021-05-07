@@ -23,7 +23,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     pub fn struct_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
         let postfix1 = match self.context.impl_type() {
             ImplType::Default => "",
-            ImplType::SliceRef => "SliceRef",
+            ImplType::SliceView => "SliceView",
         };
         let postfix2 = match self.context.alloc_type() {
             AllocatorType::Default => "",
@@ -96,7 +96,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
     pub fn is_default_available(&self) -> bool {
         match (self.context.impl_type(), self.context.alloc_type()) {
-            (ImplType::SliceRef, _) | (_, AllocatorType::Bumpalo) => false,
+            (ImplType::SliceView, _) | (_, AllocatorType::Bumpalo) => false,
             _ => true,
         }
     }
@@ -104,7 +104,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     pub fn field_visibility(&self) -> &'static str {
         match self.context.impl_type() {
             ImplType::Default => "pub ",
-            ImplType::SliceRef => "",
+            ImplType::SliceView => "",
         }
     }
 
@@ -127,7 +127,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     NonTrivialFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
                 },
             },
-            ImplType::SliceRef => {
+            ImplType::SliceView => {
                 unimplemented!()
             }
         })
@@ -179,7 +179,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 FieldLabel::Required => scalar_type.into(),
                 FieldLabel::Repeated => self.vec_type(scalar_type.as_ref()).into(),
             },
-            ImplType::SliceRef => {
+            ImplType::SliceView => {
                 unimplemented!()
             }
         })
@@ -252,7 +252,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     _ => "::std::default::Default::default".into(),
                 },
             },
-            ImplType::SliceRef => {
+            ImplType::SliceView => {
                 unimplemented!()
             }
         })

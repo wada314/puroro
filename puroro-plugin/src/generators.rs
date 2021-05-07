@@ -6,7 +6,7 @@ mod writer;
 
 use itertools::Itertools;
 
-use crate::context::{AllocatorType, Context};
+use crate::context::{AllocatorType, Context, ImplType};
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case, Indentor};
 use crate::wrappers::{DescriptorVisitor, EnumDescriptor, MessageDescriptor};
 use crate::Result;
@@ -20,16 +20,19 @@ struct Visitor<'c> {
     output: Indentor<String>,
     context: Context<'c>,
     bumpalo_context: Context<'c>,
+    slice_view_context: Context<'c>,
 }
 impl<'c> DescriptorVisitor<'c> for Visitor<'c> {
     fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
         let normal_impl_gen = MessageImplCodeGenerator::new(&self.context, msg);
         let bumpalo_impl_gen = MessageImplCodeGenerator::new(&self.bumpalo_context, msg);
+        let slice_view_impl_gen = MessageImplCodeGenerator::new(&self.slice_view_context, msg);
         let trait_gen = MessageTraitCodeGenerator::new(&self.context, msg);
 
         trait_gen.print_msg_traits(&mut self.output)?;
         normal_impl_gen.print_msg(&mut self.output)?;
         bumpalo_impl_gen.print_msg(&mut self.output)?;
+        slice_view_impl_gen.print_msg(&mut self.output)?;
         Ok(())
     }
 
@@ -64,6 +67,7 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
             output: Indentor::new(output),
             context: context.with_alloc_type(AllocatorType::Default),
             bumpalo_context: context.with_alloc_type(AllocatorType::Bumpalo),
+            slice_view_context: context.with_impl_type(ImplType::SliceView),
         };
         file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
         filenames_and_contents.insert(file_name, visitor.output.into_inner());
