@@ -1,9 +1,7 @@
-use std::borrow::Cow;
 use std::fmt::Debug;
 
 use crate::google::protobuf::field_descriptor_proto::Label;
 use crate::google::protobuf::FieldDescriptorProto;
-use crate::once_map::OnceCellMap2;
 use crate::utils::{get_keyword_safe_ident, iter_package_to_root, to_lower_snake_case};
 use crate::Context;
 use crate::{ErrorKind, Result};
@@ -19,9 +17,6 @@ pub struct FieldDescriptor<'c> {
 
     lazy_type: OnceCell<FieldType<'c>>,
     lazy_fq_type_name: OnceCell<String>,
-    lazy_native_owned_type_name: OnceCell<String>,
-    lazy_native_scalar_ref_type_name: OnceCellMap2<&'static str, String>,
-    lazy_native_scalar_mut_ref_type_name: OnceCellMap2<&'static str, String>,
     lazy_native_name: OnceCell<String>,
 }
 impl<'c> FieldDescriptor<'c> {
@@ -36,9 +31,6 @@ impl<'c> FieldDescriptor<'c> {
             parent,
             lazy_type: Default::default(),
             lazy_fq_type_name: Default::default(),
-            lazy_native_owned_type_name: Default::default(),
-            lazy_native_scalar_ref_type_name: Default::default(),
-            lazy_native_scalar_mut_ref_type_name: Default::default(),
             lazy_native_name: Default::default(),
         }
     }

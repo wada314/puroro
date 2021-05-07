@@ -3,7 +3,6 @@
 mod context;
 mod error;
 mod generators;
-mod once_map;
 #[cfg(feature = "stage1")]
 mod stage1;
 #[cfg(feature = "stage2")]

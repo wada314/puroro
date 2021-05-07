@@ -75,7 +75,7 @@ pub trait {trait_ident} {{\n",
             (FieldLabel::Repeated, FieldType::Message(m)) if m.is_map_entry() => {
                 // Map.
                 let (key_field, value_field) = m.key_value_of_map_entry()?;
-                let type_ident = format!("{}_MapType", to_camel_case(field.native_ident()?));
+                let type_ident = format!("{}Map", to_camel_case(field.native_ident()?));
                 GetterMethods::MapField {
                     type_ident: type_ident.clone(),
                     type_bound: format!(
@@ -98,7 +98,7 @@ pub trait {trait_ident} {{\n",
                 ))
             }
             (FieldLabel::Repeated, _) => {
-                let type_ident = format!("{}_RepeatedType", to_camel_case(field.native_ident()?));
+                let type_ident = format!("{}Repeated", to_camel_case(field.native_ident()?));
                 GetterMethods::RepeatedField {
                     type_ident: type_ident.clone(),
                     type_bound: format!(
@@ -132,7 +132,7 @@ pub trait {trait_ident} {{\n",
         ))
     }
     pub fn associated_msg_type_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
-        Ok(format!("{}_Type", msg.native_ident()?))
+        Ok(format!("{}Type", msg.native_ident()?))
     }
 
     pub fn scalar_deref_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {

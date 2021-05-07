@@ -9,7 +9,7 @@ This library is under development and it is very possible to make breaking chang
     - [ ] extensions
 - proto2 & 3
     - [x] Maps
-        - [ ] A Bumpalo implementation needs improvement because `bumpalo::boxed::Box` does not support moving out the value like `std::boxed::Box` does.
+        - [ ] Bumpalo's `field_take_or_init.rs` implementation needs improvement because `bumpalo::boxed::Box` does not support moving out the value like `std::boxed::Box` does.
     - [ ] OneOfs
     - [ ] Anys, and other well-known types
     - [ ] Unit tests
