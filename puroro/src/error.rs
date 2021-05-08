@@ -41,6 +41,8 @@ pub enum ErrorKind {
     InvalidFieldLength,
     #[error("Internal error in SliceView struct.")]
     InvalidSliceViewType,
+    #[error("Invalid UTF8 string is given.")]
+    InvalidUtf8,
     #[error("Group is not supported.")]
     GroupNotSupported,
     #[error("Other error: {0}")]

@@ -26,13 +26,12 @@ pub enum FieldData<T> {
 #[derive(Debug, Clone)]
 pub enum SliceViewScalarField<'slice, T: Clone> {
     NotFound,
-    // Ld stands for "Length Delimited", a wire type.
-    // Only available for scalar String, Bytes, and Message fields.
+    // Only available for scalar Message fields.
     // Otherwise, the value is already decoded and stored while scanning.
-    SingleLdLocation(FieldData<BytesSlice<'slice>>),
+    SingleMessageLocation(FieldData<BytesSlice<'slice>>),
     // Only available for scalar Message field. For String and Bytes,
     // they can just use the last single (needs non-empty check in proto3) field.
-    MultipleLdLocations {
+    MultipleMessageLocations {
         first: FieldData<BytesSlice<'slice>>,
         remaining_slice: &'slice [u8],
         count: usize,
