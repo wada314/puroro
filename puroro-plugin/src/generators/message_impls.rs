@@ -266,7 +266,7 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
             "\
 {cfg}
 impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
-    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {{
+    fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {{
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
         let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
@@ -290,20 +290,21 @@ impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
                 "\
 {cfg}
 impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice for {ident}{gpb} {{
-    fn met_field_at<'slice>(
+    fn met_field_at<'slice2>(
         &mut self,
-        _: &'slice [u8],
-        field: ::puroro_internal::types::FieldData<&'slice [u8]>, 
+        _: &'slice2 [u8],
+        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {{
-        todo!()\n",
+        todo!();
+        \n",
                 ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
                 gpb = self.frag_gen.struct_generic_params_bounds(&[]),
             ),
-            "\
+            "        \
         Ok(true)
     }}
 }}\n",
@@ -387,6 +388,10 @@ impl{gp} ::puroro::Serializable for {name}{gpb} {{
     }
 
     fn print_msg_trait_impl<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+        if matches!(self.context.impl_type(), ImplType::SliceView { .. }) {
+            // TODO: do impl
+            return Ok(());
+        }
         (
             format!(
                 "\
@@ -530,7 +535,7 @@ impl{gp} ::puroro_internal::helpers::FieldNew<'a> for {name}{gpb} {{
 }}\n",
                     name = self.frag_gen.struct_ident(self.msg)?,
                     gp = self.frag_gen.struct_generic_params(&["'a"]),
-                    gpb = self.frag_gen.struct_generic_params_bounds(&[""]),
+                    gpb = self.frag_gen.struct_generic_params_bounds(&[]),
                 )
             }
             crate::context::AllocatorType::Bumpalo => {

@@ -69,12 +69,12 @@ impl<'bump> FieldNew<'bump> for ::bumpalo::collections::String<'bump> {
     }
 }
 
-impl<'bump, 'slice, T> FieldNew<'bump> for SliceViewScalarField<'slice, T> {
+impl<'bump, 'slice, T: Clone> FieldNew<'bump> for SliceViewScalarField<'slice, T> {
     fn new() -> Self {
         SliceViewScalarField::NotFound
     }
 }
-impl<'bump, 'slice, T> FieldNew<'bump> for SliceViewRepeatedField<'slice, T> {
+impl<'bump, 'slice, T: Clone> FieldNew<'bump> for SliceViewRepeatedField<'slice, T> {
     fn new() -> Self {
         SliceViewRepeatedField::NotFound
     }

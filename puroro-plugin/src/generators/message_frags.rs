@@ -70,11 +70,17 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     /// A type name of the struct with a relative path from the current msg.
     /// Includes generic param bounds if there is any.
     pub fn type_name_of_msg(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
-        let generic_args_iter = match self.context.alloc_type() {
+        let generic_args_iter1 = match self.context.alloc_type() {
             AllocatorType::Default => None,
             AllocatorType::Bumpalo => Some("'bump"),
         }
         .into_iter();
+        let generic_args_iter2 = match self.context.impl_type() {
+            ImplType::Default => None,
+            ImplType::SliceView { .. } => Some("'slice"),
+        }
+        .into_iter();
+        let generic_args_iter = generic_args_iter1.chain(generic_args_iter2);
         if generic_args_iter.clone().count() == 0 {
             Ok(self.struct_ident_with_relative_path(msg)?)
         } else {
@@ -134,9 +140,20 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     NonTrivialFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
                 },
             },
-            ImplType::SliceView { check_utf8: _ } => {
-                unimplemented!()
-            }
+            ImplType::SliceView { .. } => match field.type_()?.native_trivial_type_name() {
+                Ok(name) => name.into(),
+                Err(nontrivial_type) => match nontrivial_type {
+                    NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                    NonTrivialFieldType::String => "&'slice str".into(),
+                    NonTrivialFieldType::Bytes => "&'slice [u8]".into(),
+                    NonTrivialFieldType::Enum(e) => format!(
+                        "::std::result::Result<{type_}, i32>",
+                        type_ = e.native_ident_with_relative_path(field.package()?)?
+                    )
+                    .into(),
+                    NonTrivialFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
+                },
+            },
         })
     }
 
@@ -382,11 +399,17 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     }
 
     pub fn internal_data_type(&self) -> &'static str {
-        match self.context.alloc_type() {
-            AllocatorType::Default => "::puroro_internal::helpers::InternalDataForNormalStruct",
-            AllocatorType::Bumpalo => {
+        match (self.context.impl_type(), self.context.alloc_type()) {
+            (ImplType::Default, AllocatorType::Default) => {
+                "::puroro_internal::helpers::InternalDataForNormalStruct"
+            }
+            (ImplType::Default, AllocatorType::Bumpalo) => {
                 "::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>"
             }
+            (ImplType::SliceView { .. }, AllocatorType::Default) => {
+                "::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>"
+            }
+            _ => unimplemented!(),
         }
     }
 

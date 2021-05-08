@@ -23,7 +23,8 @@ pub enum FieldData<T> {
     Bits64([u8; 8]),
 }
 
-pub enum SliceViewScalarField<'slice, T> {
+#[derive(Debug, Clone)]
+pub enum SliceViewScalarField<'slice, T: Clone> {
     NotFound,
     // Ld stands for "Length Delimited", a wire type.
     // Only available for scalar String, Bytes, and Message fields.
@@ -41,7 +42,8 @@ pub enum SliceViewScalarField<'slice, T> {
     ValueAvailable(T),
 }
 
-pub enum SliceViewRepeatedField<'slice, T> {
+#[derive(Debug, Clone)]
+pub enum SliceViewRepeatedField<'slice, T: Clone> {
     NotFound,
     // Only available for Variant wire type.
     SinglePacked(FieldData<BytesSlice<'slice>>),

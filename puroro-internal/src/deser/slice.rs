@@ -16,6 +16,7 @@ pub trait DeserializableMessageFromSlice {
     ) -> Result<bool>;
 }
 
+#[derive(Debug, Clone)]
 pub struct BytesSlice<'slice> {
     slice: &'slice [u8],
 }
