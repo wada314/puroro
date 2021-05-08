@@ -144,11 +144,11 @@ where
         Ok(())
     }
 
-    pub fn bytes(&mut self) -> Bytes<'_, Self> {
+    pub fn bytes(&mut self) -> Bytes<&'_ mut Self> {
         Bytes::new(self)
     }
 
-    pub fn chars(&mut self) -> Chars<'_, Self> {
+    pub fn chars(&mut self) -> Chars<&'_ mut Self> {
         Chars::new(self)
     }
 
@@ -174,15 +174,15 @@ where
 }
 
 /// Converts `Result<u8, std::io::IoError>` into `Result<u8, ErrorKind>`.
-pub struct Bytes<'a, I: Iterator<Item = IoResult<u8>>> {
-    iter: &'a mut I,
+pub struct Bytes<I: Iterator<Item = IoResult<u8>>> {
+    iter: I,
 }
-impl<'a, I: Iterator<Item = IoResult<u8>>> Bytes<'a, I> {
-    pub fn new(iter: &'a mut I) -> Self {
+impl<I: Iterator<Item = IoResult<u8>>> Bytes<I> {
+    pub fn new(iter: I) -> Self {
         Self { iter }
     }
 }
-impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for Bytes<'a, I> {
+impl<I: Iterator<Item = IoResult<u8>>> Iterator for Bytes<I> {
     type Item = Result<u8>;
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|ior| ior.map_err(|ioe| ioe.into()))
@@ -190,17 +190,17 @@ impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for Bytes<'a, I> {
 }
 
 /// Converts `Result<u8, std::io::IoError>` into `Result<char, ErrorKind>`.
-pub struct Chars<'a, I: Iterator<Item = IoResult<u8>>> {
-    iter: ::utf8_decode::UnsafeDecoder<&'a mut I>,
+pub struct Chars<I: Iterator<Item = IoResult<u8>>> {
+    iter: ::utf8_decode::UnsafeDecoder<I>,
 }
-impl<'a, I: Iterator<Item = IoResult<u8>>> Chars<'a, I> {
-    pub(crate) fn new(iter: &'a mut I) -> Self {
+impl<I: Iterator<Item = IoResult<u8>>> Chars<I> {
+    pub(crate) fn new(iter: I) -> Self {
         Self {
             iter: ::utf8_decode::UnsafeDecoder::new(iter),
         }
     }
 }
-impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for Chars<'a, I> {
+impl<I: Iterator<Item = IoResult<u8>>> Iterator for Chars<I> {
     type Item = Result<char>;
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|ior| ior.map_err(|ioe| ioe.into()))
