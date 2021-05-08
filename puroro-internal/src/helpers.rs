@@ -97,14 +97,14 @@ impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
 pub struct InternalDataForSliceViewStruct<'slice> {
     pub first_field: BytesSlice<'slice>,
     pub remaining_slice: Option<&'slice [u8]>,
-    pub count: usize,
+    pub count_in_remaining_slice: usize,
 }
 impl<'slice> InternalDataForSliceViewStruct<'slice> {
     pub fn new(slice: &'slice [u8]) -> Self {
         Self {
             first_field: BytesSlice::new(slice),
             remaining_slice: None,
-            count: 1,
+            count_in_remaining_slice: 0,
         }
     }
 }

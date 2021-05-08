@@ -97,6 +97,29 @@ impl<'slice> SliceViewUpdate<'slice, tags::String, tags::Required>
     }
 }
 
+impl<'slice, T> SliceViewUpdate<'slice, tags::Message<T>, tags::Required>
+    for SliceViewScalarField<'slice, &'slice T>
+{
+    fn update(&mut self, field: FieldData<&'slice [u8]>) -> Result<()> {
+        match field {
+            FieldData::LengthDelimited(slice) => match self {
+                SliceViewScalarField::NotFound => {
+                    *self = SliceViewScalarField::MessageLocations {
+                        first: BytesSlice::new(slice),
+                        count: 0,
+                    }
+                }
+                SliceViewScalarField::MessageLocations { count, .. } => {
+                    *count += 1;
+                }
+                SliceViewScalarField::ValueAvailable(_) => Err(ErrorKind::InvalidSliceViewType)?,
+            },
+            _ => Err(ErrorKind::InvalidWireType)?,
+        }
+        Ok(())
+    }
+}
+
 impl<'slice> SliceViewUpdate<'slice, tags::Float, tags::Required>
     for SliceViewScalarField<'slice, f32>
 {

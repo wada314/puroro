@@ -26,14 +26,11 @@ pub enum FieldData<T> {
 #[derive(Debug, Clone)]
 pub enum SliceViewScalarField<'slice, T: Clone> {
     NotFound,
-    // Only available for scalar Message fields.
-    // Otherwise, the value is already decoded and stored while scanning.
-    SingleMessageLocation(FieldData<BytesSlice<'slice>>),
-    // Only available for scalar Message field. For String and Bytes,
-    // they can just use the last single (needs non-empty check in proto3) field.
-    MultipleMessageLocations {
-        first: FieldData<BytesSlice<'slice>>,
-        remaining_slice: &'slice [u8],
+    // Only available for scalar Message field.
+    // For String and Bytes, they can just use the last single field.
+    MessageLocations {
+        first: BytesSlice<'slice>,
+        // number of the message field merged into this message instance.
         count: usize,
     },
     // The data is available and already decoded.
