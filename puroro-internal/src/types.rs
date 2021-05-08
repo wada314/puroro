@@ -34,7 +34,7 @@ pub enum SliceViewScalarField<'slice, T: Clone> {
         count: usize,
     },
     // The data is available and already decoded.
-    //  For numerical fields including Enum.
+    //  For types except Message (and probably Map? TBD).
     ValueAvailable(T),
 }
 
