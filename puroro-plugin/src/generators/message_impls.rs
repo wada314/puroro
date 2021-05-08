@@ -30,6 +30,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             func(|output| self.print_msg_clone(output)),
             (
                 func(|output| self.print_msg_deser_from_iter(output)),
+                func(|output| self.print_msg_deser_from_slice(output)),
                 func(|output| self.print_msg_ser(output)),
                 func(|output| self.print_map_entry_impl(output)),
             ),
@@ -246,6 +247,39 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
                 gp = self.frag_gen.struct_generic_params(&[]),
                 gpb = self.frag_gen.struct_generic_params_bounds(&[]),
             ),
+        )
+            .write_into(output)
+    }
+
+    pub fn print_msg_deser_from_slice<W: std::fmt::Write>(
+        &self,
+        output: &mut Indentor<W>,
+    ) -> Result<()> {
+        (
+            format!(
+                "\
+{cfg}
+impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice for {ident}{gpb} {{
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {{
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        \n",
+                ident = self.frag_gen.struct_ident(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params(&[]),
+                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+            ),
+            "\
+        Ok(true)
+    }}
+}}\n",
         )
             .write_into(output)
     }

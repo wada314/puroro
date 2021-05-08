@@ -77,6 +77,22 @@ impl ::puroro::DeserializableFromIter for GeneratedCodeInfo {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for GeneratedCodeInfo {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for GeneratedCodeInfo {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -172,6 +188,22 @@ impl<'bump> ::puroro::DeserializableFromIter for GeneratedCodeInfoBumpalo<'bump>
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for GeneratedCodeInfoBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -315,6 +347,22 @@ impl ::puroro::DeserializableFromIter for Annotation {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for Annotation {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 
@@ -463,6 +511,22 @@ impl<'bump> ::puroro::DeserializableFromIter for AnnotationBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for AnnotationBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for AnnotationBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -597,6 +661,22 @@ impl ::puroro::DeserializableFromIter for SourceCodeInfo {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for SourceCodeInfo {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for SourceCodeInfo {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -692,6 +772,22 @@ impl<'bump> ::puroro::DeserializableFromIter for SourceCodeInfoBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for SourceCodeInfoBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -847,6 +943,22 @@ impl ::puroro::DeserializableFromIter for Location {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for Location {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 
@@ -1010,6 +1122,22 @@ impl<'bump> ::puroro::DeserializableFromIter for LocationBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for LocationBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1216,6 +1344,22 @@ impl ::puroro::DeserializableFromIter for UninterpretedOption {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for UninterpretedOption {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for UninterpretedOption {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1410,6 +1554,22 @@ impl<'bump> ::puroro::DeserializableFromIter for UninterpretedOptionBumpalo<'bum
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for UninterpretedOptionBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for UninterpretedOptionBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1574,6 +1734,22 @@ impl ::puroro::DeserializableFromIter for NamePart {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for NamePart {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for NamePart {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1683,6 +1859,22 @@ impl<'bump> ::puroro::DeserializableFromIter for NamePartBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for NamePartBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1825,6 +2017,22 @@ impl ::puroro::DeserializableFromIter for MethodOptions {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for MethodOptions {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for MethodOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1952,6 +2160,22 @@ impl<'bump> ::puroro::DeserializableFromIter for MethodOptionsBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for MethodOptionsBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2116,6 +2340,22 @@ impl ::puroro::DeserializableFromIter for ServiceOptions {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for ServiceOptions {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for ServiceOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2227,6 +2467,22 @@ impl<'bump> ::puroro::DeserializableFromIter for ServiceOptionsBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for ServiceOptionsBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2360,6 +2616,22 @@ impl ::puroro::DeserializableFromIter for EnumValueOptions {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for EnumValueOptions {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for EnumValueOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2471,6 +2743,22 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumValueOptionsBumpalo<'bump> 
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for EnumValueOptionsBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2614,6 +2902,22 @@ impl ::puroro::DeserializableFromIter for EnumOptions {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for EnumOptions {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for EnumOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2744,6 +3048,22 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for EnumOptionsBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for EnumOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2871,6 +3191,22 @@ impl ::puroro::DeserializableFromIter for OneofOptions {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for OneofOptions {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for OneofOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2966,6 +3302,22 @@ impl<'bump> ::puroro::DeserializableFromIter for OneofOptionsBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for OneofOptionsBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3139,6 +3491,22 @@ impl ::puroro::DeserializableFromIter for FieldOptions {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for FieldOptions {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 
@@ -3333,6 +3701,22 @@ impl<'bump> ::puroro::DeserializableFromIter for FieldOptionsBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for FieldOptionsBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3577,6 +3961,22 @@ impl ::puroro::DeserializableFromIter for MessageOptions {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for MessageOptions {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for MessageOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -3736,6 +4136,22 @@ impl<'bump> ::puroro::DeserializableFromIter for MessageOptionsBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for MessageOptionsBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -4077,6 +4493,22 @@ impl ::puroro::DeserializableFromIter for FileOptions {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for FileOptions {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 
@@ -4498,6 +4930,22 @@ impl<'bump> ::puroro::DeserializableFromIter for FileOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for FileOptionsBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for FileOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -4824,6 +5272,22 @@ impl ::puroro::DeserializableFromIter for MethodDescriptorProto {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for MethodDescriptorProto {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for MethodDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5001,6 +5465,22 @@ impl<'bump> ::puroro::DeserializableFromIter for MethodDescriptorProtoBumpalo<'b
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for MethodDescriptorProtoBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for MethodDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5169,6 +5649,22 @@ impl ::puroro::DeserializableFromIter for ServiceDescriptorProto {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for ServiceDescriptorProto {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for ServiceDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5297,6 +5793,22 @@ impl<'bump> ::puroro::DeserializableFromIter for ServiceDescriptorProtoBumpalo<'
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for ServiceDescriptorProtoBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5447,6 +5959,22 @@ impl ::puroro::DeserializableFromIter for EnumValueDescriptorProto {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for EnumValueDescriptorProto {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for EnumValueDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5573,6 +6101,22 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumValueDescriptorProtoBumpalo
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for EnumValueDescriptorProtoBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5746,6 +6290,22 @@ impl ::puroro::DeserializableFromIter for EnumDescriptorProto {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for EnumDescriptorProto {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for EnumDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5912,6 +6472,22 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumDescriptorProtoBumpalo<'bum
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for EnumDescriptorProtoBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for EnumDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -6066,6 +6642,22 @@ impl ::puroro::DeserializableFromIter for EnumReservedRange {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for EnumReservedRange {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for EnumReservedRange {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -6175,6 +6767,22 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumReservedRangeBumpalo<'bump>
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for EnumReservedRangeBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6306,6 +6914,22 @@ impl ::puroro::DeserializableFromIter for OneofDescriptorProto {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for OneofDescriptorProto {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for OneofDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -6416,6 +7040,22 @@ impl<'bump> ::puroro::DeserializableFromIter for OneofDescriptorProtoBumpalo<'bu
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for OneofDescriptorProtoBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6634,6 +7274,22 @@ impl ::puroro::DeserializableFromIter for FieldDescriptorProto {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for FieldDescriptorProto {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 
@@ -6891,6 +7547,22 @@ impl<'bump> ::puroro::DeserializableFromIter for FieldDescriptorProtoBumpalo<'bu
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for FieldDescriptorProtoBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -7152,6 +7824,22 @@ impl ::puroro::DeserializableFromIter for ExtensionRangeOptions {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for ExtensionRangeOptions {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for ExtensionRangeOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -7247,6 +7935,22 @@ impl<'bump> ::puroro::DeserializableFromIter for ExtensionRangeOptionsBumpalo<'b
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for ExtensionRangeOptionsBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -7463,6 +8167,22 @@ impl ::puroro::DeserializableFromIter for DescriptorProto {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for DescriptorProto {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 
@@ -7721,6 +8441,22 @@ impl<'bump> ::puroro::DeserializableFromIter for DescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for DescriptorProtoBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for DescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -7919,6 +8655,22 @@ impl ::puroro::DeserializableFromIter for ReservedRange {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for ReservedRange {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for ReservedRange {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -8028,6 +8780,22 @@ impl<'bump> ::puroro::DeserializableFromIter for ReservedRangeBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for ReservedRangeBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8168,6 +8936,22 @@ impl ::puroro::DeserializableFromIter for ExtensionRange {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for ExtensionRange {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for ExtensionRange {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -8294,6 +9078,22 @@ impl<'bump> ::puroro::DeserializableFromIter for ExtensionRangeBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for ExtensionRangeBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8542,6 +9342,22 @@ impl ::puroro::DeserializableFromIter for FileDescriptorProto {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for FileDescriptorProto {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 
@@ -8830,6 +9646,22 @@ impl<'bump> ::puroro::DeserializableFromIter for FileDescriptorProtoBumpalo<'bum
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for FileDescriptorProtoBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for FileDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -9031,6 +9863,22 @@ impl ::puroro::DeserializableFromIter for FileDescriptorSet {
     }
 }
 
+impl ::puroro_internal::deser::DeserializableMessageFromSlice for FileDescriptorSet {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for FileDescriptorSet {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -9126,6 +9974,22 @@ impl<'bump> ::puroro::DeserializableFromIter for FileDescriptorSetBumpalo<'bump>
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro_internal::deser::DeserializableMessageFromSlice for FileDescriptorSetBumpalo<'bump> {
+    fn met_field(
+        &mut self, 
+        field: ::puroro_internal::types::FieldData<&[u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        use ::puroro::InternalData;
+        use ::puroro_internal::tags;
+        use ::std::convert::TryInto;
+        let puroro_internal = &self.puroro_internal;
+        
+Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
