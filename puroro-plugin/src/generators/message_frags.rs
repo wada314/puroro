@@ -55,11 +55,14 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 break;
             }
         }
+        let super_count = cur_package_iter.count();
+        let maybe_self = if super_count == 0 { "self::" } else { "" };
         Ok(format!(
-            "self::{supers}{mods}{name}",
+            "{maybe_self}{supers}{mods}{name}",
             name = struct_name,
+            maybe_self = maybe_self,
             supers = std::iter::repeat("super::")
-                .take(cur_package_iter.count())
+                .take(super_count)
                 .collect::<String>(),
             mods = struct_package_iter
                 .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
@@ -207,12 +210,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             }
             ImplType::SliceView { check_utf8: _ } => match field.label()? {
                 FieldLabel::Repeated => format!(
-                    "::puroro_internal::types::SliceViewRepeatedField<{field_type}>",
+                    "::puroro_internal::types::SliceViewRepeatedField<'slice, {field_type}>",
                     field_type = scalar_type
                 )
                 .into(),
                 _ => format!(
-                    "::puroro_internal::types::SliceViewScalarField<{field_type}>",
+                    "::puroro_internal::types::SliceViewScalarField<'slice, {field_type}>",
                     field_type = scalar_type
                 )
                 .into(),

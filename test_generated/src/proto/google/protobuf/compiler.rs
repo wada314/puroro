@@ -98,7 +98,7 @@ impl ::puroro::DeserializableFromIter for CodeGeneratorResponse {
 }
 
 impl ::puroro::DeserializableFromSlice for CodeGeneratorResponse {
-    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+    fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
         let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
@@ -148,7 +148,7 @@ impl CodeGeneratorResponseTrait for CodeGeneratorResponse {
         &self.file
     }
 }
-impl<'a> ::puroro_internal::helpers::FieldNew<'a> for CodeGeneratorResponse<> {
+impl<'a> ::puroro_internal::helpers::FieldNew<'a> for CodeGeneratorResponse {
     fn new() -> Self {
         Default::default()
     }
@@ -237,7 +237,7 @@ impl<'bump> ::puroro::DeserializableFromIter for CodeGeneratorResponseBumpalo<'b
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::DeserializableFromSlice for CodeGeneratorResponseBumpalo<'bump> {
-    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+    fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
         let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
@@ -296,6 +296,67 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRespons
         Self::new_in(bump)
     }
 }
+
+#[derive(Debug)]
+pub struct CodeGeneratorResponseSliceView<'slice> {
+    error: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
+    supported_features: ::puroro_internal::types::SliceViewScalarField<'slice, u64>,
+    file: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::code_generator_response::FileSliceView<'slice>>,
+    puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
+}
+
+impl<'slice> CodeGeneratorResponseSliceView<'slice> {
+    pub fn from_slice(slice: &'slice [u8]) -> Self {
+        Self {
+            error: ::puroro_internal::helpers::FieldNew::new(),
+            supported_features: ::puroro_internal::helpers::FieldNew::new(),
+            file: ::puroro_internal::helpers::FieldNew::new(),
+            puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice),
+        }
+    }
+}
+
+impl<'slice> ::std::clone::Clone for CodeGeneratorResponseSliceView<'slice> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
+        Self {
+            error: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.error),
+            supported_features: <::puroro_internal::types::SliceViewScalarField<'slice, u64> as FieldClone>::clone(&self.supported_features),
+            file: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::code_generator_response::FileSliceView<'slice>> as FieldClone>::clone(&self.file),
+            puroro_internal: self.puroro_internal.clone(),
+        }
+    }
+}
+
+impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorResponseSliceView<'slice> {
+    fn met_field_at<'slice2>(
+        &mut self,
+        _: &'slice2 [u8],
+        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        todo!();
+        
+        Ok(true)
+    }
+}
+
+impl<'slice> ::puroro_internal::ser::SerializableMessage for CodeGeneratorResponseSliceView<'slice> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_raw_bytes(self.puroro_internal.slice)
+    }
+}
+
+impl<'slice> ::puroro::Serializable for CodeGeneratorResponseSliceView<'slice> {
+    fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
+    }
+}
 pub mod code_generator_response {
 #[derive(Debug, Clone)]
 pub enum Feature {
@@ -330,7 +391,7 @@ pub struct File {
     pub name: ::std::option::Option<::std::string::String>,
     pub insertion_point: ::std::option::Option<::std::string::String>,
     pub content: ::std::option::Option<::std::string::String>,
-    pub generated_code_info: ::std::option::Option<::std::boxed::Box<self::super::super::GeneratedCodeInfo>>,
+    pub generated_code_info: ::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
 
@@ -360,7 +421,7 @@ impl ::std::clone::Clone for File {
             name: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.name),
             insertion_point: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.insertion_point),
             content: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.content),
-            generated_code_info: <::std::option::Option<::std::boxed::Box<self::super::super::GeneratedCodeInfo>> as FieldClone>::clone(&self.generated_code_info),
+            generated_code_info: <::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>> as FieldClone>::clone(&self.generated_code_info),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -401,8 +462,8 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for File {
                 ::deser(&mut self.content, field, ::std::default::Default::default)?;
             }
             16 => {
-                <::std::option::Option<::std::boxed::Box<self::super::super::GeneratedCodeInfo>> as FieldDeserFromIter<
-                    tags::Message<self::super::super::GeneratedCodeInfo>, 
+                <::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>> as FieldDeserFromIter<
+                    tags::Message<super::super::GeneratedCodeInfo>, 
                     tags::Optional2>>
                 ::deser(&mut self.generated_code_info, field, ::std::default::Default::default)?;
             }
@@ -423,7 +484,7 @@ impl ::puroro::DeserializableFromIter for File {
 }
 
 impl ::puroro::DeserializableFromSlice for File {
-    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+    fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
         let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
@@ -449,8 +510,8 @@ impl ::puroro_internal::ser::SerializableMessage for File {
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.content, serializer, 15)?;
-        <::std::option::Option<::std::boxed::Box<self::super::super::GeneratedCodeInfo>> as FieldSer<
-                tags::Message<self::super::super::GeneratedCodeInfo>, 
+        <::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>> as FieldSer<
+                tags::Message<super::super::GeneratedCodeInfo>, 
                 tags::Optional2>>
             ::ser(&self.generated_code_info, serializer, 16)?;
         Ok(())
@@ -465,7 +526,7 @@ impl ::puroro::Serializable for File {
 }
 
 impl FileTrait for File {
-    type GeneratedCodeInfoType = self::super::super::GeneratedCodeInfo;
+    type GeneratedCodeInfoType = super::super::GeneratedCodeInfo;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
@@ -479,7 +540,7 @@ impl FileTrait for File {
         self.generated_code_info.as_deref()
     }
 }
-impl<'a> ::puroro_internal::helpers::FieldNew<'a> for File<> {
+impl<'a> ::puroro_internal::helpers::FieldNew<'a> for File {
     fn new() -> Self {
         Default::default()
     }
@@ -490,7 +551,7 @@ pub struct FileBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub insertion_point: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub content: ::std::option::Option<::bumpalo::collections::String<'bump>>,
-    pub generated_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::super::super::GeneratedCodeInfoBumpalo<'bump>>>,
+    pub generated_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -514,7 +575,7 @@ impl<'bump> ::std::clone::Clone for FileBumpalo<'bump> {
             name: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.name, self.puroro_internal.bumpalo()),
             insertion_point: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.insertion_point, self.puroro_internal.bumpalo()),
             content: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.content, self.puroro_internal.bumpalo()),
-            generated_code_info: <::std::option::Option<::bumpalo::boxed::Box<'bump, self::super::super::GeneratedCodeInfoBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.generated_code_info, self.puroro_internal.bumpalo()),
+            generated_code_info: <::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.generated_code_info, self.puroro_internal.bumpalo()),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -555,10 +616,10 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileBump
                 ::deser(&mut self.content, field, || ::bumpalo::collections::String::new_in(puroro_internal.bumpalo()))?;
             }
             16 => {
-                <::std::option::Option<::bumpalo::boxed::Box<'bump, self::super::super::GeneratedCodeInfoBumpalo<'bump>>> as FieldDeserFromIter<
-                    tags::Message<self::super::super::GeneratedCodeInfoBumpalo<'bump>>, 
+                <::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>> as FieldDeserFromIter<
+                    tags::Message<super::super::GeneratedCodeInfoBumpalo<'bump>>, 
                     tags::Optional2>>
-                ::deser(&mut self.generated_code_info, field, || ::bumpalo::boxed::Box::new_in(self::super::super::GeneratedCodeInfoBumpalo::new_in(puroro_internal.bumpalo()), puroro_internal.bumpalo()))?;
+                ::deser(&mut self.generated_code_info, field, || ::bumpalo::boxed::Box::new_in(super::super::GeneratedCodeInfoBumpalo::new_in(puroro_internal.bumpalo()), puroro_internal.bumpalo()))?;
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
@@ -577,7 +638,7 @@ impl<'bump> ::puroro::DeserializableFromIter for FileBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::DeserializableFromSlice for FileBumpalo<'bump> {
-    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+    fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
         let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
@@ -603,8 +664,8 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for FileBumpalo<'bump> {
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.content, serializer, 15)?;
-        <::std::option::Option<::bumpalo::boxed::Box<'bump, self::super::super::GeneratedCodeInfoBumpalo<'bump>>> as FieldSer<
-                tags::Message<self::super::super::GeneratedCodeInfoBumpalo<'bump>>, 
+        <::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>> as FieldSer<
+                tags::Message<super::super::GeneratedCodeInfoBumpalo<'bump>>, 
                 tags::Optional2>>
             ::ser(&self.generated_code_info, serializer, 16)?;
         Ok(())
@@ -619,7 +680,7 @@ impl<'bump> ::puroro::Serializable for FileBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileTrait for FileBumpalo<'bump> {
-    type GeneratedCodeInfoType = self::super::super::GeneratedCodeInfoBumpalo<'bump>;
+    type GeneratedCodeInfoType = super::super::GeneratedCodeInfoBumpalo<'bump>;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
@@ -642,6 +703,70 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileBumpalo<'bump> {
         Self::new_in(bump)
     }
 }
+
+#[derive(Debug)]
+pub struct FileSliceView<'slice> {
+    name: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
+    insertion_point: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
+    content: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
+    generated_code_info: ::puroro_internal::types::SliceViewScalarField<'slice, super::super::GeneratedCodeInfoSliceView<'slice>>,
+    puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
+}
+
+impl<'slice> FileSliceView<'slice> {
+    pub fn from_slice(slice: &'slice [u8]) -> Self {
+        Self {
+            name: ::puroro_internal::helpers::FieldNew::new(),
+            insertion_point: ::puroro_internal::helpers::FieldNew::new(),
+            content: ::puroro_internal::helpers::FieldNew::new(),
+            generated_code_info: ::puroro_internal::helpers::FieldNew::new(),
+            puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice),
+        }
+    }
+}
+
+impl<'slice> ::std::clone::Clone for FileSliceView<'slice> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
+        Self {
+            name: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.name),
+            insertion_point: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.insertion_point),
+            content: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.content),
+            generated_code_info: <::puroro_internal::types::SliceViewScalarField<'slice, super::super::GeneratedCodeInfoSliceView<'slice>> as FieldClone>::clone(&self.generated_code_info),
+            puroro_internal: self.puroro_internal.clone(),
+        }
+    }
+}
+
+impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for FileSliceView<'slice> {
+    fn met_field_at<'slice2>(
+        &mut self,
+        _: &'slice2 [u8],
+        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        todo!();
+        
+        Ok(true)
+    }
+}
+
+impl<'slice> ::puroro_internal::ser::SerializableMessage for FileSliceView<'slice> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_raw_bytes(self.puroro_internal.slice)
+    }
+}
+
+impl<'slice> ::puroro::Serializable for FileSliceView<'slice> {
+    fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
+    }
+}
 } // mod code_generator_response
 pub trait CodeGeneratorRequestTrait {
     type FileDescriptorProtoType: super::FileDescriptorProtoTrait;
@@ -658,7 +783,7 @@ pub trait CodeGeneratorRequestTrait {
 pub struct CodeGeneratorRequest {
     pub file_to_generate: ::std::vec::Vec<::std::string::String>,
     pub parameter: ::std::option::Option<::std::string::String>,
-    pub proto_file: ::std::vec::Vec<self::super::FileDescriptorProto>,
+    pub proto_file: ::std::vec::Vec<super::FileDescriptorProto>,
     pub compiler_version: ::std::option::Option<::std::boxed::Box<self::Version>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
 }
@@ -688,7 +813,7 @@ impl ::std::clone::Clone for CodeGeneratorRequest {
         Self {
             file_to_generate: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.file_to_generate),
             parameter: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.parameter),
-            proto_file: <::std::vec::Vec<self::super::FileDescriptorProto> as FieldClone>::clone(&self.proto_file),
+            proto_file: <::std::vec::Vec<super::FileDescriptorProto> as FieldClone>::clone(&self.proto_file),
             compiler_version: <::std::option::Option<::std::boxed::Box<self::Version>> as FieldClone>::clone(&self.compiler_version),
             puroro_internal: self.puroro_internal.clone(),
         }
@@ -724,8 +849,8 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
                 ::deser(&mut self.parameter, field, ::std::default::Default::default)?;
             }
             15 => {
-                <::std::vec::Vec<self::super::FileDescriptorProto> as FieldDeserFromIter<
-                    tags::Message<self::super::FileDescriptorProto>, 
+                <::std::vec::Vec<super::FileDescriptorProto> as FieldDeserFromIter<
+                    tags::Message<super::FileDescriptorProto>, 
                     tags::Repeated>>
                 ::deser(&mut self.proto_file, field, ::std::default::Default::default)?;
             }
@@ -752,7 +877,7 @@ impl ::puroro::DeserializableFromIter for CodeGeneratorRequest {
 }
 
 impl ::puroro::DeserializableFromSlice for CodeGeneratorRequest {
-    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+    fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
         let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
@@ -774,8 +899,8 @@ impl ::puroro_internal::ser::SerializableMessage for CodeGeneratorRequest {
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.parameter, serializer, 2)?;
-        <::std::vec::Vec<self::super::FileDescriptorProto> as FieldSer<
-                tags::Message<self::super::FileDescriptorProto>, 
+        <::std::vec::Vec<super::FileDescriptorProto> as FieldSer<
+                tags::Message<super::FileDescriptorProto>, 
                 tags::Repeated>>
             ::ser(&self.proto_file, serializer, 15)?;
         <::std::option::Option<::std::boxed::Box<self::Version>> as FieldSer<
@@ -794,7 +919,7 @@ impl ::puroro::Serializable for CodeGeneratorRequest {
 }
 
 impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
-    type FileDescriptorProtoType = self::super::FileDescriptorProto;
+    type FileDescriptorProtoType = super::FileDescriptorProto;
     type VersionType = self::Version;
     type FileToGenerateRepeated = ::std::vec::Vec<::std::string::String>;
     fn file_to_generate(&self) -> &Self::FileToGenerateRepeated {
@@ -803,7 +928,7 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
     fn parameter(&self) -> ::std::option::Option<&'_ str> {
         self.parameter.as_deref()
     }
-    type ProtoFileRepeated = ::std::vec::Vec<self::super::FileDescriptorProto>;
+    type ProtoFileRepeated = ::std::vec::Vec<super::FileDescriptorProto>;
     fn proto_file(&self) -> &Self::ProtoFileRepeated {
         &self.proto_file
     }
@@ -811,7 +936,7 @@ impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
         self.compiler_version.as_deref()
     }
 }
-impl<'a> ::puroro_internal::helpers::FieldNew<'a> for CodeGeneratorRequest<> {
+impl<'a> ::puroro_internal::helpers::FieldNew<'a> for CodeGeneratorRequest {
     fn new() -> Self {
         Default::default()
     }
@@ -821,7 +946,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for CodeGeneratorRequest<> {
 pub struct CodeGeneratorRequestBumpalo<'bump> {
     pub file_to_generate: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
     pub parameter: ::std::option::Option<::bumpalo::collections::String<'bump>>,
-    pub proto_file: ::bumpalo::collections::Vec<'bump, self::super::FileDescriptorProtoBumpalo<'bump>>,
+    pub proto_file: ::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>>,
     pub compiler_version: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::VersionBumpalo<'bump>>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
 }
@@ -845,7 +970,7 @@ impl<'bump> ::std::clone::Clone for CodeGeneratorRequestBumpalo<'bump> {
         Self {
             file_to_generate: <::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.file_to_generate, self.puroro_internal.bumpalo()),
             parameter: <::std::option::Option<::bumpalo::collections::String<'bump>> as FieldClone>::clone_in_bumpalo(&self.parameter, self.puroro_internal.bumpalo()),
-            proto_file: <::bumpalo::collections::Vec<'bump, self::super::FileDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.proto_file, self.puroro_internal.bumpalo()),
+            proto_file: <::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>> as FieldClone>::clone_in_bumpalo(&self.proto_file, self.puroro_internal.bumpalo()),
             compiler_version: <::std::option::Option<::bumpalo::boxed::Box<'bump, self::VersionBumpalo<'bump>>> as FieldClone>::clone_in_bumpalo(&self.compiler_version, self.puroro_internal.bumpalo()),
             puroro_internal: self.puroro_internal.clone(),
         }
@@ -881,10 +1006,10 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
                 ::deser(&mut self.parameter, field, || ::bumpalo::collections::String::new_in(puroro_internal.bumpalo()))?;
             }
             15 => {
-                <::bumpalo::collections::Vec<'bump, self::super::FileDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
-                    tags::Message<self::super::FileDescriptorProtoBumpalo<'bump>>, 
+                <::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>> as FieldDeserFromIter<
+                    tags::Message<super::FileDescriptorProtoBumpalo<'bump>>, 
                     tags::Repeated>>
-                ::deser(&mut self.proto_file, field, || self::super::FileDescriptorProtoBumpalo::new_in(puroro_internal.bumpalo()))?;
+                ::deser(&mut self.proto_file, field, || super::FileDescriptorProtoBumpalo::new_in(puroro_internal.bumpalo()))?;
             }
             3 => {
                 <::std::option::Option<::bumpalo::boxed::Box<'bump, self::VersionBumpalo<'bump>>> as FieldDeserFromIter<
@@ -909,7 +1034,7 @@ impl<'bump> ::puroro::DeserializableFromIter for CodeGeneratorRequestBumpalo<'bu
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::DeserializableFromSlice for CodeGeneratorRequestBumpalo<'bump> {
-    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+    fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
         let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
@@ -931,8 +1056,8 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRequest
                 tags::String, 
                 tags::Optional2>>
             ::ser(&self.parameter, serializer, 2)?;
-        <::bumpalo::collections::Vec<'bump, self::super::FileDescriptorProtoBumpalo<'bump>> as FieldSer<
-                tags::Message<self::super::FileDescriptorProtoBumpalo<'bump>>, 
+        <::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>> as FieldSer<
+                tags::Message<super::FileDescriptorProtoBumpalo<'bump>>, 
                 tags::Repeated>>
             ::ser(&self.proto_file, serializer, 15)?;
         <::std::option::Option<::bumpalo::boxed::Box<'bump, self::VersionBumpalo<'bump>>> as FieldSer<
@@ -951,7 +1076,7 @@ impl<'bump> ::puroro::Serializable for CodeGeneratorRequestBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo<'bump> {
-    type FileDescriptorProtoType = self::super::FileDescriptorProtoBumpalo<'bump>;
+    type FileDescriptorProtoType = super::FileDescriptorProtoBumpalo<'bump>;
     type VersionType = self::VersionBumpalo<'bump>;
     type FileToGenerateRepeated = ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>;
     fn file_to_generate(&self) -> &Self::FileToGenerateRepeated {
@@ -960,7 +1085,7 @@ impl<'bump> CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo<'bump> {
     fn parameter(&self) -> ::std::option::Option<&'_ str> {
         self.parameter.as_deref()
     }
-    type ProtoFileRepeated = ::bumpalo::collections::Vec<'bump, self::super::FileDescriptorProtoBumpalo<'bump>>;
+    type ProtoFileRepeated = ::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>>;
     fn proto_file(&self) -> &Self::ProtoFileRepeated {
         &self.proto_file
     }
@@ -975,6 +1100,70 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRequest
     }
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
+    }
+}
+
+#[derive(Debug)]
+pub struct CodeGeneratorRequestSliceView<'slice> {
+    file_to_generate: ::puroro_internal::types::SliceViewRepeatedField<'slice, &'slice str>,
+    parameter: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
+    proto_file: ::puroro_internal::types::SliceViewRepeatedField<'slice, super::FileDescriptorProtoSliceView<'slice>>,
+    compiler_version: ::puroro_internal::types::SliceViewScalarField<'slice, self::VersionSliceView<'slice>>,
+    puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
+}
+
+impl<'slice> CodeGeneratorRequestSliceView<'slice> {
+    pub fn from_slice(slice: &'slice [u8]) -> Self {
+        Self {
+            file_to_generate: ::puroro_internal::helpers::FieldNew::new(),
+            parameter: ::puroro_internal::helpers::FieldNew::new(),
+            proto_file: ::puroro_internal::helpers::FieldNew::new(),
+            compiler_version: ::puroro_internal::helpers::FieldNew::new(),
+            puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice),
+        }
+    }
+}
+
+impl<'slice> ::std::clone::Clone for CodeGeneratorRequestSliceView<'slice> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
+        Self {
+            file_to_generate: <::puroro_internal::types::SliceViewRepeatedField<'slice, &'slice str> as FieldClone>::clone(&self.file_to_generate),
+            parameter: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.parameter),
+            proto_file: <::puroro_internal::types::SliceViewRepeatedField<'slice, super::FileDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.proto_file),
+            compiler_version: <::puroro_internal::types::SliceViewScalarField<'slice, self::VersionSliceView<'slice>> as FieldClone>::clone(&self.compiler_version),
+            puroro_internal: self.puroro_internal.clone(),
+        }
+    }
+}
+
+impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorRequestSliceView<'slice> {
+    fn met_field_at<'slice2>(
+        &mut self,
+        _: &'slice2 [u8],
+        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        todo!();
+        
+        Ok(true)
+    }
+}
+
+impl<'slice> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRequestSliceView<'slice> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_raw_bytes(self.puroro_internal.slice)
+    }
+}
+
+impl<'slice> ::puroro::Serializable for CodeGeneratorRequestSliceView<'slice> {
+    fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 pub trait VersionTrait {
@@ -1082,7 +1271,7 @@ impl ::puroro::DeserializableFromIter for Version {
 }
 
 impl ::puroro::DeserializableFromSlice for Version {
-    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+    fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
         let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
@@ -1137,7 +1326,7 @@ impl VersionTrait for Version {
         self.suffix.as_deref()
     }
 }
-impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Version<> {
+impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Version {
     fn new() -> Self {
         Default::default()
     }
@@ -1235,7 +1424,7 @@ impl<'bump> ::puroro::DeserializableFromIter for VersionBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro::DeserializableFromSlice for VersionBumpalo<'bump> {
-    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+    fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
         let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
@@ -1297,5 +1486,69 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for VersionBumpalo<'bump
     }
     fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self::new_in(bump)
+    }
+}
+
+#[derive(Debug)]
+pub struct VersionSliceView<'slice> {
+    major: ::puroro_internal::types::SliceViewScalarField<'slice, i32>,
+    minor: ::puroro_internal::types::SliceViewScalarField<'slice, i32>,
+    patch: ::puroro_internal::types::SliceViewScalarField<'slice, i32>,
+    suffix: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
+    puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
+}
+
+impl<'slice> VersionSliceView<'slice> {
+    pub fn from_slice(slice: &'slice [u8]) -> Self {
+        Self {
+            major: ::puroro_internal::helpers::FieldNew::new(),
+            minor: ::puroro_internal::helpers::FieldNew::new(),
+            patch: ::puroro_internal::helpers::FieldNew::new(),
+            suffix: ::puroro_internal::helpers::FieldNew::new(),
+            puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice),
+        }
+    }
+}
+
+impl<'slice> ::std::clone::Clone for VersionSliceView<'slice> {
+    fn clone(&self) -> Self {
+        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro::InternalData;
+        Self {
+            major: <::puroro_internal::types::SliceViewScalarField<'slice, i32> as FieldClone>::clone(&self.major),
+            minor: <::puroro_internal::types::SliceViewScalarField<'slice, i32> as FieldClone>::clone(&self.minor),
+            patch: <::puroro_internal::types::SliceViewScalarField<'slice, i32> as FieldClone>::clone(&self.patch),
+            suffix: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.suffix),
+            puroro_internal: self.puroro_internal.clone(),
+        }
+    }
+}
+
+impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for VersionSliceView<'slice> {
+    fn met_field_at<'slice2>(
+        &mut self,
+        _: &'slice2 [u8],
+        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field_number: usize
+    ) -> ::puroro::Result<bool>
+    {
+        todo!();
+        
+        Ok(true)
+    }
+}
+
+impl<'slice> ::puroro_internal::ser::SerializableMessage for VersionSliceView<'slice> {
+    fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
+        &self, serializer: &mut T) -> ::puroro::Result<()>
+    {
+        serializer.serialize_raw_bytes(self.puroro_internal.slice)
+    }
+}
+
+impl<'slice> ::puroro::Serializable for VersionSliceView<'slice> {
+    fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
+        let mut serializer = ::puroro_internal::ser::default_serializer(write);
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }

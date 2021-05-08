@@ -524,23 +524,24 @@ impl{gp} ::puroro_internal::helpers::MapEntry for {entry_type} {{
     }
 
     fn print_msg_field_new_impl<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
-        (match self.context.alloc_type() {
-            crate::context::AllocatorType::Default => {
-                format!(
-                    "\
+        (
+            match (self.context.impl_type(), self.context.alloc_type()) {
+                (ImplType::Default, AllocatorType::Default) => {
+                    format!(
+                        "\
 impl{gp} ::puroro_internal::helpers::FieldNew<'a> for {name}{gpb} {{
     fn new() -> Self {{
         Default::default()
     }}
 }}\n",
-                    name = self.frag_gen.struct_ident(self.msg)?,
-                    gp = self.frag_gen.struct_generic_params(&["'a"]),
-                    gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-                )
-            }
-            crate::context::AllocatorType::Bumpalo => {
-                format!(
-                    "\
+                        name = self.frag_gen.struct_ident(self.msg)?,
+                        gp = self.frag_gen.struct_generic_params(&["'a"]),
+                        gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+                    )
+                }
+                (ImplType::Default, AllocatorType::Bumpalo) => {
+                    format!(
+                        "\
 {cfg}
 impl{gp} ::puroro_internal::helpers::FieldNew<'bump> for {name}{gpb} {{
     fn new() -> Self {{
@@ -550,13 +551,15 @@ impl{gp} ::puroro_internal::helpers::FieldNew<'bump> for {name}{gpb} {{
         Self::new_in(bump)
     }}
 }}\n",
-                    cfg = self.frag_gen.cfg_condition(),
-                    name = self.frag_gen.struct_ident(self.msg)?,
-                    gp = self.frag_gen.struct_generic_params(&[]),
-                    gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-                )
-            }
-        },)
+                        cfg = self.frag_gen.cfg_condition(),
+                        name = self.frag_gen.struct_ident(self.msg)?,
+                        gp = self.frag_gen.struct_generic_params(&[]),
+                        gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+                    )
+                }
+                _ => "".to_string(),
+            },
+        )
             .write_into(output)
     }
 }
