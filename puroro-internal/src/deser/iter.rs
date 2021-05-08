@@ -12,7 +12,7 @@ pub trait DeserializableMessageFromIter: Sized {
         &mut self,
         field: FieldData<&'a mut BytesIter<'b, I>>,
         field_number: usize,
-    ) -> Result<()>
+    ) -> Result<bool>
     where
         I: Iterator<Item = ::std::io::Result<u8>>;
 
@@ -31,7 +31,7 @@ impl<T> super::slice::DeserializableMessageFromSlice for FromIterToFromSlice<T>
 where
     T: DeserializableMessageFromIter,
 {
-    fn met_field<'a>(&mut self, field: FieldData<&'a [u8]>, field_number: usize) -> Result<()> {
+    fn met_field<'a>(&mut self, field: FieldData<&'a [u8]>, field_number: usize) -> Result<bool> {
         use std::io::Read;
         type BytesIterBoundType<'a> = BytesIter<'a, std::io::Bytes<&'a [u8]>>;
         match field {
@@ -123,8 +123,11 @@ where
                 WireType::Bits64 => FieldData::Bits64(self.next_bytes::<8>()?),
                 WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
             };
-            handler.met_field(field_data, field_number)?;
+            let finish_loop = !handler.met_field(field_data, field_number)?;
             self.end = old_end_index;
+            if finish_loop {
+                break;
+            }
         }
         Ok(())
     }

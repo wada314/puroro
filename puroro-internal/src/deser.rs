@@ -2,4 +2,4 @@ mod iter;
 mod slice;
 
 pub use iter::{BytesIter, DeserializableMessageFromIter};
-pub use slice::{BytesSlice, DeserializableFromSlice, DeserializableMessageFromSlice};
+pub use slice::{BytesSlice, DeserializableMessageFromSlice};

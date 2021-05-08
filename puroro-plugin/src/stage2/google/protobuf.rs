@@ -2,9 +2,9 @@
 #![allow(unused_imports)]
 
 pub trait GeneratedCodeInfoTrait {
-    type Annotation_Type: self::generated_code_info::AnnotationTrait;
-    type Annotation_RepeatedType: ::puroro::RepeatedField<Self::Annotation_Type>;
-    fn annotation(&self) -> &Self::Annotation_RepeatedType;
+    type AnnotationType: self::generated_code_info::AnnotationTrait;
+    type AnnotationRepeated: ::puroro::RepeatedField<Self::AnnotationType>;
+    fn annotation(&self) -> &Self::AnnotationRepeated;
 }
 
 #[derive(Debug)]
@@ -45,7 +45,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for GeneratedCodeIn
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -63,7 +63,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for GeneratedCodeIn
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -99,9 +99,9 @@ impl ::puroro::Serializable for GeneratedCodeInfo {
 }
 
 impl GeneratedCodeInfoTrait for GeneratedCodeInfo {
-    type Annotation_Type = self::generated_code_info::Annotation;
-    type Annotation_RepeatedType = ::std::vec::Vec<self::generated_code_info::Annotation>;
-    fn annotation(&self) -> &Self::Annotation_RepeatedType {
+    type AnnotationType = self::generated_code_info::Annotation;
+    type AnnotationRepeated = ::std::vec::Vec<self::generated_code_info::Annotation>;
+    fn annotation(&self) -> &Self::AnnotationRepeated {
         &self.annotation
     }
 }
@@ -143,7 +143,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Generate
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -161,7 +161,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Generate
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -192,14 +192,14 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for GeneratedCodeInfoBum
 impl<'bump> ::puroro::Serializable for GeneratedCodeInfoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> GeneratedCodeInfoTrait for GeneratedCodeInfoBumpalo<'bump> {
-    type Annotation_Type = self::generated_code_info::AnnotationBumpalo<'bump>;
-    type Annotation_RepeatedType = ::bumpalo::collections::Vec<'bump, self::generated_code_info::AnnotationBumpalo<'bump>>;
-    fn annotation(&self) -> &Self::Annotation_RepeatedType {
+    type AnnotationType = self::generated_code_info::AnnotationBumpalo<'bump>;
+    type AnnotationRepeated = ::bumpalo::collections::Vec<'bump, self::generated_code_info::AnnotationBumpalo<'bump>>;
+    fn annotation(&self) -> &Self::AnnotationRepeated {
         &self.annotation
     }
 }
@@ -214,8 +214,8 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for GeneratedCodeInfoBum
 }
 pub mod generated_code_info {
 pub trait AnnotationTrait {
-    type Path_RepeatedType: ::puroro::RepeatedField<i32>;
-    fn path(&self) -> &Self::Path_RepeatedType;
+    type PathRepeated: ::puroro::RepeatedField<i32>;
+    fn path(&self) -> &Self::PathRepeated;
     fn source_file(&self) -> ::std::option::Option<&'_ str>;
     fn begin(&self) -> ::std::option::Option<i32>;
     fn end(&self) -> ::std::option::Option<i32>;
@@ -268,7 +268,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Annotation {
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -304,7 +304,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Annotation {
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -352,8 +352,8 @@ impl ::puroro::Serializable for Annotation {
 }
 
 impl AnnotationTrait for Annotation {
-    type Path_RepeatedType = ::std::vec::Vec<i32>;
-    fn path(&self) -> &Self::Path_RepeatedType {
+    type PathRepeated = ::std::vec::Vec<i32>;
+    fn path(&self) -> &Self::PathRepeated {
         &self.path
     }
     fn source_file(&self) -> ::std::option::Option<&'_ str> {
@@ -413,7 +413,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Annotati
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -449,7 +449,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Annotati
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -492,13 +492,13 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for AnnotationBumpalo<'b
 impl<'bump> ::puroro::Serializable for AnnotationBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> AnnotationTrait for AnnotationBumpalo<'bump> {
-    type Path_RepeatedType = ::bumpalo::collections::Vec<'bump, i32>;
-    fn path(&self) -> &Self::Path_RepeatedType {
+    type PathRepeated = ::bumpalo::collections::Vec<'bump, i32>;
+    fn path(&self) -> &Self::PathRepeated {
         &self.path
     }
     fn source_file(&self) -> ::std::option::Option<&'_ str> {
@@ -522,9 +522,9 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for AnnotationBumpalo<'b
 }
 } // mod generated_code_info
 pub trait SourceCodeInfoTrait {
-    type Location_Type: self::source_code_info::LocationTrait;
-    type Location_RepeatedType: ::puroro::RepeatedField<Self::Location_Type>;
-    fn location(&self) -> &Self::Location_RepeatedType;
+    type LocationType: self::source_code_info::LocationTrait;
+    type LocationRepeated: ::puroro::RepeatedField<Self::LocationType>;
+    fn location(&self) -> &Self::LocationRepeated;
 }
 
 #[derive(Debug)]
@@ -565,7 +565,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for SourceCodeInfo 
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -583,7 +583,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for SourceCodeInfo 
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -619,9 +619,9 @@ impl ::puroro::Serializable for SourceCodeInfo {
 }
 
 impl SourceCodeInfoTrait for SourceCodeInfo {
-    type Location_Type = self::source_code_info::Location;
-    type Location_RepeatedType = ::std::vec::Vec<self::source_code_info::Location>;
-    fn location(&self) -> &Self::Location_RepeatedType {
+    type LocationType = self::source_code_info::Location;
+    type LocationRepeated = ::std::vec::Vec<self::source_code_info::Location>;
+    fn location(&self) -> &Self::LocationRepeated {
         &self.location
     }
 }
@@ -663,7 +663,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for SourceCo
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -681,7 +681,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for SourceCo
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -712,14 +712,14 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for SourceCodeInfoBumpal
 impl<'bump> ::puroro::Serializable for SourceCodeInfoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> SourceCodeInfoTrait for SourceCodeInfoBumpalo<'bump> {
-    type Location_Type = self::source_code_info::LocationBumpalo<'bump>;
-    type Location_RepeatedType = ::bumpalo::collections::Vec<'bump, self::source_code_info::LocationBumpalo<'bump>>;
-    fn location(&self) -> &Self::Location_RepeatedType {
+    type LocationType = self::source_code_info::LocationBumpalo<'bump>;
+    type LocationRepeated = ::bumpalo::collections::Vec<'bump, self::source_code_info::LocationBumpalo<'bump>>;
+    fn location(&self) -> &Self::LocationRepeated {
         &self.location
     }
 }
@@ -734,14 +734,14 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for SourceCodeInfoBumpal
 }
 pub mod source_code_info {
 pub trait LocationTrait {
-    type Path_RepeatedType: ::puroro::RepeatedField<i32>;
-    fn path(&self) -> &Self::Path_RepeatedType;
-    type Span_RepeatedType: ::puroro::RepeatedField<i32>;
-    fn span(&self) -> &Self::Span_RepeatedType;
+    type PathRepeated: ::puroro::RepeatedField<i32>;
+    fn path(&self) -> &Self::PathRepeated;
+    type SpanRepeated: ::puroro::RepeatedField<i32>;
+    fn span(&self) -> &Self::SpanRepeated;
     fn leading_comments(&self) -> ::std::option::Option<&'_ str>;
     fn trailing_comments(&self) -> ::std::option::Option<&'_ str>;
-    type LeadingDetachedComments_RepeatedType: ::puroro::RepeatedField<str>;
-    fn leading_detached_comments(&self) -> &Self::LeadingDetachedComments_RepeatedType;
+    type LeadingDetachedCommentsRepeated: ::puroro::RepeatedField<str>;
+    fn leading_detached_comments(&self) -> &Self::LeadingDetachedCommentsRepeated;
 }
 
 #[derive(Debug)]
@@ -794,7 +794,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Location {
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -836,7 +836,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Location {
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -888,12 +888,12 @@ impl ::puroro::Serializable for Location {
 }
 
 impl LocationTrait for Location {
-    type Path_RepeatedType = ::std::vec::Vec<i32>;
-    fn path(&self) -> &Self::Path_RepeatedType {
+    type PathRepeated = ::std::vec::Vec<i32>;
+    fn path(&self) -> &Self::PathRepeated {
         &self.path
     }
-    type Span_RepeatedType = ::std::vec::Vec<i32>;
-    fn span(&self) -> &Self::Span_RepeatedType {
+    type SpanRepeated = ::std::vec::Vec<i32>;
+    fn span(&self) -> &Self::SpanRepeated {
         &self.span
     }
     fn leading_comments(&self) -> ::std::option::Option<&'_ str> {
@@ -902,8 +902,8 @@ impl LocationTrait for Location {
     fn trailing_comments(&self) -> ::std::option::Option<&'_ str> {
         self.trailing_comments.as_deref()
     }
-    type LeadingDetachedComments_RepeatedType = ::std::vec::Vec<::std::string::String>;
-    fn leading_detached_comments(&self) -> &Self::LeadingDetachedComments_RepeatedType {
+    type LeadingDetachedCommentsRepeated = ::std::vec::Vec<::std::string::String>;
+    fn leading_detached_comments(&self) -> &Self::LeadingDetachedCommentsRepeated {
         &self.leading_detached_comments
     }
 }
@@ -957,7 +957,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Location
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -999,7 +999,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Location
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1046,17 +1046,17 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for LocationBumpalo<'bum
 impl<'bump> ::puroro::Serializable for LocationBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> LocationTrait for LocationBumpalo<'bump> {
-    type Path_RepeatedType = ::bumpalo::collections::Vec<'bump, i32>;
-    fn path(&self) -> &Self::Path_RepeatedType {
+    type PathRepeated = ::bumpalo::collections::Vec<'bump, i32>;
+    fn path(&self) -> &Self::PathRepeated {
         &self.path
     }
-    type Span_RepeatedType = ::bumpalo::collections::Vec<'bump, i32>;
-    fn span(&self) -> &Self::Span_RepeatedType {
+    type SpanRepeated = ::bumpalo::collections::Vec<'bump, i32>;
+    fn span(&self) -> &Self::SpanRepeated {
         &self.span
     }
     fn leading_comments(&self) -> ::std::option::Option<&'_ str> {
@@ -1065,8 +1065,8 @@ impl<'bump> LocationTrait for LocationBumpalo<'bump> {
     fn trailing_comments(&self) -> ::std::option::Option<&'_ str> {
         self.trailing_comments.as_deref()
     }
-    type LeadingDetachedComments_RepeatedType = ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>;
-    fn leading_detached_comments(&self) -> &Self::LeadingDetachedComments_RepeatedType {
+    type LeadingDetachedCommentsRepeated = ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>;
+    fn leading_detached_comments(&self) -> &Self::LeadingDetachedCommentsRepeated {
         &self.leading_detached_comments
     }
 }
@@ -1081,9 +1081,9 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for LocationBumpalo<'bum
 }
 } // mod source_code_info
 pub trait UninterpretedOptionTrait {
-    type NamePart_Type: self::uninterpreted_option::NamePartTrait;
-    type Name_RepeatedType: ::puroro::RepeatedField<Self::NamePart_Type>;
-    fn name(&self) -> &Self::Name_RepeatedType;
+    type NamePartType: self::uninterpreted_option::NamePartTrait;
+    type NameRepeated: ::puroro::RepeatedField<Self::NamePartType>;
+    fn name(&self) -> &Self::NameRepeated;
     fn identifier_value(&self) -> ::std::option::Option<&'_ str>;
     fn positive_int_value(&self) -> ::std::option::Option<u64>;
     fn negative_int_value(&self) -> ::std::option::Option<i64>;
@@ -1148,7 +1148,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for UninterpretedOp
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -1202,7 +1202,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for UninterpretedOp
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -1262,9 +1262,9 @@ impl ::puroro::Serializable for UninterpretedOption {
 }
 
 impl UninterpretedOptionTrait for UninterpretedOption {
-    type NamePart_Type = self::uninterpreted_option::NamePart;
-    type Name_RepeatedType = ::std::vec::Vec<self::uninterpreted_option::NamePart>;
-    fn name(&self) -> &Self::Name_RepeatedType {
+    type NamePartType = self::uninterpreted_option::NamePart;
+    type NameRepeated = ::std::vec::Vec<self::uninterpreted_option::NamePart>;
+    fn name(&self) -> &Self::NameRepeated {
         &self.name
     }
     fn identifier_value(&self) -> ::std::option::Option<&'_ str> {
@@ -1342,7 +1342,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Uninterp
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -1396,7 +1396,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Uninterp
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1451,14 +1451,14 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for UninterpretedOptionB
 impl<'bump> ::puroro::Serializable for UninterpretedOptionBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> UninterpretedOptionTrait for UninterpretedOptionBumpalo<'bump> {
-    type NamePart_Type = self::uninterpreted_option::NamePartBumpalo<'bump>;
-    type Name_RepeatedType = ::bumpalo::collections::Vec<'bump, self::uninterpreted_option::NamePartBumpalo<'bump>>;
-    fn name(&self) -> &Self::Name_RepeatedType {
+    type NamePartType = self::uninterpreted_option::NamePartBumpalo<'bump>;
+    type NameRepeated = ::bumpalo::collections::Vec<'bump, self::uninterpreted_option::NamePartBumpalo<'bump>>;
+    fn name(&self) -> &Self::NameRepeated {
         &self.name
     }
     fn identifier_value(&self) -> ::std::option::Option<&'_ str> {
@@ -1536,7 +1536,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for NamePart {
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -1560,7 +1560,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for NamePart {
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -1648,7 +1648,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for NamePart
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -1672,7 +1672,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for NamePart
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1707,7 +1707,7 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for NamePartBumpalo<'bum
 impl<'bump> ::puroro::Serializable for NamePartBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1730,11 +1730,11 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for NamePartBumpalo<'bum
 }
 } // mod uninterpreted_option
 pub trait MethodOptionsTrait {
-    type UninterpretedOption_Type: self::UninterpretedOptionTrait;
+    type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn deprecated(&self) -> ::std::option::Option<bool>;
     fn idempotency_level(&self) -> ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>>;
-    type UninterpretedOption_RepeatedType: ::puroro::RepeatedField<Self::UninterpretedOption_Type>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType;
+    type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated;
 }
 
 #[derive(Debug)]
@@ -1781,7 +1781,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MethodOptions {
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -1811,7 +1811,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MethodOptions {
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -1855,15 +1855,15 @@ impl ::puroro::Serializable for MethodOptions {
 }
 
 impl MethodOptionsTrait for MethodOptions {
-    type UninterpretedOption_Type = self::UninterpretedOption;
+    type UninterpretedOptionType = self::UninterpretedOption;
     fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
     fn idempotency_level(&self) -> ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> {
         self.idempotency_level.clone()
     }
-    type UninterpretedOption_RepeatedType = ::std::vec::Vec<self::UninterpretedOption>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::std::vec::Vec<self::UninterpretedOption>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -1911,7 +1911,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MethodOp
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -1941,7 +1941,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MethodOp
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1980,20 +1980,20 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for MethodOptionsBumpalo
 impl<'bump> ::puroro::Serializable for MethodOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MethodOptionsTrait for MethodOptionsBumpalo<'bump> {
-    type UninterpretedOption_Type = self::UninterpretedOptionBumpalo<'bump>;
+    type UninterpretedOptionType = self::UninterpretedOptionBumpalo<'bump>;
     fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
     fn idempotency_level(&self) -> ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> {
         self.idempotency_level.clone()
     }
-    type UninterpretedOption_RepeatedType = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -2031,10 +2031,10 @@ impl ::std::convert::From<IdempotencyLevel> for i32 {
 }
 } // mod method_options
 pub trait ServiceOptionsTrait {
-    type UninterpretedOption_Type: self::UninterpretedOptionTrait;
+    type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn deprecated(&self) -> ::std::option::Option<bool>;
-    type UninterpretedOption_RepeatedType: ::puroro::RepeatedField<Self::UninterpretedOption_Type>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType;
+    type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated;
 }
 
 #[derive(Debug)]
@@ -2078,7 +2078,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ServiceOptions 
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -2102,7 +2102,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ServiceOptions 
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -2142,12 +2142,12 @@ impl ::puroro::Serializable for ServiceOptions {
 }
 
 impl ServiceOptionsTrait for ServiceOptions {
-    type UninterpretedOption_Type = self::UninterpretedOption;
+    type UninterpretedOptionType = self::UninterpretedOption;
     fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    type UninterpretedOption_RepeatedType = ::std::vec::Vec<self::UninterpretedOption>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::std::vec::Vec<self::UninterpretedOption>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -2192,7 +2192,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for ServiceO
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -2216,7 +2216,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for ServiceO
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2251,17 +2251,17 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for ServiceOptionsBumpal
 impl<'bump> ::puroro::Serializable for ServiceOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ServiceOptionsTrait for ServiceOptionsBumpalo<'bump> {
-    type UninterpretedOption_Type = self::UninterpretedOptionBumpalo<'bump>;
+    type UninterpretedOptionType = self::UninterpretedOptionBumpalo<'bump>;
     fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    type UninterpretedOption_RepeatedType = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -2275,10 +2275,10 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ServiceOptionsBumpal
     }
 }
 pub trait EnumValueOptionsTrait {
-    type UninterpretedOption_Type: self::UninterpretedOptionTrait;
+    type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn deprecated(&self) -> ::std::option::Option<bool>;
-    type UninterpretedOption_RepeatedType: ::puroro::RepeatedField<Self::UninterpretedOption_Type>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType;
+    type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated;
 }
 
 #[derive(Debug)]
@@ -2322,7 +2322,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumValueOption
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -2346,7 +2346,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumValueOption
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -2386,12 +2386,12 @@ impl ::puroro::Serializable for EnumValueOptions {
 }
 
 impl EnumValueOptionsTrait for EnumValueOptions {
-    type UninterpretedOption_Type = self::UninterpretedOption;
+    type UninterpretedOptionType = self::UninterpretedOption;
     fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    type UninterpretedOption_RepeatedType = ::std::vec::Vec<self::UninterpretedOption>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::std::vec::Vec<self::UninterpretedOption>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -2436,7 +2436,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumValu
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -2460,7 +2460,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumValu
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2495,17 +2495,17 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for EnumValueOptionsBump
 impl<'bump> ::puroro::Serializable for EnumValueOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumValueOptionsTrait for EnumValueOptionsBumpalo<'bump> {
-    type UninterpretedOption_Type = self::UninterpretedOptionBumpalo<'bump>;
+    type UninterpretedOptionType = self::UninterpretedOptionBumpalo<'bump>;
     fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    type UninterpretedOption_RepeatedType = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -2519,11 +2519,11 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumValueOptionsBump
     }
 }
 pub trait EnumOptionsTrait {
-    type UninterpretedOption_Type: self::UninterpretedOptionTrait;
+    type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn allow_alias(&self) -> ::std::option::Option<bool>;
     fn deprecated(&self) -> ::std::option::Option<bool>;
-    type UninterpretedOption_RepeatedType: ::puroro::RepeatedField<Self::UninterpretedOption_Type>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType;
+    type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated;
 }
 
 #[derive(Debug)]
@@ -2570,7 +2570,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumOptions {
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -2600,7 +2600,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumOptions {
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -2644,15 +2644,15 @@ impl ::puroro::Serializable for EnumOptions {
 }
 
 impl EnumOptionsTrait for EnumOptions {
-    type UninterpretedOption_Type = self::UninterpretedOption;
+    type UninterpretedOptionType = self::UninterpretedOption;
     fn allow_alias(&self) -> ::std::option::Option<bool> {
         self.allow_alias.clone()
     }
     fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    type UninterpretedOption_RepeatedType = ::std::vec::Vec<self::UninterpretedOption>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::std::vec::Vec<self::UninterpretedOption>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -2700,7 +2700,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumOpti
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -2730,7 +2730,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumOpti
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2769,20 +2769,20 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for EnumOptionsBumpalo<'
 impl<'bump> ::puroro::Serializable for EnumOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumOptionsTrait for EnumOptionsBumpalo<'bump> {
-    type UninterpretedOption_Type = self::UninterpretedOptionBumpalo<'bump>;
+    type UninterpretedOptionType = self::UninterpretedOptionBumpalo<'bump>;
     fn allow_alias(&self) -> ::std::option::Option<bool> {
         self.allow_alias.clone()
     }
     fn deprecated(&self) -> ::std::option::Option<bool> {
         self.deprecated.clone()
     }
-    type UninterpretedOption_RepeatedType = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -2796,9 +2796,9 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumOptionsBumpalo<'
     }
 }
 pub trait OneofOptionsTrait {
-    type UninterpretedOption_Type: self::UninterpretedOptionTrait;
-    type UninterpretedOption_RepeatedType: ::puroro::RepeatedField<Self::UninterpretedOption_Type>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType;
+    type UninterpretedOptionType: self::UninterpretedOptionTrait;
+    type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated;
 }
 
 #[derive(Debug)]
@@ -2839,7 +2839,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for OneofOptions {
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -2857,7 +2857,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for OneofOptions {
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -2893,9 +2893,9 @@ impl ::puroro::Serializable for OneofOptions {
 }
 
 impl OneofOptionsTrait for OneofOptions {
-    type UninterpretedOption_Type = self::UninterpretedOption;
-    type UninterpretedOption_RepeatedType = ::std::vec::Vec<self::UninterpretedOption>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionType = self::UninterpretedOption;
+    type UninterpretedOptionRepeated = ::std::vec::Vec<self::UninterpretedOption>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -2937,7 +2937,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for OneofOpt
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -2955,7 +2955,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for OneofOpt
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2986,14 +2986,14 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for OneofOptionsBumpalo<
 impl<'bump> ::puroro::Serializable for OneofOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> OneofOptionsTrait for OneofOptionsBumpalo<'bump> {
-    type UninterpretedOption_Type = self::UninterpretedOptionBumpalo<'bump>;
-    type UninterpretedOption_RepeatedType = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionType = self::UninterpretedOptionBumpalo<'bump>;
+    type UninterpretedOptionRepeated = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -3007,15 +3007,15 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for OneofOptionsBumpalo<
     }
 }
 pub trait FieldOptionsTrait {
-    type UninterpretedOption_Type: self::UninterpretedOptionTrait;
+    type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn ctype(&self) -> ::std::option::Option<::std::result::Result<field_options::Ctype, i32>>;
     fn packed(&self) -> ::std::option::Option<bool>;
     fn jstype(&self) -> ::std::option::Option<::std::result::Result<field_options::Jstype, i32>>;
     fn lazy(&self) -> ::std::option::Option<bool>;
     fn deprecated(&self) -> ::std::option::Option<bool>;
     fn weak(&self) -> ::std::option::Option<bool>;
-    type UninterpretedOption_RepeatedType: ::puroro::RepeatedField<Self::UninterpretedOption_Type>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType;
+    type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated;
 }
 
 #[derive(Debug)]
@@ -3074,7 +3074,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FieldOptions {
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -3128,7 +3128,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FieldOptions {
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -3188,7 +3188,7 @@ impl ::puroro::Serializable for FieldOptions {
 }
 
 impl FieldOptionsTrait for FieldOptions {
-    type UninterpretedOption_Type = self::UninterpretedOption;
+    type UninterpretedOptionType = self::UninterpretedOption;
     fn ctype(&self) -> ::std::option::Option<::std::result::Result<field_options::Ctype, i32>> {
         self.ctype.clone()
     }
@@ -3207,8 +3207,8 @@ impl FieldOptionsTrait for FieldOptions {
     fn weak(&self) -> ::std::option::Option<bool> {
         self.weak.clone()
     }
-    type UninterpretedOption_RepeatedType = ::std::vec::Vec<self::UninterpretedOption>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::std::vec::Vec<self::UninterpretedOption>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -3268,7 +3268,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FieldOpt
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -3322,7 +3322,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FieldOpt
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3377,12 +3377,12 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for FieldOptionsBumpalo<
 impl<'bump> ::puroro::Serializable for FieldOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FieldOptionsTrait for FieldOptionsBumpalo<'bump> {
-    type UninterpretedOption_Type = self::UninterpretedOptionBumpalo<'bump>;
+    type UninterpretedOptionType = self::UninterpretedOptionBumpalo<'bump>;
     fn ctype(&self) -> ::std::option::Option<::std::result::Result<field_options::Ctype, i32>> {
         self.ctype.clone()
     }
@@ -3401,8 +3401,8 @@ impl<'bump> FieldOptionsTrait for FieldOptionsBumpalo<'bump> {
     fn weak(&self) -> ::std::option::Option<bool> {
         self.weak.clone()
     }
-    type UninterpretedOption_RepeatedType = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -3462,13 +3462,13 @@ impl ::std::convert::From<Ctype> for i32 {
 }
 } // mod field_options
 pub trait MessageOptionsTrait {
-    type UninterpretedOption_Type: self::UninterpretedOptionTrait;
+    type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn message_set_wire_format(&self) -> ::std::option::Option<bool>;
     fn no_standard_descriptor_accessor(&self) -> ::std::option::Option<bool>;
     fn deprecated(&self) -> ::std::option::Option<bool>;
     fn map_entry(&self) -> ::std::option::Option<bool>;
-    type UninterpretedOption_RepeatedType: ::puroro::RepeatedField<Self::UninterpretedOption_Type>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType;
+    type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated;
 }
 
 #[derive(Debug)]
@@ -3521,7 +3521,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MessageOptions 
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -3563,7 +3563,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MessageOptions 
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -3615,7 +3615,7 @@ impl ::puroro::Serializable for MessageOptions {
 }
 
 impl MessageOptionsTrait for MessageOptions {
-    type UninterpretedOption_Type = self::UninterpretedOption;
+    type UninterpretedOptionType = self::UninterpretedOption;
     fn message_set_wire_format(&self) -> ::std::option::Option<bool> {
         self.message_set_wire_format.clone()
     }
@@ -3628,8 +3628,8 @@ impl MessageOptionsTrait for MessageOptions {
     fn map_entry(&self) -> ::std::option::Option<bool> {
         self.map_entry.clone()
     }
-    type UninterpretedOption_RepeatedType = ::std::vec::Vec<self::UninterpretedOption>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::std::vec::Vec<self::UninterpretedOption>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -3683,7 +3683,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MessageO
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -3725,7 +3725,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MessageO
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3772,12 +3772,12 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for MessageOptionsBumpal
 impl<'bump> ::puroro::Serializable for MessageOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MessageOptionsTrait for MessageOptionsBumpalo<'bump> {
-    type UninterpretedOption_Type = self::UninterpretedOptionBumpalo<'bump>;
+    type UninterpretedOptionType = self::UninterpretedOptionBumpalo<'bump>;
     fn message_set_wire_format(&self) -> ::std::option::Option<bool> {
         self.message_set_wire_format.clone()
     }
@@ -3790,8 +3790,8 @@ impl<'bump> MessageOptionsTrait for MessageOptionsBumpalo<'bump> {
     fn map_entry(&self) -> ::std::option::Option<bool> {
         self.map_entry.clone()
     }
-    type UninterpretedOption_RepeatedType = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -3805,7 +3805,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for MessageOptionsBumpal
     }
 }
 pub trait FileOptionsTrait {
-    type UninterpretedOption_Type: self::UninterpretedOptionTrait;
+    type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn java_package(&self) -> ::std::option::Option<&'_ str>;
     fn java_outer_classname(&self) -> ::std::option::Option<&'_ str>;
     fn java_multiple_files(&self) -> ::std::option::Option<bool>;
@@ -3826,8 +3826,8 @@ pub trait FileOptionsTrait {
     fn php_namespace(&self) -> ::std::option::Option<&'_ str>;
     fn php_metadata_namespace(&self) -> ::std::option::Option<&'_ str>;
     fn ruby_package(&self) -> ::std::option::Option<&'_ str>;
-    type UninterpretedOption_RepeatedType: ::puroro::RepeatedField<Self::UninterpretedOption_Type>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType;
+    type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated;
 }
 
 #[derive(Debug)]
@@ -3928,7 +3928,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileOptions {
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -4066,7 +4066,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileOptions {
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -4182,7 +4182,7 @@ impl ::puroro::Serializable for FileOptions {
 }
 
 impl FileOptionsTrait for FileOptions {
-    type UninterpretedOption_Type = self::UninterpretedOption;
+    type UninterpretedOptionType = self::UninterpretedOption;
     fn java_package(&self) -> ::std::option::Option<&'_ str> {
         self.java_package.as_deref()
     }
@@ -4243,8 +4243,8 @@ impl FileOptionsTrait for FileOptions {
     fn ruby_package(&self) -> ::std::option::Option<&'_ str> {
         self.ruby_package.as_deref()
     }
-    type UninterpretedOption_RepeatedType = ::std::vec::Vec<self::UninterpretedOption>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::std::vec::Vec<self::UninterpretedOption>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -4346,7 +4346,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileOpti
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -4484,7 +4484,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileOpti
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -4595,12 +4595,12 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for FileOptionsBumpalo<'
 impl<'bump> ::puroro::Serializable for FileOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileOptionsTrait for FileOptionsBumpalo<'bump> {
-    type UninterpretedOption_Type = self::UninterpretedOptionBumpalo<'bump>;
+    type UninterpretedOptionType = self::UninterpretedOptionBumpalo<'bump>;
     fn java_package(&self) -> ::std::option::Option<&'_ str> {
         self.java_package.as_deref()
     }
@@ -4661,8 +4661,8 @@ impl<'bump> FileOptionsTrait for FileOptionsBumpalo<'bump> {
     fn ruby_package(&self) -> ::std::option::Option<&'_ str> {
         self.ruby_package.as_deref()
     }
-    type UninterpretedOption_RepeatedType = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionRepeated = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -4700,11 +4700,11 @@ impl ::std::convert::From<OptimizeMode> for i32 {
 }
 } // mod file_options
 pub trait MethodDescriptorProtoTrait {
-    type MethodOptions_Type: self::MethodOptionsTrait;
+    type MethodOptionsType: self::MethodOptionsTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
     fn input_type(&self) -> ::std::option::Option<&'_ str>;
     fn output_type(&self) -> ::std::option::Option<&'_ str>;
-    fn options(&self) -> ::std::option::Option<&'_ Self::MethodOptions_Type>;
+    fn options(&self) -> ::std::option::Option<&'_ Self::MethodOptionsType>;
     fn client_streaming(&self) -> ::std::option::Option<bool>;
     fn server_streaming(&self) -> ::std::option::Option<bool>;
 }
@@ -4762,7 +4762,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MethodDescripto
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -4810,7 +4810,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for MethodDescripto
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -4866,7 +4866,7 @@ impl ::puroro::Serializable for MethodDescriptorProto {
 }
 
 impl MethodDescriptorProtoTrait for MethodDescriptorProto {
-    type MethodOptions_Type = self::MethodOptions;
+    type MethodOptionsType = self::MethodOptions;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
@@ -4876,7 +4876,7 @@ impl MethodDescriptorProtoTrait for MethodDescriptorProto {
     fn output_type(&self) -> ::std::option::Option<&'_ str> {
         self.output_type.as_deref()
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::MethodOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::MethodOptionsType> {
         self.options.as_deref()
     }
     fn client_streaming(&self) -> ::std::option::Option<bool> {
@@ -4939,7 +4939,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MethodDe
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -4987,7 +4987,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MethodDe
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5038,12 +5038,12 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for MethodDescriptorProt
 impl<'bump> ::puroro::Serializable for MethodDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MethodDescriptorProtoTrait for MethodDescriptorProtoBumpalo<'bump> {
-    type MethodOptions_Type = self::MethodOptionsBumpalo<'bump>;
+    type MethodOptionsType = self::MethodOptionsBumpalo<'bump>;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
@@ -5053,7 +5053,7 @@ impl<'bump> MethodDescriptorProtoTrait for MethodDescriptorProtoBumpalo<'bump> {
     fn output_type(&self) -> ::std::option::Option<&'_ str> {
         self.output_type.as_deref()
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::MethodOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::MethodOptionsType> {
         self.options.as_deref()
     }
     fn client_streaming(&self) -> ::std::option::Option<bool> {
@@ -5073,12 +5073,12 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for MethodDescriptorProt
     }
 }
 pub trait ServiceDescriptorProtoTrait {
-    type MethodDescriptorProto_Type: self::MethodDescriptorProtoTrait;
-    type ServiceOptions_Type: self::ServiceOptionsTrait;
+    type MethodDescriptorProtoType: self::MethodDescriptorProtoTrait;
+    type ServiceOptionsType: self::ServiceOptionsTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
-    type Method_RepeatedType: ::puroro::RepeatedField<Self::MethodDescriptorProto_Type>;
-    fn method(&self) -> &Self::Method_RepeatedType;
-    fn options(&self) -> ::std::option::Option<&'_ Self::ServiceOptions_Type>;
+    type MethodRepeated: ::puroro::RepeatedField<Self::MethodDescriptorProtoType>;
+    fn method(&self) -> &Self::MethodRepeated;
+    fn options(&self) -> ::std::option::Option<&'_ Self::ServiceOptionsType>;
 }
 
 #[derive(Debug)]
@@ -5125,7 +5125,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ServiceDescript
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -5155,7 +5155,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ServiceDescript
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -5199,16 +5199,16 @@ impl ::puroro::Serializable for ServiceDescriptorProto {
 }
 
 impl ServiceDescriptorProtoTrait for ServiceDescriptorProto {
-    type MethodDescriptorProto_Type = self::MethodDescriptorProto;
-    type ServiceOptions_Type = self::ServiceOptions;
+    type MethodDescriptorProtoType = self::MethodDescriptorProto;
+    type ServiceOptionsType = self::ServiceOptions;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type Method_RepeatedType = ::std::vec::Vec<self::MethodDescriptorProto>;
-    fn method(&self) -> &Self::Method_RepeatedType {
+    type MethodRepeated = ::std::vec::Vec<self::MethodDescriptorProto>;
+    fn method(&self) -> &Self::MethodRepeated {
         &self.method
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::ServiceOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::ServiceOptionsType> {
         self.options.as_deref()
     }
 }
@@ -5256,7 +5256,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for ServiceD
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -5286,7 +5286,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for ServiceD
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5325,21 +5325,21 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for ServiceDescriptorPro
 impl<'bump> ::puroro::Serializable for ServiceDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ServiceDescriptorProtoTrait for ServiceDescriptorProtoBumpalo<'bump> {
-    type MethodDescriptorProto_Type = self::MethodDescriptorProtoBumpalo<'bump>;
-    type ServiceOptions_Type = self::ServiceOptionsBumpalo<'bump>;
+    type MethodDescriptorProtoType = self::MethodDescriptorProtoBumpalo<'bump>;
+    type ServiceOptionsType = self::ServiceOptionsBumpalo<'bump>;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type Method_RepeatedType = ::bumpalo::collections::Vec<'bump, self::MethodDescriptorProtoBumpalo<'bump>>;
-    fn method(&self) -> &Self::Method_RepeatedType {
+    type MethodRepeated = ::bumpalo::collections::Vec<'bump, self::MethodDescriptorProtoBumpalo<'bump>>;
+    fn method(&self) -> &Self::MethodRepeated {
         &self.method
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::ServiceOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::ServiceOptionsType> {
         self.options.as_deref()
     }
 }
@@ -5353,10 +5353,10 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ServiceDescriptorPro
     }
 }
 pub trait EnumValueDescriptorProtoTrait {
-    type EnumValueOptions_Type: self::EnumValueOptionsTrait;
+    type EnumValueOptionsType: self::EnumValueOptionsTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
     fn number(&self) -> ::std::option::Option<i32>;
-    fn options(&self) -> ::std::option::Option<&'_ Self::EnumValueOptions_Type>;
+    fn options(&self) -> ::std::option::Option<&'_ Self::EnumValueOptionsType>;
 }
 
 #[derive(Debug)]
@@ -5403,7 +5403,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumValueDescri
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -5433,7 +5433,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumValueDescri
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -5477,14 +5477,14 @@ impl ::puroro::Serializable for EnumValueDescriptorProto {
 }
 
 impl EnumValueDescriptorProtoTrait for EnumValueDescriptorProto {
-    type EnumValueOptions_Type = self::EnumValueOptions;
+    type EnumValueOptionsType = self::EnumValueOptions;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
     fn number(&self) -> ::std::option::Option<i32> {
         self.number.clone()
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::EnumValueOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::EnumValueOptionsType> {
         self.options.as_deref()
     }
 }
@@ -5532,7 +5532,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumValu
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -5562,7 +5562,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumValu
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5601,19 +5601,19 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for EnumValueDescriptorP
 impl<'bump> ::puroro::Serializable for EnumValueDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumValueDescriptorProtoTrait for EnumValueDescriptorProtoBumpalo<'bump> {
-    type EnumValueOptions_Type = self::EnumValueOptionsBumpalo<'bump>;
+    type EnumValueOptionsType = self::EnumValueOptionsBumpalo<'bump>;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
     fn number(&self) -> ::std::option::Option<i32> {
         self.number.clone()
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::EnumValueOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::EnumValueOptionsType> {
         self.options.as_deref()
     }
 }
@@ -5627,17 +5627,17 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumValueDescriptorP
     }
 }
 pub trait EnumDescriptorProtoTrait {
-    type EnumValueDescriptorProto_Type: self::EnumValueDescriptorProtoTrait;
-    type EnumOptions_Type: self::EnumOptionsTrait;
-    type EnumReservedRange_Type: self::enum_descriptor_proto::EnumReservedRangeTrait;
+    type EnumValueDescriptorProtoType: self::EnumValueDescriptorProtoTrait;
+    type EnumOptionsType: self::EnumOptionsTrait;
+    type EnumReservedRangeType: self::enum_descriptor_proto::EnumReservedRangeTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
-    type Value_RepeatedType: ::puroro::RepeatedField<Self::EnumValueDescriptorProto_Type>;
-    fn value(&self) -> &Self::Value_RepeatedType;
-    fn options(&self) -> ::std::option::Option<&'_ Self::EnumOptions_Type>;
-    type ReservedRange_RepeatedType: ::puroro::RepeatedField<Self::EnumReservedRange_Type>;
-    fn reserved_range(&self) -> &Self::ReservedRange_RepeatedType;
-    type ReservedName_RepeatedType: ::puroro::RepeatedField<str>;
-    fn reserved_name(&self) -> &Self::ReservedName_RepeatedType;
+    type ValueRepeated: ::puroro::RepeatedField<Self::EnumValueDescriptorProtoType>;
+    fn value(&self) -> &Self::ValueRepeated;
+    fn options(&self) -> ::std::option::Option<&'_ Self::EnumOptionsType>;
+    type ReservedRangeRepeated: ::puroro::RepeatedField<Self::EnumReservedRangeType>;
+    fn reserved_range(&self) -> &Self::ReservedRangeRepeated;
+    type ReservedNameRepeated: ::puroro::RepeatedField<str>;
+    fn reserved_name(&self) -> &Self::ReservedNameRepeated;
 }
 
 #[derive(Debug)]
@@ -5690,7 +5690,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumDescriptorP
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -5732,7 +5732,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumDescriptorP
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -5784,25 +5784,25 @@ impl ::puroro::Serializable for EnumDescriptorProto {
 }
 
 impl EnumDescriptorProtoTrait for EnumDescriptorProto {
-    type EnumValueDescriptorProto_Type = self::EnumValueDescriptorProto;
-    type EnumOptions_Type = self::EnumOptions;
-    type EnumReservedRange_Type = self::enum_descriptor_proto::EnumReservedRange;
+    type EnumValueDescriptorProtoType = self::EnumValueDescriptorProto;
+    type EnumOptionsType = self::EnumOptions;
+    type EnumReservedRangeType = self::enum_descriptor_proto::EnumReservedRange;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type Value_RepeatedType = ::std::vec::Vec<self::EnumValueDescriptorProto>;
-    fn value(&self) -> &Self::Value_RepeatedType {
+    type ValueRepeated = ::std::vec::Vec<self::EnumValueDescriptorProto>;
+    fn value(&self) -> &Self::ValueRepeated {
         &self.value
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::EnumOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::EnumOptionsType> {
         self.options.as_deref()
     }
-    type ReservedRange_RepeatedType = ::std::vec::Vec<self::enum_descriptor_proto::EnumReservedRange>;
-    fn reserved_range(&self) -> &Self::ReservedRange_RepeatedType {
+    type ReservedRangeRepeated = ::std::vec::Vec<self::enum_descriptor_proto::EnumReservedRange>;
+    fn reserved_range(&self) -> &Self::ReservedRangeRepeated {
         &self.reserved_range
     }
-    type ReservedName_RepeatedType = ::std::vec::Vec<::std::string::String>;
-    fn reserved_name(&self) -> &Self::ReservedName_RepeatedType {
+    type ReservedNameRepeated = ::std::vec::Vec<::std::string::String>;
+    fn reserved_name(&self) -> &Self::ReservedNameRepeated {
         &self.reserved_name
     }
 }
@@ -5856,7 +5856,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumDesc
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -5898,7 +5898,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumDesc
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5945,30 +5945,30 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for EnumDescriptorProtoB
 impl<'bump> ::puroro::Serializable for EnumDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumDescriptorProtoTrait for EnumDescriptorProtoBumpalo<'bump> {
-    type EnumValueDescriptorProto_Type = self::EnumValueDescriptorProtoBumpalo<'bump>;
-    type EnumOptions_Type = self::EnumOptionsBumpalo<'bump>;
-    type EnumReservedRange_Type = self::enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>;
+    type EnumValueDescriptorProtoType = self::EnumValueDescriptorProtoBumpalo<'bump>;
+    type EnumOptionsType = self::EnumOptionsBumpalo<'bump>;
+    type EnumReservedRangeType = self::enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type Value_RepeatedType = ::bumpalo::collections::Vec<'bump, self::EnumValueDescriptorProtoBumpalo<'bump>>;
-    fn value(&self) -> &Self::Value_RepeatedType {
+    type ValueRepeated = ::bumpalo::collections::Vec<'bump, self::EnumValueDescriptorProtoBumpalo<'bump>>;
+    fn value(&self) -> &Self::ValueRepeated {
         &self.value
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::EnumOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::EnumOptionsType> {
         self.options.as_deref()
     }
-    type ReservedRange_RepeatedType = ::bumpalo::collections::Vec<'bump, self::enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>>;
-    fn reserved_range(&self) -> &Self::ReservedRange_RepeatedType {
+    type ReservedRangeRepeated = ::bumpalo::collections::Vec<'bump, self::enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>>;
+    fn reserved_range(&self) -> &Self::ReservedRangeRepeated {
         &self.reserved_range
     }
-    type ReservedName_RepeatedType = ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>;
-    fn reserved_name(&self) -> &Self::ReservedName_RepeatedType {
+    type ReservedNameRepeated = ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>;
+    fn reserved_name(&self) -> &Self::ReservedNameRepeated {
         &self.reserved_name
     }
 }
@@ -6028,7 +6028,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumReservedRan
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -6052,7 +6052,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for EnumReservedRan
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -6140,7 +6140,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumRese
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -6164,7 +6164,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for EnumRese
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6199,7 +6199,7 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for EnumReservedRangeBum
 impl<'bump> ::puroro::Serializable for EnumReservedRangeBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6222,9 +6222,9 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumReservedRangeBum
 }
 } // mod enum_descriptor_proto
 pub trait OneofDescriptorProtoTrait {
-    type OneofOptions_Type: self::OneofOptionsTrait;
+    type OneofOptionsType: self::OneofOptionsTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
-    fn options(&self) -> ::std::option::Option<&'_ Self::OneofOptions_Type>;
+    fn options(&self) -> ::std::option::Option<&'_ Self::OneofOptionsType>;
 }
 
 #[derive(Debug)]
@@ -6268,7 +6268,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for OneofDescriptor
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -6292,7 +6292,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for OneofDescriptor
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -6332,11 +6332,11 @@ impl ::puroro::Serializable for OneofDescriptorProto {
 }
 
 impl OneofDescriptorProtoTrait for OneofDescriptorProto {
-    type OneofOptions_Type = self::OneofOptions;
+    type OneofOptionsType = self::OneofOptions;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::OneofOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::OneofOptionsType> {
         self.options.as_deref()
     }
 }
@@ -6381,7 +6381,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for OneofDes
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -6405,7 +6405,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for OneofDes
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6440,16 +6440,16 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for OneofDescriptorProto
 impl<'bump> ::puroro::Serializable for OneofDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> OneofDescriptorProtoTrait for OneofDescriptorProtoBumpalo<'bump> {
-    type OneofOptions_Type = self::OneofOptionsBumpalo<'bump>;
+    type OneofOptionsType = self::OneofOptionsBumpalo<'bump>;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::OneofOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::OneofOptionsType> {
         self.options.as_deref()
     }
 }
@@ -6463,7 +6463,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for OneofDescriptorProto
     }
 }
 pub trait FieldDescriptorProtoTrait {
-    type FieldOptions_Type: self::FieldOptionsTrait;
+    type FieldOptionsType: self::FieldOptionsTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
     fn number(&self) -> ::std::option::Option<i32>;
     fn label(&self) -> ::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>>;
@@ -6473,7 +6473,7 @@ pub trait FieldDescriptorProtoTrait {
     fn default_value(&self) -> ::std::option::Option<&'_ str>;
     fn oneof_index(&self) -> ::std::option::Option<i32>;
     fn json_name(&self) -> ::std::option::Option<&'_ str>;
-    fn options(&self) -> ::std::option::Option<&'_ Self::FieldOptions_Type>;
+    fn options(&self) -> ::std::option::Option<&'_ Self::FieldOptionsType>;
     fn proto3_optional(&self) -> ::std::option::Option<bool>;
 }
 
@@ -6545,7 +6545,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FieldDescriptor
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -6623,7 +6623,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FieldDescriptor
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -6699,7 +6699,7 @@ impl ::puroro::Serializable for FieldDescriptorProto {
 }
 
 impl FieldDescriptorProtoTrait for FieldDescriptorProto {
-    type FieldOptions_Type = self::FieldOptions;
+    type FieldOptionsType = self::FieldOptions;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
@@ -6727,7 +6727,7 @@ impl FieldDescriptorProtoTrait for FieldDescriptorProto {
     fn json_name(&self) -> ::std::option::Option<&'_ str> {
         self.json_name.as_deref()
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::FieldOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::FieldOptionsType> {
         self.options.as_deref()
     }
     fn proto3_optional(&self) -> ::std::option::Option<bool> {
@@ -6802,7 +6802,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FieldDes
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -6880,7 +6880,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FieldDes
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6951,12 +6951,12 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for FieldDescriptorProto
 impl<'bump> ::puroro::Serializable for FieldDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FieldDescriptorProtoTrait for FieldDescriptorProtoBumpalo<'bump> {
-    type FieldOptions_Type = self::FieldOptionsBumpalo<'bump>;
+    type FieldOptionsType = self::FieldOptionsBumpalo<'bump>;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
@@ -6984,7 +6984,7 @@ impl<'bump> FieldDescriptorProtoTrait for FieldDescriptorProtoBumpalo<'bump> {
     fn json_name(&self) -> ::std::option::Option<&'_ str> {
         self.json_name.as_deref()
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::FieldOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::FieldOptionsType> {
         self.options.as_deref()
     }
     fn proto3_optional(&self) -> ::std::option::Option<bool> {
@@ -7077,9 +7077,9 @@ impl ::std::convert::From<Type> for i32 {
 }
 } // mod field_descriptor_proto
 pub trait ExtensionRangeOptionsTrait {
-    type UninterpretedOption_Type: self::UninterpretedOptionTrait;
-    type UninterpretedOption_RepeatedType: ::puroro::RepeatedField<Self::UninterpretedOption_Type>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType;
+    type UninterpretedOptionType: self::UninterpretedOptionTrait;
+    type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated;
 }
 
 #[derive(Debug)]
@@ -7120,7 +7120,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ExtensionRangeO
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -7138,7 +7138,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ExtensionRangeO
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -7174,9 +7174,9 @@ impl ::puroro::Serializable for ExtensionRangeOptions {
 }
 
 impl ExtensionRangeOptionsTrait for ExtensionRangeOptions {
-    type UninterpretedOption_Type = self::UninterpretedOption;
-    type UninterpretedOption_RepeatedType = ::std::vec::Vec<self::UninterpretedOption>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionType = self::UninterpretedOption;
+    type UninterpretedOptionRepeated = ::std::vec::Vec<self::UninterpretedOption>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -7218,7 +7218,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Extensio
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -7236,7 +7236,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Extensio
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -7267,14 +7267,14 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for ExtensionRangeOption
 impl<'bump> ::puroro::Serializable for ExtensionRangeOptionsBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ExtensionRangeOptionsTrait for ExtensionRangeOptionsBumpalo<'bump> {
-    type UninterpretedOption_Type = self::UninterpretedOptionBumpalo<'bump>;
-    type UninterpretedOption_RepeatedType = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
-    fn uninterpreted_option(&self) -> &Self::UninterpretedOption_RepeatedType {
+    type UninterpretedOptionType = self::UninterpretedOptionBumpalo<'bump>;
+    type UninterpretedOptionRepeated = ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>;
+    fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated {
         &self.uninterpreted_option
     }
 }
@@ -7288,31 +7288,31 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ExtensionRangeOption
     }
 }
 pub trait DescriptorProtoTrait {
-    type FieldDescriptorProto_Type: self::FieldDescriptorProtoTrait;
-    type DescriptorProto_Type: self::DescriptorProtoTrait;
-    type EnumDescriptorProto_Type: self::EnumDescriptorProtoTrait;
-    type ExtensionRange_Type: self::descriptor_proto::ExtensionRangeTrait;
-    type OneofDescriptorProto_Type: self::OneofDescriptorProtoTrait;
-    type MessageOptions_Type: self::MessageOptionsTrait;
-    type ReservedRange_Type: self::descriptor_proto::ReservedRangeTrait;
+    type FieldDescriptorProtoType: self::FieldDescriptorProtoTrait;
+    type DescriptorProtoType: self::DescriptorProtoTrait;
+    type EnumDescriptorProtoType: self::EnumDescriptorProtoTrait;
+    type ExtensionRangeType: self::descriptor_proto::ExtensionRangeTrait;
+    type OneofDescriptorProtoType: self::OneofDescriptorProtoTrait;
+    type MessageOptionsType: self::MessageOptionsTrait;
+    type ReservedRangeType: self::descriptor_proto::ReservedRangeTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
-    type Field_RepeatedType: ::puroro::RepeatedField<Self::FieldDescriptorProto_Type>;
-    fn field(&self) -> &Self::Field_RepeatedType;
-    type Extension_RepeatedType: ::puroro::RepeatedField<Self::FieldDescriptorProto_Type>;
-    fn extension(&self) -> &Self::Extension_RepeatedType;
-    type NestedType_RepeatedType: ::puroro::RepeatedField<Self::DescriptorProto_Type>;
-    fn nested_type(&self) -> &Self::NestedType_RepeatedType;
-    type EnumType_RepeatedType: ::puroro::RepeatedField<Self::EnumDescriptorProto_Type>;
-    fn enum_type(&self) -> &Self::EnumType_RepeatedType;
-    type ExtensionRange_RepeatedType: ::puroro::RepeatedField<Self::ExtensionRange_Type>;
-    fn extension_range(&self) -> &Self::ExtensionRange_RepeatedType;
-    type OneofDecl_RepeatedType: ::puroro::RepeatedField<Self::OneofDescriptorProto_Type>;
-    fn oneof_decl(&self) -> &Self::OneofDecl_RepeatedType;
-    fn options(&self) -> ::std::option::Option<&'_ Self::MessageOptions_Type>;
-    type ReservedRange_RepeatedType: ::puroro::RepeatedField<Self::ReservedRange_Type>;
-    fn reserved_range(&self) -> &Self::ReservedRange_RepeatedType;
-    type ReservedName_RepeatedType: ::puroro::RepeatedField<str>;
-    fn reserved_name(&self) -> &Self::ReservedName_RepeatedType;
+    type FieldRepeated: ::puroro::RepeatedField<Self::FieldDescriptorProtoType>;
+    fn field(&self) -> &Self::FieldRepeated;
+    type ExtensionRepeated: ::puroro::RepeatedField<Self::FieldDescriptorProtoType>;
+    fn extension(&self) -> &Self::ExtensionRepeated;
+    type NestedTypeRepeated: ::puroro::RepeatedField<Self::DescriptorProtoType>;
+    fn nested_type(&self) -> &Self::NestedTypeRepeated;
+    type EnumTypeRepeated: ::puroro::RepeatedField<Self::EnumDescriptorProtoType>;
+    fn enum_type(&self) -> &Self::EnumTypeRepeated;
+    type ExtensionRangeRepeated: ::puroro::RepeatedField<Self::ExtensionRangeType>;
+    fn extension_range(&self) -> &Self::ExtensionRangeRepeated;
+    type OneofDeclRepeated: ::puroro::RepeatedField<Self::OneofDescriptorProtoType>;
+    fn oneof_decl(&self) -> &Self::OneofDeclRepeated;
+    fn options(&self) -> ::std::option::Option<&'_ Self::MessageOptionsType>;
+    type ReservedRangeRepeated: ::puroro::RepeatedField<Self::ReservedRangeType>;
+    fn reserved_range(&self) -> &Self::ReservedRangeRepeated;
+    type ReservedNameRepeated: ::puroro::RepeatedField<str>;
+    fn reserved_name(&self) -> &Self::ReservedNameRepeated;
 }
 
 #[derive(Debug)]
@@ -7380,7 +7380,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for DescriptorProto
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -7452,7 +7452,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for DescriptorProto
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -7524,49 +7524,49 @@ impl ::puroro::Serializable for DescriptorProto {
 }
 
 impl DescriptorProtoTrait for DescriptorProto {
-    type FieldDescriptorProto_Type = self::FieldDescriptorProto;
-    type DescriptorProto_Type = self::DescriptorProto;
-    type EnumDescriptorProto_Type = self::EnumDescriptorProto;
-    type ExtensionRange_Type = self::descriptor_proto::ExtensionRange;
-    type OneofDescriptorProto_Type = self::OneofDescriptorProto;
-    type MessageOptions_Type = self::MessageOptions;
-    type ReservedRange_Type = self::descriptor_proto::ReservedRange;
+    type FieldDescriptorProtoType = self::FieldDescriptorProto;
+    type DescriptorProtoType = self::DescriptorProto;
+    type EnumDescriptorProtoType = self::EnumDescriptorProto;
+    type ExtensionRangeType = self::descriptor_proto::ExtensionRange;
+    type OneofDescriptorProtoType = self::OneofDescriptorProto;
+    type MessageOptionsType = self::MessageOptions;
+    type ReservedRangeType = self::descriptor_proto::ReservedRange;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type Field_RepeatedType = ::std::vec::Vec<self::FieldDescriptorProto>;
-    fn field(&self) -> &Self::Field_RepeatedType {
+    type FieldRepeated = ::std::vec::Vec<self::FieldDescriptorProto>;
+    fn field(&self) -> &Self::FieldRepeated {
         &self.field
     }
-    type Extension_RepeatedType = ::std::vec::Vec<self::FieldDescriptorProto>;
-    fn extension(&self) -> &Self::Extension_RepeatedType {
+    type ExtensionRepeated = ::std::vec::Vec<self::FieldDescriptorProto>;
+    fn extension(&self) -> &Self::ExtensionRepeated {
         &self.extension
     }
-    type NestedType_RepeatedType = ::std::vec::Vec<self::DescriptorProto>;
-    fn nested_type(&self) -> &Self::NestedType_RepeatedType {
+    type NestedTypeRepeated = ::std::vec::Vec<self::DescriptorProto>;
+    fn nested_type(&self) -> &Self::NestedTypeRepeated {
         &self.nested_type
     }
-    type EnumType_RepeatedType = ::std::vec::Vec<self::EnumDescriptorProto>;
-    fn enum_type(&self) -> &Self::EnumType_RepeatedType {
+    type EnumTypeRepeated = ::std::vec::Vec<self::EnumDescriptorProto>;
+    fn enum_type(&self) -> &Self::EnumTypeRepeated {
         &self.enum_type
     }
-    type ExtensionRange_RepeatedType = ::std::vec::Vec<self::descriptor_proto::ExtensionRange>;
-    fn extension_range(&self) -> &Self::ExtensionRange_RepeatedType {
+    type ExtensionRangeRepeated = ::std::vec::Vec<self::descriptor_proto::ExtensionRange>;
+    fn extension_range(&self) -> &Self::ExtensionRangeRepeated {
         &self.extension_range
     }
-    type OneofDecl_RepeatedType = ::std::vec::Vec<self::OneofDescriptorProto>;
-    fn oneof_decl(&self) -> &Self::OneofDecl_RepeatedType {
+    type OneofDeclRepeated = ::std::vec::Vec<self::OneofDescriptorProto>;
+    fn oneof_decl(&self) -> &Self::OneofDeclRepeated {
         &self.oneof_decl
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::MessageOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::MessageOptionsType> {
         self.options.as_deref()
     }
-    type ReservedRange_RepeatedType = ::std::vec::Vec<self::descriptor_proto::ReservedRange>;
-    fn reserved_range(&self) -> &Self::ReservedRange_RepeatedType {
+    type ReservedRangeRepeated = ::std::vec::Vec<self::descriptor_proto::ReservedRange>;
+    fn reserved_range(&self) -> &Self::ReservedRangeRepeated {
         &self.reserved_range
     }
-    type ReservedName_RepeatedType = ::std::vec::Vec<::std::string::String>;
-    fn reserved_name(&self) -> &Self::ReservedName_RepeatedType {
+    type ReservedNameRepeated = ::std::vec::Vec<::std::string::String>;
+    fn reserved_name(&self) -> &Self::ReservedNameRepeated {
         &self.reserved_name
     }
 }
@@ -7635,7 +7635,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Descript
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -7707,7 +7707,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Descript
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -7774,54 +7774,54 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for DescriptorProtoBumpa
 impl<'bump> ::puroro::Serializable for DescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> DescriptorProtoTrait for DescriptorProtoBumpalo<'bump> {
-    type FieldDescriptorProto_Type = self::FieldDescriptorProtoBumpalo<'bump>;
-    type DescriptorProto_Type = self::DescriptorProtoBumpalo<'bump>;
-    type EnumDescriptorProto_Type = self::EnumDescriptorProtoBumpalo<'bump>;
-    type ExtensionRange_Type = self::descriptor_proto::ExtensionRangeBumpalo<'bump>;
-    type OneofDescriptorProto_Type = self::OneofDescriptorProtoBumpalo<'bump>;
-    type MessageOptions_Type = self::MessageOptionsBumpalo<'bump>;
-    type ReservedRange_Type = self::descriptor_proto::ReservedRangeBumpalo<'bump>;
+    type FieldDescriptorProtoType = self::FieldDescriptorProtoBumpalo<'bump>;
+    type DescriptorProtoType = self::DescriptorProtoBumpalo<'bump>;
+    type EnumDescriptorProtoType = self::EnumDescriptorProtoBumpalo<'bump>;
+    type ExtensionRangeType = self::descriptor_proto::ExtensionRangeBumpalo<'bump>;
+    type OneofDescriptorProtoType = self::OneofDescriptorProtoBumpalo<'bump>;
+    type MessageOptionsType = self::MessageOptionsBumpalo<'bump>;
+    type ReservedRangeType = self::descriptor_proto::ReservedRangeBumpalo<'bump>;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
-    type Field_RepeatedType = ::bumpalo::collections::Vec<'bump, self::FieldDescriptorProtoBumpalo<'bump>>;
-    fn field(&self) -> &Self::Field_RepeatedType {
+    type FieldRepeated = ::bumpalo::collections::Vec<'bump, self::FieldDescriptorProtoBumpalo<'bump>>;
+    fn field(&self) -> &Self::FieldRepeated {
         &self.field
     }
-    type Extension_RepeatedType = ::bumpalo::collections::Vec<'bump, self::FieldDescriptorProtoBumpalo<'bump>>;
-    fn extension(&self) -> &Self::Extension_RepeatedType {
+    type ExtensionRepeated = ::bumpalo::collections::Vec<'bump, self::FieldDescriptorProtoBumpalo<'bump>>;
+    fn extension(&self) -> &Self::ExtensionRepeated {
         &self.extension
     }
-    type NestedType_RepeatedType = ::bumpalo::collections::Vec<'bump, self::DescriptorProtoBumpalo<'bump>>;
-    fn nested_type(&self) -> &Self::NestedType_RepeatedType {
+    type NestedTypeRepeated = ::bumpalo::collections::Vec<'bump, self::DescriptorProtoBumpalo<'bump>>;
+    fn nested_type(&self) -> &Self::NestedTypeRepeated {
         &self.nested_type
     }
-    type EnumType_RepeatedType = ::bumpalo::collections::Vec<'bump, self::EnumDescriptorProtoBumpalo<'bump>>;
-    fn enum_type(&self) -> &Self::EnumType_RepeatedType {
+    type EnumTypeRepeated = ::bumpalo::collections::Vec<'bump, self::EnumDescriptorProtoBumpalo<'bump>>;
+    fn enum_type(&self) -> &Self::EnumTypeRepeated {
         &self.enum_type
     }
-    type ExtensionRange_RepeatedType = ::bumpalo::collections::Vec<'bump, self::descriptor_proto::ExtensionRangeBumpalo<'bump>>;
-    fn extension_range(&self) -> &Self::ExtensionRange_RepeatedType {
+    type ExtensionRangeRepeated = ::bumpalo::collections::Vec<'bump, self::descriptor_proto::ExtensionRangeBumpalo<'bump>>;
+    fn extension_range(&self) -> &Self::ExtensionRangeRepeated {
         &self.extension_range
     }
-    type OneofDecl_RepeatedType = ::bumpalo::collections::Vec<'bump, self::OneofDescriptorProtoBumpalo<'bump>>;
-    fn oneof_decl(&self) -> &Self::OneofDecl_RepeatedType {
+    type OneofDeclRepeated = ::bumpalo::collections::Vec<'bump, self::OneofDescriptorProtoBumpalo<'bump>>;
+    fn oneof_decl(&self) -> &Self::OneofDeclRepeated {
         &self.oneof_decl
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::MessageOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::MessageOptionsType> {
         self.options.as_deref()
     }
-    type ReservedRange_RepeatedType = ::bumpalo::collections::Vec<'bump, self::descriptor_proto::ReservedRangeBumpalo<'bump>>;
-    fn reserved_range(&self) -> &Self::ReservedRange_RepeatedType {
+    type ReservedRangeRepeated = ::bumpalo::collections::Vec<'bump, self::descriptor_proto::ReservedRangeBumpalo<'bump>>;
+    fn reserved_range(&self) -> &Self::ReservedRangeRepeated {
         &self.reserved_range
     }
-    type ReservedName_RepeatedType = ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>;
-    fn reserved_name(&self) -> &Self::ReservedName_RepeatedType {
+    type ReservedNameRepeated = ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>;
+    fn reserved_name(&self) -> &Self::ReservedNameRepeated {
         &self.reserved_name
     }
 }
@@ -7881,7 +7881,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ReservedRange {
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -7905,7 +7905,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ReservedRange {
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -7993,7 +7993,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Reserved
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -8017,7 +8017,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Reserved
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8052,7 +8052,7 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for ReservedRangeBumpalo
 impl<'bump> ::puroro::Serializable for ReservedRangeBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8074,10 +8074,10 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ReservedRangeBumpalo
     }
 }
 pub trait ExtensionRangeTrait {
-    type ExtensionRangeOptions_Type: super::ExtensionRangeOptionsTrait;
+    type ExtensionRangeOptionsType: super::ExtensionRangeOptionsTrait;
     fn start(&self) -> ::std::option::Option<i32>;
     fn end(&self) -> ::std::option::Option<i32>;
-    fn options(&self) -> ::std::option::Option<&'_ Self::ExtensionRangeOptions_Type>;
+    fn options(&self) -> ::std::option::Option<&'_ Self::ExtensionRangeOptionsType>;
 }
 
 #[derive(Debug)]
@@ -8124,7 +8124,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ExtensionRange 
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -8154,7 +8154,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for ExtensionRange 
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -8198,14 +8198,14 @@ impl ::puroro::Serializable for ExtensionRange {
 }
 
 impl ExtensionRangeTrait for ExtensionRange {
-    type ExtensionRangeOptions_Type = self::super::ExtensionRangeOptions;
+    type ExtensionRangeOptionsType = self::super::ExtensionRangeOptions;
     fn start(&self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
     fn end(&self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::ExtensionRangeOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::ExtensionRangeOptionsType> {
         self.options.as_deref()
     }
 }
@@ -8253,7 +8253,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Extensio
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -8283,7 +8283,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for Extensio
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8322,19 +8322,19 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for ExtensionRangeBumpal
 impl<'bump> ::puroro::Serializable for ExtensionRangeBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ExtensionRangeTrait for ExtensionRangeBumpalo<'bump> {
-    type ExtensionRangeOptions_Type = self::super::ExtensionRangeOptionsBumpalo<'bump>;
+    type ExtensionRangeOptionsType = self::super::ExtensionRangeOptionsBumpalo<'bump>;
     fn start(&self) -> ::std::option::Option<i32> {
         self.start.clone()
     }
     fn end(&self) -> ::std::option::Option<i32> {
         self.end.clone()
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::ExtensionRangeOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::ExtensionRangeOptionsType> {
         self.options.as_deref()
     }
 }
@@ -8349,30 +8349,30 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ExtensionRangeBumpal
 }
 } // mod descriptor_proto
 pub trait FileDescriptorProtoTrait {
-    type DescriptorProto_Type: self::DescriptorProtoTrait;
-    type EnumDescriptorProto_Type: self::EnumDescriptorProtoTrait;
-    type ServiceDescriptorProto_Type: self::ServiceDescriptorProtoTrait;
-    type FieldDescriptorProto_Type: self::FieldDescriptorProtoTrait;
-    type FileOptions_Type: self::FileOptionsTrait;
-    type SourceCodeInfo_Type: self::SourceCodeInfoTrait;
+    type DescriptorProtoType: self::DescriptorProtoTrait;
+    type EnumDescriptorProtoType: self::EnumDescriptorProtoTrait;
+    type ServiceDescriptorProtoType: self::ServiceDescriptorProtoTrait;
+    type FieldDescriptorProtoType: self::FieldDescriptorProtoTrait;
+    type FileOptionsType: self::FileOptionsTrait;
+    type SourceCodeInfoType: self::SourceCodeInfoTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
     fn package(&self) -> ::std::option::Option<&'_ str>;
-    type Dependency_RepeatedType: ::puroro::RepeatedField<str>;
-    fn dependency(&self) -> &Self::Dependency_RepeatedType;
-    type PublicDependency_RepeatedType: ::puroro::RepeatedField<i32>;
-    fn public_dependency(&self) -> &Self::PublicDependency_RepeatedType;
-    type WeakDependency_RepeatedType: ::puroro::RepeatedField<i32>;
-    fn weak_dependency(&self) -> &Self::WeakDependency_RepeatedType;
-    type MessageType_RepeatedType: ::puroro::RepeatedField<Self::DescriptorProto_Type>;
-    fn message_type(&self) -> &Self::MessageType_RepeatedType;
-    type EnumType_RepeatedType: ::puroro::RepeatedField<Self::EnumDescriptorProto_Type>;
-    fn enum_type(&self) -> &Self::EnumType_RepeatedType;
-    type Service_RepeatedType: ::puroro::RepeatedField<Self::ServiceDescriptorProto_Type>;
-    fn service(&self) -> &Self::Service_RepeatedType;
-    type Extension_RepeatedType: ::puroro::RepeatedField<Self::FieldDescriptorProto_Type>;
-    fn extension(&self) -> &Self::Extension_RepeatedType;
-    fn options(&self) -> ::std::option::Option<&'_ Self::FileOptions_Type>;
-    fn source_code_info(&self) -> ::std::option::Option<&'_ Self::SourceCodeInfo_Type>;
+    type DependencyRepeated: ::puroro::RepeatedField<str>;
+    fn dependency(&self) -> &Self::DependencyRepeated;
+    type PublicDependencyRepeated: ::puroro::RepeatedField<i32>;
+    fn public_dependency(&self) -> &Self::PublicDependencyRepeated;
+    type WeakDependencyRepeated: ::puroro::RepeatedField<i32>;
+    fn weak_dependency(&self) -> &Self::WeakDependencyRepeated;
+    type MessageTypeRepeated: ::puroro::RepeatedField<Self::DescriptorProtoType>;
+    fn message_type(&self) -> &Self::MessageTypeRepeated;
+    type EnumTypeRepeated: ::puroro::RepeatedField<Self::EnumDescriptorProtoType>;
+    fn enum_type(&self) -> &Self::EnumTypeRepeated;
+    type ServiceRepeated: ::puroro::RepeatedField<Self::ServiceDescriptorProtoType>;
+    fn service(&self) -> &Self::ServiceRepeated;
+    type ExtensionRepeated: ::puroro::RepeatedField<Self::FieldDescriptorProtoType>;
+    fn extension(&self) -> &Self::ExtensionRepeated;
+    fn options(&self) -> ::std::option::Option<&'_ Self::FileOptionsType>;
+    fn source_code_info(&self) -> ::std::option::Option<&'_ Self::SourceCodeInfoType>;
     fn syntax(&self) -> ::std::option::Option<&'_ str>;
 }
 
@@ -8447,7 +8447,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileDescriptorP
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -8531,7 +8531,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileDescriptorP
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -8611,50 +8611,50 @@ impl ::puroro::Serializable for FileDescriptorProto {
 }
 
 impl FileDescriptorProtoTrait for FileDescriptorProto {
-    type DescriptorProto_Type = self::DescriptorProto;
-    type EnumDescriptorProto_Type = self::EnumDescriptorProto;
-    type ServiceDescriptorProto_Type = self::ServiceDescriptorProto;
-    type FieldDescriptorProto_Type = self::FieldDescriptorProto;
-    type FileOptions_Type = self::FileOptions;
-    type SourceCodeInfo_Type = self::SourceCodeInfo;
+    type DescriptorProtoType = self::DescriptorProto;
+    type EnumDescriptorProtoType = self::EnumDescriptorProto;
+    type ServiceDescriptorProtoType = self::ServiceDescriptorProto;
+    type FieldDescriptorProtoType = self::FieldDescriptorProto;
+    type FileOptionsType = self::FileOptions;
+    type SourceCodeInfoType = self::SourceCodeInfo;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
     fn package(&self) -> ::std::option::Option<&'_ str> {
         self.package.as_deref()
     }
-    type Dependency_RepeatedType = ::std::vec::Vec<::std::string::String>;
-    fn dependency(&self) -> &Self::Dependency_RepeatedType {
+    type DependencyRepeated = ::std::vec::Vec<::std::string::String>;
+    fn dependency(&self) -> &Self::DependencyRepeated {
         &self.dependency
     }
-    type PublicDependency_RepeatedType = ::std::vec::Vec<i32>;
-    fn public_dependency(&self) -> &Self::PublicDependency_RepeatedType {
+    type PublicDependencyRepeated = ::std::vec::Vec<i32>;
+    fn public_dependency(&self) -> &Self::PublicDependencyRepeated {
         &self.public_dependency
     }
-    type WeakDependency_RepeatedType = ::std::vec::Vec<i32>;
-    fn weak_dependency(&self) -> &Self::WeakDependency_RepeatedType {
+    type WeakDependencyRepeated = ::std::vec::Vec<i32>;
+    fn weak_dependency(&self) -> &Self::WeakDependencyRepeated {
         &self.weak_dependency
     }
-    type MessageType_RepeatedType = ::std::vec::Vec<self::DescriptorProto>;
-    fn message_type(&self) -> &Self::MessageType_RepeatedType {
+    type MessageTypeRepeated = ::std::vec::Vec<self::DescriptorProto>;
+    fn message_type(&self) -> &Self::MessageTypeRepeated {
         &self.message_type
     }
-    type EnumType_RepeatedType = ::std::vec::Vec<self::EnumDescriptorProto>;
-    fn enum_type(&self) -> &Self::EnumType_RepeatedType {
+    type EnumTypeRepeated = ::std::vec::Vec<self::EnumDescriptorProto>;
+    fn enum_type(&self) -> &Self::EnumTypeRepeated {
         &self.enum_type
     }
-    type Service_RepeatedType = ::std::vec::Vec<self::ServiceDescriptorProto>;
-    fn service(&self) -> &Self::Service_RepeatedType {
+    type ServiceRepeated = ::std::vec::Vec<self::ServiceDescriptorProto>;
+    fn service(&self) -> &Self::ServiceRepeated {
         &self.service
     }
-    type Extension_RepeatedType = ::std::vec::Vec<self::FieldDescriptorProto>;
-    fn extension(&self) -> &Self::Extension_RepeatedType {
+    type ExtensionRepeated = ::std::vec::Vec<self::FieldDescriptorProto>;
+    fn extension(&self) -> &Self::ExtensionRepeated {
         &self.extension
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::FileOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::FileOptionsType> {
         self.options.as_deref()
     }
-    fn source_code_info(&self) -> ::std::option::Option<&'_ Self::SourceCodeInfo_Type> {
+    fn source_code_info(&self) -> ::std::option::Option<&'_ Self::SourceCodeInfoType> {
         self.source_code_info.as_deref()
     }
     fn syntax(&self) -> ::std::option::Option<&'_ str> {
@@ -8732,7 +8732,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileDesc
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -8816,7 +8816,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileDesc
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8891,55 +8891,55 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for FileDescriptorProtoB
 impl<'bump> ::puroro::Serializable for FileDescriptorProtoBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileDescriptorProtoTrait for FileDescriptorProtoBumpalo<'bump> {
-    type DescriptorProto_Type = self::DescriptorProtoBumpalo<'bump>;
-    type EnumDescriptorProto_Type = self::EnumDescriptorProtoBumpalo<'bump>;
-    type ServiceDescriptorProto_Type = self::ServiceDescriptorProtoBumpalo<'bump>;
-    type FieldDescriptorProto_Type = self::FieldDescriptorProtoBumpalo<'bump>;
-    type FileOptions_Type = self::FileOptionsBumpalo<'bump>;
-    type SourceCodeInfo_Type = self::SourceCodeInfoBumpalo<'bump>;
+    type DescriptorProtoType = self::DescriptorProtoBumpalo<'bump>;
+    type EnumDescriptorProtoType = self::EnumDescriptorProtoBumpalo<'bump>;
+    type ServiceDescriptorProtoType = self::ServiceDescriptorProtoBumpalo<'bump>;
+    type FieldDescriptorProtoType = self::FieldDescriptorProtoBumpalo<'bump>;
+    type FileOptionsType = self::FileOptionsBumpalo<'bump>;
+    type SourceCodeInfoType = self::SourceCodeInfoBumpalo<'bump>;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
     fn package(&self) -> ::std::option::Option<&'_ str> {
         self.package.as_deref()
     }
-    type Dependency_RepeatedType = ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>;
-    fn dependency(&self) -> &Self::Dependency_RepeatedType {
+    type DependencyRepeated = ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>;
+    fn dependency(&self) -> &Self::DependencyRepeated {
         &self.dependency
     }
-    type PublicDependency_RepeatedType = ::bumpalo::collections::Vec<'bump, i32>;
-    fn public_dependency(&self) -> &Self::PublicDependency_RepeatedType {
+    type PublicDependencyRepeated = ::bumpalo::collections::Vec<'bump, i32>;
+    fn public_dependency(&self) -> &Self::PublicDependencyRepeated {
         &self.public_dependency
     }
-    type WeakDependency_RepeatedType = ::bumpalo::collections::Vec<'bump, i32>;
-    fn weak_dependency(&self) -> &Self::WeakDependency_RepeatedType {
+    type WeakDependencyRepeated = ::bumpalo::collections::Vec<'bump, i32>;
+    fn weak_dependency(&self) -> &Self::WeakDependencyRepeated {
         &self.weak_dependency
     }
-    type MessageType_RepeatedType = ::bumpalo::collections::Vec<'bump, self::DescriptorProtoBumpalo<'bump>>;
-    fn message_type(&self) -> &Self::MessageType_RepeatedType {
+    type MessageTypeRepeated = ::bumpalo::collections::Vec<'bump, self::DescriptorProtoBumpalo<'bump>>;
+    fn message_type(&self) -> &Self::MessageTypeRepeated {
         &self.message_type
     }
-    type EnumType_RepeatedType = ::bumpalo::collections::Vec<'bump, self::EnumDescriptorProtoBumpalo<'bump>>;
-    fn enum_type(&self) -> &Self::EnumType_RepeatedType {
+    type EnumTypeRepeated = ::bumpalo::collections::Vec<'bump, self::EnumDescriptorProtoBumpalo<'bump>>;
+    fn enum_type(&self) -> &Self::EnumTypeRepeated {
         &self.enum_type
     }
-    type Service_RepeatedType = ::bumpalo::collections::Vec<'bump, self::ServiceDescriptorProtoBumpalo<'bump>>;
-    fn service(&self) -> &Self::Service_RepeatedType {
+    type ServiceRepeated = ::bumpalo::collections::Vec<'bump, self::ServiceDescriptorProtoBumpalo<'bump>>;
+    fn service(&self) -> &Self::ServiceRepeated {
         &self.service
     }
-    type Extension_RepeatedType = ::bumpalo::collections::Vec<'bump, self::FieldDescriptorProtoBumpalo<'bump>>;
-    fn extension(&self) -> &Self::Extension_RepeatedType {
+    type ExtensionRepeated = ::bumpalo::collections::Vec<'bump, self::FieldDescriptorProtoBumpalo<'bump>>;
+    fn extension(&self) -> &Self::ExtensionRepeated {
         &self.extension
     }
-    fn options(&self) -> ::std::option::Option<&'_ Self::FileOptions_Type> {
+    fn options(&self) -> ::std::option::Option<&'_ Self::FileOptionsType> {
         self.options.as_deref()
     }
-    fn source_code_info(&self) -> ::std::option::Option<&'_ Self::SourceCodeInfo_Type> {
+    fn source_code_info(&self) -> ::std::option::Option<&'_ Self::SourceCodeInfoType> {
         self.source_code_info.as_deref()
     }
     fn syntax(&self) -> ::std::option::Option<&'_ str> {
@@ -8956,9 +8956,9 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileDescriptorProtoB
     }
 }
 pub trait FileDescriptorSetTrait {
-    type FileDescriptorProto_Type: self::FileDescriptorProtoTrait;
-    type File_RepeatedType: ::puroro::RepeatedField<Self::FileDescriptorProto_Type>;
-    fn file(&self) -> &Self::File_RepeatedType;
+    type FileDescriptorProtoType: self::FileDescriptorProtoTrait;
+    type FileRepeated: ::puroro::RepeatedField<Self::FileDescriptorProtoType>;
+    fn file(&self) -> &Self::FileRepeated;
 }
 
 #[derive(Debug)]
@@ -8999,7 +8999,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileDescriptorS
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -9017,7 +9017,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for FileDescriptorS
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -9053,9 +9053,9 @@ impl ::puroro::Serializable for FileDescriptorSet {
 }
 
 impl FileDescriptorSetTrait for FileDescriptorSet {
-    type FileDescriptorProto_Type = self::FileDescriptorProto;
-    type File_RepeatedType = ::std::vec::Vec<self::FileDescriptorProto>;
-    fn file(&self) -> &Self::File_RepeatedType {
+    type FileDescriptorProtoType = self::FileDescriptorProto;
+    type FileRepeated = ::std::vec::Vec<self::FileDescriptorProto>;
+    fn file(&self) -> &Self::FileRepeated {
         &self.file
     }
 }
@@ -9097,7 +9097,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileDesc
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -9115,7 +9115,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileDesc
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -9146,14 +9146,14 @@ impl<'bump> ::puroro_internal::ser::SerializableMessage for FileDescriptorSetBum
 impl<'bump> ::puroro::Serializable for FileDescriptorSetBumpalo<'bump> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileDescriptorSetTrait for FileDescriptorSetBumpalo<'bump> {
-    type FileDescriptorProto_Type = self::FileDescriptorProtoBumpalo<'bump>;
-    type File_RepeatedType = ::bumpalo::collections::Vec<'bump, self::FileDescriptorProtoBumpalo<'bump>>;
-    fn file(&self) -> &Self::File_RepeatedType {
+    type FileDescriptorProtoType = self::FileDescriptorProtoBumpalo<'bump>;
+    type FileRepeated = ::bumpalo::collections::Vec<'bump, self::FileDescriptorProtoBumpalo<'bump>>;
+    fn file(&self) -> &Self::FileRepeated {
         &self.file
     }
 }

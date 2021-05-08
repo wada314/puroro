@@ -186,7 +186,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {{
@@ -226,7 +226,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb
             ),
             "        \
         }}
-        Ok(())
+        Ok(true)
     }}
 }}\n",
             format!(
@@ -313,7 +313,7 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
 impl{gp} ::puroro::Serializable for {name}{gpb} {{
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {{
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
-        <Self as ::puroro_internal::ser::Serializable>::serialize(self, &mut serializer)
+        <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }}
 }}\n",
                 name = self.frag_gen.struct_ident(self.msg)?,

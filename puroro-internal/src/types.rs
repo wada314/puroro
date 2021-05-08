@@ -1,5 +1,6 @@
 use std::marker::PhantomData;
 
+use crate::deser::BytesSlice;
 use crate::variant::Variant;
 use ::num_derive::FromPrimitive;
 
@@ -24,7 +25,7 @@ pub enum FieldData<T> {
 
 pub enum SliceRefScalarField<'slice, T> {
     Unchecked,
-    SingleLocation(FieldData<&'slice [u8]>),
+    SingleLocation(FieldData<BytesSlice<'slice>>),
     MultipleLocations { start: &'slice [u8], count: usize },
     ValueAvailable(T),
     NotExist,
@@ -32,7 +33,7 @@ pub enum SliceRefScalarField<'slice, T> {
 
 pub enum SliceRefRepeatedField<'slice, T> {
     Unchecked,
-    SinglePacked(FieldData<&'slice [u8]>),
+    SinglePacked(FieldData<BytesSlice<'slice>>),
     MultipleFields { start: &'slice [u8], count: usize },
     NotExist,
     _Phantom(PhantomData<T>),

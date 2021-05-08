@@ -2,11 +2,11 @@
 #![allow(unused_imports)]
 
 pub trait CodeGeneratorResponseTrait {
-    type File_Type: self::code_generator_response::FileTrait;
+    type FileType: self::code_generator_response::FileTrait;
     fn error(&self) -> ::std::option::Option<&'_ str>;
     fn supported_features(&self) -> ::std::option::Option<u64>;
-    type File_RepeatedType: ::puroro::RepeatedField<Self::File_Type>;
-    fn file(&self) -> &Self::File_RepeatedType;
+    type FileRepeated: ::puroro::RepeatedField<Self::FileType>;
+    fn file(&self) -> &Self::FileRepeated;
 }
 
 #[derive(Debug)]
@@ -53,7 +53,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -83,7 +83,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -127,15 +127,15 @@ impl ::puroro::Serializable for CodeGeneratorResponse {
 }
 
 impl CodeGeneratorResponseTrait for CodeGeneratorResponse {
-    type File_Type = self::code_generator_response::File;
+    type FileType = self::code_generator_response::File;
     fn error(&self) -> ::std::option::Option<&'_ str> {
         self.error.as_deref()
     }
     fn supported_features(&self) -> ::std::option::Option<u64> {
         self.supported_features.clone()
     }
-    type File_RepeatedType = ::std::vec::Vec<self::code_generator_response::File>;
-    fn file(&self) -> &Self::File_RepeatedType {
+    type FileRepeated = ::std::vec::Vec<self::code_generator_response::File>;
+    fn file(&self) -> &Self::FileRepeated {
         &self.file
     }
 }
@@ -183,7 +183,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -213,7 +213,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -257,15 +257,15 @@ impl<'bump> ::puroro::Serializable for CodeGeneratorResponseBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorResponseTrait for CodeGeneratorResponseBumpalo<'bump> {
-    type File_Type = self::code_generator_response::FileBumpalo<'bump>;
+    type FileType = self::code_generator_response::FileBumpalo<'bump>;
     fn error(&self) -> ::std::option::Option<&'_ str> {
         self.error.as_deref()
     }
     fn supported_features(&self) -> ::std::option::Option<u64> {
         self.supported_features.clone()
     }
-    type File_RepeatedType = ::bumpalo::collections::Vec<'bump, self::code_generator_response::FileBumpalo<'bump>>;
-    fn file(&self) -> &Self::File_RepeatedType {
+    type FileRepeated = ::bumpalo::collections::Vec<'bump, self::code_generator_response::FileBumpalo<'bump>>;
+    fn file(&self) -> &Self::FileRepeated {
         &self.file
     }
 }
@@ -300,11 +300,11 @@ impl ::std::convert::From<Feature> for i32 {
     }
 }
 pub trait FileTrait {
-    type GeneratedCodeInfo_Type: super::super::GeneratedCodeInfoTrait;
+    type GeneratedCodeInfoType: super::super::GeneratedCodeInfoTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
     fn insertion_point(&self) -> ::std::option::Option<&'_ str>;
     fn content(&self) -> ::std::option::Option<&'_ str>;
-    fn generated_code_info(&self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfo_Type>;
+    fn generated_code_info(&self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfoType>;
 }
 
 #[derive(Debug)]
@@ -354,7 +354,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for File {
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -390,7 +390,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for File {
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -438,7 +438,7 @@ impl ::puroro::Serializable for File {
 }
 
 impl FileTrait for File {
-    type GeneratedCodeInfo_Type = self::super::super::GeneratedCodeInfo;
+    type GeneratedCodeInfoType = self::super::super::GeneratedCodeInfo;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
@@ -448,7 +448,7 @@ impl FileTrait for File {
     fn content(&self) -> ::std::option::Option<&'_ str> {
         self.content.as_deref()
     }
-    fn generated_code_info(&self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfo_Type> {
+    fn generated_code_info(&self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfoType> {
         self.generated_code_info.as_deref()
     }
 }
@@ -499,7 +499,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileBump
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -535,7 +535,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileBump
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -583,7 +583,7 @@ impl<'bump> ::puroro::Serializable for FileBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileTrait for FileBumpalo<'bump> {
-    type GeneratedCodeInfo_Type = self::super::super::GeneratedCodeInfoBumpalo<'bump>;
+    type GeneratedCodeInfoType = self::super::super::GeneratedCodeInfoBumpalo<'bump>;
     fn name(&self) -> ::std::option::Option<&'_ str> {
         self.name.as_deref()
     }
@@ -593,7 +593,7 @@ impl<'bump> FileTrait for FileBumpalo<'bump> {
     fn content(&self) -> ::std::option::Option<&'_ str> {
         self.content.as_deref()
     }
-    fn generated_code_info(&self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfo_Type> {
+    fn generated_code_info(&self) -> ::std::option::Option<&'_ Self::GeneratedCodeInfoType> {
         self.generated_code_info.as_deref()
     }
 }
@@ -608,14 +608,14 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileBumpalo<'bump> {
 }
 } // mod code_generator_response
 pub trait CodeGeneratorRequestTrait {
-    type FileDescriptorProto_Type: super::FileDescriptorProtoTrait;
-    type Version_Type: self::VersionTrait;
-    type FileToGenerate_RepeatedType: ::puroro::RepeatedField<str>;
-    fn file_to_generate(&self) -> &Self::FileToGenerate_RepeatedType;
+    type FileDescriptorProtoType: super::FileDescriptorProtoTrait;
+    type VersionType: self::VersionTrait;
+    type FileToGenerateRepeated: ::puroro::RepeatedField<str>;
+    fn file_to_generate(&self) -> &Self::FileToGenerateRepeated;
     fn parameter(&self) -> ::std::option::Option<&'_ str>;
-    type ProtoFile_RepeatedType: ::puroro::RepeatedField<Self::FileDescriptorProto_Type>;
-    fn proto_file(&self) -> &Self::ProtoFile_RepeatedType;
-    fn compiler_version(&self) -> ::std::option::Option<&'_ Self::Version_Type>;
+    type ProtoFileRepeated: ::puroro::RepeatedField<Self::FileDescriptorProtoType>;
+    fn proto_file(&self) -> &Self::ProtoFileRepeated;
+    fn compiler_version(&self) -> ::std::option::Option<&'_ Self::VersionType>;
 }
 
 #[derive(Debug)]
@@ -665,7 +665,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -701,7 +701,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -749,20 +749,20 @@ impl ::puroro::Serializable for CodeGeneratorRequest {
 }
 
 impl CodeGeneratorRequestTrait for CodeGeneratorRequest {
-    type FileDescriptorProto_Type = self::super::FileDescriptorProto;
-    type Version_Type = self::Version;
-    type FileToGenerate_RepeatedType = ::std::vec::Vec<::std::string::String>;
-    fn file_to_generate(&self) -> &Self::FileToGenerate_RepeatedType {
+    type FileDescriptorProtoType = self::super::FileDescriptorProto;
+    type VersionType = self::Version;
+    type FileToGenerateRepeated = ::std::vec::Vec<::std::string::String>;
+    fn file_to_generate(&self) -> &Self::FileToGenerateRepeated {
         &self.file_to_generate
     }
     fn parameter(&self) -> ::std::option::Option<&'_ str> {
         self.parameter.as_deref()
     }
-    type ProtoFile_RepeatedType = ::std::vec::Vec<self::super::FileDescriptorProto>;
-    fn proto_file(&self) -> &Self::ProtoFile_RepeatedType {
+    type ProtoFileRepeated = ::std::vec::Vec<self::super::FileDescriptorProto>;
+    fn proto_file(&self) -> &Self::ProtoFileRepeated {
         &self.proto_file
     }
-    fn compiler_version(&self) -> ::std::option::Option<&'_ Self::Version_Type> {
+    fn compiler_version(&self) -> ::std::option::Option<&'_ Self::VersionType> {
         self.compiler_version.as_deref()
     }
 }
@@ -813,7 +813,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -849,7 +849,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -897,20 +897,20 @@ impl<'bump> ::puroro::Serializable for CodeGeneratorRequestBumpalo<'bump> {
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorRequestTrait for CodeGeneratorRequestBumpalo<'bump> {
-    type FileDescriptorProto_Type = self::super::FileDescriptorProtoBumpalo<'bump>;
-    type Version_Type = self::VersionBumpalo<'bump>;
-    type FileToGenerate_RepeatedType = ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>;
-    fn file_to_generate(&self) -> &Self::FileToGenerate_RepeatedType {
+    type FileDescriptorProtoType = self::super::FileDescriptorProtoBumpalo<'bump>;
+    type VersionType = self::VersionBumpalo<'bump>;
+    type FileToGenerateRepeated = ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>;
+    fn file_to_generate(&self) -> &Self::FileToGenerateRepeated {
         &self.file_to_generate
     }
     fn parameter(&self) -> ::std::option::Option<&'_ str> {
         self.parameter.as_deref()
     }
-    type ProtoFile_RepeatedType = ::bumpalo::collections::Vec<'bump, self::super::FileDescriptorProtoBumpalo<'bump>>;
-    fn proto_file(&self) -> &Self::ProtoFile_RepeatedType {
+    type ProtoFileRepeated = ::bumpalo::collections::Vec<'bump, self::super::FileDescriptorProtoBumpalo<'bump>>;
+    fn proto_file(&self) -> &Self::ProtoFileRepeated {
         &self.proto_file
     }
-    fn compiler_version(&self) -> ::std::option::Option<&'_ Self::Version_Type> {
+    fn compiler_version(&self) -> ::std::option::Option<&'_ Self::VersionType> {
         self.compiler_version.as_deref()
     }
 }
@@ -977,7 +977,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Version {
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -1013,7 +1013,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Version {
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -1121,7 +1121,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for VersionB
         field: ::puroro_internal::types::FieldData<
             &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
         field_number: usize,
-    ) -> ::puroro::Result<()> 
+    ) -> ::puroro::Result<bool> 
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {
@@ -1157,7 +1157,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for VersionB
             }
             _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
-        Ok(())
+        Ok(true)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]

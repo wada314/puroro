@@ -7,11 +7,8 @@ use crate::ErrorKind;
 use crate::Result;
 use ::num_traits::FromPrimitive;
 
-pub trait DeserializableFromSlice {
-    fn deserialize(&mut self, slice: &[u8]) -> Result<()>;
-}
 pub trait DeserializableMessageFromSlice {
-    fn met_field(&mut self, field: FieldData<&[u8]>, field_number: usize) -> Result<()>;
+    fn met_field(&mut self, field: FieldData<&[u8]>, field_number: usize) -> Result<bool>;
 }
 
 pub struct BytesSlice<'slice> {
@@ -60,7 +57,9 @@ impl<'slice> BytesSlice<'slice> {
                 }
                 WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
             };
-            handler.met_field(field_data, field_number)?;
+            if !handler.met_field(field_data, field_number)? {
+                break;
+            }
         }
         Ok(())
     }
