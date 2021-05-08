@@ -88,6 +88,12 @@ where
 {
     Fragment::Functor(Box::new(f) as Box<dyn FnOnce(&mut Indentor<W>) -> Result<()>>)
 }
+pub fn seq<'w, T, W: 'w>(frags: T) -> Fragment<'w, W>
+where
+    Fragment<'w, W>: From<T>,
+{
+    frags.into()
+}
 
 fn frag_write_impl<'w, W>(w: &'w mut Indentor<W>, frag: Fragment<'w, W>) -> Result<()>
 where

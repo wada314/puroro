@@ -1,6 +1,6 @@
 use super::message_frags::MessageImplFragmentGenerator;
 use super::message_traits::{GetterMethods, MessageTraitCodeGenerator};
-use super::writer::{func, indent, indent_n, iter, IntoFragment};
+use super::writer::{func, indent, indent_n, iter, seq, IntoFragment};
 use crate::context::{AllocatorType, Context, ImplType};
 use crate::utils::Indentor;
 use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
@@ -253,7 +253,7 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
     pub fn print_msg_ser<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
             match self.context.impl_type() {
-                ImplType::Default => (
+                ImplType::Default => seq((
                     format!(
                         "\
 {cfg}
@@ -289,9 +289,8 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
         Ok(())
     }}
 }}\n",
-                )
-                    .into(),
-                ImplType::SliceView { .. } => (format!(
+                )),
+                ImplType::SliceView { .. } => format!(
                     "\
 {cfg}
 impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
@@ -305,8 +304,8 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
                     cfg = self.frag_gen.cfg_condition(),
                     gp = self.frag_gen.struct_generic_params(&[]),
                     gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-                ),)
-                    .into(),
+                )
+                .into(),
             },
             format!(
                 "\
