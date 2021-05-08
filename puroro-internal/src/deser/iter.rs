@@ -26,18 +26,25 @@ pub trait DeserializableMessageFromIter: Sized {
     }
 }
 
-pub struct FromIterToFromSlice<T: DeserializableMessageFromIter>(T);
-impl<T> super::slice::DeserializableMessageFromSlice for FromIterToFromSlice<T>
+pub struct FromIterToFromSlice<'a, T: DeserializableMessageFromIter>(&'a mut T);
+
+impl<'a, T: DeserializableMessageFromIter> FromIterToFromSlice<'a, T> {
+    pub fn new(from_iter: &'a mut T) -> Self {
+        Self(from_iter)
+    }
+}
+
+impl<'a, T> super::slice::DeserializableMessageFromSlice for FromIterToFromSlice<'a, T>
 where
     T: DeserializableMessageFromIter,
 {
-    fn met_field<'a>(&mut self, field: FieldData<&'a [u8]>, field_number: usize) -> Result<bool> {
+    fn met_field<'b>(&mut self, field: FieldData<&'b [u8]>, field_number: usize) -> Result<bool> {
         use std::io::Read;
-        type BytesIterBoundType<'a> = BytesIter<'a, std::io::Bytes<&'a [u8]>>;
+        type BytesIterBoundType<'c> = BytesIter<'c, std::io::Bytes<&'c [u8]>>;
         match field {
             FieldData::Variant(v) => self
                 .0
-                .met_field::<BytesIterBoundType<'a>>(FieldData::Variant(v), field_number),
+                .met_field::<BytesIterBoundType<'b>>(FieldData::Variant(v), field_number),
             FieldData::LengthDelimited(slice) => {
                 let mut bytes = slice.bytes();
                 let mut bytes_iter = BytesIter::new(&mut bytes);
@@ -46,10 +53,10 @@ where
             }
             FieldData::Bits32(b) => self
                 .0
-                .met_field::<BytesIterBoundType<'a>>(FieldData::Bits32(b), field_number),
+                .met_field::<BytesIterBoundType<'b>>(FieldData::Bits32(b), field_number),
             FieldData::Bits64(b) => self
                 .0
-                .met_field::<BytesIterBoundType<'a>>(FieldData::Bits64(b), field_number),
+                .met_field::<BytesIterBoundType<'b>>(FieldData::Bits64(b), field_number),
         }
     }
 }

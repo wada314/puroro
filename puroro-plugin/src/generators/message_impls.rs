@@ -30,7 +30,14 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             func(|output| self.print_msg_clone(output)),
             (
                 func(|output| self.print_msg_deser_from_iter(output)),
-                func(|output| self.print_msg_deser_from_slice(output)),
+                match self.context.impl_type() {
+                    ImplType::Default => {
+                        func(|output| self.print_msg_deser_from_slice_using_from_iter(output))
+                    }
+                    ImplType::SliceView { .. } => {
+                        func(|output| self.print_msg_deser_from_slice_for_slice_view(output))
+                    }
+                },
                 func(|output| self.print_msg_ser(output)),
                 func(|output| self.print_map_entry_impl(output)),
             ),
@@ -251,7 +258,30 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
             .write_into(output)
     }
 
-    pub fn print_msg_deser_from_slice<W: std::fmt::Write>(
+    fn print_msg_deser_from_slice_using_from_iter<W: std::fmt::Write>(
+        &self,
+        output: &mut Indentor<W>,
+    ) -> Result<()> {
+        (format!(
+            "\
+{cfg}
+impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {{
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }}
+}}\n",
+            ident = self.frag_gen.struct_ident(self.msg)?,
+            cfg = self.frag_gen.cfg_condition(),
+            gp = self.frag_gen.struct_generic_params(&[]),
+            gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+        ),)
+            .write_into(output)
+    }
+
+    fn print_msg_deser_from_slice_for_slice_view<W: std::fmt::Write>(
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
@@ -266,11 +296,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice for {ident}{gp
         field_number: usize
     ) -> ::puroro::Result<bool>
     {{
-        use ::puroro::InternalData;
-        use ::puroro_internal::tags;
-        use ::std::convert::TryInto;
-        let puroro_internal = &self.puroro_internal;
-        \n",
+        todo!()\n",
                 ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),

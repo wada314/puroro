@@ -15,6 +15,10 @@ pub struct BytesSlice<'slice> {
     slice: &'slice [u8],
 }
 impl<'slice> BytesSlice<'slice> {
+    pub fn new(slice: &'slice [u8]) -> Self {
+        Self { slice }
+    }
+
     pub fn deser_message<H: DeserializableMessageFromSlice>(
         &mut self,
         handler: &mut H,

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
-use crate::types::{SliceRefRepeatedField, SliceRefScalarField};
+use crate::types::{SliceViewRepeatedField, SliceViewScalarField};
 
 pub trait FieldNew<'bump>: Sized {
     fn new() -> Self;
@@ -69,13 +69,13 @@ impl<'bump> FieldNew<'bump> for ::bumpalo::collections::String<'bump> {
     }
 }
 
-impl<'bump, 'slice, T> FieldNew<'bump> for SliceRefScalarField<'slice, T> {
+impl<'bump, 'slice, T> FieldNew<'bump> for SliceViewScalarField<'slice, T> {
     fn new() -> Self {
-        SliceRefScalarField::Unchecked
+        SliceViewScalarField::NotFound
     }
 }
-impl<'bump, 'slice, T> FieldNew<'bump> for SliceRefRepeatedField<'slice, T> {
+impl<'bump, 'slice, T> FieldNew<'bump> for SliceViewRepeatedField<'slice, T> {
     fn new() -> Self {
-        SliceRefRepeatedField::Unchecked
+        SliceViewRepeatedField::NotFound
     }
 }
