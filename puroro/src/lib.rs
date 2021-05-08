@@ -14,6 +14,9 @@ pub trait DeserializableFromIter {
     where
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
+pub trait DeserializableFromSlice {
+    fn deser_from_iter<I>(&mut self, slice: &[u8]) -> Result<()>;
+}
 
 pub trait Serializable: Sized {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> Result<()>;
