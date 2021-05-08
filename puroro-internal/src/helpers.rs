@@ -12,10 +12,21 @@ pub use field_take_or_init::FieldTakeOrInit;
 
 use crate::deser::BytesSlice;
 use crate::ser::MessageSerializer;
+use crate::tags;
 use crate::types::FieldData;
 use crate::Result;
 use ::puroro::InternalData;
 use std::collections::HashMap;
+
+trait DoDefaultCheck {
+    const DO_DEFAULT_CHECK: bool = false;
+}
+impl DoDefaultCheck for tags::Optional3 {
+    const DO_DEFAULT_CHECK: bool = true;
+}
+impl DoDefaultCheck for tags::Required {}
+impl DoDefaultCheck for tags::Optional2 {}
+impl DoDefaultCheck for tags::Repeated {}
 
 pub trait MapEntry {
     // Note: `KeyType` (or `ValueType`) != the message's `key` (or `value`) field type.

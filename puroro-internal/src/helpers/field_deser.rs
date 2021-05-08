@@ -8,17 +8,7 @@ use std::convert::TryFrom;
 use std::hash::Hash;
 use std::marker::PhantomData;
 
-use super::MapEntry;
-
-trait DoDefaultCheck {
-    const DO_DEFAULT_CHECK: bool = false;
-}
-impl DoDefaultCheck for tags::Optional3 {
-    const DO_DEFAULT_CHECK: bool = true;
-}
-impl DoDefaultCheck for tags::Required {}
-impl DoDefaultCheck for tags::Optional2 {}
-impl DoDefaultCheck for tags::Repeated {}
+use super::{MapEntry, DoDefaultCheck};
 
 pub trait FieldDeserFromIter<TypeTag, LabelTag>
 where

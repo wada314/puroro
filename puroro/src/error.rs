@@ -39,6 +39,8 @@ pub enum ErrorKind {
     FormatterError(#[from] std::fmt::Error),
     #[error("The string length is not correct.")]
     InvalidFieldLength,
+    #[error("Internal error in SliceView struct.")]
+    InvalidSliceViewType,
     #[error("Group is not supported.")]
     GroupNotSupported,
     #[error("Other error: {0}")]
