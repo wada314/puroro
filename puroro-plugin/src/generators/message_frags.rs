@@ -190,21 +190,13 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             }
             ImplType::SliceView { check_utf8: _ } => match field.label()? {
                 FieldLabel::Repeated => format!(
-                    "::puroro_internal::types::SliceRefRepeatedField<{field_type}>",
-                    field_type = if matches!(field.type_()?, FieldType::Message(_)) {
-                        self.box_type(scalar_type.as_ref())
-                    } else {
-                        scalar_type.into_owned()
-                    }
+                    "::puroro_internal::types::SliceViewRepeatedField<{field_type}>",
+                    scalar_type
                 )
                 .into(),
                 _ => format!(
-                    "::puroro_internal::types::SliceRefScalarField<{field_type}>",
-                    field_type = if matches!(field.type_()?, FieldType::Message(_)) {
-                        self.box_type(scalar_type.as_ref())
-                    } else {
-                        scalar_type.into_owned()
-                    }
+                    "::puroro_internal::types::SliceViewScalarField<{field_type}>",
+                    scalar_type
                 )
                 .into(),
             },

@@ -23,18 +23,32 @@ pub enum FieldData<T> {
     Bits64([u8; 8]),
 }
 
-pub enum SliceRefScalarField<'slice, T> {
-    Unchecked,
-    SingleLocation(FieldData<BytesSlice<'slice>>),
-    MultipleLocations { start: &'slice [u8], count: usize },
+pub enum SliceViewScalarField<'slice, T> {
+    NotFound,
+    // Ld stands for "Length Delimited", a wire type.
+    // Only available for scalar String, Bytes, and Message fields.
+    // Otherwise, the value is already decoded and stored while scanning.
+    SingleLdLocation(FieldData<BytesSlice<'slice>>),
+    // Only available for scalar Message field. For String and Bytes,
+    // they can just use the last single (needs non-empty check in proto3) field.
+    MultipleLdLocations {
+        first: FieldData<BytesSlice<'slice>>,
+        remaining_slice: &'slice [u8],
+        count: usize,
+    },
+    // The data is available and already decoded.
+    //  For numerical fields including Enum.
     ValueAvailable(T),
-    NotExist,
 }
 
-pub enum SliceRefRepeatedField<'slice, T> {
-    Unchecked,
+pub enum SliceViewRepeatedField<'slice, T> {
+    NotFound,
+    // Only available for Variant wire type.
     SinglePacked(FieldData<BytesSlice<'slice>>),
-    MultipleFields { start: &'slice [u8], count: usize },
-    NotExist,
+    MultipleFields {
+        first: FieldData<BytesSlice<'slice>>,
+        remaining_slice: &'slice [u8],
+        count: usize,
+    },
     _Phantom(PhantomData<T>),
 }
