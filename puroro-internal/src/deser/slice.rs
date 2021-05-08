@@ -104,4 +104,8 @@ impl<'slice> BytesSlice<'slice> {
     pub fn slice(&self) -> &'slice [u8] {
         self.slice
     }
+
+    pub fn variants(&self) -> super::iter::Variants<std::io::Bytes<&'slice [u8]>> {
+        super::iter::Variants::new(self.slice().bytes())
+    }
 }

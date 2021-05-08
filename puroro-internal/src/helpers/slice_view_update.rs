@@ -9,7 +9,7 @@ pub trait SliceViewUpdate<TypeTag: FieldTypeTag> {
     fn update(&mut self, field: FieldData<&[u8]>) -> Result<()>;
 }
 
-impl SliceViewUpdate<tags::Int32> for SliceViewScalarField<i32> {
+impl<'slice> SliceViewUpdate<tags::Int32> for SliceViewScalarField<'slice, i32> {
     fn update(&mut self, field: FieldData<&[u8]>) -> Result<()> {
         let new_val = match field {
             FieldData::Variant(variant) => variant.to_native::<tags::Int32>()?,

@@ -152,8 +152,8 @@ where
         Chars::new(self)
     }
 
-    pub fn variants(&mut self) -> Variants<'_, Self> {
-        Variants::new(self)
+    pub fn variants(&mut self) -> Variants<&'_ mut Self> {
+        Variants::new(self.by_ref())
     }
 }
 
@@ -208,15 +208,15 @@ impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for Chars<'a, I> {
 }
 
 /// Converts `Result<u8, std::io::IoError>` into `Result<Variant, ErrorKind>`.
-pub struct Variants<'a, I: Iterator<Item = IoResult<u8>>> {
-    iter: &'a mut I,
+pub struct Variants<I: Iterator<Item = IoResult<u8>>> {
+    iter: I,
 }
-impl<'a, I: Iterator<Item = IoResult<u8>>> Variants<'a, I> {
-    pub(crate) fn new(iter: &'a mut I) -> Self {
+impl<I: Iterator<Item = IoResult<u8>>> Variants<I> {
+    pub(crate) fn new(iter: I) -> Self {
         Self { iter }
     }
 }
-impl<'a, I: Iterator<Item = IoResult<u8>>> Iterator for Variants<'a, I> {
+impl<I: Iterator<Item = IoResult<u8>>> Iterator for Variants<I> {
     type Item = Result<Variant>;
     fn next(&mut self) -> Option<Self::Item> {
         let mut peekable = self.iter.by_ref().peekable();
