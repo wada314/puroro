@@ -347,7 +347,11 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRespon
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        serializer.serialize_raw_bytes(self.puroro_internal.slice)
+        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
+            todo!()
+        } else {
+            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
+        }
     }
 }
 
@@ -757,7 +761,11 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for FileSliceView<'slic
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        serializer.serialize_raw_bytes(self.puroro_internal.slice)
+        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
+            todo!()
+        } else {
+            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
+        }
     }
 }
 
@@ -1156,7 +1164,11 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for CodeGeneratorReques
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        serializer.serialize_raw_bytes(self.puroro_internal.slice)
+        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
+            todo!()
+        } else {
+            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
+        }
     }
 }
 
@@ -1542,7 +1554,11 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for VersionSliceView<'s
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        serializer.serialize_raw_bytes(self.puroro_internal.slice)
+        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
+            todo!()
+        } else {
+            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
+        }
     }
 }
 

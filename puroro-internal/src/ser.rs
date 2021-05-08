@@ -37,7 +37,7 @@ pub trait MessageSerializer {
         bytes: [u8; BYTES],
     ) -> Result<()>;
 
-    fn serialize_raw_bytes(&mut self, bytes: &[u8]) -> Result<()>;
+    fn serialize_raw_fields(&mut self, bytes: &[u8]) -> Result<()>;
 }
 pub fn default_serializer<'a, W>(write: &'a mut W) -> impl MessageSerializer + 'a
 where
@@ -161,7 +161,7 @@ where
         Ok(())
     }
 
-    fn serialize_raw_bytes(&mut self, bytes: &[u8]) -> Result<()> {
+    fn serialize_raw_fields(&mut self, bytes: &[u8]) -> Result<()> {
         self.write.write_all(bytes)?;
         Ok(())
     }

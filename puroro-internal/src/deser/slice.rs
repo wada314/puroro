@@ -100,4 +100,8 @@ impl<'slice> BytesSlice<'slice> {
     fn bytes(&mut self) -> std::io::Bytes<&mut &'slice [u8]> {
         self.slice.by_ref().bytes()
     }
+
+    pub fn slice(&self) -> &'slice [u8] {
+        self.slice
+    }
 }
