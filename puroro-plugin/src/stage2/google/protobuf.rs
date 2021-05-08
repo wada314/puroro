@@ -77,6 +77,15 @@ impl ::puroro::DeserializableFromIter for GeneratedCodeInfo {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for GeneratedCodeInfo {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for GeneratedCodeInfo {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -172,6 +181,15 @@ impl<'bump> ::puroro::DeserializableFromIter for GeneratedCodeInfoBumpalo<'bump>
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for GeneratedCodeInfoBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -315,6 +333,15 @@ impl ::puroro::DeserializableFromIter for Annotation {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro::DeserializableFromSlice for Annotation {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 
@@ -463,6 +490,15 @@ impl<'bump> ::puroro::DeserializableFromIter for AnnotationBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for AnnotationBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for AnnotationBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -597,6 +633,15 @@ impl ::puroro::DeserializableFromIter for SourceCodeInfo {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for SourceCodeInfo {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for SourceCodeInfo {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -692,6 +737,15 @@ impl<'bump> ::puroro::DeserializableFromIter for SourceCodeInfoBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for SourceCodeInfoBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -847,6 +901,15 @@ impl ::puroro::DeserializableFromIter for Location {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro::DeserializableFromSlice for Location {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 
@@ -1010,6 +1073,15 @@ impl<'bump> ::puroro::DeserializableFromIter for LocationBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for LocationBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1216,6 +1288,15 @@ impl ::puroro::DeserializableFromIter for UninterpretedOption {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for UninterpretedOption {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for UninterpretedOption {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1410,6 +1491,15 @@ impl<'bump> ::puroro::DeserializableFromIter for UninterpretedOptionBumpalo<'bum
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for UninterpretedOptionBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for UninterpretedOptionBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1574,6 +1664,15 @@ impl ::puroro::DeserializableFromIter for NamePart {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for NamePart {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for NamePart {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1683,6 +1782,15 @@ impl<'bump> ::puroro::DeserializableFromIter for NamePartBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for NamePartBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -1825,6 +1933,15 @@ impl ::puroro::DeserializableFromIter for MethodOptions {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for MethodOptions {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for MethodOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -1952,6 +2069,15 @@ impl<'bump> ::puroro::DeserializableFromIter for MethodOptionsBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for MethodOptionsBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2116,6 +2242,15 @@ impl ::puroro::DeserializableFromIter for ServiceOptions {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for ServiceOptions {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for ServiceOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2227,6 +2362,15 @@ impl<'bump> ::puroro::DeserializableFromIter for ServiceOptionsBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for ServiceOptionsBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2360,6 +2504,15 @@ impl ::puroro::DeserializableFromIter for EnumValueOptions {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for EnumValueOptions {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for EnumValueOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2471,6 +2624,15 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumValueOptionsBumpalo<'bump> 
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for EnumValueOptionsBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -2614,6 +2776,15 @@ impl ::puroro::DeserializableFromIter for EnumOptions {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for EnumOptions {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for EnumOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2744,6 +2915,15 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for EnumOptionsBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for EnumOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2871,6 +3051,15 @@ impl ::puroro::DeserializableFromIter for OneofOptions {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for OneofOptions {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for OneofOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -2966,6 +3155,15 @@ impl<'bump> ::puroro::DeserializableFromIter for OneofOptionsBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for OneofOptionsBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3139,6 +3337,15 @@ impl ::puroro::DeserializableFromIter for FieldOptions {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro::DeserializableFromSlice for FieldOptions {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 
@@ -3333,6 +3540,15 @@ impl<'bump> ::puroro::DeserializableFromIter for FieldOptionsBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for FieldOptionsBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -3577,6 +3793,15 @@ impl ::puroro::DeserializableFromIter for MessageOptions {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for MessageOptions {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for MessageOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -3736,6 +3961,15 @@ impl<'bump> ::puroro::DeserializableFromIter for MessageOptionsBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for MessageOptionsBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -4077,6 +4311,15 @@ impl ::puroro::DeserializableFromIter for FileOptions {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro::DeserializableFromSlice for FileOptions {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 
@@ -4498,6 +4741,15 @@ impl<'bump> ::puroro::DeserializableFromIter for FileOptionsBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for FileOptionsBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for FileOptionsBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -4824,6 +5076,15 @@ impl ::puroro::DeserializableFromIter for MethodDescriptorProto {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for MethodDescriptorProto {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for MethodDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5001,6 +5262,15 @@ impl<'bump> ::puroro::DeserializableFromIter for MethodDescriptorProtoBumpalo<'b
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for MethodDescriptorProtoBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for MethodDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5169,6 +5439,15 @@ impl ::puroro::DeserializableFromIter for ServiceDescriptorProto {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for ServiceDescriptorProto {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for ServiceDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5297,6 +5576,15 @@ impl<'bump> ::puroro::DeserializableFromIter for ServiceDescriptorProtoBumpalo<'
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for ServiceDescriptorProtoBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5447,6 +5735,15 @@ impl ::puroro::DeserializableFromIter for EnumValueDescriptorProto {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for EnumValueDescriptorProto {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for EnumValueDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5573,6 +5870,15 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumValueDescriptorProtoBumpalo
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for EnumValueDescriptorProtoBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -5746,6 +6052,15 @@ impl ::puroro::DeserializableFromIter for EnumDescriptorProto {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for EnumDescriptorProto {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for EnumDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -5912,6 +6227,15 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumDescriptorProtoBumpalo<'bum
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for EnumDescriptorProtoBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for EnumDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -6066,6 +6390,15 @@ impl ::puroro::DeserializableFromIter for EnumReservedRange {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for EnumReservedRange {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for EnumReservedRange {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -6175,6 +6508,15 @@ impl<'bump> ::puroro::DeserializableFromIter for EnumReservedRangeBumpalo<'bump>
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for EnumReservedRangeBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6306,6 +6648,15 @@ impl ::puroro::DeserializableFromIter for OneofDescriptorProto {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for OneofDescriptorProto {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for OneofDescriptorProto {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -6416,6 +6767,15 @@ impl<'bump> ::puroro::DeserializableFromIter for OneofDescriptorProtoBumpalo<'bu
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for OneofDescriptorProtoBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -6634,6 +6994,15 @@ impl ::puroro::DeserializableFromIter for FieldDescriptorProto {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro::DeserializableFromSlice for FieldDescriptorProto {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 
@@ -6891,6 +7260,15 @@ impl<'bump> ::puroro::DeserializableFromIter for FieldDescriptorProtoBumpalo<'bu
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for FieldDescriptorProtoBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -7152,6 +7530,15 @@ impl ::puroro::DeserializableFromIter for ExtensionRangeOptions {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for ExtensionRangeOptions {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for ExtensionRangeOptions {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -7247,6 +7634,15 @@ impl<'bump> ::puroro::DeserializableFromIter for ExtensionRangeOptionsBumpalo<'b
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for ExtensionRangeOptionsBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -7463,6 +7859,15 @@ impl ::puroro::DeserializableFromIter for DescriptorProto {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro::DeserializableFromSlice for DescriptorProto {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 
@@ -7721,6 +8126,15 @@ impl<'bump> ::puroro::DeserializableFromIter for DescriptorProtoBumpalo<'bump> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for DescriptorProtoBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for DescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -7919,6 +8333,15 @@ impl ::puroro::DeserializableFromIter for ReservedRange {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for ReservedRange {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for ReservedRange {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -8028,6 +8451,15 @@ impl<'bump> ::puroro::DeserializableFromIter for ReservedRangeBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for ReservedRangeBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8168,6 +8600,15 @@ impl ::puroro::DeserializableFromIter for ExtensionRange {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for ExtensionRange {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for ExtensionRange {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -8294,6 +8735,15 @@ impl<'bump> ::puroro::DeserializableFromIter for ExtensionRangeBumpalo<'bump> {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for ExtensionRangeBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -8542,6 +8992,15 @@ impl ::puroro::DeserializableFromIter for FileDescriptorProto {
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+
+impl ::puroro::DeserializableFromSlice for FileDescriptorProto {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 
@@ -8830,6 +9289,15 @@ impl<'bump> ::puroro::DeserializableFromIter for FileDescriptorProtoBumpalo<'bum
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for FileDescriptorProtoBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ::puroro_internal::ser::SerializableMessage for FileDescriptorProtoBumpalo<'bump> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -9031,6 +9499,15 @@ impl ::puroro::DeserializableFromIter for FileDescriptorSet {
     }
 }
 
+impl ::puroro::DeserializableFromSlice for FileDescriptorSet {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
+    }
+}
+
 impl ::puroro_internal::ser::SerializableMessage for FileDescriptorSet {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
@@ -9126,6 +9603,15 @@ impl<'bump> ::puroro::DeserializableFromIter for FileDescriptorSetBumpalo<'bump>
     {
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
             ::deser_from_iter(self, iter)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> ::puroro::DeserializableFromSlice for FileDescriptorSetBumpalo<'bump> {
+    fn deser_from_slice<I>(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        wrapped_slice.deser_message(&mut from_slice)?;
+        Ok(())
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
