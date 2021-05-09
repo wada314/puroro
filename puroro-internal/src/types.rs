@@ -23,34 +23,8 @@ pub enum FieldData<T> {
     Bits64([u8; 8]),
 }
 
-// For non-repeated types except Message (and probably Map? TBD).
 #[derive(Debug, Clone)]
-pub enum SliceViewScalarField<T: Clone> {
-    NotFound,
-    ValueAvailable(T),
-}
-
-#[derive(Debug, Clone)]
-pub enum SliceViewMultipleField<'slice, T: Clone> {
-    NotFound,
-    // Only available for scalar Message field.
-    // For String and Bytes, they can just use the last single field.
-    MessageLocations {
-        first: BytesSlice<'slice>,
-        // number of the message field merged into this message instance.
-        count: usize,
-    },
-    // Only available for Variant wire type.
-    SinglePacked(FieldData<BytesSlice<'slice>>),
-    MultipleFields {
-        first: FieldData<BytesSlice<'slice>>,
-        remaining_slice: &'slice [u8],
-        count: usize,
-    },
-    _Phantom(PhantomData<T>),
-}
-
-enum SourceFields<'slice> {
+pub enum SliceViewFields<'slice> {
     FieldsInSingleSlice {
         slice: &'slice [u8],
         count: usize,
@@ -58,5 +32,10 @@ enum SourceFields<'slice> {
     },
     FieldsInMultipleSlices {
         count: usize,
-    }
+    },
 }
+
+#[derive(Debug, Clone)]
+pub struct SliceViewScalarField<'a, T>(PhantomData<&'a T>);
+#[derive(Debug, Clone)]
+pub struct SliceViewMultipleField<'a, T>(PhantomData<&'a T>);

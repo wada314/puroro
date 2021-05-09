@@ -1,4 +1,4 @@
-use crate::types::{SliceViewMultipleField, SliceViewScalarField};
+use crate::types::SliceViewFields;
 use std::collections::HashMap;
 
 /// We need this JUST ONLY for `::bumpalo::boxed::Box`, because it doesn't have
@@ -70,5 +70,15 @@ define_field_clone!(HashMap<K, V>, <K: Clone, V: Clone>);
 define_field_clone!(::bumpalo::collections::Vec<'bump, T>, <T: Clone>);
 #[cfg(feature = "puroro-bumpalo")]
 define_field_clone!(::bumpalo::collections::String<'bump>);
-define_field_clone!(SliceViewScalarField<'slice, T>, <'slice, T: Clone>);
-define_field_clone!(SliceViewMultipleField<'slice, T>, <'slice, T: Clone>);
+define_field_clone!(SliceViewFields<'slice>, <'slice>);
+
+impl<'bump, 'slice, T> FieldClone<'bump> for crate::types::SliceViewScalarField<'slice, T> {
+    fn clone(&self) -> Self {
+        todo!()
+    }
+}
+impl<'bump, 'slice, T> FieldClone<'bump> for crate::types::SliceViewMultipleField<'slice, T> {
+    fn clone(&self) -> Self {
+        todo!()
+    }
+}
