@@ -208,17 +208,17 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     FieldLabel::Repeated => self.vec_type(scalar_type.as_ref()).into(),
                 }
             }
-            ImplType::SliceView { check_utf8: _ } => match field.label()? {
-                FieldLabel::Repeated => format!(
-                    "::puroro_internal::types::SliceViewRepeatedField<'slice, {field_type}>",
-                    field_type = scalar_type
+            ImplType::SliceView { check_utf8: _ } => match (field.label()?, field.type_()?) {
+                (FieldLabel::Repeated, _) | (_, FieldType::Message(_)) => {
+                    "::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>"
+                        .into()
+                }
+                (FieldLabel::Optional2, _) => format!(
+                    "::std::option::Option<{scalar_type}>",
+                    scalar_type = scalar_type,
                 )
                 .into(),
-                _ => format!(
-                    "::puroro_internal::types::SliceViewScalarField<'slice, {field_type}>",
-                    field_type = scalar_type
-                )
-                .into(),
+                _ => scalar_type.into(),
             },
         })
     }

@@ -62,9 +62,11 @@ define_field_clone!(f32);
 define_field_clone!(f64);
 define_field_clone!(bool);
 define_field_clone!(String);
+define_field_clone!(&str);
 define_field_clone!(std::result::Result<T, i32>, <T: Clone>);
 define_field_clone!(Box<T>, <T: Clone>);
 define_field_clone!(Vec<T>, <T: Clone>);
+define_field_clone!(&[u8]);
 define_field_clone!(HashMap<K, V>, <K: Clone, V: Clone>);
 #[cfg(feature = "puroro-bumpalo")]
 define_field_clone!(::bumpalo::collections::Vec<'bump, T>, <T: Clone>);
