@@ -34,8 +34,3 @@ pub enum SliceViewFields<'slice> {
         count: usize,
     },
 }
-
-#[derive(Debug, Clone)]
-pub struct SliceViewScalarField<'a, T>(PhantomData<&'a T>);
-#[derive(Debug, Clone)]
-pub struct SliceViewMultipleField<'a, T>(PhantomData<&'a T>);

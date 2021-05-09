@@ -299,9 +299,9 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRespons
 
 #[derive(Debug)]
 pub struct CodeGeneratorResponseSliceView<'slice> {
-    error: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
-    supported_features: ::puroro_internal::types::SliceViewScalarField<'slice, u64>,
-    file: ::puroro_internal::types::SliceViewMultipleField<'slice, self::code_generator_response::FileSliceView<'slice>>,
+    error: ::std::option::Option<&'slice str>,
+    supported_features: ::std::option::Option<u64>,
+    file: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -321,9 +321,9 @@ impl<'slice> ::std::clone::Clone for CodeGeneratorResponseSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            error: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.error),
-            supported_features: <::puroro_internal::types::SliceViewScalarField<'slice, u64> as FieldClone>::clone(&self.supported_features),
-            file: <::puroro_internal::types::SliceViewMultipleField<'slice, self::code_generator_response::FileSliceView<'slice>> as FieldClone>::clone(&self.file),
+            error: <::std::option::Option<&'slice str> as FieldClone>::clone(&self.error),
+            supported_features: <::std::option::Option<u64> as FieldClone>::clone(&self.supported_features),
+            file: <::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>> as FieldClone>::clone(&self.file),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -710,10 +710,10 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileBumpalo<'bump> {
 
 #[derive(Debug)]
 pub struct FileSliceView<'slice> {
-    name: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
-    insertion_point: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
-    content: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
-    generated_code_info: ::puroro_internal::types::SliceViewScalarField<'slice, super::super::GeneratedCodeInfoSliceView<'slice>>,
+    name: ::std::option::Option<&'slice str>,
+    insertion_point: ::std::option::Option<&'slice str>,
+    content: ::std::option::Option<&'slice str>,
+    generated_code_info: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -734,10 +734,10 @@ impl<'slice> ::std::clone::Clone for FileSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            name: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.name),
-            insertion_point: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.insertion_point),
-            content: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.content),
-            generated_code_info: <::puroro_internal::types::SliceViewScalarField<'slice, super::super::GeneratedCodeInfoSliceView<'slice>> as FieldClone>::clone(&self.generated_code_info),
+            name: <::std::option::Option<&'slice str> as FieldClone>::clone(&self.name),
+            insertion_point: <::std::option::Option<&'slice str> as FieldClone>::clone(&self.insertion_point),
+            content: <::std::option::Option<&'slice str> as FieldClone>::clone(&self.content),
+            generated_code_info: <::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>> as FieldClone>::clone(&self.generated_code_info),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -1113,10 +1113,10 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRequest
 
 #[derive(Debug)]
 pub struct CodeGeneratorRequestSliceView<'slice> {
-    file_to_generate: ::puroro_internal::types::SliceViewMultipleField<'slice, &'slice str>,
-    parameter: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
-    proto_file: ::puroro_internal::types::SliceViewMultipleField<'slice, super::FileDescriptorProtoSliceView<'slice>>,
-    compiler_version: ::puroro_internal::types::SliceViewScalarField<'slice, self::VersionSliceView<'slice>>,
+    file_to_generate: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
+    parameter: ::std::option::Option<&'slice str>,
+    proto_file: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
+    compiler_version: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -1137,10 +1137,10 @@ impl<'slice> ::std::clone::Clone for CodeGeneratorRequestSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            file_to_generate: <::puroro_internal::types::SliceViewMultipleField<'slice, &'slice str> as FieldClone>::clone(&self.file_to_generate),
-            parameter: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.parameter),
-            proto_file: <::puroro_internal::types::SliceViewMultipleField<'slice, super::FileDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.proto_file),
-            compiler_version: <::puroro_internal::types::SliceViewScalarField<'slice, self::VersionSliceView<'slice>> as FieldClone>::clone(&self.compiler_version),
+            file_to_generate: <::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>> as FieldClone>::clone(&self.file_to_generate),
+            parameter: <::std::option::Option<&'slice str> as FieldClone>::clone(&self.parameter),
+            proto_file: <::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>> as FieldClone>::clone(&self.proto_file),
+            compiler_version: <::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>> as FieldClone>::clone(&self.compiler_version),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -1503,10 +1503,10 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for VersionBumpalo<'bump
 
 #[derive(Debug)]
 pub struct VersionSliceView<'slice> {
-    major: ::puroro_internal::types::SliceViewScalarField<'slice, i32>,
-    minor: ::puroro_internal::types::SliceViewScalarField<'slice, i32>,
-    patch: ::puroro_internal::types::SliceViewScalarField<'slice, i32>,
-    suffix: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
+    major: ::std::option::Option<i32>,
+    minor: ::std::option::Option<i32>,
+    patch: ::std::option::Option<i32>,
+    suffix: ::std::option::Option<&'slice str>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -1527,10 +1527,10 @@ impl<'slice> ::std::clone::Clone for VersionSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            major: <::puroro_internal::types::SliceViewScalarField<'slice, i32> as FieldClone>::clone(&self.major),
-            minor: <::puroro_internal::types::SliceViewScalarField<'slice, i32> as FieldClone>::clone(&self.minor),
-            patch: <::puroro_internal::types::SliceViewScalarField<'slice, i32> as FieldClone>::clone(&self.patch),
-            suffix: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.suffix),
+            major: <::std::option::Option<i32> as FieldClone>::clone(&self.major),
+            minor: <::std::option::Option<i32> as FieldClone>::clone(&self.minor),
+            patch: <::std::option::Option<i32> as FieldClone>::clone(&self.patch),
+            suffix: <::std::option::Option<&'slice str> as FieldClone>::clone(&self.suffix),
             puroro_internal: self.puroro_internal.clone(),
         }
     }

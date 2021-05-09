@@ -67,14 +67,3 @@ impl<'bump> FieldNew<'bump> for ::bumpalo::collections::String<'bump> {
         ::bumpalo::collections::String::new_in(bump)
     }
 }
-
-impl<'bump, 'slice, T: Clone> FieldNew<'bump> for crate::types::SliceViewScalarField<'slice, T> {
-    fn new() -> Self {
-        todo!()
-    }
-}
-impl<'bump, 'slice, T: Clone> FieldNew<'bump> for crate::types::SliceViewMultipleField<'slice, T> {
-    fn new() -> Self {
-        todo!()
-    }
-}

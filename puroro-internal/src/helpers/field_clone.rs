@@ -73,14 +73,3 @@ define_field_clone!(::bumpalo::collections::Vec<'bump, T>, <T: Clone>);
 #[cfg(feature = "puroro-bumpalo")]
 define_field_clone!(::bumpalo::collections::String<'bump>);
 define_field_clone!(SliceViewFields<'slice>, <'slice>);
-
-impl<'bump, 'slice, T> FieldClone<'bump> for crate::types::SliceViewScalarField<'slice, T> {
-    fn clone(&self) -> Self {
-        todo!()
-    }
-}
-impl<'bump, 'slice, T> FieldClone<'bump> for crate::types::SliceViewMultipleField<'slice, T> {
-    fn clone(&self) -> Self {
-        todo!()
-    }
-}
