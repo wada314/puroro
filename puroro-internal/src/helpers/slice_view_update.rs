@@ -2,7 +2,7 @@ use super::DoDefaultCheck;
 use crate::deser::BytesSlice;
 use crate::tags::FieldTypeTag;
 use crate::tags::{self, FieldLabelTag};
-use crate::types::{FieldData, SliceViewRepeatedField, SliceViewScalarField};
+use crate::types::{FieldData, SliceViewMultipleField, SliceViewScalarField};
 use crate::variant::Variant;
 use crate::{ErrorKind, Result};
 

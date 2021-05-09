@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
-use crate::types::{SliceViewRepeatedField, SliceViewScalarField};
+use crate::types::{SliceViewMultipleField, SliceViewScalarField};
 
 pub trait FieldNew<'bump>: Sized {
     fn new() -> Self;
@@ -74,8 +74,8 @@ impl<'bump, 'slice, T: Clone> FieldNew<'bump> for SliceViewScalarField<'slice, T
         SliceViewScalarField::NotFound
     }
 }
-impl<'bump, 'slice, T: Clone> FieldNew<'bump> for SliceViewRepeatedField<'slice, T> {
+impl<'bump, 'slice, T: Clone> FieldNew<'bump> for SliceViewMultipleField<'slice, T> {
     fn new() -> Self {
-        SliceViewRepeatedField::NotFound
+        SliceViewMultipleField::NotFound
     }
 }

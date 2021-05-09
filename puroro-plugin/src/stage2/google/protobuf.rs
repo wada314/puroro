@@ -233,7 +233,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for GeneratedCodeInfoBum
 
 #[derive(Debug)]
 pub struct GeneratedCodeInfoSliceView<'slice> {
-    annotation: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::generated_code_info::AnnotationSliceView<'slice>>,
+    annotation: ::puroro_internal::types::SliceViewMultipleField<'slice, self::generated_code_info::AnnotationSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -251,7 +251,7 @@ impl<'slice> ::std::clone::Clone for GeneratedCodeInfoSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            annotation: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::generated_code_info::AnnotationSliceView<'slice>> as FieldClone>::clone(&self.annotation),
+            annotation: <::puroro_internal::types::SliceViewMultipleField<'slice, self::generated_code_info::AnnotationSliceView<'slice>> as FieldClone>::clone(&self.annotation),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -618,7 +618,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for AnnotationBumpalo<'b
 
 #[derive(Debug)]
 pub struct AnnotationSliceView<'slice> {
-    path: ::puroro_internal::types::SliceViewRepeatedField<'slice, i32>,
+    path: ::puroro_internal::types::SliceViewMultipleField<'slice, i32>,
     source_file: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
     begin: ::puroro_internal::types::SliceViewScalarField<'slice, i32>,
     end: ::puroro_internal::types::SliceViewScalarField<'slice, i32>,
@@ -642,7 +642,7 @@ impl<'slice> ::std::clone::Clone for AnnotationSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            path: <::puroro_internal::types::SliceViewRepeatedField<'slice, i32> as FieldClone>::clone(&self.path),
+            path: <::puroro_internal::types::SliceViewMultipleField<'slice, i32> as FieldClone>::clone(&self.path),
             source_file: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.source_file),
             begin: <::puroro_internal::types::SliceViewScalarField<'slice, i32> as FieldClone>::clone(&self.begin),
             end: <::puroro_internal::types::SliceViewScalarField<'slice, i32> as FieldClone>::clone(&self.end),
@@ -916,7 +916,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for SourceCodeInfoBumpal
 
 #[derive(Debug)]
 pub struct SourceCodeInfoSliceView<'slice> {
-    location: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::source_code_info::LocationSliceView<'slice>>,
+    location: ::puroro_internal::types::SliceViewMultipleField<'slice, self::source_code_info::LocationSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -934,7 +934,7 @@ impl<'slice> ::std::clone::Clone for SourceCodeInfoSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            location: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::source_code_info::LocationSliceView<'slice>> as FieldClone>::clone(&self.location),
+            location: <::puroro_internal::types::SliceViewMultipleField<'slice, self::source_code_info::LocationSliceView<'slice>> as FieldClone>::clone(&self.location),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -1340,11 +1340,11 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for LocationBumpalo<'bum
 
 #[derive(Debug)]
 pub struct LocationSliceView<'slice> {
-    path: ::puroro_internal::types::SliceViewRepeatedField<'slice, i32>,
-    span: ::puroro_internal::types::SliceViewRepeatedField<'slice, i32>,
+    path: ::puroro_internal::types::SliceViewMultipleField<'slice, i32>,
+    span: ::puroro_internal::types::SliceViewMultipleField<'slice, i32>,
     leading_comments: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
     trailing_comments: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
-    leading_detached_comments: ::puroro_internal::types::SliceViewRepeatedField<'slice, &'slice str>,
+    leading_detached_comments: ::puroro_internal::types::SliceViewMultipleField<'slice, &'slice str>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -1366,11 +1366,11 @@ impl<'slice> ::std::clone::Clone for LocationSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            path: <::puroro_internal::types::SliceViewRepeatedField<'slice, i32> as FieldClone>::clone(&self.path),
-            span: <::puroro_internal::types::SliceViewRepeatedField<'slice, i32> as FieldClone>::clone(&self.span),
+            path: <::puroro_internal::types::SliceViewMultipleField<'slice, i32> as FieldClone>::clone(&self.path),
+            span: <::puroro_internal::types::SliceViewMultipleField<'slice, i32> as FieldClone>::clone(&self.span),
             leading_comments: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.leading_comments),
             trailing_comments: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.trailing_comments),
-            leading_detached_comments: <::puroro_internal::types::SliceViewRepeatedField<'slice, &'slice str> as FieldClone>::clone(&self.leading_detached_comments),
+            leading_detached_comments: <::puroro_internal::types::SliceViewMultipleField<'slice, &'slice str> as FieldClone>::clone(&self.leading_detached_comments),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -1839,7 +1839,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for UninterpretedOptionB
 
 #[derive(Debug)]
 pub struct UninterpretedOptionSliceView<'slice> {
-    name: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::uninterpreted_option::NamePartSliceView<'slice>>,
+    name: ::puroro_internal::types::SliceViewMultipleField<'slice, self::uninterpreted_option::NamePartSliceView<'slice>>,
     identifier_value: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
     positive_int_value: ::puroro_internal::types::SliceViewScalarField<'slice, u64>,
     negative_int_value: ::puroro_internal::types::SliceViewScalarField<'slice, i64>,
@@ -1869,7 +1869,7 @@ impl<'slice> ::std::clone::Clone for UninterpretedOptionSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            name: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::uninterpreted_option::NamePartSliceView<'slice>> as FieldClone>::clone(&self.name),
+            name: <::puroro_internal::types::SliceViewMultipleField<'slice, self::uninterpreted_option::NamePartSliceView<'slice>> as FieldClone>::clone(&self.name),
             identifier_value: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.identifier_value),
             positive_int_value: <::puroro_internal::types::SliceViewScalarField<'slice, u64> as FieldClone>::clone(&self.positive_int_value),
             negative_int_value: <::puroro_internal::types::SliceViewScalarField<'slice, i64> as FieldClone>::clone(&self.negative_int_value),
@@ -2533,7 +2533,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for MethodOptionsBumpalo
 pub struct MethodOptionsSliceView<'slice> {
     deprecated: ::puroro_internal::types::SliceViewScalarField<'slice, bool>,
     idempotency_level: ::puroro_internal::types::SliceViewScalarField<'slice, ::std::result::Result<method_options::IdempotencyLevel, i32>>,
-    uninterpreted_option: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>>,
+    uninterpreted_option: ::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -2555,7 +2555,7 @@ impl<'slice> ::std::clone::Clone for MethodOptionsSliceView<'slice> {
         Self {
             deprecated: <::puroro_internal::types::SliceViewScalarField<'slice, bool> as FieldClone>::clone(&self.deprecated),
             idempotency_level: <::puroro_internal::types::SliceViewScalarField<'slice, ::std::result::Result<method_options::IdempotencyLevel, i32>> as FieldClone>::clone(&self.idempotency_level),
-            uninterpreted_option: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
+            uninterpreted_option: <::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -2883,7 +2883,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ServiceOptionsBumpal
 #[derive(Debug)]
 pub struct ServiceOptionsSliceView<'slice> {
     deprecated: ::puroro_internal::types::SliceViewScalarField<'slice, bool>,
-    uninterpreted_option: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>>,
+    uninterpreted_option: ::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -2903,7 +2903,7 @@ impl<'slice> ::std::clone::Clone for ServiceOptionsSliceView<'slice> {
         use ::puroro::InternalData;
         Self {
             deprecated: <::puroro_internal::types::SliceViewScalarField<'slice, bool> as FieldClone>::clone(&self.deprecated),
-            uninterpreted_option: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
+            uninterpreted_option: <::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -3207,7 +3207,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumValueOptionsBump
 #[derive(Debug)]
 pub struct EnumValueOptionsSliceView<'slice> {
     deprecated: ::puroro_internal::types::SliceViewScalarField<'slice, bool>,
-    uninterpreted_option: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>>,
+    uninterpreted_option: ::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -3227,7 +3227,7 @@ impl<'slice> ::std::clone::Clone for EnumValueOptionsSliceView<'slice> {
         use ::puroro::InternalData;
         Self {
             deprecated: <::puroro_internal::types::SliceViewScalarField<'slice, bool> as FieldClone>::clone(&self.deprecated),
-            uninterpreted_option: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
+            uninterpreted_option: <::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -3565,7 +3565,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumOptionsBumpalo<'
 pub struct EnumOptionsSliceView<'slice> {
     allow_alias: ::puroro_internal::types::SliceViewScalarField<'slice, bool>,
     deprecated: ::puroro_internal::types::SliceViewScalarField<'slice, bool>,
-    uninterpreted_option: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>>,
+    uninterpreted_option: ::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -3587,7 +3587,7 @@ impl<'slice> ::std::clone::Clone for EnumOptionsSliceView<'slice> {
         Self {
             allow_alias: <::puroro_internal::types::SliceViewScalarField<'slice, bool> as FieldClone>::clone(&self.allow_alias),
             deprecated: <::puroro_internal::types::SliceViewScalarField<'slice, bool> as FieldClone>::clone(&self.deprecated),
-            uninterpreted_option: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
+            uninterpreted_option: <::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -3857,7 +3857,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for OneofOptionsBumpalo<
 
 #[derive(Debug)]
 pub struct OneofOptionsSliceView<'slice> {
-    uninterpreted_option: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>>,
+    uninterpreted_option: ::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -3875,7 +3875,7 @@ impl<'slice> ::std::clone::Clone for OneofOptionsSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            uninterpreted_option: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
+            uninterpreted_option: <::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -4349,7 +4349,7 @@ pub struct FieldOptionsSliceView<'slice> {
     lazy: ::puroro_internal::types::SliceViewScalarField<'slice, bool>,
     deprecated: ::puroro_internal::types::SliceViewScalarField<'slice, bool>,
     weak: ::puroro_internal::types::SliceViewScalarField<'slice, bool>,
-    uninterpreted_option: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>>,
+    uninterpreted_option: ::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -4379,7 +4379,7 @@ impl<'slice> ::std::clone::Clone for FieldOptionsSliceView<'slice> {
             lazy: <::puroro_internal::types::SliceViewScalarField<'slice, bool> as FieldClone>::clone(&self.lazy),
             deprecated: <::puroro_internal::types::SliceViewScalarField<'slice, bool> as FieldClone>::clone(&self.deprecated),
             weak: <::puroro_internal::types::SliceViewScalarField<'slice, bool> as FieldClone>::clone(&self.weak),
-            uninterpreted_option: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
+            uninterpreted_option: <::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -4831,7 +4831,7 @@ pub struct MessageOptionsSliceView<'slice> {
     no_standard_descriptor_accessor: ::puroro_internal::types::SliceViewScalarField<'slice, bool>,
     deprecated: ::puroro_internal::types::SliceViewScalarField<'slice, bool>,
     map_entry: ::puroro_internal::types::SliceViewScalarField<'slice, bool>,
-    uninterpreted_option: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>>,
+    uninterpreted_option: ::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -4857,7 +4857,7 @@ impl<'slice> ::std::clone::Clone for MessageOptionsSliceView<'slice> {
             no_standard_descriptor_accessor: <::puroro_internal::types::SliceViewScalarField<'slice, bool> as FieldClone>::clone(&self.no_standard_descriptor_accessor),
             deprecated: <::puroro_internal::types::SliceViewScalarField<'slice, bool> as FieldClone>::clone(&self.deprecated),
             map_entry: <::puroro_internal::types::SliceViewScalarField<'slice, bool> as FieldClone>::clone(&self.map_entry),
-            uninterpreted_option: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
+            uninterpreted_option: <::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -5807,7 +5807,7 @@ pub struct FileOptionsSliceView<'slice> {
     php_namespace: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
     php_metadata_namespace: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
     ruby_package: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
-    uninterpreted_option: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>>,
+    uninterpreted_option: ::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -5865,7 +5865,7 @@ impl<'slice> ::std::clone::Clone for FileOptionsSliceView<'slice> {
             php_namespace: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.php_namespace),
             php_metadata_namespace: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.php_metadata_namespace),
             ruby_package: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.ruby_package),
-            uninterpreted_option: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
+            uninterpreted_option: <::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -6694,7 +6694,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ServiceDescriptorPro
 #[derive(Debug)]
 pub struct ServiceDescriptorProtoSliceView<'slice> {
     name: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
-    method: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::MethodDescriptorProtoSliceView<'slice>>,
+    method: ::puroro_internal::types::SliceViewMultipleField<'slice, self::MethodDescriptorProtoSliceView<'slice>>,
     options: ::puroro_internal::types::SliceViewScalarField<'slice, self::ServiceOptionsSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
@@ -6716,7 +6716,7 @@ impl<'slice> ::std::clone::Clone for ServiceDescriptorProtoSliceView<'slice> {
         use ::puroro::InternalData;
         Self {
             name: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.name),
-            method: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::MethodDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.method),
+            method: <::puroro_internal::types::SliceViewMultipleField<'slice, self::MethodDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.method),
             options: <::puroro_internal::types::SliceViewScalarField<'slice, self::ServiceOptionsSliceView<'slice>> as FieldClone>::clone(&self.options),
             puroro_internal: self.puroro_internal.clone(),
         }
@@ -7489,10 +7489,10 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumDescriptorProtoB
 #[derive(Debug)]
 pub struct EnumDescriptorProtoSliceView<'slice> {
     name: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
-    value: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::EnumValueDescriptorProtoSliceView<'slice>>,
+    value: ::puroro_internal::types::SliceViewMultipleField<'slice, self::EnumValueDescriptorProtoSliceView<'slice>>,
     options: ::puroro_internal::types::SliceViewScalarField<'slice, self::EnumOptionsSliceView<'slice>>,
-    reserved_range: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::enum_descriptor_proto::EnumReservedRangeSliceView<'slice>>,
-    reserved_name: ::puroro_internal::types::SliceViewRepeatedField<'slice, &'slice str>,
+    reserved_range: ::puroro_internal::types::SliceViewMultipleField<'slice, self::enum_descriptor_proto::EnumReservedRangeSliceView<'slice>>,
+    reserved_name: ::puroro_internal::types::SliceViewMultipleField<'slice, &'slice str>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -7515,10 +7515,10 @@ impl<'slice> ::std::clone::Clone for EnumDescriptorProtoSliceView<'slice> {
         use ::puroro::InternalData;
         Self {
             name: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.name),
-            value: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::EnumValueDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.value),
+            value: <::puroro_internal::types::SliceViewMultipleField<'slice, self::EnumValueDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.value),
             options: <::puroro_internal::types::SliceViewScalarField<'slice, self::EnumOptionsSliceView<'slice>> as FieldClone>::clone(&self.options),
-            reserved_range: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::enum_descriptor_proto::EnumReservedRangeSliceView<'slice>> as FieldClone>::clone(&self.reserved_range),
-            reserved_name: <::puroro_internal::types::SliceViewRepeatedField<'slice, &'slice str> as FieldClone>::clone(&self.reserved_name),
+            reserved_range: <::puroro_internal::types::SliceViewMultipleField<'slice, self::enum_descriptor_proto::EnumReservedRangeSliceView<'slice>> as FieldClone>::clone(&self.reserved_range),
+            reserved_name: <::puroro_internal::types::SliceViewMultipleField<'slice, &'slice str> as FieldClone>::clone(&self.reserved_name),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -9150,7 +9150,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ExtensionRangeOption
 
 #[derive(Debug)]
 pub struct ExtensionRangeOptionsSliceView<'slice> {
-    uninterpreted_option: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>>,
+    uninterpreted_option: ::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -9168,7 +9168,7 @@ impl<'slice> ::std::clone::Clone for ExtensionRangeOptionsSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            uninterpreted_option: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
+            uninterpreted_option: <::puroro_internal::types::SliceViewMultipleField<'slice, self::UninterpretedOptionSliceView<'slice>> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -9775,15 +9775,15 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for DescriptorProtoBumpa
 #[derive(Debug)]
 pub struct DescriptorProtoSliceView<'slice> {
     name: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
-    field: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::FieldDescriptorProtoSliceView<'slice>>,
-    extension: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::FieldDescriptorProtoSliceView<'slice>>,
-    nested_type: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::DescriptorProtoSliceView<'slice>>,
-    enum_type: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::EnumDescriptorProtoSliceView<'slice>>,
-    extension_range: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::descriptor_proto::ExtensionRangeSliceView<'slice>>,
-    oneof_decl: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::OneofDescriptorProtoSliceView<'slice>>,
+    field: ::puroro_internal::types::SliceViewMultipleField<'slice, self::FieldDescriptorProtoSliceView<'slice>>,
+    extension: ::puroro_internal::types::SliceViewMultipleField<'slice, self::FieldDescriptorProtoSliceView<'slice>>,
+    nested_type: ::puroro_internal::types::SliceViewMultipleField<'slice, self::DescriptorProtoSliceView<'slice>>,
+    enum_type: ::puroro_internal::types::SliceViewMultipleField<'slice, self::EnumDescriptorProtoSliceView<'slice>>,
+    extension_range: ::puroro_internal::types::SliceViewMultipleField<'slice, self::descriptor_proto::ExtensionRangeSliceView<'slice>>,
+    oneof_decl: ::puroro_internal::types::SliceViewMultipleField<'slice, self::OneofDescriptorProtoSliceView<'slice>>,
     options: ::puroro_internal::types::SliceViewScalarField<'slice, self::MessageOptionsSliceView<'slice>>,
-    reserved_range: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::descriptor_proto::ReservedRangeSliceView<'slice>>,
-    reserved_name: ::puroro_internal::types::SliceViewRepeatedField<'slice, &'slice str>,
+    reserved_range: ::puroro_internal::types::SliceViewMultipleField<'slice, self::descriptor_proto::ReservedRangeSliceView<'slice>>,
+    reserved_name: ::puroro_internal::types::SliceViewMultipleField<'slice, &'slice str>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -9811,15 +9811,15 @@ impl<'slice> ::std::clone::Clone for DescriptorProtoSliceView<'slice> {
         use ::puroro::InternalData;
         Self {
             name: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.name),
-            field: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::FieldDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.field),
-            extension: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::FieldDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.extension),
-            nested_type: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::DescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.nested_type),
-            enum_type: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::EnumDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.enum_type),
-            extension_range: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::descriptor_proto::ExtensionRangeSliceView<'slice>> as FieldClone>::clone(&self.extension_range),
-            oneof_decl: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::OneofDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.oneof_decl),
+            field: <::puroro_internal::types::SliceViewMultipleField<'slice, self::FieldDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.field),
+            extension: <::puroro_internal::types::SliceViewMultipleField<'slice, self::FieldDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.extension),
+            nested_type: <::puroro_internal::types::SliceViewMultipleField<'slice, self::DescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.nested_type),
+            enum_type: <::puroro_internal::types::SliceViewMultipleField<'slice, self::EnumDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.enum_type),
+            extension_range: <::puroro_internal::types::SliceViewMultipleField<'slice, self::descriptor_proto::ExtensionRangeSliceView<'slice>> as FieldClone>::clone(&self.extension_range),
+            oneof_decl: <::puroro_internal::types::SliceViewMultipleField<'slice, self::OneofDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.oneof_decl),
             options: <::puroro_internal::types::SliceViewScalarField<'slice, self::MessageOptionsSliceView<'slice>> as FieldClone>::clone(&self.options),
-            reserved_range: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::descriptor_proto::ReservedRangeSliceView<'slice>> as FieldClone>::clone(&self.reserved_range),
-            reserved_name: <::puroro_internal::types::SliceViewRepeatedField<'slice, &'slice str> as FieldClone>::clone(&self.reserved_name),
+            reserved_range: <::puroro_internal::types::SliceViewMultipleField<'slice, self::descriptor_proto::ReservedRangeSliceView<'slice>> as FieldClone>::clone(&self.reserved_range),
+            reserved_name: <::puroro_internal::types::SliceViewMultipleField<'slice, &'slice str> as FieldClone>::clone(&self.reserved_name),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -11164,13 +11164,13 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileDescriptorProtoB
 pub struct FileDescriptorProtoSliceView<'slice> {
     name: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
     package: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
-    dependency: ::puroro_internal::types::SliceViewRepeatedField<'slice, &'slice str>,
-    public_dependency: ::puroro_internal::types::SliceViewRepeatedField<'slice, i32>,
-    weak_dependency: ::puroro_internal::types::SliceViewRepeatedField<'slice, i32>,
-    message_type: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::DescriptorProtoSliceView<'slice>>,
-    enum_type: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::EnumDescriptorProtoSliceView<'slice>>,
-    service: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::ServiceDescriptorProtoSliceView<'slice>>,
-    extension: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::FieldDescriptorProtoSliceView<'slice>>,
+    dependency: ::puroro_internal::types::SliceViewMultipleField<'slice, &'slice str>,
+    public_dependency: ::puroro_internal::types::SliceViewMultipleField<'slice, i32>,
+    weak_dependency: ::puroro_internal::types::SliceViewMultipleField<'slice, i32>,
+    message_type: ::puroro_internal::types::SliceViewMultipleField<'slice, self::DescriptorProtoSliceView<'slice>>,
+    enum_type: ::puroro_internal::types::SliceViewMultipleField<'slice, self::EnumDescriptorProtoSliceView<'slice>>,
+    service: ::puroro_internal::types::SliceViewMultipleField<'slice, self::ServiceDescriptorProtoSliceView<'slice>>,
+    extension: ::puroro_internal::types::SliceViewMultipleField<'slice, self::FieldDescriptorProtoSliceView<'slice>>,
     options: ::puroro_internal::types::SliceViewScalarField<'slice, self::FileOptionsSliceView<'slice>>,
     source_code_info: ::puroro_internal::types::SliceViewScalarField<'slice, self::SourceCodeInfoSliceView<'slice>>,
     syntax: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
@@ -11204,13 +11204,13 @@ impl<'slice> ::std::clone::Clone for FileDescriptorProtoSliceView<'slice> {
         Self {
             name: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.name),
             package: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.package),
-            dependency: <::puroro_internal::types::SliceViewRepeatedField<'slice, &'slice str> as FieldClone>::clone(&self.dependency),
-            public_dependency: <::puroro_internal::types::SliceViewRepeatedField<'slice, i32> as FieldClone>::clone(&self.public_dependency),
-            weak_dependency: <::puroro_internal::types::SliceViewRepeatedField<'slice, i32> as FieldClone>::clone(&self.weak_dependency),
-            message_type: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::DescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.message_type),
-            enum_type: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::EnumDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.enum_type),
-            service: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::ServiceDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.service),
-            extension: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::FieldDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.extension),
+            dependency: <::puroro_internal::types::SliceViewMultipleField<'slice, &'slice str> as FieldClone>::clone(&self.dependency),
+            public_dependency: <::puroro_internal::types::SliceViewMultipleField<'slice, i32> as FieldClone>::clone(&self.public_dependency),
+            weak_dependency: <::puroro_internal::types::SliceViewMultipleField<'slice, i32> as FieldClone>::clone(&self.weak_dependency),
+            message_type: <::puroro_internal::types::SliceViewMultipleField<'slice, self::DescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.message_type),
+            enum_type: <::puroro_internal::types::SliceViewMultipleField<'slice, self::EnumDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.enum_type),
+            service: <::puroro_internal::types::SliceViewMultipleField<'slice, self::ServiceDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.service),
+            extension: <::puroro_internal::types::SliceViewMultipleField<'slice, self::FieldDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.extension),
             options: <::puroro_internal::types::SliceViewScalarField<'slice, self::FileOptionsSliceView<'slice>> as FieldClone>::clone(&self.options),
             source_code_info: <::puroro_internal::types::SliceViewScalarField<'slice, self::SourceCodeInfoSliceView<'slice>> as FieldClone>::clone(&self.source_code_info),
             syntax: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.syntax),
@@ -11483,7 +11483,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileDescriptorSetBum
 
 #[derive(Debug)]
 pub struct FileDescriptorSetSliceView<'slice> {
-    file: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::FileDescriptorProtoSliceView<'slice>>,
+    file: ::puroro_internal::types::SliceViewMultipleField<'slice, self::FileDescriptorProtoSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -11501,7 +11501,7 @@ impl<'slice> ::std::clone::Clone for FileDescriptorSetSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            file: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::FileDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.file),
+            file: <::puroro_internal::types::SliceViewMultipleField<'slice, self::FileDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.file),
             puroro_internal: self.puroro_internal.clone(),
         }
     }

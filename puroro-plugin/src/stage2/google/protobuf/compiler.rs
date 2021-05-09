@@ -301,7 +301,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRespons
 pub struct CodeGeneratorResponseSliceView<'slice> {
     error: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
     supported_features: ::puroro_internal::types::SliceViewScalarField<'slice, u64>,
-    file: ::puroro_internal::types::SliceViewRepeatedField<'slice, self::code_generator_response::FileSliceView<'slice>>,
+    file: ::puroro_internal::types::SliceViewMultipleField<'slice, self::code_generator_response::FileSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
 
@@ -323,7 +323,7 @@ impl<'slice> ::std::clone::Clone for CodeGeneratorResponseSliceView<'slice> {
         Self {
             error: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.error),
             supported_features: <::puroro_internal::types::SliceViewScalarField<'slice, u64> as FieldClone>::clone(&self.supported_features),
-            file: <::puroro_internal::types::SliceViewRepeatedField<'slice, self::code_generator_response::FileSliceView<'slice>> as FieldClone>::clone(&self.file),
+            file: <::puroro_internal::types::SliceViewMultipleField<'slice, self::code_generator_response::FileSliceView<'slice>> as FieldClone>::clone(&self.file),
             puroro_internal: self.puroro_internal.clone(),
         }
     }
@@ -1113,9 +1113,9 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRequest
 
 #[derive(Debug)]
 pub struct CodeGeneratorRequestSliceView<'slice> {
-    file_to_generate: ::puroro_internal::types::SliceViewRepeatedField<'slice, &'slice str>,
+    file_to_generate: ::puroro_internal::types::SliceViewMultipleField<'slice, &'slice str>,
     parameter: ::puroro_internal::types::SliceViewScalarField<'slice, &'slice str>,
-    proto_file: ::puroro_internal::types::SliceViewRepeatedField<'slice, super::FileDescriptorProtoSliceView<'slice>>,
+    proto_file: ::puroro_internal::types::SliceViewMultipleField<'slice, super::FileDescriptorProtoSliceView<'slice>>,
     compiler_version: ::puroro_internal::types::SliceViewScalarField<'slice, self::VersionSliceView<'slice>>,
     puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
 }
@@ -1137,9 +1137,9 @@ impl<'slice> ::std::clone::Clone for CodeGeneratorRequestSliceView<'slice> {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
         Self {
-            file_to_generate: <::puroro_internal::types::SliceViewRepeatedField<'slice, &'slice str> as FieldClone>::clone(&self.file_to_generate),
+            file_to_generate: <::puroro_internal::types::SliceViewMultipleField<'slice, &'slice str> as FieldClone>::clone(&self.file_to_generate),
             parameter: <::puroro_internal::types::SliceViewScalarField<'slice, &'slice str> as FieldClone>::clone(&self.parameter),
-            proto_file: <::puroro_internal::types::SliceViewRepeatedField<'slice, super::FileDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.proto_file),
+            proto_file: <::puroro_internal::types::SliceViewMultipleField<'slice, super::FileDescriptorProtoSliceView<'slice>> as FieldClone>::clone(&self.proto_file),
             compiler_version: <::puroro_internal::types::SliceViewScalarField<'slice, self::VersionSliceView<'slice>> as FieldClone>::clone(&self.compiler_version),
             puroro_internal: self.puroro_internal.clone(),
         }
