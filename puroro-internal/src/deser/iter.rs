@@ -10,7 +10,7 @@ use ::num_traits::FromPrimitive;
 pub trait DeserializableMessageFromIter: Sized {
     fn met_field<'a, 'b, I>(
         &mut self,
-        field: FieldData<&'a mut BytesIter<'b, I>>,
+        field: FieldData<&'a mut LdIter<'b, I>>,
         field_number: usize,
     ) -> Result<bool>
     where
@@ -20,7 +20,7 @@ pub trait DeserializableMessageFromIter: Sized {
     where
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
-        let mut bytes_iter = BytesIter::new(iter);
+        let mut bytes_iter = LdIter::new(iter);
         bytes_iter.deser_message(self)?;
         Ok(())
     }
@@ -45,14 +45,14 @@ where
         field_number: usize,
     ) -> Result<bool> {
         use std::io::Read;
-        type BytesIterBoundType<'b> = BytesIter<'b, std::io::Bytes<&'b [u8]>>;
+        type BytesIterBoundType<'b> = LdIter<'b, std::io::Bytes<&'b [u8]>>;
         match field {
             FieldData::Variant(v) => self
                 .0
                 .met_field::<BytesIterBoundType<'slice>>(FieldData::Variant(v), field_number),
             FieldData::LengthDelimited(slice) => {
                 let mut bytes = slice.bytes();
-                let mut bytes_iter = BytesIter::new(&mut bytes);
+                let mut bytes_iter = LdIter::new(&mut bytes);
                 let field_data = FieldData::LengthDelimited(&mut bytes_iter);
                 self.0.met_field(field_data, field_number)
             }
@@ -66,7 +66,7 @@ where
     }
 }
 
-pub struct BytesIter<'a, I>
+pub struct LdIter<'a, I>
 where
     I: Iterator<Item = ::std::io::Result<u8>>,
 {
@@ -75,7 +75,7 @@ where
     end: usize,
 }
 
-impl<'a, I> BytesIter<'a, I>
+impl<'a, I> LdIter<'a, I>
 where
     I: Iterator<Item = ::std::io::Result<u8>>,
 {
@@ -157,7 +157,7 @@ where
     }
 }
 
-impl<'a, I> Iterator for BytesIter<'a, I>
+impl<'a, I> Iterator for LdIter<'a, I>
 where
     I: Iterator<Item = ::std::io::Result<u8>>,
 {

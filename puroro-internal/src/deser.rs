@@ -1,5 +1,5 @@
 mod iter;
 mod slice;
 
-pub use iter::{BytesIter, DeserializableMessageFromIter, FromIterToFromSlice};
-pub use slice::{BytesSlice, DeserializableMessageFromSlice};
+pub use iter::{DeserializableMessageFromIter, FromIterToFromSlice, LdIter};
+pub use slice::{DeserializableMessageFromSlice, LdSlice};

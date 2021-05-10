@@ -192,7 +192,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -268,7 +268,7 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
 impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
     fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {{
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
-        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        let mut wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
         Ok(())
     }}

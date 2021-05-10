@@ -9,7 +9,7 @@ pub use field_new::FieldNew;
 pub use field_ser::FieldSer;
 pub use field_take_or_init::FieldTakeOrInit;
 
-use crate::deser::BytesSlice;
+use crate::deser::LdSlice;
 use crate::ser::MessageSerializer;
 use crate::tags;
 use crate::types::FieldData;
@@ -94,14 +94,14 @@ impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
 
 #[derive(Debug, Clone)]
 pub struct InternalDataForSliceViewStruct<'slice> {
-    pub first_field: BytesSlice<'slice>,
+    pub first_field: LdSlice<'slice>,
     pub remaining_slice: Option<&'slice [u8]>,
     pub count_in_remaining_slice: usize,
 }
 impl<'slice> InternalDataForSliceViewStruct<'slice> {
     pub fn new(slice: &'slice [u8]) -> Self {
         Self {
-            first_field: BytesSlice::new(slice),
+            first_field: LdSlice::new(slice),
             remaining_slice: None,
             count_in_remaining_slice: 0,
         }

@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use crate::deser::BytesSlice;
+use crate::deser::LdSlice;
 use crate::variant::Variant;
 use ::num_derive::FromPrimitive;
 

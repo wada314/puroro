@@ -17,10 +17,10 @@ pub trait DeserializableMessageFromSlice {
 }
 
 #[derive(Debug, Clone)]
-pub struct BytesSlice<'slice> {
+pub struct LdSlice<'slice> {
     slice: &'slice [u8],
 }
-impl<'slice> BytesSlice<'slice> {
+impl<'slice> LdSlice<'slice> {
     pub fn new(slice: &'slice [u8]) -> Self {
         Self { slice }
     }

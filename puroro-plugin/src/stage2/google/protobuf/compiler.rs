@@ -51,7 +51,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -100,7 +100,7 @@ impl ::puroro::DeserializableFromIter for CodeGeneratorResponse {
 impl ::puroro::DeserializableFromSlice for CodeGeneratorResponse {
     fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
-        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        let mut wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
         Ok(())
     }
@@ -190,7 +190,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -239,7 +239,7 @@ impl<'bump> ::puroro::DeserializableFromIter for CodeGeneratorResponseBumpalo<'b
 impl<'bump> ::puroro::DeserializableFromSlice for CodeGeneratorResponseBumpalo<'bump> {
     fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
-        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        let mut wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
         Ok(())
     }
@@ -370,7 +370,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for File {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -425,7 +425,7 @@ impl ::puroro::DeserializableFromIter for File {
 impl ::puroro::DeserializableFromSlice for File {
     fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
-        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        let mut wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
         Ok(())
     }
@@ -524,7 +524,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileBump
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -579,7 +579,7 @@ impl<'bump> ::puroro::DeserializableFromIter for FileBumpalo<'bump> {
 impl<'bump> ::puroro::DeserializableFromSlice for FileBumpalo<'bump> {
     fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
-        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        let mut wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
         Ok(())
     }
@@ -699,7 +699,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -754,7 +754,7 @@ impl ::puroro::DeserializableFromIter for CodeGeneratorRequest {
 impl ::puroro::DeserializableFromSlice for CodeGeneratorRequest {
     fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
-        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        let mut wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
         Ok(())
     }
@@ -856,7 +856,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -911,7 +911,7 @@ impl<'bump> ::puroro::DeserializableFromIter for CodeGeneratorRequestBumpalo<'bu
 impl<'bump> ::puroro::DeserializableFromSlice for CodeGeneratorRequestBumpalo<'bump> {
     fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
-        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        let mut wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
         Ok(())
     }
@@ -1029,7 +1029,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Version {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -1084,7 +1084,7 @@ impl ::puroro::DeserializableFromIter for Version {
 impl ::puroro::DeserializableFromSlice for Version {
     fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
-        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        let mut wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
         Ok(())
     }
@@ -1182,7 +1182,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for VersionB
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::BytesIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -1237,7 +1237,7 @@ impl<'bump> ::puroro::DeserializableFromIter for VersionBumpalo<'bump> {
 impl<'bump> ::puroro::DeserializableFromSlice for VersionBumpalo<'bump> {
     fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
-        let mut wrapped_slice = ::puroro_internal::deser::BytesSlice::new(slice);
+        let mut wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
         Ok(())
     }
