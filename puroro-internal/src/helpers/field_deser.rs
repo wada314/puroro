@@ -48,20 +48,7 @@ where
     /// * `field` - A data of the field, where the wire type and (for length delimited wire
     /// type) the field length are already load. For variants and fixed bytes fields,
     /// the content data is also already load.
-    fn deser<'slice>(&mut self, field: FieldData<&'slice [u8]>) -> Result<()> {
-        let iter_field = match field {
-            FieldData::LengthDelimited(slice) => {
-                todo!();
-                let mut temp_iter = std::io::stdin().bytes();
-                let mut temp_ld_iter = LdIter::new(&mut temp_iter);
-                FieldData::LengthDelimited(&mut temp_ld_iter)
-            }
-            FieldData::Variant(v) => FieldData::Variant(v),
-            FieldData::Bits32(x) => FieldData::Bits32(x),
-            FieldData::Bits64(x) => FieldData::Bits64(x),
-        };
-        Ok(())
-    }
+    fn deser<'slice>(&mut self, field: FieldData<&'slice [u8]>) -> Result<()>;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -121,12 +108,24 @@ define_deser_scalar_variants!(i64, tags::SInt64, tags::Optional3);
 define_deser_scalar_variants!(u32, tags::UInt32, tags::Optional3);
 define_deser_scalar_variants!(u64, tags::UInt64, tags::Optional3);
 define_deser_scalar_variants!(bool, tags::Bool, tags::Optional3);
-
+/*
 impl FieldDeserFromSlice<tags::Int32, tags::Required> for i32 {
     fn deser<'slice>(&mut self, field: FieldData<&'slice [u8]>) -> Result<()> {
-        todo!()
+        <i32 as FieldDeserFromIter<tags::Int32, tags::Required>>::deser(
+            self,
+            match field {
+                FieldData::LengthDelimited(slice) => {
+                    let mut temp_ld_iter = LdIter::new(slice.bytes());
+                    FieldData::LengthDelimited(&mut temp_ld_iter)
+                }
+                FieldData::Variant(v) => FieldData::Variant(v),
+                FieldData::Bits32(x) => FieldData::Bits32(x),
+                FieldData::Bits64(x) => FieldData::Bits64(x),
+            },
+            Default::default,
+        )
     }
-}
+}*/
 
 macro_rules! define_deser_scalar_enum {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
