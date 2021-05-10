@@ -51,6 +51,26 @@ where
     fn deser<'slice>(&mut self, field: FieldData<&'slice [u8]>) -> Result<()>;
 }
 
+macro_rules! redirect_deser_from_slice_to_from_iter {
+    ($ty:ty, $ttag:ty, $ltag:ty $(, $($gpt:ident)? $($gpl:lifetime)? )*) => {
+        impl<'bump> FieldDeserFromSlice<$ttag, $ltag> for $ty {
+            fn deser<'slice>(&mut self, field: FieldData<&'slice [u8]>) -> Result<()> {
+                let mut ld_iter;
+                let new_field = match field {
+                    FieldData::LengthDelimited(slice) => {
+                        ld_iter = LdIter::new(slice.bytes());
+                        FieldData::LengthDelimited(&mut ld_iter)
+                    }
+                    FieldData::Variant(v) => FieldData::Variant(v),
+                    FieldData::Bits32(x) => FieldData::Bits32(x),
+                    FieldData::Bits64(x) => FieldData::Bits64(x),
+                };
+                <$ty as FieldDeserFromIter<$ttag, $ltag>>::deser(self, new_field, Default::default)
+            }
+        }
+    };
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Baretype fields
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,6 +112,7 @@ macro_rules! define_deser_scalar_variants {
                 }
             }
         }
+        redirect_deser_from_slice_to_from_iter!($ty, $ttag, $ltag);
     };
 }
 define_deser_scalar_variants!(i32, tags::Int32, tags::Required);
@@ -108,24 +129,6 @@ define_deser_scalar_variants!(i64, tags::SInt64, tags::Optional3);
 define_deser_scalar_variants!(u32, tags::UInt32, tags::Optional3);
 define_deser_scalar_variants!(u64, tags::UInt64, tags::Optional3);
 define_deser_scalar_variants!(bool, tags::Bool, tags::Optional3);
-/*
-impl FieldDeserFromSlice<tags::Int32, tags::Required> for i32 {
-    fn deser<'slice>(&mut self, field: FieldData<&'slice [u8]>) -> Result<()> {
-        <i32 as FieldDeserFromIter<tags::Int32, tags::Required>>::deser(
-            self,
-            match field {
-                FieldData::LengthDelimited(slice) => {
-                    let mut temp_ld_iter = LdIter::new(slice.bytes());
-                    FieldData::LengthDelimited(&mut temp_ld_iter)
-                }
-                FieldData::Variant(v) => FieldData::Variant(v),
-                FieldData::Bits32(x) => FieldData::Bits32(x),
-                FieldData::Bits64(x) => FieldData::Bits64(x),
-            },
-            Default::default,
-        )
-    }
-}*/
 
 macro_rules! define_deser_scalar_enum {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
@@ -264,6 +267,7 @@ macro_rules! define_deser_scalar_fixed {
                 }
             }
         }
+        redirect_deser_from_slice_to_from_iter!($ty, $ttag, $ltag);
     };
 }
 define_deser_scalar_fixed!(f32, tags::Float, tags::Required, Bits32);
@@ -308,6 +312,15 @@ define_deser_optional_fields_from_scalar!(i64, tags::SInt64, tags::Optional2);
 define_deser_optional_fields_from_scalar!(u32, tags::UInt32, tags::Optional2);
 define_deser_optional_fields_from_scalar!(u64, tags::UInt64, tags::Optional2);
 define_deser_optional_fields_from_scalar!(bool, tags::Bool, tags::Optional2);
+
+redirect_deser_from_slice_to_from_iter!(Option<i32>, tags::Int32, tags::Optional2);
+redirect_deser_from_slice_to_from_iter!(Option<i64>, tags::Int64, tags::Optional2);
+redirect_deser_from_slice_to_from_iter!(Option<i32>, tags::SInt32, tags::Optional2);
+redirect_deser_from_slice_to_from_iter!(Option<i64>, tags::SInt64, tags::Optional2);
+redirect_deser_from_slice_to_from_iter!(Option<u32>, tags::UInt32, tags::Optional2);
+redirect_deser_from_slice_to_from_iter!(Option<u64>, tags::UInt64, tags::Optional2);
+redirect_deser_from_slice_to_from_iter!(Option<bool>, tags::Bool, tags::Optional2);
+
 define_deser_optional_fields_from_scalar!(String, tags::String, tags::Optional2);
 define_deser_optional_fields_from_scalar!(Vec<u8>, tags::Bytes, tags::Optional2);
 #[cfg(feature = "puroro-bumpalo")]
@@ -329,7 +342,14 @@ define_deser_optional_fields_from_scalar!(f64, tags::Double, tags::Optional2);
 define_deser_optional_fields_from_scalar!(i64, tags::SFixed64, tags::Optional2);
 define_deser_optional_fields_from_scalar!(u64, tags::Fixed64, tags::Optional2);
 
-// Enum, essentially same with the macro above but needs a generic type parameter.
+redirect_deser_from_slice_to_from_iter!(Option<f32>, tags::Float, tags::Optional2);
+redirect_deser_from_slice_to_from_iter!(Option<i32>, tags::SFixed32, tags::Optional2);
+redirect_deser_from_slice_to_from_iter!(Option<u32>, tags::Fixed32, tags::Optional2);
+redirect_deser_from_slice_to_from_iter!(Option<f64>, tags::Double, tags::Optional2);
+redirect_deser_from_slice_to_from_iter!(Option<i64>, tags::SFixed64, tags::Optional2);
+redirect_deser_from_slice_to_from_iter!(Option<u64>, tags::Fixed64, tags::Optional2);
+
+// Enum; essentially same with the macro above but needs a generic type parameter.
 impl<T> FieldDeserFromIter<tags::Enum<T>, tags::Optional2> for Option<std::result::Result<T, i32>>
 where
     T: TryFrom<i32, Error = i32>,
