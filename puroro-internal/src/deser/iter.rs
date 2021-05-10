@@ -20,8 +20,8 @@ pub trait DeserializableMessageFromIter: Sized {
     where
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
-        let mut bytes_iter = LdIter::new(iter);
-        bytes_iter.deser_message(self)?;
+        let mut ld_iter = LdIter::new(iter);
+        ld_iter.deser_message(self)?;
         Ok(())
     }
 }
@@ -52,8 +52,8 @@ where
                 .met_field::<BytesIterBoundType<'slice>>(FieldData::Variant(v), field_number),
             FieldData::LengthDelimited(slice) => {
                 let mut bytes = slice.bytes();
-                let mut bytes_iter = LdIter::new(&mut bytes);
-                let field_data = FieldData::LengthDelimited(&mut bytes_iter);
+                let mut ld_iter = LdIter::new(&mut bytes);
+                let field_data = FieldData::LengthDelimited(&mut ld_iter);
                 self.0.met_field(field_data, field_number)
             }
             FieldData::Bits32(b) => self

@@ -74,8 +74,8 @@ macro_rules! define_deser_scalar_variants {
                         }
                         Ok(())
                     }
-                    FieldData::LengthDelimited(bytes_iter) => {
-                        let mut variants = bytes_iter.variants().peekable();
+                    FieldData::LengthDelimited(ld_iter) => {
+                        let mut variants = ld_iter.variants().peekable();
                         if let None = variants.peek() {
                             Err(ErrorKind::ZeroLengthPackedField)?
                         }
@@ -164,10 +164,10 @@ macro_rules! define_deser_scalar_ld {
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
             {
-                if let FieldData::LengthDelimited(bytes_iter) = field {
-                    let expected_len = bytes_iter.len();
+                if let FieldData::LengthDelimited(ld_iter) = field {
+                    let expected_len = ld_iter.len();
                     if <$ltag>::DO_DEFAULT_CHECK {
-                        let mut iter = bytes_iter.$method().peekable();
+                        let mut iter = ld_iter.$method().peekable();
                         if let Some(_) = iter.peek() {
                             self.clear();
                             self.reserve(expected_len);
@@ -178,7 +178,7 @@ macro_rules! define_deser_scalar_ld {
                     } else {
                         self.clear();
                         self.reserve(expected_len);
-                        for rv in bytes_iter.$method() {
+                        for rv in ld_iter.$method() {
                             self.push(rv?);
                         }
                     }
@@ -236,8 +236,8 @@ where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
     {
-        if let FieldData::LengthDelimited(bytes_iter) = field {
-            bytes_iter.deser_message(self)
+        if let FieldData::LengthDelimited(ld_iter) = field {
+            ld_iter.deser_message(self)
         } else {
             Err(ErrorKind::UnexpectedWireType)?
         }
@@ -420,8 +420,8 @@ macro_rules! define_deser_repeated_variants {
                     FieldData::Variant(variant) => {
                         self.push(variant.to_native::<$ttag>()?);
                     }
-                    FieldData::LengthDelimited(bytes_iter) => {
-                        let mut var_iter = bytes_iter.variants();
+                    FieldData::LengthDelimited(ld_iter) => {
+                        let mut var_iter = ld_iter.variants();
                         // The spec demands at least one item for a packed repeated field.
                         self.push(
                             var_iter
@@ -477,8 +477,8 @@ macro_rules! define_deser_repeated_enum {
                     FieldData::Variant(variant) => {
                         self.push(T::try_from(variant.to_native::<tags::Int32>()?))
                     }
-                    FieldData::LengthDelimited(bytes_iter) => {
-                        for rvariant in bytes_iter.variants() {
+                    FieldData::LengthDelimited(ld_iter) => {
+                        for rvariant in ld_iter.variants() {
                             self.push(T::try_from(rvariant?.to_native::<tags::Int32>()?))
                         }
                     }
@@ -516,10 +516,10 @@ macro_rules! define_deser_repeated_ld {
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
             {
-                if let FieldData::LengthDelimited(bytes_iter) = field {
+                if let FieldData::LengthDelimited(ld_iter) = field {
                     let mut new_item = (f)();
-                    new_item.reserve(bytes_iter.len());
-                    for rv in bytes_iter.$method() {
+                    new_item.reserve(ld_iter.len());
+                    for rv in ld_iter.$method() {
                         new_item.push(rv?);
                     }
                     self.push(new_item);
@@ -559,9 +559,9 @@ macro_rules! define_deser_repeated_message {
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
             {
-                if let FieldData::LengthDelimited(bytes_iter) = field {
+                if let FieldData::LengthDelimited(ld_iter) = field {
                     let mut new_message = (f)();
-                    bytes_iter.deser_message(&mut new_message)?;
+                    ld_iter.deser_message(&mut new_message)?;
                     self.push(new_message);
                     Ok(())
                 } else {
@@ -590,9 +590,9 @@ where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
     {
-        if let FieldData::LengthDelimited(bytes_iter) = field {
+        if let FieldData::LengthDelimited(ld_iter) = field {
             let mut entry = (f)();
-            bytes_iter.deser_message(&mut entry)?;
+            ld_iter.deser_message(&mut entry)?;
             let kv = entry.into_tuple();
             self.insert(kv.0, kv.1);
             Ok(())
