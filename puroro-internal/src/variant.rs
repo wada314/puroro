@@ -66,10 +66,10 @@ impl Variant {
         Ok(())
     }
 
-    pub fn to_native<T: VariantType>(&self) -> Result<T::NativeType> {
+    pub fn to_native<T: VariantTypeTag>(&self) -> Result<T::NativeType> {
         T::from_variant(self)
     }
-    pub fn from_native<T: VariantType>(val: T::NativeType) -> Result<Variant> {
+    pub fn from_native<T: VariantTypeTag>(val: T::NativeType) -> Result<Variant> {
         T::to_variant(val)
     }
 
@@ -90,11 +90,11 @@ impl Variant {
 
 macro_rules! define_convert_methods {
     ($vtype:ty, $toname:ident, $fromname:ident) => {
-        pub fn $toname(&self) -> Result<<$vtype as VariantType>::NativeType> {
+        pub fn $toname(&self) -> Result<<$vtype as VariantTypeTag>::NativeType> {
             self.to_native::<$vtype>()
         }
-        pub fn $fromname(val: <$vtype as VariantType>::NativeType) -> Result<Variant> {
-            <$vtype as VariantType>::to_variant(val)
+        pub fn $fromname(val: <$vtype as VariantTypeTag>::NativeType) -> Result<Variant> {
+            <$vtype as VariantTypeTag>::to_variant(val)
         }
     };
 }
@@ -109,7 +109,7 @@ impl Variant {
     define_convert_methods!(RustUsize, to_usize, from_usize);
 }
 
-pub trait VariantType {
+pub trait VariantTypeTag {
     type NativeType;
     fn from_variant(var: &Variant) -> Result<Self::NativeType>;
     fn to_variant(val: Self::NativeType) -> Result<Variant>;
@@ -117,7 +117,7 @@ pub trait VariantType {
 
 pub struct RustUsize();
 
-impl VariantType for Int32 {
+impl VariantTypeTag for Int32 {
     type NativeType = i32;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i32::try_from(i64::from_le_bytes(var.0))?)
@@ -126,7 +126,7 @@ impl VariantType for Int32 {
         Ok(Variant::new(i64::to_le_bytes(i64::from(val))))
     }
 }
-impl VariantType for UInt32 {
+impl VariantTypeTag for UInt32 {
     type NativeType = u32;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(u32::try_from(u64::from_le_bytes(var.0))?)
@@ -135,7 +135,7 @@ impl VariantType for UInt32 {
         Ok(Variant::new(u64::to_le_bytes(u64::from(val))))
     }
 }
-impl VariantType for SInt32 {
+impl VariantTypeTag for SInt32 {
     type NativeType = i32;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i32::try_from(var.to_sint()?)?)
@@ -145,7 +145,7 @@ impl VariantType for SInt32 {
     }
 }
 
-impl VariantType for Int64 {
+impl VariantTypeTag for Int64 {
     type NativeType = i64;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i64::from_le_bytes(var.0))
@@ -154,7 +154,7 @@ impl VariantType for Int64 {
         Ok(Variant::new(i64::to_le_bytes(val)))
     }
 }
-impl VariantType for UInt64 {
+impl VariantTypeTag for UInt64 {
     type NativeType = u64;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(u64::from_le_bytes(var.0))
@@ -163,7 +163,7 @@ impl VariantType for UInt64 {
         Ok(Variant::new(u64::to_le_bytes(val)))
     }
 }
-impl VariantType for SInt64 {
+impl VariantTypeTag for SInt64 {
     type NativeType = i64;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(var.to_sint()?)
@@ -172,7 +172,7 @@ impl VariantType for SInt64 {
         Ok(Variant::from_sint(val))
     }
 }
-impl VariantType for Bool {
+impl VariantTypeTag for Bool {
     type NativeType = bool;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         match u64::from_le_bytes(var.0) {
@@ -185,7 +185,7 @@ impl VariantType for Bool {
         Ok(Variant::new(u64::to_le_bytes(if val { 1 } else { 0 })))
     }
 }
-impl<T> VariantType for Enum<T>
+impl<T> VariantTypeTag for Enum<T>
 where
     T: TryFrom<i32, Error = i32> + Into<i32>,
 {
@@ -201,7 +201,7 @@ where
         Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))
     }
 }
-impl VariantType for RustUsize {
+impl VariantTypeTag for RustUsize {
     type NativeType = usize;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(usize::try_from(u64::from_le_bytes(var.0))?)

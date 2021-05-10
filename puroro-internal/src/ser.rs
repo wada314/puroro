@@ -1,7 +1,7 @@
 use crate::Result;
 use crate::{
     types::WireType,
-    variant::{RustUsize, VariantType},
+    variant::{RustUsize, VariantTypeTag},
 };
 use std::io::Write;
 
@@ -10,7 +10,7 @@ pub trait SerializableMessage {
 }
 
 pub trait MessageSerializer {
-    fn serialize_variant<T: VariantType>(
+    fn serialize_variant<T: VariantTypeTag>(
         &mut self,
         field_number: usize,
         value: T::NativeType,
@@ -18,7 +18,7 @@ pub trait MessageSerializer {
 
     fn serialize_variants_twice<T, I>(&mut self, field_number: usize, iter: I) -> Result<()>
     where
-        T: VariantType,
+        T: VariantTypeTag,
         I: Clone + Iterator<Item = Result<T::NativeType>>;
 
     fn serialize_bytes_twice<I>(&mut self, field_number: usize, bytes: I) -> Result<()>
@@ -78,7 +78,7 @@ impl<'a, W> MessageSerializer for MessageSerializerImpl<'a, W>
 where
     W: std::io::Write,
 {
-    fn serialize_variant<T: VariantType>(
+    fn serialize_variant<T: VariantTypeTag>(
         &mut self,
         field_number: usize,
         value: T::NativeType,
@@ -91,7 +91,7 @@ where
 
     fn serialize_variants_twice<T, I>(&mut self, field_number: usize, mut iter: I) -> Result<()>
     where
-        T: VariantType,
+        T: VariantTypeTag,
         I: Clone + Iterator<Item = Result<T::NativeType>>,
     {
         match iter.clone().count() {

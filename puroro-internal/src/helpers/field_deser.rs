@@ -2,6 +2,7 @@ use crate::deser::{DeserializableMessageFromIter, LdIter};
 use crate::tags;
 use crate::tags::{FieldLabelTag, FieldTypeTag};
 use crate::types::FieldData;
+use crate::variant::VariantTypeTag;
 use crate::{ErrorKind, Result};
 use std::collections::HashMap;
 use std::convert::TryFrom;
@@ -52,7 +53,7 @@ where
 }
 
 macro_rules! redirect_deser_from_slice_to_from_iter {
-    ($ty:ty, $ttag:ty, $ltag:ty $(, $($gpt:ident)? $($gpl:lifetime)? )*) => {
+    ($ty:ty, $ttag:ty, $ltag:ty) => {
         impl<'bump> FieldDeserFromSlice<$ttag, $ltag> for $ty {
             fn deser<'slice>(&mut self, field: FieldData<&'slice [u8]>) -> Result<()> {
                 let mut ld_iter;
@@ -76,9 +77,12 @@ macro_rules! redirect_deser_from_slice_to_from_iter {
 ///////////////////////////////////////////////////////////////////////////////
 
 macro_rules! define_deser_scalar_variants {
-    ($ty:ty, $ttag:ty, $ltag:ty) => {
-        impl FieldDeserFromIter<$ttag, $ltag> for $ty {
-            type Item = $ty;
+    ($ttag:ty, $ltag:ty) => {
+        impl FieldDeserFromIter<$ttag, $ltag> for <$ttag as VariantTypeTag>::NativeType
+        where
+            $ttag: VariantTypeTag,
+        {
+            type Item = <$ttag as VariantTypeTag>::NativeType;
             fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _f: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
@@ -112,23 +116,27 @@ macro_rules! define_deser_scalar_variants {
                 }
             }
         }
-        redirect_deser_from_slice_to_from_iter!($ty, $ttag, $ltag);
+        redirect_deser_from_slice_to_from_iter!(
+            <$ttag as VariantTypeTag>::NativeType,
+            $ttag,
+            $ltag
+        );
     };
 }
-define_deser_scalar_variants!(i32, tags::Int32, tags::Required);
-define_deser_scalar_variants!(i64, tags::Int64, tags::Required);
-define_deser_scalar_variants!(i32, tags::SInt32, tags::Required);
-define_deser_scalar_variants!(i64, tags::SInt64, tags::Required);
-define_deser_scalar_variants!(u32, tags::UInt32, tags::Required);
-define_deser_scalar_variants!(u64, tags::UInt64, tags::Required);
-define_deser_scalar_variants!(bool, tags::Bool, tags::Required);
-define_deser_scalar_variants!(i32, tags::Int32, tags::Optional3);
-define_deser_scalar_variants!(i64, tags::Int64, tags::Optional3);
-define_deser_scalar_variants!(i32, tags::SInt32, tags::Optional3);
-define_deser_scalar_variants!(i64, tags::SInt64, tags::Optional3);
-define_deser_scalar_variants!(u32, tags::UInt32, tags::Optional3);
-define_deser_scalar_variants!(u64, tags::UInt64, tags::Optional3);
-define_deser_scalar_variants!(bool, tags::Bool, tags::Optional3);
+define_deser_scalar_variants!(tags::Int32, tags::Required);
+define_deser_scalar_variants!(tags::Int64, tags::Required);
+define_deser_scalar_variants!(tags::SInt32, tags::Required);
+define_deser_scalar_variants!(tags::SInt64, tags::Required);
+define_deser_scalar_variants!(tags::UInt32, tags::Required);
+define_deser_scalar_variants!(tags::UInt64, tags::Required);
+define_deser_scalar_variants!(tags::Bool, tags::Required);
+define_deser_scalar_variants!(tags::Int32, tags::Optional3);
+define_deser_scalar_variants!(tags::Int64, tags::Optional3);
+define_deser_scalar_variants!(tags::SInt32, tags::Optional3);
+define_deser_scalar_variants!(tags::SInt64, tags::Optional3);
+define_deser_scalar_variants!(tags::UInt32, tags::Optional3);
+define_deser_scalar_variants!(tags::UInt64, tags::Optional3);
+define_deser_scalar_variants!(tags::Bool, tags::Optional3);
 
 macro_rules! define_deser_scalar_enum {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
