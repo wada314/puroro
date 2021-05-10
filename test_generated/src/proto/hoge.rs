@@ -44,7 +44,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Msg {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<()> 
     where
@@ -143,7 +143,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for MsgBumpa
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<()> 
     where
@@ -261,7 +261,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for TheMapEntry {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<()> 
     where
@@ -403,7 +403,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for TheMapEn
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<()> 
     where
@@ -551,7 +551,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for SubMsg {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<()> 
     where
@@ -631,7 +631,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for SubMsgBu
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<()> 
     where

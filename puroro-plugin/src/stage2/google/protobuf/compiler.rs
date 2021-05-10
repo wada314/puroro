@@ -51,7 +51,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -190,7 +190,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -370,7 +370,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for File {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -524,7 +524,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for FileBump
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -699,7 +699,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for CodeGeneratorRe
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -856,7 +856,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for CodeGene
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -1029,7 +1029,7 @@ impl ::puroro_internal::deser::DeserializableMessageFromIter for Version {
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where
@@ -1182,7 +1182,7 @@ impl<'bump> ::puroro_internal::deser::DeserializableMessageFromIter for VersionB
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where

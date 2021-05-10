@@ -34,7 +34,7 @@ where
     /// value, which `Default::default` cannot support.
     /// ** Message types - `Option<Box<T>>` for the both proto2 and proto3's optional types,
     /// otherwise just a raw message type. This is because of an implementation details...
-    fn deser<'a, 'b, I, F>(&mut self, field: FieldData<&'a mut LdIter<'b, I>>, f: F) -> Result<()>
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item;
@@ -72,11 +72,7 @@ macro_rules! define_deser_scalar_variants {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
         impl FieldDeserFromIter<$ttag, $ltag> for $ty {
             type Item = $ty;
-            fn deser<'a, 'b, I, F>(
-                &mut self,
-                field: FieldData<&'a mut LdIter<'b, I>>,
-                _f: F,
-            ) -> Result<()>
+            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _f: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
@@ -139,11 +135,7 @@ macro_rules! define_deser_scalar_enum {
             T: TryFrom<i32, Error = i32>,
         {
             type Item = Self;
-            fn deser<'a, 'b, I, F>(
-                &mut self,
-                field: FieldData<&'a mut LdIter<'b, I>>,
-                _: F,
-            ) -> Result<()>
+            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
@@ -169,11 +161,7 @@ macro_rules! define_deser_scalar_ld {
     ($ty:ty, $ttag:ty, $ltag:ty, $method:ident) => {
         impl<'bump> FieldDeserFromIter<$ttag, $ltag> for $ty {
             type Item = $ty;
-            fn deser<'a, 'b, I, F>(
-                &mut self,
-                field: FieldData<&'a mut LdIter<'b, I>>,
-                _: F,
-            ) -> Result<()>
+            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
@@ -245,7 +233,7 @@ where
     T: crate::deser::DeserializableMessageFromIter,
 {
     type Item = T;
-    fn deser<'a, 'b, I, F>(&mut self, field: FieldData<&'a mut LdIter<'b, I>>, _: F) -> Result<()>
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -262,11 +250,7 @@ macro_rules! define_deser_scalar_fixed {
     ($ty:ty, $ttag:ty, $ltag:ty, $bits:ident) => {
         impl FieldDeserFromIter<$ttag, $ltag> for $ty {
             type Item = $ty;
-            fn deser<'a, 'b, I, F>(
-                &mut self,
-                field: FieldData<&'a mut LdIter<'b, I>>,
-                _: F,
-            ) -> Result<()>
+            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
@@ -304,11 +288,7 @@ macro_rules! define_deser_optional_fields_from_scalar {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
         impl<'bump> FieldDeserFromIter<$ttag, $ltag> for Option<$ty> {
             type Item = $ty;
-            fn deser<'a, 'b, I, F>(
-                &mut self,
-                field: FieldData<&'a mut LdIter<'b, I>>,
-                f: F,
-            ) -> Result<()>
+            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
@@ -356,7 +336,7 @@ where
     T: TryFrom<i32, Error = i32>,
 {
     type Item = std::result::Result<T, i32>;
-    fn deser<'a, 'b, I, F>(&mut self, field: FieldData<&'a mut LdIter<'b, I>>, f: F) -> Result<()>
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -383,11 +363,7 @@ macro_rules! define_deser_optional_message_field {
             T: crate::deser::DeserializableMessageFromIter,
         {
             type Item = $box;
-            fn deser<'a, 'b, I, F>(
-                &mut self,
-                field: FieldData<&'a mut LdIter<'b, I>>,
-                f: F,
-            ) -> Result<()>
+            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
@@ -421,11 +397,7 @@ macro_rules! define_deser_repeated_variants {
     ($scalar:ty, $ttag:ty, $vec:ty) => {
         impl<'bump> FieldDeserFromIter<$ttag, tags::Repeated> for $vec {
             type Item = $scalar;
-            fn deser<'a, 'b, I, F>(
-                &mut self,
-                field: FieldData<&'a mut LdIter<'b, I>>,
-                _: F,
-            ) -> Result<()>
+            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
@@ -478,11 +450,7 @@ macro_rules! define_deser_repeated_enum {
             T: TryFrom<i32, Error = i32>,
         {
             type Item = std::result::Result<T, i32>;
-            fn deser<'a, 'b, I, F>(
-                &mut self,
-                field: FieldData<&'a mut LdIter<'b, I>>,
-                _: F,
-            ) -> Result<()>
+            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
@@ -521,11 +489,7 @@ macro_rules! define_deser_repeated_ld {
     ($scalar:ty, $ttag:ty, $method:ident, $vec:ty) => {
         impl<'bump> FieldDeserFromIter<$ttag, tags::Repeated> for $vec {
             type Item = $scalar;
-            fn deser<'a, 'b, I, F>(
-                &mut self,
-                field: FieldData<&'a mut LdIter<'b, I>>,
-                f: F,
-            ) -> Result<()>
+            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
@@ -564,11 +528,7 @@ macro_rules! define_deser_repeated_message {
             T: crate::deser::DeserializableMessageFromIter,
         {
             type Item = T;
-            fn deser<'a, 'b, I, F>(
-                &mut self,
-                field: FieldData<&'a mut LdIter<'b, I>>,
-                f: F,
-            ) -> Result<()>
+            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
                 F: Fn() -> Self::Item,
@@ -599,7 +559,7 @@ where
 {
     type Item = Entry;
 
-    fn deser<'a, 'b, I, F>(&mut self, field: FieldData<&'a mut LdIter<'b, I>>, f: F) -> Result<()>
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,

@@ -192,7 +192,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
-            &'a mut ::puroro_internal::deser::LdIter<'b, I>>,
+            &'a mut ::puroro_internal::deser::LdIter<I>>,
         field_number: usize,
     ) -> ::puroro::Result<bool> 
     where

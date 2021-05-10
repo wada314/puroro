@@ -8,15 +8,15 @@ use std::marker::PhantomData;
 use ::num_traits::FromPrimitive;
 
 pub trait DeserializableMessageFromIter: Sized {
-    fn met_field<'a, 'b, I>(
+    fn met_field<'a, I>(
         &mut self,
-        field: FieldData<&'a mut LdIter<'b, I>>,
+        field: FieldData<&'a mut LdIter<I>>,
         field_number: usize,
     ) -> Result<bool>
     where
         I: Iterator<Item = ::std::io::Result<u8>>;
 
-    fn deser_from_iter<I>(&mut self, iter: &mut I) -> Result<()>
+    fn deser_from_iter<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
@@ -45,7 +45,7 @@ where
         field_number: usize,
     ) -> Result<bool> {
         use std::io::Read;
-        type BytesIterBoundType<'b> = LdIter<'b, std::io::Bytes<&'b [u8]>>;
+        type BytesIterBoundType<'b> = LdIter<std::io::Bytes<&'b [u8]>>;
         match field {
             FieldData::Variant(v) => self
                 .0
@@ -66,20 +66,20 @@ where
     }
 }
 
-pub struct LdIter<'a, I>
+pub struct LdIter<I>
 where
     I: Iterator<Item = ::std::io::Result<u8>>,
 {
-    iter: &'a mut I,
+    iter: I,
     index: usize,
     end: usize,
 }
 
-impl<'a, I> LdIter<'a, I>
+impl<I> LdIter<I>
 where
     I: Iterator<Item = ::std::io::Result<u8>>,
 {
-    pub fn new(iter: &'a mut I) -> Self {
+    pub fn new(iter: I) -> Self {
         Self {
             iter,
             index: 0,
@@ -157,7 +157,7 @@ where
     }
 }
 
-impl<'a, I> Iterator for LdIter<'a, I>
+impl<'a, I> Iterator for LdIter<I>
 where
     I: Iterator<Item = ::std::io::Result<u8>>,
 {
