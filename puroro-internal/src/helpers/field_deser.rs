@@ -6,6 +6,7 @@ use crate::{ErrorKind, Result};
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::hash::Hash;
+use std::io::Read;
 use std::marker::PhantomData;
 
 use super::{DoDefaultCheck, MapEntry};
@@ -47,7 +48,20 @@ where
     /// * `field` - A data of the field, where the wire type and (for length delimited wire
     /// type) the field length are already load. For variants and fixed bytes fields,
     /// the content data is also already load.
-    fn deser<'slice>(&mut self, field: FieldData<&'slice [u8]>) -> Result<()>;
+    fn deser<'slice>(&mut self, field: FieldData<&'slice [u8]>) -> Result<()> {
+        let iter_field = match field {
+            FieldData::LengthDelimited(slice) => {
+                todo!();
+                let mut temp_iter = std::io::stdin().bytes();
+                let mut temp_ld_iter = LdIter::new(&mut temp_iter);
+                FieldData::LengthDelimited(&mut temp_ld_iter)
+            }
+            FieldData::Variant(v) => FieldData::Variant(v),
+            FieldData::Bits32(x) => FieldData::Bits32(x),
+            FieldData::Bits64(x) => FieldData::Bits64(x),
+        };
+        Ok(())
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
