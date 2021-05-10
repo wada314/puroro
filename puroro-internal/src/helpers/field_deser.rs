@@ -7,6 +7,7 @@ use crate::{ErrorKind, Result};
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::hash::Hash;
+use std::intrinsics::transmute;
 use std::io::Read;
 use std::marker::PhantomData;
 
@@ -40,7 +41,7 @@ where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item;
 }
-pub trait FieldDeserFromSlice<TypeTag, LabelTag>
+pub trait FieldDeserFromSlice<'slice, TypeTag, LabelTag>
 where
     TypeTag: FieldTypeTag,
     LabelTag: FieldLabelTag,
@@ -49,13 +50,13 @@ where
     /// * `field` - A data of the field, where the wire type and (for length delimited wire
     /// type) the field length are already load. For variants and fixed bytes fields,
     /// the content data is also already load.
-    fn deser<'slice>(&mut self, field: FieldData<&'slice [u8]>) -> Result<()>;
+    fn deser(&mut self, field: FieldData<&'slice [u8]>) -> Result<()>;
 }
 
 macro_rules! redirect_deser_from_slice_to_from_iter {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
-        impl<'bump> FieldDeserFromSlice<$ttag, $ltag> for $ty {
-            fn deser<'slice>(&mut self, field: FieldData<&'slice [u8]>) -> Result<()> {
+        impl<'bump, 'slice> FieldDeserFromSlice<'slice, $ttag, $ltag> for $ty {
+            fn deser(&mut self, field: FieldData<&'slice [u8]>) -> Result<()> {
                 let mut ld_iter;
                 let new_field = match field {
                     FieldData::LengthDelimited(slice) => {
@@ -234,6 +235,30 @@ define_deser_scalar_ld!(
     tags::Optional3,
     bytes
 );
+
+macro_rules! define_deser_scalar_ld_from_slice {
+    ($ty:ty, $ttag:ty, $ltag:ty, $conv:expr) => {
+        impl<'slice> FieldDeserFromSlice<'slice, $ttag, $ltag> for $ty {
+            fn deser(&mut self, field: FieldData<&'slice [u8]>) -> Result<()> {
+                match field {
+                    FieldData::LengthDelimited(slice) => {
+                        *self = ($conv)(slice);
+                        Ok(())
+                    }
+                    _ => Err(ErrorKind::UnexpectedWireType)?,
+                }
+            }
+        }
+    };
+}
+define_deser_scalar_ld_from_slice!(&'slice [u8], tags::Bytes, tags::Required, |x| x);
+define_deser_scalar_ld_from_slice!(&'slice str, tags::String, tags::Required, |x| unsafe {
+    transmute(x)
+});
+define_deser_scalar_ld_from_slice!(&'slice [u8], tags::Bytes, tags::Optional3, |x| x);
+define_deser_scalar_ld_from_slice!(&'slice str, tags::String, tags::Optional3, |x| unsafe {
+    transmute(x)
+});
 
 // Unlike C++ implementation, the required message field in Rust is not
 // wrapped by `Option` (and neither `Box`).
