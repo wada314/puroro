@@ -23,7 +23,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     pub fn struct_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
         let postfix1 = match self.context.impl_type() {
             ImplType::Default => "",
-            ImplType::SliceView { check_utf8: _ } => "SliceView",
+            ImplType::SliceView { .. } => "SliceView",
         };
         let postfix2 = match self.context.alloc_type() {
             AllocatorType::Default => "",
@@ -105,7 +105,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
     pub fn is_default_available(&self) -> bool {
         match (self.context.impl_type(), self.context.alloc_type()) {
-            (ImplType::SliceView { check_utf8: _ }, _) | (_, AllocatorType::Bumpalo) => false,
+            (ImplType::SliceView { .. }, _) | (_, AllocatorType::Bumpalo) => false,
             _ => true,
         }
     }
@@ -120,7 +120,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     pub fn field_visibility(&self) -> &'static str {
         match self.context.impl_type() {
             ImplType::Default => "pub ",
-            ImplType::SliceView { check_utf8: _ } => "",
+            ImplType::SliceView { .. } => "",
         }
     }
 
@@ -208,7 +208,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     FieldLabel::Repeated => self.vec_type(scalar_type.as_ref()).into(),
                 }
             }
-            ImplType::SliceView { check_utf8: _ } => match (field.label()?, field.type_()?) {
+            ImplType::SliceView { .. } => match (field.label()?, field.type_()?) {
                 (FieldLabel::Repeated, _) | (_, FieldType::Message(_)) => {
                     "::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>"
                         .into()
@@ -290,7 +290,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     _ => "::std::default::Default::default".into(),
                 },
             },
-            ImplType::SliceView { check_utf8: _ } => {
+            ImplType::SliceView { .. } => {
                 unimplemented!()
             }
         })
@@ -310,7 +310,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             .chain(
                 match self.context.impl_type() {
                     ImplType::Default => None,
-                    ImplType::SliceView { check_utf8: _ } => Some("'slice"),
+                    ImplType::SliceView { .. } => Some("'slice"),
                 }
                 .into_iter(),
             );
