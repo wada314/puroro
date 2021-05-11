@@ -310,7 +310,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             .chain(
                 match self.context.impl_type() {
                     ImplType::Default => None,
-                    ImplType::SliceView { .. } => Some("'slice"),
+                    ImplType::SliceView { .. } => Some("'slice, 'p"),
                 }
                 .into_iter(),
             );
@@ -410,7 +410,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 "::puroro_internal::InternalDataForBumpaloStruct<'bump>"
             }
             (ImplType::SliceView { .. }, AllocatorType::Default) => {
-                "::puroro_internal::InternalDataForSliceViewStruct<'slice>"
+                "::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>"
             }
             _ => unimplemented!(),
         }

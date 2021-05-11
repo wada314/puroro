@@ -298,14 +298,14 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRespons
 }
 
 #[derive(Debug)]
-pub struct CodeGeneratorResponseSliceView<'slice> {
+pub struct CodeGeneratorResponseSliceView<'slice, 'p> {
     error: ::std::option::Option<&'slice str>,
     supported_features: ::std::option::Option<u64>,
     file: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
 }
 
-impl<'slice> CodeGeneratorResponseSliceView<'slice> {
+impl<'slice, 'p> CodeGeneratorResponseSliceView<'slice, 'p> {
     pub fn from_slice(slice: &'slice [u8]) -> Self {
         Self {
             error: ::puroro_internal::helpers::FieldNew::new(),
@@ -316,7 +316,7 @@ impl<'slice> CodeGeneratorResponseSliceView<'slice> {
     }
 }
 
-impl<'slice> ::std::clone::Clone for CodeGeneratorResponseSliceView<'slice> {
+impl<'slice, 'p> ::std::clone::Clone for CodeGeneratorResponseSliceView<'slice, 'p> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
@@ -329,7 +329,7 @@ impl<'slice> ::std::clone::Clone for CodeGeneratorResponseSliceView<'slice> {
     }
 }
 
-impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorResponseSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorResponseSliceView<'slice, 'p> {
     fn met_field_at<'slice2>(
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
@@ -344,7 +344,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGe
     }
 }
 
-impl<'slice> ::puroro_internal::ser::SerializableMessage for CodeGeneratorResponseSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for CodeGeneratorResponseSliceView<'slice, 'p> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -352,7 +352,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRespon
     }
 }
 
-impl<'slice> ::puroro::Serializable for CodeGeneratorResponseSliceView<'slice> {
+impl<'slice, 'p> ::puroro::Serializable for CodeGeneratorResponseSliceView<'slice, 'p> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
@@ -706,7 +706,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileBumpalo<'bump> {
 }
 
 #[derive(Debug)]
-pub struct FileSliceView<'slice> {
+pub struct FileSliceView<'slice, 'p> {
     name: ::std::option::Option<&'slice str>,
     insertion_point: ::std::option::Option<&'slice str>,
     content: ::std::option::Option<&'slice str>,
@@ -714,7 +714,7 @@ pub struct FileSliceView<'slice> {
     puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
 }
 
-impl<'slice> FileSliceView<'slice> {
+impl<'slice, 'p> FileSliceView<'slice, 'p> {
     pub fn from_slice(slice: &'slice [u8]) -> Self {
         Self {
             name: ::puroro_internal::helpers::FieldNew::new(),
@@ -726,7 +726,7 @@ impl<'slice> FileSliceView<'slice> {
     }
 }
 
-impl<'slice> ::std::clone::Clone for FileSliceView<'slice> {
+impl<'slice, 'p> ::std::clone::Clone for FileSliceView<'slice, 'p> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
@@ -740,7 +740,7 @@ impl<'slice> ::std::clone::Clone for FileSliceView<'slice> {
     }
 }
 
-impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for FileSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice for FileSliceView<'slice, 'p> {
     fn met_field_at<'slice2>(
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
@@ -755,7 +755,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for FileSl
     }
 }
 
-impl<'slice> ::puroro_internal::ser::SerializableMessage for FileSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileSliceView<'slice, 'p> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -763,7 +763,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for FileSliceView<'slic
     }
 }
 
-impl<'slice> ::puroro::Serializable for FileSliceView<'slice> {
+impl<'slice, 'p> ::puroro::Serializable for FileSliceView<'slice, 'p> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
@@ -1106,7 +1106,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRequest
 }
 
 #[derive(Debug)]
-pub struct CodeGeneratorRequestSliceView<'slice> {
+pub struct CodeGeneratorRequestSliceView<'slice, 'p> {
     file_to_generate: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     parameter: ::std::option::Option<&'slice str>,
     proto_file: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
@@ -1114,7 +1114,7 @@ pub struct CodeGeneratorRequestSliceView<'slice> {
     puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
 }
 
-impl<'slice> CodeGeneratorRequestSliceView<'slice> {
+impl<'slice, 'p> CodeGeneratorRequestSliceView<'slice, 'p> {
     pub fn from_slice(slice: &'slice [u8]) -> Self {
         Self {
             file_to_generate: ::puroro_internal::helpers::FieldNew::new(),
@@ -1126,7 +1126,7 @@ impl<'slice> CodeGeneratorRequestSliceView<'slice> {
     }
 }
 
-impl<'slice> ::std::clone::Clone for CodeGeneratorRequestSliceView<'slice> {
+impl<'slice, 'p> ::std::clone::Clone for CodeGeneratorRequestSliceView<'slice, 'p> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
@@ -1140,7 +1140,7 @@ impl<'slice> ::std::clone::Clone for CodeGeneratorRequestSliceView<'slice> {
     }
 }
 
-impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorRequestSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorRequestSliceView<'slice, 'p> {
     fn met_field_at<'slice2>(
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
@@ -1155,7 +1155,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGe
     }
 }
 
-impl<'slice> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRequestSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRequestSliceView<'slice, 'p> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -1163,7 +1163,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for CodeGeneratorReques
     }
 }
 
-impl<'slice> ::puroro::Serializable for CodeGeneratorRequestSliceView<'slice> {
+impl<'slice, 'p> ::puroro::Serializable for CodeGeneratorRequestSliceView<'slice, 'p> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
@@ -1493,7 +1493,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for VersionBumpalo<'bump
 }
 
 #[derive(Debug)]
-pub struct VersionSliceView<'slice> {
+pub struct VersionSliceView<'slice, 'p> {
     major: ::std::option::Option<i32>,
     minor: ::std::option::Option<i32>,
     patch: ::std::option::Option<i32>,
@@ -1501,7 +1501,7 @@ pub struct VersionSliceView<'slice> {
     puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
 }
 
-impl<'slice> VersionSliceView<'slice> {
+impl<'slice, 'p> VersionSliceView<'slice, 'p> {
     pub fn from_slice(slice: &'slice [u8]) -> Self {
         Self {
             major: ::puroro_internal::helpers::FieldNew::new(),
@@ -1513,7 +1513,7 @@ impl<'slice> VersionSliceView<'slice> {
     }
 }
 
-impl<'slice> ::std::clone::Clone for VersionSliceView<'slice> {
+impl<'slice, 'p> ::std::clone::Clone for VersionSliceView<'slice, 'p> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
@@ -1527,7 +1527,7 @@ impl<'slice> ::std::clone::Clone for VersionSliceView<'slice> {
     }
 }
 
-impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for VersionSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice for VersionSliceView<'slice, 'p> {
     fn met_field_at<'slice2>(
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
@@ -1542,7 +1542,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Versio
     }
 }
 
-impl<'slice> ::puroro_internal::ser::SerializableMessage for VersionSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for VersionSliceView<'slice, 'p> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
@@ -1550,7 +1550,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for VersionSliceView<'s
     }
 }
 
-impl<'slice> ::puroro::Serializable for VersionSliceView<'slice> {
+impl<'slice, 'p> ::puroro::Serializable for VersionSliceView<'slice, 'p> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)

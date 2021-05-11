@@ -54,21 +54,35 @@ impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
 }
 
 #[derive(Debug, Clone)]
-pub struct InternalDataForSliceViewStruct<'slice> {
+pub struct InternalDataForSliceViewStruct<'slice, 'p> {
     pub first_field: LdSlice<'slice>,
     pub remaining_slice: Option<&'slice [u8]>,
     pub count_in_remaining_slice: usize,
+    pub parent_internal_data: Option<&'p InternalDataForSliceViewStruct<'slice, 'p>>,
 }
-impl<'slice> InternalDataForSliceViewStruct<'slice> {
+impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     pub fn new(slice: &'slice [u8]) -> Self {
         Self {
             first_field: LdSlice::new(slice),
             remaining_slice: None,
             count_in_remaining_slice: 0,
+            parent_internal_data: None,
+        }
+    }
+
+    pub fn new_with_parent(
+        slice: &'slice [u8],
+        parent_internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> Self {
+        Self {
+            first_field: LdSlice::new(slice),
+            remaining_slice: None,
+            count_in_remaining_slice: 0,
+            parent_internal_data: Some(parent_internal_data),
         }
     }
 }
-impl<'bump, 'slice> InternalData<'bump> for InternalDataForSliceViewStruct<'slice> {
+impl<'bump, 'slice, 'p> InternalData<'bump> for InternalDataForSliceViewStruct<'slice, 'p> {
     fn bumpalo(&self) -> &'bump bumpalo::Bump {
         panic!("The Bumpalo data field is only available for a Bumpalo struct!")
     }
