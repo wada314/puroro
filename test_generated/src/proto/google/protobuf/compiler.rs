@@ -350,7 +350,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRespon
         if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
             todo!()
         } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
+            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
         }
     }
 }
@@ -764,7 +764,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for FileSliceView<'slic
         if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
             todo!()
         } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
+            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
         }
     }
 }
@@ -1167,7 +1167,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for CodeGeneratorReques
         if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
             todo!()
         } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
+            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
         }
     }
 }
@@ -1557,7 +1557,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for VersionSliceView<'s
         if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
             todo!()
         } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
+            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
         }
     }
 }

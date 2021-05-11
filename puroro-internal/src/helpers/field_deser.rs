@@ -1,7 +1,7 @@
 use crate::deser::{DeserializableMessageFromIter, LdIter};
 use crate::tags;
 use crate::tags::{FieldLabelTag, FieldTypeTag};
-use crate::types::FieldData;
+use crate::types::{FieldData, SliceViewFields};
 use crate::variant::{Variant, VariantTypeTag};
 use crate::{ErrorKind, Result};
 use std::collections::HashMap;
@@ -496,10 +496,33 @@ define_deser_repeated_variants!(u64, tags::UInt64);
 define_deser_repeated_variants!(bool, tags::Bool);
 
 impl<'slice> FieldDeserFromSlice<'slice, tags::Int32, tags::Repeated>
-    for <tags::Int32 as VariantTypeTag>::NativeType
+    for Option<SliceViewFields<'slice>>
 {
-    fn deser(&mut self, field: FieldData<&'slice [u8]>, _: &'slice [u8]) -> Result<()> {
-        todo!()
+    fn deser(
+        &mut self,
+        field: FieldData<&'slice [u8]>,
+        enclosing_slice: &'slice [u8],
+    ) -> Result<()> {
+        match self {
+            None => {
+                todo!()
+            }
+            Some(SliceViewFields::FieldsInSingleSlice {
+                slice,
+                count,
+                enclosing_slice,
+            }) => {
+                todo!()
+            }
+            Some(SliceViewFields::FieldsInMultipleSlices {
+                count,
+                first_enclosing_slice,
+                enclosing_slice_count,
+            }) => {
+                todo!()
+            }
+        }
+        Ok(())
     }
 }
 

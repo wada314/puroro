@@ -26,11 +26,15 @@ pub enum FieldData<T> {
 #[derive(Debug, Clone)]
 pub enum SliceViewFields<'slice> {
     FieldsInSingleSlice {
+        /// A subslice of `enclosing_slice` starting from this field's item.
         slice: &'slice [u8],
+        /// A total number of field items in the slice. Packed repeated field is counted as 1.
         count: usize,
         enclosing_slice: &'slice [u8],
     },
     FieldsInMultipleSlices {
         count: usize,
+        first_enclosing_slice: &'slice [u8],
+        enclosing_slice_count: usize,
     },
 }

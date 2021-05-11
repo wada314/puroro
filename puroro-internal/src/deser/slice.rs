@@ -101,11 +101,11 @@ impl<'slice> LdSlice<'slice> {
         self.slice.by_ref().bytes()
     }
 
-    pub fn slice(&self) -> &'slice [u8] {
+    pub fn as_slice(&self) -> &'slice [u8] {
         self.slice
     }
 
     pub fn variants(&self) -> super::iter::Variants<std::io::Bytes<&'slice [u8]>> {
-        super::iter::Variants::new(self.slice().bytes())
+        super::iter::Variants::new(self.as_slice().bytes())
     }
 }
