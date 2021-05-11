@@ -41,9 +41,10 @@ where
 {
     fn met_field_at<'slice>(
         &mut self,
-        _: &'slice [u8],
         field: FieldData<LdSlice<'slice>>,
         field_number: usize,
+        _: &'slice [u8],
+        _: &'slice [u8],
     ) -> Result<bool> {
         type BytesIterBoundType<'b> = LdIter<std::io::Bytes<&'b [u8]>>;
         match field {

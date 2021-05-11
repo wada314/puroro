@@ -332,9 +332,10 @@ impl<'slice> ::std::clone::Clone for CodeGeneratorResponseSliceView<'slice> {
 impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorResponseSliceView<'slice> {
     fn met_field_at<'slice2>(
         &mut self,
-        _: &'slice2 [u8],
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
-        field_number: usize
+        field_number: usize,
+        _: &'slice2 [u8],
+        _: &'slice2 [u8],
     ) -> ::puroro::Result<bool>
     {
         todo!();
@@ -362,8 +363,6 @@ impl<'slice> ::puroro::Serializable for CodeGeneratorResponseSliceView<'slice> {
     }
 }
 pub mod code_generator_response {
-    use puroro_internal::deser::LdSlice;
-
 #[derive(Debug, Clone)]
 pub enum Feature {
     FeatureNone = 0,
@@ -748,9 +747,10 @@ impl<'slice> ::std::clone::Clone for FileSliceView<'slice> {
 impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for FileSliceView<'slice> {
     fn met_field_at<'slice2>(
         &mut self,
-        _: &'slice2 [u8],
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
-        field_number: usize
+        field_number: usize,
+        _: &'slice2 [u8],
+        _: &'slice2 [u8],
     ) -> ::puroro::Result<bool>
     {
         todo!();
@@ -1151,9 +1151,10 @@ impl<'slice> ::std::clone::Clone for CodeGeneratorRequestSliceView<'slice> {
 impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorRequestSliceView<'slice> {
     fn met_field_at<'slice2>(
         &mut self,
-        _: &'slice2 [u8],
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
-        field_number: usize
+        field_number: usize,
+        _: &'slice2 [u8],
+        _: &'slice2 [u8],
     ) -> ::puroro::Result<bool>
     {
         todo!();
@@ -1541,9 +1542,10 @@ impl<'slice> ::std::clone::Clone for VersionSliceView<'slice> {
 impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for VersionSliceView<'slice> {
     fn met_field_at<'slice2>(
         &mut self,
-        _: &'slice2 [u8],
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
-        field_number: usize
+        field_number: usize,
+        _: &'slice2 [u8],
+        _: &'slice2 [u8],
     ) -> ::puroro::Result<bool>
     {
         todo!();

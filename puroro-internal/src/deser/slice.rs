@@ -10,9 +10,10 @@ use ::num_traits::FromPrimitive;
 pub trait DeserializableMessageFromSlice {
     fn met_field_at<'slice>(
         &mut self,
-        at: &'slice [u8],
         field: FieldData<LdSlice<'slice>>,
         field_number: usize,
+        slice_from_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> Result<bool>;
 }
 
@@ -29,8 +30,9 @@ impl<'slice> LdSlice<'slice> {
         &mut self,
         handler: &mut H,
     ) -> Result<()> {
+        let enclosing_slice = self.slice;
         loop {
-            let cur_slice = self.slice;
+            let slice_from_field = self.slice;
             let maybe_wire_type_and_field_number = self.try_get_wire_type_and_field_number()?;
             match maybe_wire_type_and_field_number {
                 None => {
@@ -77,7 +79,12 @@ impl<'slice> LdSlice<'slice> {
                             Err(ErrorKind::GroupNotSupported)?
                         }
                     };
-                    if !handler.met_field_at(cur_slice, field_data, field_number)? {
+                    if !handler.met_field_at(
+                        field_data,
+                        field_number,
+                        slice_from_field,
+                        enclosing_slice,
+                    )? {
                         break;
                     }
                 }

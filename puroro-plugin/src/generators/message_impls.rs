@@ -292,9 +292,10 @@ impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
 impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice for {ident}{gpb} {{
     fn met_field_at<'slice2>(
         &mut self,
-        _: &'slice2 [u8],
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
-        field_number: usize
+        field_number: usize,
+        _: &'slice2 [u8],
+        _: &'slice2 [u8],
     ) -> ::puroro::Result<bool>
     {{
         todo!();
@@ -362,7 +363,7 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
         if let Some(remaining_slice) = self.puroro_internal.remaining_slice {{
             todo!()
         }} else {{
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
+            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
         }}
     }}
 }}\n",
