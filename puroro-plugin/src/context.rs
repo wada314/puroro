@@ -12,7 +12,10 @@ use ::once_cell::unsync::OnceCell;
 #[derive(Debug, Clone)]
 pub enum ImplType {
     Default,
-    SliceView { check_utf8: bool },
+    SliceView {
+        check_utf8: bool,
+        check_wire_types: bool,
+    },
 }
 
 #[derive(Debug, Clone)]

@@ -1,6 +1,7 @@
 use crate::deser::LdSlice;
-use crate::types::FieldData;
-use ::puroro::InternalData;
+use crate::types::{FieldData, SliceViewFields};
+use ::itertools::Either;
+use puroro::InternalData;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -55,33 +56,70 @@ impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
 
 #[derive(Debug, Clone)]
 pub struct InternalDataForSliceViewStruct<'slice, 'p> {
-    pub first_field: LdSlice<'slice>,
-    pub remaining_slice: Option<&'slice [u8]>,
-    pub count_in_remaining_slice: usize,
-    pub parent_internal_data: Option<&'p InternalDataForSliceViewStruct<'slice, 'p>>,
+    source_slices: SourceSlicesView<'slice, 'p>,
 }
+#[derive(Debug, Clone)]
+pub enum SourceSlicesView<'slice, 'p> {
+    SingleSlice(LdSlice<'slice>),
+    MaybeMultipleSlice {
+        field_in_parent: Option<&'p SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
+    },
+}
+
 impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     pub fn new(slice: &'slice [u8]) -> Self {
         Self {
-            first_field: LdSlice::new(slice),
-            remaining_slice: None,
-            count_in_remaining_slice: 0,
-            parent_internal_data: None,
+            source_slices: SourceSlicesView::SingleSlice(LdSlice::new(slice)),
         }
     }
 
     pub fn new_with_parent(
-        slice: &'slice [u8],
+        parent_field: &'p Option<SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
         parent_internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
     ) -> Self {
         Self {
-            first_field: LdSlice::new(slice),
-            remaining_slice: None,
-            count_in_remaining_slice: 0,
-            parent_internal_data: Some(parent_internal_data),
+            source_slices: SourceSlicesView::MaybeMultipleSlice {
+                field_in_parent: parent_field.as_ref(),
+                field_number_in_parent,
+                parent_internal_data: parent_internal_data,
+            },
         }
     }
 }
+impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
+    pub fn iter(&self) -> impl Iterator<Item = LdSlice<'slice>> {
+        match self {
+            SourceSlicesView::SingleSlice(ld_slice) => {
+                Either::Left(std::iter::once(ld_slice.clone()))
+            }
+            SourceSlicesView::MaybeMultipleSlice {
+                field_in_parent,
+                field_number_in_parent,
+                parent_internal_data,
+            } => Either::Right(match field_in_parent {
+                None => std::iter::empty(),
+                Some(SliceViewFields::FieldsInSingleSlice {
+                    slice: slice_of_fields_in_parent,
+                    count,
+                    enclosing_slice: _,
+                }) => {
+                    todo!()
+                }
+                Some(SliceViewFields::FieldsInMultipleSlices {
+                    count,
+                    first_enclosing_slice,
+                }) => {
+                    todo!()
+                }
+            }),
+        }
+        .into_iter()
+    }
+}
+
 impl<'bump, 'slice, 'p> InternalData<'bump> for InternalDataForSliceViewStruct<'slice, 'p> {
     fn bumpalo(&self) -> &'bump bumpalo::Bump {
         panic!("The Bumpalo data field is only available for a Bumpalo struct!")

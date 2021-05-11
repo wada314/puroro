@@ -302,7 +302,7 @@ pub struct CodeGeneratorResponseSliceView<'slice, 'p> {
     error: ::std::option::Option<&'slice str>,
     supported_features: ::std::option::Option<u64>,
     file: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> CodeGeneratorResponseSliceView<'slice, 'p> {
@@ -711,7 +711,7 @@ pub struct FileSliceView<'slice, 'p> {
     insertion_point: ::std::option::Option<&'slice str>,
     content: ::std::option::Option<&'slice str>,
     generated_code_info: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> FileSliceView<'slice, 'p> {
@@ -1111,7 +1111,7 @@ pub struct CodeGeneratorRequestSliceView<'slice, 'p> {
     parameter: ::std::option::Option<&'slice str>,
     proto_file: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     compiler_version: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> CodeGeneratorRequestSliceView<'slice, 'p> {
@@ -1498,7 +1498,7 @@ pub struct VersionSliceView<'slice, 'p> {
     minor: ::std::option::Option<i32>,
     patch: ::std::option::Option<i32>,
     suffix: ::std::option::Option<&'slice str>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> VersionSliceView<'slice, 'p> {

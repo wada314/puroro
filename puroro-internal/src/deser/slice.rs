@@ -17,6 +17,7 @@ pub trait DeserializableMessageFromSlice {
     ) -> Result<bool>;
 }
 
+/// A wrapper over slice which stores maybe multiple fields data
 #[derive(Debug, Clone)]
 pub struct LdSlice<'slice> {
     slice: &'slice [u8],
@@ -31,12 +32,50 @@ impl<'slice> LdSlice<'slice> {
         handler: &mut H,
     ) -> Result<()> {
         let enclosing_slice = self.slice;
-        loop {
+
+        for field_number_and_data in self {
+            let (field_number, field_data, slice_from_this_field) = field_number_and_data?;
+            if !handler.met_field_at(
+                field_data,
+                field_number,
+                slice_from_this_field,
+                enclosing_slice,
+            )? {
+                break;
+            }
+        }
+        Ok(())
+    }
+
+    fn try_get_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, usize)>> {
+        if self.slice.len() == 0 {
+            return Ok(None);
+        }
+        let key = { Variant::decode_bytes(&mut self.bytes())?.to_usize()? };
+        Ok(Some((
+            WireType::from_usize(key & 0x07).ok_or(ErrorKind::InvalidWireType)?,
+            (key >> 3),
+        )))
+    }
+
+    pub fn bytes(&mut self) -> std::io::Bytes<&mut &'slice [u8]> {
+        self.slice.by_ref().bytes()
+    }
+
+    pub fn as_slice(&self) -> &'slice [u8] {
+        self.slice
+    }
+}
+
+impl<'slice> Iterator for &mut LdSlice<'slice> {
+    type Item = Result<(usize, FieldData<LdSlice<'slice>>, &'slice [u8])>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        (|| {
             let slice_from_this_field = self.slice;
-            let maybe_wire_type_and_field_number = self.try_get_wire_type_and_field_number()?;
-            match maybe_wire_type_and_field_number {
+            Ok(match self.try_get_wire_type_and_field_number()? {
                 None => {
-                    break;
+                    None // end of slice
                 }
                 Some((wire_type, field_number)) => {
                     let field_data = match wire_type {
@@ -79,40 +118,10 @@ impl<'slice> LdSlice<'slice> {
                             Err(ErrorKind::GroupNotSupported)?
                         }
                     };
-                    if !handler.met_field_at(
-                        field_data,
-                        field_number,
-                        slice_from_this_field,
-                        enclosing_slice,
-                    )? {
-                        break;
-                    }
+                    Some((field_number, field_data, slice_from_this_field))
                 }
-            }
-        }
-        Ok(())
-    }
-
-    fn try_get_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, usize)>> {
-        if self.slice.len() == 0 {
-            return Ok(None);
-        }
-        let key = { Variant::decode_bytes(&mut self.bytes())?.to_usize()? };
-        Ok(Some((
-            WireType::from_usize(key & 0x07).ok_or(ErrorKind::InvalidWireType)?,
-            (key >> 3),
-        )))
-    }
-
-    pub fn bytes(&mut self) -> std::io::Bytes<&mut &'slice [u8]> {
-        self.slice.by_ref().bytes()
-    }
-
-    pub fn as_slice(&self) -> &'slice [u8] {
-        self.slice
-    }
-
-    pub fn variants(&self) -> super::iter::Variants<std::io::Bytes<&'slice [u8]>> {
-        super::iter::Variants::new(self.as_slice().bytes())
+            })
+        })()
+        .transpose()
     }
 }

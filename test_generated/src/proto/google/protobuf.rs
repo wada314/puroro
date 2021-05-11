@@ -234,7 +234,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for GeneratedCodeInfoBum
 #[derive(Debug)]
 pub struct GeneratedCodeInfoSliceView<'slice, 'p> {
     annotation: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> GeneratedCodeInfoSliceView<'slice, 'p> {
@@ -619,7 +619,7 @@ pub struct AnnotationSliceView<'slice, 'p> {
     source_file: ::std::option::Option<&'slice str>,
     begin: ::std::option::Option<i32>,
     end: ::std::option::Option<i32>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> AnnotationSliceView<'slice, 'p> {
@@ -911,7 +911,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for SourceCodeInfoBumpal
 #[derive(Debug)]
 pub struct SourceCodeInfoSliceView<'slice, 'p> {
     location: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> SourceCodeInfoSliceView<'slice, 'p> {
@@ -1336,7 +1336,7 @@ pub struct LocationSliceView<'slice, 'p> {
     leading_comments: ::std::option::Option<&'slice str>,
     trailing_comments: ::std::option::Option<&'slice str>,
     leading_detached_comments: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> LocationSliceView<'slice, 'p> {
@@ -1834,7 +1834,7 @@ pub struct UninterpretedOptionSliceView<'slice, 'p> {
     double_value: ::std::option::Option<f64>,
     string_value: ::std::option::Option<&'slice [u8]>,
     aggregate_value: ::std::option::Option<&'slice str>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
@@ -2160,7 +2160,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for NamePartBumpalo<'bum
 pub struct NamePartSliceView<'slice, 'p> {
     name_part: &'slice str,
     is_extension: bool,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> NamePartSliceView<'slice, 'p> {
@@ -2516,7 +2516,7 @@ pub struct MethodOptionsSliceView<'slice, 'p> {
     deprecated: ::std::option::Option<bool>,
     idempotency_level: ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>>,
     uninterpreted_option: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> MethodOptionsSliceView<'slice, 'p> {
@@ -2863,7 +2863,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ServiceOptionsBumpal
 pub struct ServiceOptionsSliceView<'slice, 'p> {
     deprecated: ::std::option::Option<bool>,
     uninterpreted_option: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> ServiceOptionsSliceView<'slice, 'p> {
@@ -3184,7 +3184,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumValueOptionsBump
 pub struct EnumValueOptionsSliceView<'slice, 'p> {
     deprecated: ::std::option::Option<bool>,
     uninterpreted_option: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> EnumValueOptionsSliceView<'slice, 'p> {
@@ -3539,7 +3539,7 @@ pub struct EnumOptionsSliceView<'slice, 'p> {
     allow_alias: ::std::option::Option<bool>,
     deprecated: ::std::option::Option<bool>,
     uninterpreted_option: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> EnumOptionsSliceView<'slice, 'p> {
@@ -3828,7 +3828,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for OneofOptionsBumpalo<
 #[derive(Debug)]
 pub struct OneofOptionsSliceView<'slice, 'p> {
     uninterpreted_option: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> OneofOptionsSliceView<'slice, 'p> {
@@ -4317,7 +4317,7 @@ pub struct FieldOptionsSliceView<'slice, 'p> {
     deprecated: ::std::option::Option<bool>,
     weak: ::std::option::Option<bool>,
     uninterpreted_option: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
@@ -4796,7 +4796,7 @@ pub struct MessageOptionsSliceView<'slice, 'p> {
     deprecated: ::std::option::Option<bool>,
     map_entry: ::std::option::Option<bool>,
     uninterpreted_option: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
@@ -5769,7 +5769,7 @@ pub struct FileOptionsSliceView<'slice, 'p> {
     php_metadata_namespace: ::std::option::Option<&'slice str>,
     ruby_package: ::std::option::Option<&'slice str>,
     uninterpreted_option: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
@@ -6285,7 +6285,7 @@ pub struct MethodDescriptorProtoSliceView<'slice, 'p> {
     options: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     client_streaming: ::std::option::Option<bool>,
     server_streaming: ::std::option::Option<bool>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
@@ -6651,7 +6651,7 @@ pub struct ServiceDescriptorProtoSliceView<'slice, 'p> {
     name: ::std::option::Option<&'slice str>,
     method: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     options: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> ServiceDescriptorProtoSliceView<'slice, 'p> {
@@ -7005,7 +7005,7 @@ pub struct EnumValueDescriptorProtoSliceView<'slice, 'p> {
     name: ::std::option::Option<&'slice str>,
     number: ::std::option::Option<i32>,
     options: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> EnumValueDescriptorProtoSliceView<'slice, 'p> {
@@ -7442,7 +7442,7 @@ pub struct EnumDescriptorProtoSliceView<'slice, 'p> {
     options: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     reserved_range: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     reserved_name: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
@@ -7764,7 +7764,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for EnumReservedRangeBum
 pub struct EnumReservedRangeSliceView<'slice, 'p> {
     start: ::std::option::Option<i32>,
     end: ::std::option::Option<i32>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> EnumReservedRangeSliceView<'slice, 'p> {
@@ -8083,7 +8083,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for OneofDescriptorProto
 pub struct OneofDescriptorProtoSliceView<'slice, 'p> {
     name: ::std::option::Option<&'slice str>,
     options: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> OneofDescriptorProtoSliceView<'slice, 'p> {
@@ -8707,7 +8707,7 @@ pub struct FieldDescriptorProtoSliceView<'slice, 'p> {
     json_name: ::std::option::Option<&'slice str>,
     options: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     proto3_optional: ::std::option::Option<bool>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
@@ -9088,7 +9088,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ExtensionRangeOption
 #[derive(Debug)]
 pub struct ExtensionRangeOptionsSliceView<'slice, 'p> {
     uninterpreted_option: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> ExtensionRangeOptionsSliceView<'slice, 'p> {
@@ -9718,7 +9718,7 @@ pub struct DescriptorProtoSliceView<'slice, 'p> {
     options: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     reserved_range: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     reserved_name: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
@@ -10050,7 +10050,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for ReservedRangeBumpalo
 pub struct ReservedRangeSliceView<'slice, 'p> {
     start: ::std::option::Option<i32>,
     end: ::std::option::Option<i32>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> ReservedRangeSliceView<'slice, 'p> {
@@ -10402,7 +10402,7 @@ pub struct ExtensionRangeSliceView<'slice, 'p> {
     start: ::std::option::Option<i32>,
     end: ::std::option::Option<i32>,
     options: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> ExtensionRangeSliceView<'slice, 'p> {
@@ -11099,7 +11099,7 @@ pub struct FileDescriptorProtoSliceView<'slice, 'p> {
     options: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     source_code_info: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     syntax: ::std::option::Option<&'slice str>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
@@ -11406,7 +11406,7 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileDescriptorSetBum
 #[derive(Debug)]
 pub struct FileDescriptorSetSliceView<'slice, 'p> {
     file: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 }
 
 impl<'slice, 'p> FileDescriptorSetSliceView<'slice, 'p> {

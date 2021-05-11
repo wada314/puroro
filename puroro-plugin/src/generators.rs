@@ -67,7 +67,10 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
             output: Indentor::new(output),
             context: context.with_alloc_type(AllocatorType::Default),
             bumpalo_context: context.with_alloc_type(AllocatorType::Bumpalo),
-            slice_view_context: context.with_impl_type(ImplType::SliceView { check_utf8: true }),
+            slice_view_context: context.with_impl_type(ImplType::SliceView {
+                check_utf8: true,
+                check_wire_types: true,
+            }),
         };
         file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
         filenames_and_contents.insert(file_name, visitor.output.into_inner());
