@@ -2,7 +2,7 @@ use crate::deser::{DeserializableMessageFromIter, LdIter};
 use crate::tags;
 use crate::tags::{FieldLabelTag, FieldTypeTag};
 use crate::types::FieldData;
-use crate::variant::VariantTypeTag;
+use crate::variant::{Variant, VariantTypeTag};
 use crate::{ErrorKind, Result};
 use std::collections::HashMap;
 use std::convert::TryFrom;
@@ -50,13 +50,20 @@ where
     /// * `field` - A data of the field, where the wire type and (for length delimited wire
     /// type) the field length are already load. For variants and fixed bytes fields,
     /// the content data is also already load.
-    fn deser(&mut self, field: FieldData<&'slice [u8]>) -> Result<()>;
+    /// * `enclosing_slice` - Slice for this field's owner's fields. If the owner message is
+    /// split into multiple instances in the input slice, then the instance of the one that
+    /// this field is included.
+    fn deser(
+        &mut self,
+        field: FieldData<&'slice [u8]>,
+        enclosing_slice: &'slice [u8],
+    ) -> Result<()>;
 }
 
 macro_rules! redirect_deser_from_slice_to_from_iter {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
         impl<'bump, 'slice> FieldDeserFromSlice<'slice, $ttag, $ltag> for $ty {
-            fn deser(&mut self, field: FieldData<&'slice [u8]>) -> Result<()> {
+            fn deser(&mut self, field: FieldData<&'slice [u8]>, _: &'slice [u8]) -> Result<()> {
                 let mut ld_iter;
                 let new_field = match field {
                     FieldData::LengthDelimited(slice) => {
@@ -239,7 +246,7 @@ define_deser_scalar_ld!(
 macro_rules! define_deser_scalar_ld_from_slice {
     ($ty:ty, $ttag:ty, $ltag:ty, $conv:expr) => {
         impl<'slice> FieldDeserFromSlice<'slice, $ttag, $ltag> for $ty {
-            fn deser(&mut self, field: FieldData<&'slice [u8]>) -> Result<()> {
+            fn deser(&mut self, field: FieldData<&'slice [u8]>, _: &'slice [u8]) -> Result<()> {
                 match field {
                     FieldData::LengthDelimited(slice) => {
                         *self = ($conv)(slice);
@@ -487,6 +494,14 @@ define_deser_repeated_variants!(i64, tags::SInt64);
 define_deser_repeated_variants!(u32, tags::UInt32);
 define_deser_repeated_variants!(u64, tags::UInt64);
 define_deser_repeated_variants!(bool, tags::Bool);
+
+impl<'slice> FieldDeserFromSlice<'slice, tags::Int32, tags::Repeated>
+    for <tags::Int32 as VariantTypeTag>::NativeType
+{
+    fn deser(&mut self, field: FieldData<&'slice [u8]>, _: &'slice [u8]) -> Result<()> {
+        todo!()
+    }
+}
 
 macro_rules! define_deser_repeated_enum {
     () => {
