@@ -12,7 +12,7 @@ pub trait DeserializableMessageFromSlice {
         &mut self,
         field: FieldData<LdSlice<'slice>>,
         field_number: usize,
-        slice_from_field: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
         enclosing_slice: &'slice [u8],
     ) -> Result<bool>;
 }
@@ -32,7 +32,7 @@ impl<'slice> LdSlice<'slice> {
     ) -> Result<()> {
         let enclosing_slice = self.slice;
         loop {
-            let slice_from_field = self.slice;
+            let slice_from_this_field = self.slice;
             let maybe_wire_type_and_field_number = self.try_get_wire_type_and_field_number()?;
             match maybe_wire_type_and_field_number {
                 None => {
@@ -82,7 +82,7 @@ impl<'slice> LdSlice<'slice> {
                     if !handler.met_field_at(
                         field_data,
                         field_number,
-                        slice_from_field,
+                        slice_from_this_field,
                         enclosing_slice,
                     )? {
                         break;

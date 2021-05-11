@@ -10,14 +10,14 @@ pub trait GeneratedCodeInfoTrait {
 #[derive(Debug)]
 pub struct GeneratedCodeInfo {
     pub annotation: ::std::vec::Vec<self::generated_code_info::Annotation>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl GeneratedCodeInfo {
     pub fn new() -> Self {
         Self {
             annotation: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -123,14 +123,14 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for GeneratedCodeInfo {
 #[derive(Debug)]
 pub struct GeneratedCodeInfoBumpalo<'bump> {
     pub annotation: ::bumpalo::collections::Vec<'bump, self::generated_code_info::AnnotationBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> GeneratedCodeInfoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             annotation: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -245,7 +245,7 @@ pub struct Annotation {
     pub source_file: ::std::option::Option<::std::string::String>,
     pub begin: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl Annotation {
@@ -255,7 +255,7 @@ impl Annotation {
             source_file: ::puroro_internal::helpers::FieldNew::new(),
             begin: ::puroro_internal::helpers::FieldNew::new(),
             end: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -405,7 +405,7 @@ pub struct AnnotationBumpalo<'bump> {
     pub source_file: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub begin: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> AnnotationBumpalo<'bump> {
@@ -415,7 +415,7 @@ impl<'bump> AnnotationBumpalo<'bump> {
             source_file: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             begin: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             end: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -566,14 +566,14 @@ pub trait SourceCodeInfoTrait {
 #[derive(Debug)]
 pub struct SourceCodeInfo {
     pub location: ::std::vec::Vec<self::source_code_info::Location>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl SourceCodeInfo {
     pub fn new() -> Self {
         Self {
             location: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -679,14 +679,14 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for SourceCodeInfo {
 #[derive(Debug)]
 pub struct SourceCodeInfoBumpalo<'bump> {
     pub location: ::bumpalo::collections::Vec<'bump, self::source_code_info::LocationBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> SourceCodeInfoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             location: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -805,7 +805,7 @@ pub struct Location {
     pub leading_comments: ::std::option::Option<::std::string::String>,
     pub trailing_comments: ::std::option::Option<::std::string::String>,
     pub leading_detached_comments: ::std::vec::Vec<::std::string::String>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl Location {
@@ -816,7 +816,7 @@ impl Location {
             leading_comments: ::puroro_internal::helpers::FieldNew::new(),
             trailing_comments: ::puroro_internal::helpers::FieldNew::new(),
             leading_detached_comments: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -983,7 +983,7 @@ pub struct LocationBumpalo<'bump> {
     pub leading_comments: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub trailing_comments: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub leading_detached_comments: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> LocationBumpalo<'bump> {
@@ -994,7 +994,7 @@ impl<'bump> LocationBumpalo<'bump> {
             leading_comments: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             trailing_comments: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             leading_detached_comments: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -1173,7 +1173,7 @@ pub struct UninterpretedOption {
     pub double_value: ::std::option::Option<f64>,
     pub string_value: ::std::option::Option<::std::vec::Vec<u8>>,
     pub aggregate_value: ::std::option::Option<::std::string::String>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl UninterpretedOption {
@@ -1186,7 +1186,7 @@ impl UninterpretedOption {
             double_value: ::puroro_internal::helpers::FieldNew::new(),
             string_value: ::puroro_internal::helpers::FieldNew::new(),
             aggregate_value: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -1382,7 +1382,7 @@ pub struct UninterpretedOptionBumpalo<'bump> {
     pub double_value: ::std::option::Option<f64>,
     pub string_value: ::std::option::Option<::bumpalo::collections::Vec<'bump, u8>>,
     pub aggregate_value: ::std::option::Option<::bumpalo::collections::String<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> UninterpretedOptionBumpalo<'bump> {
@@ -1395,7 +1395,7 @@ impl<'bump> UninterpretedOptionBumpalo<'bump> {
             double_value: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             string_value: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             aggregate_value: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -1589,7 +1589,7 @@ pub trait NamePartTrait {
 pub struct NamePart {
     pub name_part: ::std::string::String,
     pub is_extension: bool,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl NamePart {
@@ -1597,7 +1597,7 @@ impl NamePart {
         Self {
             name_part: ::puroro_internal::helpers::FieldNew::new(),
             is_extension: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -1716,7 +1716,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for NamePart {
 pub struct NamePartBumpalo<'bump> {
     pub name_part: ::bumpalo::collections::String<'bump>,
     pub is_extension: bool,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> NamePartBumpalo<'bump> {
@@ -1724,7 +1724,7 @@ impl<'bump> NamePartBumpalo<'bump> {
         Self {
             name_part: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             is_extension: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -1850,7 +1850,7 @@ pub struct MethodOptions {
     pub deprecated: ::std::option::Option<bool>,
     pub idempotency_level: ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>>,
     pub uninterpreted_option: ::std::vec::Vec<self::UninterpretedOption>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl MethodOptions {
@@ -1859,7 +1859,7 @@ impl MethodOptions {
             deprecated: ::puroro_internal::helpers::FieldNew::new(),
             idempotency_level: ::puroro_internal::helpers::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -1995,7 +1995,7 @@ pub struct MethodOptionsBumpalo<'bump> {
     pub deprecated: ::std::option::Option<bool>,
     pub idempotency_level: ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MethodOptionsBumpalo<'bump> {
@@ -2004,7 +2004,7 @@ impl<'bump> MethodOptionsBumpalo<'bump> {
             deprecated: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             idempotency_level: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -2167,7 +2167,7 @@ pub trait ServiceOptionsTrait {
 pub struct ServiceOptions {
     pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::std::vec::Vec<self::UninterpretedOption>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl ServiceOptions {
@@ -2175,7 +2175,7 @@ impl ServiceOptions {
         Self {
             deprecated: ::puroro_internal::helpers::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -2296,7 +2296,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for ServiceOptions {
 pub struct ServiceOptionsBumpalo<'bump> {
     pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ServiceOptionsBumpalo<'bump> {
@@ -2304,7 +2304,7 @@ impl<'bump> ServiceOptionsBumpalo<'bump> {
         Self {
             deprecated: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -2429,7 +2429,7 @@ pub trait EnumValueOptionsTrait {
 pub struct EnumValueOptions {
     pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::std::vec::Vec<self::UninterpretedOption>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl EnumValueOptions {
@@ -2437,7 +2437,7 @@ impl EnumValueOptions {
         Self {
             deprecated: ::puroro_internal::helpers::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -2558,7 +2558,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for EnumValueOptions {
 pub struct EnumValueOptionsBumpalo<'bump> {
     pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumValueOptionsBumpalo<'bump> {
@@ -2566,7 +2566,7 @@ impl<'bump> EnumValueOptionsBumpalo<'bump> {
         Self {
             deprecated: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -2693,7 +2693,7 @@ pub struct EnumOptions {
     pub allow_alias: ::std::option::Option<bool>,
     pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::std::vec::Vec<self::UninterpretedOption>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl EnumOptions {
@@ -2702,7 +2702,7 @@ impl EnumOptions {
             allow_alias: ::puroro_internal::helpers::FieldNew::new(),
             deprecated: ::puroro_internal::helpers::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -2838,7 +2838,7 @@ pub struct EnumOptionsBumpalo<'bump> {
     pub allow_alias: ::std::option::Option<bool>,
     pub deprecated: ::std::option::Option<bool>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumOptionsBumpalo<'bump> {
@@ -2847,7 +2847,7 @@ impl<'bump> EnumOptionsBumpalo<'bump> {
             allow_alias: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             deprecated: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -2984,14 +2984,14 @@ pub trait OneofOptionsTrait {
 #[derive(Debug)]
 pub struct OneofOptions {
     pub uninterpreted_option: ::std::vec::Vec<self::UninterpretedOption>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl OneofOptions {
     pub fn new() -> Self {
         Self {
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -3097,14 +3097,14 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for OneofOptions {
 #[derive(Debug)]
 pub struct OneofOptionsBumpalo<'bump> {
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> OneofOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -3225,7 +3225,7 @@ pub struct FieldOptions {
     pub deprecated: ::std::option::Option<bool>,
     pub weak: ::std::option::Option<bool>,
     pub uninterpreted_option: ::std::vec::Vec<self::UninterpretedOption>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl FieldOptions {
@@ -3238,7 +3238,7 @@ impl FieldOptions {
             deprecated: ::puroro_internal::helpers::FieldNew::new(),
             weak: ::puroro_internal::helpers::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -3434,7 +3434,7 @@ pub struct FieldOptionsBumpalo<'bump> {
     pub deprecated: ::std::option::Option<bool>,
     pub weak: ::std::option::Option<bool>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FieldOptionsBumpalo<'bump> {
@@ -3447,7 +3447,7 @@ impl<'bump> FieldOptionsBumpalo<'bump> {
             deprecated: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             weak: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -3694,7 +3694,7 @@ pub struct MessageOptions {
     pub deprecated: ::std::option::Option<bool>,
     pub map_entry: ::std::option::Option<bool>,
     pub uninterpreted_option: ::std::vec::Vec<self::UninterpretedOption>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl MessageOptions {
@@ -3705,7 +3705,7 @@ impl MessageOptions {
             deprecated: ::puroro_internal::helpers::FieldNew::new(),
             map_entry: ::puroro_internal::helpers::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -3871,7 +3871,7 @@ pub struct MessageOptionsBumpalo<'bump> {
     pub deprecated: ::std::option::Option<bool>,
     pub map_entry: ::std::option::Option<bool>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MessageOptionsBumpalo<'bump> {
@@ -3882,7 +3882,7 @@ impl<'bump> MessageOptionsBumpalo<'bump> {
             deprecated: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             map_entry: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -4087,7 +4087,7 @@ pub struct FileOptions {
     pub php_metadata_namespace: ::std::option::Option<::std::string::String>,
     pub ruby_package: ::std::option::Option<::std::string::String>,
     pub uninterpreted_option: ::std::vec::Vec<self::UninterpretedOption>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl FileOptions {
@@ -4114,7 +4114,7 @@ impl FileOptions {
             php_metadata_namespace: ::puroro_internal::helpers::FieldNew::new(),
             ruby_package: ::puroro_internal::helpers::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -4520,7 +4520,7 @@ pub struct FileOptionsBumpalo<'bump> {
     pub php_metadata_namespace: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub ruby_package: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileOptionsBumpalo<'bump> {
@@ -4547,7 +4547,7 @@ impl<'bump> FileOptionsBumpalo<'bump> {
             php_metadata_namespace: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             ruby_package: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -4969,7 +4969,7 @@ pub struct MethodDescriptorProto {
     pub options: ::std::option::Option<::std::boxed::Box<self::MethodOptions>>,
     pub client_streaming: ::std::option::Option<bool>,
     pub server_streaming: ::std::option::Option<bool>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl MethodDescriptorProto {
@@ -4981,7 +4981,7 @@ impl MethodDescriptorProto {
             options: ::puroro_internal::helpers::FieldNew::new(),
             client_streaming: ::puroro_internal::helpers::FieldNew::new(),
             server_streaming: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -5161,7 +5161,7 @@ pub struct MethodDescriptorProtoBumpalo<'bump> {
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::MethodOptionsBumpalo<'bump>>>,
     pub client_streaming: ::std::option::Option<bool>,
     pub server_streaming: ::std::option::Option<bool>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MethodDescriptorProtoBumpalo<'bump> {
@@ -5173,7 +5173,7 @@ impl<'bump> MethodDescriptorProtoBumpalo<'bump> {
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             client_streaming: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             server_streaming: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -5356,7 +5356,7 @@ pub struct ServiceDescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub method: ::std::vec::Vec<self::MethodDescriptorProto>,
     pub options: ::std::option::Option<::std::boxed::Box<self::ServiceOptions>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl ServiceDescriptorProto {
@@ -5365,7 +5365,7 @@ impl ServiceDescriptorProto {
             name: ::puroro_internal::helpers::FieldNew::new(),
             method: ::puroro_internal::helpers::FieldNew::new(),
             options: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -5502,7 +5502,7 @@ pub struct ServiceDescriptorProtoBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub method: ::bumpalo::collections::Vec<'bump, self::MethodDescriptorProtoBumpalo<'bump>>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::ServiceOptionsBumpalo<'bump>>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ServiceDescriptorProtoBumpalo<'bump> {
@@ -5511,7 +5511,7 @@ impl<'bump> ServiceDescriptorProtoBumpalo<'bump> {
             name: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             method: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -5652,7 +5652,7 @@ pub struct EnumValueDescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub number: ::std::option::Option<i32>,
     pub options: ::std::option::Option<::std::boxed::Box<self::EnumValueOptions>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl EnumValueDescriptorProto {
@@ -5661,7 +5661,7 @@ impl EnumValueDescriptorProto {
             name: ::puroro_internal::helpers::FieldNew::new(),
             number: ::puroro_internal::helpers::FieldNew::new(),
             options: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -5796,7 +5796,7 @@ pub struct EnumValueDescriptorProtoBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub number: ::std::option::Option<i32>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::EnumValueOptionsBumpalo<'bump>>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumValueDescriptorProtoBumpalo<'bump> {
@@ -5805,7 +5805,7 @@ impl<'bump> EnumValueDescriptorProtoBumpalo<'bump> {
             name: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             number: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -5953,7 +5953,7 @@ pub struct EnumDescriptorProto {
     pub options: ::std::option::Option<::std::boxed::Box<self::EnumOptions>>,
     pub reserved_range: ::std::vec::Vec<self::enum_descriptor_proto::EnumReservedRange>,
     pub reserved_name: ::std::vec::Vec<::std::string::String>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl EnumDescriptorProto {
@@ -5964,7 +5964,7 @@ impl EnumDescriptorProto {
             options: ::puroro_internal::helpers::FieldNew::new(),
             reserved_range: ::puroro_internal::helpers::FieldNew::new(),
             reserved_name: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -6134,7 +6134,7 @@ pub struct EnumDescriptorProtoBumpalo<'bump> {
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::EnumOptionsBumpalo<'bump>>>,
     pub reserved_range: ::bumpalo::collections::Vec<'bump, self::enum_descriptor_proto::EnumReservedRangeBumpalo<'bump>>,
     pub reserved_name: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumDescriptorProtoBumpalo<'bump> {
@@ -6145,7 +6145,7 @@ impl<'bump> EnumDescriptorProtoBumpalo<'bump> {
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             reserved_range: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             reserved_name: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -6315,7 +6315,7 @@ pub trait EnumReservedRangeTrait {
 pub struct EnumReservedRange {
     pub start: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl EnumReservedRange {
@@ -6323,7 +6323,7 @@ impl EnumReservedRange {
         Self {
             start: ::puroro_internal::helpers::FieldNew::new(),
             end: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -6442,7 +6442,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for EnumReservedRange {
 pub struct EnumReservedRangeBumpalo<'bump> {
     pub start: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> EnumReservedRangeBumpalo<'bump> {
@@ -6450,7 +6450,7 @@ impl<'bump> EnumReservedRangeBumpalo<'bump> {
         Self {
             start: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             end: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -6573,7 +6573,7 @@ pub trait OneofDescriptorProtoTrait {
 pub struct OneofDescriptorProto {
     pub name: ::std::option::Option<::std::string::String>,
     pub options: ::std::option::Option<::std::boxed::Box<self::OneofOptions>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl OneofDescriptorProto {
@@ -6581,7 +6581,7 @@ impl OneofDescriptorProto {
         Self {
             name: ::puroro_internal::helpers::FieldNew::new(),
             options: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -6701,7 +6701,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for OneofDescriptorProto {
 pub struct OneofDescriptorProtoBumpalo<'bump> {
     pub name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::OneofOptionsBumpalo<'bump>>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> OneofDescriptorProtoBumpalo<'bump> {
@@ -6709,7 +6709,7 @@ impl<'bump> OneofDescriptorProtoBumpalo<'bump> {
         Self {
             name: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -6850,7 +6850,7 @@ pub struct FieldDescriptorProto {
     pub json_name: ::std::option::Option<::std::string::String>,
     pub options: ::std::option::Option<::std::boxed::Box<self::FieldOptions>>,
     pub proto3_optional: ::std::option::Option<bool>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl FieldDescriptorProto {
@@ -6867,7 +6867,7 @@ impl FieldDescriptorProto {
             json_name: ::puroro_internal::helpers::FieldNew::new(),
             options: ::puroro_internal::helpers::FieldNew::new(),
             proto3_optional: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -7122,7 +7122,7 @@ pub struct FieldDescriptorProtoBumpalo<'bump> {
     pub json_name: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::FieldOptionsBumpalo<'bump>>>,
     pub proto3_optional: ::std::option::Option<bool>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FieldDescriptorProtoBumpalo<'bump> {
@@ -7139,7 +7139,7 @@ impl<'bump> FieldDescriptorProtoBumpalo<'bump> {
             json_name: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             proto3_optional: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -7463,14 +7463,14 @@ pub trait ExtensionRangeOptionsTrait {
 #[derive(Debug)]
 pub struct ExtensionRangeOptions {
     pub uninterpreted_option: ::std::vec::Vec<self::UninterpretedOption>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl ExtensionRangeOptions {
     pub fn new() -> Self {
         Self {
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -7576,14 +7576,14 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for ExtensionRangeOptions {
 #[derive(Debug)]
 pub struct ExtensionRangeOptionsBumpalo<'bump> {
     pub uninterpreted_option: ::bumpalo::collections::Vec<'bump, self::UninterpretedOptionBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ExtensionRangeOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             uninterpreted_option: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -7723,7 +7723,7 @@ pub struct DescriptorProto {
     pub options: ::std::option::Option<::std::boxed::Box<self::MessageOptions>>,
     pub reserved_range: ::std::vec::Vec<self::descriptor_proto::ReservedRange>,
     pub reserved_name: ::std::vec::Vec<::std::string::String>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl DescriptorProto {
@@ -7739,7 +7739,7 @@ impl DescriptorProto {
             options: ::puroro_internal::helpers::FieldNew::new(),
             reserved_range: ::puroro_internal::helpers::FieldNew::new(),
             reserved_name: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -7993,7 +7993,7 @@ pub struct DescriptorProtoBumpalo<'bump> {
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::MessageOptionsBumpalo<'bump>>>,
     pub reserved_range: ::bumpalo::collections::Vec<'bump, self::descriptor_proto::ReservedRangeBumpalo<'bump>>,
     pub reserved_name: ::bumpalo::collections::Vec<'bump, ::bumpalo::collections::String<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> DescriptorProtoBumpalo<'bump> {
@@ -8009,7 +8009,7 @@ impl<'bump> DescriptorProtoBumpalo<'bump> {
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             reserved_range: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             reserved_name: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -8258,7 +8258,7 @@ pub trait ReservedRangeTrait {
 pub struct ReservedRange {
     pub start: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl ReservedRange {
@@ -8266,7 +8266,7 @@ impl ReservedRange {
         Self {
             start: ::puroro_internal::helpers::FieldNew::new(),
             end: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -8385,7 +8385,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for ReservedRange {
 pub struct ReservedRangeBumpalo<'bump> {
     pub start: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ReservedRangeBumpalo<'bump> {
@@ -8393,7 +8393,7 @@ impl<'bump> ReservedRangeBumpalo<'bump> {
         Self {
             start: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             end: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -8517,7 +8517,7 @@ pub struct ExtensionRange {
     pub start: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
     pub options: ::std::option::Option<::std::boxed::Box<super::ExtensionRangeOptions>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl ExtensionRange {
@@ -8526,7 +8526,7 @@ impl ExtensionRange {
             start: ::puroro_internal::helpers::FieldNew::new(),
             end: ::puroro_internal::helpers::FieldNew::new(),
             options: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -8661,7 +8661,7 @@ pub struct ExtensionRangeBumpalo<'bump> {
     pub start: ::std::option::Option<i32>,
     pub end: ::std::option::Option<i32>,
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::ExtensionRangeOptionsBumpalo<'bump>>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> ExtensionRangeBumpalo<'bump> {
@@ -8670,7 +8670,7 @@ impl<'bump> ExtensionRangeBumpalo<'bump> {
             start: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             end: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -8840,7 +8840,7 @@ pub struct FileDescriptorProto {
     pub options: ::std::option::Option<::std::boxed::Box<self::FileOptions>>,
     pub source_code_info: ::std::option::Option<::std::boxed::Box<self::SourceCodeInfo>>,
     pub syntax: ::std::option::Option<::std::string::String>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl FileDescriptorProto {
@@ -8858,7 +8858,7 @@ impl FileDescriptorProto {
             options: ::puroro_internal::helpers::FieldNew::new(),
             source_code_info: ::puroro_internal::helpers::FieldNew::new(),
             syntax: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -9140,7 +9140,7 @@ pub struct FileDescriptorProtoBumpalo<'bump> {
     pub options: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::FileOptionsBumpalo<'bump>>>,
     pub source_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::SourceCodeInfoBumpalo<'bump>>>,
     pub syntax: ::std::option::Option<::bumpalo::collections::String<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileDescriptorProtoBumpalo<'bump> {
@@ -9158,7 +9158,7 @@ impl<'bump> FileDescriptorProtoBumpalo<'bump> {
             options: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             source_code_info: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             syntax: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -9432,14 +9432,14 @@ pub trait FileDescriptorSetTrait {
 #[derive(Debug)]
 pub struct FileDescriptorSet {
     pub file: ::std::vec::Vec<self::FileDescriptorProto>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl FileDescriptorSet {
     pub fn new() -> Self {
         Self {
             file: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -9545,14 +9545,14 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for FileDescriptorSet {
 #[derive(Debug)]
 pub struct FileDescriptorSetBumpalo<'bump> {
     pub file: ::bumpalo::collections::Vec<'bump, self::FileDescriptorProtoBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileDescriptorSetBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             file: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }

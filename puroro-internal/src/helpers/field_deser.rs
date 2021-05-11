@@ -20,7 +20,7 @@ where
 {
     /// The return type of the default instance generator passed to `deser` method.
     type Item;
-    /// Deserialize bynary data into this field.
+    /// Deserialize binary data into this field.
     /// * `field` - A data of the field, where the wire type and (for length delimited wire
     /// type) the field length are already load. For variants and fixed bytes fields,
     /// the content data is also already load.
@@ -46,16 +46,19 @@ where
     TypeTag: FieldTypeTag,
     LabelTag: FieldLabelTag,
 {
-    /// Deserialize bynary data into this field.
+    /// Deserialize binary data into this field.
     /// * `field` - A data of the field, where the wire type and (for length delimited wire
     /// type) the field length are already load. For variants and fixed bytes fields,
     /// the content data is also already load.
+    /// * `slice_from_this_field` - a subslice of `enclosing_slice` starting from the field's
+    /// first byte (including the bytes for wire_type, field_number and field_length).
     /// * `enclosing_slice` - Slice for this field's owner's fields. If the owner message is
     /// split into multiple instances in the input slice, then the instance of the one that
     /// this field is included.
     fn deser(
         &mut self,
         field: FieldData<LdSlice<'slice>>,
+        slice_from_this_field: &'slice [u8],
         enclosing_slice: &'slice [u8],
     ) -> Result<()>;
 }
@@ -63,7 +66,12 @@ where
 macro_rules! redirect_deser_from_slice_to_from_iter {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
         impl<'bump, 'slice> FieldDeserFromSlice<'slice, $ttag, $ltag> for $ty {
-            fn deser(&mut self, field: FieldData<LdSlice<'slice>>, _: &'slice [u8]) -> Result<()> {
+            fn deser(
+                &mut self,
+                field: FieldData<LdSlice<'slice>>,
+                _: &'slice [u8],
+                _: &'slice [u8],
+            ) -> Result<()> {
                 let mut ld_iter;
                 let new_field = match field {
                     FieldData::LengthDelimited(ld_slice) => {
@@ -175,7 +183,7 @@ macro_rules! define_deser_scalar_enum {
 define_deser_scalar_enum!(std::result::Result<T, i32>, tags::Enum<T>, tags::Required);
 define_deser_scalar_enum!(std::result::Result<T, i32>, tags::Enum<T>, tags::Optional3);
 
-macro_rules! define_deser_scalar_ld {
+macro_rules! define_deser_scalar_ld_from_iter {
     ($ty:ty, $ttag:ty, $ltag:ty, $method:ident) => {
         impl<'bump> FieldDeserFromIter<$ttag, $ltag> for $ty {
             type Item = $ty;
@@ -210,33 +218,33 @@ macro_rules! define_deser_scalar_ld {
         }
     };
 }
-define_deser_scalar_ld!(String, tags::String, tags::Required, chars);
-define_deser_scalar_ld!(Vec<u8>, tags::Bytes, tags::Required, bytes);
-define_deser_scalar_ld!(String, tags::String, tags::Optional3, chars);
-define_deser_scalar_ld!(Vec<u8>, tags::Bytes, tags::Optional3, bytes);
+define_deser_scalar_ld_from_iter!(String, tags::String, tags::Required, chars);
+define_deser_scalar_ld_from_iter!(Vec<u8>, tags::Bytes, tags::Required, bytes);
+define_deser_scalar_ld_from_iter!(String, tags::String, tags::Optional3, chars);
+define_deser_scalar_ld_from_iter!(Vec<u8>, tags::Bytes, tags::Optional3, bytes);
 #[cfg(feature = "puroro-bumpalo")]
-define_deser_scalar_ld!(
+define_deser_scalar_ld_from_iter!(
     ::bumpalo::collections::String<'bump>,
     tags::String,
     tags::Required,
     chars
 );
 #[cfg(feature = "puroro-bumpalo")]
-define_deser_scalar_ld!(
+define_deser_scalar_ld_from_iter!(
     ::bumpalo::collections::Vec<'bump, u8>,
     tags::Bytes,
     tags::Required,
     bytes
 );
 #[cfg(feature = "puroro-bumpalo")]
-define_deser_scalar_ld!(
+define_deser_scalar_ld_from_iter!(
     ::bumpalo::collections::String<'bump>,
     tags::String,
     tags::Optional3,
     chars
 );
 #[cfg(feature = "puroro-bumpalo")]
-define_deser_scalar_ld!(
+define_deser_scalar_ld_from_iter!(
     ::bumpalo::collections::Vec<'bump, u8>,
     tags::Bytes,
     tags::Optional3,
@@ -246,7 +254,12 @@ define_deser_scalar_ld!(
 macro_rules! define_deser_scalar_ld_from_slice {
     ($ty:ty, $ttag:ty, $ltag:ty, $conv:expr) => {
         impl<'slice> FieldDeserFromSlice<'slice, $ttag, $ltag> for $ty {
-            fn deser(&mut self, field: FieldData<LdSlice<'slice>>, _: &'slice [u8]) -> Result<()> {
+            fn deser(
+                &mut self,
+                field: FieldData<LdSlice<'slice>>,
+                _: &'slice [u8],
+                _: &'slice [u8],
+            ) -> Result<()> {
                 match field {
                     FieldData::LengthDelimited(slice) => {
                         *self = ($conv)(slice);
@@ -503,33 +516,51 @@ define_deser_repeated_variants!(u32, tags::UInt32);
 define_deser_repeated_variants!(u64, tags::UInt64);
 define_deser_repeated_variants!(bool, tags::Bool);
 
-impl<'slice> FieldDeserFromSlice<'slice, tags::Int32, tags::Repeated>
+// This covers all Repeated fields and all Message types.
+impl<'slice, TypeTag, LabelTag> FieldDeserFromSlice<'slice, TypeTag, LabelTag>
     for Option<SliceViewFields<'slice>>
+where
+    TypeTag: FieldTypeTag,
+    LabelTag: FieldLabelTag,
 {
     fn deser(
         &mut self,
-        field: FieldData<LdSlice<'slice>>,
+        _: FieldData<LdSlice<'slice>>,
+        slice_from_this_field: &'slice [u8],
         enclosing_slice: &'slice [u8],
     ) -> Result<()> {
-        match self {
-            None => {
-                todo!()
-            }
+        *self = match self {
+            None => Some(SliceViewFields::FieldsInSingleSlice {
+                slice: slice_from_this_field,
+                count: 1,
+                enclosing_slice,
+            }),
             Some(SliceViewFields::FieldsInSingleSlice {
                 slice,
                 count,
-                enclosing_slice,
-            }) => {
-                todo!()
-            }
+                enclosing_slice: existing_fields_enclosing_slice,
+            }) => Some(
+                if std::ptr::eq(enclosing_slice, *existing_fields_enclosing_slice) {
+                    SliceViewFields::FieldsInSingleSlice {
+                        slice,
+                        count: *count + 1,
+                        enclosing_slice: *existing_fields_enclosing_slice,
+                    }
+                } else {
+                    SliceViewFields::FieldsInMultipleSlices {
+                        count: *count + 1,
+                        first_enclosing_slice: *existing_fields_enclosing_slice,
+                    }
+                },
+            ),
             Some(SliceViewFields::FieldsInMultipleSlices {
                 count,
                 first_enclosing_slice,
-                enclosing_slice_count,
-            }) => {
-                todo!()
-            }
-        }
+            }) => Some(SliceViewFields::FieldsInMultipleSlices {
+                count: *count + 1,
+                first_enclosing_slice,
+            }),
+        };
         Ok(())
     }
 }

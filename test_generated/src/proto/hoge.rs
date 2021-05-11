@@ -11,14 +11,14 @@ pub trait MsgTrait {
 #[derive(Debug)]
 pub struct Msg {
     pub the_map: ::std::collections::HashMap<::std::string::String, self::msg::SubMsg>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl Msg {
     pub fn new() -> Self {
         Self {
             the_map: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -116,14 +116,14 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for Msg<> {
 #[derive(Debug)]
 pub struct MsgBumpalo<'bump> {
     pub the_map: ::std::collections::HashMap<::bumpalo::collections::String<'bump>, self::msg::SubMsgBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> MsgBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             the_map: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -226,7 +226,7 @@ pub trait TheMapEntryTrait {
 pub struct TheMapEntry {
     pub key: ::std::string::String,
     pub value: ::std::option::Option<::std::boxed::Box<self::SubMsg>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl TheMapEntry {
@@ -234,7 +234,7 @@ impl TheMapEntry {
         Self {
             key: ::puroro_internal::helpers::FieldNew::new(),
             value: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -374,7 +374,7 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for TheMapEntry<> {
 pub struct TheMapEntryBumpalo<'bump> {
     pub key: ::bumpalo::collections::String<'bump>,
     pub value: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::SubMsgBumpalo<'bump>>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> TheMapEntryBumpalo<'bump> {
@@ -382,7 +382,7 @@ impl<'bump> TheMapEntryBumpalo<'bump> {
         Self {
             key: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             value: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -520,13 +520,13 @@ pub trait SubMsgTrait {
 
 #[derive(Debug)]
 pub struct SubMsg {
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl SubMsg {
     pub fn new() -> Self {
         Self {
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -606,13 +606,13 @@ impl<'a> ::puroro_internal::helpers::FieldNew<'a> for SubMsg<> {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug)]
 pub struct SubMsgBumpalo<'bump> {
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> SubMsgBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }

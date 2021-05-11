@@ -35,6 +35,5 @@ pub enum SliceViewFields<'slice> {
     FieldsInMultipleSlices {
         count: usize,
         first_enclosing_slice: &'slice [u8],
-        enclosing_slice_count: usize,
     },
 }

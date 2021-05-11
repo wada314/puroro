@@ -14,7 +14,7 @@ pub struct CodeGeneratorResponse {
     pub error: ::std::option::Option<::std::string::String>,
     pub supported_features: ::std::option::Option<u64>,
     pub file: ::std::vec::Vec<self::code_generator_response::File>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl CodeGeneratorResponse {
@@ -23,7 +23,7 @@ impl CodeGeneratorResponse {
             error: ::puroro_internal::helpers::FieldNew::new(),
             supported_features: ::puroro_internal::helpers::FieldNew::new(),
             file: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -159,7 +159,7 @@ pub struct CodeGeneratorResponseBumpalo<'bump> {
     pub error: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub supported_features: ::std::option::Option<u64>,
     pub file: ::bumpalo::collections::Vec<'bump, self::code_generator_response::FileBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorResponseBumpalo<'bump> {
@@ -168,7 +168,7 @@ impl<'bump> CodeGeneratorResponseBumpalo<'bump> {
             error: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             supported_features: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             file: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -302,7 +302,7 @@ pub struct CodeGeneratorResponseSliceView<'slice> {
     error: ::std::option::Option<&'slice str>,
     supported_features: ::std::option::Option<u64>,
     file: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
 }
 
 impl<'slice> CodeGeneratorResponseSliceView<'slice> {
@@ -311,7 +311,7 @@ impl<'slice> CodeGeneratorResponseSliceView<'slice> {
             error: ::puroro_internal::helpers::FieldNew::new(),
             supported_features: ::puroro_internal::helpers::FieldNew::new(),
             file: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         }
     }
 }
@@ -397,7 +397,7 @@ pub struct File {
     pub insertion_point: ::std::option::Option<::std::string::String>,
     pub content: ::std::option::Option<::std::string::String>,
     pub generated_code_info: ::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl File {
@@ -407,7 +407,7 @@ impl File {
             insertion_point: ::puroro_internal::helpers::FieldNew::new(),
             content: ::puroro_internal::helpers::FieldNew::new(),
             generated_code_info: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -557,7 +557,7 @@ pub struct FileBumpalo<'bump> {
     pub insertion_point: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub content: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub generated_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileBumpalo<'bump> {
@@ -567,7 +567,7 @@ impl<'bump> FileBumpalo<'bump> {
             insertion_point: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             content: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             generated_code_info: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -715,7 +715,7 @@ pub struct FileSliceView<'slice> {
     insertion_point: ::std::option::Option<&'slice str>,
     content: ::std::option::Option<&'slice str>,
     generated_code_info: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
 }
 
 impl<'slice> FileSliceView<'slice> {
@@ -725,7 +725,7 @@ impl<'slice> FileSliceView<'slice> {
             insertion_point: ::puroro_internal::helpers::FieldNew::new(),
             content: ::puroro_internal::helpers::FieldNew::new(),
             generated_code_info: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         }
     }
 }
@@ -795,7 +795,7 @@ pub struct CodeGeneratorRequest {
     pub parameter: ::std::option::Option<::std::string::String>,
     pub proto_file: ::std::vec::Vec<super::FileDescriptorProto>,
     pub compiler_version: ::std::option::Option<::std::boxed::Box<self::Version>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl CodeGeneratorRequest {
@@ -805,7 +805,7 @@ impl CodeGeneratorRequest {
             parameter: ::puroro_internal::helpers::FieldNew::new(),
             proto_file: ::puroro_internal::helpers::FieldNew::new(),
             compiler_version: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -958,7 +958,7 @@ pub struct CodeGeneratorRequestBumpalo<'bump> {
     pub parameter: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub proto_file: ::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>>,
     pub compiler_version: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::VersionBumpalo<'bump>>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorRequestBumpalo<'bump> {
@@ -968,7 +968,7 @@ impl<'bump> CodeGeneratorRequestBumpalo<'bump> {
             parameter: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             proto_file: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             compiler_version: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -1119,7 +1119,7 @@ pub struct CodeGeneratorRequestSliceView<'slice> {
     parameter: ::std::option::Option<&'slice str>,
     proto_file: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     compiler_version: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
 }
 
 impl<'slice> CodeGeneratorRequestSliceView<'slice> {
@@ -1129,7 +1129,7 @@ impl<'slice> CodeGeneratorRequestSliceView<'slice> {
             parameter: ::puroro_internal::helpers::FieldNew::new(),
             proto_file: ::puroro_internal::helpers::FieldNew::new(),
             compiler_version: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         }
     }
 }
@@ -1194,7 +1194,7 @@ pub struct Version {
     pub minor: ::std::option::Option<i32>,
     pub patch: ::std::option::Option<i32>,
     pub suffix: ::std::option::Option<::std::string::String>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl Version {
@@ -1204,7 +1204,7 @@ impl Version {
             minor: ::puroro_internal::helpers::FieldNew::new(),
             patch: ::puroro_internal::helpers::FieldNew::new(),
             suffix: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -1353,7 +1353,7 @@ pub struct VersionBumpalo<'bump> {
     pub minor: ::std::option::Option<i32>,
     pub patch: ::std::option::Option<i32>,
     pub suffix: ::std::option::Option<::bumpalo::collections::String<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> VersionBumpalo<'bump> {
@@ -1363,7 +1363,7 @@ impl<'bump> VersionBumpalo<'bump> {
             minor: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             patch: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             suffix: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -1510,7 +1510,7 @@ pub struct VersionSliceView<'slice> {
     minor: ::std::option::Option<i32>,
     patch: ::std::option::Option<i32>,
     suffix: ::std::option::Option<&'slice str>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
 }
 
 impl<'slice> VersionSliceView<'slice> {
@@ -1520,7 +1520,7 @@ impl<'slice> VersionSliceView<'slice> {
             minor: ::puroro_internal::helpers::FieldNew::new(),
             patch: ::puroro_internal::helpers::FieldNew::new(),
             suffix: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         }
     }
 }
