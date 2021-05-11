@@ -1,3 +1,4 @@
+use crate::deser::LdSlice;
 use crate::helpers::MapEntry;
 use crate::types::{FieldData, WireType};
 use crate::variant::Variant;
@@ -41,16 +42,15 @@ where
     fn met_field_at<'slice>(
         &mut self,
         _: &'slice [u8],
-        field: FieldData<&'slice [u8]>,
+        field: FieldData<LdSlice<'slice>>,
         field_number: usize,
     ) -> Result<bool> {
-        use std::io::Read;
         type BytesIterBoundType<'b> = LdIter<std::io::Bytes<&'b [u8]>>;
         match field {
             FieldData::Variant(v) => self
                 .0
                 .met_field::<BytesIterBoundType<'slice>>(FieldData::Variant(v), field_number),
-            FieldData::LengthDelimited(slice) => {
+            FieldData::LengthDelimited(mut slice) => {
                 let mut bytes = slice.bytes();
                 let mut ld_iter = LdIter::new(&mut bytes);
                 let field_data = FieldData::LengthDelimited(&mut ld_iter);

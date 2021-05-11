@@ -1,4 +1,4 @@
-use crate::deser::{DeserializableMessageFromIter, LdIter};
+use crate::deser::{DeserializableMessageFromIter, LdIter, LdSlice};
 use crate::tags;
 use crate::tags::{FieldLabelTag, FieldTypeTag};
 use crate::types::{FieldData, SliceViewFields};
@@ -55,7 +55,7 @@ where
     /// this field is included.
     fn deser(
         &mut self,
-        field: FieldData<&'slice [u8]>,
+        field: FieldData<LdSlice<'slice>>,
         enclosing_slice: &'slice [u8],
     ) -> Result<()>;
 }
@@ -63,11 +63,11 @@ where
 macro_rules! redirect_deser_from_slice_to_from_iter {
     ($ty:ty, $ttag:ty, $ltag:ty) => {
         impl<'bump, 'slice> FieldDeserFromSlice<'slice, $ttag, $ltag> for $ty {
-            fn deser(&mut self, field: FieldData<&'slice [u8]>, _: &'slice [u8]) -> Result<()> {
+            fn deser(&mut self, field: FieldData<LdSlice<'slice>>, _: &'slice [u8]) -> Result<()> {
                 let mut ld_iter;
                 let new_field = match field {
-                    FieldData::LengthDelimited(slice) => {
-                        ld_iter = LdIter::new(slice.bytes());
+                    FieldData::LengthDelimited(ld_slice) => {
+                        ld_iter = LdIter::new(ld_slice.as_slice().bytes());
                         FieldData::LengthDelimited(&mut ld_iter)
                     }
                     FieldData::Variant(v) => FieldData::Variant(v),
@@ -246,7 +246,7 @@ define_deser_scalar_ld!(
 macro_rules! define_deser_scalar_ld_from_slice {
     ($ty:ty, $ttag:ty, $ltag:ty, $conv:expr) => {
         impl<'slice> FieldDeserFromSlice<'slice, $ttag, $ltag> for $ty {
-            fn deser(&mut self, field: FieldData<&'slice [u8]>, _: &'slice [u8]) -> Result<()> {
+            fn deser(&mut self, field: FieldData<LdSlice<'slice>>, _: &'slice [u8]) -> Result<()> {
                 match field {
                     FieldData::LengthDelimited(slice) => {
                         *self = ($conv)(slice);
@@ -258,13 +258,21 @@ macro_rules! define_deser_scalar_ld_from_slice {
         }
     };
 }
-define_deser_scalar_ld_from_slice!(&'slice [u8], tags::Bytes, tags::Required, |x| x);
-define_deser_scalar_ld_from_slice!(&'slice str, tags::String, tags::Required, |x| unsafe {
-    transmute(x)
+define_deser_scalar_ld_from_slice!(&'slice [u8], tags::Bytes, tags::Required, |x: LdSlice<
+    'slice,
+>| x.as_slice());
+define_deser_scalar_ld_from_slice!(&'slice str, tags::String, tags::Required, |x: LdSlice<
+    'slice,
+>| unsafe {
+    transmute(x.as_slice())
 });
-define_deser_scalar_ld_from_slice!(&'slice [u8], tags::Bytes, tags::Optional3, |x| x);
-define_deser_scalar_ld_from_slice!(&'slice str, tags::String, tags::Optional3, |x| unsafe {
-    transmute(x)
+define_deser_scalar_ld_from_slice!(&'slice [u8], tags::Bytes, tags::Optional3, |x: LdSlice<
+    'slice,
+>| x.as_slice());
+define_deser_scalar_ld_from_slice!(&'slice str, tags::String, tags::Optional3, |x: LdSlice<
+    'slice,
+>| unsafe {
+    transmute(x.as_slice())
 });
 
 // Unlike C++ implementation, the required message field in Rust is not
@@ -500,7 +508,7 @@ impl<'slice> FieldDeserFromSlice<'slice, tags::Int32, tags::Repeated>
 {
     fn deser(
         &mut self,
-        field: FieldData<&'slice [u8]>,
+        field: FieldData<LdSlice<'slice>>,
         enclosing_slice: &'slice [u8],
     ) -> Result<()> {
         match self {

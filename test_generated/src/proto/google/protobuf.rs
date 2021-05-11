@@ -261,7 +261,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Genera
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -655,7 +655,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Annota
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -944,7 +944,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Source
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -1380,7 +1380,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Locati
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -1885,7 +1885,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Uninte
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -2204,7 +2204,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for NamePa
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -2565,7 +2565,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Method
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -2913,7 +2913,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Servic
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -3237,7 +3237,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for EnumVa
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -3597,7 +3597,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for EnumOp
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -3885,7 +3885,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for OneofO
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -4389,7 +4389,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for FieldO
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -4867,7 +4867,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Messag
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -5875,7 +5875,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for FileOp
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -6364,7 +6364,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Method
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -6727,7 +6727,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Servic
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -7084,7 +7084,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for EnumVa
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -7528,7 +7528,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for EnumDe
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -7847,7 +7847,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for EnumRe
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -8169,7 +8169,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for OneofD
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -8814,7 +8814,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for FieldD
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -9178,7 +9178,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Extens
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -9829,7 +9829,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Descri
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -10148,7 +10148,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Reserv
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -10505,7 +10505,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Extens
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -11223,7 +11223,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for FileDe
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -11511,7 +11511,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for FileDe
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {

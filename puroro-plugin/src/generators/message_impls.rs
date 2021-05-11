@@ -293,7 +293,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice for {ident}{gp
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {{

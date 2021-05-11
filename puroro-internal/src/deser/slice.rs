@@ -11,7 +11,7 @@ pub trait DeserializableMessageFromSlice {
     fn met_field_at<'slice>(
         &mut self,
         at: &'slice [u8],
-        field: FieldData<&'slice [u8]>,
+        field: FieldData<LdSlice<'slice>>,
         field_number: usize,
     ) -> Result<bool>;
 }
@@ -47,7 +47,7 @@ impl<'slice> LdSlice<'slice> {
                                 Variant::decode_bytes(&mut self.bytes())?.to_usize()?;
                             let (inner_slice, rest) = self.slice.split_at(field_length);
                             self.slice = rest;
-                            FieldData::LengthDelimited(inner_slice)
+                            FieldData::LengthDelimited(LdSlice::new(inner_slice))
                         }
                         WireType::Bits32 => {
                             if self.slice.len() < 4 {
@@ -97,7 +97,7 @@ impl<'slice> LdSlice<'slice> {
         )))
     }
 
-    fn bytes(&mut self) -> std::io::Bytes<&mut &'slice [u8]> {
+    pub fn bytes(&mut self) -> std::io::Bytes<&mut &'slice [u8]> {
         self.slice.by_ref().bytes()
     }
 

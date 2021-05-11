@@ -333,7 +333,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGe
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -362,6 +362,8 @@ impl<'slice> ::puroro::Serializable for CodeGeneratorResponseSliceView<'slice> {
     }
 }
 pub mod code_generator_response {
+    use puroro_internal::deser::LdSlice;
+
 #[derive(Debug, Clone)]
 pub enum Feature {
     FeatureNone = 0,
@@ -747,7 +749,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for FileSl
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -1150,7 +1152,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGe
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
@@ -1540,7 +1542,7 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Versio
     fn met_field_at<'slice2>(
         &mut self,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
         field_number: usize
     ) -> ::puroro::Result<bool>
     {
