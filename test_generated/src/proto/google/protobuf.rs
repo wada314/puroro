@@ -276,11 +276,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for GeneratedCodeInfoSl
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -671,11 +667,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for AnnotationSliceView
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -961,11 +953,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for SourceCodeInfoSlice
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -1398,11 +1386,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for LocationSliceView<'
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -1904,11 +1888,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for UninterpretedOption
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -2224,11 +2204,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for NamePartSliceView<'
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -2586,11 +2562,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for MethodOptionsSliceV
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -2935,11 +2907,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for ServiceOptionsSlice
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -3260,11 +3228,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for EnumValueOptionsSli
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -3621,11 +3585,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for EnumOptionsSliceVie
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -3910,11 +3870,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for OneofOptionsSliceVi
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -4415,11 +4371,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for FieldOptionsSliceVi
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -4894,11 +4846,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for MessageOptionsSlice
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -5903,11 +5851,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for FileOptionsSliceVie
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -6393,11 +6337,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for MethodDescriptorPro
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -6757,11 +6697,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for ServiceDescriptorPr
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -7115,11 +7051,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for EnumValueDescriptor
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -7560,11 +7492,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for EnumDescriptorProto
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -7880,11 +7808,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for EnumReservedRangeSl
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -8203,11 +8127,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for OneofDescriptorProt
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -8849,11 +8769,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for FieldDescriptorProt
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -9214,11 +9130,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for ExtensionRangeOptio
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -9866,11 +9778,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for DescriptorProtoSlic
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -10186,11 +10094,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for ReservedRangeSliceV
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -10544,11 +10448,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for ExtensionRangeSlice
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -11263,11 +11163,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for FileDescriptorProto
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
@@ -11552,11 +11448,7 @@ impl<'slice> ::puroro_internal::ser::SerializableMessage for FileDescriptorSetSl
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.as_slice())
-        }
+        todo!()
     }
 }
 
