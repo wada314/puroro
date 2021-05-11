@@ -14,7 +14,7 @@ pub struct CodeGeneratorResponse {
     pub error: ::std::option::Option<::std::string::String>,
     pub supported_features: ::std::option::Option<u64>,
     pub file: ::std::vec::Vec<self::code_generator_response::File>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl CodeGeneratorResponse {
@@ -23,7 +23,7 @@ impl CodeGeneratorResponse {
             error: ::puroro_internal::helpers::FieldNew::new(),
             supported_features: ::puroro_internal::helpers::FieldNew::new(),
             file: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -159,7 +159,7 @@ pub struct CodeGeneratorResponseBumpalo<'bump> {
     pub error: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub supported_features: ::std::option::Option<u64>,
     pub file: ::bumpalo::collections::Vec<'bump, self::code_generator_response::FileBumpalo<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorResponseBumpalo<'bump> {
@@ -168,7 +168,7 @@ impl<'bump> CodeGeneratorResponseBumpalo<'bump> {
             error: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             supported_features: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             file: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -298,25 +298,25 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRespons
 }
 
 #[derive(Debug)]
-pub struct CodeGeneratorResponseSliceView<'slice> {
+pub struct CodeGeneratorResponseSliceView<'slice, 'p> {
     error: ::std::option::Option<&'slice str>,
     supported_features: ::std::option::Option<u64>,
     file: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
 }
 
-impl<'slice> CodeGeneratorResponseSliceView<'slice> {
+impl<'slice, 'p> CodeGeneratorResponseSliceView<'slice, 'p> {
     pub fn from_slice(slice: &'slice [u8]) -> Self {
         Self {
             error: ::puroro_internal::helpers::FieldNew::new(),
             supported_features: ::puroro_internal::helpers::FieldNew::new(),
             file: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         }
     }
 }
 
-impl<'slice> ::std::clone::Clone for CodeGeneratorResponseSliceView<'slice> {
+impl<'slice, 'p> ::std::clone::Clone for CodeGeneratorResponseSliceView<'slice, 'p> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
@@ -329,12 +329,13 @@ impl<'slice> ::std::clone::Clone for CodeGeneratorResponseSliceView<'slice> {
     }
 }
 
-impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorResponseSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorResponseSliceView<'slice, 'p> {
     fn met_field_at<'slice2>(
         &mut self,
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
+        field_number: usize,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
-        field_number: usize
+        _: &'slice2 [u8],
     ) -> ::puroro::Result<bool>
     {
         todo!();
@@ -343,19 +344,15 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGe
     }
 }
 
-impl<'slice> ::puroro_internal::ser::SerializableMessage for CodeGeneratorResponseSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for CodeGeneratorResponseSliceView<'slice, 'p> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
-        }
+        todo!()
     }
 }
 
-impl<'slice> ::puroro::Serializable for CodeGeneratorResponseSliceView<'slice> {
+impl<'slice, 'p> ::puroro::Serializable for CodeGeneratorResponseSliceView<'slice, 'p> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
@@ -396,7 +393,7 @@ pub struct File {
     pub insertion_point: ::std::option::Option<::std::string::String>,
     pub content: ::std::option::Option<::std::string::String>,
     pub generated_code_info: ::std::option::Option<::std::boxed::Box<super::super::GeneratedCodeInfo>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl File {
@@ -406,7 +403,7 @@ impl File {
             insertion_point: ::puroro_internal::helpers::FieldNew::new(),
             content: ::puroro_internal::helpers::FieldNew::new(),
             generated_code_info: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -556,7 +553,7 @@ pub struct FileBumpalo<'bump> {
     pub insertion_point: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub content: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub generated_code_info: ::std::option::Option<::bumpalo::boxed::Box<'bump, super::super::GeneratedCodeInfoBumpalo<'bump>>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> FileBumpalo<'bump> {
@@ -566,7 +563,7 @@ impl<'bump> FileBumpalo<'bump> {
             insertion_point: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             content: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             generated_code_info: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -709,27 +706,27 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for FileBumpalo<'bump> {
 }
 
 #[derive(Debug)]
-pub struct FileSliceView<'slice> {
+pub struct FileSliceView<'slice, 'p> {
     name: ::std::option::Option<&'slice str>,
     insertion_point: ::std::option::Option<&'slice str>,
     content: ::std::option::Option<&'slice str>,
     generated_code_info: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
 }
 
-impl<'slice> FileSliceView<'slice> {
+impl<'slice, 'p> FileSliceView<'slice, 'p> {
     pub fn from_slice(slice: &'slice [u8]) -> Self {
         Self {
             name: ::puroro_internal::helpers::FieldNew::new(),
             insertion_point: ::puroro_internal::helpers::FieldNew::new(),
             content: ::puroro_internal::helpers::FieldNew::new(),
             generated_code_info: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         }
     }
 }
 
-impl<'slice> ::std::clone::Clone for FileSliceView<'slice> {
+impl<'slice, 'p> ::std::clone::Clone for FileSliceView<'slice, 'p> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
@@ -743,12 +740,13 @@ impl<'slice> ::std::clone::Clone for FileSliceView<'slice> {
     }
 }
 
-impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for FileSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice for FileSliceView<'slice, 'p> {
     fn met_field_at<'slice2>(
         &mut self,
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
+        field_number: usize,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
-        field_number: usize
+        _: &'slice2 [u8],
     ) -> ::puroro::Result<bool>
     {
         todo!();
@@ -757,19 +755,15 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for FileSl
     }
 }
 
-impl<'slice> ::puroro_internal::ser::SerializableMessage for FileSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileSliceView<'slice, 'p> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
-        }
+        todo!()
     }
 }
 
-impl<'slice> ::puroro::Serializable for FileSliceView<'slice> {
+impl<'slice, 'p> ::puroro::Serializable for FileSliceView<'slice, 'p> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
@@ -793,7 +787,7 @@ pub struct CodeGeneratorRequest {
     pub parameter: ::std::option::Option<::std::string::String>,
     pub proto_file: ::std::vec::Vec<super::FileDescriptorProto>,
     pub compiler_version: ::std::option::Option<::std::boxed::Box<self::Version>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl CodeGeneratorRequest {
@@ -803,7 +797,7 @@ impl CodeGeneratorRequest {
             parameter: ::puroro_internal::helpers::FieldNew::new(),
             proto_file: ::puroro_internal::helpers::FieldNew::new(),
             compiler_version: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -956,7 +950,7 @@ pub struct CodeGeneratorRequestBumpalo<'bump> {
     pub parameter: ::std::option::Option<::bumpalo::collections::String<'bump>>,
     pub proto_file: ::bumpalo::collections::Vec<'bump, super::FileDescriptorProtoBumpalo<'bump>>,
     pub compiler_version: ::std::option::Option<::bumpalo::boxed::Box<'bump, self::VersionBumpalo<'bump>>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> CodeGeneratorRequestBumpalo<'bump> {
@@ -966,7 +960,7 @@ impl<'bump> CodeGeneratorRequestBumpalo<'bump> {
             parameter: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             proto_file: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             compiler_version: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -1112,27 +1106,27 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for CodeGeneratorRequest
 }
 
 #[derive(Debug)]
-pub struct CodeGeneratorRequestSliceView<'slice> {
+pub struct CodeGeneratorRequestSliceView<'slice, 'p> {
     file_to_generate: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     parameter: ::std::option::Option<&'slice str>,
     proto_file: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
     compiler_version: ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
 }
 
-impl<'slice> CodeGeneratorRequestSliceView<'slice> {
+impl<'slice, 'p> CodeGeneratorRequestSliceView<'slice, 'p> {
     pub fn from_slice(slice: &'slice [u8]) -> Self {
         Self {
             file_to_generate: ::puroro_internal::helpers::FieldNew::new(),
             parameter: ::puroro_internal::helpers::FieldNew::new(),
             proto_file: ::puroro_internal::helpers::FieldNew::new(),
             compiler_version: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         }
     }
 }
 
-impl<'slice> ::std::clone::Clone for CodeGeneratorRequestSliceView<'slice> {
+impl<'slice, 'p> ::std::clone::Clone for CodeGeneratorRequestSliceView<'slice, 'p> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
@@ -1146,12 +1140,13 @@ impl<'slice> ::std::clone::Clone for CodeGeneratorRequestSliceView<'slice> {
     }
 }
 
-impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorRequestSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorRequestSliceView<'slice, 'p> {
     fn met_field_at<'slice2>(
         &mut self,
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
+        field_number: usize,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
-        field_number: usize
+        _: &'slice2 [u8],
     ) -> ::puroro::Result<bool>
     {
         todo!();
@@ -1160,19 +1155,15 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGe
     }
 }
 
-impl<'slice> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRequestSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRequestSliceView<'slice, 'p> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
-        }
+        todo!()
     }
 }
 
-impl<'slice> ::puroro::Serializable for CodeGeneratorRequestSliceView<'slice> {
+impl<'slice, 'p> ::puroro::Serializable for CodeGeneratorRequestSliceView<'slice, 'p> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
@@ -1191,7 +1182,7 @@ pub struct Version {
     pub minor: ::std::option::Option<i32>,
     pub patch: ::std::option::Option<i32>,
     pub suffix: ::std::option::Option<::std::string::String>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct,
+    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
 }
 
 impl Version {
@@ -1201,7 +1192,7 @@ impl Version {
             minor: ::puroro_internal::helpers::FieldNew::new(),
             patch: ::puroro_internal::helpers::FieldNew::new(),
             suffix: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForNormalStruct::new(),
+            puroro_internal: ::puroro_internal::InternalDataForNormalStruct::new(),
         }
     }
 }
@@ -1350,7 +1341,7 @@ pub struct VersionBumpalo<'bump> {
     pub minor: ::std::option::Option<i32>,
     pub patch: ::std::option::Option<i32>,
     pub suffix: ::std::option::Option<::bumpalo::collections::String<'bump>>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>,
+    puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct<'bump>,
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> VersionBumpalo<'bump> {
@@ -1360,7 +1351,7 @@ impl<'bump> VersionBumpalo<'bump> {
             minor: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             patch: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
             suffix: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
         }
     }
 }
@@ -1502,27 +1493,27 @@ impl<'bump> ::puroro_internal::helpers::FieldNew<'bump> for VersionBumpalo<'bump
 }
 
 #[derive(Debug)]
-pub struct VersionSliceView<'slice> {
+pub struct VersionSliceView<'slice, 'p> {
     major: ::std::option::Option<i32>,
     minor: ::std::option::Option<i32>,
     patch: ::std::option::Option<i32>,
     suffix: ::std::option::Option<&'slice str>,
-    puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>,
+    puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct<'slice>,
 }
 
-impl<'slice> VersionSliceView<'slice> {
+impl<'slice, 'p> VersionSliceView<'slice, 'p> {
     pub fn from_slice(slice: &'slice [u8]) -> Self {
         Self {
             major: ::puroro_internal::helpers::FieldNew::new(),
             minor: ::puroro_internal::helpers::FieldNew::new(),
             patch: ::puroro_internal::helpers::FieldNew::new(),
             suffix: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         }
     }
 }
 
-impl<'slice> ::std::clone::Clone for VersionSliceView<'slice> {
+impl<'slice, 'p> ::std::clone::Clone for VersionSliceView<'slice, 'p> {
     fn clone(&self) -> Self {
         use ::puroro_internal::helpers::FieldClone;
         use ::puroro::InternalData;
@@ -1536,12 +1527,13 @@ impl<'slice> ::std::clone::Clone for VersionSliceView<'slice> {
     }
 }
 
-impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for VersionSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice for VersionSliceView<'slice, 'p> {
     fn met_field_at<'slice2>(
         &mut self,
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
+        field_number: usize,
         _: &'slice2 [u8],
-        field: ::puroro_internal::types::FieldData<&'slice2 [u8]>, 
-        field_number: usize
+        _: &'slice2 [u8],
     ) -> ::puroro::Result<bool>
     {
         todo!();
@@ -1550,19 +1542,15 @@ impl<'slice> ::puroro_internal::deser::DeserializableMessageFromSlice for Versio
     }
 }
 
-impl<'slice> ::puroro_internal::ser::SerializableMessage for VersionSliceView<'slice> {
+impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for VersionSliceView<'slice, 'p> {
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        if let Some(remaining_slice) = self.puroro_internal.remaining_slice {
-            todo!()
-        } else {
-            serializer.serialize_raw_fields(self.puroro_internal.first_field.slice())
-        }
+        todo!()
     }
 }
 
-impl<'slice> ::puroro::Serializable for VersionSliceView<'slice> {
+impl<'slice, 'p> ::puroro::Serializable for VersionSliceView<'slice, 'p> {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)

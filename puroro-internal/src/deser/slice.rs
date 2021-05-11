@@ -10,9 +10,10 @@ use ::num_traits::FromPrimitive;
 pub trait DeserializableMessageFromSlice {
     fn met_field_at<'slice>(
         &mut self,
-        at: &'slice [u8],
-        field: FieldData<&'slice [u8]>,
+        field: FieldData<LdSlice<'slice>>,
         field_number: usize,
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> Result<bool>;
 }
 
@@ -29,8 +30,9 @@ impl<'slice> LdSlice<'slice> {
         &mut self,
         handler: &mut H,
     ) -> Result<()> {
+        let enclosing_slice = self.slice;
         loop {
-            let cur_slice = self.slice;
+            let slice_from_this_field = self.slice;
             let maybe_wire_type_and_field_number = self.try_get_wire_type_and_field_number()?;
             match maybe_wire_type_and_field_number {
                 None => {
@@ -47,7 +49,7 @@ impl<'slice> LdSlice<'slice> {
                                 Variant::decode_bytes(&mut self.bytes())?.to_usize()?;
                             let (inner_slice, rest) = self.slice.split_at(field_length);
                             self.slice = rest;
-                            FieldData::LengthDelimited(inner_slice)
+                            FieldData::LengthDelimited(LdSlice::new(inner_slice))
                         }
                         WireType::Bits32 => {
                             if self.slice.len() < 4 {
@@ -77,7 +79,12 @@ impl<'slice> LdSlice<'slice> {
                             Err(ErrorKind::GroupNotSupported)?
                         }
                     };
-                    if !handler.met_field_at(cur_slice, field_data, field_number)? {
+                    if !handler.met_field_at(
+                        field_data,
+                        field_number,
+                        slice_from_this_field,
+                        enclosing_slice,
+                    )? {
                         break;
                     }
                 }
@@ -97,15 +104,15 @@ impl<'slice> LdSlice<'slice> {
         )))
     }
 
-    fn bytes(&mut self) -> std::io::Bytes<&mut &'slice [u8]> {
+    pub fn bytes(&mut self) -> std::io::Bytes<&mut &'slice [u8]> {
         self.slice.by_ref().bytes()
     }
 
-    pub fn slice(&self) -> &'slice [u8] {
+    pub fn as_slice(&self) -> &'slice [u8] {
         self.slice
     }
 
     pub fn variants(&self) -> super::iter::Variants<std::io::Bytes<&'slice [u8]>> {
-        super::iter::Variants::new(self.slice().bytes())
+        super::iter::Variants::new(self.as_slice().bytes())
     }
 }

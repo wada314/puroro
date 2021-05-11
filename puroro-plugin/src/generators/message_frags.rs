@@ -310,7 +310,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             .chain(
                 match self.context.impl_type() {
                     ImplType::Default => None,
-                    ImplType::SliceView { .. } => Some("'slice"),
+                    ImplType::SliceView { .. } => Some("'slice, 'p"),
                 }
                 .into_iter(),
             );
@@ -404,13 +404,13 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     pub fn internal_data_type(&self) -> &'static str {
         match (self.context.impl_type(), self.context.alloc_type()) {
             (ImplType::Default, AllocatorType::Default) => {
-                "::puroro_internal::helpers::InternalDataForNormalStruct"
+                "::puroro_internal::InternalDataForNormalStruct"
             }
             (ImplType::Default, AllocatorType::Bumpalo) => {
-                "::puroro_internal::helpers::InternalDataForBumpaloStruct<'bump>"
+                "::puroro_internal::InternalDataForBumpaloStruct<'bump>"
             }
             (ImplType::SliceView { .. }, AllocatorType::Default) => {
-                "::puroro_internal::helpers::InternalDataForSliceViewStruct<'slice>"
+                "::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>"
             }
             _ => unimplemented!(),
         }
@@ -419,13 +419,13 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     pub fn internal_field_init_value(&self) -> &'static str {
         match (self.context.impl_type(), self.context.alloc_type()) {
             (ImplType::Default, AllocatorType::Default) => {
-                "::puroro_internal::helpers::InternalDataForNormalStruct::new()"
+                "::puroro_internal::InternalDataForNormalStruct::new()"
             }
             (ImplType::Default, AllocatorType::Bumpalo) => {
-                "::puroro_internal::helpers::InternalDataForBumpaloStruct::new(bump)"
+                "::puroro_internal::InternalDataForBumpaloStruct::new(bump)"
             }
             (ImplType::SliceView { .. }, AllocatorType::Default) => {
-                "::puroro_internal::helpers::InternalDataForSliceViewStruct::new(slice)"
+                "::puroro_internal::InternalDataForSliceViewStruct::new(slice)"
             }
             _ => unimplemented!(),
         }
