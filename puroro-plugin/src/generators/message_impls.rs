@@ -83,42 +83,48 @@ pub struct {ident}{gp} {{\n",
             format!(
                 "\
 {cfg}
-impl{gp} {ident}{gpb} {{
-    pub {new_decl} {{
-        Self {{\n",
+impl{gp} {ident}{gpb} {{\n",
                 ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
                 gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-                new_decl = self.frag_gen.new_method_declaration(),
             ),
-            indent_n(
-                3,
-                (
-                    iter(self.msg.fields().map(|field| {
-                        Ok(match self.context.alloc_type() {
-                            AllocatorType::Default => {
-                                format!(
-                                    "{name}: ::puroro_internal::helpers::FieldNew::new(),\n",
+            indent((
+                format!(
+                    "\
+pub {new_decl} {{
+    Self {{\n",
+                    new_decl = self.frag_gen.new_method_declaration(),
+                ),
+                indent_n(
+                    2,
+                    (
+                        iter(self.msg.fields().map(|field| {
+                            Ok(match self.context.alloc_type() {
+                                AllocatorType::Default => {
+                                    format!(
+                                        "{name}: ::puroro_internal::FieldNew::new(),\n",
+                                        name = field.native_ident()?
+                                    )
+                                }
+                                AllocatorType::Bumpalo => format!(
+                                    "{name}: ::puroro_internal::FieldNew::new_in_bumpalo(bump),\n",
                                     name = field.native_ident()?
-                                )
-                            }
-                            AllocatorType::Bumpalo => format!(
-                                "{name}: ::puroro_internal::helpers::FieldNew::new_in_bumpalo(bump),\n",
-                                name = field.native_ident()?
-                            ),
-                        })
-                    })),
-                    format!(
-                        "puroro_internal: {value},\n",
-                        value = self.frag_gen.internal_field_init_value()
+                                ),
+                            })
+                        })),
+                        format!(
+                            "puroro_internal: {value},\n",
+                            value = self.frag_gen.internal_field_init_value()
+                        ),
                     ),
                 ),
-            ),
-            "        \
-        }}
+                "    \
     }}
-}}\n",
+}}\n", // pub {new_decl} {{
+            )),
+            "\
+}}\n", // impl{gp} {ident}{gpb} {{
             if self.frag_gen.is_default_available() {
                 format!(
                     "\
@@ -147,7 +153,7 @@ impl{gp} ::std::default::Default for {ident}{gpb} {{
 {cfg}
 impl{gp} ::std::clone::Clone for {ident}{gpb} {{
     fn clone(&self) -> Self {{
-        use ::puroro_internal::helpers::FieldClone;
+        use ::puroro_internal::FieldClone;
         use ::puroro::InternalData;
         Self {{\n",
                 ident = self.frag_gen.struct_ident(self.msg)?,
@@ -198,7 +204,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {{
-        use ::puroro_internal::helpers::FieldDeserFromIter;
+        use ::puroro_internal::FieldDeserFromIter;
         use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
@@ -324,7 +330,7 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
-        use ::puroro_internal::helpers::FieldSer;
+        use ::puroro_internal::FieldSer;
         use ::puroro_internal::tags;\n",
                         ident = self.frag_gen.struct_ident(self.msg)?,
                         cfg = self.frag_gen.cfg_condition(),
@@ -483,7 +489,7 @@ type {type_ident} = {type_name};
         (format!(
             "\
 {cfg}
-impl{gp} ::puroro_internal::helpers::MapEntry for {entry_type} {{
+impl{gp} ::puroro_internal::MapEntry for {entry_type} {{
     type KeyType = {key_type};
     type ValueType = {value_type};
     fn ser_kv<T: ::puroro_internal::ser::MessageSerializer>(
@@ -491,7 +497,7 @@ impl{gp} ::puroro_internal::helpers::MapEntry for {entry_type} {{
         value: &Self::ValueType,
         serializer: &mut T,
     ) -> ::puroro::Result<()> {{
-        use ::puroro_internal::helpers::FieldSer;
+        use ::puroro_internal::FieldSer;
         use ::puroro_internal::tags;
         <{key_type} as FieldSer<
             tags::{key_type_tag}, 
@@ -504,7 +510,7 @@ impl{gp} ::puroro_internal::helpers::MapEntry for {entry_type} {{
         Ok(())
     }}
     fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {{
-        use ::puroro_internal::helpers::FieldTakeOrInit;
+        use ::puroro_internal::FieldTakeOrInit;
         (
             {take_key}, 
             {take_value},
@@ -530,7 +536,7 @@ impl{gp} ::puroro_internal::helpers::MapEntry for {entry_type} {{
                 (ImplType::Default, AllocatorType::Default) => {
                     format!(
                         "\
-impl{gp} ::puroro_internal::helpers::FieldNew<'a> for {name}{gpb} {{
+impl{gp} ::puroro_internal::FieldNew<'a> for {name}{gpb} {{
     fn new() -> Self {{
         Default::default()
     }}
@@ -544,7 +550,7 @@ impl{gp} ::puroro_internal::helpers::FieldNew<'a> for {name}{gpb} {{
                     format!(
                         "\
 {cfg}
-impl{gp} ::puroro_internal::helpers::FieldNew<'bump> for {name}{gpb} {{
+impl{gp} ::puroro_internal::FieldNew<'bump> for {name}{gpb} {{
     fn new() -> Self {{
         unimplemented!()
     }}

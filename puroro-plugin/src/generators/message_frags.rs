@@ -210,8 +210,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             }
             ImplType::SliceView { .. } => match (field.label()?, field.type_()?) {
                 (FieldLabel::Repeated, _) | (_, FieldType::Message(_)) => {
-                    "::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>"
-                        .into()
+                    "::std::option::Option<::puroro_internal::SliceViewFields<'slice>>".into()
                 }
                 (FieldLabel::Optional2, _) => format!(
                     "::std::option::Option<{scalar_type}>",
@@ -337,10 +336,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             (ImplType::SliceView { .. }, AllocatorType::Default) => {
                 "\
 fn new_with_parent(
-    parent_field: &'p ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
-    field_number_in_parent: usize,
-    parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-) -> Self"
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> Self"
             }
             _ => {
                 unimplemented!()
