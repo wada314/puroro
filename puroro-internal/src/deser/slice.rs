@@ -34,8 +34,8 @@ impl<'slice> LdSlice<'slice> {
         let mut slice_from_this_field = self.slice;
         let mut fields = self.fields();
 
-        while let Some(field_number_and_data) = fields.next() {
-            let (field_number, field_data) = field_number_and_data?;
+        while let Some(field) = fields.next() {
+            let (field_number, field_data, slice_from_this_field) = field?;
             if !handler.met_field_at(
                 field_data,
                 field_number,
@@ -53,24 +53,25 @@ impl<'slice> LdSlice<'slice> {
         self.slice
     }
 
-    pub fn fields(&self) -> impl Iterator<Item = Result<(usize, FieldData<LdSlice<'slice>>)>> {
+    pub fn fields(&self) -> Fields<'slice> {
         Fields {
             slice: self.as_slice(),
         }
     }
 }
 
-struct Fields<'slice> {
+pub struct Fields<'slice> {
     slice: &'slice [u8],
 }
 
 impl<'slice> Fields<'slice> {
-    fn try_next(&mut self) -> Result<Option<(usize, FieldData<LdSlice<'slice>>)>> {
+    fn try_next(&mut self) -> Result<Option<(usize, FieldData<LdSlice<'slice>>, &'slice [u8])>> {
         Ok(match self.try_get_wire_type_and_field_number()? {
             None => {
                 None // end of slice
             }
             Some((wire_type, field_number)) => {
+                let slice_from_this_field = self.slice;
                 let field_data = match wire_type {
                     WireType::Variant => {
                         let variant = Variant::decode_bytes(&mut self.slice.by_ref().bytes())?;
@@ -109,7 +110,7 @@ impl<'slice> Fields<'slice> {
                     }
                     WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
                 };
-                Some((field_number, field_data))
+                Some((field_number, field_data, slice_from_this_field))
             }
         })
     }
@@ -127,7 +128,7 @@ impl<'slice> Fields<'slice> {
 }
 
 impl<'slice> Iterator for Fields<'slice> {
-    type Item = Result<(usize, FieldData<LdSlice<'slice>>)>;
+    type Item = Result<(usize, FieldData<LdSlice<'slice>>, &'slice [u8])>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.try_next().transpose()
