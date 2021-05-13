@@ -91,7 +91,7 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
 }
 impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
     pub fn iter(&self) -> impl Iterator<Item = LdSlice<'slice>> {
-        match self {
+        match self.clone() {
             SourceSlicesView::SingleSlice(ld_slice) => {
                 Either::Left(std::iter::once(ld_slice.clone()))
             }
@@ -99,14 +99,35 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                 field_in_parent,
                 field_number_in_parent,
                 parent_internal_data,
-            } => Either::Right(match field_in_parent {
-                None => std::iter::empty(),
+            } => Either::Right(match field_in_parent.cloned() {
+                None => Either::Left(std::iter::empty()),
                 Some(SliceViewFields::FieldsInSingleSlice {
                     slice: slice_of_fields_in_parent,
                     count,
                     enclosing_slice: _,
                 }) => {
-                    todo!()
+                    let ld_slice = LdSlice::new(slice_of_fields_in_parent);
+                    let iter = ld_slice
+                        .map(|x| {
+                            x.expect(
+                                "An error occured while deserializing the input. \
+                                    Consider check the data validity in earlier stage to catch this error.",
+                            )
+                        })
+                        .filter_map(|(field_number, field_data)| {
+                            if field_number == field_number_in_parent {
+                                match field_data {
+                                    FieldData::LengthDelimited(inner_ld_slice) => {
+                                        Some(inner_ld_slice)
+                                    }
+                                    _ => None,
+                                }
+                            } else {
+                                None
+                            }
+                        })
+                        .take(count);
+                    Either::Right(iter)
                 }
                 Some(SliceViewFields::FieldsInMultipleSlices {
                     count,
@@ -114,7 +135,7 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                 }) => {
                     todo!()
                 }
-            }),
+            }.into_iter()),
         }
         .into_iter()
     }

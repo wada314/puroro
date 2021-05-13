@@ -17,7 +17,8 @@ pub trait DeserializableMessageFromSlice {
     ) -> Result<bool>;
 }
 
-/// A wrapper over slice which stores maybe multiple fields data
+/// A wrapper over slice which stores maybe multiple fields data.
+/// Ld = Length delimited = wiretype==2
 #[derive(Debug, Clone)]
 pub struct LdSlice<'slice> {
     slice: &'slice [u8],
@@ -32,9 +33,10 @@ impl<'slice> LdSlice<'slice> {
         handler: &mut H,
     ) -> Result<()> {
         let enclosing_slice = self.slice;
+        let mut slice_from_this_field = self.slice;
 
-        for field_number_and_data in self {
-            let (field_number, field_data, slice_from_this_field) = field_number_and_data?;
+        while let Some(field_number_and_data) = self.next() {
+            let (field_number, field_data) = field_number_and_data?;
             if !handler.met_field_at(
                 field_data,
                 field_number,
@@ -43,6 +45,7 @@ impl<'slice> LdSlice<'slice> {
             )? {
                 break;
             }
+            slice_from_this_field = self.slice;
         }
         Ok(())
     }
@@ -67,12 +70,11 @@ impl<'slice> LdSlice<'slice> {
     }
 }
 
-impl<'slice> Iterator for &mut LdSlice<'slice> {
-    type Item = Result<(usize, FieldData<LdSlice<'slice>>, &'slice [u8])>;
+impl<'slice> Iterator for LdSlice<'slice> {
+    type Item = Result<(usize, FieldData<LdSlice<'slice>>)>;
 
     fn next(&mut self) -> Option<Self::Item> {
         (|| {
-            let slice_from_this_field = self.slice;
             Ok(match self.try_get_wire_type_and_field_number()? {
                 None => {
                     None // end of slice
@@ -118,7 +120,7 @@ impl<'slice> Iterator for &mut LdSlice<'slice> {
                             Err(ErrorKind::GroupNotSupported)?
                         }
                     };
-                    Some((field_number, field_data, slice_from_this_field))
+                    Some((field_number, field_data))
                 }
             })
         })()
