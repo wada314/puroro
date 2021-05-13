@@ -31,7 +31,6 @@ impl<'slice> LdSlice<'slice> {
 
     pub fn deser_message<H: DeserializableMessageFromSlice>(&self, handler: &mut H) -> Result<()> {
         let enclosing_slice = self.slice;
-        let mut slice_from_this_field = self.slice;
         let mut fields = self.fields();
 
         while let Some(field) = fields.next() {
@@ -44,7 +43,6 @@ impl<'slice> LdSlice<'slice> {
             )? {
                 break;
             }
-            slice_from_this_field = self.slice;
         }
         Ok(())
     }
