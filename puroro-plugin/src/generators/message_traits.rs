@@ -39,7 +39,7 @@ pub trait {trait_ident} {{\n",
                 iter(self.msg.fields().map(|field| -> Result<String> {
                     // getter method decls
                     Ok(match self.generate_getter_method_decls(field)? {
-                        GetterMethods::ScalarField(decl) | GetterMethods::OptionalField(decl) => {
+                        GetterMethods::BareField(decl) | GetterMethods::OptionalField(decl) => {
                             format!("{decl};\n", decl = decl)
                         }
                         GetterMethods::RepeatedField {
@@ -113,7 +113,7 @@ pub trait {trait_ident} {{\n",
                 }
             }
             (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
-                GetterMethods::ScalarField(format!(
+                GetterMethods::BareField(format!(
                     "fn {name}(&self) -> {reftype}",
                     name = field.native_ident()?,
                     reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
@@ -182,7 +182,7 @@ pub trait {trait_ident} {{\n",
 }
 
 pub enum GetterMethods {
-    ScalarField(String),
+    BareField(String),
     OptionalField(String),
     RepeatedField {
         type_ident: String,

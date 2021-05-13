@@ -416,7 +416,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                 })),
                 iter(self.msg.fields().map(|field| -> Result<_> {
                     Ok(match self.traits_gen.generate_getter_method_decls(field)? {
-                        GetterMethods::ScalarField(decl) => {
+                        GetterMethods::BareField(decl) => {
                             let transform = match field.type_()? {
                                 FieldType::String | FieldType::Bytes | FieldType::Message(_) => {
                                     ".as_ref()"
