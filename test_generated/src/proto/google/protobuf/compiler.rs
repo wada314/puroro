@@ -306,12 +306,17 @@ pub struct CodeGeneratorResponseSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> CodeGeneratorResponseSliceView<'slice, 'p> {
-    pub fn from_slice(slice: &'slice [u8]) -> Self {
+    pub fn new_with_parent(
+    parent_field: &'p ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
+    field_number_in_parent: usize,
+    parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+) -> Self {
         Self {
             error: ::puroro_internal::helpers::FieldNew::new(),
             supported_features: ::puroro_internal::helpers::FieldNew::new(),
             file: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
+                parent_field, field_number_in_parent, parent_internal_data),
         }
     }
 }
@@ -715,13 +720,18 @@ pub struct FileSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> FileSliceView<'slice, 'p> {
-    pub fn from_slice(slice: &'slice [u8]) -> Self {
+    pub fn new_with_parent(
+    parent_field: &'p ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
+    field_number_in_parent: usize,
+    parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+) -> Self {
         Self {
             name: ::puroro_internal::helpers::FieldNew::new(),
             insertion_point: ::puroro_internal::helpers::FieldNew::new(),
             content: ::puroro_internal::helpers::FieldNew::new(),
             generated_code_info: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
+                parent_field, field_number_in_parent, parent_internal_data),
         }
     }
 }
@@ -1115,13 +1125,18 @@ pub struct CodeGeneratorRequestSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> CodeGeneratorRequestSliceView<'slice, 'p> {
-    pub fn from_slice(slice: &'slice [u8]) -> Self {
+    pub fn new_with_parent(
+    parent_field: &'p ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
+    field_number_in_parent: usize,
+    parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+) -> Self {
         Self {
             file_to_generate: ::puroro_internal::helpers::FieldNew::new(),
             parameter: ::puroro_internal::helpers::FieldNew::new(),
             proto_file: ::puroro_internal::helpers::FieldNew::new(),
             compiler_version: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
+                parent_field, field_number_in_parent, parent_internal_data),
         }
     }
 }
@@ -1502,13 +1517,18 @@ pub struct VersionSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> VersionSliceView<'slice, 'p> {
-    pub fn from_slice(slice: &'slice [u8]) -> Self {
+    pub fn new_with_parent(
+    parent_field: &'p ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
+    field_number_in_parent: usize,
+    parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+) -> Self {
         Self {
             major: ::puroro_internal::helpers::FieldNew::new(),
             minor: ::puroro_internal::helpers::FieldNew::new(),
             patch: ::puroro_internal::helpers::FieldNew::new(),
             suffix: ::puroro_internal::helpers::FieldNew::new(),
-            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
+                parent_field, field_number_in_parent, parent_internal_data),
         }
     }
 }

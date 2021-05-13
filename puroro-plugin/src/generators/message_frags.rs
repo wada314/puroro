@@ -335,7 +335,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 "fn new_in(bump: &'bump ::bumpalo::Bump) -> Self"
             }
             (ImplType::SliceView { .. }, AllocatorType::Default) => {
-                "fn from_slice(slice: &'slice [u8]) -> Self"
+                "\
+fn new_with_parent(
+    parent_field: &'p ::std::option::Option<::puroro_internal::types::SliceViewFields<'slice>>,
+    field_number_in_parent: usize,
+    parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+) -> Self"
             }
             _ => {
                 unimplemented!()
@@ -425,7 +430,9 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 "::puroro_internal::InternalDataForBumpaloStruct::new(bump)"
             }
             (ImplType::SliceView { .. }, AllocatorType::Default) => {
-                "::puroro_internal::InternalDataForSliceViewStruct::new(slice)"
+                "\
+::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
+    parent_field, field_number_in_parent, parent_internal_data)"
             }
             _ => unimplemented!(),
         }
