@@ -105,14 +105,18 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                 field_number_in_parent,
                 parent_internal_data,
             } => match field_in_parent.cloned() {
-                None => Either4::Two(std::iter::empty()),
+                None => {
+                    // This can happen if a scalar message field exists in .proto definition
+                    // but it does not appear in the serialized input stream.
+                    Either4::Two(std::iter::empty())
+                }
                 Some(SliceViewFields::FieldsInSingleSlice {
                     slice: slice_of_fields_in_parent,
                     count,
                     enclosing_slice: _,
                 }) => {
                     // iterate over a single slice given from a parent message,
-                    // and filter out the field that has proper field number.
+                    // and choose out the fields that has proper field number.
                     let ld_slice = LdSlice::new(slice_of_fields_in_parent);
                     let iter = ld_slice
                         .fields()
