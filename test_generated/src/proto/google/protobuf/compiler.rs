@@ -329,13 +329,13 @@ impl<'slice, 'p> ::std::clone::Clone for CodeGeneratorResponseSliceView<'slice, 
     }
 }
 
-impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorResponseSliceView<'slice, 'p> {
-    fn met_field_at<'slice2>(
+impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for CodeGeneratorResponseSliceView<'slice, 'p> {
+    fn met_field_at(
         &mut self,
-        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice2 [u8],
-        _: &'slice2 [u8],
+        _: &'slice [u8],
+        _: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
         todo!();
@@ -740,13 +740,13 @@ impl<'slice, 'p> ::std::clone::Clone for FileSliceView<'slice, 'p> {
     }
 }
 
-impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice for FileSliceView<'slice, 'p> {
-    fn met_field_at<'slice2>(
+impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for FileSliceView<'slice, 'p> {
+    fn met_field_at(
         &mut self,
-        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice2 [u8],
-        _: &'slice2 [u8],
+        _: &'slice [u8],
+        _: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
         todo!();
@@ -1140,13 +1140,13 @@ impl<'slice, 'p> ::std::clone::Clone for CodeGeneratorRequestSliceView<'slice, '
     }
 }
 
-impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice for CodeGeneratorRequestSliceView<'slice, 'p> {
-    fn met_field_at<'slice2>(
+impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for CodeGeneratorRequestSliceView<'slice, 'p> {
+    fn met_field_at(
         &mut self,
-        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice2 [u8],
-        _: &'slice2 [u8],
+        _: &'slice [u8],
+        _: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
         todo!();
@@ -1527,13 +1527,13 @@ impl<'slice, 'p> ::std::clone::Clone for VersionSliceView<'slice, 'p> {
     }
 }
 
-impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice for VersionSliceView<'slice, 'p> {
-    fn met_field_at<'slice2>(
+impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for VersionSliceView<'slice, 'p> {
+    fn met_field_at(
         &mut self,
-        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice2 [u8],
-        _: &'slice2 [u8],
+        _: &'slice [u8],
+        _: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
         todo!();

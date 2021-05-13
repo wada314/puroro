@@ -289,13 +289,13 @@ impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice for {ident}{gpb} {{
-    fn met_field_at<'slice2>(
+impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {ident}{gpb} {{
+    fn met_field_at(
         &mut self,
-        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice2>>, 
+        field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice2 [u8],
-        _: &'slice2 [u8],
+        _: &'slice [u8],
+        _: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {{
         todo!();

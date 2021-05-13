@@ -8,8 +8,8 @@ use crate::ErrorKind;
 use crate::Result;
 use ::num_traits::FromPrimitive;
 
-pub trait DeserializableMessageFromSlice {
-    fn met_field_at<'slice>(
+pub trait DeserializableMessageFromSlice<'slice> {
+    fn met_field_at(
         &mut self,
         field: FieldData<LdSlice<'slice>>,
         field_number: usize,
@@ -29,7 +29,10 @@ impl<'slice> LdSlice<'slice> {
         Self { slice }
     }
 
-    pub fn deser_message<H: DeserializableMessageFromSlice>(&self, handler: &mut H) -> Result<()> {
+    pub fn deser_message<H: DeserializableMessageFromSlice<'slice>>(
+        &self,
+        handler: &mut H,
+    ) -> Result<()> {
         let enclosing_slice = self.slice;
         let mut fields = self.fields();
 
@@ -141,11 +144,11 @@ impl<'a, T: DeserializableMessageFromIter> FromIterToFromSlice<'a, T> {
     }
 }
 
-impl<'a, T> super::slice::DeserializableMessageFromSlice for FromIterToFromSlice<'a, T>
+impl<'slice, 'a, T> DeserializableMessageFromSlice<'slice> for FromIterToFromSlice<'a, T>
 where
     T: DeserializableMessageFromIter,
 {
-    fn met_field_at<'slice>(
+    fn met_field_at(
         &mut self,
         field: FieldData<LdSlice<'slice>>,
         field_number: usize,
