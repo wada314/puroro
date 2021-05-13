@@ -141,8 +141,8 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                     first_enclosing_slice,
                 }) => {
                     // The parent message instance is scattering around multiple slices.
-                    
-                    todo!()
+                    todo!();
+                    Either4::Four(std::iter::empty())
                 }
             },
         }
