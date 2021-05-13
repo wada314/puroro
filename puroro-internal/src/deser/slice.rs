@@ -153,23 +153,16 @@ where
         _: &'slice [u8],
         _: &'slice [u8],
     ) -> Result<bool> {
-        type LdIterBoundType<'b> = LdIter<std::io::Bytes<&'b [u8]>>;
-        match field {
-            FieldData::Variant(v) => self
-                .0
-                .met_field::<LdIterBoundType<'slice>>(FieldData::Variant(v), field_number),
+        let mut ld_iter;
+        let field_data = match field {
+            FieldData::Variant(v) => FieldData::Variant(v),
             FieldData::LengthDelimited(ld_slice) => {
-                let mut bytes = ld_slice.slice.bytes();
-                let mut ld_iter = LdIter::new(&mut bytes);
-                let field_data = FieldData::LengthDelimited(&mut ld_iter);
-                self.0.met_field(field_data, field_number)
+                ld_iter = LdIter::new(ld_slice.slice.bytes());
+                FieldData::LengthDelimited(&mut ld_iter)
             }
-            FieldData::Bits32(b) => self
-                .0
-                .met_field::<LdIterBoundType<'slice>>(FieldData::Bits32(b), field_number),
-            FieldData::Bits64(b) => self
-                .0
-                .met_field::<LdIterBoundType<'slice>>(FieldData::Bits64(b), field_number),
-        }
+            FieldData::Bits32(b) => FieldData::Bits32(b),
+            FieldData::Bits64(b) => FieldData::Bits64(b),
+        };
+        self.0.met_field(field_data, field_number)
     }
 }
