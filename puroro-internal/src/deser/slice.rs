@@ -68,6 +68,74 @@ impl<'slice> LdSlice<'slice> {
     pub fn as_slice(&self) -> &'slice [u8] {
         self.slice
     }
+
+    pub fn fields(&self) -> impl Iterator<Item = Result<(usize, FieldData<LdSlice<'slice>>)>> {
+        Fields {
+            ld_slice: self.clone(),
+        }
+    }
+}
+
+struct Fields<'slice> {
+    ld_slice: LdSlice<'slice>,
+}
+
+impl<'slice> Iterator for Fields<'slice> {
+    type Item = Result<(usize, FieldData<LdSlice<'slice>>)>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        (|| {
+            Ok(match self.ld_slice.try_get_wire_type_and_field_number()? {
+                None => {
+                    None // end of slice
+                }
+                Some((wire_type, field_number)) => {
+                    let field_data = match wire_type {
+                        WireType::Variant => {
+                            let variant = Variant::decode_bytes(&mut self.ld_slice.bytes())?;
+                            FieldData::Variant(variant)
+                        }
+                        WireType::LengthDelimited => {
+                            let field_length =
+                                Variant::decode_bytes(&mut self.ld_slice.bytes())?.to_usize()?;
+                            let (inner_slice, rest) = self.ld_slice.slice.split_at(field_length);
+                            self.ld_slice.slice = rest;
+                            FieldData::LengthDelimited(LdSlice::new(inner_slice))
+                        }
+                        WireType::Bits32 => {
+                            if self.ld_slice.slice.len() < 4 {
+                                Err(ErrorKind::UnexpectedInputTermination)?;
+                            }
+                            let (bytes, rest) = self.ld_slice.slice.split_at(4);
+                            self.ld_slice.slice = rest;
+                            FieldData::Bits32(
+                                bytes
+                                    .try_into()
+                                    .map_err(|_| ErrorKind::UnexpectedInputTermination)?,
+                            )
+                        }
+                        WireType::Bits64 => {
+                            if self.ld_slice.slice.len() < 8 {
+                                Err(ErrorKind::UnexpectedInputTermination)?;
+                            }
+                            let (bytes, rest) = self.ld_slice.slice.split_at(8);
+                            self.ld_slice.slice = rest;
+                            FieldData::Bits64(
+                                bytes
+                                    .try_into()
+                                    .map_err(|_| ErrorKind::UnexpectedInputTermination)?,
+                            )
+                        }
+                        WireType::StartGroup | WireType::EndGroup => {
+                            Err(ErrorKind::GroupNotSupported)?
+                        }
+                    };
+                    Some((field_number, field_data))
+                }
+            })
+        })()
+        .transpose()
+    }
 }
 
 impl<'slice> Iterator for LdSlice<'slice> {

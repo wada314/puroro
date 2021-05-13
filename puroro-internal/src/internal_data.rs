@@ -1,5 +1,6 @@
 use crate::deser::LdSlice;
 use crate::types::{FieldData, SliceViewFields};
+use ::either_n::Either4;
 use ::itertools::Either;
 use puroro::InternalData;
 use std::collections::HashMap;
@@ -88,33 +89,39 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
             },
         }
     }
+
+    pub fn slices(&self) -> impl Iterator<Item = LdSlice<'slice>> {
+        self.source_slices.iter()
+    }
 }
 impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
     pub fn iter(&self) -> impl Iterator<Item = LdSlice<'slice>> {
         match self.clone() {
             SourceSlicesView::SingleSlice(ld_slice) => {
-                Either::Left(std::iter::once(ld_slice.clone()))
+                Either4::One(std::iter::once(ld_slice.clone()))
             }
             SourceSlicesView::MaybeMultipleSlice {
                 field_in_parent,
                 field_number_in_parent,
                 parent_internal_data,
-            } => Either::Right(match field_in_parent.cloned() {
-                None => Either::Left(std::iter::empty()),
+            } => match field_in_parent.cloned() {
+                None => Either4::Two(std::iter::empty()),
                 Some(SliceViewFields::FieldsInSingleSlice {
                     slice: slice_of_fields_in_parent,
                     count,
                     enclosing_slice: _,
                 }) => {
+                    // iterate over a single slice given from a parent message,
+                    // and filter out the field that has proper field number.
                     let ld_slice = LdSlice::new(slice_of_fields_in_parent);
-                    let iter = ld_slice
+                    let iter = ld_slice.fields()
                         .map(|x| {
                             x.expect(
                                 "An error occured while deserializing the input. \
                                     Consider check the data validity in earlier stage to catch this error.",
                             )
                         })
-                        .filter_map(|(field_number, field_data)| {
+                        .filter_map(move |(field_number, field_data)| {
                             if field_number == field_number_in_parent {
                                 match field_data {
                                     FieldData::LengthDelimited(inner_ld_slice) => {
@@ -127,15 +134,17 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                             }
                         })
                         .take(count);
-                    Either::Right(iter)
+                    Either4::Three(iter)
                 }
                 Some(SliceViewFields::FieldsInMultipleSlices {
                     count,
                     first_enclosing_slice,
                 }) => {
+                    // The parent message instance is scattering around multiple slices.
+                    
                     todo!()
                 }
-            }.into_iter()),
+            },
         }
         .into_iter()
     }
