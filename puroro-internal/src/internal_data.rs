@@ -114,20 +114,18 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                     // iterate over a single slice given from a parent message,
                     // and filter out the field that has proper field number.
                     let ld_slice = LdSlice::new(slice_of_fields_in_parent);
-                    let iter = ld_slice.fields()
-                        .map(|x| {
-                            x.expect(
+                    let iter = ld_slice
+                        .fields()
+                        .filter_map(move |rfield| {
+                            let (field_number, field_data, _) = rfield.expect(
                                 "An error occured while deserializing the input. \
-                                    Consider check the data validity in earlier stage to catch this error.",
-                            )
-                        })
-                        .filter_map(move |(field_number, field_data)| {
+                                Consider checking the data in earlier stage to catch this error.",
+                            );
                             if field_number == field_number_in_parent {
-                                match field_data {
-                                    FieldData::LengthDelimited(inner_ld_slice) => {
-                                        Some(inner_ld_slice)
-                                    }
-                                    _ => None,
+                                if let FieldData::LengthDelimited(inner_ld_slice) = field_data {
+                                    Some(inner_ld_slice)
+                                } else {
+                                    None
                                 }
                             } else {
                                 None
@@ -141,8 +139,34 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                     first_enclosing_slice,
                 }) => {
                     // The parent message instance is scattering around multiple slices.
-                    todo!();
-                    Either4::Four(std::iter::empty())
+                    // In this case we to iterate in the parent message recursively,
+                    // that means we cannot use a static dispatching iterator because the type
+                    // of the iterator recursives infinitely.
+                    let iter = parent_internal_data
+                        .slices()
+                        .skip_while(move |ld_slice| {
+                            !std::ptr::eq(ld_slice.as_slice(), first_enclosing_slice)
+                        })
+                        .flat_map(move |ld_slice| {
+                            ld_slice.fields().filter_map(move |rfield| {
+                                let (field_number, field_data, _) = rfield.expect(
+                                    "An error occured while deserializing the input. \
+                                Consider checking the data in earlier stage to catch this error.",
+                                );
+                                if field_number == field_number_in_parent {
+                                    if let FieldData::LengthDelimited(inner_ld_slice) = field_data {
+                                        Some(inner_ld_slice)
+                                    } else {
+                                        None
+                                    }
+                                } else {
+                                    None
+                                }
+                            })
+                        })
+                        .take(count);
+                    // Dynamic dispatching iterator to avoid an infinite recursive type...
+                    Either4::Four(Box::new(iter) as Box<dyn Iterator<Item = LdSlice<'slice>>>)
                 }
             },
         }
