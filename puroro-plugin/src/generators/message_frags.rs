@@ -347,6 +347,13 @@ fn new_with_parent(
         }
     }
 
+    pub fn field_new(&self) -> &'static str {
+        match self.context.alloc_type() {
+            AllocatorType::Default => "::puroro_internal::FieldNew::new()",
+            AllocatorType::Bumpalo => "::puroro_internal::FieldNew::new_in_bumpalo(bump)",
+        }
+    }
+
     pub fn field_clone(&self, field_ident: &str, field_type: &str) -> String {
         match self.context.alloc_type() {
             AllocatorType::Default => format!(

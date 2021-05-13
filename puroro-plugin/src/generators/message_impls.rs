@@ -1,6 +1,6 @@
 use super::message_frags::MessageImplFragmentGenerator;
 use super::message_traits::{GetterMethods, MessageTraitCodeGenerator};
-use super::writer::{func, indent, indent_n, iter, seq, IntoFragment};
+use super::writer::{func, indent, indent_n, iter, seq, Fragment, IntoFragment};
 use crate::context::{AllocatorType, Context, ImplType};
 use crate::utils::Indentor;
 use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
@@ -144,6 +144,87 @@ impl{gp} ::std::default::Default for {ident}{gpb} {{
             },
         )
             .write_into(output)
+    }
+
+    pub fn new_method_declaration(&self) -> &'static str {
+        match (self.context.impl_type(), self.context.alloc_type()) {
+            (ImplType::Default, AllocatorType::Default) => "fn new() -> Self",
+            (ImplType::Default, AllocatorType::Bumpalo) => {
+                "fn new_in(bump: &'bump ::bumpalo::Bump) -> Self"
+            }
+            (ImplType::SliceView { .. }, AllocatorType::Default) => {
+                "\
+fn new_with_parent(
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> Self"
+            }
+            _ => {
+                unimplemented!()
+            }
+        }
+    }
+
+    pub fn print_new_methods<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+        (
+            format!(
+                "{cfg}\nimpl{gp} {ident}{gpb} {{\n",
+                ident = self.frag_gen.struct_ident(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params(&[]),
+                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+            ),
+            match (self.context.impl_type(), self.context.alloc_type()) {
+                (ImplType::Default, _) => func(|output| self.new_method_default_impl(output)),
+                (ImplType::SliceView { .. }, AllocatorType::Default) => {
+                    func(|output| self.new_method_slice_view_impl(output))
+                }
+                _ => {
+                    unreachable!()
+                }
+            },
+            "    }}\n",
+        )
+            .write_into(output)
+    }
+
+    fn new_method_default_impl<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+        (
+            format!(
+                "\
+pub {decl} {{
+    Self {{\n",
+                decl = self.frag_gen.new_method_declaration()
+            ),
+            indent_n(
+                2,
+                (
+                    iter(self.msg.fields().map(|field| {
+                        Ok(format!(
+                            "{name}: {field_new},\n",
+                            name = field.native_ident()?,
+                            field_new = self.frag_gen.field_new(),
+                        ))
+                    })),
+                    format!(
+                        "puroro_internal: {value},\n",
+                        value = self.frag_gen.internal_field_init_value()
+                    ),
+                ),
+            ),
+            "    \
+    }}
+}}\n",
+        )
+            .write_into(output)
+    }
+
+    fn new_method_slice_view_impl<W: std::fmt::Write>(
+        &self,
+        output: &mut Indentor<W>,
+    ) -> Result<()> {
+        (format!(""),).write_into(output)
     }
 
     pub fn print_msg_clone<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
