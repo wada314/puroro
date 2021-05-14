@@ -160,7 +160,7 @@ pub {decl} {{
         (
             "\
 fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
-    let new_self = Self {{\n",
+    let mut new_self = Self {{\n",
             indent_n(
                 2,
                 func(|output| {
@@ -173,7 +173,10 @@ fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
             ),
             "    \
     }};
-    todo!(\"Initialize fields\")
+    for ld_slice in new_self.puroro_internal.slices() {
+        ld_slice.deser_message(&mut new_self)?;
+    }
+    Ok(new_self)
 }}
 
 fn try_new_with_parent(
@@ -196,7 +199,10 @@ fn try_new_with_parent(
             ),
             "    \
     }};
-    todo!(\"Initialize fields\")
+    for ld_slice in new_self.puroro_internal.slices() {
+        ld_slice.deser_message(&mut new_self)?;
+    }
+    Ok(new_self)
 }}\n",
         )
             .write_into(output)
