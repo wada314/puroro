@@ -43,13 +43,13 @@ pub trait {trait_ident} {{\n",
                             format!("{decl};\n", decl = decl)
                         }
                         GetterMethods::RepeatedField {
-                            type_ident,
-                            type_bound,
+                            return_type_ident: type_ident,
+                            return_type_bound: type_bound,
                             get_decl,
                         }
                         | GetterMethods::MapField {
-                            type_ident,
-                            type_bound,
+                            return_type_ident: type_ident,
+                            return_type_bound: type_bound,
                             get_decl,
                         } => {
                             format!(
@@ -77,8 +77,8 @@ pub trait {trait_ident} {{\n",
                 let (key_field, value_field) = m.key_value_of_map_entry()?;
                 let type_ident = format!("{}Map", to_camel_case(field.native_ident()?));
                 GetterMethods::MapField {
-                    type_ident: type_ident.clone(),
-                    type_bound: format!(
+                    return_type_ident: type_ident.clone(),
+                    return_type_bound: format!(
                         "::puroro::MapField<{key}, {value}>",
                         key = self.scalar_deref_type_name(key_field)?,
                         value = self.scalar_deref_type_name(value_field)?,
@@ -100,8 +100,8 @@ pub trait {trait_ident} {{\n",
             (FieldLabel::Repeated, _) => {
                 let type_ident = format!("{}Repeated", to_camel_case(field.native_ident()?));
                 GetterMethods::RepeatedField {
-                    type_ident: type_ident.clone(),
-                    type_bound: format!(
+                    return_type_ident: type_ident.clone(),
+                    return_type_bound: format!(
                         "::puroro::RepeatedField<{value}>",
                         value = self.scalar_deref_type_name(field)?,
                     ),
@@ -185,13 +185,13 @@ pub enum GetterMethods {
     BareField(String),
     OptionalField(String),
     RepeatedField {
-        type_ident: String,
-        type_bound: String,
+        return_type_ident: String,
+        return_type_bound: String,
         get_decl: String,
     },
     MapField {
-        type_ident: String,
-        type_bound: String,
+        return_type_ident: String,
+        return_type_bound: String,
         get_decl: String,
     },
 }

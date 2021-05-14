@@ -2271,10 +2271,10 @@ impl ::puroro::Serializable for NamePart {
 
 impl NamePartTrait for NamePart {
     fn name_part(&self) -> &'_ str {
-        self.name_part.as_ref()
+        <::std::string::String as std::convert::AsRef<_>>::as_ref(&self.name_part)
     }
     fn is_extension(&self) -> bool {
-        self.is_extension.clone()
+        <bool as std::clone::Clone>::clone(&self.is_extension)
     }
 }
 impl<'a> ::puroro_internal::FieldNew<'a> for NamePart {
@@ -2392,10 +2392,10 @@ impl<'bump> ::puroro::Serializable for NamePartBumpalo<'bump> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> NamePartTrait for NamePartBumpalo<'bump> {
     fn name_part(&self) -> &'_ str {
-        self.name_part.as_ref()
+        <::bumpalo::collections::String<'bump> as std::convert::AsRef<_>>::as_ref(&self.name_part)
     }
     fn is_extension(&self) -> bool {
-        self.is_extension.clone()
+        <bool as std::clone::Clone>::clone(&self.is_extension)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
