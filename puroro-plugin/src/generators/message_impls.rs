@@ -527,6 +527,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                 iter(self.msg.fields().map(|field| -> Result<_> {
                     Ok(match self.traits_gen.generate_getter_method_decls(field)? {
                         GetterMethods::BareField(decl) => {
+                            // Getter method returns bare type `T`
                             match (self.context.impl_type(), field.type_()?) {
                                 (ImplType::Default, FieldType::Message(_))
                                 | (_, FieldType::String)
@@ -557,6 +558,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                             }
                         }
                         GetterMethods::OptionalField(decl) => {
+                            // Getter method returns type `Option<T>`
                             match (self.context.impl_type(), field.type_()?) {
                                 (ImplType::Default, FieldType::Message(_))
                                 | (_, FieldType::String)
