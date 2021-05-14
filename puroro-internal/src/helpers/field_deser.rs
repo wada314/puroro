@@ -3,7 +3,6 @@ use crate::tags;
 use crate::tags::{FieldLabelTag, FieldTypeTag};
 use crate::types::{FieldData, SliceViewFields};
 use crate::variant::VariantTypeTag;
-use crate::FieldNew;
 use crate::{ErrorKind, Result};
 use std::collections::HashMap;
 use std::convert::TryFrom;

@@ -37,7 +37,7 @@ pub struct InternalDataForBumpaloStruct<'bump> {
 
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> InternalDataForBumpaloStruct<'bump> {
-    pub fn new(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_with_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             unknown_fields: None,
             bump,
