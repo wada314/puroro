@@ -180,11 +180,10 @@ fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
 }}
 
 fn try_new_with_parent(
-        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-        field_number_in_parent: usize,
-        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-    ) -> ::puroro::Result<Self>
-{{
+    parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+    field_number_in_parent: usize,
+    parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+) -> ::puroro::Result<Self> {{
     let mut new_self = Self {{\n",
             indent_n(
                 2,
@@ -388,7 +387,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
     {{
         use ::puroro_internal::FieldDeserFromSlice;
         use ::puroro_internal::tags;
-        match field_number {{",
+        match field_number {{\n",
                 ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
