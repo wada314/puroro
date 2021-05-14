@@ -80,9 +80,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         .into_iter();
         let generic_args_iter2 = match self.context.impl_type() {
             ImplType::Default => None,
-            ImplType::SliceView { .. } => Some("'slice"),
+            ImplType::SliceView { .. } => Some(std::array::IntoIter::new(["'slice", "'p"])),
         }
-        .into_iter();
+        .into_iter()
+        .flatten();
         let generic_args_iter = generic_args_iter1.chain(generic_args_iter2);
         if generic_args_iter.clone().count() == 0 {
             Ok(self.struct_ident_with_relative_path(msg)?)

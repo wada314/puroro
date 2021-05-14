@@ -382,18 +382,43 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {{
-        todo!();
-        \n",
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {{",
                 ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
                 gpb = self.frag_gen.struct_generic_params_bounds(&[]),
             ),
+            indent_n(
+                3,
+                (
+                    iter(self.msg.fields().map(|field| -> Result<_> {
+                        Ok(format!(
+                            "\
+{number} => {{
+    <{type_} as FieldDeserFromSlice<
+        tags::{type_tag}, 
+        tags::{label_tag}>>
+    ::deser(&mut self.{ident}, field, slice_from_this_field, enclosing_slice)?;
+}}\n",
+                            number = field.number(),
+                            ident = field.native_ident()?,
+                            type_ = self.frag_gen.field_type_for(field)?,
+                            type_tag = self.frag_gen.type_tag_for(field)?,
+                            label_tag = field.label_tag()?,
+                        ))
+                    })),
+                    "_ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,\n",
+                ),
+            ),
             "        \
+        }}
+        Ok(true)
     }}
 }}\n",
         )

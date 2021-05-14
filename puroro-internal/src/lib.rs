@@ -11,5 +11,8 @@ pub use internal_data::{
     InternalDataForBumpaloStruct, InternalDataForNormalStruct, InternalDataForSliceViewStruct,
 };
 
-pub use helpers::{FieldClone, FieldDeserFromIter, FieldNew, FieldSer, FieldTakeOrInit, MapEntry};
+pub use helpers::{
+    FieldClone, FieldDeserFromIter, FieldDeserFromSlice, FieldNew, FieldSer, FieldTakeOrInit,
+    MapEntry,
+};
 pub use types::SliceViewFields;

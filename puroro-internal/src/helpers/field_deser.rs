@@ -286,6 +286,18 @@ define_deser_scalar_ld_from_slice!(&'slice str, tags::String, tags::Optional3, |
 >| unsafe {
     transmute(x.as_slice())
 });
+define_deser_scalar_ld_from_slice!(
+    Option<&'slice [u8]>,
+    tags::Bytes,
+    tags::Optional2,
+    |x: LdSlice<'slice>| Some(x.as_slice())
+);
+define_deser_scalar_ld_from_slice!(
+    Option<&'slice str>,
+    tags::String,
+    tags::Optional2,
+    |x: LdSlice<'slice>| Some(unsafe { transmute(x.as_slice()) })
+);
 
 // Unlike C++ implementation, the required message field in Rust is not
 // wrapped by `Option` (and neither `Box`).
