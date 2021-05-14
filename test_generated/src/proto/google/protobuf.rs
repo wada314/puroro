@@ -306,7 +306,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for GeneratedCodeIn
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -747,7 +750,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for AnnotationSlice
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -1062,7 +1068,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for SourceCodeInfoS
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -1552,7 +1561,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for LocationSliceVi
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -2125,7 +2137,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for UninterpretedOp
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -2477,7 +2492,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for NamePartSliceVi
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -2878,7 +2896,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for MethodOptionsSl
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -3259,7 +3280,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ServiceOptionsS
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -3616,7 +3640,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumValueOption
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -4016,7 +4043,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumOptionsSlic
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -4330,7 +4360,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for OneofOptionsSli
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -4902,7 +4935,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FieldOptionsSli
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -5434,7 +5470,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for MessageOptionsS
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -6608,7 +6647,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileOptionsSlic
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -7158,7 +7200,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for MethodDescripto
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -7561,7 +7606,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ServiceDescript
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -7958,7 +8006,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumValueDescri
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -8456,7 +8507,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumDescriptorP
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -8808,7 +8862,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumReservedRan
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -9163,7 +9220,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for OneofDescriptor
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -9904,7 +9964,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FieldDescriptor
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -10294,7 +10357,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ExtensionRangeO
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -11034,7 +11100,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for DescriptorProto
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -11386,7 +11455,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ReservedRangeSl
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -11783,7 +11855,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ExtensionRangeS
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -12604,7 +12679,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileDescriptorP
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -12918,7 +12996,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileDescriptorS
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 

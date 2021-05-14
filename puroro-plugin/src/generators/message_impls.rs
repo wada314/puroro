@@ -471,7 +471,10 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {{
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }}
+        Ok(())
     }}
 }}\n",
                     ident = self.frag_gen.struct_ident(self.msg)?,

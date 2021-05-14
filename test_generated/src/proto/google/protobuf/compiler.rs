@@ -392,7 +392,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRe
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -853,7 +856,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileSliceView<'
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -1303,7 +1309,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRe
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
@@ -1740,7 +1749,10 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for VersionSliceVie
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        todo!()
+        for ld_slice in self.puroro_internal.slices() {
+            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+        }
+        Ok(())
     }
 }
 
