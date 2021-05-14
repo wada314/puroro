@@ -168,7 +168,7 @@ impl<'bump> CodeGeneratorResponseBumpalo<'bump> {
             error: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             supported_features: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             file: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -306,18 +306,32 @@ pub struct CodeGeneratorResponseSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> CodeGeneratorResponseSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            error: ::puroro_internal::FieldNew::new(),
+            supported_features: ::puroro_internal::FieldNew::new(),
+            file: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             error: ::puroro_internal::FieldNew::new(),
             supported_features: ::puroro_internal::FieldNew::new(),
             file: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -568,7 +582,7 @@ impl<'bump> FileBumpalo<'bump> {
             insertion_point: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             content: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             generated_code_info: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -720,19 +734,34 @@ pub struct FileSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> FileSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            name: ::puroro_internal::FieldNew::new(),
+            insertion_point: ::puroro_internal::FieldNew::new(),
+            content: ::puroro_internal::FieldNew::new(),
+            generated_code_info: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             insertion_point: ::puroro_internal::FieldNew::new(),
             content: ::puroro_internal::FieldNew::new(),
             generated_code_info: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -970,7 +999,7 @@ impl<'bump> CodeGeneratorRequestBumpalo<'bump> {
             parameter: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             proto_file: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             compiler_version: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -1125,19 +1154,34 @@ pub struct CodeGeneratorRequestSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> CodeGeneratorRequestSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            file_to_generate: ::puroro_internal::FieldNew::new(),
+            parameter: ::puroro_internal::FieldNew::new(),
+            proto_file: ::puroro_internal::FieldNew::new(),
+            compiler_version: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             file_to_generate: ::puroro_internal::FieldNew::new(),
             parameter: ::puroro_internal::FieldNew::new(),
             proto_file: ::puroro_internal::FieldNew::new(),
             compiler_version: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -1366,7 +1410,7 @@ impl<'bump> VersionBumpalo<'bump> {
             minor: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             patch: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             suffix: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -1517,19 +1561,34 @@ pub struct VersionSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> VersionSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            major: ::puroro_internal::FieldNew::new(),
+            minor: ::puroro_internal::FieldNew::new(),
+            patch: ::puroro_internal::FieldNew::new(),
+            suffix: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             major: ::puroro_internal::FieldNew::new(),
             minor: ::puroro_internal::FieldNew::new(),
             patch: ::puroro_internal::FieldNew::new(),
             suffix: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 

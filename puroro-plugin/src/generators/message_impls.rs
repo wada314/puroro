@@ -26,8 +26,8 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
     pub fn print_msg<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
             func(|output| self.print_msg_struct(output)),
-            func(|output| self.print_msg_new(output)),
-            func(|output| self.print_msg_clone(output)),
+            func(|output| self.print_new_methods(output)),
+            func(|output| self.print_clone(output)),
             (
                 func(|output| self.print_msg_deser_from_iter(output)),
                 match self.context.impl_type() {
@@ -39,10 +39,10 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
                     }
                 },
                 func(|output| self.print_msg_ser(output)),
-                func(|output| self.print_map_entry_impl(output)),
+                func(|output| self.print_impl_map_entry(output)),
             ),
-            func(|output| self.print_msg_trait_impl(output)),
-            func(|output| self.print_msg_field_new_impl(output)),
+            func(|output| self.print_impl_trait(output)),
+            func(|output| self.print_impl_field_new(output)),
         )
             .write_into(output)
     }
@@ -78,53 +78,27 @@ pub struct {ident}{gp} {{\n",
             .write_into(output)
     }
 
-    pub fn print_msg_new<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+    fn print_new_methods<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
             format!(
-                "\
-{cfg}
-impl{gp} {ident}{gpb} {{\n",
+                "{cfg}\nimpl{gp} {ident}{gpb} {{\n",
                 ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&[]),
                 gpb = self.frag_gen.struct_generic_params_bounds(&[]),
             ),
-            indent((
-                format!(
-                    "\
-pub {new_decl} {{
-    Self {{\n",
-                    new_decl = self.frag_gen.new_method_declaration(),
-                ),
-                indent_n(
-                    2,
-                    (
-                        iter(self.msg.fields().map(|field| {
-                            Ok(match self.context.alloc_type() {
-                                AllocatorType::Default => {
-                                    format!(
-                                        "{name}: ::puroro_internal::FieldNew::new(),\n",
-                                        name = field.native_ident()?
-                                    )
-                                }
-                                AllocatorType::Bumpalo => format!(
-                                    "{name}: ::puroro_internal::FieldNew::new_in_bumpalo(bump),\n",
-                                    name = field.native_ident()?
-                                ),
-                            })
-                        })),
-                        format!(
-                            "puroro_internal: {value},\n",
-                            value = self.frag_gen.internal_field_init_value()
-                        ),
-                    ),
-                ),
-                "    \
-    }}
-}}\n", // pub {new_decl} {{
-            )),
-            "\
-}}\n", // impl{gp} {ident}{gpb} {{
+            indent(
+                match (self.context.impl_type(), self.context.alloc_type()) {
+                    (ImplType::Default, _) => func(|output| self.new_method_default_impl(output)),
+                    (ImplType::SliceView { .. }, AllocatorType::Default) => {
+                        func(|output| self.new_method_slice_view_impl(output))
+                    }
+                    _ => {
+                        unreachable!()
+                    }
+                },
+            ),
+            "}}\n",
             if self.frag_gen.is_default_available() {
                 format!(
                     "\
@@ -146,45 +120,20 @@ impl{gp} ::std::default::Default for {ident}{gpb} {{
             .write_into(output)
     }
 
-    pub fn new_method_declaration(&self) -> &'static str {
-        match (self.context.impl_type(), self.context.alloc_type()) {
-            (ImplType::Default, AllocatorType::Default) => "fn new() -> Self",
-            (ImplType::Default, AllocatorType::Bumpalo) => {
-                "fn new_in(bump: &'bump ::bumpalo::Bump) -> Self"
-            }
-            (ImplType::SliceView { .. }, AllocatorType::Default) => {
-                "\
-fn new_with_parent(
-        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-        field_number_in_parent: usize,
-        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-    ) -> Self"
-            }
-            _ => {
-                unimplemented!()
-            }
-        }
-    }
-
-    pub fn print_new_methods<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+    fn new_method_self_members<W: std::fmt::Write>(
+        &self,
+        output: &mut Indentor<W>,
+        internal_init: &str,
+    ) -> Result<()> {
         (
-            format!(
-                "{cfg}\nimpl{gp} {ident}{gpb} {{\n",
-                ident = self.frag_gen.struct_ident(self.msg)?,
-                cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(&[]),
-                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-            ),
-            match (self.context.impl_type(), self.context.alloc_type()) {
-                (ImplType::Default, _) => func(|output| self.new_method_default_impl(output)),
-                (ImplType::SliceView { .. }, AllocatorType::Default) => {
-                    func(|output| self.new_method_slice_view_impl(output))
-                }
-                _ => {
-                    unreachable!()
-                }
-            },
-            "    }}\n",
+            iter(self.msg.fields().map(|field| {
+                Ok(format!(
+                    "{name}: {field_new},\n",
+                    name = field.native_ident()?,
+                    field_new = self.frag_gen.field_new(),
+                ))
+            })),
+            format!("puroro_internal: {value},\n", value = internal_init),
         )
             .write_into(output)
     }
@@ -199,19 +148,19 @@ pub {decl} {{
             ),
             indent_n(
                 2,
-                (
-                    iter(self.msg.fields().map(|field| {
-                        Ok(format!(
-                            "{name}: {field_new},\n",
-                            name = field.native_ident()?,
-                            field_new = self.frag_gen.field_new(),
-                        ))
-                    })),
-                    format!(
-                        "puroro_internal: {value},\n",
-                        value = self.frag_gen.internal_field_init_value()
-                    ),
-                ),
+                func(|output| {
+                    self.new_method_self_members(
+                        output,
+                        match self.context.alloc_type() {
+                            AllocatorType::Default => {
+                                "::puroro_internal::InternalDataForNormalStruct::new()"
+                            }
+                            AllocatorType::Bumpalo => {
+                                "::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump)"
+                            }
+                        },
+                    )
+                }),
             ),
             "    \
     }}
@@ -224,10 +173,54 @@ pub {decl} {{
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
-        (format!(""),).write_into(output)
+        (
+            "\
+fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
+    let new_self = Self {{\n",
+            indent_n(
+                2,
+                func(|output| {
+                    self.new_method_self_members(
+                        output,
+                        "\
+::puroro_internal::InternalDataForSliceViewStruct::new(slice)",
+                    )
+                }),
+            ),
+            "    \
+    }};
+    todo!(\"Initialize fields\");
+    Ok(new_self)
+}}
+
+fn try_new_with_parent(
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self>
+{{
+    let new_self = Self {{\n",
+            indent_n(
+                2,
+                func(|output| {
+                    self.new_method_self_members(
+                        output,
+                        "\
+::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
+    parent_field, field_number_in_parent, parent_internal_data)",
+                    )
+                }),
+            ),
+            "    \
+    }};
+    todo!(\"Initialize fields\");
+    Ok(new_self)
+}}\n",
+        )
+            .write_into(output)
     }
 
-    pub fn print_msg_clone<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+    pub fn print_clone<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
             format!(
                 "\
@@ -475,7 +468,7 @@ impl{gp} ::puroro::Serializable for {name}{gpb} {{
             .write_into(output)
     }
 
-    fn print_msg_trait_impl<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+    fn print_impl_trait<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         if matches!(self.context.impl_type(), ImplType::SliceView { .. }) {
             // TODO: do impl
             return Ok(());
@@ -562,7 +555,7 @@ type {type_ident} = {type_name};
             .write_into(output)
     }
 
-    pub fn print_map_entry_impl<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+    pub fn print_impl_map_entry<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         if !self.msg.is_map_entry() {
             return Ok(());
         }
@@ -611,7 +604,7 @@ impl{gp} ::puroro_internal::MapEntry for {entry_type} {{
             .write_into(output)
     }
 
-    fn print_msg_field_new_impl<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+    fn print_impl_field_new<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
             match (self.context.impl_type(), self.context.alloc_type()) {
                 (ImplType::Default, AllocatorType::Default) => {

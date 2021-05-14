@@ -130,7 +130,7 @@ impl<'bump> GeneratedCodeInfoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             annotation: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -238,16 +238,28 @@ pub struct GeneratedCodeInfoSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> GeneratedCodeInfoSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            annotation: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             annotation: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -476,7 +488,7 @@ impl<'bump> AnnotationBumpalo<'bump> {
             source_file: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             begin: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             end: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -628,19 +640,34 @@ pub struct AnnotationSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> AnnotationSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            path: ::puroro_internal::FieldNew::new(),
+            source_file: ::puroro_internal::FieldNew::new(),
+            begin: ::puroro_internal::FieldNew::new(),
+            end: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             path: ::puroro_internal::FieldNew::new(),
             source_file: ::puroro_internal::FieldNew::new(),
             begin: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -817,7 +844,7 @@ impl<'bump> SourceCodeInfoBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             location: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -925,16 +952,28 @@ pub struct SourceCodeInfoSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> SourceCodeInfoSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            location: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             location: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -1186,7 +1225,7 @@ impl<'bump> LocationBumpalo<'bump> {
             leading_comments: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             trailing_comments: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             leading_detached_comments: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -1355,12 +1394,26 @@ pub struct LocationSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> LocationSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            path: ::puroro_internal::FieldNew::new(),
+            span: ::puroro_internal::FieldNew::new(),
+            leading_comments: ::puroro_internal::FieldNew::new(),
+            trailing_comments: ::puroro_internal::FieldNew::new(),
+            leading_detached_comments: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             path: ::puroro_internal::FieldNew::new(),
             span: ::puroro_internal::FieldNew::new(),
             leading_comments: ::puroro_internal::FieldNew::new(),
@@ -1368,7 +1421,9 @@ impl<'slice, 'p> LocationSliceView<'slice, 'p> {
             leading_detached_comments: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -1660,7 +1715,7 @@ impl<'bump> UninterpretedOptionBumpalo<'bump> {
             double_value: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             string_value: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             aggregate_value: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -1858,12 +1913,28 @@ pub struct UninterpretedOptionSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            name: ::puroro_internal::FieldNew::new(),
+            identifier_value: ::puroro_internal::FieldNew::new(),
+            positive_int_value: ::puroro_internal::FieldNew::new(),
+            negative_int_value: ::puroro_internal::FieldNew::new(),
+            double_value: ::puroro_internal::FieldNew::new(),
+            string_value: ::puroro_internal::FieldNew::new(),
+            aggregate_value: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             identifier_value: ::puroro_internal::FieldNew::new(),
             positive_int_value: ::puroro_internal::FieldNew::new(),
@@ -1873,7 +1944,9 @@ impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
             aggregate_value: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -2068,7 +2141,7 @@ impl<'bump> NamePartBumpalo<'bump> {
         Self {
             name_part: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             is_extension: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -2189,17 +2262,30 @@ pub struct NamePartSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> NamePartSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            name_part: ::puroro_internal::FieldNew::new(),
+            is_extension: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             name_part: ::puroro_internal::FieldNew::new(),
             is_extension: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -2412,7 +2498,7 @@ impl<'bump> MethodOptionsBumpalo<'bump> {
             deprecated: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             idempotency_level: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -2550,18 +2636,32 @@ pub struct MethodOptionsSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> MethodOptionsSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            deprecated: ::puroro_internal::FieldNew::new(),
+            idempotency_level: ::puroro_internal::FieldNew::new(),
+            uninterpreted_option: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             deprecated: ::puroro_internal::FieldNew::new(),
             idempotency_level: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -2779,7 +2879,7 @@ impl<'bump> ServiceOptionsBumpalo<'bump> {
         Self {
             deprecated: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -2902,17 +3002,30 @@ pub struct ServiceOptionsSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> ServiceOptionsSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            deprecated: ::puroro_internal::FieldNew::new(),
+            uninterpreted_option: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             deprecated: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -3105,7 +3218,7 @@ impl<'bump> EnumValueOptionsBumpalo<'bump> {
         Self {
             deprecated: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -3228,17 +3341,30 @@ pub struct EnumValueOptionsSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> EnumValueOptionsSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            deprecated: ::puroro_internal::FieldNew::new(),
+            uninterpreted_option: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             deprecated: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -3450,7 +3576,7 @@ impl<'bump> EnumOptionsBumpalo<'bump> {
             allow_alias: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             deprecated: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -3588,18 +3714,32 @@ pub struct EnumOptionsSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> EnumOptionsSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            allow_alias: ::puroro_internal::FieldNew::new(),
+            deprecated: ::puroro_internal::FieldNew::new(),
+            uninterpreted_option: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             allow_alias: ::puroro_internal::FieldNew::new(),
             deprecated: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -3774,7 +3914,7 @@ impl<'bump> OneofOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             uninterpreted_option: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -3882,16 +4022,28 @@ pub struct OneofOptionsSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> OneofOptionsSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            uninterpreted_option: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -4178,7 +4330,7 @@ impl<'bump> FieldOptionsBumpalo<'bump> {
             deprecated: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             weak: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -4376,12 +4528,28 @@ pub struct FieldOptionsSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            ctype: ::puroro_internal::FieldNew::new(),
+            packed: ::puroro_internal::FieldNew::new(),
+            jstype: ::puroro_internal::FieldNew::new(),
+            lazy: ::puroro_internal::FieldNew::new(),
+            deprecated: ::puroro_internal::FieldNew::new(),
+            weak: ::puroro_internal::FieldNew::new(),
+            uninterpreted_option: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             ctype: ::puroro_internal::FieldNew::new(),
             packed: ::puroro_internal::FieldNew::new(),
             jstype: ::puroro_internal::FieldNew::new(),
@@ -4391,7 +4559,9 @@ impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -4692,7 +4862,7 @@ impl<'bump> MessageOptionsBumpalo<'bump> {
             deprecated: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             map_entry: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -4860,12 +5030,26 @@ pub struct MessageOptionsSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            message_set_wire_format: ::puroro_internal::FieldNew::new(),
+            no_standard_descriptor_accessor: ::puroro_internal::FieldNew::new(),
+            deprecated: ::puroro_internal::FieldNew::new(),
+            map_entry: ::puroro_internal::FieldNew::new(),
+            uninterpreted_option: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             message_set_wire_format: ::puroro_internal::FieldNew::new(),
             no_standard_descriptor_accessor: ::puroro_internal::FieldNew::new(),
             deprecated: ::puroro_internal::FieldNew::new(),
@@ -4873,7 +5057,9 @@ impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -5430,7 +5616,7 @@ impl<'bump> FileOptionsBumpalo<'bump> {
             php_metadata_namespace: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             ruby_package: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             uninterpreted_option: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -5838,12 +6024,42 @@ pub struct FileOptionsSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            java_package: ::puroro_internal::FieldNew::new(),
+            java_outer_classname: ::puroro_internal::FieldNew::new(),
+            java_multiple_files: ::puroro_internal::FieldNew::new(),
+            java_generate_equals_and_hash: ::puroro_internal::FieldNew::new(),
+            java_string_check_utf8: ::puroro_internal::FieldNew::new(),
+            optimize_for: ::puroro_internal::FieldNew::new(),
+            go_package: ::puroro_internal::FieldNew::new(),
+            cc_generic_services: ::puroro_internal::FieldNew::new(),
+            java_generic_services: ::puroro_internal::FieldNew::new(),
+            py_generic_services: ::puroro_internal::FieldNew::new(),
+            php_generic_services: ::puroro_internal::FieldNew::new(),
+            deprecated: ::puroro_internal::FieldNew::new(),
+            cc_enable_arenas: ::puroro_internal::FieldNew::new(),
+            objc_class_prefix: ::puroro_internal::FieldNew::new(),
+            csharp_namespace: ::puroro_internal::FieldNew::new(),
+            swift_prefix: ::puroro_internal::FieldNew::new(),
+            php_class_prefix: ::puroro_internal::FieldNew::new(),
+            php_namespace: ::puroro_internal::FieldNew::new(),
+            php_metadata_namespace: ::puroro_internal::FieldNew::new(),
+            ruby_package: ::puroro_internal::FieldNew::new(),
+            uninterpreted_option: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             java_package: ::puroro_internal::FieldNew::new(),
             java_outer_classname: ::puroro_internal::FieldNew::new(),
             java_multiple_files: ::puroro_internal::FieldNew::new(),
@@ -5867,7 +6083,9 @@ impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -6177,7 +6395,7 @@ impl<'bump> MethodDescriptorProtoBumpalo<'bump> {
             options: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             client_streaming: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             server_streaming: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -6359,12 +6577,27 @@ pub struct MethodDescriptorProtoSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            name: ::puroro_internal::FieldNew::new(),
+            input_type: ::puroro_internal::FieldNew::new(),
+            output_type: ::puroro_internal::FieldNew::new(),
+            options: ::puroro_internal::FieldNew::new(),
+            client_streaming: ::puroro_internal::FieldNew::new(),
+            server_streaming: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             input_type: ::puroro_internal::FieldNew::new(),
             output_type: ::puroro_internal::FieldNew::new(),
@@ -6373,7 +6606,9 @@ impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
             server_streaming: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -6591,7 +6826,7 @@ impl<'bump> ServiceDescriptorProtoBumpalo<'bump> {
             name: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             method: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -6730,18 +6965,32 @@ pub struct ServiceDescriptorProtoSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> ServiceDescriptorProtoSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            name: ::puroro_internal::FieldNew::new(),
+            method: ::puroro_internal::FieldNew::new(),
+            options: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             method: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -6952,7 +7201,7 @@ impl<'bump> EnumValueDescriptorProtoBumpalo<'bump> {
             name: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             number: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -7089,18 +7338,32 @@ pub struct EnumValueDescriptorProtoSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> EnumValueDescriptorProtoSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            name: ::puroro_internal::FieldNew::new(),
+            number: ::puroro_internal::FieldNew::new(),
+            options: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             number: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -7359,7 +7622,7 @@ impl<'bump> EnumDescriptorProtoBumpalo<'bump> {
             options: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             reserved_range: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             reserved_name: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -7531,12 +7794,26 @@ pub struct EnumDescriptorProtoSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            name: ::puroro_internal::FieldNew::new(),
+            value: ::puroro_internal::FieldNew::new(),
+            options: ::puroro_internal::FieldNew::new(),
+            reserved_range: ::puroro_internal::FieldNew::new(),
+            reserved_name: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             value: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
@@ -7544,7 +7821,9 @@ impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
             reserved_name: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -7737,7 +8016,7 @@ impl<'bump> EnumReservedRangeBumpalo<'bump> {
         Self {
             start: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             end: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -7858,17 +8137,30 @@ pub struct EnumReservedRangeSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> EnumReservedRangeSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            start: ::puroro_internal::FieldNew::new(),
+            end: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             start: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -8060,7 +8352,7 @@ impl<'bump> OneofDescriptorProtoBumpalo<'bump> {
         Self {
             name: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -8182,17 +8474,30 @@ pub struct OneofDescriptorProtoSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> OneofDescriptorProtoSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            name: ::puroro_internal::FieldNew::new(),
+            options: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -8554,7 +8859,7 @@ impl<'bump> FieldDescriptorProtoBumpalo<'bump> {
             json_name: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             proto3_optional: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -8811,12 +9116,32 @@ pub struct FieldDescriptorProtoSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            name: ::puroro_internal::FieldNew::new(),
+            number: ::puroro_internal::FieldNew::new(),
+            label: ::puroro_internal::FieldNew::new(),
+            type_: ::puroro_internal::FieldNew::new(),
+            type_name: ::puroro_internal::FieldNew::new(),
+            extendee: ::puroro_internal::FieldNew::new(),
+            default_value: ::puroro_internal::FieldNew::new(),
+            oneof_index: ::puroro_internal::FieldNew::new(),
+            json_name: ::puroro_internal::FieldNew::new(),
+            options: ::puroro_internal::FieldNew::new(),
+            proto3_optional: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             number: ::puroro_internal::FieldNew::new(),
             label: ::puroro_internal::FieldNew::new(),
@@ -8830,7 +9155,9 @@ impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
             proto3_optional: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -9089,7 +9416,7 @@ impl<'bump> ExtensionRangeOptionsBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             uninterpreted_option: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -9197,16 +9524,28 @@ pub struct ExtensionRangeOptionsSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> ExtensionRangeOptionsSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            uninterpreted_option: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -9576,7 +9915,7 @@ impl<'bump> DescriptorProtoBumpalo<'bump> {
             options: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             reserved_range: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             reserved_name: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -9832,12 +10171,31 @@ pub struct DescriptorProtoSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            name: ::puroro_internal::FieldNew::new(),
+            field: ::puroro_internal::FieldNew::new(),
+            extension: ::puroro_internal::FieldNew::new(),
+            nested_type: ::puroro_internal::FieldNew::new(),
+            enum_type: ::puroro_internal::FieldNew::new(),
+            extension_range: ::puroro_internal::FieldNew::new(),
+            oneof_decl: ::puroro_internal::FieldNew::new(),
+            options: ::puroro_internal::FieldNew::new(),
+            reserved_range: ::puroro_internal::FieldNew::new(),
+            reserved_name: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             field: ::puroro_internal::FieldNew::new(),
             extension: ::puroro_internal::FieldNew::new(),
@@ -9850,7 +10208,9 @@ impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
             reserved_name: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -10048,7 +10408,7 @@ impl<'bump> ReservedRangeBumpalo<'bump> {
         Self {
             start: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             end: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -10169,17 +10529,30 @@ pub struct ReservedRangeSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> ReservedRangeSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            start: ::puroro_internal::FieldNew::new(),
+            end: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             start: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -10389,7 +10762,7 @@ impl<'bump> ExtensionRangeBumpalo<'bump> {
             start: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             end: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             options: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -10526,18 +10899,32 @@ pub struct ExtensionRangeSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> ExtensionRangeSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            start: ::puroro_internal::FieldNew::new(),
+            end: ::puroro_internal::FieldNew::new(),
+            options: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             start: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -10944,7 +11331,7 @@ impl<'bump> FileDescriptorProtoBumpalo<'bump> {
             options: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             source_code_info: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
             syntax: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -11228,12 +11615,33 @@ pub struct FileDescriptorProtoSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            name: ::puroro_internal::FieldNew::new(),
+            package: ::puroro_internal::FieldNew::new(),
+            dependency: ::puroro_internal::FieldNew::new(),
+            public_dependency: ::puroro_internal::FieldNew::new(),
+            weak_dependency: ::puroro_internal::FieldNew::new(),
+            message_type: ::puroro_internal::FieldNew::new(),
+            enum_type: ::puroro_internal::FieldNew::new(),
+            service: ::puroro_internal::FieldNew::new(),
+            extension: ::puroro_internal::FieldNew::new(),
+            options: ::puroro_internal::FieldNew::new(),
+            source_code_info: ::puroro_internal::FieldNew::new(),
+            syntax: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             package: ::puroro_internal::FieldNew::new(),
             dependency: ::puroro_internal::FieldNew::new(),
@@ -11248,7 +11656,9 @@ impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
             syntax: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 
@@ -11432,7 +11842,7 @@ impl<'bump> FileDescriptorSetBumpalo<'bump> {
     pub fn new_in(bump: &'bump ::bumpalo::Bump) -> Self {
         Self {
             file: ::puroro_internal::FieldNew::new_in_bumpalo(bump),
-            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new(bump),
+            puroro_internal: ::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump),
         }
     }
 }
@@ -11540,16 +11950,28 @@ pub struct FileDescriptorSetSliceView<'slice, 'p> {
 }
 
 impl<'slice, 'p> FileDescriptorSetSliceView<'slice, 'p> {
-    pub fn new_with_parent(
+    fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
+        let new_self = Self {
+            file: ::puroro_internal::FieldNew::new(),
+            puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
+    }
+    
+    fn try_new_with_parent(
             parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
             field_number_in_parent: usize,
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> Self {
-        Self {
+        ) -> ::puroro::Result<Self>
+    {
+        let new_self = Self {
             file: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
-        }
+        };
+        todo!("Initialize fields");
+        Ok(new_self)
     }
 }
 

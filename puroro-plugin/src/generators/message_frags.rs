@@ -333,14 +333,6 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             (ImplType::Default, AllocatorType::Bumpalo) => {
                 "fn new_in(bump: &'bump ::bumpalo::Bump) -> Self"
             }
-            (ImplType::SliceView { .. }, AllocatorType::Default) => {
-                "\
-fn new_with_parent(
-        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-        field_number_in_parent: usize,
-        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-    ) -> Self"
-            }
             _ => {
                 unimplemented!()
             }
@@ -422,23 +414,6 @@ fn new_with_parent(
             }
             (ImplType::SliceView { .. }, AllocatorType::Default) => {
                 "::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>"
-            }
-            _ => unimplemented!(),
-        }
-    }
-
-    pub fn internal_field_init_value(&self) -> &'static str {
-        match (self.context.impl_type(), self.context.alloc_type()) {
-            (ImplType::Default, AllocatorType::Default) => {
-                "::puroro_internal::InternalDataForNormalStruct::new()"
-            }
-            (ImplType::Default, AllocatorType::Bumpalo) => {
-                "::puroro_internal::InternalDataForBumpaloStruct::new(bump)"
-            }
-            (ImplType::SliceView { .. }, AllocatorType::Default) => {
-                "\
-::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
-    parent_field, field_number_in_parent, parent_internal_data)"
             }
             _ => unimplemented!(),
         }
