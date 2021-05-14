@@ -28,6 +28,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             func(|output| self.print_msg_struct(output)),
             func(|output| self.print_new_methods(output)),
             func(|output| self.print_clone(output)),
+            func(|output| self.print_default(output)),
             (
                 func(|output| self.print_msg_deser_from_iter(output)),
                 match self.context.impl_type() {
@@ -99,23 +100,6 @@ pub struct {ident}{gp} {{\n",
                 },
             ),
             "}}\n",
-            if self.frag_gen.is_default_available() {
-                format!(
-                    "\
-{cfg}
-impl{gp} ::std::default::Default for {ident}{gpb} {{
-    fn default() -> Self {{
-        Self::new()
-    }}
-}}\n",
-                    ident = self.frag_gen.struct_ident(self.msg)?,
-                    cfg = self.frag_gen.cfg_condition(),
-                    gp = self.frag_gen.struct_generic_params(&[]),
-                    gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-                )
-            } else {
-                "".to_string()
-            },
         )
             .write_into(output)
     }
@@ -218,7 +202,7 @@ fn try_new_with_parent(
             .write_into(output)
     }
 
-    pub fn print_clone<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+    fn print_clone<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
             format!(
                 "\
@@ -255,7 +239,27 @@ impl{gp} ::std::clone::Clone for {ident}{gpb} {{
             .write_into(output)
     }
 
-    pub fn print_msg_deser_from_iter<W: std::fmt::Write>(
+    fn print_default<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+        if !self.frag_gen.is_default_available() {
+            return Ok(());
+        }
+        (format!(
+            "\
+{cfg}
+impl{gp} ::std::default::Default for {ident}{gpb} {{
+    fn default() -> Self {{
+        Self::new()
+    }}
+}}\n",
+            ident = self.frag_gen.struct_ident(self.msg)?,
+            cfg = self.frag_gen.cfg_condition(),
+            gp = self.frag_gen.struct_generic_params(&[]),
+            gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+        ),)
+            .write_into(output)
+    }
+
+    fn print_msg_deser_from_iter<W: std::fmt::Write>(
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
@@ -390,7 +394,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
             .write_into(output)
     }
 
-    pub fn print_msg_ser<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+    fn print_msg_ser<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (
             match self.context.impl_type() {
                 ImplType::Default => seq((
@@ -552,7 +556,7 @@ type {type_ident} = {type_name};
             .write_into(output)
     }
 
-    pub fn print_impl_map_entry<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+    fn print_impl_map_entry<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         if !self.msg.is_map_entry() {
             return Ok(());
         }
