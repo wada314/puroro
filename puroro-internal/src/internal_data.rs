@@ -1,7 +1,6 @@
 use crate::deser::LdSlice;
 use crate::types::{FieldData, SliceViewFields};
 use ::either_n::Either4;
-use ::itertools::Either;
 use puroro::InternalData;
 use std::collections::HashMap;
 

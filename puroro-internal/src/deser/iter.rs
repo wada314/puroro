@@ -1,10 +1,7 @@
-use crate::deser::LdSlice;
-use crate::helpers::MapEntry;
 use crate::types::{FieldData, WireType};
 use crate::variant::Variant;
 use crate::{ErrorKind, PuroroError, Result};
 use std::io::Result as IoResult;
-use std::marker::PhantomData;
 
 use ::num_traits::FromPrimitive;
 

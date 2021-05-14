@@ -2,14 +2,13 @@ use crate::deser::{DeserializableMessageFromIter, LdIter, LdSlice};
 use crate::tags;
 use crate::tags::{FieldLabelTag, FieldTypeTag};
 use crate::types::{FieldData, SliceViewFields};
-use crate::variant::{Variant, VariantTypeTag};
+use crate::variant::VariantTypeTag;
 use crate::{ErrorKind, Result};
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::hash::Hash;
 use std::intrinsics::transmute;
 use std::io::Read;
-use std::marker::PhantomData;
 
 use super::{DoDefaultCheck, MapEntry};
 

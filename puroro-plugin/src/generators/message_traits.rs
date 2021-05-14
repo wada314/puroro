@@ -1,4 +1,4 @@
-use super::writer::{func, indent, iter, Fragment, IntoFragment};
+use super::writer::{func, indent, iter, IntoFragment};
 use crate::context::Context;
 use crate::utils::{to_camel_case, Indentor};
 use crate::wrappers::{

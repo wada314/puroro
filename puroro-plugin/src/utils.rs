@@ -50,6 +50,7 @@ impl<W: Write> Write for Indentor<W> {
 
 enum WordCase {
     CamelCase,
+    #[allow(unused)]
     UpperCase,
     LowerCase,
 }
@@ -89,6 +90,7 @@ fn convert_cases(input: &str, generate_snake_case: bool, out_word_case: WordCase
 pub fn to_lower_snake_case(input: &str) -> String {
     convert_cases(input, true, WordCase::LowerCase)
 }
+#[allow(unused)]
 pub fn to_upper_snake_case(input: &str) -> String {
     convert_cases(input, true, WordCase::UpperCase)
 }

@@ -1,7 +1,5 @@
 use std::marker::PhantomData;
 
-use crate::helpers::MapEntry;
-
 pub trait FieldTypeTag {}
 pub trait VariantTypeTag: FieldTypeTag {}
 pub trait FieldLabelTag {}

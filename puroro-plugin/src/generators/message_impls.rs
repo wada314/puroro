@@ -1,10 +1,10 @@
 use super::message_frags::MessageImplFragmentGenerator;
 use super::message_traits::{GetterMethods, MessageTraitCodeGenerator};
-use super::writer::{func, indent, indent_n, iter, seq, Fragment, IntoFragment};
+use super::writer::{func, indent, indent_n, iter, seq, IntoFragment};
 use crate::context::{AllocatorType, Context, ImplType};
 use crate::utils::Indentor;
-use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
-use crate::{ErrorKind, Result};
+use crate::wrappers::{FieldType, MessageDescriptor};
+use crate::Result;
 
 pub struct MessageImplCodeGenerator<'a, 'c> {
     context: &'a Context<'c>,
@@ -348,7 +348,7 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
 impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
     fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {{
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
-        let mut wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
+        let wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
         wrapped_slice.deser_message(&mut from_slice)?;
         Ok(())
     }}
