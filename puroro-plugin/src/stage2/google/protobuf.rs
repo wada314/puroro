@@ -23,12 +23,6 @@ impl GeneratedCodeInfo {
     }
 }
 
-impl ::std::default::Default for GeneratedCodeInfo {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for GeneratedCodeInfo {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -37,6 +31,12 @@ impl ::std::clone::Clone for GeneratedCodeInfo {
             annotation: <::std::vec::Vec<self::generated_code_info::Annotation> as FieldClone>::clone(&self.annotation),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for GeneratedCodeInfo {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -240,25 +240,30 @@ pub struct GeneratedCodeInfoSliceView<'slice, 'p> {
 
 impl<'slice, 'p> GeneratedCodeInfoSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             annotation: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             annotation: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -278,13 +283,23 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::generated_code_info::AnnotationSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.annotation, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for GeneratedCodeInfoSliceView<'slice, 'p> {
@@ -331,12 +346,6 @@ impl Annotation {
     }
 }
 
-impl ::std::default::Default for Annotation {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for Annotation {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -348,6 +357,12 @@ impl ::std::clone::Clone for Annotation {
             end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for Annotation {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -639,23 +654,25 @@ pub struct AnnotationSliceView<'slice, 'p> {
 
 impl<'slice, 'p> AnnotationSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             path: ::puroro_internal::FieldNew::new(),
             source_file: ::puroro_internal::FieldNew::new(),
             begin: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             path: ::puroro_internal::FieldNew::new(),
             source_file: ::puroro_internal::FieldNew::new(),
             begin: ::puroro_internal::FieldNew::new(),
@@ -663,7 +680,10 @@ impl<'slice, 'p> AnnotationSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -686,13 +706,41 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Repeated>>
+                ::deser(&mut self.path, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.source_file, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<i32> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Optional2>>
+                ::deser(&mut self.begin, field, slice_from_this_field, enclosing_slice)?;
+            }
+            4 => {
+                <::std::option::Option<i32> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Optional2>>
+                ::deser(&mut self.end, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for AnnotationSliceView<'slice, 'p> {
@@ -731,12 +779,6 @@ impl SourceCodeInfo {
     }
 }
 
-impl ::std::default::Default for SourceCodeInfo {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for SourceCodeInfo {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -745,6 +787,12 @@ impl ::std::clone::Clone for SourceCodeInfo {
             location: <::std::vec::Vec<self::source_code_info::Location> as FieldClone>::clone(&self.location),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for SourceCodeInfo {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -948,25 +996,30 @@ pub struct SourceCodeInfoSliceView<'slice, 'p> {
 
 impl<'slice, 'p> SourceCodeInfoSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             location: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             location: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -986,13 +1039,23 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::source_code_info::LocationSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.location, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for SourceCodeInfoSliceView<'slice, 'p> {
@@ -1044,12 +1107,6 @@ impl Location {
     }
 }
 
-impl ::std::default::Default for Location {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for Location {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -1062,6 +1119,12 @@ impl ::std::clone::Clone for Location {
             leading_detached_comments: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.leading_detached_comments),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for Location {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -1387,7 +1450,7 @@ pub struct LocationSliceView<'slice, 'p> {
 
 impl<'slice, 'p> LocationSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             path: ::puroro_internal::FieldNew::new(),
             span: ::puroro_internal::FieldNew::new(),
             leading_comments: ::puroro_internal::FieldNew::new(),
@@ -1395,16 +1458,18 @@ impl<'slice, 'p> LocationSliceView<'slice, 'p> {
             leading_detached_comments: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             path: ::puroro_internal::FieldNew::new(),
             span: ::puroro_internal::FieldNew::new(),
             leading_comments: ::puroro_internal::FieldNew::new(),
@@ -1413,7 +1478,10 @@ impl<'slice, 'p> LocationSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -1437,13 +1505,47 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Repeated>>
+                ::deser(&mut self.path, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Repeated>>
+                ::deser(&mut self.span, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.leading_comments, field, slice_from_this_field, enclosing_slice)?;
+            }
+            4 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.trailing_comments, field, slice_from_this_field, enclosing_slice)?;
+            }
+            6 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Repeated>>
+                ::deser(&mut self.leading_detached_comments, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for LocationSliceView<'slice, 'p> {
@@ -1500,12 +1602,6 @@ impl UninterpretedOption {
     }
 }
 
-impl ::std::default::Default for UninterpretedOption {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for UninterpretedOption {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -1520,6 +1616,12 @@ impl ::std::clone::Clone for UninterpretedOption {
             aggregate_value: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.aggregate_value),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for UninterpretedOption {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -1903,7 +2005,7 @@ pub struct UninterpretedOptionSliceView<'slice, 'p> {
 
 impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             identifier_value: ::puroro_internal::FieldNew::new(),
             positive_int_value: ::puroro_internal::FieldNew::new(),
@@ -1913,16 +2015,18 @@ impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
             aggregate_value: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             identifier_value: ::puroro_internal::FieldNew::new(),
             positive_int_value: ::puroro_internal::FieldNew::new(),
@@ -1933,7 +2037,10 @@ impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -1959,13 +2066,59 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            2 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::uninterpreted_option::NamePartSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.identifier_value, field, slice_from_this_field, enclosing_slice)?;
+            }
+            4 => {
+                <::std::option::Option<u64> as FieldDeserFromSlice<
+                    tags::UInt64, 
+                    tags::Optional2>>
+                ::deser(&mut self.positive_int_value, field, slice_from_this_field, enclosing_slice)?;
+            }
+            5 => {
+                <::std::option::Option<i64> as FieldDeserFromSlice<
+                    tags::Int64, 
+                    tags::Optional2>>
+                ::deser(&mut self.negative_int_value, field, slice_from_this_field, enclosing_slice)?;
+            }
+            6 => {
+                <::std::option::Option<f64> as FieldDeserFromSlice<
+                    tags::Double, 
+                    tags::Optional2>>
+                ::deser(&mut self.double_value, field, slice_from_this_field, enclosing_slice)?;
+            }
+            7 => {
+                <::std::option::Option<&'slice [u8]> as FieldDeserFromSlice<
+                    tags::Bytes, 
+                    tags::Optional2>>
+                ::deser(&mut self.string_value, field, slice_from_this_field, enclosing_slice)?;
+            }
+            8 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.aggregate_value, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for UninterpretedOptionSliceView<'slice, 'p> {
@@ -2005,12 +2158,6 @@ impl NamePart {
     }
 }
 
-impl ::std::default::Default for NamePart {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for NamePart {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -2020,6 +2167,12 @@ impl ::std::clone::Clone for NamePart {
             is_extension: <bool as FieldClone>::clone(&self.is_extension),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for NamePart {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -2249,27 +2402,32 @@ pub struct NamePartSliceView<'slice, 'p> {
 
 impl<'slice, 'p> NamePartSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             name_part: ::puroro_internal::FieldNew::new(),
             is_extension: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             name_part: ::puroro_internal::FieldNew::new(),
             is_extension: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -2290,13 +2448,29 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <&'slice str as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Required>>
+                ::deser(&mut self.name_part, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <bool as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Required>>
+                ::deser(&mut self.is_extension, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for NamePartSliceView<'slice, 'p> {
@@ -2341,12 +2515,6 @@ impl MethodOptions {
     }
 }
 
-impl ::std::default::Default for MethodOptions {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for MethodOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -2357,6 +2525,12 @@ impl ::std::clone::Clone for MethodOptions {
             uninterpreted_option: <::std::vec::Vec<self::UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for MethodOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -2620,29 +2794,34 @@ pub struct MethodOptionsSliceView<'slice, 'p> {
 
 impl<'slice, 'p> MethodOptionsSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             deprecated: ::puroro_internal::FieldNew::new(),
             idempotency_level: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             deprecated: ::puroro_internal::FieldNew::new(),
             idempotency_level: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -2664,13 +2843,35 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            33 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.deprecated, field, slice_from_this_field, enclosing_slice)?;
+            }
+            34 => {
+                <::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>> as FieldDeserFromSlice<
+                    tags::Enum<method_options::IdempotencyLevel>, 
+                    tags::Optional2>>
+                ::deser(&mut self.idempotency_level, field, slice_from_this_field, enclosing_slice)?;
+            }
+            999 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::UninterpretedOptionSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.uninterpreted_option, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for MethodOptionsSliceView<'slice, 'p> {
@@ -2735,12 +2936,6 @@ impl ServiceOptions {
     }
 }
 
-impl ::std::default::Default for ServiceOptions {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for ServiceOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -2750,6 +2945,12 @@ impl ::std::clone::Clone for ServiceOptions {
             uninterpreted_option: <::std::vec::Vec<self::UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for ServiceOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -2983,27 +3184,32 @@ pub struct ServiceOptionsSliceView<'slice, 'p> {
 
 impl<'slice, 'p> ServiceOptionsSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             deprecated: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             deprecated: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -3024,13 +3230,29 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            33 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.deprecated, field, slice_from_this_field, enclosing_slice)?;
+            }
+            999 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::UninterpretedOptionSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.uninterpreted_option, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ServiceOptionsSliceView<'slice, 'p> {
@@ -3071,12 +3293,6 @@ impl EnumValueOptions {
     }
 }
 
-impl ::std::default::Default for EnumValueOptions {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for EnumValueOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -3086,6 +3302,12 @@ impl ::std::clone::Clone for EnumValueOptions {
             uninterpreted_option: <::std::vec::Vec<self::UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for EnumValueOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -3319,27 +3541,32 @@ pub struct EnumValueOptionsSliceView<'slice, 'p> {
 
 impl<'slice, 'p> EnumValueOptionsSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             deprecated: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             deprecated: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -3360,13 +3587,29 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.deprecated, field, slice_from_this_field, enclosing_slice)?;
+            }
+            999 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::UninterpretedOptionSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.uninterpreted_option, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumValueOptionsSliceView<'slice, 'p> {
@@ -3410,12 +3653,6 @@ impl EnumOptions {
     }
 }
 
-impl ::std::default::Default for EnumOptions {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for EnumOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -3426,6 +3663,12 @@ impl ::std::clone::Clone for EnumOptions {
             uninterpreted_option: <::std::vec::Vec<self::UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for EnumOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -3689,29 +3932,34 @@ pub struct EnumOptionsSliceView<'slice, 'p> {
 
 impl<'slice, 'p> EnumOptionsSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             allow_alias: ::puroro_internal::FieldNew::new(),
             deprecated: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             allow_alias: ::puroro_internal::FieldNew::new(),
             deprecated: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -3733,13 +3981,35 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            2 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.allow_alias, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.deprecated, field, slice_from_this_field, enclosing_slice)?;
+            }
+            999 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::UninterpretedOptionSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.uninterpreted_option, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumOptionsSliceView<'slice, 'p> {
@@ -3777,12 +4047,6 @@ impl OneofOptions {
     }
 }
 
-impl ::std::default::Default for OneofOptions {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for OneofOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -3791,6 +4055,12 @@ impl ::std::clone::Clone for OneofOptions {
             uninterpreted_option: <::std::vec::Vec<self::UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for OneofOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -3994,25 +4264,30 @@ pub struct OneofOptionsSliceView<'slice, 'p> {
 
 impl<'slice, 'p> OneofOptionsSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -4032,13 +4307,23 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            999 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::UninterpretedOptionSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.uninterpreted_option, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for OneofOptionsSliceView<'slice, 'p> {
@@ -4094,12 +4379,6 @@ impl FieldOptions {
     }
 }
 
-impl ::std::default::Default for FieldOptions {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for FieldOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -4114,6 +4393,12 @@ impl ::std::clone::Clone for FieldOptions {
             uninterpreted_option: <::std::vec::Vec<self::UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for FieldOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -4497,7 +4782,7 @@ pub struct FieldOptionsSliceView<'slice, 'p> {
 
 impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             ctype: ::puroro_internal::FieldNew::new(),
             packed: ::puroro_internal::FieldNew::new(),
             jstype: ::puroro_internal::FieldNew::new(),
@@ -4507,16 +4792,18 @@ impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             ctype: ::puroro_internal::FieldNew::new(),
             packed: ::puroro_internal::FieldNew::new(),
             jstype: ::puroro_internal::FieldNew::new(),
@@ -4527,7 +4814,10 @@ impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -4553,13 +4843,59 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<::std::result::Result<field_options::Ctype, i32>> as FieldDeserFromSlice<
+                    tags::Enum<field_options::Ctype>, 
+                    tags::Optional2>>
+                ::deser(&mut self.ctype, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.packed, field, slice_from_this_field, enclosing_slice)?;
+            }
+            6 => {
+                <::std::option::Option<::std::result::Result<field_options::Jstype, i32>> as FieldDeserFromSlice<
+                    tags::Enum<field_options::Jstype>, 
+                    tags::Optional2>>
+                ::deser(&mut self.jstype, field, slice_from_this_field, enclosing_slice)?;
+            }
+            5 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.lazy, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.deprecated, field, slice_from_this_field, enclosing_slice)?;
+            }
+            10 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.weak, field, slice_from_this_field, enclosing_slice)?;
+            }
+            999 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::UninterpretedOptionSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.uninterpreted_option, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FieldOptionsSliceView<'slice, 'p> {
@@ -4655,12 +4991,6 @@ impl MessageOptions {
     }
 }
 
-impl ::std::default::Default for MessageOptions {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for MessageOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -4673,6 +5003,12 @@ impl ::std::clone::Clone for MessageOptions {
             uninterpreted_option: <::std::vec::Vec<self::UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for MessageOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -4996,7 +5332,7 @@ pub struct MessageOptionsSliceView<'slice, 'p> {
 
 impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             message_set_wire_format: ::puroro_internal::FieldNew::new(),
             no_standard_descriptor_accessor: ::puroro_internal::FieldNew::new(),
             deprecated: ::puroro_internal::FieldNew::new(),
@@ -5004,16 +5340,18 @@ impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             message_set_wire_format: ::puroro_internal::FieldNew::new(),
             no_standard_descriptor_accessor: ::puroro_internal::FieldNew::new(),
             deprecated: ::puroro_internal::FieldNew::new(),
@@ -5022,7 +5360,10 @@ impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -5046,13 +5387,47 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.message_set_wire_format, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.no_standard_descriptor_accessor, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.deprecated, field, slice_from_this_field, enclosing_slice)?;
+            }
+            7 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.map_entry, field, slice_from_this_field, enclosing_slice)?;
+            }
+            999 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::UninterpretedOptionSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.uninterpreted_option, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for MessageOptionsSliceView<'slice, 'p> {
@@ -5150,12 +5525,6 @@ impl FileOptions {
     }
 }
 
-impl ::std::default::Default for FileOptions {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for FileOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -5184,6 +5553,12 @@ impl ::std::clone::Clone for FileOptions {
             uninterpreted_option: <::std::vec::Vec<self::UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for FileOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -5987,7 +6362,7 @@ pub struct FileOptionsSliceView<'slice, 'p> {
 
 impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             java_package: ::puroro_internal::FieldNew::new(),
             java_outer_classname: ::puroro_internal::FieldNew::new(),
             java_multiple_files: ::puroro_internal::FieldNew::new(),
@@ -6011,16 +6386,18 @@ impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             java_package: ::puroro_internal::FieldNew::new(),
             java_outer_classname: ::puroro_internal::FieldNew::new(),
             java_multiple_files: ::puroro_internal::FieldNew::new(),
@@ -6045,7 +6422,10 @@ impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -6085,13 +6465,143 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.java_package, field, slice_from_this_field, enclosing_slice)?;
+            }
+            8 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.java_outer_classname, field, slice_from_this_field, enclosing_slice)?;
+            }
+            10 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.java_multiple_files, field, slice_from_this_field, enclosing_slice)?;
+            }
+            20 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.java_generate_equals_and_hash, field, slice_from_this_field, enclosing_slice)?;
+            }
+            27 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.java_string_check_utf8, field, slice_from_this_field, enclosing_slice)?;
+            }
+            9 => {
+                <::std::option::Option<::std::result::Result<file_options::OptimizeMode, i32>> as FieldDeserFromSlice<
+                    tags::Enum<file_options::OptimizeMode>, 
+                    tags::Optional2>>
+                ::deser(&mut self.optimize_for, field, slice_from_this_field, enclosing_slice)?;
+            }
+            11 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.go_package, field, slice_from_this_field, enclosing_slice)?;
+            }
+            16 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.cc_generic_services, field, slice_from_this_field, enclosing_slice)?;
+            }
+            17 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.java_generic_services, field, slice_from_this_field, enclosing_slice)?;
+            }
+            18 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.py_generic_services, field, slice_from_this_field, enclosing_slice)?;
+            }
+            42 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.php_generic_services, field, slice_from_this_field, enclosing_slice)?;
+            }
+            23 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.deprecated, field, slice_from_this_field, enclosing_slice)?;
+            }
+            31 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.cc_enable_arenas, field, slice_from_this_field, enclosing_slice)?;
+            }
+            36 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.objc_class_prefix, field, slice_from_this_field, enclosing_slice)?;
+            }
+            37 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.csharp_namespace, field, slice_from_this_field, enclosing_slice)?;
+            }
+            39 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.swift_prefix, field, slice_from_this_field, enclosing_slice)?;
+            }
+            40 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.php_class_prefix, field, slice_from_this_field, enclosing_slice)?;
+            }
+            41 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.php_namespace, field, slice_from_this_field, enclosing_slice)?;
+            }
+            44 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.php_metadata_namespace, field, slice_from_this_field, enclosing_slice)?;
+            }
+            45 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.ruby_package, field, slice_from_this_field, enclosing_slice)?;
+            }
+            999 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::UninterpretedOptionSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.uninterpreted_option, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileOptionsSliceView<'slice, 'p> {
@@ -6167,12 +6677,6 @@ impl MethodDescriptorProto {
     }
 }
 
-impl ::std::default::Default for MethodDescriptorProto {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for MethodDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -6186,6 +6690,12 @@ impl ::std::clone::Clone for MethodDescriptorProto {
             server_streaming: <::std::option::Option<bool> as FieldClone>::clone(&self.server_streaming),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for MethodDescriptorProto {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -6537,7 +7047,7 @@ pub struct MethodDescriptorProtoSliceView<'slice, 'p> {
 
 impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             input_type: ::puroro_internal::FieldNew::new(),
             output_type: ::puroro_internal::FieldNew::new(),
@@ -6546,16 +7056,18 @@ impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
             server_streaming: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             input_type: ::puroro_internal::FieldNew::new(),
             output_type: ::puroro_internal::FieldNew::new(),
@@ -6565,7 +7077,10 @@ impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -6590,13 +7105,53 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.input_type, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.output_type, field, slice_from_this_field, enclosing_slice)?;
+            }
+            4 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::MethodOptionsSliceView<'slice, 'p>>, 
+                    tags::Optional2>>
+                ::deser(&mut self.options, field, slice_from_this_field, enclosing_slice)?;
+            }
+            5 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.client_streaming, field, slice_from_this_field, enclosing_slice)?;
+            }
+            6 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.server_streaming, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for MethodDescriptorProtoSliceView<'slice, 'p> {
@@ -6641,12 +7196,6 @@ impl ServiceDescriptorProto {
     }
 }
 
-impl ::std::default::Default for ServiceDescriptorProto {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for ServiceDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -6657,6 +7206,12 @@ impl ::std::clone::Clone for ServiceDescriptorProto {
             options: <::std::option::Option<::std::boxed::Box<self::ServiceOptions>> as FieldClone>::clone(&self.options),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for ServiceDescriptorProto {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -6922,29 +7477,34 @@ pub struct ServiceDescriptorProtoSliceView<'slice, 'p> {
 
 impl<'slice, 'p> ServiceDescriptorProtoSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             method: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             method: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -6966,13 +7526,35 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::MethodDescriptorProtoSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.method, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::ServiceOptionsSliceView<'slice, 'p>>, 
+                    tags::Optional2>>
+                ::deser(&mut self.options, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ServiceDescriptorProtoSliceView<'slice, 'p> {
@@ -7015,12 +7597,6 @@ impl EnumValueDescriptorProto {
     }
 }
 
-impl ::std::default::Default for EnumValueDescriptorProto {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for EnumValueDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -7031,6 +7607,12 @@ impl ::std::clone::Clone for EnumValueDescriptorProto {
             options: <::std::option::Option<::std::boxed::Box<self::EnumValueOptions>> as FieldClone>::clone(&self.options),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for EnumValueDescriptorProto {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -7292,29 +7874,34 @@ pub struct EnumValueDescriptorProtoSliceView<'slice, 'p> {
 
 impl<'slice, 'p> EnumValueDescriptorProtoSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             number: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             number: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -7336,13 +7923,35 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<i32> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Optional2>>
+                ::deser(&mut self.number, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::EnumValueOptionsSliceView<'slice, 'p>>, 
+                    tags::Optional2>>
+                ::deser(&mut self.options, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumValueDescriptorProtoSliceView<'slice, 'p> {
@@ -7396,12 +8005,6 @@ impl EnumDescriptorProto {
     }
 }
 
-impl ::std::default::Default for EnumDescriptorProto {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for EnumDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -7414,6 +8017,12 @@ impl ::std::clone::Clone for EnumDescriptorProto {
             reserved_name: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.reserved_name),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for EnumDescriptorProto {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -7745,7 +8354,7 @@ pub struct EnumDescriptorProtoSliceView<'slice, 'p> {
 
 impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             value: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
@@ -7753,16 +8362,18 @@ impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
             reserved_name: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             value: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
@@ -7771,7 +8382,10 @@ impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -7795,13 +8409,47 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::EnumValueDescriptorProtoSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.value, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::EnumOptionsSliceView<'slice, 'p>>, 
+                    tags::Optional2>>
+                ::deser(&mut self.options, field, slice_from_this_field, enclosing_slice)?;
+            }
+            4 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::enum_descriptor_proto::EnumReservedRangeSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.reserved_range, field, slice_from_this_field, enclosing_slice)?;
+            }
+            5 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Repeated>>
+                ::deser(&mut self.reserved_name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumDescriptorProtoSliceView<'slice, 'p> {
@@ -7841,12 +8489,6 @@ impl EnumReservedRange {
     }
 }
 
-impl ::std::default::Default for EnumReservedRange {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for EnumReservedRange {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -7856,6 +8498,12 @@ impl ::std::clone::Clone for EnumReservedRange {
             end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for EnumReservedRange {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -8085,27 +8733,32 @@ pub struct EnumReservedRangeSliceView<'slice, 'p> {
 
 impl<'slice, 'p> EnumReservedRangeSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             start: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             start: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -8126,13 +8779,29 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<i32> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Optional2>>
+                ::deser(&mut self.start, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<i32> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Optional2>>
+                ::deser(&mut self.end, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumReservedRangeSliceView<'slice, 'p> {
@@ -8173,12 +8842,6 @@ impl OneofDescriptorProto {
     }
 }
 
-impl ::std::default::Default for OneofDescriptorProto {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for OneofDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -8188,6 +8851,12 @@ impl ::std::clone::Clone for OneofDescriptorProto {
             options: <::std::option::Option<::std::boxed::Box<self::OneofOptions>> as FieldClone>::clone(&self.options),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for OneofDescriptorProto {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -8419,27 +9088,32 @@ pub struct OneofDescriptorProtoSliceView<'slice, 'p> {
 
 impl<'slice, 'p> OneofDescriptorProtoSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -8460,13 +9134,29 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::OneofOptionsSliceView<'slice, 'p>>, 
+                    tags::Optional2>>
+                ::deser(&mut self.options, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for OneofDescriptorProtoSliceView<'slice, 'p> {
@@ -8533,12 +9223,6 @@ impl FieldDescriptorProto {
     }
 }
 
-impl ::std::default::Default for FieldDescriptorProto {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for FieldDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -8557,6 +9241,12 @@ impl ::std::clone::Clone for FieldDescriptorProto {
             proto3_optional: <::std::option::Option<bool> as FieldClone>::clone(&self.proto3_optional),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for FieldDescriptorProto {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -9058,7 +9748,7 @@ pub struct FieldDescriptorProtoSliceView<'slice, 'p> {
 
 impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             number: ::puroro_internal::FieldNew::new(),
             label: ::puroro_internal::FieldNew::new(),
@@ -9072,16 +9762,18 @@ impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
             proto3_optional: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             number: ::puroro_internal::FieldNew::new(),
             label: ::puroro_internal::FieldNew::new(),
@@ -9096,7 +9788,10 @@ impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -9126,13 +9821,83 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<i32> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Optional2>>
+                ::deser(&mut self.number, field, slice_from_this_field, enclosing_slice)?;
+            }
+            4 => {
+                <::std::option::Option<::std::result::Result<field_descriptor_proto::Label, i32>> as FieldDeserFromSlice<
+                    tags::Enum<field_descriptor_proto::Label>, 
+                    tags::Optional2>>
+                ::deser(&mut self.label, field, slice_from_this_field, enclosing_slice)?;
+            }
+            5 => {
+                <::std::option::Option<::std::result::Result<field_descriptor_proto::Type, i32>> as FieldDeserFromSlice<
+                    tags::Enum<field_descriptor_proto::Type>, 
+                    tags::Optional2>>
+                ::deser(&mut self.type_, field, slice_from_this_field, enclosing_slice)?;
+            }
+            6 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.type_name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.extendee, field, slice_from_this_field, enclosing_slice)?;
+            }
+            7 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.default_value, field, slice_from_this_field, enclosing_slice)?;
+            }
+            9 => {
+                <::std::option::Option<i32> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Optional2>>
+                ::deser(&mut self.oneof_index, field, slice_from_this_field, enclosing_slice)?;
+            }
+            10 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.json_name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            8 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::FieldOptionsSliceView<'slice, 'p>>, 
+                    tags::Optional2>>
+                ::deser(&mut self.options, field, slice_from_this_field, enclosing_slice)?;
+            }
+            17 => {
+                <::std::option::Option<bool> as FieldDeserFromSlice<
+                    tags::Bool, 
+                    tags::Optional2>>
+                ::deser(&mut self.proto3_optional, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FieldDescriptorProtoSliceView<'slice, 'p> {
@@ -9246,12 +10011,6 @@ impl ExtensionRangeOptions {
     }
 }
 
-impl ::std::default::Default for ExtensionRangeOptions {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for ExtensionRangeOptions {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -9260,6 +10019,12 @@ impl ::std::clone::Clone for ExtensionRangeOptions {
             uninterpreted_option: <::std::vec::Vec<self::UninterpretedOption> as FieldClone>::clone(&self.uninterpreted_option),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for ExtensionRangeOptions {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -9463,25 +10228,30 @@ pub struct ExtensionRangeOptionsSliceView<'slice, 'p> {
 
 impl<'slice, 'p> ExtensionRangeOptionsSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -9501,13 +10271,23 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            999 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::UninterpretedOptionSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.uninterpreted_option, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ExtensionRangeOptionsSliceView<'slice, 'p> {
@@ -9585,12 +10365,6 @@ impl DescriptorProto {
     }
 }
 
-impl ::std::default::Default for DescriptorProto {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for DescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -9608,6 +10382,12 @@ impl ::std::clone::Clone for DescriptorProto {
             reserved_name: <::std::vec::Vec<::std::string::String> as FieldClone>::clone(&self.reserved_name),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for DescriptorProto {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -10107,7 +10887,7 @@ pub struct DescriptorProtoSliceView<'slice, 'p> {
 
 impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             field: ::puroro_internal::FieldNew::new(),
             extension: ::puroro_internal::FieldNew::new(),
@@ -10120,16 +10900,18 @@ impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
             reserved_name: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             field: ::puroro_internal::FieldNew::new(),
             extension: ::puroro_internal::FieldNew::new(),
@@ -10143,7 +10925,10 @@ impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -10172,13 +10957,77 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::FieldDescriptorProtoSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.field, field, slice_from_this_field, enclosing_slice)?;
+            }
+            6 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::FieldDescriptorProtoSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.extension, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::DescriptorProtoSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.nested_type, field, slice_from_this_field, enclosing_slice)?;
+            }
+            4 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::EnumDescriptorProtoSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.enum_type, field, slice_from_this_field, enclosing_slice)?;
+            }
+            5 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::descriptor_proto::ExtensionRangeSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.extension_range, field, slice_from_this_field, enclosing_slice)?;
+            }
+            8 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::OneofDescriptorProtoSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.oneof_decl, field, slice_from_this_field, enclosing_slice)?;
+            }
+            7 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::MessageOptionsSliceView<'slice, 'p>>, 
+                    tags::Optional2>>
+                ::deser(&mut self.options, field, slice_from_this_field, enclosing_slice)?;
+            }
+            9 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::descriptor_proto::ReservedRangeSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.reserved_range, field, slice_from_this_field, enclosing_slice)?;
+            }
+            10 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Repeated>>
+                ::deser(&mut self.reserved_name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for DescriptorProtoSliceView<'slice, 'p> {
@@ -10218,12 +11067,6 @@ impl ReservedRange {
     }
 }
 
-impl ::std::default::Default for ReservedRange {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for ReservedRange {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -10233,6 +11076,12 @@ impl ::std::clone::Clone for ReservedRange {
             end: <::std::option::Option<i32> as FieldClone>::clone(&self.end),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for ReservedRange {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -10462,27 +11311,32 @@ pub struct ReservedRangeSliceView<'slice, 'p> {
 
 impl<'slice, 'p> ReservedRangeSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             start: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             start: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -10503,13 +11357,29 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<i32> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Optional2>>
+                ::deser(&mut self.start, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<i32> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Optional2>>
+                ::deser(&mut self.end, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ReservedRangeSliceView<'slice, 'p> {
@@ -10552,12 +11422,6 @@ impl ExtensionRange {
     }
 }
 
-impl ::std::default::Default for ExtensionRange {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for ExtensionRange {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -10568,6 +11432,12 @@ impl ::std::clone::Clone for ExtensionRange {
             options: <::std::option::Option<::std::boxed::Box<super::ExtensionRangeOptions>> as FieldClone>::clone(&self.options),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for ExtensionRange {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -10829,29 +11699,34 @@ pub struct ExtensionRangeSliceView<'slice, 'p> {
 
 impl<'slice, 'p> ExtensionRangeSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             start: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             start: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -10873,13 +11748,35 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<i32> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Optional2>>
+                ::deser(&mut self.start, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<i32> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Optional2>>
+                ::deser(&mut self.end, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<super::ExtensionRangeOptionsSliceView<'slice, 'p>>, 
+                    tags::Optional2>>
+                ::deser(&mut self.options, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ExtensionRangeSliceView<'slice, 'p> {
@@ -10962,12 +11859,6 @@ impl FileDescriptorProto {
     }
 }
 
-impl ::std::default::Default for FileDescriptorProto {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for FileDescriptorProto {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -10987,6 +11878,12 @@ impl ::std::clone::Clone for FileDescriptorProto {
             syntax: <::std::option::Option<::std::string::String> as FieldClone>::clone(&self.syntax),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for FileDescriptorProto {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -11542,7 +12439,7 @@ pub struct FileDescriptorProtoSliceView<'slice, 'p> {
 
 impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             package: ::puroro_internal::FieldNew::new(),
             dependency: ::puroro_internal::FieldNew::new(),
@@ -11557,16 +12454,18 @@ impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
             syntax: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             package: ::puroro_internal::FieldNew::new(),
             dependency: ::puroro_internal::FieldNew::new(),
@@ -11582,7 +12481,10 @@ impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -11613,13 +12515,89 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.name, field, slice_from_this_field, enclosing_slice)?;
+            }
+            2 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.package, field, slice_from_this_field, enclosing_slice)?;
+            }
+            3 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Repeated>>
+                ::deser(&mut self.dependency, field, slice_from_this_field, enclosing_slice)?;
+            }
+            10 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Repeated>>
+                ::deser(&mut self.public_dependency, field, slice_from_this_field, enclosing_slice)?;
+            }
+            11 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Int32, 
+                    tags::Repeated>>
+                ::deser(&mut self.weak_dependency, field, slice_from_this_field, enclosing_slice)?;
+            }
+            4 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::DescriptorProtoSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.message_type, field, slice_from_this_field, enclosing_slice)?;
+            }
+            5 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::EnumDescriptorProtoSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.enum_type, field, slice_from_this_field, enclosing_slice)?;
+            }
+            6 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::ServiceDescriptorProtoSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.service, field, slice_from_this_field, enclosing_slice)?;
+            }
+            7 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::FieldDescriptorProtoSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.extension, field, slice_from_this_field, enclosing_slice)?;
+            }
+            8 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::FileOptionsSliceView<'slice, 'p>>, 
+                    tags::Optional2>>
+                ::deser(&mut self.options, field, slice_from_this_field, enclosing_slice)?;
+            }
+            9 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::SourceCodeInfoSliceView<'slice, 'p>>, 
+                    tags::Optional2>>
+                ::deser(&mut self.source_code_info, field, slice_from_this_field, enclosing_slice)?;
+            }
+            12 => {
+                <::std::option::Option<&'slice str> as FieldDeserFromSlice<
+                    tags::String, 
+                    tags::Optional2>>
+                ::deser(&mut self.syntax, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileDescriptorProtoSliceView<'slice, 'p> {
@@ -11657,12 +12635,6 @@ impl FileDescriptorSet {
     }
 }
 
-impl ::std::default::Default for FileDescriptorSet {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl ::std::clone::Clone for FileDescriptorSet {
     fn clone(&self) -> Self {
         use ::puroro_internal::FieldClone;
@@ -11671,6 +12643,12 @@ impl ::std::clone::Clone for FileDescriptorSet {
             file: <::std::vec::Vec<self::FileDescriptorProto> as FieldClone>::clone(&self.file),
             puroro_internal: self.puroro_internal.clone(),
         }
+    }
+}
+
+impl ::std::default::Default for FileDescriptorSet {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -11874,25 +12852,30 @@ pub struct FileDescriptorSetSliceView<'slice, 'p> {
 
 impl<'slice, 'p> FileDescriptorSetSliceView<'slice, 'p> {
     fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {
-        let new_self = Self {
+        let mut new_self = Self {
             file: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
     
     fn try_new_with_parent(
-            parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
-            field_number_in_parent: usize,
-            parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-        ) -> ::puroro::Result<Self>
-    {
-        let new_self = Self {
+        parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> ::puroro::Result<Self> {
+        let mut new_self = Self {
             file: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields")
+        for ld_slice in new_self.puroro_internal.slices() {
+            ld_slice.deser_message(&mut new_self)?;
+        }
+        Ok(new_self)
     }
 }
 
@@ -11912,13 +12895,23 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        slice_from_this_field: &'slice [u8],
+        enclosing_slice: &'slice [u8],
     ) -> ::puroro::Result<bool>
     {
-        todo!();
-        
+        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::tags;
+        match field_number {
+            1 => {
+                <::std::option::Option<::puroro_internal::SliceViewFields<'slice>> as FieldDeserFromSlice<
+                    tags::Message<self::FileDescriptorProtoSliceView<'slice, 'p>>, 
+                    tags::Repeated>>
+                ::deser(&mut self.file, field, slice_from_this_field, enclosing_slice)?;
+            }
+            _ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,
         }
+        Ok(true)
+    }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileDescriptorSetSliceView<'slice, 'p> {
