@@ -189,8 +189,7 @@ fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
             ),
             "    \
     }};
-    todo!(\"Initialize fields\");
-    Ok(new_self)
+    todo!(\"Initialize fields\")
 }}
 
 fn try_new_with_parent(
@@ -213,8 +212,7 @@ fn try_new_with_parent(
             ),
             "    \
     }};
-    todo!(\"Initialize fields\");
-    Ok(new_self)
+    todo!(\"Initialize fields\")
 }}\n",
         )
             .write_into(output)
@@ -386,7 +384,6 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
                 gpb = self.frag_gen.struct_generic_params_bounds(&[]),
             ),
             "        \
-        Ok(true)
     }}
 }}\n",
         )

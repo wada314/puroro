@@ -1,5 +1,6 @@
 #![allow(unused_variables)]
 #![allow(unused_imports)]
+#![allow(dead_code)]
 
 pub trait GeneratedCodeInfoTrait {
     type AnnotationType: self::generated_code_info::AnnotationTrait;
@@ -243,8 +244,7 @@ impl<'slice, 'p> GeneratedCodeInfoSliceView<'slice, 'p> {
             annotation: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -258,8 +258,7 @@ impl<'slice, 'p> GeneratedCodeInfoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -285,8 +284,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for GeneratedCodeInfoSliceView<'slice, 'p> {
@@ -648,8 +646,7 @@ impl<'slice, 'p> AnnotationSliceView<'slice, 'p> {
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -666,8 +663,7 @@ impl<'slice, 'p> AnnotationSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -696,8 +692,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for AnnotationSliceView<'slice, 'p> {
@@ -957,8 +952,7 @@ impl<'slice, 'p> SourceCodeInfoSliceView<'slice, 'p> {
             location: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -972,8 +966,7 @@ impl<'slice, 'p> SourceCodeInfoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -999,8 +992,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for SourceCodeInfoSliceView<'slice, 'p> {
@@ -1403,8 +1395,7 @@ impl<'slice, 'p> LocationSliceView<'slice, 'p> {
             leading_detached_comments: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -1422,8 +1413,7 @@ impl<'slice, 'p> LocationSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -1453,8 +1443,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for LocationSliceView<'slice, 'p> {
@@ -1924,8 +1913,7 @@ impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
             aggregate_value: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -1945,8 +1933,7 @@ impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -1978,8 +1965,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for UninterpretedOptionSliceView<'slice, 'p> {
@@ -2268,8 +2254,7 @@ impl<'slice, 'p> NamePartSliceView<'slice, 'p> {
             is_extension: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -2284,8 +2269,7 @@ impl<'slice, 'p> NamePartSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -2312,8 +2296,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for NamePartSliceView<'slice, 'p> {
@@ -2643,8 +2626,7 @@ impl<'slice, 'p> MethodOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -2660,8 +2642,7 @@ impl<'slice, 'p> MethodOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -2689,8 +2670,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for MethodOptionsSliceView<'slice, 'p> {
@@ -3008,8 +2988,7 @@ impl<'slice, 'p> ServiceOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -3024,8 +3003,7 @@ impl<'slice, 'p> ServiceOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -3052,8 +3030,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ServiceOptionsSliceView<'slice, 'p> {
@@ -3347,8 +3324,7 @@ impl<'slice, 'p> EnumValueOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -3363,8 +3339,7 @@ impl<'slice, 'p> EnumValueOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -3391,8 +3366,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumValueOptionsSliceView<'slice, 'p> {
@@ -3721,8 +3695,7 @@ impl<'slice, 'p> EnumOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -3738,8 +3711,7 @@ impl<'slice, 'p> EnumOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -3767,8 +3739,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumOptionsSliceView<'slice, 'p> {
@@ -4027,8 +3998,7 @@ impl<'slice, 'p> OneofOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -4042,8 +4012,7 @@ impl<'slice, 'p> OneofOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -4069,8 +4038,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for OneofOptionsSliceView<'slice, 'p> {
@@ -4539,8 +4507,7 @@ impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -4560,8 +4527,7 @@ impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -4593,8 +4559,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FieldOptionsSliceView<'slice, 'p> {
@@ -5039,8 +5004,7 @@ impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -5058,8 +5022,7 @@ impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -5089,8 +5052,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for MessageOptionsSliceView<'slice, 'p> {
@@ -6049,8 +6011,7 @@ impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -6084,8 +6045,7 @@ impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -6131,8 +6091,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileOptionsSliceView<'slice, 'p> {
@@ -6587,8 +6546,7 @@ impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
             server_streaming: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -6607,8 +6565,7 @@ impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -6639,8 +6596,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for MethodDescriptorProtoSliceView<'slice, 'p> {
@@ -6972,8 +6928,7 @@ impl<'slice, 'p> ServiceDescriptorProtoSliceView<'slice, 'p> {
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -6989,8 +6944,7 @@ impl<'slice, 'p> ServiceDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -7018,8 +6972,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ServiceDescriptorProtoSliceView<'slice, 'p> {
@@ -7345,8 +7298,7 @@ impl<'slice, 'p> EnumValueDescriptorProtoSliceView<'slice, 'p> {
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -7362,8 +7314,7 @@ impl<'slice, 'p> EnumValueDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -7391,8 +7342,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumValueDescriptorProtoSliceView<'slice, 'p> {
@@ -7803,8 +7753,7 @@ impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
             reserved_name: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -7822,8 +7771,7 @@ impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -7853,8 +7801,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumDescriptorProtoSliceView<'slice, 'p> {
@@ -8143,8 +8090,7 @@ impl<'slice, 'p> EnumReservedRangeSliceView<'slice, 'p> {
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -8159,8 +8105,7 @@ impl<'slice, 'p> EnumReservedRangeSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -8187,8 +8132,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumReservedRangeSliceView<'slice, 'p> {
@@ -8480,8 +8424,7 @@ impl<'slice, 'p> OneofDescriptorProtoSliceView<'slice, 'p> {
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -8496,8 +8439,7 @@ impl<'slice, 'p> OneofDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -8524,8 +8466,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for OneofDescriptorProtoSliceView<'slice, 'p> {
@@ -9131,8 +9072,7 @@ impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
             proto3_optional: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -9156,8 +9096,7 @@ impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -9193,8 +9132,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FieldDescriptorProtoSliceView<'slice, 'p> {
@@ -9529,8 +9467,7 @@ impl<'slice, 'p> ExtensionRangeOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -9544,8 +9481,7 @@ impl<'slice, 'p> ExtensionRangeOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -9571,8 +9507,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ExtensionRangeOptionsSliceView<'slice, 'p> {
@@ -10185,8 +10120,7 @@ impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
             reserved_name: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -10209,8 +10143,7 @@ impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -10245,8 +10178,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for DescriptorProtoSliceView<'slice, 'p> {
@@ -10535,8 +10467,7 @@ impl<'slice, 'p> ReservedRangeSliceView<'slice, 'p> {
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -10551,8 +10482,7 @@ impl<'slice, 'p> ReservedRangeSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -10579,8 +10509,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ReservedRangeSliceView<'slice, 'p> {
@@ -10906,8 +10835,7 @@ impl<'slice, 'p> ExtensionRangeSliceView<'slice, 'p> {
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -10923,8 +10851,7 @@ impl<'slice, 'p> ExtensionRangeSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -10952,8 +10879,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ExtensionRangeSliceView<'slice, 'p> {
@@ -11631,8 +11557,7 @@ impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
             syntax: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -11657,8 +11582,7 @@ impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -11695,8 +11619,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileDescriptorProtoSliceView<'slice, 'p> {
@@ -11955,8 +11878,7 @@ impl<'slice, 'p> FileDescriptorSetSliceView<'slice, 'p> {
             file: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -11970,8 +11892,7 @@ impl<'slice, 'p> FileDescriptorSetSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -11997,8 +11918,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileDescriptorSetSliceView<'slice, 'p> {

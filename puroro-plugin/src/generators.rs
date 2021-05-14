@@ -61,6 +61,7 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
         let output = "\
 #![allow(unused_variables)]
 #![allow(unused_imports)]
+#![allow(dead_code)]
 \n"
         .to_string();
         let mut visitor = Visitor {

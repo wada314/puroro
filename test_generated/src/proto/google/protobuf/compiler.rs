@@ -1,5 +1,6 @@
 #![allow(unused_variables)]
 #![allow(unused_imports)]
+#![allow(dead_code)]
 
 pub trait CodeGeneratorResponseTrait {
     type FileType: self::code_generator_response::FileTrait;
@@ -313,8 +314,7 @@ impl<'slice, 'p> CodeGeneratorResponseSliceView<'slice, 'p> {
             file: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -330,8 +330,7 @@ impl<'slice, 'p> CodeGeneratorResponseSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -359,8 +358,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for CodeGeneratorResponseSliceView<'slice, 'p> {
@@ -742,8 +740,7 @@ impl<'slice, 'p> FileSliceView<'slice, 'p> {
             generated_code_info: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -760,8 +757,7 @@ impl<'slice, 'p> FileSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -790,8 +786,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileSliceView<'slice, 'p> {
@@ -1162,8 +1157,7 @@ impl<'slice, 'p> CodeGeneratorRequestSliceView<'slice, 'p> {
             compiler_version: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -1180,8 +1174,7 @@ impl<'slice, 'p> CodeGeneratorRequestSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -1210,8 +1203,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for CodeGeneratorRequestSliceView<'slice, 'p> {
@@ -1569,8 +1561,7 @@ impl<'slice, 'p> VersionSliceView<'slice, 'p> {
             suffix: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
     
     fn try_new_with_parent(
@@ -1587,8 +1578,7 @@ impl<'slice, 'p> VersionSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        todo!("Initialize fields");
-        Ok(new_self)
+        todo!("Initialize fields")
     }
 }
 
@@ -1617,8 +1607,7 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
     {
         todo!();
         
-        Ok(true)
-    }
+        }
 }
 
 impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for VersionSliceView<'slice, 'p> {
