@@ -185,7 +185,7 @@ fn try_new_with_parent(
         parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
     ) -> ::puroro::Result<Self>
 {{
-    let new_self = Self {{\n",
+    let mut new_self = Self {{\n",
             indent_n(
                 2,
                 func(|output| {

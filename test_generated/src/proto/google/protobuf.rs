@@ -256,7 +256,7 @@ impl<'slice, 'p> GeneratedCodeInfoSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             annotation: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
@@ -673,7 +673,7 @@ impl<'slice, 'p> AnnotationSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             path: ::puroro_internal::FieldNew::new(),
             source_file: ::puroro_internal::FieldNew::new(),
             begin: ::puroro_internal::FieldNew::new(),
@@ -1012,7 +1012,7 @@ impl<'slice, 'p> SourceCodeInfoSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             location: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
@@ -1470,7 +1470,7 @@ impl<'slice, 'p> LocationSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             path: ::puroro_internal::FieldNew::new(),
             span: ::puroro_internal::FieldNew::new(),
             leading_comments: ::puroro_internal::FieldNew::new(),
@@ -2027,7 +2027,7 @@ impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             identifier_value: ::puroro_internal::FieldNew::new(),
             positive_int_value: ::puroro_internal::FieldNew::new(),
@@ -2419,7 +2419,7 @@ impl<'slice, 'p> NamePartSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             name_part: ::puroro_internal::FieldNew::new(),
             is_extension: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
@@ -2812,7 +2812,7 @@ impl<'slice, 'p> MethodOptionsSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             deprecated: ::puroro_internal::FieldNew::new(),
             idempotency_level: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
@@ -3201,7 +3201,7 @@ impl<'slice, 'p> ServiceOptionsSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             deprecated: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
@@ -3558,7 +3558,7 @@ impl<'slice, 'p> EnumValueOptionsSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             deprecated: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
@@ -3950,7 +3950,7 @@ impl<'slice, 'p> EnumOptionsSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             allow_alias: ::puroro_internal::FieldNew::new(),
             deprecated: ::puroro_internal::FieldNew::new(),
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
@@ -4280,7 +4280,7 @@ impl<'slice, 'p> OneofOptionsSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
@@ -4804,7 +4804,7 @@ impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             ctype: ::puroro_internal::FieldNew::new(),
             packed: ::puroro_internal::FieldNew::new(),
             jstype: ::puroro_internal::FieldNew::new(),
@@ -5352,7 +5352,7 @@ impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             message_set_wire_format: ::puroro_internal::FieldNew::new(),
             no_standard_descriptor_accessor: ::puroro_internal::FieldNew::new(),
             deprecated: ::puroro_internal::FieldNew::new(),
@@ -6398,7 +6398,7 @@ impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             java_package: ::puroro_internal::FieldNew::new(),
             java_outer_classname: ::puroro_internal::FieldNew::new(),
             java_multiple_files: ::puroro_internal::FieldNew::new(),
@@ -7068,7 +7068,7 @@ impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             input_type: ::puroro_internal::FieldNew::new(),
             output_type: ::puroro_internal::FieldNew::new(),
@@ -7495,7 +7495,7 @@ impl<'slice, 'p> ServiceDescriptorProtoSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             method: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
@@ -7892,7 +7892,7 @@ impl<'slice, 'p> EnumValueDescriptorProtoSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             number: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
@@ -8374,7 +8374,7 @@ impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             value: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
@@ -8750,7 +8750,7 @@ impl<'slice, 'p> EnumReservedRangeSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             start: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
@@ -9105,7 +9105,7 @@ impl<'slice, 'p> OneofDescriptorProtoSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
@@ -9774,7 +9774,7 @@ impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             number: ::puroro_internal::FieldNew::new(),
             label: ::puroro_internal::FieldNew::new(),
@@ -10244,7 +10244,7 @@ impl<'slice, 'p> ExtensionRangeOptionsSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
@@ -10912,7 +10912,7 @@ impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             field: ::puroro_internal::FieldNew::new(),
             extension: ::puroro_internal::FieldNew::new(),
@@ -11328,7 +11328,7 @@ impl<'slice, 'p> ReservedRangeSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             start: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
@@ -11717,7 +11717,7 @@ impl<'slice, 'p> ExtensionRangeSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             start: ::puroro_internal::FieldNew::new(),
             end: ::puroro_internal::FieldNew::new(),
             options: ::puroro_internal::FieldNew::new(),
@@ -12466,7 +12466,7 @@ impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             package: ::puroro_internal::FieldNew::new(),
             dependency: ::puroro_internal::FieldNew::new(),
@@ -12868,7 +12868,7 @@ impl<'slice, 'p> FileDescriptorSetSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             file: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),

@@ -326,7 +326,7 @@ impl<'slice, 'p> CodeGeneratorResponseSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             error: ::puroro_internal::FieldNew::new(),
             supported_features: ::puroro_internal::FieldNew::new(),
             file: ::puroro_internal::FieldNew::new(),
@@ -779,7 +779,7 @@ impl<'slice, 'p> FileSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             name: ::puroro_internal::FieldNew::new(),
             insertion_point: ::puroro_internal::FieldNew::new(),
             content: ::puroro_internal::FieldNew::new(),
@@ -1229,7 +1229,7 @@ impl<'slice, 'p> CodeGeneratorRequestSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             file_to_generate: ::puroro_internal::FieldNew::new(),
             parameter: ::puroro_internal::FieldNew::new(),
             proto_file: ::puroro_internal::FieldNew::new(),
@@ -1666,7 +1666,7 @@ impl<'slice, 'p> VersionSliceView<'slice, 'p> {
             parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
         ) -> ::puroro::Result<Self>
     {
-        let new_self = Self {
+        let mut new_self = Self {
             major: ::puroro_internal::FieldNew::new(),
             minor: ::puroro_internal::FieldNew::new(),
             patch: ::puroro_internal::FieldNew::new(),
