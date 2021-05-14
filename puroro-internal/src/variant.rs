@@ -83,6 +83,9 @@ impl Variant {
         Self(encoded.to_le_bytes())
     }
 
+    pub fn zero() -> Self {
+        Self([0; 8])
+    }
     pub fn is_zero(&self) -> bool {
         self.0.iter().all(|x| *x == 0)
     }

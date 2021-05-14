@@ -3,6 +3,7 @@ use crate::tags;
 use crate::tags::{FieldLabelTag, FieldTypeTag};
 use crate::types::{FieldData, SliceViewFields};
 use crate::variant::VariantTypeTag;
+use crate::FieldNew;
 use crate::{ErrorKind, Result};
 use std::collections::HashMap;
 use std::convert::TryFrom;
@@ -63,8 +64,9 @@ where
 }
 
 macro_rules! redirect_deser_from_slice_to_from_iter {
-    ($ty:ty, $ttag:ty, $ltag:ty) => {
-        impl<'bump, 'slice> FieldDeserFromSlice<'slice, $ttag, $ltag> for $ty {
+    ($ty:ty, $ttag:ty, $ltag:ty $(, $gp:ident $(: $bounds:tt $(+ $bounds2:tt)+ )?)* ) => {
+        impl<'bump, 'slice $(, $gp $(: $bounds $(+ $bounds2)* )*)*>
+        FieldDeserFromSlice<'slice, $ttag, $ltag> for $ty {
             fn deser(
                 &mut self,
                 field: FieldData<LdSlice<'slice>>,
@@ -81,7 +83,10 @@ macro_rules! redirect_deser_from_slice_to_from_iter {
                     FieldData::Bits32(x) => FieldData::Bits32(x),
                     FieldData::Bits64(x) => FieldData::Bits64(x),
                 };
-                <$ty as FieldDeserFromIter<$ttag, $ltag>>::deser(self, new_field, Default::default)
+                <$ty as FieldDeserFromIter<$ttag, $ltag>>::deser(
+                    self,
+                    new_field,
+                    crate::helpers::Default::default)
             }
         }
     };
@@ -92,8 +97,9 @@ macro_rules! redirect_deser_from_slice_to_from_iter {
 ///////////////////////////////////////////////////////////////////////////////
 
 macro_rules! define_deser_scalar_variants {
-    ($ttag:ty, $ltag:ty) => {
-        impl FieldDeserFromIter<$ttag, $ltag> for <$ttag as VariantTypeTag>::NativeType
+    ($ttag:ty, $ltag:ty $(, $gp:ident $(: $bounds:tt $(+ $bounds2:tt)+ )?)* ) => {
+        impl<$($gp $(: $bounds $(+ $bounds2)* )*),*>
+            FieldDeserFromIter<$ttag, $ltag> for <$ttag as VariantTypeTag>::NativeType
         where
             $ttag: VariantTypeTag,
         {
@@ -135,6 +141,7 @@ macro_rules! define_deser_scalar_variants {
             <$ttag as VariantTypeTag>::NativeType,
             $ttag,
             $ltag
+            $(, $gp $(: $bounds $(+ $bounds2)* )*)*
         );
     };
 }
@@ -145,6 +152,7 @@ define_deser_scalar_variants!(tags::SInt64, tags::Required);
 define_deser_scalar_variants!(tags::UInt32, tags::Required);
 define_deser_scalar_variants!(tags::UInt64, tags::Required);
 define_deser_scalar_variants!(tags::Bool, tags::Required);
+define_deser_scalar_variants!(tags::Enum<T>, tags::Required, T: (TryFrom<i32, Error=i32>) + (Into<i32>));
 define_deser_scalar_variants!(tags::Int32, tags::Optional3);
 define_deser_scalar_variants!(tags::Int64, tags::Optional3);
 define_deser_scalar_variants!(tags::SInt32, tags::Optional3);
@@ -152,35 +160,7 @@ define_deser_scalar_variants!(tags::SInt64, tags::Optional3);
 define_deser_scalar_variants!(tags::UInt32, tags::Optional3);
 define_deser_scalar_variants!(tags::UInt64, tags::Optional3);
 define_deser_scalar_variants!(tags::Bool, tags::Optional3);
-
-macro_rules! define_deser_scalar_enum {
-    ($ty:ty, $ttag:ty, $ltag:ty) => {
-        impl<T> FieldDeserFromIter<$ttag, $ltag> for $ty
-        where
-            T: TryFrom<i32, Error = i32>,
-        {
-            type Item = Self;
-            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _: F) -> Result<()>
-            where
-                I: Iterator<Item = std::io::Result<u8>>,
-                F: Fn() -> Self::Item,
-            {
-                let mut ival = 0i32;
-                <i32 as FieldDeserFromIter<tags::Int32, tags::Required>>::deser(
-                    &mut ival,
-                    field,
-                    Default::default,
-                )?;
-                if !<$ltag>::DO_DEFAULT_CHECK || ival != 0 {
-                    *self = T::try_from(ival);
-                }
-                Ok(())
-            }
-        }
-    };
-}
-define_deser_scalar_enum!(std::result::Result<T, i32>, tags::Enum<T>, tags::Required);
-define_deser_scalar_enum!(std::result::Result<T, i32>, tags::Enum<T>, tags::Optional3);
+define_deser_scalar_variants!(tags::Enum<T>, tags::Optional3, T: (TryFrom<i32, Error=i32>) + (Into<i32>));
 
 macro_rules! define_deser_scalar_ld_from_iter {
     ($ty:ty, $ttag:ty, $ltag:ty, $method:ident) => {
@@ -360,8 +340,10 @@ define_deser_scalar_fixed!(u64, tags::Fixed64, tags::Optional3, Bits64);
 ///////////////////////////////////////////////////////////////////////////////
 
 macro_rules! define_deser_optional_fields_from_scalar {
-    ($ty:ty, $ttag:ty, $ltag:ty) => {
-        impl<'bump> FieldDeserFromIter<$ttag, $ltag> for Option<$ty> {
+    ($ty:ty, $ttag:ty, $ltag:ty $(, $gp:ident $(: $bounds:tt $(+ $bounds2:tt)+ )?)* ) => {
+        impl<'bump $(, $gp $(: $bounds $(+ $bounds2)* )*)*>
+            FieldDeserFromIter<$ttag, $ltag> for Option<$ty>
+        {
             type Item = $ty;
             fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
             where
@@ -384,6 +366,12 @@ define_deser_optional_fields_from_scalar!(i64, tags::SInt64, tags::Optional2);
 define_deser_optional_fields_from_scalar!(u32, tags::UInt32, tags::Optional2);
 define_deser_optional_fields_from_scalar!(u64, tags::UInt64, tags::Optional2);
 define_deser_optional_fields_from_scalar!(bool, tags::Bool, tags::Optional2);
+define_deser_optional_fields_from_scalar!(
+    std::result::Result<T, i32>,
+    tags::Enum<T>,
+    tags::Optional2,
+    T: (TryFrom<i32, Error = i32>) + (Into<i32>)
+);
 
 redirect_deser_from_slice_to_from_iter!(Option<i32>, tags::Int32, tags::Optional2);
 redirect_deser_from_slice_to_from_iter!(Option<i64>, tags::Int64, tags::Optional2);
@@ -392,6 +380,12 @@ redirect_deser_from_slice_to_from_iter!(Option<i64>, tags::SInt64, tags::Optiona
 redirect_deser_from_slice_to_from_iter!(Option<u32>, tags::UInt32, tags::Optional2);
 redirect_deser_from_slice_to_from_iter!(Option<u64>, tags::UInt64, tags::Optional2);
 redirect_deser_from_slice_to_from_iter!(Option<bool>, tags::Bool, tags::Optional2);
+redirect_deser_from_slice_to_from_iter!(
+    Option<std::result::Result<T, i32>>,
+    tags::Enum<T>,
+    tags::Optional2,
+    T: (TryFrom<i32, Error = i32>) + (Into<i32>)
+);
 
 define_deser_optional_fields_from_scalar!(String, tags::String, tags::Optional2);
 define_deser_optional_fields_from_scalar!(Vec<u8>, tags::Bytes, tags::Optional2);
@@ -420,25 +414,6 @@ redirect_deser_from_slice_to_from_iter!(Option<u32>, tags::Fixed32, tags::Option
 redirect_deser_from_slice_to_from_iter!(Option<f64>, tags::Double, tags::Optional2);
 redirect_deser_from_slice_to_from_iter!(Option<i64>, tags::SFixed64, tags::Optional2);
 redirect_deser_from_slice_to_from_iter!(Option<u64>, tags::Fixed64, tags::Optional2);
-
-// Enum; essentially same with the macro above but needs a generic type parameter.
-impl<T> FieldDeserFromIter<tags::Enum<T>, tags::Optional2> for Option<std::result::Result<T, i32>>
-where
-    T: TryFrom<i32, Error = i32>,
-{
-    type Item = std::result::Result<T, i32>;
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-        F: Fn() -> Self::Item,
-    {
-        <Self::Item as FieldDeserFromIter<tags::Enum<T>, tags::Required>>::deser(
-            self.get_or_insert_with(f),
-            field,
-            || unreachable!(),
-        )
-    }
-}
 
 // Message. Different from the other types, it is wrapped by Option<Box<_>> for
 // the both Optional2 and Optional3.
@@ -476,18 +451,25 @@ define_deser_optional_message_field!(tags::Optional3);
 ///////////////////////////////////////////////////////////////////////////////
 
 macro_rules! define_deser_repeated_variants {
-    ($scalar:ty, $ttag:ty) => {
-        define_deser_repeated_variants!($scalar, $ttag, Vec<$scalar>);
+    ($ttag:ty $(, $gp:ident $(: $bounds:tt $(+ $bounds2:tt)+ )?)* ) => {
+        define_deser_repeated_variants!(
+            $ttag,
+            Vec<<$ttag as VariantTypeTag>::NativeType>
+            $(, $gp $(: $bounds $(+ $bounds2)* )*)*);
         #[cfg(feature = "puroro-bumpalo")]
         define_deser_repeated_variants!(
-            $scalar,
             $ttag,
-            ::bumpalo::collections::Vec<'bump, $scalar>
+            ::bumpalo::collections::Vec<'bump, <$ttag as VariantTypeTag>::NativeType>
+            $(, $gp $(: $bounds $(+ $bounds2)* )*)*
         );
     };
-    ($scalar:ty, $ttag:ty, $vec:ty) => {
-        impl<'bump> FieldDeserFromIter<$ttag, tags::Repeated> for $vec {
-            type Item = $scalar;
+    ($ttag:ty, $vec:ty $(, $gp:ident $(: $bounds:tt $(+ $bounds2:tt)+ )?)* ) => {
+        impl<'bump $(, $gp $(: $bounds $(+ $bounds2)* )*)*>
+            FieldDeserFromIter<$ttag, tags::Repeated> for $vec
+        where
+            $ttag: VariantTypeTag,
+        {
+            type Item = <$ttag as VariantTypeTag>::NativeType;
             fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _: F) -> Result<()>
             where
                 I: Iterator<Item = std::io::Result<u8>>,
@@ -519,13 +501,14 @@ macro_rules! define_deser_repeated_variants {
         }
     };
 }
-define_deser_repeated_variants!(i32, tags::Int32);
-define_deser_repeated_variants!(i64, tags::Int64);
-define_deser_repeated_variants!(i32, tags::SInt32);
-define_deser_repeated_variants!(i64, tags::SInt64);
-define_deser_repeated_variants!(u32, tags::UInt32);
-define_deser_repeated_variants!(u64, tags::UInt64);
-define_deser_repeated_variants!(bool, tags::Bool);
+define_deser_repeated_variants!(tags::Int32);
+define_deser_repeated_variants!(tags::Int64);
+define_deser_repeated_variants!(tags::SInt32);
+define_deser_repeated_variants!(tags::SInt64);
+define_deser_repeated_variants!(tags::UInt32);
+define_deser_repeated_variants!(tags::UInt64);
+define_deser_repeated_variants!(tags::Bool);
+define_deser_repeated_variants!(tags::Enum<T>, T: (TryFrom<i32, Error = i32>) + (Into<i32>));
 
 // This covers all Repeated fields and all Message types.
 impl<'slice, TypeTag, LabelTag> FieldDeserFromSlice<'slice, TypeTag, LabelTag>
@@ -575,45 +558,6 @@ where
         Ok(())
     }
 }
-
-macro_rules! define_deser_repeated_enum {
-    () => {
-        define_deser_repeated_enum!(Vec<std::result::Result<T, i32>>);
-        #[cfg(feature = "puroro-bumpalo")]
-        define_deser_repeated_enum!(
-            ::bumpalo::collections::Vec<'bump, std::result::Result<T, i32>>
-        );
-    };
-    ($vec:ty) => {
-        impl<'bump, T> FieldDeserFromIter<tags::Enum<T>, tags::Repeated> for $vec
-        where
-            T: TryFrom<i32, Error = i32>,
-        {
-            type Item = std::result::Result<T, i32>;
-            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _: F) -> Result<()>
-            where
-                I: Iterator<Item = std::io::Result<u8>>,
-                F: Fn() -> Self::Item,
-            {
-                match field {
-                    FieldData::Variant(variant) => {
-                        self.push(T::try_from(variant.to_native::<tags::Int32>()?))
-                    }
-                    FieldData::LengthDelimited(ld_iter) => {
-                        for rvariant in ld_iter.variants() {
-                            self.push(T::try_from(rvariant?.to_native::<tags::Int32>()?))
-                        }
-                    }
-                    FieldData::Bits32(_) | FieldData::Bits64(_) => {
-                        Err(ErrorKind::UnexpectedWireType)?
-                    }
-                }
-                Ok(())
-            }
-        }
-    };
-}
-define_deser_repeated_enum!();
 
 macro_rules! define_deser_repeated_ld {
     ($scalar:ty, $ttag:ty, $method:ident) => {

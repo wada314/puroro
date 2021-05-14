@@ -3,6 +3,8 @@ pub mod field_deser;
 pub mod field_new;
 pub mod field_ser;
 pub mod field_take_or_init;
+use std::convert::TryFrom;
+
 pub use field_clone::FieldClone;
 pub use field_deser::{FieldDeserFromIter, FieldDeserFromSlice};
 pub use field_new::FieldNew;
@@ -36,4 +38,32 @@ pub trait MapEntry {
         value: &Self::ValueType,
         serializer: &mut T,
     ) -> Result<()>;
+}
+
+/// An alternative for `std::default::Default` just only because of `Result<Enum, i32>`.
+trait Default {
+    fn default() -> Self;
+}
+macro_rules! impl_default {
+    ($ty:ty) => {
+        impl Default for $ty {
+            fn default() -> Self {
+                ::std::default::Default::default()
+            }
+        }
+    };
+}
+impl_default!(i32);
+impl_default!(i64);
+impl_default!(u32);
+impl_default!(u64);
+impl_default!(f32);
+impl_default!(f64);
+impl_default!(bool);
+impl_default!(String);
+impl_default!(Vec<u8>);
+impl<T: TryFrom<i32, Error = i32>> Default for ::std::result::Result<T, i32> {
+    fn default() -> Self {
+        T::try_from(0i32)
+    }
 }
