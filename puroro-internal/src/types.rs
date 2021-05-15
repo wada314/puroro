@@ -1,4 +1,7 @@
+use std::marker::PhantomData;
+
 use crate::variant::Variant;
+use crate::{tags, InternalDataForSliceViewStruct};
 use ::num_derive::FromPrimitive;
 
 #[non_exhaustive]
@@ -35,3 +38,13 @@ pub enum SliceViewFields<'slice> {
     },
 }
 
+#[derive(Debug, Clone)]
+pub struct RepeatedSliceViewField<'slice, 'p, TypeTag>
+where
+    TypeTag: tags::FieldTypeTag,
+{
+    field: Option<&'p SliceViewFields<'slice>>,
+    field_number: usize,
+    internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
+    phantom: PhantomData<TypeTag>,
+}

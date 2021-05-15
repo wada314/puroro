@@ -525,19 +525,18 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                     ))
                 })),
                 iter(self.msg.fields().map(|field| -> Result<_> {
-                    Ok(match self.traits_gen.generate_getter_method_decls(field)? {
-                        GetterMethods::BareField(decl) => {
-                            // Getter method returns bare type `T`
-                            match (self.context.impl_type(), field.type_()?) {
-                                (ImplType::Default, FieldType::Message(_))
-                                | (_, FieldType::String)
-                                | (_, FieldType::Bytes) => format!(
-                                    "{decl} {{\n    self.{ident}.as_ref()\n}}\n",
-                                    decl = decl,
-                                    ident = field.native_ident()?
-                                ),
-                                (ImplType::SliceView { .. }, FieldType::Message(m)) => format!(
-                                    "\
+                    Ok(
+                        match (
+                            self.traits_gen.generate_getter_method_decls(field)?,
+                            self.context.impl_type(),
+                            field.type_()?,
+                        ) {
+                            (
+                                GetterMethods::BareField(decl),
+                                ImplType::SliceView { .. },
+                                FieldType::Message(m),
+                            ) => format!(
+                                "\
 {decl} {{
     {msg}::try_new_with_parent(
         self.{ident}.as_ref(),
@@ -545,30 +544,17 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
         &self.puroro_internal
     ).expect(\"Invalid input slice. Consider checking the slice content earlier (TBD).\")
 }}\n",
-                                    decl = decl,
-                                    msg = self.frag_gen.type_name_of_msg(m)?,
-                                    ident = field.native_ident()?,
-                                    field_number = field.number(),
-                                ),
-                                _ => format!(
-                                    "{decl} {{\n    self.{ident}.clone()\n}}\n",
-                                    decl = decl,
-                                    ident = field.native_ident()?
-                                ),
-                            }
-                        }
-                        GetterMethods::OptionalField(decl) => {
-                            // Getter method returns type `Option<T>`
-                            match (self.context.impl_type(), field.type_()?) {
-                                (ImplType::Default, FieldType::Message(_))
-                                | (_, FieldType::String)
-                                | (_, FieldType::Bytes) => format!(
-                                    "{decl} {{\n    self.{ident}.as_deref()\n}}\n",
-                                    decl = decl,
-                                    ident = field.native_ident()?
-                                ),
-                                (ImplType::SliceView { .. }, FieldType::Message(m)) => format!(
-                                    "\
+                                decl = decl,
+                                msg = self.frag_gen.type_name_of_msg(m)?,
+                                ident = field.native_ident()?,
+                                field_number = field.number(),
+                            ),
+                            (
+                                GetterMethods::OptionalField(decl),
+                                ImplType::SliceView { .. },
+                                FieldType::Message(m),
+                            ) => format!(
+                                "\
 {decl} {{
     if self.{ident}.is_some() {{
         {msg}::try_new_with_parent(
@@ -580,29 +566,55 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
         None
     }}
 }}\n",
-                                    decl = decl,
-                                    msg = self.frag_gen.type_name_of_msg(m)?,
-                                    ident = field.native_ident()?,
-                                    field_number = field.number(),
-                                ),
-                                _ => format!(
-                                    "{decl} {{\n    self.{ident}.clone()\n}}\n",
-                                    decl = decl,
-                                    ident = field.native_ident()?
-                                ),
-                            }
-                        }
-                        GetterMethods::RepeatedField {
-                            return_type_ident,
-                            return_type_bound: _,
-                            get_decl,
-                        }
-                        | GetterMethods::MapField {
-                            return_type_ident,
-                            return_type_bound: _,
-                            get_decl,
-                        } => {
-                            format!(
+                                decl = decl,
+                                msg = self.frag_gen.type_name_of_msg(m)?,
+                                ident = field.native_ident()?,
+                                field_number = field.number(),
+                            ),
+
+                            (
+                                GetterMethods::BareField(decl),
+                                ImplType::Default,
+                                FieldType::Message(_) | FieldType::String | FieldType::Bytes,
+                            ) => format!(
+                                "{decl} {{\n    self.{ident}.as_ref()\n}}\n",
+                                decl = decl,
+                                ident = field.native_ident()?
+                            ),
+                            (
+                                GetterMethods::OptionalField(decl),
+                                ImplType::Default,
+                                FieldType::Message(_) | FieldType::String | FieldType::Bytes,
+                            ) => format!(
+                                "{decl} {{\n    self.{ident}.as_deref()\n}}\n",
+                                decl = decl,
+                                ident = field.native_ident()?
+                            ),
+
+                            (
+                                GetterMethods::BareField(decl) | GetterMethods::OptionalField(decl),
+                                _,
+                                _,
+                            ) => format!(
+                                "{decl} {{\n    self.{ident}.clone()\n}}\n",
+                                decl = decl,
+                                ident = field.native_ident()?
+                            ),
+
+                            (
+                                GetterMethods::RepeatedField {
+                                    return_type_ident,
+                                    return_type_bound: _,
+                                    get_decl,
+                                }
+                                | GetterMethods::MapField {
+                                    return_type_ident,
+                                    return_type_bound: _,
+                                    get_decl,
+                                },
+                                ImplType::Default,
+                                _,
+                            ) => format!(
                                 "\
 type {return_type_ident} = {type_name};
 {get_decl} {{
@@ -612,9 +624,9 @@ type {return_type_ident} = {type_name};
                                 type_name = self.frag_gen.field_type_for(field)?,
                                 get_decl = get_decl,
                                 ident = field.native_ident()?,
-                            )
-                        }
-                    })
+                            ),
+                        },
+                    )
                 })),
             )),
             "}}\n",
