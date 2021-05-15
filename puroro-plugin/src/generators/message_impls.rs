@@ -625,6 +625,24 @@ type {return_type_ident} = {type_name};
                                 get_decl = get_decl,
                                 ident = field.native_ident()?,
                             ),
+                            (
+                                GetterMethods::RepeatedField {
+                                    return_type_ident,
+                                    return_type_bound: _,
+                                    get_decl,
+                                },
+                                ImplType::SliceView { .. },
+                                _,
+                            ) => todo!(),
+                            (
+                                GetterMethods::MapField {
+                                    return_type_ident,
+                                    return_type_bound: _,
+                                    get_decl,
+                                },
+                                ImplType::SliceView { .. },
+                                _,
+                            ) => todo!(),
                         },
                     )
                 })),

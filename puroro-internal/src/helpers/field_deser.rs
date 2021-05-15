@@ -518,40 +518,53 @@ where
 {
     fn deser(
         &mut self,
-        _: FieldData<LdSlice<'slice>>,
+        field_data: FieldData<LdSlice<'slice>>,
         slice_from_this_field: &'slice [u8],
         enclosing_slice: &'slice [u8],
     ) -> Result<()> {
+        let maybe_this_ld_field_content = if let FieldData::LengthDelimited(ld) = field_data {
+            Some(ld.as_slice())
+        } else {
+            None
+        };
         *self = match self {
             None => Some(SliceViewFields::FieldsInSingleSlice {
                 slice: slice_from_this_field,
                 count: 1,
                 enclosing_slice,
+                last_ld_field_content: maybe_this_ld_field_content,
             }),
             Some(SliceViewFields::FieldsInSingleSlice {
                 slice,
                 count,
                 enclosing_slice: existing_fields_enclosing_slice,
+                last_ld_field_content,
             }) => Some(
                 if std::ptr::eq(enclosing_slice, *existing_fields_enclosing_slice) {
                     SliceViewFields::FieldsInSingleSlice {
                         slice,
                         count: *count + 1,
                         enclosing_slice: *existing_fields_enclosing_slice,
+                        last_ld_field_content: maybe_this_ld_field_content
+                            .or(*last_ld_field_content),
                     }
                 } else {
                     SliceViewFields::FieldsInMultipleSlices {
                         count: *count + 1,
                         first_enclosing_slice: *existing_fields_enclosing_slice,
+                        last_ld_field_content: maybe_this_ld_field_content
+                            .or(*last_ld_field_content),
                     }
                 },
             ),
             Some(SliceViewFields::FieldsInMultipleSlices {
                 count,
                 first_enclosing_slice,
+                last_ld_field_content,
             }) => Some(SliceViewFields::FieldsInMultipleSlices {
                 count: *count + 1,
                 first_enclosing_slice,
+                last_ld_field_content: maybe_this_ld_field_content.or(*last_ld_field_content),
             }),
         };
         Ok(())

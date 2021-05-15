@@ -32,10 +32,12 @@ pub enum SliceViewFields<'slice> {
         /// A total number of field items in the slice. Packed repeated field is counted as 1.
         count: usize,
         enclosing_slice: &'slice [u8],
+        last_ld_field_content: Option<&'slice [u8]>,
     },
     FieldsInMultipleSlices {
         count: usize,
         first_enclosing_slice: &'slice [u8],
+        last_ld_field_content: Option<&'slice [u8]>,
     },
 }
 

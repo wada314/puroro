@@ -113,6 +113,7 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                     slice: slice_of_fields_in_parent,
                     count,
                     enclosing_slice: _,
+                    last_ld_field_content: _,
                 }) => {
                     // iterate over a single slice given from a parent message,
                     // and choose out the fields that has proper field number.
@@ -140,6 +141,7 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                 Some(SliceViewFields::FieldsInMultipleSlices {
                     count,
                     first_enclosing_slice,
+                    last_ld_field_content: _,
                 }) => {
                     // The parent message instance is scattering around multiple slices.
                     // In this case we need to iterate in the parent message recursively,
