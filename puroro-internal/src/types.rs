@@ -1,5 +1,6 @@
 use std::marker::PhantomData;
 
+use crate::deser::LdSlice;
 use crate::variant::Variant;
 use crate::{internal_data, tags, InternalDataForSliceViewStruct};
 use ::num_derive::FromPrimitive;

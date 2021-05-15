@@ -184,3 +184,28 @@ impl<'bump, 'slice, 'p> InternalData<'bump> for InternalDataForSliceViewStruct<'
         panic!("The Bumpalo data field is only available for a Bumpalo struct!")
     }
 }
+
+fn end_address(s: &[u8]) -> usize {
+    s.as_ptr_range().end as usize
+}
+
+fn next_field_item_internal<'slice, 'p>(
+    depth: usize,
+    last_childs_field: &'slice [u8],
+    repeated_field: &'p Option<SliceViewFields<'slice>>,
+    repeated_field_number: usize,
+    internal_data: InternalDataForSliceViewStruct<'slice, 'p>,
+) -> Option<LdSlice<'slice>> {
+    match internal_data.source_slices {
+        SourceSlicesView::SingleSlice(ld_slice) => {
+            todo!()
+        }
+        SourceSlicesView::MaybeMultipleSlice {
+            field_in_parent,
+            field_number_in_parent,
+            parent_internal_data,
+        } => {
+            todo!()
+        }
+    }
+}
