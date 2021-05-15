@@ -142,7 +142,7 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                     first_enclosing_slice,
                 }) => {
                     // The parent message instance is scattering around multiple slices.
-                    // In this case we to iterate in the parent message recursively,
+                    // In this case we need to iterate in the parent message recursively,
                     // that means we cannot use a static dispatching iterator because the type
                     // of the iterator recursives infinitely.
                     let iter = parent_internal_data

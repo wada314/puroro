@@ -1,8 +1,9 @@
 use std::marker::PhantomData;
 
 use crate::variant::Variant;
-use crate::{tags, InternalDataForSliceViewStruct};
+use crate::{internal_data, tags, InternalDataForSliceViewStruct};
 use ::num_derive::FromPrimitive;
+use ::puroro::RepeatedField;
 
 #[non_exhaustive]
 #[derive(FromPrimitive, Debug)]
@@ -43,7 +44,7 @@ pub struct RepeatedSliceViewField<'slice, 'p, TypeTag>
 where
     TypeTag: tags::FieldTypeTag,
 {
-    field: Option<&'p SliceViewFields<'slice>>,
+    field: &'p Option<SliceViewFields<'slice>>,
     field_number: usize,
     internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
     phantom: PhantomData<TypeTag>,
