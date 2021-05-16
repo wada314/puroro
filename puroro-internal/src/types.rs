@@ -26,15 +26,15 @@ pub enum FieldData<T> {
 }
 
 #[derive(Debug, Clone)]
-pub enum SliceViewFields<'slice> {
-    FieldsInSingleSlice {
+pub enum SliceViewField<'slice> {
+    FieldInSingleSlice {
         /// A subslice of `enclosing_slice` starting from this field's item.
         ld_slice: LdSlice<'slice>,
         /// A total number of field items in the slice. Packed repeated field is counted as 1.
         count: usize,
         enclosing_ld_slice: LdSlice<'slice>,
     },
-    FieldsInMultipleSlices {
+    FieldInMultipleSlices {
         count: usize,
         first_enclosing_ld_slice: LdSlice<'slice>,
     },
@@ -45,7 +45,7 @@ pub struct RepeatedSliceViewField<'slice, 'p, TypeTag>
 where
     TypeTag: tags::FieldTypeTag,
 {
-    field: &'p Option<SliceViewFields<'slice>>,
+    field: &'p Option<SliceViewField<'slice>>,
     field_number: usize,
     internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
     phantom: PhantomData<TypeTag>,

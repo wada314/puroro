@@ -1,5 +1,5 @@
 use crate::deser::LdSlice;
-use crate::types::{FieldData, SliceViewFields};
+use crate::types::{FieldData, SliceViewField};
 use crate::{ErrorKind, Result};
 use ::either_n::Either4;
 use puroro::InternalData;
@@ -63,7 +63,7 @@ pub struct InternalDataForSliceViewStruct<'slice, 'p> {
 pub enum SourceSlicesView<'slice, 'p> {
     SingleSlice(LdSlice<'slice>),
     MaybeMultipleSlice {
-        field_in_parent: Option<&'p SliceViewFields<'slice>>,
+        field_in_parent: Option<&'p SliceViewField<'slice>>,
         field_number_in_parent: usize,
         parent_internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
     },
@@ -77,7 +77,7 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     }
 
     pub fn new_with_parent(
-        parent_field: &'p Option<SliceViewFields<'slice>>,
+        parent_field: &'p Option<SliceViewField<'slice>>,
         field_number_in_parent: usize,
         parent_internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
     ) -> Self {
@@ -110,7 +110,7 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                     // but it does not appear in the serialized input stream.
                     Either4::Two(std::iter::empty())
                 }
-                Some(SliceViewFields::FieldsInSingleSlice {
+                Some(SliceViewField::FieldInSingleSlice {
                     ld_slice, count, ..
                 }) => {
                     // iterate over a single slice given from a parent message,
@@ -135,7 +135,7 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                         .take(count);
                     Either4::Three(iter)
                 }
-                Some(SliceViewFields::FieldsInMultipleSlices {
+                Some(SliceViewField::FieldInMultipleSlices {
                     count,
                     first_enclosing_ld_slice: first_enclosing_slice,
                     ..
@@ -211,12 +211,12 @@ fn slice_after<'a, 'b>(source: &'a [u8], prev: &'b [u8]) -> &'a [u8] {
 fn next_field_item_internal<'slice, 'p>(
     depth: usize,
     prev_child_field_slice: &'slice [u8],
-    repeated_field: &'p Option<SliceViewFields<'slice>>,
+    repeated_field: &'p Option<SliceViewField<'slice>>,
     repeated_field_number: usize,
     internal_data: InternalDataForSliceViewStruct<'slice, 'p>,
 ) -> Result<Option<LdSlice<'slice>>> {
     Ok(match repeated_field.clone() {
-        Some(SliceViewFields::FieldsInSingleSlice { mut ld_slice, .. }) => {
+        Some(SliceViewField::FieldInSingleSlice { mut ld_slice, .. }) => {
             ld_slice.skip_until_end_of(prev_child_field_slice);
             for rfield in ld_slice.fields() {
                 let field = rfield?;
@@ -230,7 +230,7 @@ fn next_field_item_internal<'slice, 'p>(
             }
             None
         }
-        Some(SliceViewFields::FieldsInMultipleSlices {
+        Some(SliceViewField::FieldInMultipleSlices {
             count,
             first_enclosing_ld_slice: first_enclosing_slice,
         }) => {

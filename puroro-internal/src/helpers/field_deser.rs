@@ -1,7 +1,7 @@
 use crate::deser::{DeserializableMessageFromIter, LdIter, LdSlice};
 use crate::tags;
 use crate::tags::{FieldLabelTag, FieldTypeTag};
-use crate::types::{FieldData, SliceViewFields};
+use crate::types::{FieldData, SliceViewField};
 use crate::variant::VariantTypeTag;
 use crate::{ErrorKind, Result};
 use std::collections::HashMap;
@@ -511,7 +511,7 @@ define_deser_repeated_variants!(tags::Enum<T>, T: (TryFrom<i32, Error = i32>) + 
 
 // This covers all Repeated fields and all Message types.
 impl<'slice, TypeTag, LabelTag> FieldDeserFromSlice<'slice, TypeTag, LabelTag>
-    for Option<SliceViewFields<'slice>>
+    for Option<SliceViewField<'slice>>
 where
     TypeTag: FieldTypeTag,
     LabelTag: FieldLabelTag,
@@ -523,33 +523,33 @@ where
         enclosing_ld_slice: LdSlice<'slice>,
     ) -> Result<()> {
         *self = match self.clone() {
-            None => Some(SliceViewFields::FieldsInSingleSlice {
+            None => Some(SliceViewField::FieldInSingleSlice {
                 ld_slice: ld_slice_from_this_field,
                 count: 1,
                 enclosing_ld_slice,
             }),
-            Some(SliceViewFields::FieldsInSingleSlice {
+            Some(SliceViewField::FieldInSingleSlice {
                 ld_slice,
                 count,
                 enclosing_ld_slice: existing_fields_enclosing_ld_slice,
             }) => Some(
                 if enclosing_ld_slice == existing_fields_enclosing_ld_slice {
-                    SliceViewFields::FieldsInSingleSlice {
+                    SliceViewField::FieldInSingleSlice {
                         ld_slice,
                         count: count + 1,
                         enclosing_ld_slice: existing_fields_enclosing_ld_slice,
                     }
                 } else {
-                    SliceViewFields::FieldsInMultipleSlices {
+                    SliceViewField::FieldInMultipleSlices {
                         count: count + 1,
                         first_enclosing_ld_slice: existing_fields_enclosing_ld_slice,
                     }
                 },
             ),
-            Some(SliceViewFields::FieldsInMultipleSlices {
+            Some(SliceViewField::FieldInMultipleSlices {
                 count,
                 first_enclosing_ld_slice,
-            }) => Some(SliceViewFields::FieldsInMultipleSlices {
+            }) => Some(SliceViewField::FieldInMultipleSlices {
                 count: count + 1,
                 first_enclosing_ld_slice,
             }),

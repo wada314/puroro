@@ -1,4 +1,4 @@
-use crate::types::SliceViewFields;
+use crate::types::SliceViewField;
 use std::collections::HashMap;
 
 /// We need this JUST ONLY for `::bumpalo::boxed::Box`, because it doesn't have
@@ -72,4 +72,4 @@ define_field_clone!(HashMap<K, V>, <K: Clone, V: Clone>);
 define_field_clone!(::bumpalo::collections::Vec<'bump, T>, <T: Clone>);
 #[cfg(feature = "puroro-bumpalo")]
 define_field_clone!(::bumpalo::collections::String<'bump>);
-define_field_clone!(SliceViewFields<'slice>, <'slice>);
+define_field_clone!(SliceViewField<'slice>, <'slice>);

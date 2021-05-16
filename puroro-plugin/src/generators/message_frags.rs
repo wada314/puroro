@@ -211,7 +211,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             }
             ImplType::SliceView { .. } => match (field.label()?, field.type_()?) {
                 (FieldLabel::Repeated, _) | (_, FieldType::Message(_)) => {
-                    "::std::option::Option<::puroro_internal::SliceViewFields<'slice>>".into()
+                    "::std::option::Option<::puroro_internal::SliceViewField<'slice>>".into()
                 }
                 (FieldLabel::Optional2, _) => format!(
                     "::std::option::Option<{scalar_type}>",

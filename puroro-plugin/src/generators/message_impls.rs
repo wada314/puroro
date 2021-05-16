@@ -180,7 +180,7 @@ fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
 }}
 
 fn try_new_with_parent(
-    parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewFields<'slice>>,
+    parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewField<'slice>>,
     field_number_in_parent: usize,
     parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
 ) -> ::puroro::Result<Self> {{

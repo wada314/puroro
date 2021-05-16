@@ -15,4 +15,4 @@ pub use helpers::{
     FieldClone, FieldDeserFromIter, FieldDeserFromSlice, FieldNew, FieldSer, FieldTakeOrInit,
     MapEntry,
 };
-pub use types::SliceViewFields;
+pub use types::SliceViewField;
