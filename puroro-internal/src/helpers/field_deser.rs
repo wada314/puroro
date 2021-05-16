@@ -57,8 +57,8 @@ where
     fn deser(
         &mut self,
         field: FieldData<LdSlice<'slice>>,
-        slice_from_this_field: &'slice [u8],
-        enclosing_slice: &'slice [u8],
+        slice_from_this_field: LdSlice<'slice>,
+        enclosing_slice: LdSlice<'slice>,
     ) -> Result<()>;
 }
 
@@ -69,8 +69,8 @@ macro_rules! redirect_deser_from_slice_to_from_iter {
             fn deser(
                 &mut self,
                 field: FieldData<LdSlice<'slice>>,
-                _: &'slice [u8],
-                _: &'slice [u8],
+                _: LdSlice<'slice>,
+                _: LdSlice<'slice>,
             ) -> Result<()> {
                 let mut ld_iter;
                 let new_field = match field {
@@ -235,8 +235,8 @@ macro_rules! define_deser_bare_ld_from_slice {
             fn deser(
                 &mut self,
                 field: FieldData<LdSlice<'slice>>,
-                _: &'slice [u8],
-                _: &'slice [u8],
+                _: LdSlice<'slice>,
+                _: LdSlice<'slice>,
             ) -> Result<()> {
                 match field {
                     FieldData::LengthDelimited(slice) => {
@@ -519,52 +519,39 @@ where
     fn deser(
         &mut self,
         field_data: FieldData<LdSlice<'slice>>,
-        slice_from_this_field: &'slice [u8],
-        enclosing_slice: &'slice [u8],
+        ld_slice_from_this_field: LdSlice<'slice>,
+        enclosing_ld_slice: LdSlice<'slice>,
     ) -> Result<()> {
-        let maybe_this_ld_field_content = if let FieldData::LengthDelimited(ld) = field_data {
-            Some(ld.as_slice())
-        } else {
-            None
-        };
-        *self = match self {
+        *self = match self.clone() {
             None => Some(SliceViewFields::FieldsInSingleSlice {
-                slice: slice_from_this_field,
+                ld_slice: ld_slice_from_this_field,
                 count: 1,
-                enclosing_slice,
-                last_ld_field_content: maybe_this_ld_field_content,
+                enclosing_slice: enclosing_ld_slice,
             }),
             Some(SliceViewFields::FieldsInSingleSlice {
-                slice,
+                ld_slice,
                 count,
-                enclosing_slice: existing_fields_enclosing_slice,
-                last_ld_field_content,
+                enclosing_slice: existing_fields_enclosing_ld_slice,
             }) => Some(
-                if std::ptr::eq(enclosing_slice, *existing_fields_enclosing_slice) {
+                if enclosing_ld_slice == existing_fields_enclosing_ld_slice {
                     SliceViewFields::FieldsInSingleSlice {
-                        slice,
-                        count: *count + 1,
-                        enclosing_slice: *existing_fields_enclosing_slice,
-                        last_ld_field_content: maybe_this_ld_field_content
-                            .or(*last_ld_field_content),
+                        ld_slice,
+                        count: count + 1,
+                        enclosing_slice: existing_fields_enclosing_ld_slice,
                     }
                 } else {
                     SliceViewFields::FieldsInMultipleSlices {
-                        count: *count + 1,
-                        first_enclosing_slice: *existing_fields_enclosing_slice,
-                        last_ld_field_content: maybe_this_ld_field_content
-                            .or(*last_ld_field_content),
+                        count: count + 1,
+                        first_enclosing_slice: existing_fields_enclosing_ld_slice,
                     }
                 },
             ),
             Some(SliceViewFields::FieldsInMultipleSlices {
                 count,
                 first_enclosing_slice,
-                last_ld_field_content,
             }) => Some(SliceViewFields::FieldsInMultipleSlices {
-                count: *count + 1,
+                count: count + 1,
                 first_enclosing_slice,
-                last_ld_field_content: maybe_this_ld_field_content.or(*last_ld_field_content),
             }),
         };
         Ok(())

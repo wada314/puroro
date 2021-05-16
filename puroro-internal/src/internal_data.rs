@@ -90,7 +90,7 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
         }
     }
 
-    pub fn slices(&self) -> impl Iterator<Item = LdSlice<'slice>> {
+    pub fn ld_slices(&self) -> impl Iterator<Item = LdSlice<'slice>> {
         self.source_slices.iter()
     }
 }
@@ -111,23 +111,19 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                     Either4::Two(std::iter::empty())
                 }
                 Some(SliceViewFields::FieldsInSingleSlice {
-                    slice: slice_of_fields_in_parent,
-                    count,
-                    enclosing_slice: _,
-                    last_ld_field_content: _,
+                    ld_slice, count, ..
                 }) => {
                     // iterate over a single slice given from a parent message,
                     // and choose out the fields that has proper field number.
-                    let ld_slice = LdSlice::new(slice_of_fields_in_parent);
                     let iter = ld_slice
                         .fields()
                         .filter_map(move |rfield| {
-                            let (field_number, field_data, _) = rfield.expect(
+                            let field = rfield.expect(
                                 "An error occured while deserializing the input. \
                                 Consider checking the data in earlier stage to catch this error.",
                             );
-                            if field_number == field_number_in_parent {
-                                if let FieldData::LengthDelimited(inner_ld_slice) = field_data {
+                            if field.number == field_number_in_parent {
+                                if let FieldData::LengthDelimited(inner_ld_slice) = field.data {
                                     Some(inner_ld_slice)
                                 } else {
                                     None
@@ -142,25 +138,23 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                 Some(SliceViewFields::FieldsInMultipleSlices {
                     count,
                     first_enclosing_slice,
-                    last_ld_field_content: _,
+                    ..
                 }) => {
                     // The parent message instance is scattering around multiple slices.
                     // In this case we need to iterate in the parent message recursively,
                     // that means we cannot use a static dispatching iterator because the type
                     // of the iterator recursives infinitely.
                     let iter = parent_internal_data
-                        .slices()
-                        .skip_while(move |ld_slice| {
-                            !std::ptr::eq(ld_slice.as_slice(), first_enclosing_slice)
-                        })
+                        .ld_slices()
+                        .skip_while(move |ld_slice| *ld_slice != first_enclosing_slice)
                         .flat_map(move |ld_slice| {
                             ld_slice.fields().filter_map(move |rfield| {
-                                let (field_number, field_data, _) = rfield.expect(
+                                let field = rfield.expect(
                                     "An error occured while deserializing the input. \
                                 Consider checking the data in earlier stage to catch this error.",
                                 );
-                                if field_number == field_number_in_parent {
-                                    if let FieldData::LengthDelimited(inner_ld_slice) = field_data {
+                                if field.number == field_number_in_parent {
+                                    if let FieldData::LengthDelimited(inner_ld_slice) = field.data {
                                         Some(inner_ld_slice)
                                     } else {
                                         None
@@ -216,28 +210,18 @@ fn slice_after<'a, 'b>(source: &'a [u8], prev: &'b [u8]) -> &'a [u8] {
 
 fn next_field_item_internal<'slice, 'p>(
     depth: usize,
-    prev_child_slice: &'slice [u8],
+    prev_child_field_slice: &'slice [u8],
     repeated_field: &'p Option<SliceViewFields<'slice>>,
     repeated_field_number: usize,
     internal_data: InternalDataForSliceViewStruct<'slice, 'p>,
 ) -> Result<Option<LdSlice<'slice>>> {
-    Ok(match repeated_field {
-        &Some(SliceViewFields::FieldsInSingleSlice {
-            slice,
-            count,
-            enclosing_slice,
-            last_ld_field_content,
-        }) => {
-            if let Some(last_slice) = last_ld_field_content {
-                if std::ptr::eq(last_slice, prev_child_slice) {
-                    return Ok(None);
-                }
-            }
-            let next_slice = LdSlice::new(slice_after(slice, prev_child_slice));
-            for rfield in next_slice.fields() {
-                let (field_number, field_data, _) = rfield?;
-                if field_number == repeated_field_number {
-                    if let FieldData::LengthDelimited(ld_slice) = field_data {
+    Ok(match repeated_field.clone() {
+        Some(SliceViewFields::FieldsInSingleSlice { mut ld_slice, .. }) => {
+            ld_slice.skip_until_end_of(prev_child_field_slice);
+            for rfield in ld_slice.fields() {
+                let field = rfield?;
+                if field.number == repeated_field_number {
+                    if let FieldData::LengthDelimited(ld_slice) = field.data {
                         return Ok(Some(ld_slice));
                     } else {
                         Err(ErrorKind::InvalidWireType)?
@@ -246,18 +230,12 @@ fn next_field_item_internal<'slice, 'p>(
             }
             None
         }
-        &Some(SliceViewFields::FieldsInMultipleSlices {
+        Some(SliceViewFields::FieldsInMultipleSlices {
             count,
             first_enclosing_slice,
-            last_ld_field_content,
         }) => {
-            if let Some(last_slice) = last_ld_field_content {
-                if std::ptr::eq(last_slice, prev_child_slice) {
-                    return Ok(None);
-                }
-            }
             todo!()
         }
-        &None => None,
+        None => None,
     })
 }

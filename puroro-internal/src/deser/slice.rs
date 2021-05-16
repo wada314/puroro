@@ -13,11 +13,12 @@ pub trait DeserializableMessageFromSlice<'slice> {
         &mut self,
         field: FieldData<LdSlice<'slice>>,
         field_number: usize,
-        slice_from_this_field: &'slice [u8],
-        enclosing_slice: &'slice [u8],
+        ld_slice_from_this_field: LdSlice<'slice>,
+        enclosing_ld_slice: LdSlice<'slice>,
     ) -> Result<bool>;
 }
 
+/// Maybe-multiple-fields over slice.
 /// A wrapper over slice which stores maybe multiple fields data.
 /// Ld = Length delimited = wiretype==2
 #[derive(Debug, Clone)]
@@ -33,7 +34,6 @@ impl<'slice> LdSlice<'slice> {
         &self,
         handler: &mut H,
     ) -> Result<()> {
-        let enclosing_slice = self.slice;
         let mut fields = self.fields();
 
         while let Some(rfield) = fields.next() {
@@ -44,7 +44,7 @@ impl<'slice> LdSlice<'slice> {
                 field.data,
                 field.number,
                 ld_slice_from_this_field,
-                enclosing_slice,
+                self.clone(),
             )? {
                 break;
             }
@@ -71,11 +71,26 @@ impl<'slice> LdSlice<'slice> {
         self.slice = new_slice;
     }
 
-    pub fn get_slice_by(&self, sub_slice: &'slice [u8]) -> &'slice [u8] {
+    pub fn skip_until_end_of(&mut self, given_slice: &'slice [u8]) {
+        let given_end = given_slice.as_ptr_range().end;
+        debug_assert!(self.as_slice().as_ptr_range().start <= given_end);
+        debug_assert!(given_end <= self.as_slice().as_ptr_range().end);
+        let skip_len = (given_end as usize) - (self.as_slice().as_ptr_range().start as usize);
+        self.slice = self.slice.split_at(skip_len).1;
+    }
+
+    pub fn get_slice_by_start_of(&self, sub_slice: &'slice [u8]) -> &'slice [u8] {
         debug_assert!(self.as_slice().as_ptr_range().start <= sub_slice.as_ptr_range().start);
         let mut length = (sub_slice.as_ptr() as usize) - (self.as_slice().as_ptr() as usize);
         length = usize::min(length, self.as_slice().len());
         self.as_slice().split_at(length).0
+    }
+}
+
+/// Compare by pointer address, unlike the normal slice's `PartialEq`.
+impl<'slice> PartialEq for LdSlice<'slice> {
+    fn eq(&self, other: &Self) -> bool {
+        std::ptr::eq(self.slice, other.slice)
     }
 }
 
@@ -91,8 +106,7 @@ pub struct Fields<'slice> {
 
 impl<'slice> Fields<'slice> {
     fn try_next(&mut self) -> Result<Option<FieldInSlice<'slice>>> {
-        let slice_from_this_field = self.ld_slice.as_slice();
-        match self.try_get_wire_type_and_field_number(slice_from_this_field)? {
+        match self.try_get_wire_type_and_field_number()? {
             None => {
                 Ok(None) // end of slice
             }
@@ -126,7 +140,7 @@ impl<'slice> Fields<'slice> {
                         if slice.len() < 8 {
                             Err(ErrorKind::UnexpectedInputTermination)?;
                         }
-                        let (bytes, remain) = slice_from_this_field.split_at(8);
+                        let (bytes, remain) = slice.split_at(8);
                         (
                             FieldData::Bits64(
                                 bytes
@@ -138,7 +152,7 @@ impl<'slice> Fields<'slice> {
                     }
                     WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
                 };
-                let field_slice = self.ld_slice.get_slice_by(remaining_slice);
+                let field_slice = self.ld_slice.get_slice_by_start_of(remaining_slice);
                 self.ld_slice.update_start_pos(remaining_slice);
                 Ok(Some(FieldInSlice {
                     number: field_number,
@@ -151,8 +165,8 @@ impl<'slice> Fields<'slice> {
 
     fn try_get_wire_type_and_field_number(
         &self,
-        mut slice: &'slice [u8],
     ) -> Result<Option<(WireType, usize, &'slice [u8])>> {
+        let mut slice = self.ld_slice.as_slice();
         if slice.len() == 0 {
             return Ok(None);
         }
@@ -189,8 +203,8 @@ where
         &mut self,
         field: FieldData<LdSlice<'slice>>,
         field_number: usize,
-        _: &'slice [u8],
-        _: &'slice [u8],
+        _: LdSlice<'slice>,
+        _: LdSlice<'slice>,
     ) -> Result<bool> {
         let mut ld_iter;
         let field_data = match field {

@@ -381,8 +381,8 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        slice_from_this_field: &'slice [u8],
-        enclosing_slice: &'slice [u8],
+        slice_from_this_field: ::puroro_internal::deser::LdSlice<'slice>,
+        enclosing_slice: ::puroro_internal::deser::LdSlice<'slice>,
     ) -> ::puroro::Result<bool>
     {{
         use ::puroro_internal::FieldDeserFromSlice;

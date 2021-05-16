@@ -314,7 +314,7 @@ impl<'slice, 'p> CodeGeneratorResponseSliceView<'slice, 'p> {
             file: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -332,7 +332,7 @@ impl<'slice, 'p> CodeGeneratorResponseSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -357,8 +357,8 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        slice_from_this_field: &'slice [u8],
-        enclosing_slice: &'slice [u8],
+        slice_from_this_field: ::puroro_internal::deser::LdSlice<'slice>,
+        enclosing_slice: ::puroro_internal::deser::LdSlice<'slice>,
     ) -> ::puroro::Result<bool>
     {
         use ::puroro_internal::FieldDeserFromSlice;
@@ -767,7 +767,7 @@ impl<'slice, 'p> FileSliceView<'slice, 'p> {
             generated_code_info: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -786,7 +786,7 @@ impl<'slice, 'p> FileSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -812,8 +812,8 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        slice_from_this_field: &'slice [u8],
-        enclosing_slice: &'slice [u8],
+        slice_from_this_field: ::puroro_internal::deser::LdSlice<'slice>,
+        enclosing_slice: ::puroro_internal::deser::LdSlice<'slice>,
     ) -> ::puroro::Result<bool>
     {
         use ::puroro_internal::FieldDeserFromSlice;
@@ -1217,7 +1217,7 @@ impl<'slice, 'p> CodeGeneratorRequestSliceView<'slice, 'p> {
             compiler_version: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -1236,7 +1236,7 @@ impl<'slice, 'p> CodeGeneratorRequestSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -1262,8 +1262,8 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        slice_from_this_field: &'slice [u8],
-        enclosing_slice: &'slice [u8],
+        slice_from_this_field: ::puroro_internal::deser::LdSlice<'slice>,
+        enclosing_slice: ::puroro_internal::deser::LdSlice<'slice>,
     ) -> ::puroro::Result<bool>
     {
         use ::puroro_internal::FieldDeserFromSlice;
@@ -1654,7 +1654,7 @@ impl<'slice, 'p> VersionSliceView<'slice, 'p> {
             suffix: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -1673,7 +1673,7 @@ impl<'slice, 'p> VersionSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -1699,8 +1699,8 @@ impl<'slice, 'p> ::puroro_internal::deser::DeserializableMessageFromSlice<'slice
         &mut self,
         field: ::puroro_internal::types::FieldData<::puroro_internal::deser::LdSlice<'slice>>, 
         field_number: usize,
-        slice_from_this_field: &'slice [u8],
-        enclosing_slice: &'slice [u8],
+        slice_from_this_field: ::puroro_internal::deser::LdSlice<'slice>,
+        enclosing_slice: ::puroro_internal::deser::LdSlice<'slice>,
     ) -> ::puroro::Result<bool>
     {
         use ::puroro_internal::FieldDeserFromSlice;
