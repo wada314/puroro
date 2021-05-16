@@ -39,7 +39,7 @@ impl<'slice> LdSlice<'slice> {
         while let Some(rfield) = fields.next() {
             let field = rfield?;
             let mut ld_slice_from_this_field = self.clone();
-            ld_slice_from_this_field.update_start_pos(field.slice);
+            ld_slice_from_this_field.skip_until_start_of(field.slice);
             if !handler.met_field_at(
                 field.data,
                 field.number,
@@ -62,28 +62,35 @@ impl<'slice> LdSlice<'slice> {
         }
     }
 
-    pub fn update_start_pos(&mut self, new_slice: &'slice [u8]) {
-        debug_assert!(self.as_slice().as_ptr_range().start <= new_slice.as_ptr_range().start);
-        debug_assert_eq!(
-            self.as_slice().as_ptr_range().end,
-            new_slice.as_ptr_range().end
-        );
-        self.slice = new_slice;
+    pub fn skip_until_start_of(&mut self, given_slice: &'slice [u8]) {
+        let given_start = given_slice.as_ptr_range().start;
+        debug_assert!(self.start() <= given_start);
+        debug_assert!(given_start <= self.end());
+        let skip_len = (given_start as usize) - (self.start() as usize);
+        self.slice = self.slice.split_at(skip_len).1;
     }
 
     pub fn skip_until_end_of(&mut self, given_slice: &'slice [u8]) {
         let given_end = given_slice.as_ptr_range().end;
-        debug_assert!(self.as_slice().as_ptr_range().start <= given_end);
-        debug_assert!(given_end <= self.as_slice().as_ptr_range().end);
-        let skip_len = (given_end as usize) - (self.as_slice().as_ptr_range().start as usize);
+        debug_assert!(self.start() <= given_end);
+        debug_assert!(given_end <= self.end());
+        let skip_len = (given_end as usize) - (self.start() as usize);
         self.slice = self.slice.split_at(skip_len).1;
     }
 
     pub fn get_slice_by_start_of(&self, sub_slice: &'slice [u8]) -> &'slice [u8] {
-        debug_assert!(self.as_slice().as_ptr_range().start <= sub_slice.as_ptr_range().start);
-        let mut length = (sub_slice.as_ptr() as usize) - (self.as_slice().as_ptr() as usize);
+        debug_assert!(self.start() <= sub_slice.as_ptr_range().start);
+        let mut length = (sub_slice.as_ptr_range().start as usize) - (self.start() as usize);
         length = usize::min(length, self.as_slice().len());
         self.as_slice().split_at(length).0
+    }
+
+    fn start(&self) -> *const u8 {
+        self.as_slice().as_ptr_range().start
+    }
+
+    fn end(&self) -> *const u8 {
+        self.as_slice().as_ptr_range().end
     }
 }
 
@@ -153,7 +160,7 @@ impl<'slice> Fields<'slice> {
                     WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
                 };
                 let field_slice = self.ld_slice.get_slice_by_start_of(remaining_slice);
-                self.ld_slice.update_start_pos(remaining_slice);
+                self.ld_slice.skip_until_start_of(remaining_slice);
                 Ok(Some(FieldInSlice {
                     number: field_number,
                     data: field_data,
