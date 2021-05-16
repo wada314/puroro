@@ -174,68 +174,13 @@ impl<'slice, 'p> SourceLdSlices<'slice, 'p> {
     }
 }
 
+struct SourceLdSlicesIter<'slice, 'p> {
+    container: &'p SourceLdSlices<'slice, 'p>,
+    prev_ld_slice: Option<LdSlice<'slice>>,
+}
+
 impl<'bump, 'slice, 'p> InternalData<'bump> for InternalDataForSliceViewStruct<'slice, 'p> {
     fn bumpalo(&self) -> &'bump bumpalo::Bump {
         panic!("The Bumpalo data field is only available for a Bumpalo struct!")
     }
-}
-
-fn start_address(s: &[u8]) -> usize {
-    s.as_ptr_range().start as usize
-}
-
-fn end_address(s: &[u8]) -> usize {
-    s.as_ptr_range().end as usize
-}
-
-// Inclusive.
-fn is_subslice_of(smaller: &[u8], larger: &[u8]) -> bool {
-    let s = smaller.as_ptr_range();
-    let l = larger.as_ptr_range();
-    l.start <= s.start && s.end <= l.end
-}
-
-/// ```
-/// let a = &[1, 2, 3, 4, 5];
-/// let subview = &a[1:3];
-/// assert_eq!(slice_after(a, subview), &[4, 5]);
-/// ```
-fn slice_after<'a, 'b>(source: &'a [u8], prev: &'b [u8]) -> &'a [u8] {
-    let mut new_start_index = end_address(prev) - start_address(source);
-    if new_start_index > source.len() {
-        new_start_index = source.len();
-    }
-    source.split_at(new_start_index).1
-}
-
-fn next_field_item_internal<'slice, 'p>(
-    depth: usize,
-    prev_child_field_slice: &'slice [u8],
-    repeated_field: &'p Option<SliceViewField<'slice>>,
-    repeated_field_number: usize,
-    internal_data: InternalDataForSliceViewStruct<'slice, 'p>,
-) -> Result<Option<LdSlice<'slice>>> {
-    Ok(match repeated_field.clone() {
-        Some(SliceViewField::FieldInSingleSlice { mut ld_slice, .. }) => {
-            ld_slice.skip_until_end_of(prev_child_field_slice);
-            for rfield in ld_slice.fields() {
-                let field = rfield?;
-                if field.number == repeated_field_number {
-                    if let FieldData::LengthDelimited(ld_slice) = field.data {
-                        return Ok(Some(ld_slice));
-                    } else {
-                        Err(ErrorKind::InvalidWireType)?
-                    }
-                }
-            }
-            None
-        }
-        Some(SliceViewField::FieldInMultipleSlices {
-            count,
-            first_enclosing_ld_slice: first_enclosing_slice,
-        }) => {
-            todo!()
-        }
-        None => None,
-    })
 }
