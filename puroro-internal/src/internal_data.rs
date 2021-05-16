@@ -137,7 +137,7 @@ impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
                 }
                 Some(SliceViewFields::FieldsInMultipleSlices {
                     count,
-                    first_enclosing_slice,
+                    first_enclosing_ld_slice: first_enclosing_slice,
                     ..
                 }) => {
                     // The parent message instance is scattering around multiple slices.
@@ -232,7 +232,7 @@ fn next_field_item_internal<'slice, 'p>(
         }
         Some(SliceViewFields::FieldsInMultipleSlices {
             count,
-            first_enclosing_slice,
+            first_enclosing_ld_slice: first_enclosing_slice,
         }) => {
             todo!()
         }

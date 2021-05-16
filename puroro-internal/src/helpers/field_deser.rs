@@ -518,7 +518,7 @@ where
 {
     fn deser(
         &mut self,
-        field_data: FieldData<LdSlice<'slice>>,
+        _: FieldData<LdSlice<'slice>>,
         ld_slice_from_this_field: LdSlice<'slice>,
         enclosing_ld_slice: LdSlice<'slice>,
     ) -> Result<()> {
@@ -526,32 +526,32 @@ where
             None => Some(SliceViewFields::FieldsInSingleSlice {
                 ld_slice: ld_slice_from_this_field,
                 count: 1,
-                enclosing_slice: enclosing_ld_slice,
+                enclosing_ld_slice,
             }),
             Some(SliceViewFields::FieldsInSingleSlice {
                 ld_slice,
                 count,
-                enclosing_slice: existing_fields_enclosing_ld_slice,
+                enclosing_ld_slice: existing_fields_enclosing_ld_slice,
             }) => Some(
                 if enclosing_ld_slice == existing_fields_enclosing_ld_slice {
                     SliceViewFields::FieldsInSingleSlice {
                         ld_slice,
                         count: count + 1,
-                        enclosing_slice: existing_fields_enclosing_ld_slice,
+                        enclosing_ld_slice: existing_fields_enclosing_ld_slice,
                     }
                 } else {
                     SliceViewFields::FieldsInMultipleSlices {
                         count: count + 1,
-                        first_enclosing_slice: existing_fields_enclosing_ld_slice,
+                        first_enclosing_ld_slice: existing_fields_enclosing_ld_slice,
                     }
                 },
             ),
             Some(SliceViewFields::FieldsInMultipleSlices {
                 count,
-                first_enclosing_slice,
+                first_enclosing_ld_slice,
             }) => Some(SliceViewFields::FieldsInMultipleSlices {
                 count: count + 1,
-                first_enclosing_slice,
+                first_enclosing_ld_slice,
             }),
         };
         Ok(())
