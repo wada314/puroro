@@ -120,7 +120,7 @@ impl<'slice> Fields<'slice> {
                         let ld_length =
                             Variant::decode_bytes(&mut slice.by_ref().bytes())?.to_usize()?;
                         let (inner_slice, rest) = slice.split_at(ld_length);
-                        (FieldData::LengthDelimited(LdSlice::new(inner_slice)), slice)
+                        (FieldData::LengthDelimited(LdSlice::new(inner_slice)), rest)
                     }
                     WireType::Bits32 => {
                         if slice.len() < 4 {
