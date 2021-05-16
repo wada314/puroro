@@ -57,12 +57,12 @@ impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
 
 #[derive(Debug, Clone)]
 pub struct InternalDataForSliceViewStruct<'slice, 'p> {
-    source_slices: SourceSlicesView<'slice, 'p>,
+    source_ld_slices: SourceLdSlices<'slice, 'p>,
 }
 #[derive(Debug, Clone)]
-pub enum SourceSlicesView<'slice, 'p> {
-    SingleSlice(LdSlice<'slice>),
-    MaybeMultipleSlice {
+pub enum SourceLdSlices<'slice, 'p> {
+    SingleLdSlice(LdSlice<'slice>),
+    MaybeMultipleLdSlices {
         field_in_parent: Option<&'p SliceViewField<'slice>>,
         field_number_in_parent: usize,
         parent_internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
@@ -72,7 +72,7 @@ pub enum SourceSlicesView<'slice, 'p> {
 impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     pub fn new(slice: &'slice [u8]) -> Self {
         Self {
-            source_slices: SourceSlicesView::SingleSlice(LdSlice::new(slice)),
+            source_ld_slices: SourceLdSlices::SingleLdSlice(LdSlice::new(slice)),
         }
     }
 
@@ -82,25 +82,25 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
         parent_internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
     ) -> Self {
         Self {
-            source_slices: SourceSlicesView::MaybeMultipleSlice {
+            source_ld_slices: SourceLdSlices::MaybeMultipleLdSlices {
                 field_in_parent: parent_field.as_ref(),
                 field_number_in_parent,
-                parent_internal_data: parent_internal_data,
+                parent_internal_data,
             },
         }
     }
 
     pub fn ld_slices(&self) -> impl Iterator<Item = LdSlice<'slice>> {
-        self.source_slices.iter()
+        self.source_ld_slices.iter()
     }
 }
-impl<'slice, 'p> SourceSlicesView<'slice, 'p> {
+impl<'slice, 'p> SourceLdSlices<'slice, 'p> {
     pub fn iter(&self) -> impl Iterator<Item = LdSlice<'slice>> {
         match self.clone() {
-            SourceSlicesView::SingleSlice(ld_slice) => {
+            SourceLdSlices::SingleLdSlice(ld_slice) => {
                 Either4::One(std::iter::once(ld_slice.clone()))
             }
-            SourceSlicesView::MaybeMultipleSlice {
+            SourceLdSlices::MaybeMultipleLdSlices {
                 field_in_parent,
                 field_number_in_parent,
                 parent_internal_data,
