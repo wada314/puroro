@@ -1,5 +1,6 @@
 use crate::deser::LdSlice;
 use crate::types::{FieldData, SliceViewFields};
+use crate::{ErrorKind, Result};
 use ::either_n::Either4;
 use puroro::InternalData;
 use std::collections::HashMap;
@@ -185,27 +186,78 @@ impl<'bump, 'slice, 'p> InternalData<'bump> for InternalDataForSliceViewStruct<'
     }
 }
 
+fn start_address(s: &[u8]) -> usize {
+    s.as_ptr_range().start as usize
+}
+
 fn end_address(s: &[u8]) -> usize {
     s.as_ptr_range().end as usize
 }
 
+// Inclusive.
+fn is_subslice_of(smaller: &[u8], larger: &[u8]) -> bool {
+    let s = smaller.as_ptr_range();
+    let l = larger.as_ptr_range();
+    l.start <= s.start && s.end <= l.end
+}
+
+/// ```
+/// let a = &[1, 2, 3, 4, 5];
+/// let subview = &a[1:3];
+/// assert_eq!(slice_after(a, subview), &[4, 5]);
+/// ```
+fn slice_after<'a, 'b>(source: &'a [u8], prev: &'b [u8]) -> &'a [u8] {
+    let mut new_start_index = end_address(prev) - start_address(source);
+    if new_start_index > source.len() {
+        new_start_index = source.len();
+    }
+    source.split_at(new_start_index).1
+}
+
 fn next_field_item_internal<'slice, 'p>(
     depth: usize,
-    last_childs_field: &'slice [u8],
+    prev_child_slice: &'slice [u8],
     repeated_field: &'p Option<SliceViewFields<'slice>>,
     repeated_field_number: usize,
     internal_data: InternalDataForSliceViewStruct<'slice, 'p>,
-) -> Option<LdSlice<'slice>> {
-    match internal_data.source_slices {
-        SourceSlicesView::SingleSlice(ld_slice) => {
+) -> Result<Option<LdSlice<'slice>>> {
+    Ok(match repeated_field {
+        &Some(SliceViewFields::FieldsInSingleSlice {
+            slice,
+            count,
+            enclosing_slice,
+            last_ld_field_content,
+        }) => {
+            if let Some(last_slice) = last_ld_field_content {
+                if std::ptr::eq(last_slice, prev_child_slice) {
+                    return Ok(None);
+                }
+            }
+            let next_slice = LdSlice::new(slice_after(slice, prev_child_slice));
+            for rfield in next_slice.fields() {
+                let (field_number, field_data, _) = rfield?;
+                if field_number == repeated_field_number {
+                    if let FieldData::LengthDelimited(ld_slice) = field_data {
+                        return Ok(Some(ld_slice));
+                    } else {
+                        Err(ErrorKind::InvalidWireType)?
+                    }
+                }
+            }
+            None
+        }
+        &Some(SliceViewFields::FieldsInMultipleSlices {
+            count,
+            first_enclosing_slice,
+            last_ld_field_content,
+        }) => {
+            if let Some(last_slice) = last_ld_field_content {
+                if std::ptr::eq(last_slice, prev_child_slice) {
+                    return Ok(None);
+                }
+            }
             todo!()
         }
-        SourceSlicesView::MaybeMultipleSlice {
-            field_in_parent,
-            field_number_in_parent,
-            parent_internal_data,
-        } => {
-            todo!()
-        }
-    }
+        &None => None,
+    })
 }
