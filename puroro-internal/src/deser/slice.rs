@@ -36,12 +36,14 @@ impl<'slice> LdSlice<'slice> {
         let enclosing_slice = self.slice;
         let mut fields = self.fields();
 
-        while let Some(field) = fields.next() {
-            let (field_number, field_data, slice_from_this_field) = field?;
+        while let Some(rfield) = fields.next() {
+            let field = rfield?;
+            let mut ld_slice_from_this_field = self.clone();
+            ld_slice_from_this_field.update_start_pos(field.slice);
             if !handler.met_field_at(
-                field_data,
-                field_number,
-                slice_from_this_field,
+                field.data,
+                field.number,
+                ld_slice_from_this_field,
                 enclosing_slice,
             )? {
                 break;
@@ -56,80 +58,115 @@ impl<'slice> LdSlice<'slice> {
 
     pub fn fields(&self) -> Fields<'slice> {
         Fields {
-            slice: self.as_slice(),
+            ld_slice: self.clone(),
         }
+    }
+
+    pub fn update_start_pos(&mut self, new_slice: &'slice [u8]) {
+        debug_assert!(self.as_slice().as_ptr_range().start <= new_slice.as_ptr_range().start);
+        debug_assert_eq!(
+            self.as_slice().as_ptr_range().end,
+            new_slice.as_ptr_range().end
+        );
+        self.slice = new_slice;
+    }
+
+    pub fn get_slice_by(&self, sub_slice: &'slice [u8]) -> &'slice [u8] {
+        debug_assert!(self.as_slice().as_ptr_range().start <= sub_slice.as_ptr_range().start);
+        let mut length = (sub_slice.as_ptr() as usize) - (self.as_slice().as_ptr() as usize);
+        length = usize::min(length, self.as_slice().len());
+        self.as_slice().split_at(length).0
     }
 }
 
+pub struct FieldInSlice<'slice> {
+    pub number: usize,
+    pub data: FieldData<LdSlice<'slice>>,
+    pub slice: &'slice [u8],
+}
+
 pub struct Fields<'slice> {
-    slice: &'slice [u8],
+    ld_slice: LdSlice<'slice>,
 }
 
 impl<'slice> Fields<'slice> {
-    fn try_next(&mut self) -> Result<Option<(usize, FieldData<LdSlice<'slice>>, &'slice [u8])>> {
-        Ok(match self.try_get_wire_type_and_field_number()? {
+    fn try_next(&mut self) -> Result<Option<FieldInSlice<'slice>>> {
+        let slice_from_this_field = self.ld_slice.as_slice();
+        match self.try_get_wire_type_and_field_number(slice_from_this_field)? {
             None => {
-                None // end of slice
+                Ok(None) // end of slice
             }
-            Some((wire_type, field_number)) => {
-                let slice_from_this_field = self.slice;
-                let field_data = match wire_type {
+            Some((wire_type, field_number, mut slice)) => {
+                let (field_data, remaining_slice) = match wire_type {
                     WireType::Variant => {
-                        let variant = Variant::decode_bytes(&mut self.slice.by_ref().bytes())?;
-                        FieldData::Variant(variant)
+                        let variant = Variant::decode_bytes(&mut slice.by_ref().bytes())?;
+                        (FieldData::Variant(variant), slice)
                     }
                     WireType::LengthDelimited => {
-                        let field_length =
-                            Variant::decode_bytes(&mut self.slice.by_ref().bytes())?.to_usize()?;
-                        let (inner_slice, rest) = self.slice.split_at(field_length);
-                        self.slice = rest;
-                        FieldData::LengthDelimited(LdSlice::new(inner_slice))
+                        let ld_length =
+                            Variant::decode_bytes(&mut slice.by_ref().bytes())?.to_usize()?;
+                        let (inner_slice, rest) = slice.split_at(ld_length);
+                        (FieldData::LengthDelimited(LdSlice::new(inner_slice)), slice)
                     }
                     WireType::Bits32 => {
-                        if self.slice.len() < 4 {
+                        if slice.len() < 4 {
                             Err(ErrorKind::UnexpectedInputTermination)?;
                         }
-                        let (bytes, rest) = self.slice.split_at(4);
-                        self.slice = rest;
-                        FieldData::Bits32(
-                            bytes
-                                .try_into()
-                                .map_err(|_| ErrorKind::UnexpectedInputTermination)?,
+                        let (bytes, remain) = slice.split_at(4);
+                        (
+                            FieldData::Bits32(
+                                bytes
+                                    .try_into()
+                                    .map_err(|_| ErrorKind::UnexpectedInputTermination)?,
+                            ),
+                            remain,
                         )
                     }
                     WireType::Bits64 => {
-                        if self.slice.len() < 8 {
+                        if slice.len() < 8 {
                             Err(ErrorKind::UnexpectedInputTermination)?;
                         }
-                        let (bytes, rest) = self.slice.split_at(8);
-                        self.slice = rest;
-                        FieldData::Bits64(
-                            bytes
-                                .try_into()
-                                .map_err(|_| ErrorKind::UnexpectedInputTermination)?,
+                        let (bytes, remain) = slice_from_this_field.split_at(8);
+                        (
+                            FieldData::Bits64(
+                                bytes
+                                    .try_into()
+                                    .map_err(|_| ErrorKind::UnexpectedInputTermination)?,
+                            ),
+                            remain,
                         )
                     }
                     WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
                 };
-                Some((field_number, field_data, slice_from_this_field))
+                let field_slice = self.ld_slice.get_slice_by(remaining_slice);
+                self.ld_slice.update_start_pos(remaining_slice);
+                Ok(Some(FieldInSlice {
+                    number: field_number,
+                    data: field_data,
+                    slice: field_slice,
+                }))
             }
-        })
+        }
     }
 
-    fn try_get_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, usize)>> {
-        if self.slice.len() == 0 {
+    fn try_get_wire_type_and_field_number(
+        &self,
+        mut slice: &'slice [u8],
+    ) -> Result<Option<(WireType, usize, &'slice [u8])>> {
+        if slice.len() == 0 {
             return Ok(None);
         }
-        let header = { Variant::decode_bytes(&mut self.slice.by_ref().bytes())?.to_usize()? };
+        let header = { Variant::decode_bytes(&mut slice.by_ref().bytes())?.to_usize()? };
         Ok(Some((
             WireType::from_usize(header & 0x07).ok_or(ErrorKind::InvalidWireType)?,
             (header >> 3),
+            slice,
         )))
     }
 }
 
 impl<'slice> Iterator for Fields<'slice> {
-    type Item = Result<(usize, FieldData<LdSlice<'slice>>, &'slice [u8])>;
+    type Item = Result<FieldInSlice<'slice>>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.try_next().transpose()
