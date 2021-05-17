@@ -14,7 +14,9 @@ bumpalo = { git = "https://github.com/fitzgen/bumpalo.git", features = ["collect
 num-traits = "0.2.14"
 num-derive = "0.3.3"
 utf8-decode = "1.0.1"
-itertools = "0.10.0"
+# Requires this commit to be included:
+# https://github.com/rust-itertools/itertools/commit/125502571abfe49b619bc9ce0adde47414a1a601
+itertools = { git = "https://github.com/rust-itertools/itertools" }
 either_n = "0.2.0"
 
 [features]
