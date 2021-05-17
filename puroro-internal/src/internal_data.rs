@@ -94,6 +94,14 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     pub fn ld_slices(&'p self) -> impl 'p + Iterator<Item = Result<LdSlice<'slice>>> {
         SourceLdSlicesIter::<'slice, 'p>::new(&self.source_ld_slices, None)
     }
+
+    pub fn field_data_iter(
+        &'p self,
+        field_number: usize,
+        field: &'p Option<SliceViewField<'slice>>,
+    ) -> impl 'p + Iterator<Item = Result<FieldData<LdSlice<'slice>>>> {
+        SourceLdSlicesIter::<'slice, 'p>::new(&self.source_ld_slices, None)
+    }
 }
 
 struct SourceLdSlicesIter<'slice, 'p> {
@@ -120,41 +128,53 @@ impl<'slice, 'p> SourceLdSlicesIter<'slice, 'p> {
     }
 
     fn try_next(&mut self) -> Result<Option<LdSlice<'slice>>> {
-        let result = match (self.container.clone(), self.prev_ld_slice.clone()) {
-            (SourceLdSlices::SingleLdSlice(slice), None) => Some(slice),
-            (SourceLdSlices::SingleLdSlice(_), Some(_)) => None,
-            (
-                SourceLdSlices::MaybeMultipleLdSlices {
-                    field_in_parent,
-                    field_number_in_parent,
-                    parent_internal_data,
-                },
-                None,
-            ) => {
-                parent_internal_data
+        let result = match self.container.clone() {
+            SourceLdSlices::SingleLdSlice(slice) => match &self.prev_ld_slice {
+                &Some(prev_ld_slice) => {
+                    debug_assert_eq!(prev_ld_slice, slice);
+                    Ok(None)
+                }
+                &None => Ok(Some(slice)),
+            },
+            SourceLdSlices::MaybeMultipleLdSlices {
+                field_in_parent,
+                field_number_in_parent,
+                parent_internal_data,
+            } => {
+                // WRONG. before getting parent_internal_data.ld_slices(), we need to check if
+                // the field_in_parent is singular slice or multiple slices. We need to go to parent_internal_data
+                // only in the latter case.
+                let ld_slices_iter = parent_internal_data
                     .ld_slices()
                     .map_ok(|ld_slice| ld_slice.fields())
                     .flatten_ok()
-                    // ↓ i.e. Result<Result<T, E>, E>::flatten() => Result<T, E>, which is not stable yet.
+                    // ↓ i.e. Result<Result<T, E>, E>::flatten() => Result<T, E>, which is not in stable std yet.
                     .map(|rrfield| rrfield.and_then(|x| x))
-                    .filter_map_ok(|field| {
+                    .filter_map_ok(|field| -> Option<Result<_>> {
                         if field.number == field_number_in_parent {
                             if let FieldData::LengthDelimited(ld_slice) = field.data {
-                                return Some(ld_slice);
+                                Some(Ok(ld_slice))
+                            } else {
+                                Some(Err(ErrorKind::UnexpectedWireType.into()))
                             }
+                        } else {
+                            None
                         }
-                        None
-                    });
-                todo!()
+                    })
+                    .map(|rrfield| rrfield.and_then(|x| x));
+                match self.prev_ld_slice.clone() {
+                    Some(prev_ld_slice) => {
+                        // Skip until we see the prev_ld_slice value, and then get the next value.
+                        ld_slices_iter
+                            .skip_while(|rld_slice| {
+                                rld_slice.map_or(true, |rd_slice| rd_slice != prev_ld_slice)
+                            })
+                            .nth(1)
+                    }
+                    None => ld_slices_iter.next(),
+                }
+                .transpose()
             }
-            (
-                SourceLdSlices::MaybeMultipleLdSlices {
-                    field_in_parent,
-                    field_number_in_parent,
-                    parent_internal_data,
-                },
-                Some(_),
-            ) => {}
         };
         self.prev_ld_slice = result.or(self.prev_ld_slice);
         result

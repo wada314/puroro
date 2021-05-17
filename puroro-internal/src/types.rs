@@ -27,6 +27,7 @@ pub enum FieldData<T> {
 
 #[derive(Debug, Clone)]
 pub enum SliceViewField<'slice> {
+    /// This field is embedded in a single slice. Simple.
     FieldInSingleSlice {
         /// A subslice of `enclosing_slice` starting from this field's item.
         ld_slice: LdSlice<'slice>,
@@ -34,6 +35,10 @@ pub enum SliceViewField<'slice> {
         count: usize,
         enclosing_ld_slice: LdSlice<'slice>,
     },
+    /// The field's owner message is constructed from multiple slices (and merged then),
+    /// so we cannot store the arbitrary length list of the source slice
+    /// in a stack memory.
+    /// In this case, we need to get the list of LdSlices from puroro_internal field.
     FieldInMultipleSlices {
         count: usize,
         first_enclosing_ld_slice: LdSlice<'slice>,
