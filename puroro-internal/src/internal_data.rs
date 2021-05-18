@@ -91,6 +91,8 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     /// If your purpose to get a certain field's data then make sure that field ([`SliceViewField`])'s  
     /// variant is [`SliceViewField::FieldInMultipleSlices`]. If it is [`SliceViewField::FieldInSingleSlice`],
     /// then you can use that enum variant's `ld_slice` field for shortcut.
+    /// Note that iterating over this iterator takes O(n^2) time where n is the iterator length.
+    /// We believe n (== the number of messages merged) is very small in the most usecases.
     pub fn ld_slices_from_parent_message(
         &'p self,
     ) -> impl 'p + Iterator<Item = Result<LdSlice<'slice>>> {
@@ -133,6 +135,7 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
                         first_enclosing_ld_slice,
                     } => {
                         // A difficult case. The field is consist of multiple separated slices.
+                        // This case can happen if the message is merged from multiple instances.
                         Either::Right(
                             self.ld_slices_from_parent_message()
                                 .skip_while(move |rld_slice| match rld_slice.as_ref() {
