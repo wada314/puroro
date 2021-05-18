@@ -56,6 +56,8 @@ impl<'slice> LdSlice<'slice> {
         self.slice
     }
 
+    /// Returns an `Iterator<Item = Result<FieldInSlice<'slice>>>`.
+    /// See also [`FieldInSlice`].
     pub fn fields(&self) -> Fields<'slice> {
         Fields {
             ld_slice: self.clone(),
@@ -104,6 +106,8 @@ impl<'slice> PartialEq for LdSlice<'slice> {
 pub struct FieldInSlice<'slice> {
     pub number: usize,
     pub data: FieldData<LdSlice<'slice>>,
+    /// The slice corresponding to this field data.
+    /// i.e. The encoded field number, wire type, and the field body.
     pub slice: &'slice [u8],
 }
 

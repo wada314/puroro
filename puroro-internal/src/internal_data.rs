@@ -47,10 +47,6 @@ impl<'bump> InternalDataForBumpaloStruct<'bump> {
     }
 }
 impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
-    /// Note that the returned bumpalo lifetime is not `'bump' but `'_`.
-    /// This is because I don't want to introduce the lifetime parameter
-    /// `'b` into the trait's definition. The lifetime `'_` might be shorter
-    /// than `'b`, but I believe it's not a problem.
     fn bumpalo(&self) -> &'bump bumpalo::Bump {
         self.bump
     }
@@ -64,7 +60,7 @@ pub struct InternalDataForSliceViewStruct<'slice, 'p> {
 pub enum SourceLdSlices<'slice, 'p> {
     SingleLdSlice(LdSlice<'slice>),
     MaybeMultipleLdSlices {
-        field_in_parent: Option<&'p SliceViewField<'slice>>,
+        field_in_parent: &'p Option<SliceViewField<'slice>>,
         field_number_in_parent: usize,
         parent_internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
     },
@@ -84,100 +80,149 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     ) -> Self {
         Self {
             source_ld_slices: SourceLdSlices::MaybeMultipleLdSlices {
-                field_in_parent: parent_field.as_ref(),
+                field_in_parent: parent_field,
                 field_number_in_parent,
                 parent_internal_data,
             },
         }
     }
 
-    pub fn ld_slices(&'p self) -> impl 'p + Iterator<Item = Result<LdSlice<'slice>>> {
-        SourceLdSlicesIter::<'slice, 'p>::new(&self.source_ld_slices, None)
+    /// Get the list of the slices which is the source of this Message.
+    /// If your purpose to get a certain field's data then make sure that field ([`SliceViewField`])'s  
+    /// variant is [`SliceViewField::FieldInMultipleSlices`]. If it is [`SliceViewField::FieldInSingleSlice`],
+    /// then you can use that enum variant's `ld_slice` field for shortcut.
+    pub fn ld_slices_from_parent_message(
+        &'p self,
+    ) -> impl 'p + Iterator<Item = Result<LdSlice<'slice>>> {
+        match self.source_ld_slices.clone() {
+            SourceLdSlices::SingleLdSlice(ld_slice) => Either::Left(std::iter::once(Ok(ld_slice))),
+            SourceLdSlices::MaybeMultipleLdSlices {
+                field_in_parent,
+                field_number_in_parent,
+                parent_internal_data,
+            } => Either::Right(MultipleSourceLdSlicesIter::<'slice, 'p>::new(
+                field_number_in_parent,
+                field_in_parent,
+                parent_internal_data,
+                None,
+            )),
+        }
+        .into_iter()
     }
 
+    /// Returns an iterator over the specifield field number's [`FieldData`] instance.
     pub fn field_data_iter(
         &'p self,
         field_number: usize,
         field: &'p Option<SliceViewField<'slice>>,
     ) -> impl 'p + Iterator<Item = Result<FieldData<LdSlice<'slice>>>> {
-        SourceLdSlicesIter::<'slice, 'p>::new(&self.source_ld_slices, None)
+        // The iter of `ld_slice` which consists the specified field.
+        // Note that this might be a smaller set when compared with the `ld_slice`s consisting
+        // the message struct. For example, even if there's a message consist of 3 separated slices,
+        // but a certain field k can be consist of only the 2nd slice.
+        let ld_slices = field
+            .iter()
+            .map(move |field| {
+                match field {
+                    SliceViewField::FieldInSingleSlice { ld_slice, .. } => {
+                        // The field is consist of a single slice. Easy case.
+                        Either::Left(std::iter::once(Ok(ld_slice.clone())))
+                    }
+                    SliceViewField::FieldInMultipleSlices {
+                        count,
+                        first_enclosing_ld_slice,
+                    } => {
+                        // A difficult case. The field is consist of multiple separated slices.
+                        Either::Right(
+                            self.ld_slices_from_parent_message()
+                                .skip_while(move |rld_slice| match rld_slice.as_ref() {
+                                    Ok(ld_slice) => *ld_slice != *first_enclosing_ld_slice,
+                                    Err(_) => true,
+                                })
+                                .take(*count),
+                        )
+                    }
+                }
+                .into_iter()
+            })
+            .flatten();
+        ld_slices
+            .map_ok(|ld_slice| ld_slice.fields())
+            .flatten_ok()
+            // ↓ same with unstable Result::flatten.
+            .map(|rrfield| rrfield.and_then(|x| x))
+            .filter_map_ok(move |field| {
+                if field.number == field_number {
+                    Some(field.data)
+                } else {
+                    None
+                }
+            })
     }
 }
 
-struct SourceLdSlicesIter<'slice, 'p> {
-    container: &'p SourceLdSlices<'slice, 'p>,
+struct MultipleSourceLdSlicesIter<'slice, 'p> {
+    field_number: usize,
+    field: &'p Option<SliceViewField<'slice>>,
+    internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
+
     prev_ld_slice: Option<LdSlice<'slice>>,
 }
 
-impl<'slice, 'p> Iterator for SourceLdSlicesIter<'slice, 'p> {
+impl<'slice, 'p> Iterator for MultipleSourceLdSlicesIter<'slice, 'p> {
     type Item = Result<LdSlice<'slice>>;
     fn next(&mut self) -> Option<Self::Item> {
         self.try_next().transpose()
     }
 }
 
-impl<'slice, 'p> SourceLdSlicesIter<'slice, 'p> {
+impl<'slice, 'p> MultipleSourceLdSlicesIter<'slice, 'p> {
     fn new(
-        container: &'p SourceLdSlices<'slice, 'p>,
+        field_number: usize,
+        field: &'p Option<SliceViewField<'slice>>,
+        internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
         prev_ld_slice: Option<LdSlice<'slice>>,
     ) -> Self {
         Self {
-            container,
+            field_number,
+            field,
+            internal_data,
             prev_ld_slice,
         }
     }
 
     fn try_next(&mut self) -> Result<Option<LdSlice<'slice>>> {
-        let result = match self.container.clone() {
-            SourceLdSlices::SingleLdSlice(slice) => match &self.prev_ld_slice {
-                &Some(prev_ld_slice) => {
-                    debug_assert_eq!(prev_ld_slice, slice);
-                    Ok(None)
+        // An iterator of ld_slices which consists the message struct.
+        // Note that this iterator type contains this [`MultipleSourceLdSlicesIter`] type
+        // so we cannot remember this iterator as this struct's item.
+        // (Memory allocation is prohibited in SliceView methods)
+        let mut ld_slices_iter = self
+            .internal_data
+            .field_data_iter(self.field_number, self.field)
+            .filter_map_ok(|field_data| -> Option<Result<_>> {
+                if let FieldData::LengthDelimited(ld_slice) = field_data {
+                    Some(Ok(ld_slice))
+                } else {
+                    Some(Err(ErrorKind::UnexpectedWireType.into()))
                 }
-                &None => Ok(Some(slice)),
-            },
-            SourceLdSlices::MaybeMultipleLdSlices {
-                field_in_parent,
-                field_number_in_parent,
-                parent_internal_data,
-            } => {
-                // WRONG. before getting parent_internal_data.ld_slices(), we need to check if
-                // the field_in_parent is singular slice or multiple slices. We need to go to parent_internal_data
-                // only in the latter case.
-                let ld_slices_iter = parent_internal_data
-                    .ld_slices()
-                    .map_ok(|ld_slice| ld_slice.fields())
-                    .flatten_ok()
-                    // ↓ i.e. Result<Result<T, E>, E>::flatten() => Result<T, E>, which is not in stable std yet.
-                    .map(|rrfield| rrfield.and_then(|x| x))
-                    .filter_map_ok(|field| -> Option<Result<_>> {
-                        if field.number == field_number_in_parent {
-                            if let FieldData::LengthDelimited(ld_slice) = field.data {
-                                Some(Ok(ld_slice))
-                            } else {
-                                Some(Err(ErrorKind::UnexpectedWireType.into()))
-                            }
-                        } else {
-                            None
-                        }
+            })
+            .map(|rrfield| rrfield.and_then(|x| x));
+        let result = match self.prev_ld_slice.clone() {
+            Some(prev_ld_slice) => {
+                // Skip until we see the prev_ld_slice value, and then get the next value.
+                ld_slices_iter
+                    .skip_while(|rld_slice| {
+                        rld_slice
+                            .as_ref()
+                            .map_or(true, |ld_slice| *ld_slice != prev_ld_slice)
                     })
-                    .map(|rrfield| rrfield.and_then(|x| x));
-                match self.prev_ld_slice.clone() {
-                    Some(prev_ld_slice) => {
-                        // Skip until we see the prev_ld_slice value, and then get the next value.
-                        ld_slices_iter
-                            .skip_while(|rld_slice| {
-                                rld_slice.map_or(true, |rd_slice| rd_slice != prev_ld_slice)
-                            })
-                            .nth(1)
-                    }
-                    None => ld_slices_iter.next(),
-                }
-                .transpose()
+                    .nth(1)
             }
-        };
-        self.prev_ld_slice = result.or(self.prev_ld_slice);
-        result
+            None => ld_slices_iter.next(),
+        }
+        .transpose()?;
+        self.prev_ld_slice = result.clone().or(self.prev_ld_slice.clone());
+        Ok(result)
     }
 }
 

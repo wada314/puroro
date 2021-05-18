@@ -244,7 +244,7 @@ impl<'slice, 'p> GeneratedCodeInfoSliceView<'slice, 'p> {
             annotation: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -260,7 +260,7 @@ impl<'slice, 'p> GeneratedCodeInfoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -661,7 +661,7 @@ impl<'slice, 'p> AnnotationSliceView<'slice, 'p> {
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -680,7 +680,7 @@ impl<'slice, 'p> AnnotationSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -1000,7 +1000,7 @@ impl<'slice, 'p> SourceCodeInfoSliceView<'slice, 'p> {
             location: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -1016,7 +1016,7 @@ impl<'slice, 'p> SourceCodeInfoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -1458,7 +1458,7 @@ impl<'slice, 'p> LocationSliceView<'slice, 'p> {
             leading_detached_comments: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -1478,7 +1478,7 @@ impl<'slice, 'p> LocationSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -2015,7 +2015,7 @@ impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
             aggregate_value: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -2037,7 +2037,7 @@ impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -2407,7 +2407,7 @@ impl<'slice, 'p> NamePartSliceView<'slice, 'p> {
             is_extension: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -2424,7 +2424,7 @@ impl<'slice, 'p> NamePartSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -2800,7 +2800,7 @@ impl<'slice, 'p> MethodOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -2818,7 +2818,7 @@ impl<'slice, 'p> MethodOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -3189,7 +3189,7 @@ impl<'slice, 'p> ServiceOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -3206,7 +3206,7 @@ impl<'slice, 'p> ServiceOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -3546,7 +3546,7 @@ impl<'slice, 'p> EnumValueOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -3563,7 +3563,7 @@ impl<'slice, 'p> EnumValueOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -3938,7 +3938,7 @@ impl<'slice, 'p> EnumOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -3956,7 +3956,7 @@ impl<'slice, 'p> EnumOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -4268,7 +4268,7 @@ impl<'slice, 'p> OneofOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -4284,7 +4284,7 @@ impl<'slice, 'p> OneofOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -4792,7 +4792,7 @@ impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -4814,7 +4814,7 @@ impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -5340,7 +5340,7 @@ impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -5360,7 +5360,7 @@ impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -6386,7 +6386,7 @@ impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -6422,7 +6422,7 @@ impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -7056,7 +7056,7 @@ impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
             server_streaming: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -7077,7 +7077,7 @@ impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -7483,7 +7483,7 @@ impl<'slice, 'p> ServiceDescriptorProtoSliceView<'slice, 'p> {
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -7501,7 +7501,7 @@ impl<'slice, 'p> ServiceDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -7880,7 +7880,7 @@ impl<'slice, 'p> EnumValueDescriptorProtoSliceView<'slice, 'p> {
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -7898,7 +7898,7 @@ impl<'slice, 'p> EnumValueDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -8362,7 +8362,7 @@ impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
             reserved_name: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -8382,7 +8382,7 @@ impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -8738,7 +8738,7 @@ impl<'slice, 'p> EnumReservedRangeSliceView<'slice, 'p> {
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -8755,7 +8755,7 @@ impl<'slice, 'p> EnumReservedRangeSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -9093,7 +9093,7 @@ impl<'slice, 'p> OneofDescriptorProtoSliceView<'slice, 'p> {
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -9110,7 +9110,7 @@ impl<'slice, 'p> OneofDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -9762,7 +9762,7 @@ impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
             proto3_optional: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -9788,7 +9788,7 @@ impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -10232,7 +10232,7 @@ impl<'slice, 'p> ExtensionRangeOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -10248,7 +10248,7 @@ impl<'slice, 'p> ExtensionRangeOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -10900,7 +10900,7 @@ impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
             reserved_name: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -10925,7 +10925,7 @@ impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -11316,7 +11316,7 @@ impl<'slice, 'p> ReservedRangeSliceView<'slice, 'p> {
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -11333,7 +11333,7 @@ impl<'slice, 'p> ReservedRangeSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -11705,7 +11705,7 @@ impl<'slice, 'p> ExtensionRangeSliceView<'slice, 'p> {
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -11723,7 +11723,7 @@ impl<'slice, 'p> ExtensionRangeSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -12454,7 +12454,7 @@ impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
             syntax: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -12481,7 +12481,7 @@ impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -12856,7 +12856,7 @@ impl<'slice, 'p> FileDescriptorSetSliceView<'slice, 'p> {
             file: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -12872,7 +12872,7 @@ impl<'slice, 'p> FileDescriptorSetSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)

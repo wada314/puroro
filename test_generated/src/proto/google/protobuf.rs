@@ -244,7 +244,7 @@ impl<'slice, 'p> GeneratedCodeInfoSliceView<'slice, 'p> {
             annotation: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -260,7 +260,7 @@ impl<'slice, 'p> GeneratedCodeInfoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -306,7 +306,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for GeneratedCodeIn
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -664,7 +664,7 @@ impl<'slice, 'p> AnnotationSliceView<'slice, 'p> {
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -683,7 +683,7 @@ impl<'slice, 'p> AnnotationSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -750,7 +750,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for AnnotationSlice
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -1006,7 +1006,7 @@ impl<'slice, 'p> SourceCodeInfoSliceView<'slice, 'p> {
             location: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -1022,7 +1022,7 @@ impl<'slice, 'p> SourceCodeInfoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -1068,7 +1068,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for SourceCodeInfoS
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -1467,7 +1467,7 @@ impl<'slice, 'p> LocationSliceView<'slice, 'p> {
             leading_detached_comments: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -1487,7 +1487,7 @@ impl<'slice, 'p> LocationSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -1561,7 +1561,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for LocationSliceVi
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -2027,7 +2027,7 @@ impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
             aggregate_value: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -2049,7 +2049,7 @@ impl<'slice, 'p> UninterpretedOptionSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -2137,7 +2137,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for UninterpretedOp
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -2422,7 +2422,7 @@ impl<'slice, 'p> NamePartSliceView<'slice, 'p> {
             is_extension: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -2439,7 +2439,7 @@ impl<'slice, 'p> NamePartSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -2492,7 +2492,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for NamePartSliceVi
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -2818,7 +2818,7 @@ impl<'slice, 'p> MethodOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -2836,7 +2836,7 @@ impl<'slice, 'p> MethodOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -2896,7 +2896,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for MethodOptionsSl
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -3210,7 +3210,7 @@ impl<'slice, 'p> ServiceOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -3227,7 +3227,7 @@ impl<'slice, 'p> ServiceOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -3280,7 +3280,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ServiceOptionsS
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -3570,7 +3570,7 @@ impl<'slice, 'p> EnumValueOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -3587,7 +3587,7 @@ impl<'slice, 'p> EnumValueOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -3640,7 +3640,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumValueOption
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -3965,7 +3965,7 @@ impl<'slice, 'p> EnumOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -3983,7 +3983,7 @@ impl<'slice, 'p> EnumOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -4043,7 +4043,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumOptionsSlic
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -4298,7 +4298,7 @@ impl<'slice, 'p> OneofOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -4314,7 +4314,7 @@ impl<'slice, 'p> OneofOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -4360,7 +4360,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for OneofOptionsSli
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -4825,7 +4825,7 @@ impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -4847,7 +4847,7 @@ impl<'slice, 'p> FieldOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -4935,7 +4935,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FieldOptionsSli
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -5376,7 +5376,7 @@ impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -5396,7 +5396,7 @@ impl<'slice, 'p> MessageOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -5470,7 +5470,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for MessageOptionsS
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -6425,7 +6425,7 @@ impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -6461,7 +6461,7 @@ impl<'slice, 'p> FileOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -6647,7 +6647,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileOptionsSlic
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -7098,7 +7098,7 @@ impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
             server_streaming: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -7119,7 +7119,7 @@ impl<'slice, 'p> MethodDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -7200,7 +7200,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for MethodDescripto
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -7528,7 +7528,7 @@ impl<'slice, 'p> ServiceDescriptorProtoSliceView<'slice, 'p> {
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -7546,7 +7546,7 @@ impl<'slice, 'p> ServiceDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -7606,7 +7606,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ServiceDescript
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -7928,7 +7928,7 @@ impl<'slice, 'p> EnumValueDescriptorProtoSliceView<'slice, 'p> {
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -7946,7 +7946,7 @@ impl<'slice, 'p> EnumValueDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -8006,7 +8006,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumValueDescri
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -8413,7 +8413,7 @@ impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
             reserved_name: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -8433,7 +8433,7 @@ impl<'slice, 'p> EnumDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -8507,7 +8507,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumDescriptorP
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -8792,7 +8792,7 @@ impl<'slice, 'p> EnumReservedRangeSliceView<'slice, 'p> {
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -8809,7 +8809,7 @@ impl<'slice, 'p> EnumReservedRangeSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -8862,7 +8862,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for EnumReservedRan
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -9150,7 +9150,7 @@ impl<'slice, 'p> OneofDescriptorProtoSliceView<'slice, 'p> {
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -9167,7 +9167,7 @@ impl<'slice, 'p> OneofDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -9220,7 +9220,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for OneofDescriptor
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -9822,7 +9822,7 @@ impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
             proto3_optional: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -9848,7 +9848,7 @@ impl<'slice, 'p> FieldDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -9964,7 +9964,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FieldDescriptor
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -10295,7 +10295,7 @@ impl<'slice, 'p> ExtensionRangeOptionsSliceView<'slice, 'p> {
             uninterpreted_option: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -10311,7 +10311,7 @@ impl<'slice, 'p> ExtensionRangeOptionsSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -10357,7 +10357,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ExtensionRangeO
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -10966,7 +10966,7 @@ impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
             reserved_name: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -10991,7 +10991,7 @@ impl<'slice, 'p> DescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -11100,7 +11100,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for DescriptorProto
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -11385,7 +11385,7 @@ impl<'slice, 'p> ReservedRangeSliceView<'slice, 'p> {
             end: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -11402,7 +11402,7 @@ impl<'slice, 'p> ReservedRangeSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -11455,7 +11455,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ReservedRangeSl
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -11777,7 +11777,7 @@ impl<'slice, 'p> ExtensionRangeSliceView<'slice, 'p> {
             options: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -11795,7 +11795,7 @@ impl<'slice, 'p> ExtensionRangeSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -11855,7 +11855,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for ExtensionRangeS
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -12529,7 +12529,7 @@ impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
             syntax: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -12556,7 +12556,7 @@ impl<'slice, 'p> FileDescriptorProtoSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -12679,7 +12679,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileDescriptorP
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
@@ -12934,7 +12934,7 @@ impl<'slice, 'p> FileDescriptorSetSliceView<'slice, 'p> {
             file: ::puroro_internal::FieldNew::new(),
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -12950,7 +12950,7 @@ impl<'slice, 'p> FileDescriptorSetSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
                 parent_field, field_number_in_parent, parent_internal_data),
         };
-        for ld_slice in new_self.puroro_internal.ld_slices() {
+        for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
             ld_slice.deser_message(&mut new_self)?;
         }
         Ok(new_self)
@@ -12996,7 +12996,7 @@ impl<'slice, 'p> ::puroro_internal::ser::SerializableMessage for FileDescriptorS
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {
-        for ld_slice in self.puroro_internal.ld_slices() {
+        for ld_slice in self.puroro_internal.ld_slices_from_parent_message() {
             serializer.serialize_raw_fields(ld_slice.as_slice())?;
         }
         Ok(())
