@@ -1,7 +1,6 @@
 use crate::deser::LdSlice;
 use crate::types::{FieldData, SliceViewField};
-use crate::{ErrorKind, Result};
-use ::either_n::Either4;
+use crate::{ErrorKind, Result, ResultHelper};
 use itertools::{Either, Itertools};
 use puroro::InternalData;
 use std::collections::HashMap;
@@ -94,7 +93,7 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     /// Note that iterating over this iterator takes O(n^2) time where n is the iterator length.
     /// We believe n (== the number of messages merged) is very small in the most usecases.
     pub fn ld_slices_from_parent_message(
-        &'p self,
+        &self,
     ) -> impl 'p + Iterator<Item = Result<LdSlice<'slice>>> {
         match self.source_ld_slices.clone() {
             SourceLdSlices::SingleLdSlice(ld_slice) => Either::Left(std::iter::once(Ok(ld_slice))),
@@ -153,7 +152,7 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
             .map_ok(|ld_slice| ld_slice.fields())
             .flatten_ok()
             // ↓ same with unstable Result::flatten.
-            .map(|rrfield| rrfield.and_then(|x| x))
+            .map(|rrfield| rrfield.flatten())
             .filter_map_ok(move |field| {
                 if field.number == field_number {
                     Some(field.data)

@@ -16,3 +16,12 @@ pub use helpers::{
     MapEntry,
 };
 pub use types::SliceViewField;
+
+trait ResultHelper<T, E> {
+    fn flatten(self) -> std::result::Result<T, E>;
+}
+impl<T, E> ResultHelper<T, E> for std::result::Result<std::result::Result<T, E>, E> {
+    fn flatten(self) -> std::result::Result<T, E> {
+        self.and_then(|x| x)
+    }
+}

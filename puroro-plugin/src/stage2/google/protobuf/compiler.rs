@@ -315,7 +315,7 @@ impl<'slice, 'p> CodeGeneratorResponseSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
         for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
-            ld_slice.deser_message(&mut new_self)?;
+            ld_slice?.deser_message(&mut new_self)?;
         }
         Ok(new_self)
     }
@@ -333,7 +333,7 @@ impl<'slice, 'p> CodeGeneratorResponseSliceView<'slice, 'p> {
                 parent_field, field_number_in_parent, parent_internal_data),
         };
         for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
-            ld_slice.deser_message(&mut new_self)?;
+            ld_slice?.deser_message(&mut new_self)?;
         }
         Ok(new_self)
     }
@@ -768,7 +768,7 @@ impl<'slice, 'p> FileSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
         for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
-            ld_slice.deser_message(&mut new_self)?;
+            ld_slice?.deser_message(&mut new_self)?;
         }
         Ok(new_self)
     }
@@ -787,7 +787,7 @@ impl<'slice, 'p> FileSliceView<'slice, 'p> {
                 parent_field, field_number_in_parent, parent_internal_data),
         };
         for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
-            ld_slice.deser_message(&mut new_self)?;
+            ld_slice?.deser_message(&mut new_self)?;
         }
         Ok(new_self)
     }
@@ -1218,7 +1218,7 @@ impl<'slice, 'p> CodeGeneratorRequestSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
         for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
-            ld_slice.deser_message(&mut new_self)?;
+            ld_slice?.deser_message(&mut new_self)?;
         }
         Ok(new_self)
     }
@@ -1237,7 +1237,7 @@ impl<'slice, 'p> CodeGeneratorRequestSliceView<'slice, 'p> {
                 parent_field, field_number_in_parent, parent_internal_data),
         };
         for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
-            ld_slice.deser_message(&mut new_self)?;
+            ld_slice?.deser_message(&mut new_self)?;
         }
         Ok(new_self)
     }
@@ -1655,7 +1655,7 @@ impl<'slice, 'p> VersionSliceView<'slice, 'p> {
             puroro_internal: ::puroro_internal::InternalDataForSliceViewStruct::new(slice),
         };
         for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
-            ld_slice.deser_message(&mut new_self)?;
+            ld_slice?.deser_message(&mut new_self)?;
         }
         Ok(new_self)
     }
@@ -1674,7 +1674,7 @@ impl<'slice, 'p> VersionSliceView<'slice, 'p> {
                 parent_field, field_number_in_parent, parent_internal_data),
         };
         for ld_slice in new_self.puroro_internal.ld_slices_from_parent_message() {
-            ld_slice.deser_message(&mut new_self)?;
+            ld_slice?.deser_message(&mut new_self)?;
         }
         Ok(new_self)
     }

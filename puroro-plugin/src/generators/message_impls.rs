@@ -174,7 +174,7 @@ fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
             "    \
     }};
     for ld_slice in new_self.puroro_internal.slices() {
-        ld_slice.deser_message(&mut new_self)?;
+        ld_slice?.deser_message(&mut new_self)?;
     }
     Ok(new_self)
 }}
@@ -199,7 +199,7 @@ fn try_new_with_parent(
             "    \
     }};
     for ld_slice in new_self.puroro_internal.slices() {
-        ld_slice.deser_message(&mut new_self)?;
+        ld_slice?.deser_message(&mut new_self)?;
     }
     Ok(new_self)
 }}\n",
@@ -472,7 +472,7 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
         for ld_slice in self.puroro_internal.slices() {{
-            serializer.serialize_raw_fields(ld_slice.as_slice())?;
+            serializer.serialize_raw_fields(ld_slice?.as_slice())?;
         }}
         Ok(())
     }}
