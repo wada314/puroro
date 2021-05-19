@@ -4,7 +4,7 @@ use crate::deser::LdSlice;
 use crate::tags;
 use crate::types::{FieldData, SliceViewField};
 use crate::InternalDataForSliceViewStruct;
-use crate::{ErrorKind, Result};
+use crate::{ErrorKind, Result, ResultHelper};
 use ::itertools::Itertools;
 use itertools::Either;
 
@@ -23,7 +23,7 @@ impl<'slice, 'p> RepeatedSliceViewField<'slice, 'p, tags::Int32> {
     pub fn iter(&self) -> impl '_ + Iterator<Item = i32> {
         self.internal_data
             .field_data_iter(self.field_number, self.field)
-            .map_ok(|field| -> Result<_> {
+            .map_ok(|field| -> Result<_ /* impl Iterator<Item=Result<i32>> */> {
                 Ok(match field {
                     FieldData::Variant(variant) => {
                         Either::Left(std::iter::once(variant.to_native::<tags::Int32>()))
@@ -32,19 +32,15 @@ impl<'slice, 'p> RepeatedSliceViewField<'slice, 'p, tags::Int32> {
                         ld_slice
                             .variants()
                             .map_ok(|variant| variant.to_native::<tags::Int32>())
-                            .map(|rrval| rrval.and_then(|x| x)),
+                            .map(|rrval| rrval.flatten()),
                     ),
                     _ => Err(ErrorKind::UnexpectedWireType)?,
                 }
-                .into_iter())
+                .into_iter()) // Result<Iterator<Item=Result<i32>>>
             })
-            .map(|rrval| rrval.and_then(|x| x))
+            .map(|rrval| rrval.flatten())
             .flatten_ok()
-            .map(|rrval| rrval.and_then(|x| x))
+            .map(|rrval| rrval.flatten())
             .map(|result| result.unwrap())
     }
-}
-
-trait RepeatedSliceViewIterGen {
-    type Item;
 }

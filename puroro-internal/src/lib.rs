@@ -1,3 +1,5 @@
+// For ResultHelper::flatten.
+#![allow(unstable_name_collisions)]
 pub mod deser;
 pub mod helpers;
 pub mod internal_data;
