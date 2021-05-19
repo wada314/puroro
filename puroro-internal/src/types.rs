@@ -29,7 +29,7 @@ pub enum FieldData<T> {
 pub enum SliceViewField<'slice> {
     /// This field is embedded in a single slice. Simple.
     FieldInSingleSlice {
-        /// A subslice of `enclosing_slice` starting from this field's item.
+        /// A subslice of `enclosing_ld_slice` starting from this field's item.
         ld_slice: LdSlice<'slice>,
         /// A total number of field items in the slice. Packed repeated field is counted as 1.
         count: usize,
