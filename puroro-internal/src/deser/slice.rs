@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 use std::io::Read;
 
-use super::{DeserializableMessageFromIter, LdIter};
+use super::{DeserializableMessageFromIter, LdIter, Variants};
 use crate::types::{FieldData, WireType};
 use crate::variant::Variant;
 use crate::ErrorKind;
@@ -18,7 +18,8 @@ pub trait DeserializableMessageFromSlice<'slice> {
     ) -> Result<bool>;
 }
 
-/// Maybe-multiple-fields over slice.
+/// Length delimited field's data. Typically it's a list of message fields,
+/// but maybe it's String or Bytes or packed variants data.
 /// A wrapper over slice which stores maybe multiple fields data.
 /// Ld = Length delimited = wiretype==2
 #[derive(Debug, Clone)]
@@ -62,6 +63,10 @@ impl<'slice> LdSlice<'slice> {
         Fields {
             ld_slice: self.clone(),
         }
+    }
+
+    pub fn variants(&self) -> Variants<std::io::Bytes<&'slice [u8]>> {
+        Variants::new(self.as_slice().bytes())
     }
 
     pub fn skip_until_start_of(&mut self, given_slice: &'slice [u8]) {

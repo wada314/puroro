@@ -24,7 +24,7 @@ impl_field_new!(u64);
 impl_field_new!(f32);
 impl_field_new!(f64);
 impl_field_new!(bool);
-impl_field_new!(::std::string::String);
+impl_field_new!(String);
 impl_field_new!(&str);
 impl<'bump, T> FieldNew<'bump> for Vec<T> {
     fn new() -> Self {

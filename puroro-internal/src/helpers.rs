@@ -3,6 +3,7 @@ pub mod field_deser;
 pub mod field_new;
 pub mod field_ser;
 pub mod field_take_or_init;
+pub mod repeated_slice_view;
 use std::convert::TryFrom;
 
 pub use field_clone::FieldClone;

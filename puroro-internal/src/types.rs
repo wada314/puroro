@@ -44,22 +44,3 @@ pub enum SliceViewField<'slice> {
         first_enclosing_ld_slice: LdSlice<'slice>,
     },
 }
-
-#[derive(Debug, Clone)]
-pub struct RepeatedSliceViewField<'slice, 'p, TypeTag, T>
-where
-    TypeTag: tags::FieldTypeTag,
-{
-    field: &'p Option<SliceViewField<'slice>>,
-    field_number: usize,
-    internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
-    phantom: PhantomData<(TypeTag, T)>,
-}
-
-#[derive(Debug, Clone)]
-pub struct RepeatedSliceViewFieldIter<'slice, 'p, TypeTag, T>
-where
-    TypeTag: tags::FieldTypeTag,
-{
-    container: &'p RepeatedSliceViewField<'slice, 'p, TypeTag, T>,
-}
