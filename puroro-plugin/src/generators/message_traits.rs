@@ -24,7 +24,7 @@ impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
         (
             format!(
                 "\
-pub trait {trait_ident} {{\n",
+pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 trait_ident = self.trait_ident(self.msg)?,
             ),
             indent((

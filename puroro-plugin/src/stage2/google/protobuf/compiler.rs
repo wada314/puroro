@@ -2,7 +2,7 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 
-pub trait CodeGeneratorResponseTrait {
+pub trait CodeGeneratorResponseTrait: ::std::clone::Clone {
     type FileType: self::code_generator_response::FileTrait;
     fn error(&self) -> ::std::option::Option<&'_ str>;
     fn supported_features(&self) -> ::std::option::Option<u64>;
@@ -423,7 +423,7 @@ impl ::std::convert::From<Feature> for i32 {
         val as i32
     }
 }
-pub trait FileTrait {
+pub trait FileTrait: ::std::clone::Clone {
     type GeneratedCodeInfoType: super::super::GeneratedCodeInfoTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
     fn insertion_point(&self) -> ::std::option::Option<&'_ str>;
@@ -864,7 +864,7 @@ impl<'slice, 'p> ::puroro::Serializable for FileSliceView<'slice, 'p> {
     }
 }
 } // mod code_generator_response
-pub trait CodeGeneratorRequestTrait {
+pub trait CodeGeneratorRequestTrait: ::std::clone::Clone {
     type FileDescriptorProtoType: super::FileDescriptorProtoTrait;
     type VersionType: self::VersionTrait;
     type FileToGenerateRepeated: ::puroro::RepeatedField<str>;
@@ -1313,7 +1313,7 @@ impl<'slice, 'p> ::puroro::Serializable for CodeGeneratorRequestSliceView<'slice
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait VersionTrait {
+pub trait VersionTrait: ::std::clone::Clone {
     fn major(&self) -> ::std::option::Option<i32>;
     fn minor(&self) -> ::std::option::Option<i32>;
     fn patch(&self) -> ::std::option::Option<i32>;

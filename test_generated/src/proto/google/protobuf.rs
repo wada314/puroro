@@ -2,7 +2,7 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 
-pub trait GeneratedCodeInfoTrait {
+pub trait GeneratedCodeInfoTrait: ::std::clone::Clone {
     type AnnotationType: self::generated_code_info::AnnotationTrait;
     type AnnotationRepeated: ::puroro::RepeatedField<Self::AnnotationType>;
     fn annotation(&self) -> &Self::AnnotationRepeated;
@@ -320,7 +320,7 @@ impl<'slice, 'p> ::puroro::Serializable for GeneratedCodeInfoSliceView<'slice, '
     }
 }
 pub mod generated_code_info {
-pub trait AnnotationTrait {
+pub trait AnnotationTrait: ::std::clone::Clone {
     type PathRepeated: ::puroro::RepeatedField<i32>;
     fn path(&self) -> &Self::PathRepeated;
     fn source_file(&self) -> ::std::option::Option<&'_ str>;
@@ -764,7 +764,7 @@ impl<'slice, 'p> ::puroro::Serializable for AnnotationSliceView<'slice, 'p> {
     }
 }
 } // mod generated_code_info
-pub trait SourceCodeInfoTrait {
+pub trait SourceCodeInfoTrait: ::std::clone::Clone {
     type LocationType: self::source_code_info::LocationTrait;
     type LocationRepeated: ::puroro::RepeatedField<Self::LocationType>;
     fn location(&self) -> &Self::LocationRepeated;
@@ -1082,7 +1082,7 @@ impl<'slice, 'p> ::puroro::Serializable for SourceCodeInfoSliceView<'slice, 'p> 
     }
 }
 pub mod source_code_info {
-pub trait LocationTrait {
+pub trait LocationTrait: ::std::clone::Clone {
     type PathRepeated: ::puroro::RepeatedField<i32>;
     fn path(&self) -> &Self::PathRepeated;
     type SpanRepeated: ::puroro::RepeatedField<i32>;
@@ -1575,7 +1575,7 @@ impl<'slice, 'p> ::puroro::Serializable for LocationSliceView<'slice, 'p> {
     }
 }
 } // mod source_code_info
-pub trait UninterpretedOptionTrait {
+pub trait UninterpretedOptionTrait: ::std::clone::Clone {
     type NamePartType: self::uninterpreted_option::NamePartTrait;
     type NameRepeated: ::puroro::RepeatedField<Self::NamePartType>;
     fn name(&self) -> &Self::NameRepeated;
@@ -2151,7 +2151,7 @@ impl<'slice, 'p> ::puroro::Serializable for UninterpretedOptionSliceView<'slice,
     }
 }
 pub mod uninterpreted_option {
-pub trait NamePartTrait {
+pub trait NamePartTrait: ::std::clone::Clone {
     fn name_part(&self) -> &'_ str;
     fn is_extension(&self) -> bool;
 }
@@ -2506,7 +2506,7 @@ impl<'slice, 'p> ::puroro::Serializable for NamePartSliceView<'slice, 'p> {
     }
 }
 } // mod uninterpreted_option
-pub trait MethodOptionsTrait {
+pub trait MethodOptionsTrait: ::std::clone::Clone {
     type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn deprecated(&self) -> ::std::option::Option<bool>;
     fn idempotency_level(&self) -> ::std::option::Option<::std::result::Result<method_options::IdempotencyLevel, i32>>;
@@ -2933,7 +2933,7 @@ impl ::std::convert::From<IdempotencyLevel> for i32 {
     }
 }
 } // mod method_options
-pub trait ServiceOptionsTrait {
+pub trait ServiceOptionsTrait: ::std::clone::Clone {
     type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn deprecated(&self) -> ::std::option::Option<bool>;
     type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
@@ -3293,7 +3293,7 @@ impl<'slice, 'p> ::puroro::Serializable for ServiceOptionsSliceView<'slice, 'p> 
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait EnumValueOptionsTrait {
+pub trait EnumValueOptionsTrait: ::std::clone::Clone {
     type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn deprecated(&self) -> ::std::option::Option<bool>;
     type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
@@ -3653,7 +3653,7 @@ impl<'slice, 'p> ::puroro::Serializable for EnumValueOptionsSliceView<'slice, 'p
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait EnumOptionsTrait {
+pub trait EnumOptionsTrait: ::std::clone::Clone {
     type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn allow_alias(&self) -> ::std::option::Option<bool>;
     fn deprecated(&self) -> ::std::option::Option<bool>;
@@ -4056,7 +4056,7 @@ impl<'slice, 'p> ::puroro::Serializable for EnumOptionsSliceView<'slice, 'p> {
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait OneofOptionsTrait {
+pub trait OneofOptionsTrait: ::std::clone::Clone {
     type UninterpretedOptionType: self::UninterpretedOptionTrait;
     type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
     fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated;
@@ -4373,7 +4373,7 @@ impl<'slice, 'p> ::puroro::Serializable for OneofOptionsSliceView<'slice, 'p> {
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait FieldOptionsTrait {
+pub trait FieldOptionsTrait: ::std::clone::Clone {
     type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn ctype(&self) -> ::std::option::Option<::std::result::Result<field_options::Ctype, i32>>;
     fn packed(&self) -> ::std::option::Option<bool>;
@@ -4994,7 +4994,7 @@ impl ::std::convert::From<Ctype> for i32 {
     }
 }
 } // mod field_options
-pub trait MessageOptionsTrait {
+pub trait MessageOptionsTrait: ::std::clone::Clone {
     type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn message_set_wire_format(&self) -> ::std::option::Option<bool>;
     fn no_standard_descriptor_accessor(&self) -> ::std::option::Option<bool>;
@@ -5483,7 +5483,7 @@ impl<'slice, 'p> ::puroro::Serializable for MessageOptionsSliceView<'slice, 'p> 
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait FileOptionsTrait {
+pub trait FileOptionsTrait: ::std::clone::Clone {
     type UninterpretedOptionType: self::UninterpretedOptionTrait;
     fn java_package(&self) -> ::std::option::Option<&'_ str>;
     fn java_outer_classname(&self) -> ::std::option::Option<&'_ str>;
@@ -6684,7 +6684,7 @@ impl ::std::convert::From<OptimizeMode> for i32 {
     }
 }
 } // mod file_options
-pub trait MethodDescriptorProtoTrait {
+pub trait MethodDescriptorProtoTrait: ::std::clone::Clone {
     type MethodOptionsType: self::MethodOptionsTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
     fn input_type(&self) -> ::std::option::Option<&'_ str>;
@@ -7213,7 +7213,7 @@ impl<'slice, 'p> ::puroro::Serializable for MethodDescriptorProtoSliceView<'slic
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait ServiceDescriptorProtoTrait {
+pub trait ServiceDescriptorProtoTrait: ::std::clone::Clone {
     type MethodDescriptorProtoType: self::MethodDescriptorProtoTrait;
     type ServiceOptionsType: self::ServiceOptionsTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
@@ -7619,7 +7619,7 @@ impl<'slice, 'p> ::puroro::Serializable for ServiceDescriptorProtoSliceView<'sli
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait EnumValueDescriptorProtoTrait {
+pub trait EnumValueDescriptorProtoTrait: ::std::clone::Clone {
     type EnumValueOptionsType: self::EnumValueOptionsTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
     fn number(&self) -> ::std::option::Option<i32>;
@@ -8019,7 +8019,7 @@ impl<'slice, 'p> ::puroro::Serializable for EnumValueDescriptorProtoSliceView<'s
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait EnumDescriptorProtoTrait {
+pub trait EnumDescriptorProtoTrait: ::std::clone::Clone {
     type EnumValueDescriptorProtoType: self::EnumValueDescriptorProtoTrait;
     type EnumOptionsType: self::EnumOptionsTrait;
     type EnumReservedRangeType: self::enum_descriptor_proto::EnumReservedRangeTrait;
@@ -8521,7 +8521,7 @@ impl<'slice, 'p> ::puroro::Serializable for EnumDescriptorProtoSliceView<'slice,
     }
 }
 pub mod enum_descriptor_proto {
-pub trait EnumReservedRangeTrait {
+pub trait EnumReservedRangeTrait: ::std::clone::Clone {
     fn start(&self) -> ::std::option::Option<i32>;
     fn end(&self) -> ::std::option::Option<i32>;
 }
@@ -8876,7 +8876,7 @@ impl<'slice, 'p> ::puroro::Serializable for EnumReservedRangeSliceView<'slice, '
     }
 }
 } // mod enum_descriptor_proto
-pub trait OneofDescriptorProtoTrait {
+pub trait OneofDescriptorProtoTrait: ::std::clone::Clone {
     type OneofOptionsType: self::OneofOptionsTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
     fn options(&self) -> ::std::option::Option<&'_ Self::OneofOptionsType>;
@@ -9233,7 +9233,7 @@ impl<'slice, 'p> ::puroro::Serializable for OneofDescriptorProtoSliceView<'slice
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait FieldDescriptorProtoTrait {
+pub trait FieldDescriptorProtoTrait: ::std::clone::Clone {
     type FieldOptionsType: self::FieldOptionsTrait;
     fn name(&self) -> ::std::option::Option<&'_ str>;
     fn number(&self) -> ::std::option::Option<i32>;
@@ -10053,7 +10053,7 @@ impl ::std::convert::From<Type> for i32 {
     }
 }
 } // mod field_descriptor_proto
-pub trait ExtensionRangeOptionsTrait {
+pub trait ExtensionRangeOptionsTrait: ::std::clone::Clone {
     type UninterpretedOptionType: self::UninterpretedOptionTrait;
     type UninterpretedOptionRepeated: ::puroro::RepeatedField<Self::UninterpretedOptionType>;
     fn uninterpreted_option(&self) -> &Self::UninterpretedOptionRepeated;
@@ -10370,7 +10370,7 @@ impl<'slice, 'p> ::puroro::Serializable for ExtensionRangeOptionsSliceView<'slic
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait DescriptorProtoTrait {
+pub trait DescriptorProtoTrait: ::std::clone::Clone {
     type FieldDescriptorProtoType: self::FieldDescriptorProtoTrait;
     type DescriptorProtoType: self::DescriptorProtoTrait;
     type EnumDescriptorProtoType: self::EnumDescriptorProtoTrait;
@@ -11114,7 +11114,7 @@ impl<'slice, 'p> ::puroro::Serializable for DescriptorProtoSliceView<'slice, 'p>
     }
 }
 pub mod descriptor_proto {
-pub trait ReservedRangeTrait {
+pub trait ReservedRangeTrait: ::std::clone::Clone {
     fn start(&self) -> ::std::option::Option<i32>;
     fn end(&self) -> ::std::option::Option<i32>;
 }
@@ -11468,7 +11468,7 @@ impl<'slice, 'p> ::puroro::Serializable for ReservedRangeSliceView<'slice, 'p> {
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait ExtensionRangeTrait {
+pub trait ExtensionRangeTrait: ::std::clone::Clone {
     type ExtensionRangeOptionsType: super::ExtensionRangeOptionsTrait;
     fn start(&self) -> ::std::option::Option<i32>;
     fn end(&self) -> ::std::option::Option<i32>;
@@ -11869,7 +11869,7 @@ impl<'slice, 'p> ::puroro::Serializable for ExtensionRangeSliceView<'slice, 'p> 
     }
 }
 } // mod descriptor_proto
-pub trait FileDescriptorProtoTrait {
+pub trait FileDescriptorProtoTrait: ::std::clone::Clone {
     type DescriptorProtoType: self::DescriptorProtoTrait;
     type EnumDescriptorProtoType: self::EnumDescriptorProtoTrait;
     type ServiceDescriptorProtoType: self::ServiceDescriptorProtoTrait;
@@ -12692,7 +12692,7 @@ impl<'slice, 'p> ::puroro::Serializable for FileDescriptorProtoSliceView<'slice,
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }
 }
-pub trait FileDescriptorSetTrait {
+pub trait FileDescriptorSetTrait: ::std::clone::Clone {
     type FileDescriptorProtoType: self::FileDescriptorProtoTrait;
     type FileRepeated: ::puroro::RepeatedField<Self::FileDescriptorProtoType>;
     fn file(&self) -> &Self::FileRepeated;
