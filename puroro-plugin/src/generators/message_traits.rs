@@ -113,7 +113,7 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                         value = self.scalar_deref_type_name(field)?,
                     ),
                     get_decl: format!(
-                        "fn {ident}<'a>(&'a self) -> &Self::{type_ident}",
+                        "fn {ident}<'a>(&'a self) -> &Self::{type_ident}<'a>",
                         ident = field.native_ident()?,
                         type_ident = type_ident,
                     ),

@@ -43,6 +43,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
                 func(|output| self.print_impl_map_entry(output)),
             ),
             func(|output| self.print_impl_trait(output)),
+            func(|output| self.print_impl_message(output)),
             func(|output| self.print_impl_field_new(output)),
         )
             .write_into(output)
@@ -648,6 +649,28 @@ type {return_type_ident} = {type_name};
                 })),
             )),
             "}}\n",
+        )
+            .write_into(output)
+    }
+
+    fn print_impl_trait<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+        (
+            format!(
+                "\
+{cfg}
+impl{gp} ::puroro::Message<'bump> for {struct_ident}{gpb} {{
+    type InternalData = {internal_data_type};
+    fn puroro_internal_data(&self) -> &Self::InternalData {{
+        &self.puroro_internal
+    }}
+}}\n",
+                struct_ident = self.frag_gen.struct_ident(self.msg)?,
+                internal_data_type = self.frag_gen.internal_data_type(),
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params(&["'bump"]),
+                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+            ),
+            indent((iter(self.msg.unique_msgs_from_fields()?.map(|msg| {})),)),
         )
             .write_into(output)
     }
