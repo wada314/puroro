@@ -17,8 +17,8 @@ thiserror = "1.0.24"
 once_cell = "1.7.2"
 
 [features]
-nightly = []
+puroro-nightly = []
 stage1 = []
 stage2 = []
 stage3 = []
-default = ["nightly", "stage2"]
+default = ["puroro-nightly", "stage2"]

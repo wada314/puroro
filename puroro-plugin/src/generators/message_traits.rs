@@ -48,7 +48,7 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                             get_decl,
                         } => {
                             format!(
-                                "type {type_ident_gp}: {type_bound};\n{get_decl};\n",
+                                "type {type_ident_gp}: {type_bound} where Self: 'a;\n{get_decl};\n",
                                 type_ident_gp = type_ident_gp,
                                 type_bound = type_bound,
                                 get_decl = get_decl
@@ -110,10 +110,10 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                     return_type_ident_gp: format!("{ident}<'a>", ident = type_ident.clone()),
                     return_type_bound: format!(
                         "::puroro::RepeatedField<'a, {value}>",
-                        value = self.scalar_deref_type_name(field)?,
+                        value = self.repeated_item_type_name(field)?,
                     ),
                     get_decl: format!(
-                        "fn {ident}<'a>(&'a self) -> &Self::{type_ident}<'a>",
+                        "fn {ident}<'a>(&'a self) -> Self::{type_ident}<'a>",
                         ident = field.native_ident()?,
                         type_ident = type_ident,
                     ),
@@ -157,6 +157,27 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 NonTrivialFieldType::Message(m) => {
                     format!("Self::{name}", name = self.associated_msg_type_ident(m)?).into()
                 }
+            },
+        })
+    }
+
+    pub fn repeated_item_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+        Ok(match field.type_()?.native_trivial_type_name() {
+            Ok(name) => name.into(),
+            Err(nontrivial_type) => match nontrivial_type {
+                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                NonTrivialFieldType::String => format!("::std::borrow::Cow<'a, str>").into(),
+                NonTrivialFieldType::Bytes => format!("::std::borrow::Cow<'a, [u8]>").into(),
+                NonTrivialFieldType::Enum(e) => format!(
+                    "::std::result::Result<{type_}, i32>",
+                    type_ = e.native_ident_with_relative_path(self.msg.package()?)?
+                )
+                .into(),
+                NonTrivialFieldType::Message(m) => format!(
+                    "::std::borrow::Cow<'a, Self::{name}>",
+                    name = self.associated_msg_type_ident(m)?
+                )
+                .into(),
             },
         })
     }

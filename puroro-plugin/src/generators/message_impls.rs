@@ -617,7 +617,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 _,
                             ) => format!(
                                 "\
-type {return_type_ident} = {type_name};
+type {return_type_ident} where Self: 'a = &'a {type_name};
 {get_decl} {{
     &self.{ident}
 }}\n",
@@ -653,10 +653,9 @@ type {return_type_ident} = {type_name};
             .write_into(output)
     }
 
-    fn print_impl_trait<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
-        (
-            format!(
-                "\
+    fn print_impl_message<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+        (format!(
+            "\
 {cfg}
 impl{gp} ::puroro::Message<'bump> for {struct_ident}{gpb} {{
     type InternalData = {internal_data_type};
@@ -664,14 +663,12 @@ impl{gp} ::puroro::Message<'bump> for {struct_ident}{gpb} {{
         &self.puroro_internal
     }}
 }}\n",
-                struct_ident = self.frag_gen.struct_ident(self.msg)?,
-                internal_data_type = self.frag_gen.internal_data_type(),
-                cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(&["'bump"]),
-                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-            ),
-            indent((iter(self.msg.unique_msgs_from_fields()?.map(|msg| {})),)),
-        )
+            struct_ident = self.frag_gen.struct_ident(self.msg)?,
+            internal_data_type = self.frag_gen.internal_data_type(),
+            cfg = self.frag_gen.cfg_condition(),
+            gp = self.frag_gen.struct_generic_params(&["'bump"]),
+            gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+        ),)
             .write_into(output)
     }
 

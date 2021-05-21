@@ -313,7 +313,8 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     ImplType::SliceView { .. } => Some("'slice, 'p"),
                 }
                 .into_iter(),
-            );
+            )
+            .unique();
         if iter.clone().count() == 0 {
             "".to_string()
         } else {
