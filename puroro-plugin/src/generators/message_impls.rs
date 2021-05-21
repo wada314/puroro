@@ -175,7 +175,7 @@ fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
             "    \
     }};
     for ld_slice in new_self.puroro_internal.slices() {
-        ld_slice?.deser_message(&mut new_self)?;
+        ld_slice?.merge_into_message(&mut new_self)?;
     }
     Ok(new_self)
 }}
@@ -200,7 +200,7 @@ fn try_new_with_parent(
             "    \
     }};
     for ld_slice in new_self.puroro_internal.slices() {
-        ld_slice?.deser_message(&mut new_self)?;
+        ld_slice?.merge_into_message(&mut new_self)?;
     }
     Ok(new_self)
 }}\n",
@@ -350,14 +350,15 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
+        return Ok(());
         (format!(
             "\
 {cfg}
 impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
-    fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {{
+    fn deser_from_slice(slice: &[u8]) -> ::puroro::Result<Self> {{
         let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
         let wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
-        wrapped_slice.deser_message(&mut from_slice)?;
+        wrapped_slice.merge_into_message(&mut from_slice)?;
         Ok(())
     }}
 }}\n",
@@ -365,8 +366,8 @@ impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
             cfg = self.frag_gen.cfg_condition(),
             gp = self.frag_gen.struct_generic_params(&[]),
             gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-        ),)
-            .write_into(output)
+        ))
+        .write_into(output);
     }
 
     fn print_msg_deser_from_slice_for_slice_view<W: std::fmt::Write>(
@@ -374,6 +375,20 @@ impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
         output: &mut Indentor<W>,
     ) -> Result<()> {
         (
+            format!(
+                "\
+{cfg}
+impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
+    fn deser_from_slice(slice: &[u8]) -> ::puroro::Result<Self> {{
+        Self::try_new(slice)
+        Ok(())
+    }}
+}}\n",
+                ident = self.frag_gen.struct_ident(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params(&[]),
+                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+            ),
             format!(
                 "\
 {cfg}

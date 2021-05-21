@@ -1,6 +1,8 @@
+use std::borrow::Cow;
+use std::intrinsics::transmute;
 use std::marker::PhantomData;
 
-use crate::deser::LdSlice;
+use crate::deser::{DeserializableMessageFromSlice, LdSlice};
 use crate::tags;
 use crate::types::{FieldData, SliceViewField};
 use crate::variant::VariantTypeTag;
@@ -8,6 +10,7 @@ use crate::InternalDataForSliceViewStruct;
 use crate::{ErrorKind, Result, ResultHelper};
 use ::itertools::{Either, Itertools};
 use ::puroro::RepeatedField;
+use puroro::DeserializableFromSlice;
 
 pub trait FieldDataIntoIter<'p> {
     type Item;
@@ -31,6 +34,35 @@ impl<'p> FieldDataIntoIter<'p> for tags::Int32 {
             _ => Err(ErrorKind::UnexpectedWireType)?,
         }
         .into_iter())
+    }
+}
+impl<'p> FieldDataIntoIter<'p> for tags::String {
+    type Item = Cow<'p, str>;
+    type Iter = impl 'p + Iterator<Item = Result<Self::Item>>;
+    fn into<'slice: 'p>(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+        if let FieldData::LengthDelimited(ld_slice) = field_data {
+            Ok(std::iter::once(Ok(Cow::Borrowed(unsafe {
+                transmute(ld_slice.as_slice())
+            }))))
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+impl<'p, T> FieldDataIntoIter<'p> for tags::Message<T>
+where
+    T: 'p + DeserializableFromSlice + ToOwned<Owned = T>,
+{
+    type Item = Cow<'p, T>;
+    type Iter = impl 'p + Iterator<Item = Result<Self::Item>>;
+    fn into<'slice: 'p>(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+        if let FieldData::LengthDelimited(ld_slice) = field_data {
+            Ok(std::iter::once(Ok(Cow::Owned(
+                <T as DeserializableFromSlice>::deser_from_slice(ld_slice.as_slice())?,
+            ))))
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
     }
 }
 
