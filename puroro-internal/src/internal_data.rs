@@ -59,7 +59,7 @@ pub struct InternalDataForSliceViewStruct<'slice, 'p> {
 pub enum SourceLdSlices<'slice, 'p> {
     SingleLdSlice(LdSlice<'slice>),
     MaybeMultipleLdSlices {
-        field_in_parent: &'p Option<SliceViewField<'slice>>,
+        field_in_parent: Option<&'p SliceViewField<'slice>>,
         field_number_in_parent: usize,
         parent_internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
     },
@@ -73,7 +73,7 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     }
 
     pub fn new_with_parent(
-        parent_field: &'p Option<SliceViewField<'slice>>,
+        parent_field: Option<&'p SliceViewField<'slice>>,
         field_number_in_parent: usize,
         parent_internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
     ) -> Self {
@@ -114,14 +114,14 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     pub fn field_data_iter(
         &'p self,
         field_number: usize,
-        field: &'p Option<SliceViewField<'slice>>,
+        field: Option<&'p SliceViewField<'slice>>,
     ) -> impl 'p + Iterator<Item = Result<FieldData<LdSlice<'slice>>>> {
         // The iter of `ld_slice` which consists the specified field.
         // Note that this might be a smaller set when compared with the `ld_slice`s consisting
         // the message struct. For example, even if there's a message consist of 3 separated slices,
         // but a certain field k can be consist of only the 2nd slice.
         let ld_slices = field
-            .iter()
+            .into_iter()
             .map(move |field| {
                 match field {
                     SliceViewField::FieldInSingleSlice { ld_slice, .. } => {
@@ -150,7 +150,6 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
         ld_slices
             .map_ok(|ld_slice| ld_slice.fields())
             .flatten_ok()
-            // ↓ same with unstable Result::flatten.
             .map(|rrfield| rrfield.flatten())
             .filter_map_ok(move |field| {
                 if field.number == field_number {
@@ -164,7 +163,7 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
 
 struct MultipleSourceLdSlicesIter<'slice, 'p> {
     field_number: usize,
-    field: &'p Option<SliceViewField<'slice>>,
+    field: Option<&'p SliceViewField<'slice>>,
     internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
 
     prev_ld_slice: Option<LdSlice<'slice>>,
@@ -180,7 +179,7 @@ impl<'slice, 'p> Iterator for MultipleSourceLdSlicesIter<'slice, 'p> {
 impl<'slice, 'p> MultipleSourceLdSlicesIter<'slice, 'p> {
     fn new(
         field_number: usize,
-        field: &'p Option<SliceViewField<'slice>>,
+        field: Option<&'p SliceViewField<'slice>>,
         internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
     ) -> Self {
         Self {

@@ -77,7 +77,7 @@ pub struct RepeatedSliceViewField<'slice, 'p, TypeTag>
 where
     TypeTag: FieldDataIntoIter<'slice, 'p>,
 {
-    field: &'p Option<SliceViewField<'slice>>,
+    field: Option<&'p SliceViewField<'slice>>,
     field_number: usize,
     internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
     phantom: PhantomData<TypeTag>,
@@ -88,7 +88,7 @@ where
     TypeTag: FieldDataIntoIter<'slice, 'p>,
 {
     pub fn new(
-        field: &'p Option<SliceViewField<'slice>>,
+        field: Option<&'p SliceViewField<'slice>>,
         field_number: usize,
         internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
     ) -> Self {
