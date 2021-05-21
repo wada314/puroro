@@ -780,10 +780,10 @@ impl{gp} ::puroro_internal::MapEntry for {entry_type} {{
             entry_type = self.frag_gen.type_name_of_msg(self.msg)?,
             cfg = self.frag_gen.cfg_condition(),
             gp = self.frag_gen.struct_generic_params(&[]),
-            key_type = self.frag_gen.field_scalar_item_type_for(key_field)?,
+            key_type = self.frag_gen.field_scalar_item_type(key_field)?,
             key_type_tag = self.frag_gen.type_tag_ident_for(key_field)?,
             take_key = self.frag_gen.field_take_or_init(key_field)?,
-            value_type = self.frag_gen.field_scalar_item_type_for(value_field)?,
+            value_type = self.frag_gen.field_scalar_item_type(value_field)?,
             value_type_tag = self.frag_gen.type_tag_ident_for(value_field)?,
             take_value = self.frag_gen.field_take_or_init(value_field)?,
         ),)

@@ -1,8 +1,10 @@
+use std::borrow::Cow;
+
 use super::writer::{func, indent, iter, IntoFragment};
 use crate::context::Context;
 use crate::utils::{to_camel_case, Indentor};
 use crate::wrappers::{
-    FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonTrivialFieldType,
+    FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
 use crate::{ErrorKind, Result};
 
@@ -81,7 +83,7 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                     return_type_bound: format!(
                         "::puroro::MapField<'a, {key}, {value}>",
                         key = self.map_key_type_name(key_field)?,
-                        value = self.repeated_item_type_name(value_field, "'a")?,
+                        value = self.scalar_getter_type_name(value_field, "'a")?,
                     ),
                     get_decl: format!(
                         "fn {ident}<'a>(&'a self) -> Self::{type_ident}<'a>",
@@ -103,7 +105,7 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                     return_type_ident_gp: format!("{ident}<'a>", ident = type_ident.clone()),
                     return_type_bound: format!(
                         "::puroro::RepeatedField<'a, {value}>",
-                        value = self.repeated_item_type_name(field, "'a")?,
+                        value = self.scalar_getter_type_name(field, "'a")?,
                     ),
                     get_decl: format!(
                         "fn {ident}<'a>(&'a self) -> Self::{type_ident}<'a>",
@@ -135,95 +137,52 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
         Ok(format!("{}Type", msg.native_ident()?))
     }
 
-    pub fn scalar_deref_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
-        Ok(match field.type_()?.native_trivial_type_name() {
-            Ok(name) => name.into(),
-            Err(nontrivial_type) => match nontrivial_type {
-                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                NonTrivialFieldType::String => format!("str").into(),
-                NonTrivialFieldType::Bytes => format!("[u8]").into(),
-                NonTrivialFieldType::Enum(e) => format!(
-                    "::std::result::Result<{type_}, i32>",
-                    type_ = e.native_ident_with_relative_path(self.msg.package()?)?
-                )
-                .into(),
-                NonTrivialFieldType::Message(m) => {
-                    format!("Self::{name}", name = self.associated_msg_type_ident(m)?).into()
-                }
-            },
-        })
-    }
-
-    pub fn repeated_item_type_name(
-        &self,
-        field: &'c FieldDescriptor<'c>,
-        lifetime: &str,
-    ) -> Result<String> {
-        Ok(match field.type_()?.native_trivial_type_name() {
-            Ok(name) => name.into(),
-            Err(nontrivial_type) => match nontrivial_type {
-                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                NonTrivialFieldType::String => {
-                    format!("::std::borrow::Cow<{lt}, str>", lt = lifetime).into()
-                }
-                NonTrivialFieldType::Bytes => {
-                    format!("::std::borrow::Cow<{lt}, [u8]>", lt = lifetime).into()
-                }
-                NonTrivialFieldType::Enum(e) => format!(
-                    "::std::result::Result<{type_}, i32>",
-                    type_ = e.native_ident_with_relative_path(self.msg.package()?)?
-                )
-                .into(),
-                NonTrivialFieldType::Message(m) => format!(
-                    "::std::borrow::Cow<{lt}, Self::{name}>",
-                    name = self.associated_msg_type_ident(m)?,
-                    lt = lifetime
-                )
-                .into(),
-            },
-        })
-    }
-
-    pub fn map_key_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<&'static str> {
-        Ok(match field.type_()?.native_trivial_type_name() {
-            Ok(name) => name,
-            Err(nontrivial_type) => match nontrivial_type {
-                NonTrivialFieldType::String => "str",
-                _ => Err(ErrorKind::InvalidMapKey {
-                    name: field.fully_qualified_type_name()?.to_string(),
-                })?,
-            },
-        })
-    }
-
     pub fn scalar_getter_type_name(
         &self,
         field: &'c FieldDescriptor<'c>,
         lifetime: &str,
     ) -> Result<String> {
-        Ok(match field.type_()?.native_trivial_type_name() {
-            Ok(name) => name.into(),
-            Err(nontrivial_type) => match nontrivial_type {
-                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                NonTrivialFieldType::String => {
-                    format!("::std::borrow::Cow<{lt}, str>", lt = lifetime).into()
+        Ok(
+            match field
+                .type_()?
+                .native_numerical_type_name(field.package()?)?
+            {
+                Ok(name) => name.into(),
+                Err(nonnumerical_type) => {
+                    let t: Cow<str> = match nonnumerical_type {
+                        NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                        NonNumericalFieldType::String => "str".into(),
+                        NonNumericalFieldType::Bytes => "[u8]".into(),
+                        NonNumericalFieldType::Message(m) => {
+                            format!("Self::{name}", name = self.associated_msg_type_ident(m)?)
+                                .into()
+                        }
+                    };
+                    format!(
+                        "::std::borrow::Cow<{lt}, {type_}>",
+                        lt = lifetime,
+                        type_ = t,
+                    )
                 }
-                NonTrivialFieldType::Bytes => {
-                    format!("::std::borrow::Cow<{lt}, [u8]>", lt = lifetime).into()
-                }
-                NonTrivialFieldType::Enum(e) => format!(
-                    "::std::result::Result<{type_}, i32>",
-                    type_ = e.native_ident_with_relative_path(field.package()?)?
-                )
-                .into(),
-                NonTrivialFieldType::Message(m) => format!(
-                    "::std::borrow::Cow<{lt}, Self::{name}>",
-                    lt = lifetime,
-                    name = self.associated_msg_type_ident(m)?
-                )
-                .into(),
             },
-        })
+        )
+    }
+
+    pub fn map_key_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'static, str>> {
+        Ok(
+            match field
+                .type_()?
+                .native_numerical_type_name(field.package()?)?
+            {
+                Ok(name) => name,
+                Err(nonnumerical_type) => match nonnumerical_type {
+                    NonNumericalFieldType::String => "str".into(),
+                    _ => Err(ErrorKind::InvalidMapKey {
+                        name: field.fully_qualified_type_name()?.to_string(),
+                    })?,
+                },
+            },
+        )
     }
 }
 

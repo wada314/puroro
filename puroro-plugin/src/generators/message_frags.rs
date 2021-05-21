@@ -5,7 +5,7 @@ use itertools::Itertools;
 use crate::context::{AllocatorType, Context, ImplType};
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::wrappers::{
-    FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonTrivialFieldType,
+    FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
 use crate::{ErrorKind, Result};
 
@@ -125,44 +125,37 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
-    pub fn field_scalar_item_type_for(
-        &self,
-        field: &'c FieldDescriptor<'c>,
-    ) -> Result<Cow<'c, str>> {
+    pub fn field_scalar_item_type(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
         Ok(match self.context.impl_type() {
-            ImplType::Default => match field.type_()?.native_trivial_type_name() {
-                Ok(name) => name.into(),
-                Err(nontrivial_type) => match nontrivial_type {
-                    NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                    NonTrivialFieldType::String => self.string_type().into(),
-                    NonTrivialFieldType::Bytes => self.vec_type("u8").into(),
-                    NonTrivialFieldType::Enum(e) => format!(
-                        "::std::result::Result<{type_}, i32>",
-                        type_ = e.native_ident_with_relative_path(field.package()?)?
-                    )
-                    .into(),
-                    NonTrivialFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
+            ImplType::Default => match field
+                .type_()?
+                .native_numerical_type_name(field.package()?)?
+            {
+                Ok(name) => name,
+                Err(nonnumerical_type) => match nonnumerical_type {
+                    NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                    NonNumericalFieldType::String => self.string_type().into(),
+                    NonNumericalFieldType::Bytes => self.vec_type("u8").into(),
+                    NonNumericalFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
                 },
             },
-            ImplType::SliceView { .. } => match field.type_()?.native_trivial_type_name() {
-                Ok(name) => name.into(),
-                Err(nontrivial_type) => match nontrivial_type {
-                    NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                    NonTrivialFieldType::String => "&'slice str".into(),
-                    NonTrivialFieldType::Bytes => "&'slice [u8]".into(),
-                    NonTrivialFieldType::Enum(e) => format!(
-                        "::std::result::Result<{type_}, i32>",
-                        type_ = e.native_ident_with_relative_path(field.package()?)?
-                    )
-                    .into(),
-                    NonTrivialFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
+            ImplType::SliceView { .. } => match field
+                .type_()?
+                .native_numerical_type_name(field.package()?)?
+            {
+                Ok(name) => name,
+                Err(nonnumerical_type) => match nonnumerical_type {
+                    NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                    NonNumericalFieldType::String => "&'slice str".into(),
+                    NonNumericalFieldType::Bytes => "&'slice [u8]".into(),
+                    NonNumericalFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
                 },
             },
         })
     }
 
     pub fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
-        let scalar_type = self.field_scalar_item_type_for(field)?;
+        let scalar_type = self.field_scalar_item_type(field)?;
         Ok(match self.context.impl_type() {
             ImplType::Default => {
                 if let FieldType::Message(m) = field.type_()? {
@@ -171,8 +164,8 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                         let (key_field, value_field) = m.key_value_of_map_entry()?;
                         return Ok(format!(
                             "::std::collections::HashMap<{key}, {value}>",
-                            key = self.field_scalar_item_type_for(key_field)?,
-                            value = self.field_scalar_item_type_for(value_field)?,
+                            key = self.field_scalar_item_type(key_field)?,
+                            value = self.field_scalar_item_type(value_field)?,
                         )
                         .into());
                     }
@@ -373,14 +366,14 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     ::take_or_init(self.{ident})",
                 ident = field.native_ident()?,
                 field_type = self.field_type_for(field)?,
-                taken_type = self.field_scalar_item_type_for(field)?,
+                taken_type = self.field_scalar_item_type(field)?,
             ),
             AllocatorType::Bumpalo => format!(
                 "<{field_type} as FieldTakeOrInit<{taken_type}>>\
                     ::take_or_init_in_bumpalo(self.{ident}, self.puroro_internal.bumpalo())",
                 ident = field.native_ident()?,
                 field_type = self.field_type_for(field)?,
-                taken_type = self.field_scalar_item_type_for(field)?,
+                taken_type = self.field_scalar_item_type(field)?,
             ),
         })
     }

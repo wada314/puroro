@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::fmt::Debug;
 
 use crate::google::protobuf::field_descriptor_proto::Label;
@@ -214,31 +215,35 @@ pub enum FieldType<'c> {
     Message(&'c super::MessageDescriptor<'c>),
 }
 impl<'c> FieldType<'c> {
-    pub fn native_trivial_type_name(
+    pub fn native_numerical_type_name(
         &self,
-    ) -> std::result::Result<&'static str, NonTrivialFieldType<'c>> {
-        match self {
-            FieldType::Double => Ok("f64"),
-            FieldType::Float => Ok("f32"),
-            FieldType::Int32 | FieldType::SInt32 | FieldType::SFixed32 => Ok("i32"),
-            FieldType::Int64 | FieldType::SInt64 | FieldType::SFixed64 => Ok("i64"),
-            FieldType::UInt32 | FieldType::Fixed32 => Ok("u32"),
-            FieldType::UInt64 | FieldType::Fixed64 => Ok("u64"),
-            FieldType::Bool => Ok("bool"),
-            FieldType::Group => Err(NonTrivialFieldType::Group),
-            FieldType::String => Err(NonTrivialFieldType::String),
-            FieldType::Bytes => Err(NonTrivialFieldType::Bytes),
-            FieldType::Enum(e) => Err(NonTrivialFieldType::Enum(e)),
-            FieldType::Message(m) => Err(NonTrivialFieldType::Message(m)),
-        }
+        package: &str,
+    ) -> Result<std::result::Result<Cow<'static, str>, NonNumericalFieldType<'c>>> {
+        Ok(match self {
+            FieldType::Double => Ok("f64".into()),
+            FieldType::Float => Ok("f32".into()),
+            FieldType::Int32 | FieldType::SInt32 | FieldType::SFixed32 => Ok("i32".into()),
+            FieldType::Int64 | FieldType::SInt64 | FieldType::SFixed64 => Ok("i64".into()),
+            FieldType::UInt32 | FieldType::Fixed32 => Ok("u32".into()),
+            FieldType::UInt64 | FieldType::Fixed64 => Ok("u64".into()),
+            FieldType::Bool => Ok("bool".into()),
+            FieldType::Group => Err(NonNumericalFieldType::Group),
+            FieldType::String => Err(NonNumericalFieldType::String),
+            FieldType::Bytes => Err(NonNumericalFieldType::Bytes),
+            FieldType::Enum(e) => Ok(format!(
+                "::std::result::Result<{type_}, i32>",
+                type_ = e.native_ident_with_relative_path(package)?
+            )
+            .into()),
+            FieldType::Message(m) => Err(NonNumericalFieldType::Message(m)),
+        })
     }
 }
 
-pub enum NonTrivialFieldType<'c> {
+pub enum NonNumericalFieldType<'c> {
     Group,
     String,
     Bytes,
-    Enum(&'c super::EnumDescriptor<'c>),
     Message(&'c super::MessageDescriptor<'c>),
 }
 

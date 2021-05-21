@@ -19,7 +19,7 @@ mod field;
 mod file;
 mod message;
 use crate::Result;
-pub use field::{FieldDescriptor, FieldLabel, FieldType, NonTrivialFieldType};
+pub use field::{FieldDescriptor, FieldLabel, FieldType, NonNumericalFieldType};
 pub use file::{DescriptorVisitor, FileDescriptor, ProtoSyntax};
 pub use message::MessageDescriptor;
 pub use r#enum::{EnumDescriptor, EnumValueDescriptor};
