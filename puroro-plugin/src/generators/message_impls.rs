@@ -603,7 +603,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
 
                             (
                                 GetterMethods::RepeatedField {
-                                    return_type_ident,
+                                    return_type_ident_gp: return_type_ident,
                                     return_type_bound: _,
                                     get_decl,
                                 }
@@ -627,7 +627,7 @@ type {return_type_ident} = {type_name};
                             ),
                             (
                                 GetterMethods::RepeatedField {
-                                    return_type_ident,
+                                    return_type_ident_gp: return_type_ident,
                                     return_type_bound: _,
                                     get_decl,
                                 },

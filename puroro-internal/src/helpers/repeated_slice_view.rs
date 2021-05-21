@@ -47,30 +47,3 @@ impl<'slice, 'p> RepeatedSliceViewField<'slice, 'p, tags::Int32> {
             .map(|result| result.unwrap())
     }
 }
-
-impl<'slice, 'p> RepeatedField<i32> for RepeatedSliceViewField<'slice, 'p, tags::Int32> {
-    fn for_each<F>(&self, f: F)
-    where
-        F: FnMut(&i32),
-    {
-        for v in self.iter_impl() {
-            f(&v);
-        }
-    }
-
-    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = std::borrow::Cow<'_, i32>>> {
-        todo!()
-    }
-
-    type Iter<'a>
-    where
-        Self: 'a,
-        i32: 'a + ToOwned;
-
-    fn iter<'a>(&'a self) -> Self::Iter<'a>
-    where
-        i32: 'a + ToOwned,
-    {
-        todo!()
-    }
-}

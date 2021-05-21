@@ -43,11 +43,18 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                             format!("{decl};\n", decl = decl)
                         }
                         GetterMethods::RepeatedField {
-                            return_type_ident: type_ident,
+                            return_type_ident_gp: type_ident_gp,
                             return_type_bound: type_bound,
                             get_decl,
+                        } => {
+                            format!(
+                                "type {type_ident_gp}: {type_bound};\n{get_decl};\n",
+                                type_ident_gp = type_ident_gp,
+                                type_bound = type_bound,
+                                get_decl = get_decl
+                            )
                         }
-                        | GetterMethods::MapField {
+                        GetterMethods::MapField {
                             return_type_ident: type_ident,
                             return_type_bound: type_bound,
                             get_decl,
@@ -100,13 +107,13 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
             (FieldLabel::Repeated, _) => {
                 let type_ident = format!("{}Repeated", to_camel_case(field.native_ident()?));
                 GetterMethods::RepeatedField {
-                    return_type_ident: type_ident.clone(),
+                    return_type_ident_gp: format!("{ident}<'a>", ident = type_ident.clone()),
                     return_type_bound: format!(
-                        "::puroro::RepeatedField<{value}>",
+                        "::puroro::RepeatedField<'a, {value}>",
                         value = self.scalar_deref_type_name(field)?,
                     ),
                     get_decl: format!(
-                        "fn {ident}(&self) -> &Self::{type_ident}",
+                        "fn {ident}<'a>(&'a self) -> &Self::{type_ident}",
                         ident = field.native_ident()?,
                         type_ident = type_ident,
                     ),
@@ -185,7 +192,7 @@ pub enum GetterMethods {
     BareField(String),
     OptionalField(String),
     RepeatedField {
-        return_type_ident: String,
+        return_type_ident_gp: String,
         return_type_bound: String,
         get_decl: String,
     },
