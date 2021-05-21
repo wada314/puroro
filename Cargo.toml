@@ -3,5 +3,5 @@ members = [
     "puroro",
     "puroro-plugin",
     "puroro-internal",
-    "test_generated",
+    "tests",
 ]
