@@ -2,10 +2,9 @@ use std::borrow::Cow;
 use std::intrinsics::transmute;
 use std::marker::PhantomData;
 
-use crate::deser::{DeserializableMessageFromSlice, LdSlice};
+use crate::deser::LdSlice;
 use crate::tags;
 use crate::types::{FieldData, SliceViewField};
-use crate::variant::VariantTypeTag;
 use crate::InternalDataForSliceViewStruct;
 use crate::{ErrorKind, Result, ResultHelper};
 use ::itertools::{Either, Itertools};

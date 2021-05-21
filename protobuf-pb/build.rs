@@ -3,10 +3,10 @@ use ::std::path::PathBuf;
 use ::std::process::Command;
 
 fn main() {
-    println!("cargo:rerun-if-changed=../puroro/**/*");
-    println!("cargo:rerun-if-changed=../puroro-internal/**/*");
-    println!("cargo:rerun-if-changed=../puroro-plugin/**/*");
-    println!("cargo:rerun-if-changed=../purotobuf/**/*.proto");
+    println!("cargo:rerun-if-changed=../puroro");
+    println!("cargo:rerun-if-changed=../puroro-internal");
+    println!("cargo:rerun-if-changed=../puroro-plugin");
+    println!("cargo:rerun-if-changed=../purotobuf");
     println!("cargo:rerun-if-changed=build.rs");
 
     let out_dir = env::var("OUT_DIR").unwrap();
@@ -26,7 +26,7 @@ fn main() {
     let output_rust_path = [&out_dir].iter().collect::<PathBuf>();
 
     let protoc_exe = env::var("PURORO_PROTOC_PATH").unwrap_or("protoc".to_string());
-    Command::new(&protoc_exe)
+    let protoc_status = Command::new(&protoc_exe)
         .arg("../protobuf/src/google/protobuf/compiler/plugin.proto")
         .arg(format!(
             "--plugin=protoc-gen-rust={}",
@@ -36,4 +36,8 @@ fn main() {
         .arg(format!("--proto_path={}", "../protobuf/src"))
         .status()
         .unwrap();
+    if !protoc_status.success() {
+        println!("cargo:warning=Failed to run `protoc` command.");
+        panic!("Failed to run `protoc` command.")
+    }
 }
