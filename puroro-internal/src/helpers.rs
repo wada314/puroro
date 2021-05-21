@@ -11,6 +11,7 @@ pub use field_deser::{FieldDeserFromIter, FieldDeserFromSlice};
 pub use field_new::FieldNew;
 pub use field_ser::FieldSer;
 pub use field_take_or_init::FieldTakeOrInit;
+pub use repeated_slice_view::RepeatedSliceViewField;
 
 use crate::ser::MessageSerializer;
 use crate::tags;

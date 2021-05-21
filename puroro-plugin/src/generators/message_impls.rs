@@ -648,13 +648,28 @@ type {return_type_ident} where Self: 'a = &'a {type_name};
                             ),
                             (
                                 GetterMethods::RepeatedField {
-                                    return_type_ident_gp: return_type_ident,
+                                    return_type_ident_gp,
                                     return_type_bound: _,
                                     get_decl,
                                 },
                                 ImplType::SliceView { .. },
                                 _,
-                            ) => todo!(),
+                            ) => format!(
+                                "\
+type {return_type_ident} where Self: 'a = &'a {type_name};
+{get_decl} {{
+    ::puroro_internal::RepeatedSliceViewField::new(
+        &self.{ident},
+        {field_number},
+        &self.puroro_internal,
+    )
+}}\n",
+                                return_type_ident = return_type_ident_gp,
+                                type_name = self.frag_gen.field_type_for(field)?,
+                                get_decl = get_decl,
+                                ident = field.native_ident()?,
+                                field_number = field.number(),
+                            ),
                             (
                                 GetterMethods::MapField {
                                     return_type_ident,

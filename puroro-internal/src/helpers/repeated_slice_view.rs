@@ -80,6 +80,19 @@ impl<'slice, 'p, TypeTag> RepeatedSliceViewField<'slice, 'p, TypeTag>
 where
     TypeTag: FieldDataIntoIter<'p>,
 {
+    pub fn new(
+        field: &'p Option<SliceViewField<'slice>>,
+        field_number: usize,
+        internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
+    ) -> Self {
+        Self {
+            field,
+            field_number,
+            internal_data,
+            phantom: PhantomData,
+        }
+    }
+
     fn iter_impl(&'p self) -> impl 'p + Iterator<Item = <TypeTag as FieldDataIntoIter>::Item> {
         self.internal_data
             .field_data_iter(self.field_number, self.field)
