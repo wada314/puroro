@@ -3,7 +3,6 @@ use ::std::path::PathBuf;
 use ::std::process::Command;
 
 fn main() {
-    //println!("cargo:warning=OUT_DIR = {}", env::var("OUT_DIR").unwrap());
     println!("cargo:rerun-if-changed=../puroro/**/*");
     println!("cargo:rerun-if-changed=../puroro-internal/**/*");
     println!("cargo:rerun-if-changed=../puroro-plugin/**/*");
