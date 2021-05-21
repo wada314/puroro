@@ -596,7 +596,10 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 ImplType::Default,
                                 FieldType::Message(_) | FieldType::String | FieldType::Bytes,
                             ) => format!(
-                                "{decl} {{\n    self.{ident}.as_ref()\n}}\n",
+                                "\
+{decl} {{
+    ::std::borrow::Cow::Borrowed(self.{ident}.as_ref())
+}}\n",
                                 decl = decl,
                                 ident = field.native_ident()?
                             ),
@@ -605,7 +608,10 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 ImplType::Default,
                                 FieldType::Message(_) | FieldType::String | FieldType::Bytes,
                             ) => format!(
-                                "{decl} {{\n    self.{ident}.as_deref()\n}}\n",
+                                "\
+{decl} {{
+    self.{ident}.as_deref().map(|r| ::std::borrow::Cow::Borrowed(r))
+}}\n",
                                 decl = decl,
                                 ident = field.native_ident()?
                             ),
