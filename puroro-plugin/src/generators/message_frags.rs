@@ -90,7 +90,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         } else {
             let generic_args = Itertools::intersperse(generic_args_iter, ", ").collect::<String>();
             Ok(format!(
-                "{name}<{gargs}>",
+                "{name}::<{gargs}>",
                 name = self.struct_ident_with_relative_path(msg)?,
                 gargs = generic_args,
             ))
@@ -223,7 +223,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    pub fn type_tag_for(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+    pub fn type_tag_ident_for(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
         Ok(match field.type_()? {
             FieldType::Double => "Double".into(),
             FieldType::Float => "Float".into(),
@@ -310,9 +310,11 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             .chain(
                 match self.context.impl_type() {
                     ImplType::Default => None,
-                    ImplType::SliceView { .. } => Some("'slice, 'p"),
+                    ImplType::SliceView { .. } => Some(["'slice", "'p"].iter()),
                 }
-                .into_iter(),
+                .into_iter()
+                .flatten()
+                .cloned(),
             )
             .unique();
         if iter.clone().count() == 0 {

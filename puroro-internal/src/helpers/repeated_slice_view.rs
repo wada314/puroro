@@ -11,15 +11,18 @@ use ::itertools::{Either, Itertools};
 use ::puroro::RepeatedField;
 use puroro::DeserializableFromSlice;
 
-pub trait FieldDataIntoIter<'p> {
+pub trait FieldDataIntoIter<'slice, 'p> {
     type Item;
     type Iter: 'p + Iterator<Item = Result<Self::Item>>;
-    fn into<'slice: 'p>(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter>;
+    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter>;
 }
-impl<'p> FieldDataIntoIter<'p> for tags::Int32 {
+impl<'slice, 'p> FieldDataIntoIter<'slice, 'p> for tags::Int32
+where
+    'slice: 'p,
+{
     type Item = i32;
     type Iter = impl 'p + Iterator<Item = Result<Self::Item>>;
-    fn into<'slice: 'p>(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         Ok(match field_data {
             FieldData::Variant(variant) => {
                 Either::Left(std::iter::once(variant.to_native::<Self>()))
@@ -35,10 +38,13 @@ impl<'p> FieldDataIntoIter<'p> for tags::Int32 {
         .into_iter())
     }
 }
-impl<'p> FieldDataIntoIter<'p> for tags::String {
+impl<'slice, 'p> FieldDataIntoIter<'slice, 'p> for tags::String
+where
+    'slice: 'p,
+{
     type Item = Cow<'p, str>;
     type Iter = impl 'p + Iterator<Item = Result<Self::Item>>;
-    fn into<'slice: 'p>(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         if let FieldData::LengthDelimited(ld_slice) = field_data {
             Ok(std::iter::once(Ok(Cow::Borrowed(unsafe {
                 transmute(ld_slice.as_slice())
@@ -48,13 +54,14 @@ impl<'p> FieldDataIntoIter<'p> for tags::String {
         }
     }
 }
-impl<'p, T> FieldDataIntoIter<'p> for tags::Message<T>
+impl<'slice, 'p, T> FieldDataIntoIter<'slice, 'p> for tags::Message<T>
 where
-    T: 'p + DeserializableFromSlice + ToOwned<Owned = T>,
+    T: 'p + DeserializableFromSlice<'slice> + ToOwned<Owned = T>,
+    'slice: 'p,
 {
     type Item = Cow<'p, T>;
     type Iter = impl 'p + Iterator<Item = Result<Self::Item>>;
-    fn into<'slice: 'p>(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         if let FieldData::LengthDelimited(ld_slice) = field_data {
             Ok(std::iter::once(Ok(Cow::Owned(
                 <T as DeserializableFromSlice>::deser_from_slice(ld_slice.as_slice())?,
@@ -68,7 +75,7 @@ where
 #[derive(Debug, Clone)]
 pub struct RepeatedSliceViewField<'slice, 'p, TypeTag>
 where
-    TypeTag: FieldDataIntoIter<'p>,
+    TypeTag: FieldDataIntoIter<'slice, 'p>,
 {
     field: &'p Option<SliceViewField<'slice>>,
     field_number: usize,
@@ -78,7 +85,7 @@ where
 
 impl<'slice, 'p, TypeTag> RepeatedSliceViewField<'slice, 'p, TypeTag>
 where
-    TypeTag: FieldDataIntoIter<'p>,
+    TypeTag: FieldDataIntoIter<'slice, 'p>,
 {
     pub fn new(
         field: &'p Option<SliceViewField<'slice>>,
@@ -93,7 +100,9 @@ where
         }
     }
 
-    fn iter_impl(&'p self) -> impl 'p + Iterator<Item = <TypeTag as FieldDataIntoIter>::Item> {
+    fn iter_impl(
+        &'p self,
+    ) -> impl 'p + Iterator<Item = <TypeTag as FieldDataIntoIter<'slice, 'p>>::Item> {
         self.internal_data
             .field_data_iter(self.field_number, self.field)
             .map_ok(|field| -> Result<_> { <TypeTag as FieldDataIntoIter>::into(field) })
@@ -106,8 +115,9 @@ where
 
 impl<'slice, 'p, T, TypeTag> RepeatedField<'p, T> for RepeatedSliceViewField<'slice, 'p, TypeTag>
 where
+    'slice: 'p,
     T: 'p,
-    TypeTag: FieldDataIntoIter<'p, Item = T>,
+    TypeTag: FieldDataIntoIter<'slice, 'p, Item = T>,
 {
     fn for_each<F>(&'p self, f: F)
     where
