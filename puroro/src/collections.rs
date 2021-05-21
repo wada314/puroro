@@ -1,9 +1,6 @@
 use std::borrow::{Borrow, Cow};
 use std::collections::HashMap;
 use std::hash::Hash;
-use std::ops::Deref;
-
-use crate::Message;
 
 pub trait VecItemIntoRepeatedFieldItem {
     type Item;

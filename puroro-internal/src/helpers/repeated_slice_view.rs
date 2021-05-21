@@ -6,7 +6,6 @@ use crate::variant::VariantTypeTag;
 use crate::InternalDataForSliceViewStruct;
 use crate::{ErrorKind, Result, ResultHelper};
 use ::itertools::Itertools;
-use ::puroro::RepeatedField;
 use itertools::Either;
 
 #[derive(Debug, Clone)]
