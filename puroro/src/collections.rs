@@ -68,11 +68,12 @@ where
 }
 
 pub trait RepeatedField<'a, T> {
-    fn for_each<F>(&self, f: F)
+    fn for_each<F>(&'a self, f: F)
     where
         F: FnMut(T);
-    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>>;
+    fn boxed_iter(&'a self) -> Box<dyn 'a + Iterator<Item = T>>;
 
+    #[cfg(feature = "puroro-nightly")]
     type Iter: Iterator<Item = T>;
     fn iter(&'a self) -> Self::Iter;
 }
@@ -81,7 +82,7 @@ impl<'a, T, U> RepeatedField<'a, T> for &'a Vec<U>
 where
     &'a U: VecItemIntoRepeatedFieldItem<Item = T>,
 {
-    fn for_each<F>(&self, f: F)
+    fn for_each<F>(&'a self, f: F)
     where
         F: FnMut(T),
     {
@@ -90,7 +91,7 @@ where
             .for_each(f)
     }
 
-    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>> {
+    fn boxed_iter(&'a self) -> Box<dyn 'a + Iterator<Item = T>> {
         Box::new(<[U]>::iter(self).map(|x| <&U as VecItemIntoRepeatedFieldItem>::into(x)))
     }
 
@@ -104,7 +105,7 @@ impl<'a, 'bump, T, U> RepeatedField<'a, T> for &'a ::bumpalo::collections::Vec<'
 where
     &'a U: VecItemIntoRepeatedFieldItem<Item = T>,
 {
-    fn for_each<F>(&self, f: F)
+    fn for_each<F>(&'a self, f: F)
     where
         F: FnMut(T),
     {
@@ -113,7 +114,7 @@ where
             .for_each(f)
     }
 
-    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>> {
+    fn boxed_iter(&'a self) -> Box<dyn 'a + Iterator<Item = T>> {
         Box::new(<[U]>::iter(self).map(|x| <&U as VecItemIntoRepeatedFieldItem>::into(x)))
     }
 
