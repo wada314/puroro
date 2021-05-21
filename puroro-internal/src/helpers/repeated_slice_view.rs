@@ -5,8 +5,8 @@ use crate::types::{FieldData, SliceViewField};
 use crate::variant::VariantTypeTag;
 use crate::InternalDataForSliceViewStruct;
 use crate::{ErrorKind, Result, ResultHelper};
-use ::itertools::Itertools;
-use itertools::Either;
+use ::itertools::{Either, Itertools};
+use ::puroro::RepeatedField;
 
 #[derive(Debug, Clone)]
 pub struct RepeatedSliceViewField<'slice, 'p, TypeTag>
@@ -44,5 +44,26 @@ impl<'slice, 'p> RepeatedSliceViewField<'slice, 'p, tags::Int32> {
             .flatten_ok()
             .map(|rrval| rrval.flatten())
             .map(|result| result.unwrap())
+    }
+}
+
+impl<'slice, 'p> RepeatedField<'p, <tags::Int32 as VariantTypeTag>::NativeType>
+    for RepeatedSliceViewField<'slice, 'p, tags::Int32>
+{
+    fn for_each<F>(&self, f: F)
+    where
+        F: FnMut(<tags::Int32 as VariantTypeTag>::NativeType),
+    {
+        self.iter_impl().for_each(f)
+    }
+    fn boxed_iter(
+        &self,
+    ) -> Box<dyn '_ + Iterator<Item = <tags::Int32 as VariantTypeTag>::NativeType>> {
+        Box::new(self.iter_impl())
+    }
+
+    type Iter = impl Iterator<Item = <tags::Int32 as VariantTypeTag>::NativeType>;
+    fn iter(&'p self) -> Self::Iter {
+        self.iter_impl()
     }
 }

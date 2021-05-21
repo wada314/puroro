@@ -67,66 +67,58 @@ where
     }
 }
 
-pub trait RepeatedField<'a, T>
-where
-    T: ?Sized,
-{
-    type Item: Sized;
+pub trait RepeatedField<'a, T> {
     fn for_each<F>(&self, f: F)
     where
-        F: FnMut(Self::Item);
-    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = Self::Item>>;
+        F: FnMut(T);
+    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>>;
 
-    type Iter: Iterator<Item = Self::Item>;
-    fn iter(&self) -> Self::Iter;
+    type Iter: Iterator<Item = T>;
+    fn iter(&'a self) -> Self::Iter;
 }
 
 impl<'a, T, U> RepeatedField<'a, T> for &'a Vec<U>
 where
-    &'a U: VecItemIntoRepeatedFieldItem,
+    &'a U: VecItemIntoRepeatedFieldItem<Item = T>,
 {
-    type Item = <&'a U as VecItemIntoRepeatedFieldItem>::Item;
-
     fn for_each<F>(&self, f: F)
     where
-        F: FnMut(Self::Item),
+        F: FnMut(T),
     {
         <[U]>::iter(self)
             .map(|x| <&U as VecItemIntoRepeatedFieldItem>::into(x))
             .for_each(f)
     }
 
-    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = Self::Item>> {
+    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>> {
         Box::new(<[U]>::iter(self).map(|x| <&U as VecItemIntoRepeatedFieldItem>::into(x)))
     }
 
-    type Iter = impl Iterator<Item = Self::Item>;
-    fn iter(&self) -> Self::Iter {
+    type Iter = impl Iterator<Item = T>;
+    fn iter(&'a self) -> Self::Iter {
         <[U]>::iter(self).map(|x| <&U as VecItemIntoRepeatedFieldItem>::into(x))
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'a, 'bump, T, U> RepeatedField<'a, T> for &'a ::bumpalo::collections::Vec<'bump, U>
 where
-    &'a U: VecItemIntoRepeatedFieldItem,
+    &'a U: VecItemIntoRepeatedFieldItem<Item = T>,
 {
-    type Item = <&'a U as VecItemIntoRepeatedFieldItem>::Item;
-
     fn for_each<F>(&self, f: F)
     where
-        F: FnMut(Self::Item),
+        F: FnMut(T),
     {
         <[U]>::iter(self)
             .map(|x| <&U as VecItemIntoRepeatedFieldItem>::into(x))
             .for_each(f)
     }
 
-    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = Self::Item>> {
+    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>> {
         Box::new(<[U]>::iter(self).map(|x| <&U as VecItemIntoRepeatedFieldItem>::into(x)))
     }
 
-    type Iter = impl Iterator<Item = Self::Item>;
-    fn iter(&self) -> Self::Iter {
+    type Iter = impl Iterator<Item = T>;
+    fn iter(&'a self) -> Self::Iter {
         <[U]>::iter(self).map(|x| <&U as VecItemIntoRepeatedFieldItem>::into(x))
     }
 }
