@@ -1,14 +1,15 @@
-use std::borrow::Cow;
+use std::borrow::{Borrow, Cow};
+use std::hash::Hash;
 use std::intrinsics::transmute;
 use std::marker::PhantomData;
 
 use crate::deser::LdSlice;
-use crate::tags;
 use crate::types::{FieldData, SliceViewField};
 use crate::InternalDataForSliceViewStruct;
+use crate::{tags, MapEntry};
 use crate::{ErrorKind, Result, ResultHelper};
 use ::itertools::{Either, Itertools};
-use ::puroro::RepeatedField;
+use ::puroro::{MapField, RepeatedField};
 use puroro::DeserializableFromSlice;
 
 pub trait FieldDataIntoIter<'slice, 'p> {
@@ -132,5 +133,28 @@ where
     type Iter = impl Iterator<Item = T>;
     fn iter(&'p self) -> Self::Iter {
         self.iter_impl()
+    }
+}
+
+impl<'slice, 'a, K, V, Entry> MapField<'a, K, V>
+    for RepeatedSliceViewField<'slice, 'a, tags::Message<Entry>>
+where
+    'slice: 'a,
+    K: ?Sized,
+    Entry::KeyType: Hash + Eq + Borrow<K>,
+    Entry: 'a + MapEntry<ValueType = V> + DeserializableFromSlice<'slice> + ToOwned<Owned = Entry>,
+{
+    fn get(&'a self, key: &K) -> Option<V>
+    where
+        K: Hash + Eq,
+    {
+        self.iter_impl().find_map(|entry| {
+            let (ekey, evalue) = entry.into_owned().into_tuple();
+            if ekey.borrow().eq(key) {
+                Some(evalue)
+            } else {
+                None
+            }
+        })
     }
 }

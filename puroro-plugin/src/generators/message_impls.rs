@@ -680,6 +680,11 @@ type {return_type_ident} where Self: 'a = &'a {type_name};
                                     return_type_ident_gp,
                                     return_type_bound: _,
                                     get_decl,
+                                }
+                                | GetterMethods::MapField {
+                                    return_type_ident_gp,
+                                    return_type_bound: _,
+                                    get_decl,
                                 },
                                 ImplType::SliceView { .. },
                                 _,
@@ -700,15 +705,6 @@ type {return_type_ident} where Self: 'a =
                                 ident = field.native_ident()?,
                                 field_number = field.number(),
                             ),
-                            (
-                                GetterMethods::MapField {
-                                    return_type_ident_gp: return_type_ident,
-                                    return_type_bound: _,
-                                    get_decl,
-                                },
-                                ImplType::SliceView { .. },
-                                _,
-                            ) => todo!(),
                         },
                     )
                 })),
