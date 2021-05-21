@@ -1,9 +1,9 @@
 use crate::deser::LdSlice;
 use crate::types::{FieldData, SliceViewField};
 use crate::{ErrorKind, Result, ResultHelper};
-use itertools::{Either, Itertools};
-use puroro::InternalData;
-use std::collections::HashMap;
+use ::itertools::{Either, Itertools};
+use ::puroro::InternalData;
+use ::std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct InternalDataForNormalStruct {
@@ -105,7 +105,6 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
                 field_number_in_parent,
                 field_in_parent,
                 parent_internal_data,
-                None,
             )),
         }
         .into_iter()
@@ -183,13 +182,12 @@ impl<'slice, 'p> MultipleSourceLdSlicesIter<'slice, 'p> {
         field_number: usize,
         field: &'p Option<SliceViewField<'slice>>,
         internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
-        prev_ld_slice: Option<LdSlice<'slice>>,
     ) -> Self {
         Self {
             field_number,
             field,
             internal_data,
-            prev_ld_slice,
+            prev_ld_slice: None,
         }
     }
 
@@ -208,7 +206,7 @@ impl<'slice, 'p> MultipleSourceLdSlicesIter<'slice, 'p> {
                     Some(Err(ErrorKind::UnexpectedWireType.into()))
                 }
             })
-            .map(|rrfield| rrfield.and_then(|x| x));
+            .map(|rrfield| rrfield.flatten());
         let result = match self.prev_ld_slice.clone() {
             Some(prev_ld_slice) => {
                 // Skip until we see the prev_ld_slice value, and then get the next value.
