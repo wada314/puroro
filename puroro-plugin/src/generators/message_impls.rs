@@ -350,16 +350,21 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
-        return Ok(());
+        if !self.frag_gen.is_default_available() {
+            return Ok(());
+        }
         (format!(
             "\
 {cfg}
 impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
     fn deser_from_slice(slice: &[u8]) -> ::puroro::Result<Self> {{
-        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+        let mut message = ::std::default::Default::default();
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(
+            &mut message
+        );
         let wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
         wrapped_slice.merge_into_message(&mut from_slice)?;
-        Ok(())
+        Ok(message)
     }}
 }}\n",
             ident = self.frag_gen.struct_ident(self.msg)?,
@@ -367,7 +372,7 @@ impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
             gp = self.frag_gen.struct_generic_params(&[]),
             gpb = self.frag_gen.struct_generic_params_bounds(&[]),
         ))
-        .write_into(output);
+        .write_into(output)
     }
 
     fn print_msg_deser_from_slice_for_slice_view<W: std::fmt::Write>(
