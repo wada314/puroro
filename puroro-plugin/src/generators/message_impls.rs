@@ -661,7 +661,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                     get_decl,
                                 }
                                 | GetterMethods::MapField {
-                                    return_type_ident,
+                                    return_type_ident_gp: return_type_ident,
                                     return_type_bound: _,
                                     get_decl,
                                 },
@@ -705,7 +705,7 @@ type {return_type_ident} where Self: 'a =
                             ),
                             (
                                 GetterMethods::MapField {
-                                    return_type_ident,
+                                    return_type_ident_gp: return_type_ident,
                                     return_type_bound: _,
                                     get_decl,
                                 },
@@ -770,6 +770,7 @@ impl{gp} ::puroro_internal::MapEntry for {entry_type} {{
     }}
     fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {{
         use ::puroro_internal::FieldTakeOrInit;
+        use ::puroro::InternalData;
         (
             {take_key}, 
             {take_value},

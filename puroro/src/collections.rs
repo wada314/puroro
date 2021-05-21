@@ -124,13 +124,13 @@ where
     }
 }
 
-pub trait MapField<K: ?Sized, V: ?Sized> {
-    fn get(&self, key: &K) -> Option<&V>
+pub trait MapField<'a, K: ?Sized, V: ?Sized> {
+    fn get(&'a self, key: &K) -> Option<&'a V>
     where
         K: Hash + Eq;
 }
 
-impl<K, V, L, W> MapField<K, V> for HashMap<L, W>
+impl<'a, K, V, L, W> MapField<'a, K, V> for &'a HashMap<L, W>
 where
     K: ?Sized,
     V: ?Sized,

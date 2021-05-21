@@ -1,5 +1,7 @@
 #[allow(unused)]
 use protobuf_pb as protos;
+#[allow(unused)]
+use sample_pb as samples;
 
 #[cfg(test)]
 mod tests {

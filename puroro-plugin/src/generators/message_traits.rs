@@ -46,22 +46,15 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                             return_type_ident_gp: type_ident_gp,
                             return_type_bound: type_bound,
                             get_decl,
-                        } => {
-                            format!(
-                                "type {type_ident_gp}: {type_bound} where Self: 'a;\n{get_decl};\n",
-                                type_ident_gp = type_ident_gp,
-                                type_bound = type_bound,
-                                get_decl = get_decl
-                            )
                         }
-                        GetterMethods::MapField {
-                            return_type_ident: type_ident,
+                        | GetterMethods::MapField {
+                            return_type_ident_gp: type_ident_gp,
                             return_type_bound: type_bound,
                             get_decl,
                         } => {
                             format!(
-                                "type {type_ident}: {type_bound};\n{get_decl};\n",
-                                type_ident = type_ident,
+                                "type {type_ident_gp}: {type_bound} where Self: 'a;\n{get_decl};\n",
+                                type_ident_gp = type_ident_gp,
                                 type_bound = type_bound,
                                 get_decl = get_decl
                             )
@@ -84,14 +77,14 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 let (key_field, value_field) = m.key_value_of_map_entry()?;
                 let type_ident = format!("{}Map", to_camel_case(field.native_ident()?));
                 GetterMethods::MapField {
-                    return_type_ident: type_ident.clone(),
+                    return_type_ident_gp: format!("{ident}<'a>", ident = type_ident.clone()),
                     return_type_bound: format!(
-                        "::puroro::MapField<{key}, {value}>",
+                        "::puroro::MapField<'a, {key}, {value}>",
                         key = self.scalar_deref_type_name(key_field)?,
                         value = self.scalar_deref_type_name(value_field)?,
                     ),
                     get_decl: format!(
-                        "fn {ident}(&self) -> &Self::{type_ident}",
+                        "fn {ident}<'a>(&'a self) -> Self::{type_ident}<'a>",
                         ident = field.native_ident()?,
                         type_ident = type_ident,
                     ),
@@ -231,7 +224,7 @@ pub enum GetterMethods {
         get_decl: String,
     },
     MapField {
-        return_type_ident: String,
+        return_type_ident_gp: String,
         return_type_bound: String,
         get_decl: String,
     },

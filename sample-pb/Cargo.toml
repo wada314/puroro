@@ -1,18 +1,19 @@
 [package]
-name = "tests"
+name = "sample-pb"
 version = "0.1.0"
-authors = ["Shohei Wada <pc@wada314.jp>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+puroro = { path = "../puroro" }
+puroro-internal = { path = "../puroro-internal" }
 # Requires this commit to be included:
 # https://github.com/fitzgen/bumpalo/commit/e9adce57a54fff2a12994ec8a5797ea041083c1c
 bumpalo = { git = "https://github.com/fitzgen/bumpalo.git", features = ["collections", "boxed"], optional = true }
-puroro = { path = "../puroro" }
-protobuf-pb = { path = "../protobuf-pb" }
-sample-pb = { path = "../sample-pb" }
+
+[build-dependencies]
+puroro-plugin = { path = "../puroro-plugin" }
 
 [features]
 puroro-nightly = []
