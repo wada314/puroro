@@ -80,8 +80,8 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                     return_type_ident_gp: format!("{ident}<'a>", ident = type_ident.clone()),
                     return_type_bound: format!(
                         "::puroro::MapField<'a, {key}, {value}>",
-                        key = self.scalar_deref_type_name(key_field)?,
-                        value = self.scalar_deref_type_name(value_field)?,
+                        key = self.map_key_type_name(key_field)?,
+                        value = self.repeated_item_type_name(value_field, "'a")?,
                     ),
                     get_decl: format!(
                         "fn {ident}<'a>(&'a self) -> Self::{type_ident}<'a>",
@@ -180,6 +180,18 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                     lt = lifetime
                 )
                 .into(),
+            },
+        })
+    }
+
+    pub fn map_key_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<&'static str> {
+        Ok(match field.type_()?.native_trivial_type_name() {
+            Ok(name) => name,
+            Err(nontrivial_type) => match nontrivial_type {
+                NonTrivialFieldType::String => "str",
+                _ => Err(ErrorKind::InvalidMapKey {
+                    name: field.fully_qualified_type_name()?.to_string(),
+                })?,
             },
         })
     }

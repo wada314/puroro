@@ -124,8 +124,8 @@ where
     }
 }
 
-pub trait MapField<'a, K: ?Sized, V: ?Sized> {
-    fn get(&'a self, key: &K) -> Option<&'a V>
+pub trait MapField<'a, K: ?Sized, V> {
+    fn get(&'a self, key: &K) -> Option<V>
     where
         K: Hash + Eq;
 }
@@ -133,14 +133,13 @@ pub trait MapField<'a, K: ?Sized, V: ?Sized> {
 impl<'a, K, V, L, W> MapField<'a, K, V> for &'a HashMap<L, W>
 where
     K: ?Sized,
-    V: ?Sized,
     L: Hash + Eq + Borrow<K>,
-    W: Borrow<V>,
+    &'a W: VecItemIntoRepeatedFieldItem<Item = V>,
 {
-    fn get(&self, key: &K) -> Option<&V>
+    fn get(&self, key: &K) -> Option<V>
     where
         K: Hash + Eq,
     {
-        <HashMap<L, W>>::get(self, key).map(|x| x.borrow())
+        <HashMap<L, W>>::get(self, key).map(|x| <&W as VecItemIntoRepeatedFieldItem>::into(x))
     }
 }

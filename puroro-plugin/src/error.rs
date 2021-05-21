@@ -23,6 +23,8 @@ pub enum ErrorKind {
     UnknownProtoSyntax { name: String },
     #[error(r#"The type "{name}" is marked as a map entry type, but it doesn't fulfill the requirement."#)]
     InvalidMapEntry { name: String },
+    #[error(r#"The type "{name}" is specified as a map key type, but it doesn't fulfill the requirement."#)]
+    InvalidMapKey { name: String },
     #[error(r#"An error from formatter: "{source}""#)]
     WriteError { source: std::fmt::Error },
     #[error(r#"An error from puroro: "{source}""#)]
