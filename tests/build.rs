@@ -22,7 +22,7 @@ fn main() {
     let output_rust_path = [&out_dir].iter().collect::<PathBuf>();
 
     let protoc_exe = env::var("PURORO_PROTOC_PATH").unwrap_or("protoc".to_string());
-    let status = Command::new(&protoc_exe)
+    Command::new(&protoc_exe)
         .arg("../protobuf/src/google/protobuf/compiler/plugin.proto")
         .arg(format!(
             "--plugin=protoc-gen-rust={}",
@@ -32,8 +32,4 @@ fn main() {
         .arg(format!("--proto_path={}", "../protobuf/src"))
         .status()
         .unwrap();
-
-    println!("cargo:warning=WARNING = {:?}", status);
-    println!("cargo:warning=WARNING = {:?}", plugin_exe_path.to_str());
-    println!("cargo:warning=WARNING = {:?}", output_rust_path.to_str());
 }
