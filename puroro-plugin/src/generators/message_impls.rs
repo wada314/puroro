@@ -557,11 +557,13 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                             ) => format!(
                                 "\
 {decl} {{
-    {msg}::try_new_with_parent(
-        self.{ident}.as_ref(),
-        {field_number},
-        &self.puroro_internal
-    ).expect(\"Invalid input slice. Consider checking the slice content earlier (TBD).\")
+    ::std::borrow::Cow::Owned(
+        {msg}::try_new_with_parent(
+            self.{ident}.as_ref(),
+            {field_number},
+            &self.puroro_internal
+        ).expect(\"Invalid input slice. Consider checking the slice content earlier (TBD).\")
+    )
 }}\n",
                                 decl = decl,
                                 msg = self.frag_gen.type_name_of_msg(m)?,
@@ -576,11 +578,13 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 "\
 {decl} {{
     if self.{ident}.is_some() {{
-        Some({msg}::try_new_with_parent(
-            &self.{ident},
-            {field_number},
-            &self.puroro_internal
-        ).expect(\"Invalid input slice. Consider checking the slice content earlier (TBD).\"))
+        Some(::std::borrow::Cow::Owned(
+            {msg}::try_new_with_parent(
+                &self.{ident},
+                {field_number},
+                &self.puroro_internal
+            ).expect(\"Invalid input slice. Consider checking the slice content earlier (TBD).\")
+        ))
     }} else {{
         None
     }}
@@ -591,6 +595,30 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 field_number = field.number(),
                             ),
 
+                            (
+                                GetterMethods::BareField(decl),
+                                ImplType::SliceView { .. },
+                                FieldType::String | FieldType::Bytes,
+                            ) => format!(
+                                "\
+{decl} {{
+    ::std::borrow::Cow::Borrowed(self.{ident})
+}}\n",
+                                decl = decl,
+                                ident = field.native_ident()?,
+                            ),
+                            (
+                                GetterMethods::OptionalField(decl),
+                                ImplType::SliceView { .. },
+                                FieldType::String | FieldType::Bytes,
+                            ) => format!(
+                                "\
+{decl} {{
+    self.{ident}.map(|x| ::std::borrow::Cow::Borrowed(x))
+}}\n",
+                                decl = decl,
+                                ident = field.native_ident()?,
+                            ),
                             (
                                 GetterMethods::BareField(decl),
                                 ImplType::Default,
