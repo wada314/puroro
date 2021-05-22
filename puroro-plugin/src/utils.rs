@@ -1,4 +1,9 @@
+use crate::syn::Ident;
+use crate::{ErrorKind, Result};
 use ::lazy_static::lazy_static;
+use std::borrow::Cow;
+use std::fmt::{Debug, Display};
+use std::iter::FromIterator;
 use std::{collections::HashSet, fmt::Write};
 
 pub struct Indentor<W> {
@@ -112,12 +117,15 @@ lazy_static! {
     .collect::<HashSet<&'static str>>();
 }
 
-pub fn get_keyword_safe_ident(input: &str) -> String {
-    let mut s = input.to_string();
-    while KEYWORDS.contains(s.as_str()) {
-        s.push('_');
+pub fn get_keyword_safe_ident<'a, T>(input: T) -> Ident<'a>
+where
+    Cow<'a, str>: From<T>,
+{
+    let mut s: Cow<str> = input.into();
+    while KEYWORDS.contains(s.as_ref()) {
+        s.to_mut().push('_');
     }
-    s
+    Ident::new(s)
 }
 
 pub fn iter_package_to_root(package: &str) -> impl Iterator<Item = &str> {

@@ -26,11 +26,11 @@ pub use r#enum::{EnumDescriptor, EnumValueDescriptor};
 
 // Used for the `parent` type for messages and enums.
 #[derive(Debug, Clone)]
-pub enum FileOrMessageRef<'c> {
-    File(&'c FileDescriptor<'c>),
-    Message(&'c MessageDescriptor<'c>),
+pub enum FileOrMessageRef<'proto> {
+    File(&'proto FileDescriptor<'proto>),
+    Message(&'proto MessageDescriptor<'proto>),
 }
-impl<'c> FileOrMessageRef<'c> {
+impl<'proto> FileOrMessageRef<'proto> {
     pub fn package_for_child(&self) -> Result<String> {
         Ok(match self {
             &FileOrMessageRef::File(file) => file.package().to_string(),
@@ -42,7 +42,7 @@ impl<'c> FileOrMessageRef<'c> {
         })
     }
 
-    pub fn file_descriptor(&'c self) -> &'c FileDescriptor {
+    pub fn file_descriptor(&'proto self) -> &'proto FileDescriptor {
         let mut p = self;
         loop {
             match p {
@@ -58,7 +58,7 @@ impl<'c> FileOrMessageRef<'c> {
 }
 
 #[derive(Debug, Clone)]
-pub enum EnumOrMessageRef<'c> {
-    Enum(&'c EnumDescriptor<'c>),
-    Message(&'c MessageDescriptor<'c>),
+pub enum EnumOrMessageRef<'proto> {
+    Enum(&'proto EnumDescriptor<'proto>),
+    Message(&'proto MessageDescriptor<'proto>),
 }

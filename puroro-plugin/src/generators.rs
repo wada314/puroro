@@ -16,14 +16,14 @@ use std::fmt::Write;
 use self::message_impls::MessageImplCodeGenerator;
 use self::message_traits::MessageTraitCodeGenerator;
 
-struct Visitor<'c> {
+struct Visitor<'proto> {
     output: Indentor<String>,
-    context: Context<'c>,
-    bumpalo_context: Context<'c>,
-    slice_view_context: Context<'c>,
+    context: Context<'proto>,
+    bumpalo_context: Context<'proto>,
+    slice_view_context: Context<'proto>,
 }
-impl<'c> DescriptorVisitor<'c> for Visitor<'c> {
-    fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
+impl<'proto> DescriptorVisitor<'proto> for Visitor<'proto> {
+    fn handle_msg(&mut self, msg: &'proto MessageDescriptor<'proto>) -> Result<()> {
         let normal_impl_gen = MessageImplCodeGenerator::new(&self.context, msg);
         let bumpalo_impl_gen = MessageImplCodeGenerator::new(&self.bumpalo_context, msg);
         let slice_view_impl_gen = MessageImplCodeGenerator::new(&self.slice_view_context, msg);
@@ -36,25 +36,25 @@ impl<'c> DescriptorVisitor<'c> for Visitor<'c> {
         Ok(())
     }
 
-    fn handle_enum(&mut self, enume: &'c EnumDescriptor<'c>) -> Result<()> {
+    fn handle_enum(&mut self, enume: &'proto EnumDescriptor<'proto>) -> Result<()> {
         enums::print_enum(&mut self.output, enume)
     }
 
     fn enter_submodule(&mut self, name: &str) -> Result<()> {
-        let mod_name = get_keyword_safe_ident(&to_lower_snake_case(name));
+        let mod_name = get_keyword_safe_ident(to_lower_snake_case(name));
         self.output
             .write_fmt(format_args!("pub mod {name} {{\n", name = mod_name))?;
         Ok(())
     }
 
     fn exit_submodule(&mut self, name: &str) -> Result<()> {
-        let mod_name = get_keyword_safe_ident(&to_lower_snake_case(name));
+        let mod_name = get_keyword_safe_ident(to_lower_snake_case(name));
         self.output
             .write_fmt(format_args!("}} // mod {name}\n", name = mod_name))?;
         Ok(())
     }
 }
-pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, String>> {
+pub fn do_generate<'proto>(context: &'proto Context<'proto>) -> Result<HashMap<String, String>> {
     let mut filenames_and_contents = HashMap::new();
     for file_desc in context.file_descriptors() {
         let file_name = file_desc.output_file_path_from_root().to_string();
@@ -82,9 +82,11 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
             "mod.rs".to_string()
         } else {
             Itertools::intersperse(
-                package
-                    .split('.')
-                    .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
+                package.split('.').map(|p| {
+                    get_keyword_safe_ident(to_lower_snake_case(p))
+                        .0
+                        .into_owned()
+                }),
                 "/".to_string(),
             )
             .collect::<String>()
@@ -94,7 +96,7 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
             .map(|p| {
                 format!(
                     "pub mod {name};\n",
-                    name = get_keyword_safe_ident(&to_lower_snake_case(p))
+                    name = get_keyword_safe_ident(to_lower_snake_case(p))
                 )
             })
             .collect::<String>();

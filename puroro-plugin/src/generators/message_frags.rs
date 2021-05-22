@@ -3,24 +3,25 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
+use crate::syn::{GenericParams, Ident, PathExpr, PathItem};
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
 use crate::{ErrorKind, Result};
 
-pub struct MessageImplFragmentGenerator<'a, 'c> {
-    context: &'a Context<'c>,
-    msg: &'c MessageDescriptor<'c>,
+pub struct MessageImplFragmentGenerator<'ctx, 'proto> {
+    context: &'ctx Context<'proto>,
+    msg: &'proto MessageDescriptor<'proto>,
 }
-impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
-    pub fn new(context: &'a Context<'c>, msg: &'c MessageDescriptor<'c>) -> Self {
+impl<'ctx, 'proto> MessageImplFragmentGenerator<'ctx, 'proto> {
+    pub fn new(context: &'ctx Context<'proto>, msg: &'proto MessageDescriptor<'proto>) -> Self {
         Self { context, msg }
     }
 
     /// A raw generated struct identifier.
     /// e.g. "FieldDescriptorProto", "DescriptorProtoBumpalo"
-    pub fn struct_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
+    pub fn struct_ident(&self, msg: &'proto MessageDescriptor<'proto>) -> Result<Ident<'_>> {
         let postfix1 = match self.context.impl_type() {
             ImplType::Default => "",
             ImplType::SliceView { .. } => "SliceView",
@@ -38,11 +39,75 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         .into())
     }
 
+    pub fn struct_ident_with_gp(
+        &self,
+        msg: &'proto MessageDescriptor<'proto>,
+    ) -> Result<(Ident<'_>, GenericParams<'_>)> {
+        let generic_args_iter1 = match self.context.alloc_type() {
+            AllocatorType::Default => None,
+            AllocatorType::Bumpalo => Some("'bump"),
+        }
+        .into_iter();
+        let generic_args_iter2 = match self.context.impl_type() {
+            ImplType::Default => None,
+            ImplType::SliceView { .. } => Some(std::array::IntoIter::new(["'slice", "'p"])),
+        }
+        .into_iter()
+        .flatten();
+        let generic_args_iter = generic_args_iter1.chain(generic_args_iter2);
+        let generic_args = generic_args_iter.collect::<GenericParams>();
+
+        Ok((self.struct_ident(msg)?, generic_args))
+    }
+
+    pub fn struct_name_path_item(
+        &self,
+        msg: &'proto MessageDescriptor<'proto>,
+    ) -> Result<PathItem<'_>> {
+        let (ident, gp) = self.struct_ident_with_gp(msg)?;
+        Ok(PathItem::new(ident, gp))
+    }
+
+    fn relative_path<'b>(from: &'b str, to: &'b str) -> Result<Vec<PathItem<'b>>> {
+        let mut from_iter = from.split('.').peekable();
+        let mut to_iter = to.split('.').peekable();
+        while let (Some(p1), Some(p2)) = (to_iter.peek(), from_iter.peek()) {
+            if *p1 == *p2 {
+                to_iter.next();
+                from_iter.next();
+            } else {
+                break;
+            }
+        }
+        let super_count = from_iter.count();
+        let maybe_self = if super_count == 0 {
+            Some(Ident::new("self".into()))
+        } else {
+            None
+        }
+        .into_iter();
+        Ok(maybe_self
+            .chain(std::iter::repeat("super".into()).take(super_count))
+            .chain(to_iter.map(|s| get_keyword_safe_ident(to_lower_snake_case(s))))
+            .map(|ident| PathItem::from(ident))
+            .collect())
+    }
+
+    pub fn struct_relative_path_expr(
+        &self,
+        msg: &'proto MessageDescriptor<'proto>,
+    ) -> Result<PathExpr> {
+        Ok(Self::relative_path(self.msg.package()?, msg.package()?)?
+            .into_iter()
+            .chain(std::iter::once(self.struct_name_path_item(msg)?))
+            .collect())
+    }
+
     /// A struct ident with relative path from the given package.
     /// Note this is still not a typename; the generic params are not bound.
     pub fn struct_ident_with_relative_path(
         &self,
-        msg: &'c MessageDescriptor<'c>,
+        msg: &'proto MessageDescriptor<'proto>,
     ) -> Result<String> {
         let struct_name = self.struct_ident(msg)?;
         let mut struct_package_iter = msg.package()?.split('.').peekable();
@@ -65,14 +130,17 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 .take(super_count)
                 .collect::<String>(),
             mods = struct_package_iter
-                .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
+                .map(|s| get_keyword_safe_ident(to_lower_snake_case(s))
+                    .0
+                    .into_owned()
+                    + "::")
                 .collect::<String>(),
         ))
     }
 
     /// A type name of the struct with a relative path from the current msg.
     /// Includes generic param bounds if there is any.
-    pub fn type_name_of_msg(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
+    pub fn type_name_of_msg(&self, msg: &'proto MessageDescriptor<'proto>) -> Result<String> {
         let generic_args_iter1 = match self.context.alloc_type() {
             AllocatorType::Default => None,
             AllocatorType::Bumpalo => Some("'bump"),
@@ -125,7 +193,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
-    pub fn field_scalar_item_type(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+    pub fn field_scalar_item_type(
+        &self,
+        field: &'proto FieldDescriptor<'proto>,
+    ) -> Result<Cow<'proto, str>> {
         Ok(match self.context.impl_type() {
             ImplType::Default => match field
                 .type_()?
@@ -154,7 +225,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    pub fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+    pub fn field_type_for(
+        &self,
+        field: &'proto FieldDescriptor<'proto>,
+    ) -> Result<Cow<'proto, str>> {
         let scalar_type = self.field_scalar_item_type(field)?;
         Ok(match self.context.impl_type() {
             ImplType::Default => {
@@ -216,7 +290,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    pub fn type_tag_ident_for(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+    pub fn type_tag_ident_for(&self, field: &'proto FieldDescriptor<'proto>) -> Result<String> {
         Ok(match field.type_()? {
             FieldType::Double => "Double".into(),
             FieldType::Float => "Float".into(),
@@ -244,7 +318,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    pub fn default_func_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+    pub fn default_func_for(
+        &self,
+        field: &'proto FieldDescriptor<'proto>,
+    ) -> Result<Cow<'proto, str>> {
         Ok(match self.context.impl_type() {
             ImplType::Default => match self.context.alloc_type() {
                 AllocatorType::Default => match field.type_()? {
@@ -289,7 +366,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    pub fn struct_generic_params(&self, params: &[&'static str]) -> String {
+    pub fn struct_generic_params(&self, params: &[&'static str]) -> GenericParams {
         let iter = params
             .iter()
             .cloned()
@@ -310,18 +387,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 .cloned(),
             )
             .unique();
-        if iter.clone().count() == 0 {
-            "".to_string()
-        } else {
-            format!(
-                "<{}>",
-                Itertools::intersperse(iter, ", ").collect::<String>()
-            )
-        }
-    }
-
-    pub fn struct_generic_params_bounds(&self, params: &[&'static str]) -> String {
-        self.struct_generic_params(params)
+        iter.collect()
     }
 
     pub fn new_method_declaration(&self) -> &'static str {
@@ -359,7 +425,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
-    pub fn field_take_or_init(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+    pub fn field_take_or_init(&self, field: &'proto FieldDescriptor<'proto>) -> Result<String> {
         Ok(match self.context.alloc_type() {
             AllocatorType::Default => format!(
                 "<{field_type} as FieldTakeOrInit<{taken_type}>>\

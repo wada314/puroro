@@ -8,14 +8,14 @@ use crate::wrappers::{
 };
 use crate::{ErrorKind, Result};
 
-pub struct MessageTraitCodeGenerator<'a, 'c> {
+pub struct MessageTraitCodeGenerator<'ctx, 'proto> {
     #[allow(unused)]
-    context: &'a Context<'c>,
-    msg: &'c MessageDescriptor<'c>,
+    context: &'ctx Context<'proto>,
+    msg: &'proto MessageDescriptor<'proto>,
 }
 
-impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
-    pub fn new(context: &'a Context<'c>, msg: &'c MessageDescriptor<'c>) -> Self {
+impl<'ctx, 'proto> MessageTraitCodeGenerator<'ctx, 'proto> {
+    pub fn new(context: &'ctx Context<'proto>, msg: &'proto MessageDescriptor<'proto>) -> Self {
         Self { context, msg }
     }
     pub fn print_msg_traits<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
@@ -33,7 +33,7 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
                     // typedefs for message types
                     Ok(format!(
-                        "type {type_name}: {trait_rel_ident};\n",
+                        "type {type_name}<'a>: {trait_rel_ident} where Self: 'a;\n",
                         type_name = self.associated_msg_type_ident(msg)?,
                         trait_rel_ident = self.trait_relative_ident(msg)?,
                     ))
@@ -71,7 +71,7 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
 
     pub fn generate_getter_method_decls(
         &self,
-        field: &'c FieldDescriptor<'c>,
+        field: &'proto FieldDescriptor<'proto>,
     ) -> Result<GetterMethods> {
         Ok(match (field.label()?, field.type_()?) {
             (FieldLabel::Repeated, FieldType::Message(m)) if m.is_map_entry() => {
@@ -124,22 +124,25 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
         })
     }
 
-    pub fn trait_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
+    pub fn trait_ident(&self, msg: &'proto MessageDescriptor<'proto>) -> Result<String> {
         Ok(format!("{}Trait", msg.native_ident()?))
     }
-    pub fn trait_relative_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
+    pub fn trait_relative_ident(&self, msg: &'proto MessageDescriptor<'proto>) -> Result<String> {
         Ok(format!(
             "{}Trait",
             msg.native_ident_with_relative_path(self.msg.package()?)?
         ))
     }
-    pub fn associated_msg_type_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
+    pub fn associated_msg_type_ident(
+        &self,
+        msg: &'proto MessageDescriptor<'proto>,
+    ) -> Result<String> {
         Ok(format!("{}Type", msg.native_ident()?))
     }
 
     pub fn scalar_getter_type_name(
         &self,
-        field: &'c FieldDescriptor<'c>,
+        field: &'proto FieldDescriptor<'proto>,
         lifetime: &str,
     ) -> Result<String> {
         Ok(
@@ -153,10 +156,12 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                         NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
                         NonNumericalFieldType::String => "str".into(),
                         NonNumericalFieldType::Bytes => "[u8]".into(),
-                        NonNumericalFieldType::Message(m) => {
-                            format!("Self::{name}", name = self.associated_msg_type_ident(m)?)
-                                .into()
-                        }
+                        NonNumericalFieldType::Message(m) => format!(
+                            "Self::{name}<{lt}>",
+                            name = self.associated_msg_type_ident(m)?,
+                            lt = lifetime
+                        )
+                        .into(),
                     };
                     format!(
                         "::std::borrow::Cow<{lt}, {type_}>",
@@ -168,7 +173,10 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
         )
     }
 
-    pub fn map_key_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'static, str>> {
+    pub fn map_key_type_name(
+        &self,
+        field: &'proto FieldDescriptor<'proto>,
+    ) -> Result<Cow<'static, str>> {
         Ok(
             match field
                 .type_()?

@@ -3,9 +3,9 @@ use crate::utils::Indentor;
 use crate::wrappers::EnumDescriptor;
 use crate::Result;
 
-pub fn print_enum<'c, W: std::fmt::Write>(
+pub fn print_enum<'proto, W: std::fmt::Write>(
     output: &mut Indentor<W>,
-    enume: &'c EnumDescriptor<'c>,
+    enume: &'proto EnumDescriptor<'proto>,
 ) -> Result<()> {
     (
         format!(
