@@ -537,7 +537,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                 iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
                     // typedefs for message types
                     Ok(format!(
-                        "type {assoc_type_ident} = {actual_type_name}{gpb};\n",
+                        "type {assoc_type_ident}<'p> = {actual_type_name}{gpb};\n",
                         assoc_type_ident = self.traits_gen.associated_msg_type_ident(msg)?,
                         actual_type_name = self.frag_gen.struct_ident_with_relative_path(msg)?,
                         gpb = self.frag_gen.struct_generic_params_bounds(&[]),

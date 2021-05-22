@@ -33,7 +33,7 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
                     // typedefs for message types
                     Ok(format!(
-                        "type {type_name}: {trait_rel_ident};\n",
+                        "type {type_name}<'a>: {trait_rel_ident};\n",
                         type_name = self.associated_msg_type_ident(msg)?,
                         trait_rel_ident = self.trait_relative_ident(msg)?,
                     ))
@@ -153,10 +153,12 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                         NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
                         NonNumericalFieldType::String => "str".into(),
                         NonNumericalFieldType::Bytes => "[u8]".into(),
-                        NonNumericalFieldType::Message(m) => {
-                            format!("Self::{name}", name = self.associated_msg_type_ident(m)?)
-                                .into()
-                        }
+                        NonNumericalFieldType::Message(m) => format!(
+                            "Self::{name}<{lt}>",
+                            name = self.associated_msg_type_ident(m)?,
+                            lt = lifetime
+                        )
+                        .into(),
                     };
                     format!(
                         "::std::borrow::Cow<{lt}, {type_}>",

@@ -15,12 +15,14 @@ This library is under development and it is very possible to make breaking chang
     - [ ] Unit tests
     - [ ] Write document!!
     - [ ] Print comments in the generated files
+    - [ ] Nightly / stable features
+        - [ ] Support stable (not using nightly features)
     - [ ] More usable message traits
         - [ ] Mutable interface
         - [ ] Repeated field interface
         - [ ] Map interface
     - [ ] Keep unknown fields
-    - [ ] Deserializer from a slice
+    - [x] Deserializer from a slice
     - [ ] Required field checker
     - [ ] Other implementations
         - [x] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
@@ -46,3 +48,5 @@ Please replace the ".exe" below into your OS's one.
 ```
 $ protoc <protofile-path> --plugin=protoc-gen-rust=./target/debug/puroro-plugin.exe --rust_out=<output-dir> --proto_path=<protofile-dir>
 ```
+
+`protobuf-pb/build.rs` is a sample build script.
