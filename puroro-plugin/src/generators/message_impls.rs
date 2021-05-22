@@ -538,7 +538,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                     // typedefs for message types
                     let mut gp_binds = self.frag_gen.struct_generic_params(&[]);
                     if matches!(self.context.impl_type(), ImplType::SliceView { .. }) {
-                        gp_binds = gp_binds.bind("'p", "'a".into())?;
+                        gp_binds = gp_binds.bind_checked("'p", "'a".into())?;
                     }
                     Ok(format!(
                         "type {assoc_type_ident}<'a> where Self: 'a = {actual_type_name}{gpb};\n",
