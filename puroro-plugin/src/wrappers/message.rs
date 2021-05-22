@@ -10,26 +10,26 @@ use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
 
 #[derive(Clone)]
-pub struct MessageDescriptor<'c> {
-    proto: &'c DescriptorProto,
-    context: &'c Context<'c>,
-    parent: FileOrMessageRef<'c>,
+pub struct MessageDescriptor<'proto> {
+    proto: &'proto DescriptorProto,
+    context: &'proto Context<'proto>,
+    parent: FileOrMessageRef<'proto>,
 
-    lazy_fields: OnceCell<Vec<FieldDescriptor<'c>>>,
-    lazy_nested_messages: OnceCell<Vec<MessageDescriptor<'c>>>,
-    lazy_enums: OnceCell<Vec<EnumDescriptor<'c>>>,
+    lazy_fields: OnceCell<Vec<FieldDescriptor<'proto>>>,
+    lazy_nested_messages: OnceCell<Vec<MessageDescriptor<'proto>>>,
+    lazy_enums: OnceCell<Vec<EnumDescriptor<'proto>>>,
 
     lazy_package: OnceCell<String>,
     lazy_path_to_root_mod: OnceCell<String>,
     lazy_fq_name: OnceCell<String>,
-    lazy_native_bare_type_name: OnceCell<Ident<'c>>,
+    lazy_native_bare_type_name: OnceCell<Ident<'proto>>,
     lazy_native_type_name_from_root: OnceCell<String>,
 }
-impl<'c> MessageDescriptor<'c> {
+impl<'proto> MessageDescriptor<'proto> {
     pub fn new(
-        proto: &'c DescriptorProto,
-        context: &'c Context<'c>,
-        parent: FileOrMessageRef<'c>,
+        proto: &'proto DescriptorProto,
+        context: &'proto Context<'proto>,
+        parent: FileOrMessageRef<'proto>,
     ) -> Self {
         Self {
             proto,
@@ -45,7 +45,7 @@ impl<'c> MessageDescriptor<'c> {
             lazy_native_type_name_from_root: Default::default(),
         }
     }
-    pub fn fields(&'c self) -> impl Iterator<Item = &FieldDescriptor<'c>> {
+    pub fn fields(&'proto self) -> impl Iterator<Item = &FieldDescriptor<'proto>> {
         self.lazy_fields
             .get_or_init(|| {
                 self.proto
@@ -56,7 +56,7 @@ impl<'c> MessageDescriptor<'c> {
             })
             .iter()
     }
-    pub fn nested_messages(&'c self) -> impl Iterator<Item = &MessageDescriptor<'c>> {
+    pub fn nested_messages(&'proto self) -> impl Iterator<Item = &MessageDescriptor<'proto>> {
         self.lazy_nested_messages
             .get_or_init(|| {
                 self.proto
@@ -69,7 +69,7 @@ impl<'c> MessageDescriptor<'c> {
             })
             .iter()
     }
-    pub fn enums(&'c self) -> impl Iterator<Item = &EnumDescriptor<'c>> {
+    pub fn enums(&'proto self) -> impl Iterator<Item = &EnumDescriptor<'proto>> {
         self.lazy_enums
             .get_or_init(|| {
                 self.proto
@@ -86,10 +86,10 @@ impl<'c> MessageDescriptor<'c> {
             detail: "Empty message name".to_string(),
         })?)
     }
-    pub fn parent(&'c self) -> &'c FileOrMessageRef<'c> {
+    pub fn parent(&'proto self) -> &'proto FileOrMessageRef<'proto> {
         &self.parent
     }
-    pub fn file(&'c self) -> &'c FileDescriptor<'c> {
+    pub fn file(&'proto self) -> &'proto FileDescriptor<'proto> {
         self.parent.file_descriptor()
     }
     pub fn is_map_entry(&self) -> bool {
@@ -100,12 +100,12 @@ impl<'c> MessageDescriptor<'c> {
             false
         }
     }
-    pub fn package(&'c self) -> Result<&str> {
+    pub fn package(&'proto self) -> Result<&str> {
         Ok(self
             .lazy_package
             .get_or_try_init(|| -> Result<_> { self.parent.package_for_child() })?)
     }
-    pub fn fully_qualified_name(&'c self) -> Result<&str> {
+    pub fn fully_qualified_name(&'proto self) -> Result<&str> {
         Ok(self.lazy_fq_name.get_or_try_init(|| -> Result<_> {
             Ok(format!(
                 "{package}.{name}",
@@ -123,7 +123,7 @@ impl<'c> MessageDescriptor<'c> {
     /// ```
     /// Returns a Rust identifier without mod path,
     /// without distinguishing between repeated / optional labels.
-    pub fn native_ident(&'c self) -> Result<&Ident<'c>> {
+    pub fn native_ident(&'proto self) -> Result<&Ident<'proto>> {
         Ok(self
             .lazy_native_bare_type_name
             .get_or_try_init(|| -> Result<_> {
@@ -131,7 +131,7 @@ impl<'c> MessageDescriptor<'c> {
             })?)
     }
 
-    pub fn native_ident_with_relative_path(&'c self, cur_package: &str) -> Result<String> {
+    pub fn native_ident_with_relative_path(&'proto self, cur_package: &str) -> Result<String> {
         let struct_name = self.native_ident()?;
         let mut struct_package_iter = self.package()?.split('.').peekable();
         let mut cur_package_iter = cur_package.split('.').peekable();
@@ -162,8 +162,8 @@ impl<'c> MessageDescriptor<'c> {
     }
 
     pub fn unique_msgs_from_fields(
-        &'c self,
-    ) -> Result<impl Iterator<Item = &'c MessageDescriptor<'c>>> {
+        &'proto self,
+    ) -> Result<impl Iterator<Item = &'proto MessageDescriptor<'proto>>> {
         // Not only the fields directly owned by this message,
         // we need to cehck the fields of the map field's keys and value fields.
         let maps_fields = self
@@ -197,8 +197,11 @@ impl<'c> MessageDescriptor<'c> {
     }
 
     pub fn key_value_of_map_entry(
-        &'c self,
-    ) -> Result<(&'c FieldDescriptor<'c>, &'c FieldDescriptor<'c>)> {
+        &'proto self,
+    ) -> Result<(
+        &'proto FieldDescriptor<'proto>,
+        &'proto FieldDescriptor<'proto>,
+    )> {
         debug_assert!(self.is_map_entry());
         let key_field =
             self.fields()

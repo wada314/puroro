@@ -25,19 +25,19 @@ pub enum AllocatorType {
 }
 
 #[derive(Clone)]
-pub struct Context<'c> {
-    proto: &'c CodeGeneratorRequest,
+pub struct Context<'proto> {
+    proto: &'proto CodeGeneratorRequest,
     impl_type: ImplType,
     alloc_type: AllocatorType,
 
-    lazy_file_descriptors: OnceCell<Vec<FileDescriptor<'c>>>,
-    lazy_fq_name_to_desc_map: OnceCell<HashMap<&'c str, EnumOrMessageRef<'c>>>,
-    lazy_packages_with_subpackages_map: OnceCell<HashMap<&'c str, HashSet<&'c str>>>,
+    lazy_file_descriptors: OnceCell<Vec<FileDescriptor<'proto>>>,
+    lazy_fq_name_to_desc_map: OnceCell<HashMap<&'proto str, EnumOrMessageRef<'proto>>>,
+    lazy_packages_with_subpackages_map: OnceCell<HashMap<&'proto str, HashSet<&'proto str>>>,
 }
 
-impl<'c> Context<'c> {
+impl<'proto> Context<'proto> {
     pub fn new(
-        cgreq: &'c CodeGeneratorRequest,
+        cgreq: &'proto CodeGeneratorRequest,
         impl_type: ImplType,
         alloc_type: AllocatorType,
     ) -> Self {
@@ -63,7 +63,7 @@ impl<'c> Context<'c> {
         self.alloc_type.clone()
     }
 
-    pub fn file_descriptors(&'c self) -> impl Iterator<Item = &FileDescriptor<'c>> + 'c {
+    pub fn file_descriptors(&'proto self) -> impl Iterator<Item = &FileDescriptor<'proto>> + 'proto {
         self.lazy_file_descriptors
             .get_or_init(|| {
                 self.proto
@@ -75,7 +75,7 @@ impl<'c> Context<'c> {
             .iter()
     }
 
-    pub fn fq_name_to_desc(&'c self, fq_name: &str) -> Result<Option<EnumOrMessageRef<'c>>> {
+    pub fn fq_name_to_desc(&'proto self, fq_name: &str) -> Result<Option<EnumOrMessageRef<'proto>>> {
         let map = self
             .lazy_fq_name_to_desc_map
             .get_or_try_init(|| -> Result<_> {
@@ -116,10 +116,10 @@ impl<'c> Context<'c> {
     }
 
     pub fn packages_with_subpackages(
-        &'c self,
-    ) -> impl Iterator<Item = (&'c str, impl Iterator<Item = &'c str>)> {
+        &'proto self,
+    ) -> impl Iterator<Item = (&'proto str, impl Iterator<Item = &'proto str>)> {
         let map = self.lazy_packages_with_subpackages_map.get_or_init(|| {
-            let mut map: HashMap<&'c str, HashSet<&'c str>> = HashMap::new();
+            let mut map: HashMap<&'proto str, HashSet<&'proto str>> = HashMap::new();
             for file in self.file_descriptors() {
                 for cur_package in iter_package_to_root(file.package()) {
                     if cur_package.is_empty() {
