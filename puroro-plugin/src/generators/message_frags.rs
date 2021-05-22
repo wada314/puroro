@@ -3,7 +3,8 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::utils::{get_keyword_safe_ident, to_lower_snake_case, GenericParams};
+use crate::syn::GenericParams;
+use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
