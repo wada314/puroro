@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::syn::{GenericParams, Ident, PathItem};
+use crate::syn::{GenericParams, Ident, PathExpr, PathItem};
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
@@ -60,6 +60,14 @@ impl<'ctx, 'proto> MessageImplFragmentGenerator<'ctx, 'proto> {
         Ok((self.struct_ident(msg)?, generic_args))
     }
 
+    pub fn struct_name_path_item(
+        &self,
+        msg: &'proto MessageDescriptor<'proto>,
+    ) -> Result<PathItem<'_>> {
+        let (ident, gp) = self.struct_ident_with_gp(msg)?;
+        Ok(PathItem::new(ident, gp))
+    }
+
     fn relative_path<'b>(from: &'b str, to: &'b str) -> Result<Vec<PathItem<'b>>> {
         let mut from_iter = from.split('.').peekable();
         let mut to_iter = to.split('.').peekable();
@@ -82,6 +90,16 @@ impl<'ctx, 'proto> MessageImplFragmentGenerator<'ctx, 'proto> {
             .chain(std::iter::repeat("super::".into()).take(super_count))
             .chain(to_iter.map(|s| get_keyword_safe_ident(to_lower_snake_case(s))))
             .map(|ident| PathItem::from(ident))
+            .collect())
+    }
+
+    pub fn struct_relative_path_expr(
+        &self,
+        msg: &'proto MessageDescriptor<'proto>,
+    ) -> Result<PathExpr> {
+        Ok(Self::relative_path(self.msg.package()?, msg.package()?)?
+            .into_iter()
+            .chain(std::iter::once(self.struct_name_path_item(msg)?))
             .collect())
     }
 
