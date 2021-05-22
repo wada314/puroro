@@ -77,7 +77,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         .into_iter();
         Ok(maybe_self
             .chain(std::iter::repeat("super::".into()).take(super_count))
-            .chain(to_iter.map(|s| get_keyword_safe_ident(to_lower_snake_case(s).into())))
+            .chain(to_iter.map(|s| get_keyword_safe_ident(to_lower_snake_case(s))))
             .map(|ident| PathItem::from(ident))
             .collect())
     }
@@ -109,7 +109,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 .take(super_count)
                 .collect::<String>(),
             mods = struct_package_iter
-                .map(|s| get_keyword_safe_ident(to_lower_snake_case(s).into())
+                .map(|s| get_keyword_safe_ident(to_lower_snake_case(s))
                     .0
                     .into_owned()
                     + "::")

@@ -117,8 +117,11 @@ lazy_static! {
     .collect::<HashSet<&'static str>>();
 }
 
-pub fn get_keyword_safe_ident<'a>(input: Cow<'a, str>) -> Ident<'a> {
-    let mut s = input;
+pub fn get_keyword_safe_ident<'a, T>(input: T) -> Ident<'a>
+where
+    Cow<'a, str>: From<T>,
+{
+    let mut s: Cow<str> = input.into();
     while KEYWORDS.contains(s.as_ref()) {
         s.to_mut().push('_');
     }

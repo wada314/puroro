@@ -41,14 +41,14 @@ impl<'c> DescriptorVisitor<'c> for Visitor<'c> {
     }
 
     fn enter_submodule(&mut self, name: &str) -> Result<()> {
-        let mod_name = get_keyword_safe_ident(to_lower_snake_case(name).into());
+        let mod_name = get_keyword_safe_ident(to_lower_snake_case(name));
         self.output
             .write_fmt(format_args!("pub mod {name} {{\n", name = mod_name))?;
         Ok(())
     }
 
     fn exit_submodule(&mut self, name: &str) -> Result<()> {
-        let mod_name = get_keyword_safe_ident(to_lower_snake_case(name).into());
+        let mod_name = get_keyword_safe_ident(to_lower_snake_case(name));
         self.output
             .write_fmt(format_args!("}} // mod {name}\n", name = mod_name))?;
         Ok(())
@@ -83,7 +83,7 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
         } else {
             Itertools::intersperse(
                 package.split('.').map(|p| {
-                    get_keyword_safe_ident(to_lower_snake_case(p).into())
+                    get_keyword_safe_ident(to_lower_snake_case(p))
                         .0
                         .into_owned()
                 }),
@@ -96,7 +96,7 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
             .map(|p| {
                 format!(
                     "pub mod {name};\n",
-                    name = get_keyword_safe_ident(to_lower_snake_case(p).into())
+                    name = get_keyword_safe_ident(to_lower_snake_case(p))
                 )
             })
             .collect::<String>();
