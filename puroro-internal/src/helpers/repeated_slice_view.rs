@@ -12,17 +12,17 @@ use ::itertools::{Either, Itertools};
 use ::puroro::{MapField, RepeatedField};
 use puroro::DeserializableFromSlice;
 
-pub trait FieldDataIntoIter<'slice, 'p> {
+pub trait FieldDataIntoIter<'slice, 'par> {
     type Item;
-    type Iter: 'p + Iterator<Item = Result<Self::Item>>;
+    type Iter: 'par + Iterator<Item = Result<Self::Item>>;
     fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter>;
 }
-impl<'slice, 'p> FieldDataIntoIter<'slice, 'p> for tags::Int32
+impl<'slice, 'par> FieldDataIntoIter<'slice, 'par> for tags::Int32
 where
-    'slice: 'p,
+    'slice: 'par,
 {
     type Item = i32;
-    type Iter = impl 'p + Iterator<Item = Result<Self::Item>>;
+    type Iter = impl 'par + Iterator<Item = Result<Self::Item>>;
     fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         Ok(match field_data {
             FieldData::Variant(variant) => {
@@ -39,12 +39,12 @@ where
         .into_iter())
     }
 }
-impl<'slice, 'p> FieldDataIntoIter<'slice, 'p> for tags::String
+impl<'slice, 'par> FieldDataIntoIter<'slice, 'par> for tags::String
 where
-    'slice: 'p,
+    'slice: 'par,
 {
-    type Item = Cow<'p, str>;
-    type Iter = impl 'p + Iterator<Item = Result<Self::Item>>;
+    type Item = Cow<'par, str>;
+    type Iter = impl 'par + Iterator<Item = Result<Self::Item>>;
     fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         if let FieldData::LengthDelimited(ld_slice) = field_data {
             Ok(std::iter::once(Ok(Cow::Borrowed(unsafe {
@@ -55,13 +55,13 @@ where
         }
     }
 }
-impl<'slice, 'p, T> FieldDataIntoIter<'slice, 'p> for tags::Message<T>
+impl<'slice, 'par, T> FieldDataIntoIter<'slice, 'par> for tags::Message<T>
 where
-    T: 'p + DeserializableFromSlice<'slice> + ToOwned<Owned = T>,
-    'slice: 'p,
+    T: 'par + DeserializableFromSlice<'slice> + ToOwned<Owned = T>,
+    'slice: 'par,
 {
-    type Item = Cow<'p, T>;
-    type Iter = impl 'p + Iterator<Item = Result<Self::Item>>;
+    type Item = Cow<'par, T>;
+    type Iter = impl 'par + Iterator<Item = Result<Self::Item>>;
     fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         if let FieldData::LengthDelimited(ld_slice) = field_data {
             Ok(std::iter::once(Ok(Cow::Owned(
@@ -74,24 +74,24 @@ where
 }
 
 #[derive(Debug, Clone)]
-pub struct RepeatedSliceViewField<'slice, 'p, TypeTag>
+pub struct RepeatedSliceViewField<'slice, 'par, TypeTag>
 where
-    TypeTag: FieldDataIntoIter<'slice, 'p>,
+    TypeTag: FieldDataIntoIter<'slice, 'par>,
 {
-    field: Option<&'p SliceViewField<'slice>>,
+    field: Option<&'par SliceViewField<'slice>>,
     field_number: usize,
-    internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
+    internal_data: &'par InternalDataForSliceViewStruct<'slice, 'par>,
     phantom: PhantomData<TypeTag>,
 }
 
-impl<'slice, 'p, TypeTag> RepeatedSliceViewField<'slice, 'p, TypeTag>
+impl<'slice, 'par, TypeTag> RepeatedSliceViewField<'slice, 'par, TypeTag>
 where
-    TypeTag: FieldDataIntoIter<'slice, 'p>,
+    TypeTag: FieldDataIntoIter<'slice, 'par>,
 {
     pub fn new(
-        field: Option<&'p SliceViewField<'slice>>,
+        field: Option<&'par SliceViewField<'slice>>,
         field_number: usize,
-        internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
+        internal_data: &'par InternalDataForSliceViewStruct<'slice, 'par>,
     ) -> Self {
         Self {
             field,
@@ -102,8 +102,8 @@ where
     }
 
     fn iter_impl(
-        &'p self,
-    ) -> impl 'p + Iterator<Item = <TypeTag as FieldDataIntoIter<'slice, 'p>>::Item> {
+        &'par self,
+    ) -> impl 'par + Iterator<Item = <TypeTag as FieldDataIntoIter<'slice, 'par>>::Item> {
         self.internal_data
             .field_data_iter(self.field_number, self.field)
             .map_ok(|field| -> Result<_> { <TypeTag as FieldDataIntoIter>::into(field) })
@@ -114,24 +114,25 @@ where
     }
 }
 
-impl<'slice, 'p, T, TypeTag> RepeatedField<'p, T> for RepeatedSliceViewField<'slice, 'p, TypeTag>
+impl<'slice, 'par, T, TypeTag> RepeatedField<'par, T>
+    for RepeatedSliceViewField<'slice, 'par, TypeTag>
 where
-    'slice: 'p,
-    T: 'p,
-    TypeTag: FieldDataIntoIter<'slice, 'p, Item = T>,
+    'slice: 'par,
+    T: 'par,
+    TypeTag: FieldDataIntoIter<'slice, 'par, Item = T>,
 {
-    fn for_each<F>(&'p self, f: F)
+    fn for_each<F>(&'par self, f: F)
     where
         F: FnMut(T),
     {
         self.iter_impl().for_each(f)
     }
-    fn boxed_iter(&'p self) -> Box<dyn 'p + Iterator<Item = T>> {
+    fn boxed_iter(&'par self) -> Box<dyn 'par + Iterator<Item = T>> {
         Box::new(self.iter_impl())
     }
 
     type Iter = impl Iterator<Item = T>;
-    fn iter(&'p self) -> Self::Iter {
+    fn iter(&'par self) -> Self::Iter {
         self.iter_impl()
     }
 }

@@ -180,9 +180,9 @@ fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
 }}
 
 fn try_new_with_parent(
-    parent_field: ::std::option::Option<&'p ::puroro_internal::SliceViewField<'slice>>,
+    parent_field: ::std::option::Option<&'par ::puroro_internal::SliceViewField<'slice>>,
     field_number_in_parent: usize,
-    parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
+    parent_internal_data: &'par ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'par>,
 ) -> ::puroro::Result<Self> {{
     let mut new_self = Self {{\n",
             indent_n(
@@ -537,7 +537,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                 iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
                     // typedefs for message types
                     let actual_type = self.frag_gen.struct_relative_path_expr(msg)?;
-                    let actual_type_bound = actual_type.bind_unchecked("'p", "'a".into());
+                    let actual_type_bound = actual_type.bind_unchecked("'par", "'a".into());
                     Ok(format!(
                         "type {assoc_type_ident}<'a> where Self: 'a = {actual_type};\n",
                         assoc_type_ident = self.traits_gen.associated_msg_type_ident(msg)?,
@@ -693,7 +693,7 @@ type {return_type_ident} where Self: 'a = &'a {type_name};
                             ) => format!(
                                 "\
 type {return_type_ident} where Self: 'a = 
-    ::puroro_internal::RepeatedSliceViewField<'slice, 'p, ::puroro_internal::tags::{type_tag}>;
+    ::puroro_internal::RepeatedSliceViewField<'slice, 'par, ::puroro_internal::tags::{type_tag}>;
 {get_decl} {{
     ::puroro_internal::RepeatedSliceViewField::new(
         &self.{ident},

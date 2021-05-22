@@ -52,20 +52,20 @@ impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
 }
 
 #[derive(Debug, Clone)]
-pub struct InternalDataForSliceViewStruct<'slice, 'p> {
-    source_ld_slices: SourceLdSlices<'slice, 'p>,
+pub struct InternalDataForSliceViewStruct<'slice, 'par> {
+    source_ld_slices: SourceLdSlices<'slice, 'par>,
 }
 #[derive(Debug, Clone)]
-pub enum SourceLdSlices<'slice, 'p> {
+pub enum SourceLdSlices<'slice, 'par> {
     SingleLdSlice(LdSlice<'slice>),
     MaybeMultipleLdSlices {
-        field_in_parent: Option<&'p SliceViewField<'slice>>,
+        field_in_parent: Option<&'par SliceViewField<'slice>>,
         field_number_in_parent: usize,
-        parent_internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
+        parent_internal_data: &'par InternalDataForSliceViewStruct<'slice, 'par>,
     },
 }
 
-impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
+impl<'slice, 'par> InternalDataForSliceViewStruct<'slice, 'par> {
     pub fn new(slice: &'slice [u8]) -> Self {
         Self {
             source_ld_slices: SourceLdSlices::SingleLdSlice(LdSlice::new(slice)),
@@ -73,9 +73,9 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     }
 
     pub fn new_with_parent(
-        parent_field: Option<&'p SliceViewField<'slice>>,
+        parent_field: Option<&'par SliceViewField<'slice>>,
         field_number_in_parent: usize,
-        parent_internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
+        parent_internal_data: &'par InternalDataForSliceViewStruct<'slice, 'par>,
     ) -> Self {
         Self {
             source_ld_slices: SourceLdSlices::MaybeMultipleLdSlices {
@@ -94,14 +94,14 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     /// We believe n (== the number of messages merged) is very small in the most usecases.
     pub fn ld_slices_from_parent_message(
         &self,
-    ) -> impl 'p + Iterator<Item = Result<LdSlice<'slice>>> {
+    ) -> impl 'par + Iterator<Item = Result<LdSlice<'slice>>> {
         match self.source_ld_slices.clone() {
             SourceLdSlices::SingleLdSlice(ld_slice) => Either::Left(std::iter::once(Ok(ld_slice))),
             SourceLdSlices::MaybeMultipleLdSlices {
                 field_in_parent,
                 field_number_in_parent,
                 parent_internal_data,
-            } => Either::Right(MultipleSourceLdSlicesIter::<'slice, 'p>::new(
+            } => Either::Right(MultipleSourceLdSlicesIter::<'slice, 'par>::new(
                 field_number_in_parent,
                 field_in_parent,
                 parent_internal_data,
@@ -112,10 +112,10 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
 
     /// Returns an iterator over the specifield field number's [`FieldData`] instance.
     pub fn field_data_iter(
-        &'p self,
+        &'par self,
         field_number: usize,
-        field: Option<&'p SliceViewField<'slice>>,
-    ) -> impl 'p + Iterator<Item = Result<FieldData<LdSlice<'slice>>>> {
+        field: Option<&'par SliceViewField<'slice>>,
+    ) -> impl 'par + Iterator<Item = Result<FieldData<LdSlice<'slice>>>> {
         // The iter of `ld_slice` which consists the specified field.
         // Note that this might be a smaller set when compared with the `ld_slice`s consisting
         // the message struct. For example, even if there's a message consist of 3 separated slices,
@@ -161,26 +161,26 @@ impl<'slice, 'p> InternalDataForSliceViewStruct<'slice, 'p> {
     }
 }
 
-struct MultipleSourceLdSlicesIter<'slice, 'p> {
+struct MultipleSourceLdSlicesIter<'slice, 'par> {
     field_number: usize,
-    field: Option<&'p SliceViewField<'slice>>,
-    internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
+    field: Option<&'par SliceViewField<'slice>>,
+    internal_data: &'par InternalDataForSliceViewStruct<'slice, 'par>,
 
     prev_ld_slice: Option<LdSlice<'slice>>,
 }
 
-impl<'slice, 'p> Iterator for MultipleSourceLdSlicesIter<'slice, 'p> {
+impl<'slice, 'par> Iterator for MultipleSourceLdSlicesIter<'slice, 'par> {
     type Item = Result<LdSlice<'slice>>;
     fn next(&mut self) -> Option<Self::Item> {
         self.try_next().transpose()
     }
 }
 
-impl<'slice, 'p> MultipleSourceLdSlicesIter<'slice, 'p> {
+impl<'slice, 'par> MultipleSourceLdSlicesIter<'slice, 'par> {
     fn new(
         field_number: usize,
-        field: Option<&'p SliceViewField<'slice>>,
-        internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
+        field: Option<&'par SliceViewField<'slice>>,
+        internal_data: &'par InternalDataForSliceViewStruct<'slice, 'par>,
     ) -> Self {
         Self {
             field_number,
@@ -225,7 +225,7 @@ impl<'slice, 'p> MultipleSourceLdSlicesIter<'slice, 'p> {
     }
 }
 
-impl<'bump, 'slice, 'p> InternalData<'bump> for InternalDataForSliceViewStruct<'slice, 'p> {
+impl<'bump, 'slice, 'par> InternalData<'bump> for InternalDataForSliceViewStruct<'slice, 'par> {
     fn bumpalo(&self) -> &'bump bumpalo::Bump {
         panic!("The Bumpalo data field is only available for a Bumpalo struct!")
     }
