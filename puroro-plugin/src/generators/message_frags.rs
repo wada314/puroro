@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
+use crate::utils::{get_keyword_safe_ident, to_lower_snake_case, GenericParams};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
@@ -289,7 +289,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    pub fn struct_generic_params(&self, params: &[&'static str]) -> String {
+    pub fn struct_generic_params(&self, params: &[&'static str]) -> GenericParams {
         let iter = params
             .iter()
             .cloned()
@@ -310,18 +310,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 .cloned(),
             )
             .unique();
-        if iter.clone().count() == 0 {
-            "".to_string()
-        } else {
-            format!(
-                "<{}>",
-                Itertools::intersperse(iter, ", ").collect::<String>()
-            )
-        }
-    }
-
-    pub fn struct_generic_params_bounds(&self, params: &[&'static str]) -> String {
-        self.struct_generic_params(params)
+        iter.collect()
     }
 
     pub fn new_method_declaration(&self) -> &'static str {
