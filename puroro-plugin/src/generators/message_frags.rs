@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::syn::GenericParams;
+use crate::syn::{GenericParams, Ident};
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
@@ -21,7 +21,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
     /// A raw generated struct identifier.
     /// e.g. "FieldDescriptorProto", "DescriptorProtoBumpalo"
-    pub fn struct_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
+    pub fn struct_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Ident> {
         let postfix1 = match self.context.impl_type() {
             ImplType::Default => "",
             ImplType::SliceView { .. } => "SliceView",

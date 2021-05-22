@@ -4,26 +4,34 @@ use std::fmt::Display;
 use std::iter::FromIterator;
 
 #[derive(Debug, Clone)]
-pub struct Ident(Cow<'static, str>);
-impl Ident {
-    pub fn new(s: Cow<'static, str>) -> Self {
+pub struct Ident<'a>(Cow<'a, str>);
+impl<'a> Ident<'a> {
+    pub fn new(s: Cow<'a, str>) -> Self {
         Self(s)
     }
 }
-impl Display for Ident {
+impl Display for Ident<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.0.as_ref())
     }
 }
+impl<'a, T> From<T> for Ident<'a>
+where
+    Cow<'a, str>: From<T>,
+{
+    fn from(s: T) -> Self {
+        Self(s.into())
+    }
+}
 
 #[derive(Debug, Clone)]
-pub struct GenericParams(Vec<Cow<'static, str>>);
-impl GenericParams {
+pub struct GenericParams<'a>(Vec<Cow<'a, str>>);
+impl<'a> GenericParams<'a> {
     pub fn new_empty() -> Self {
         Self(vec![])
     }
 
-    pub fn bind_checked(&self, from: &str, to: Cow<'static, str>) -> Result<GenericParams> {
+    pub fn bind_checked(&self, from: &str, to: Cow<'a, str>) -> Result<Self> {
         let mut newvec = Cow::Borrowed(&self.0);
         for i in 0..newvec.len() {
             if newvec[i] == from {
@@ -39,14 +47,14 @@ impl GenericParams {
         }
     }
 
-    pub fn bind_unchecked(&self, from: &str, to: Cow<'static, str>) -> Cow<'_, Self> {
+    pub fn bind_unchecked(&self, from: &str, to: Cow<'a, str>) -> Cow<'_, Self> {
         match self.bind_checked(from, to) {
             Ok(gp) => Cow::Owned(gp),
             Err(_) => Cow::Borrowed(self),
         }
     }
 }
-impl Display for GenericParams {
+impl Display for GenericParams<'_> {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> std::fmt::Result {
         use ::std::fmt::Write;
         let mut iter = self.0.iter();
@@ -62,9 +70,9 @@ impl Display for GenericParams {
         Ok(())
     }
 }
-impl<T> FromIterator<T> for GenericParams
+impl<'a, T> FromIterator<T> for GenericParams<'a>
 where
-    Cow<'static, str>: From<T>,
+    Cow<'a, str>: From<T>,
 {
     fn from_iter<U: IntoIterator<Item = T>>(iter: U) -> Self {
         Self(iter.into_iter().map(|x| x.into()).collect::<Vec<_>>())
@@ -72,36 +80,36 @@ where
 }
 
 #[derive(Debug, Clone)]
-struct PathItem {
-    ident: Ident,
-    gp: GenericParams,
+struct PathItem<'a> {
+    ident: Ident<'a>,
+    gp: GenericParams<'a>,
 }
-impl PathItem {
-    pub fn new(ident: Ident, gp: GenericParams) -> Self {
+impl<'a> PathItem<'a> {
+    pub fn new(ident: Ident<'a>, gp: GenericParams<'a>) -> Self {
         Self { ident, gp }
     }
-    pub fn bind_checked(&self, from: &str, to: Cow<'static, str>) -> Result<Self> {
+    pub fn bind_checked(&self, from: &str, to: Cow<'a, str>) -> Result<Self> {
         Ok(Self {
             ident: self.ident.clone(),
             gp: self.gp.bind_checked(from, to)?,
         })
     }
-    pub fn bind_unchecked(&self, from: &str, to: Cow<'static, str>) -> Cow<'_, Self> {
+    pub fn bind_unchecked(&self, from: &str, to: Cow<'a, str>) -> Cow<'_, Self> {
         match self.bind_checked(from, to) {
             Ok(item) => Cow::Owned(item),
             Err(_) => Cow::Borrowed(self),
         }
     }
 }
-impl From<Ident> for PathItem {
-    fn from(ident: Ident) -> Self {
+impl<'a> From<Ident<'a>> for PathItem<'a> {
+    fn from(ident: Ident<'a>) -> Self {
         Self {
             ident,
             gp: GenericParams::new_empty(),
         }
     }
 }
-impl Display for PathItem {
+impl Display for PathItem<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_fmt(format_args!("{}", self.ident))?;
         if !self.gp.0.is_empty() {
@@ -112,9 +120,9 @@ impl Display for PathItem {
 }
 
 #[derive(Debug, Clone)]
-struct PathExpr(Vec<PathItem>);
-impl PathExpr {
-    pub fn bind_checked(&self, from: &str, to: Cow<'static, str>) -> Result<Self> {
+struct PathExpr<'a>(Vec<PathItem<'a>>);
+impl<'a> PathExpr<'a> {
+    pub fn bind_checked(&self, from: &str, to: Cow<'a, str>) -> Result<Self> {
         let mut newvec = Cow::Borrowed(&self.0);
         for i in 0..self.0.len() {
             if let Ok(new_item) = self.0[i].bind_checked(from, to.clone()) {
@@ -128,14 +136,14 @@ impl PathExpr {
             Cow::Owned(vec) => Ok(Self(vec)),
         }
     }
-    pub fn bind_unchecked(&self, from: &str, to: Cow<'static, str>) -> Cow<'_, Self> {
+    pub fn bind_unchecked(&self, from: &str, to: Cow<'a, str>) -> Cow<'_, Self> {
         match self.bind_checked(from, to) {
             Ok(path) => Cow::Owned(path),
             Err(_) => Cow::Borrowed(self),
         }
     }
 }
-impl Display for PathExpr {
+impl Display for PathExpr<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut iter = self.0.iter();
         if let Some(first) = iter.next() {
@@ -147,8 +155,8 @@ impl Display for PathExpr {
         Ok(())
     }
 }
-impl FromIterator<PathItem> for PathExpr {
-    fn from_iter<T: IntoIterator<Item = PathItem>>(iter: T) -> Self {
+impl<'a> FromIterator<PathItem<'a>> for PathExpr<'a> {
+    fn from_iter<T: IntoIterator<Item = PathItem<'a>>>(iter: T) -> Self {
         Self(Vec::from_iter(iter))
     }
 }
