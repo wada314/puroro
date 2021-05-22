@@ -4,7 +4,7 @@ use std::fmt::Display;
 use std::iter::FromIterator;
 
 #[derive(Debug, Clone)]
-pub struct Ident<'a>(Cow<'a, str>);
+pub struct Ident<'a>(pub Cow<'a, str>);
 impl<'a> Ident<'a> {
     pub fn new(s: Cow<'a, str>) -> Self {
         Self(s)
@@ -80,7 +80,7 @@ where
 }
 
 #[derive(Debug, Clone)]
-struct PathItem<'a> {
+pub struct PathItem<'a> {
     ident: Ident<'a>,
     gp: GenericParams<'a>,
 }
@@ -120,7 +120,7 @@ impl Display for PathItem<'_> {
 }
 
 #[derive(Debug, Clone)]
-struct PathExpr<'a>(Vec<PathItem<'a>>);
+pub struct PathExpr<'a>(Vec<PathItem<'a>>);
 impl<'a> PathExpr<'a> {
     pub fn bind_checked(&self, from: &str, to: Cow<'a, str>) -> Result<Self> {
         let mut newvec = Cow::Borrowed(&self.0);
