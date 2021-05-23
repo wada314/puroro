@@ -33,7 +33,9 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
                     // typedefs for message types
                     Ok(format!(
-                        "type {type_ident}<'this>: {trait_module}::{trait_ident};\n",
+                        "\
+type {type_ident}<'this>: {trait_module}::{trait_ident}
+    where Self: 'this;\n",
                         type_ident = self.associated_msg_type_ident(msg)?,
                         trait_module = relative_path(self.msg.package()?, msg.package()?)?,
                         trait_ident = self.trait_ident(msg)?,
@@ -56,7 +58,10 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                             get_decl,
                         } => {
                             format!(
-                                "type {type_ident_gp}: {type_bound} where Self: 'a;\n{get_decl};\n",
+                                "\
+type {type_ident_gp}: {type_bound}
+    where Self: 'this;
+{get_decl};\n",
                                 type_ident_gp = type_ident_gp,
                                 type_bound = type_bound,
                                 get_decl = get_decl
@@ -80,14 +85,14 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 let (key_field, value_field) = m.key_value_of_map_entry()?;
                 let type_ident = format!("{}Map", to_camel_case(field.native_ident()?));
                 GetterMethods::MapField {
-                    return_type_ident_gp: format!("{ident}<'a>", ident = type_ident.clone()),
+                    return_type_ident_gp: format!("{ident}<'this>", ident = type_ident.clone()),
                     return_type_bound: format!(
-                        "::puroro::MapField::<'a, {key}, {value}>",
+                        "::puroro::MapField::<'this, {key}, {value}>",
                         key = self.map_key_type_name(key_field)?,
-                        value = self.scalar_getter_type_name(value_field, "'a")?,
+                        value = self.scalar_getter_type_name(value_field, "'this")?,
                     ),
                     get_decl: format!(
-                        "fn {ident}<'a>(&'a self) -> Self::{type_ident}::<'a>",
+                        "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
                         ident = field.native_ident()?,
                         type_ident = type_ident,
                     ),
@@ -95,21 +100,21 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
             }
             (FieldLabel::Optional2, _) | (FieldLabel::Optional3, FieldType::Message(_)) => {
                 GetterMethods::OptionalField(format!(
-                    "fn {name}(&self) -> ::std::option::Option::<{reftype}>",
+                    "fn {name}<'this>(&'this self) -> ::std::option::Option::<{reftype}>",
                     name = field.native_ident()?,
-                    reftype = self.scalar_getter_type_name(field, "'_")?,
+                    reftype = self.scalar_getter_type_name(field, "'this")?,
                 ))
             }
             (FieldLabel::Repeated, _) => {
                 let type_ident = format!("{}Repeated", to_camel_case(field.native_ident()?));
                 GetterMethods::RepeatedField {
-                    return_type_ident_gp: format!("{ident}<'a>", ident = type_ident.clone()),
+                    return_type_ident_gp: format!("{ident}<'this>", ident = type_ident.clone()),
                     return_type_bound: format!(
-                        "::puroro::RepeatedField::<'a, {value}>",
-                        value = self.scalar_getter_type_name(field, "'a")?,
+                        "::puroro::RepeatedField::<'this, {value}>",
+                        value = self.scalar_getter_type_name(field, "'this")?,
                     ),
                     get_decl: format!(
-                        "fn {ident}<'a>(&'a self) -> Self::{type_ident}::<'a>",
+                        "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
                         ident = field.native_ident()?,
                         type_ident = type_ident,
                     ),
@@ -117,9 +122,9 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
             }
             (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
                 GetterMethods::BareField(format!(
-                    "fn {name}(&self) -> {reftype}",
+                    "fn {name}<'this>(&'this self) -> {reftype}",
                     name = field.native_ident()?,
-                    reftype = self.scalar_getter_type_name(field, "'_")?,
+                    reftype = self.scalar_getter_type_name(field, "'this")?,
                 ))
             }
         })
@@ -170,7 +175,8 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                         NonNumericalFieldType::String => "str".into(),
                         NonNumericalFieldType::Bytes => "[u8]".into(),
                         NonNumericalFieldType::Message(m) => format!(
-                            "Self::{name}",
+                            "<Self as {trait_name}>::{name}",
+                            trait_name = self.trait_ident(self.msg)?,
                             name = self.associated_msg_type_ident_gp(m, &[("'this", lifetime)])?,
                         )
                         .into(),

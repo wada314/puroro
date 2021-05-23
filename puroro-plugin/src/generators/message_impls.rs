@@ -40,7 +40,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
                     }
                 },
                 func(|output| self.print_msg_ser(output)),
-                func(|output| self.print_impl_map_entry(output)),
+                //func(|output| self.print_impl_map_entry(output)),
             ),
             func(|output| self.print_impl_trait(output)),
             func(|output| self.print_impl_message(output)),
@@ -537,9 +537,12 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                 iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
                     // typedefs for message types
                     Ok(format!(
-                        "type {assoc_type_ident}<'p> = {actual_type_name};\n",
+                        "\
+type {assoc_type_ident}<'this> where Self: 'this = 
+    {actual_type_name};\n",
                         assoc_type_ident = self.traits_gen.associated_msg_type_ident(msg)?,
-                        actual_type_name = self.frag_gen.type_name_of_msg(msg, None)?,
+                        actual_type_name =
+                            self.frag_gen.type_name_of_msg(msg, &[("'par", "'this")])?,
                     ))
                 })),
                 iter(self.msg.fields().map(|field| -> Result<_> {
@@ -576,13 +579,14 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                             ) => format!(
                                 "\
 {decl} {{
-    self.{ident}.map(|field| {{
+    self.{ident}.as_ref().map(|field| {{
         ::std::borrow::Cow::Owned(
             {msg}::try_new_with_parent(
-                field,
+                ::std::option::Option::Some(field),
                 {field_number},
                 &self.puroro_internal
             ).expect(\"Invalid input slice. Consider checking the slice content earlier (TBD).\")
+        )
     }})
 }}\n",
                                 decl = decl,
@@ -665,7 +669,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 _,
                             ) => format!(
                                 "\
-type {return_type_ident} where Self: 'a = &'a {type_name};
+type {return_type_ident} where Self: 'this = &'this {type_name};
 {get_decl} {{
     &self.{ident}
 }}\n",
@@ -689,18 +693,19 @@ type {return_type_ident} where Self: 'a = &'a {type_name};
                                 _,
                             ) => format!(
                                 "\
-type {return_type_ident} where Self: 'a = 
-    ::puroro_internal::RepeatedSliceViewField::<'slice, 'a, ::puroro_internal::tags::{type_tag}>;
+type {return_type_ident} where Self: 'this =
+    ::puroro_internal::RepeatedSliceViewField::<'slice, 'this, ::puroro_internal::tags::{type_tag}>;
 {get_decl} {{
     ::puroro_internal::RepeatedSliceViewField::new(
-        &self.{ident},
+        self.{ident}.as_ref(),
         {field_number},
         &self.puroro_internal,
     )
 }}\n",
                                 return_type_ident = return_type_ident_gp,
-                                type_tag =
-                                    self.frag_gen.type_tag_ident_gp(field, &[("'par", "'a")])?,
+                                type_tag = self
+                                    .frag_gen
+                                    .type_tag_ident_gp(field, &[("'par", "'this")])?,
                                 get_decl = get_decl,
                                 ident = field.native_ident()?,
                                 field_number = field.number(),
@@ -773,10 +778,12 @@ impl{gp} ::puroro_internal::MapEntry for {entry_type} {{
             entry_type = self.frag_gen.type_name_of_msg(self.msg, None)?,
             cfg = self.frag_gen.cfg_condition(),
             gp = self.frag_gen.struct_generic_params(&[]),
-            key_type = self.frag_gen.field_scalar_item_type(key_field)?,
+            key_type = self.traits_gen.map_key_type_name(key_field)?,
             key_type_tag = self.frag_gen.type_tag_ident_gp(key_field, None)?,
             take_key = self.frag_gen.field_take_or_init(key_field)?,
-            value_type = self.frag_gen.field_scalar_item_type(value_field)?,
+            value_type = self
+                .traits_gen
+                .scalar_getter_type_name(value_field, "'par" /* TODO */)?,
             value_type_tag = self.frag_gen.type_tag_ident_gp(value_field, None)?,
             take_value = self.frag_gen.field_take_or_init(value_field)?,
         ),)
