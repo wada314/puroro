@@ -23,7 +23,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     pub fn struct_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
         let postfix1 = match self.context.impl_type() {
             ImplType::Default => "",
-            ImplType::SliceView { .. } => "SliceView",
+            ImplType::SliceView => "SliceView",
         };
         let postfix2 = match self.context.alloc_type() {
             AllocatorType::Default => "",
@@ -55,7 +55,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         .into_iter();
         let generic_args_iter2 = match self.context.impl_type() {
             ImplType::Default => None,
-            ImplType::SliceView { .. } => Some(std::array::IntoIter::new(["'slice", "'par"])),
+            ImplType::SliceView => Some(std::array::IntoIter::new(["'slice", "'par"])),
         }
         .into_iter()
         .flatten();
@@ -97,7 +97,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
     pub fn is_default_available(&self) -> bool {
         match (self.context.impl_type(), self.context.alloc_type()) {
-            (ImplType::SliceView { .. }, _) | (_, AllocatorType::Bumpalo) => false,
+            (ImplType::SliceView, _) | (_, AllocatorType::Bumpalo) => false,
             _ => true,
         }
     }
@@ -105,14 +105,14 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     pub fn is_deser_from_iter_available(&self) -> bool {
         match self.context.impl_type() {
             ImplType::Default => true,
-            ImplType::SliceView { .. } => false,
+            ImplType::SliceView => false,
         }
     }
 
     pub fn field_visibility(&self) -> &'static str {
         match self.context.impl_type() {
             ImplType::Default => "pub ",
-            ImplType::SliceView { .. } => "",
+            ImplType::SliceView => "",
         }
     }
 
@@ -130,7 +130,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     NonNumericalFieldType::Message(m) => self.type_name_of_msg(m, None)?.into(),
                 },
             },
-            ImplType::SliceView { .. } => match field
+            ImplType::SliceView => match field
                 .type_()?
                 .native_numerical_type_name(field.package()?)?
             {
@@ -181,7 +181,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     FieldLabel::Repeated => self.vec_type(scalar_type.as_ref()).into(),
                 }
             }
-            ImplType::SliceView { .. } => match (field.label()?, field.type_()?) {
+            ImplType::SliceView => match (field.label()?, field.type_()?) {
                 (FieldLabel::Repeated, _) | (_, FieldType::Message(_)) => {
                     let item = "::puroro_internal::SliceViewField::<'slice>";
                     self.option_type(item).into()
@@ -260,7 +260,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     _ => "::std::default::Default::default".into(),
                 },
             },
-            ImplType::SliceView { .. } => {
+            ImplType::SliceView => {
                 unimplemented!()
             }
         })
@@ -280,7 +280,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             .chain(
                 match self.context.impl_type() {
                     ImplType::Default => None,
-                    ImplType::SliceView { .. } => Some(["'slice", "'par"].iter()),
+                    ImplType::SliceView => Some(["'slice", "'par"].iter()),
                 }
                 .into_iter()
                 .flatten()
@@ -355,7 +355,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    pub fn box_type(&self, item: &str) -> String {
+    fn box_type(&self, item: &str) -> String {
         match self.context.alloc_type() {
             AllocatorType::Default => format!("::std::boxed::Box::<{item}>", item = item),
             AllocatorType::Bumpalo => {
@@ -392,7 +392,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             (ImplType::Default, AllocatorType::Bumpalo) => {
                 "::puroro_internal::InternalDataForBumpaloStruct<'bump>"
             }
-            (ImplType::SliceView { .. }, AllocatorType::Default) => {
+            (ImplType::SliceView, AllocatorType::Default) => {
                 "::puroro_internal::InternalDataForSliceViewStruct<'slice, 'par>"
             }
             _ => unimplemented!(),

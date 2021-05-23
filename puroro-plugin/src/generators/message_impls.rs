@@ -483,7 +483,7 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
     }}
 }}\n",
                 )),
-                ImplType::SliceView { .. } => format!(
+                ImplType::SliceView => format!(
                     "\
 {cfg}
 impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
@@ -570,7 +570,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 field_number = field.number(),
                             ),
                             (
-                                ImplType::SliceView { .. },
+                                ImplType::SliceView,
                                 GetterMethods::OptionalField(decl),
                                 FieldType::Message(m),
                             ) => format!(
@@ -592,7 +592,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                             ),
 
                             (
-                                ImplType::SliceView { .. },
+                                ImplType::SliceView,
                                 GetterMethods::BareField(decl),
                                 FieldType::String | FieldType::Bytes,
                             ) => format!(
@@ -604,7 +604,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 ident = field.native_ident()?,
                             ),
                             (
-                                ImplType::SliceView { .. },
+                                ImplType::SliceView,
                                 GetterMethods::OptionalField(decl),
                                 FieldType::String | FieldType::Bytes,
                             ) => format!(
@@ -675,7 +675,7 @@ type {return_type_ident} where Self: 'a = &'a {type_name};
                                 ident = field.native_ident()?,
                             ),
                             (
-                                ImplType::SliceView { .. },
+                                ImplType::SliceView,
                                 GetterMethods::RepeatedField {
                                     return_type_ident_gp,
                                     get_decl,
@@ -700,7 +700,7 @@ type {return_type_ident} where Self: 'a =
                                 field_number = field.number(),
                             ),
                             (
-                                ImplType::SliceView { .. },
+                                ImplType::SliceView,
                                 GetterMethods::MapField {
                                     return_type_ident_gp: _,
                                     return_type_bound: _,
