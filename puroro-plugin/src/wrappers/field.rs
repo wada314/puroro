@@ -182,7 +182,7 @@ impl<'c> FieldDescriptor<'c> {
 
     pub fn native_ident(&'c self) -> Result<&str> {
         Ok(self.lazy_native_name.get_or_try_init(|| -> Result<_> {
-            Ok(get_keyword_safe_ident(to_lower_snake_case(self.name()?))
+            Ok(get_keyword_safe_ident(to_lower_snake_case(self.name()?).into())
                 .0
                 .into_owned())
         })?)

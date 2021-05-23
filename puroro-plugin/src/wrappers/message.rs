@@ -127,7 +127,7 @@ impl<'c> MessageDescriptor<'c> {
         Ok(self
             .lazy_native_bare_type_name
             .get_or_try_init(|| -> Result<_> {
-                Ok(get_keyword_safe_ident(to_camel_case(self.name()?)))
+                Ok(get_keyword_safe_ident(to_camel_case(self.name()?).into()))
             })?)
     }
 
@@ -153,7 +153,7 @@ impl<'c> MessageDescriptor<'c> {
                 .take(num_super)
                 .collect::<String>(),
             mods = struct_package_iter
-                .map(|s| get_keyword_safe_ident(to_lower_snake_case(s))
+                .map(|s| get_keyword_safe_ident(to_lower_snake_case(s).into())
                     .0
                     .into_owned()
                     + "::")

@@ -37,7 +37,7 @@ impl<'c> FileDescriptor<'c> {
             } else {
                 Itertools::intersperse(
                     self.package().split('.').map(|p| {
-                        get_keyword_safe_ident(to_lower_snake_case(p))
+                        get_keyword_safe_ident(to_lower_snake_case(p).into())
                             .0
                             .into_owned()
                     }),
