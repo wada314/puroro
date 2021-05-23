@@ -24,22 +24,25 @@ impl GenericParams {
     }
 
     pub fn bind_checked(&self, from: &str, to: Cow<'static, str>) -> Result<GenericParams> {
-        let mut newvec = Cow::Borrowed(&self.0);
+        let mut newvec = self.0.clone();
+        let mut found = false;
         for i in 0..newvec.len() {
             if newvec[i] == from {
-                newvec.to_mut()[i] = to;
+                newvec[i] = to;
+                found = true;
                 break;
             }
         }
-        match newvec {
-            Cow::Borrowed(_) => Err(ErrorKind::InternalError {
+        if found {
+            Ok(GenericParams(newvec))
+        } else {
+            Err(ErrorKind::InternalError {
                 detail: "failed to bind generic params".to_string(),
-            })?,
-            Cow::Owned(vec) => Ok(GenericParams(vec)),
+            })?
         }
     }
 
-    pub fn bind_unchecked(&self, from: &str, to: Cow<'static, str>) -> Cow<'_, Self> {
+    pub fn bind_unchecked(&self, from: &str, to: Cow<'static, str>) -> Cow<'_, GenericParams> {
         match self.bind_checked(from, to) {
             Ok(gp) => Cow::Owned(gp),
             Err(_) => Cow::Borrowed(self),
@@ -86,12 +89,6 @@ impl PathItem {
             gp: self.gp.bind_checked(from, to)?,
         })
     }
-    pub fn bind_unchecked(&self, from: &str, to: Cow<'static, str>) -> Cow<'_, Self> {
-        match self.bind_checked(from, to) {
-            Ok(item) => Cow::Owned(item),
-            Err(_) => Cow::Borrowed(self),
-        }
-    }
 }
 impl From<Ident> for PathItem {
     fn from(ident: Ident) -> Self {
@@ -105,50 +102,9 @@ impl Display for PathItem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_fmt(format_args!("{}", self.ident))?;
         if !self.gp.0.is_empty() {
-            f.write_fmt(format_args!("::{}", self.gp))?;
+            f.write_str("::")?;
+            f.write_fmt(format_args!("{}", self.gp))?;
         }
         Ok(())
-    }
-}
-
-#[derive(Debug, Clone)]
-struct PathExpr(Vec<PathItem>);
-impl PathExpr {
-    pub fn bind_checked(&self, from: &str, to: Cow<'static, str>) -> Result<Self> {
-        let mut newvec = Cow::Borrowed(&self.0);
-        for i in 0..self.0.len() {
-            if let Ok(new_item) = self.0[i].bind_checked(from, to.clone()) {
-                newvec.to_mut()[i] = new_item;
-            }
-        }
-        match newvec {
-            Cow::Borrowed(_) => Err(ErrorKind::InternalError {
-                detail: "failed to bind generic params".to_string(),
-            })?,
-            Cow::Owned(vec) => Ok(Self(vec)),
-        }
-    }
-    pub fn bind_unchecked(&self, from: &str, to: Cow<'static, str>) -> Cow<'_, Self> {
-        match self.bind_checked(from, to) {
-            Ok(path) => Cow::Owned(path),
-            Err(_) => Cow::Borrowed(self),
-        }
-    }
-}
-impl Display for PathExpr {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut iter = self.0.iter();
-        if let Some(first) = iter.next() {
-            f.write_fmt(format_args!("{}", first))?;
-            for item in iter {
-                f.write_fmt(format_args!("::{}", item))?;
-            }
-        }
-        Ok(())
-    }
-}
-impl FromIterator<PathItem> for PathExpr {
-    fn from_iter<T: IntoIterator<Item = PathItem>>(iter: T) -> Self {
-        Self(Vec::from_iter(iter))
     }
 }
