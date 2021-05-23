@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use super::writer::{func, indent, iter, IntoFragment};
 use crate::context::Context;
-use crate::utils::{to_camel_case, Indentor};
+use crate::utils::{relative_path, to_camel_case, Indentor};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
@@ -33,9 +33,10 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
                     // typedefs for message types
                     Ok(format!(
-                        "type {type_name}<'a>: {trait_rel_ident};\n",
-                        type_name = self.associated_msg_type_ident(msg)?,
-                        trait_rel_ident = self.trait_relative_ident(msg)?,
+                        "type {type_ident}<'this>: {trait_module}::{trait_ident};\n",
+                        type_ident = self.associated_msg_type_ident(msg)?,
+                        trait_module = relative_path(self.msg.package()?, msg.package()?)?,
+                        trait_ident = self.trait_ident(msg)?,
                     ))
                 })),
                 iter(self.msg.fields().map(|field| -> Result<String> {
@@ -127,20 +128,35 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
     pub fn trait_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
         Ok(format!("{}Trait", msg.native_ident()?))
     }
-    pub fn trait_relative_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
-        Ok(format!(
-            "{}Trait",
-            msg.native_ident_with_relative_path(self.msg.package()?)?
-        ))
-    }
+
     pub fn associated_msg_type_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
         Ok(format!("{}Type", msg.native_ident()?))
+    }
+    pub fn associated_msg_type_ident_gp<'b, T>(
+        &self,
+        msg: &'c MessageDescriptor<'c>,
+        bindings: T,
+    ) -> Result<String>
+    where
+        T: IntoIterator<Item = &'b (&'static str, &'static str)>,
+    {
+        let mut lt = "'this";
+        for &(from, to) in bindings {
+            if lt == from {
+                lt = to;
+            }
+        }
+        Ok(format!(
+            "{ident}Type::<{lt}>",
+            ident = msg.native_ident()?,
+            lt = lt
+        ))
     }
 
     pub fn scalar_getter_type_name(
         &self,
         field: &'c FieldDescriptor<'c>,
-        lifetime: &str,
+        lifetime: &'static str,
     ) -> Result<String> {
         Ok(
             match field
@@ -154,14 +170,13 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                         NonNumericalFieldType::String => "str".into(),
                         NonNumericalFieldType::Bytes => "[u8]".into(),
                         NonNumericalFieldType::Message(m) => format!(
-                            "Self::{name}<{lt}>",
-                            name = self.associated_msg_type_ident(m)?,
-                            lt = lifetime
+                            "Self::{name}",
+                            name = self.associated_msg_type_ident_gp(m, &[("'this", lifetime)])?,
                         )
                         .into(),
                     };
                     format!(
-                        "::std::borrow::Cow<{lt}, {type_}>",
+                        "::std::borrow::Cow::<{lt}, {type_}>",
                         lt = lifetime,
                         type_ = t,
                     )
