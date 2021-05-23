@@ -87,7 +87,7 @@ impl<'ctx, 'proto> MessageImplFragmentGenerator<'ctx, 'proto> {
         }
         .into_iter();
         Ok(maybe_self
-            .chain(std::iter::repeat("super".into()).take(super_count))
+            .chain(std::iter::repeat("super::".into()).take(super_count))
             .chain(to_iter.map(|s| get_keyword_safe_ident(to_lower_snake_case(s))))
             .map(|ident| PathItem::from(ident))
             .collect())

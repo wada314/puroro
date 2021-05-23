@@ -536,12 +536,15 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
             indent((
                 iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
                     // typedefs for message types
-                    let actual_type = self.frag_gen.struct_relative_path_expr(msg)?;
-                    let actual_type_bound = actual_type.bind_unchecked("'par", "'a".into());
+                    let mut gp_binds = self.frag_gen.struct_generic_params(&[]);
+                    if matches!(self.context.impl_type(), ImplType::SliceView { .. }) {
+                        gp_binds = gp_binds.bind_checked("'p", "'a".into())?;
+                    }
                     Ok(format!(
-                        "type {assoc_type_ident}<'a> where Self: 'a = {actual_type};\n",
+                        "type {assoc_type_ident}<'a> where Self: 'a = {actual_type_name}{gpb};\n",
                         assoc_type_ident = self.traits_gen.associated_msg_type_ident(msg)?,
-                        actual_type = actual_type_bound,
+                        actual_type_name = self.frag_gen.struct_ident_with_relative_path(msg)?,
+                        gpb = gp_binds,
                     ))
                 })),
                 iter(self.msg.fields().map(|field| -> Result<_> {
