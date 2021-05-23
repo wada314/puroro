@@ -3,7 +3,9 @@ use std::fmt::Debug;
 
 use crate::google::protobuf::field_descriptor_proto::Label;
 use crate::google::protobuf::FieldDescriptorProto;
-use crate::utils::{get_keyword_safe_ident, iter_package_to_root, to_lower_snake_case};
+use crate::utils::{
+    get_keyword_safe_ident, iter_package_to_root, relative_path, to_lower_snake_case,
+};
 use crate::Context;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -231,8 +233,9 @@ impl<'c> FieldType<'c> {
             FieldType::String => Err(NonNumericalFieldType::String),
             FieldType::Bytes => Err(NonNumericalFieldType::Bytes),
             FieldType::Enum(e) => Ok(format!(
-                "::std::result::Result<{type_}, i32>",
-                type_ = e.native_ident_with_relative_path(package)?
+                "::std::result::Result<{module}::{ident}, i32>",
+                module = relative_path(package, e.package()?)?,
+                ident = e.native_ident()?,
             )
             .into()),
             FieldType::Message(m) => Err(NonNumericalFieldType::Message(m)),

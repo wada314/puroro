@@ -311,7 +311,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb
                             number = field.number(),
                             ident = field.native_ident()?,
                             type_ = self.frag_gen.field_type_name(field)?,
-                            type_tag = self.frag_gen.type_tag_ident_for(field)?,
+                            type_tag = self.frag_gen.type_tag_ident_gp(field)?,
                             label_tag = field.label_tag()?,
                             default_func = self.frag_gen.default_func_for(field)?,
                         ))
@@ -427,7 +427,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
                             number = field.number(),
                             ident = field.native_ident()?,
                             type_ = self.frag_gen.field_type_name(field)?,
-                            type_tag = self.frag_gen.type_tag_ident_for(field)?,
+                            type_tag = self.frag_gen.type_tag_ident_gp(field)?,
                             label_tag = field.label_tag()?,
                         ))
                     })),
@@ -473,7 +473,7 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
                                 number = field.number(),
                                 ident = field.native_ident()?,
                                 type_ = self.frag_gen.field_type_name(field)?,
-                                type_tag = self.frag_gen.type_tag_ident_for(field)?,
+                                type_tag = self.frag_gen.type_tag_ident_gp(field)?,
                                 label_tag = field.label_tag()?,
                             ))
                         })),
@@ -694,7 +694,7 @@ type {return_type_ident} where Self: 'a =
     )
 }}\n",
                                 return_type_ident = return_type_ident_gp,
-                                type_tag = self.frag_gen.type_tag_ident_for(field)?,
+                                type_tag = self.frag_gen.type_tag_ident_gp(field)?,
                                 get_decl = get_decl,
                                 ident = field.native_ident()?,
                                 field_number = field.number(),
@@ -777,10 +777,10 @@ impl{gp} ::puroro_internal::MapEntry for {entry_type} {{
             cfg = self.frag_gen.cfg_condition(),
             gp = self.frag_gen.struct_generic_params(&[]),
             key_type = self.frag_gen.field_scalar_item_type(key_field)?,
-            key_type_tag = self.frag_gen.type_tag_ident_for(key_field)?,
+            key_type_tag = self.frag_gen.type_tag_ident_gp(key_field)?,
             take_key = self.frag_gen.field_take_or_init(key_field)?,
             value_type = self.frag_gen.field_scalar_item_type(value_field)?,
-            value_type_tag = self.frag_gen.type_tag_ident_for(value_field)?,
+            value_type_tag = self.frag_gen.type_tag_ident_gp(value_field)?,
             take_value = self.frag_gen.field_take_or_init(value_field)?,
         ),)
             .write_into(output)

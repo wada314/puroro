@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
+use crate::utils::relative_path;
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
@@ -36,32 +36,6 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             postfix2 = postfix2,
         )
         .into())
-    }
-
-    pub fn relative_path(&self, dst_package: &str) -> Result<String> {
-        let mut dst_iter = dst_package.split('.').peekable();
-        let mut cur_iter = self.msg.package()?.split('.').peekable();
-        while let (Some(p1), Some(p2)) = (dst_iter.peek(), cur_iter.peek()) {
-            if *p1 == *p2 {
-                dst_iter.next();
-                cur_iter.next();
-            } else {
-                break;
-            }
-        }
-        let super_count = cur_iter.count();
-        let maybe_self = if super_count == 0 {
-            Some(Cow::Borrowed("self"))
-        } else {
-            None
-        }
-        .into_iter();
-        let supers = std::iter::repeat("super".into()).take(super_count);
-        let mods = dst_iter.map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)).into());
-        Ok(
-            Itertools::intersperse(maybe_self.chain(supers).chain(mods), "::".into())
-                .collect::<String>(),
-        )
     }
 
     /// A type name of the struct with a relative path from the current msg.
@@ -101,13 +75,13 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         if generic_args.is_empty() {
             Ok(format!(
                 "{module}::{ident}",
-                module = self.relative_path(msg.package()?)?,
+                module = relative_path(self.msg.package()?, msg.package()?)?,
                 ident = self.struct_ident(msg)?,
             ))
         } else {
             Ok(format!(
                 "{module}::{ident}::<{gargs}>",
-                module = self.relative_path(msg.package()?)?,
+                module = relative_path(self.msg.package()?, msg.package()?)?,
                 ident = self.struct_ident(msg)?,
                 gargs = generic_args,
             ))
@@ -218,7 +192,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    pub fn type_tag_ident_for(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+    pub fn type_tag_ident_gp(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
         Ok(match field.type_()? {
             FieldType::Double => "Double".into(),
             FieldType::Float => "Float".into(),
@@ -237,8 +211,9 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             FieldType::String => "String".into(),
             FieldType::Bytes => "Bytes".into(),
             FieldType::Enum(e) => format!(
-                "Enum<{}>",
-                e.native_ident_with_relative_path(self.msg.package()?)?,
+                "Enum<{module}::{ident}>",
+                module = relative_path(self.msg.package()?, e.package()?)?,
+                ident = e.native_ident()?,
             ),
             FieldType::Message(m) => {
                 format!("Message<{}>", self.type_name_of_msg(m, None)?)

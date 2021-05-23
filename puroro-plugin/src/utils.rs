@@ -1,4 +1,7 @@
+use crate::Result;
 use ::lazy_static::lazy_static;
+use itertools::Itertools;
+use std::borrow::Cow;
 use std::{collections::HashSet, fmt::Write};
 
 pub struct Indentor<W> {
@@ -130,4 +133,30 @@ pub fn iter_package_to_root(package: &str) -> impl Iterator<Item = &str> {
             Some("")
         }
     })
+}
+
+pub fn relative_path(cur_package: &str, dst_package: &str) -> Result<String> {
+    let mut dst_iter = dst_package.split('.').peekable();
+    let mut cur_iter = cur_package.split('.').peekable();
+    while let (Some(p1), Some(p2)) = (dst_iter.peek(), cur_iter.peek()) {
+        if *p1 == *p2 {
+            dst_iter.next();
+            cur_iter.next();
+        } else {
+            break;
+        }
+    }
+    let super_count = cur_iter.count();
+    let maybe_self = if super_count == 0 {
+        Some(Cow::Borrowed("self"))
+    } else {
+        None
+    }
+    .into_iter();
+    let supers = std::iter::repeat("super".into()).take(super_count);
+    let mods = dst_iter.map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)).into());
+    Ok(
+        Itertools::intersperse(maybe_self.chain(supers).chain(mods), "::".into())
+            .collect::<String>(),
+    )
 }
