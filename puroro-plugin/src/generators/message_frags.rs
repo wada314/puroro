@@ -191,26 +191,14 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 match field.label()? {
                     FieldLabel::Optional2 => {
                         if matches!(field.type_()?, FieldType::Message(_)) {
-                            format!(
-                                "::std::option::Option<{boxed_type}>",
-                                boxed_type = self.box_type(scalar_type.as_ref()),
-                            )
-                            .into()
+                            self.option_type(&self.box_type(&scalar_type)).into()
                         } else {
-                            format!(
-                                "::std::option::Option<{scalar_type}>",
-                                scalar_type = scalar_type,
-                            )
-                            .into()
+                            self.option_type(&scalar_type).into()
                         }
                     }
                     FieldLabel::Optional3 => {
                         if matches!(field.type_()?, FieldType::Message(_)) {
-                            format!(
-                                "::std::option::Option<{boxed_type}>",
-                                boxed_type = self.box_type(scalar_type.as_ref()),
-                            )
-                            .into()
+                            self.option_type(&self.box_type(&scalar_type)).into()
                         } else {
                             scalar_type.into()
                         }
@@ -221,13 +209,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             }
             ImplType::SliceView { .. } => match (field.label()?, field.type_()?) {
                 (FieldLabel::Repeated, _) | (_, FieldType::Message(_)) => {
-                    "::std::option::Option<::puroro_internal::SliceViewField<'slice>>".into()
+                    let item = "::puroro_internal::SliceViewField::<'slice>";
+                    self.option_type(item).into()
                 }
-                (FieldLabel::Optional2, _) => format!(
-                    "::std::option::Option<{scalar_type}>",
-                    scalar_type = scalar_type,
-                )
-                .into(),
+                (FieldLabel::Optional2, _) => self.option_type(&scalar_type).into(),
                 _ => scalar_type.into(),
             },
         })
@@ -397,25 +382,31 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
     pub fn box_type(&self, item: &str) -> String {
         match self.context.alloc_type() {
-            AllocatorType::Default => format!("::std::boxed::Box<{item}>", item = item),
-            AllocatorType::Bumpalo => format!("::bumpalo::boxed::Box<'bump, {item}>", item = item),
-        }
-    }
-
-    pub fn vec_type(&self, item: &str) -> String {
-        match self.context.alloc_type() {
-            AllocatorType::Default => format!("::std::vec::Vec<{item}>", item = item),
+            AllocatorType::Default => format!("::std::boxed::Box::<{item}>", item = item),
             AllocatorType::Bumpalo => {
-                format!("::bumpalo::collections::Vec<'bump, {item}>", item = item)
+                format!("::bumpalo::boxed::Box::<'bump, {item}>", item = item)
             }
         }
     }
 
-    pub fn string_type(&self) -> &'static str {
+    fn vec_type(&self, item: &str) -> String {
+        match self.context.alloc_type() {
+            AllocatorType::Default => format!("::std::vec::Vec::<{item}>", item = item),
+            AllocatorType::Bumpalo => {
+                format!("::bumpalo::collections::Vec::<'bump, {item}>", item = item)
+            }
+        }
+    }
+
+    fn string_type(&self) -> &'static str {
         match self.context.alloc_type() {
             AllocatorType::Default => "::std::string::String",
-            AllocatorType::Bumpalo => "::bumpalo::collections::String<'bump>",
+            AllocatorType::Bumpalo => "::bumpalo::collections::String::<'bump>",
         }
+    }
+
+    fn option_type(&self, item: &str) -> String {
+        format!("::std::option::Option::<{item}>", item = item)
     }
 
     pub fn internal_data_type(&self) -> &'static str {
