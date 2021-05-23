@@ -3,7 +3,6 @@ use std::hash::Hash;
 
 use super::{EnumDescriptor, FieldDescriptor, FieldType, FileDescriptor, FileOrMessageRef};
 use crate::google::protobuf::DescriptorProto;
-use crate::syn::Ident;
 use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
 use crate::{Context, ErrorKind, Result};
 use ::itertools::Itertools;
@@ -22,7 +21,7 @@ pub struct MessageDescriptor<'c> {
     lazy_package: OnceCell<String>,
     lazy_path_to_root_mod: OnceCell<String>,
     lazy_fq_name: OnceCell<String>,
-    lazy_native_bare_type_name: OnceCell<Ident<'c>>,
+    lazy_native_bare_type_name: OnceCell<String>,
     lazy_native_type_name_from_root: OnceCell<String>,
 }
 impl<'c> MessageDescriptor<'c> {
@@ -123,11 +122,11 @@ impl<'c> MessageDescriptor<'c> {
     /// ```
     /// Returns a Rust identifier without mod path,
     /// without distinguishing between repeated / optional labels.
-    pub fn native_ident(&'c self) -> Result<&Ident<'c>> {
+    pub fn native_ident(&self) -> Result<&str> {
         Ok(self
             .lazy_native_bare_type_name
             .get_or_try_init(|| -> Result<_> {
-                Ok(get_keyword_safe_ident(to_camel_case(self.name()?).into()))
+                Ok(get_keyword_safe_ident(&to_camel_case(self.name()?)))
             })?)
     }
 
@@ -153,10 +152,7 @@ impl<'c> MessageDescriptor<'c> {
                 .take(num_super)
                 .collect::<String>(),
             mods = struct_package_iter
-                .map(|s| get_keyword_safe_ident(to_lower_snake_case(s).into())
-                    .0
-                    .into_owned()
-                    + "::")
+                .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
                 .collect::<String>(),
         ))
     }

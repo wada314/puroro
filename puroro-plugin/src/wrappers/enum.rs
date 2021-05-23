@@ -74,9 +74,7 @@ impl<'c> EnumDescriptor<'c> {
         Ok(self
             .lazy_native_bare_type_name
             .get_or_try_init(|| -> Result<_> {
-                Ok(get_keyword_safe_ident(to_camel_case(self.name()?).into())
-                    .0
-                    .into_owned())
+                Ok(get_keyword_safe_ident(&to_camel_case(self.name()?)))
             })?)
     }
 
@@ -99,10 +97,7 @@ impl<'c> EnumDescriptor<'c> {
                 .take(cur_package_iter.count())
                 .collect::<String>(),
             mods = struct_package_iter
-                .map(|s| get_keyword_safe_ident(to_lower_snake_case(s).into())
-                    .0
-                    .into_owned()
-                    + "::")
+                .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
                 .collect::<String>(),
         ))
     }
@@ -143,9 +138,7 @@ impl<'c> EnumValueDescriptor<'c> {
     }
     pub fn native_name(&self) -> Result<&str> {
         Ok(self.lazy_native_name.get_or_try_init(|| -> Result<_> {
-            Ok(get_keyword_safe_ident(to_camel_case(self.name()?).into())
-                .0
-                .into_owned())
+            Ok(get_keyword_safe_ident(&to_camel_case(self.name()?)))
         })?)
     }
 }

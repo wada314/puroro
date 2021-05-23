@@ -36,11 +36,9 @@ impl<'c> FileDescriptor<'c> {
                 "mod.rs".to_string()
             } else {
                 Itertools::intersperse(
-                    self.package().split('.').map(|p| {
-                        get_keyword_safe_ident(to_lower_snake_case(p).into())
-                            .0
-                            .into_owned()
-                    }),
+                    self.package()
+                        .split('.')
+                        .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
                     "/".to_string(),
                 )
                 .collect::<String>()

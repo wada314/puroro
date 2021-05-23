@@ -1,4 +1,3 @@
-use crate::syn::Ident;
 use crate::{ErrorKind, Result};
 use ::lazy_static::lazy_static;
 use std::borrow::Cow;
@@ -117,12 +116,12 @@ lazy_static! {
     .collect::<HashSet<&'static str>>();
 }
 
-pub fn get_keyword_safe_ident<'a>(input: Cow<'a, str>) -> Ident<'a> {
-    let mut s = input;
-    while KEYWORDS.contains(s.as_ref()) {
-        s.to_mut().push('_');
+pub fn get_keyword_safe_ident(input: &str) -> String {
+    let mut s = input.to_string();
+    while KEYWORDS.contains(s.as_str()) {
+        s.push('_');
     }
-    Ident::new(s)
+    s
 }
 
 pub fn iter_package_to_root(package: &str) -> impl Iterator<Item = &str> {

@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::syn::{GenericParams, Ident, PathItem};
+use crate::syn::{GenericParams, Ident};
 use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
@@ -39,49 +39,6 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         .into())
     }
 
-    pub fn struct_ident_with_gp(&self, msg: &'c MessageDescriptor<'c>) -> Result<PathItem> {
-        let generic_args_iter1 = match self.context.alloc_type() {
-            AllocatorType::Default => None,
-            AllocatorType::Bumpalo => Some("'bump"),
-        }
-        .into_iter();
-        let generic_args_iter2 = match self.context.impl_type() {
-            ImplType::Default => None,
-            ImplType::SliceView { .. } => Some(std::array::IntoIter::new(["'slice", "'par"])),
-        }
-        .into_iter()
-        .flatten();
-        let generic_args_iter = generic_args_iter1.chain(generic_args_iter2);
-        let generic_args = generic_args_iter.collect::<GenericParams>();
-
-        Ok(PathItem::new(self.struct_ident(msg)?, generic_args))
-    }
-
-    fn relative_path<'b>(from: &'b str, to: &'b str) -> Result<Vec<PathItem<'b>>> {
-        let mut from_iter = from.split('.').peekable();
-        let mut to_iter = to.split('.').peekable();
-        while let (Some(p1), Some(p2)) = (to_iter.peek(), from_iter.peek()) {
-            if *p1 == *p2 {
-                to_iter.next();
-                from_iter.next();
-            } else {
-                break;
-            }
-        }
-        let super_count = from_iter.count();
-        let maybe_self = if super_count == 0 {
-            Some(Ident::new("self".into()))
-        } else {
-            None
-        }
-        .into_iter();
-        Ok(maybe_self
-            .chain(std::iter::repeat("super::".into()).take(super_count))
-            .chain(to_iter.map(|s| get_keyword_safe_ident(to_lower_snake_case(s).into())))
-            .map(|ident| PathItem::from(ident))
-            .collect())
-    }
-
     /// A struct ident with relative path from the given package.
     /// Note this is still not a typename; the generic params are not bound.
     pub fn struct_ident_with_relative_path(
@@ -109,10 +66,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 .take(super_count)
                 .collect::<String>(),
             mods = struct_package_iter
-                .map(|s| get_keyword_safe_ident(to_lower_snake_case(s).into())
-                    .0
-                    .into_owned()
-                    + "::")
+                .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
                 .collect::<String>(),
         ))
     }
