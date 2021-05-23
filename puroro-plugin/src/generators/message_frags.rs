@@ -66,7 +66,14 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
     /// A type name of the struct with a relative path from the current msg.
     /// Includes generic param bounds if there is any.
-    pub fn type_name_of_msg(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
+    pub fn type_name_of_msg<'b, T>(
+        &self,
+        msg: &'c MessageDescriptor<'c>,
+        bindings: T,
+    ) -> Result<String>
+    where
+        T: IntoIterator<Item = &'b (&'static str, &'static str)>,
+    {
         let generic_args_iter1 = match self.context.alloc_type() {
             AllocatorType::Default => None,
             AllocatorType::Bumpalo => Some("'bump"),
@@ -78,9 +85,19 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
         .into_iter()
         .flatten();
+        // Replace bindings
+        let mut generic_args_vec = generic_args_iter1
+            .chain(generic_args_iter2)
+            .collect::<Vec<_>>();
+        for &(from, to) in bindings {
+            for i in 0..generic_args_vec.len() {
+                if generic_args_vec[i] == from {
+                    generic_args_vec[i] = to;
+                }
+            }
+        }
         let generic_args =
-            Itertools::intersperse(generic_args_iter1.chain(generic_args_iter2), ", ")
-                .collect::<String>();
+            Itertools::intersperse(generic_args_vec.into_iter(), ", ").collect::<String>();
         if generic_args.is_empty() {
             Ok(format!(
                 "{module}::{ident}",
@@ -136,7 +153,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
                     NonNumericalFieldType::String => self.string_type().into(),
                     NonNumericalFieldType::Bytes => self.vec_type("u8").into(),
-                    NonNumericalFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
+                    NonNumericalFieldType::Message(m) => self.type_name_of_msg(m, None)?.into(),
                 },
             },
             ImplType::SliceView { .. } => match field
@@ -148,13 +165,13 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
                     NonNumericalFieldType::String => "&'slice str".into(),
                     NonNumericalFieldType::Bytes => "&'slice [u8]".into(),
-                    NonNumericalFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
+                    NonNumericalFieldType::Message(m) => self.type_name_of_msg(m, None)?.into(),
                 },
             },
         })
     }
 
-    pub fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+    pub fn field_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
         let scalar_type = self.field_scalar_item_type(field)?;
         Ok(match self.context.impl_type() {
             ImplType::Default => {
@@ -239,7 +256,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 e.native_ident_with_relative_path(self.msg.package()?)?,
             ),
             FieldType::Message(m) => {
-                format!("Message<{}>", self.type_name_of_msg(m,)?)
+                format!("Message<{}>", self.type_name_of_msg(m, None)?)
             }
         })
     }
@@ -271,12 +288,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             "|| ::bumpalo::boxed::Box::new_in({msg}::new_in(\
                                 puroro_internal.bumpalo()\
                             ), puroro_internal.bumpalo())",
-                            msg = self.type_name_of_msg(m)?,
+                            msg = self.type_name_of_msg(m, None)?,
                         )
                         .into(),
                         FieldLabel::Required | FieldLabel::Repeated => format!(
                             "|| {msg}::new_in(puroro_internal.bumpalo())",
-                            msg = self.type_name_of_msg(m)?,
+                            msg = self.type_name_of_msg(m, None)?,
                         )
                         .into(),
                     },
@@ -365,14 +382,14 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 "<{field_type} as FieldTakeOrInit<{taken_type}>>\
                     ::take_or_init(self.{ident})",
                 ident = field.native_ident()?,
-                field_type = self.field_type_for(field)?,
+                field_type = self.field_type_name(field)?,
                 taken_type = self.field_scalar_item_type(field)?,
             ),
             AllocatorType::Bumpalo => format!(
                 "<{field_type} as FieldTakeOrInit<{taken_type}>>\
                     ::take_or_init_in_bumpalo(self.{ident}, self.puroro_internal.bumpalo())",
                 ident = field.native_ident()?,
-                field_type = self.field_type_for(field)?,
+                field_type = self.field_type_name(field)?,
                 taken_type = self.field_scalar_item_type(field)?,
             ),
         })
