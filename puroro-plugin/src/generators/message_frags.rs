@@ -21,7 +21,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
     /// A raw generated struct identifier.
     /// e.g. "FieldDescriptorProto", "DescriptorProtoBumpalo"
-    pub fn struct_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Ident<'_>> {
+    pub fn struct_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Ident> {
         let postfix1 = match self.context.impl_type() {
             ImplType::Default => "",
             ImplType::SliceView { .. } => "SliceView",
@@ -39,10 +39,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         .into())
     }
 
-    pub fn struct_ident_with_gp(
-        &self,
-        msg: &'c MessageDescriptor<'c>,
-    ) -> Result<(Ident<'_>, GenericParams<'_>)> {
+    pub fn struct_ident_with_gp(&self, msg: &'c MessageDescriptor<'c>) -> Result<PathItem> {
         let generic_args_iter1 = match self.context.alloc_type() {
             AllocatorType::Default => None,
             AllocatorType::Bumpalo => Some("'bump"),
@@ -57,7 +54,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         let generic_args_iter = generic_args_iter1.chain(generic_args_iter2);
         let generic_args = generic_args_iter.collect::<GenericParams>();
 
-        Ok((self.struct_ident(msg)?, generic_args))
+        Ok(PathItem::new(self.struct_ident(msg)?, generic_args))
     }
 
     fn relative_path<'b>(from: &'b str, to: &'b str) -> Result<Vec<PathItem<'b>>> {
