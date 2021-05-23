@@ -6,7 +6,6 @@ mod context;
 mod error;
 mod generators;
 mod protos;
-mod syn;
 mod utils;
 mod wrappers;
 
