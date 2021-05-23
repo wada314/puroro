@@ -33,7 +33,7 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
                     // typedefs for message types
                     Ok(format!(
-                        "type {type_name}<'a>: {trait_rel_ident} where Self: 'a;\n",
+                        "type {type_name}<'a>: {trait_rel_ident};\n",
                         type_name = self.associated_msg_type_ident(msg)?,
                         trait_rel_ident = self.trait_relative_ident(msg)?,
                     ))
