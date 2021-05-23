@@ -38,19 +38,6 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         .into())
     }
 
-    /// A struct ident with relative path from the given package.
-    /// Note this is still not a typename; the generic params are not bound.
-    pub fn struct_ident_with_relative_path(
-        &self,
-        msg: &'c MessageDescriptor<'c>,
-    ) -> Result<String> {
-        Ok(format!(
-            "{path}::{name}",
-            path = self.relative_path(msg.package()?)?,
-            name = self.struct_ident(msg)?
-        ))
-    }
-
     pub fn relative_path(&self, dst_package: &str) -> Result<String> {
         let mut dst_iter = dst_package.split('.').peekable();
         let mut cur_iter = self.msg.package()?.split('.').peekable();
@@ -91,14 +78,20 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
         .into_iter()
         .flatten();
-        let generic_args_iter = generic_args_iter1.chain(generic_args_iter2);
-        if generic_args_iter.clone().count() == 0 {
-            Ok(self.struct_ident_with_relative_path(msg)?)
-        } else {
-            let generic_args = Itertools::intersperse(generic_args_iter, ", ").collect::<String>();
+        let generic_args =
+            Itertools::intersperse(generic_args_iter1.chain(generic_args_iter2), ", ")
+                .collect::<String>();
+        if generic_args.is_empty() {
             Ok(format!(
-                "{name}::<{gargs}>",
-                name = self.struct_ident_with_relative_path(msg)?,
+                "{module}::{ident}",
+                module = self.relative_path(msg.package()?)?,
+                ident = self.struct_ident(msg)?,
+            ))
+        } else {
+            Ok(format!(
+                "{module}::{ident}::<{gargs}>",
+                module = self.relative_path(msg.package()?)?,
+                ident = self.struct_ident(msg)?,
                 gargs = generic_args,
             ))
         }
@@ -278,12 +271,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             "|| ::bumpalo::boxed::Box::new_in({msg}::new_in(\
                                 puroro_internal.bumpalo()\
                             ), puroro_internal.bumpalo())",
-                            msg = self.struct_ident_with_relative_path(m)?,
+                            msg = self.type_name_of_msg(m)?,
                         )
                         .into(),
                         FieldLabel::Required | FieldLabel::Repeated => format!(
                             "|| {msg}::new_in(puroro_internal.bumpalo())",
-                            msg = self.struct_ident_with_relative_path(m)?,
+                            msg = self.type_name_of_msg(m)?,
                         )
                         .into(),
                     },
