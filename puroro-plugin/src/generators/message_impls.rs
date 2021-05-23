@@ -550,13 +550,13 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                 iter(self.msg.fields().map(|field| -> Result<_> {
                     Ok(
                         match (
-                            self.context.impl_type(),
                             self.traits_gen.generate_getter_method_decls(field)?,
+                            self.context.impl_type(),
                             field.type_()?,
                         ) {
                             (
-                                ImplType::SliceView { .. },
                                 GetterMethods::BareField(decl),
+                                ImplType::SliceView { .. },
                                 FieldType::Message(m),
                             ) => format!(
                                 "\
@@ -575,8 +575,8 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 field_number = field.number(),
                             ),
                             (
-                                ImplType::SliceView { .. },
                                 GetterMethods::OptionalField(decl),
+                                ImplType::SliceView { .. },
                                 FieldType::Message(m),
                             ) => format!(
                                 "\
@@ -598,8 +598,8 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                             ),
 
                             (
-                                ImplType::SliceView { .. },
                                 GetterMethods::BareField(decl),
+                                ImplType::SliceView { .. },
                                 FieldType::String | FieldType::Bytes,
                             ) => format!(
                                 "\
@@ -610,8 +610,8 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 ident = field.native_ident()?,
                             ),
                             (
-                                ImplType::SliceView { .. },
                                 GetterMethods::OptionalField(decl),
+                                ImplType::SliceView { .. },
                                 FieldType::String | FieldType::Bytes,
                             ) => format!(
                                 "\
@@ -622,8 +622,8 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 ident = field.native_ident()?,
                             ),
                             (
-                                ImplType::Default,
                                 GetterMethods::BareField(decl),
+                                ImplType::Default,
                                 FieldType::Message(_) | FieldType::String | FieldType::Bytes,
                             ) => format!(
                                 "\
@@ -634,8 +634,8 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 ident = field.native_ident()?
                             ),
                             (
-                                ImplType::Default,
                                 GetterMethods::OptionalField(decl),
+                                ImplType::Default,
                                 FieldType::Message(_) | FieldType::String | FieldType::Bytes,
                             ) => format!(
                                 "\
@@ -647,8 +647,8 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                             ),
 
                             (
-                                _,
                                 GetterMethods::BareField(decl) | GetterMethods::OptionalField(decl),
+                                _,
                                 _,
                             ) => format!(
                                 "{decl} {{\n    self.{ident}.clone()\n}}\n",
@@ -657,17 +657,17 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                             ),
 
                             (
-                                ImplType::Default,
                                 GetterMethods::RepeatedField {
-                                    return_type_ident_gp,
+                                    return_type_ident_gp: return_type_ident,
+                                    return_type_bound: _,
                                     get_decl,
-                                    ..
                                 }
                                 | GetterMethods::MapField {
-                                    return_type_ident_gp,
+                                    return_type_ident_gp: return_type_ident,
+                                    return_type_bound: _,
                                     get_decl,
-                                    ..
                                 },
+                                ImplType::Default,
                                 _,
                             ) => format!(
                                 "\
@@ -675,23 +675,23 @@ type {return_type_ident} where Self: 'a = &'a {type_name};
 {get_decl} {{
     &self.{ident}
 }}\n",
-                                return_type_ident = return_type_ident_gp,
+                                return_type_ident = return_type_ident,
                                 type_name = self.frag_gen.field_type_for(field)?,
                                 get_decl = get_decl,
                                 ident = field.native_ident()?,
                             ),
                             (
-                                ImplType::SliceView { .. },
                                 GetterMethods::RepeatedField {
                                     return_type_ident_gp,
+                                    return_type_bound: _,
                                     get_decl,
-                                    ..
                                 }
                                 | GetterMethods::MapField {
                                     return_type_ident_gp,
+                                    return_type_bound: _,
                                     get_decl,
-                                    ..
                                 },
+                                ImplType::SliceView { .. },
                                 _,
                             ) => format!(
                                 "\
