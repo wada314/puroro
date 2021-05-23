@@ -82,12 +82,12 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 GetterMethods::MapField {
                     return_type_ident_gp: format!("{ident}<'a>", ident = type_ident.clone()),
                     return_type_bound: format!(
-                        "::puroro::MapField<'a, {key}, {value}>",
+                        "::puroro::MapField::<'a, {key}, {value}>",
                         key = self.map_key_type_name(key_field)?,
                         value = self.scalar_getter_type_name(value_field, "'a")?,
                     ),
                     get_decl: format!(
-                        "fn {ident}<'a>(&'a self) -> Self::{type_ident}<'a>",
+                        "fn {ident}<'a>(&'a self) -> Self::{type_ident}::<'a>",
                         ident = field.native_ident()?,
                         type_ident = type_ident,
                     ),
@@ -95,7 +95,7 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
             }
             (FieldLabel::Optional2, _) | (FieldLabel::Optional3, FieldType::Message(_)) => {
                 GetterMethods::OptionalField(format!(
-                    "fn {name}(&self) -> ::std::option::Option<{reftype}>",
+                    "fn {name}(&self) -> ::std::option::Option::<{reftype}>",
                     name = field.native_ident()?,
                     reftype = self.scalar_getter_type_name(field, "'_")?,
                 ))
@@ -105,11 +105,11 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 GetterMethods::RepeatedField {
                     return_type_ident_gp: format!("{ident}<'a>", ident = type_ident.clone()),
                     return_type_bound: format!(
-                        "::puroro::RepeatedField<'a, {value}>",
+                        "::puroro::RepeatedField::<'a, {value}>",
                         value = self.scalar_getter_type_name(field, "'a")?,
                     ),
                     get_decl: format!(
-                        "fn {ident}<'a>(&'a self) -> Self::{type_ident}<'a>",
+                        "fn {ident}<'a>(&'a self) -> Self::{type_ident}::<'a>",
                         ident = field.native_ident()?,
                         type_ident = type_ident,
                     ),
