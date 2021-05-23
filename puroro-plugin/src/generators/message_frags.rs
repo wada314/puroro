@@ -44,30 +44,37 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         &self,
         msg: &'c MessageDescriptor<'c>,
     ) -> Result<String> {
-        let struct_name = self.struct_ident(msg)?;
-        let mut struct_package_iter = msg.package()?.split('.').peekable();
-        let mut cur_package_iter = self.msg.package()?.split('.').peekable();
-        while let (Some(p1), Some(p2)) = (struct_package_iter.peek(), cur_package_iter.peek()) {
+        Ok(format!(
+            "{path}::{name}",
+            path = self.relative_path(msg.package()?)?,
+            name = self.struct_ident(msg)?
+        ))
+    }
+
+    pub fn relative_path(&self, dst_package: &str) -> Result<String> {
+        let mut dst_iter = dst_package.split('.').peekable();
+        let mut cur_iter = self.msg.package()?.split('.').peekable();
+        while let (Some(p1), Some(p2)) = (dst_iter.peek(), cur_iter.peek()) {
             if *p1 == *p2 {
-                struct_package_iter.next();
-                cur_package_iter.next();
+                dst_iter.next();
+                cur_iter.next();
             } else {
                 break;
             }
         }
-        let super_count = cur_package_iter.count();
-        let maybe_self = if super_count == 0 { "self::" } else { "" };
-        Ok(format!(
-            "{maybe_self}{supers}{mods}{name}",
-            name = struct_name,
-            maybe_self = maybe_self,
-            supers = std::iter::repeat("super::")
-                .take(super_count)
+        let super_count = cur_iter.count();
+        let maybe_self = if super_count == 0 {
+            Some(Cow::Borrowed("self"))
+        } else {
+            None
+        }
+        .into_iter();
+        let supers = std::iter::repeat("super".into()).take(super_count);
+        let mods = dst_iter.map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)).into());
+        Ok(
+            Itertools::intersperse(maybe_self.chain(supers).chain(mods), "::".into())
                 .collect::<String>(),
-            mods = struct_package_iter
-                .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
-                .collect::<String>(),
-        ))
+        )
     }
 
     /// A type name of the struct with a relative path from the current msg.
