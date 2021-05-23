@@ -192,7 +192,14 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    pub fn type_tag_ident_gp(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+    pub fn type_tag_ident_gp<'b, T>(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+        bindings: T,
+    ) -> Result<String>
+    where
+        T: IntoIterator<Item = &'b (&'static str, &'static str)>,
+    {
         Ok(match field.type_()? {
             FieldType::Double => "Double".into(),
             FieldType::Float => "Float".into(),
@@ -216,7 +223,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 ident = e.native_ident()?,
             ),
             FieldType::Message(m) => {
-                format!("Message<{}>", self.type_name_of_msg(m, None)?)
+                format!("Message<{}>", self.type_name_of_msg(m, bindings)?)
             }
         })
     }
