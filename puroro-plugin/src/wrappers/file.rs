@@ -11,16 +11,16 @@ use ::once_cell::unsync::OnceCell;
 use itertools::Itertools;
 
 #[derive(Clone)]
-pub struct FileDescriptor<'proto> {
-    proto: &'proto FileDescriptorProto,
-    context: &'proto Context<'proto>,
+pub struct FileDescriptor<'c> {
+    proto: &'c FileDescriptorProto,
+    context: &'c Context<'c>,
 
-    lazy_messages: OnceCell<Vec<MessageDescriptor<'proto>>>,
-    lazy_enums: OnceCell<Vec<EnumDescriptor<'proto>>>,
+    lazy_messages: OnceCell<Vec<MessageDescriptor<'c>>>,
+    lazy_enums: OnceCell<Vec<EnumDescriptor<'c>>>,
     lazy_output_file_path_from_root: OnceCell<String>,
 }
-impl<'proto> FileDescriptor<'proto> {
-    pub fn new(proto: &'proto FileDescriptorProto, context: &'proto Context<'proto>) -> Self {
+impl<'c> FileDescriptor<'c> {
+    pub fn new(proto: &'c FileDescriptorProto, context: &'c Context<'c>) -> Self {
         Self {
             proto,
             context,
@@ -30,7 +30,7 @@ impl<'proto> FileDescriptor<'proto> {
             lazy_output_file_path_from_root: Default::default(),
         }
     }
-    pub fn output_file_path_from_root(&'proto self) -> &str {
+    pub fn output_file_path_from_root(&'c self) -> &str {
         self.lazy_output_file_path_from_root.get_or_init(|| {
             if self.package().is_empty() {
                 "mod.rs".to_string()
@@ -58,7 +58,7 @@ impl<'proto> FileDescriptor<'proto> {
         }
     }
 
-    pub fn messages(&'proto self) -> impl Iterator<Item = &MessageDescriptor<'proto>> {
+    pub fn messages(&'c self) -> impl Iterator<Item = &MessageDescriptor<'c>> {
         self.lazy_messages
             .get_or_init(|| {
                 self.proto
@@ -69,7 +69,7 @@ impl<'proto> FileDescriptor<'proto> {
             })
             .iter()
     }
-    pub fn enums(&'proto self) -> impl Iterator<Item = &EnumDescriptor<'proto>> {
+    pub fn enums(&'c self) -> impl Iterator<Item = &EnumDescriptor<'c>> {
         self.lazy_enums
             .get_or_init(|| {
                 self.proto
@@ -80,14 +80,14 @@ impl<'proto> FileDescriptor<'proto> {
             })
             .iter()
     }
-    pub fn package(&'proto self) -> &'proto str {
+    pub fn package(&'c self) -> &'c str {
         self.proto.package.as_deref().unwrap_or("")
     }
 
     /// Visit all `MessageDescriptor` and `EnumDescriptor` in this
     /// file, including the nested messages and enums.
-    pub fn visit_messages_and_enums_in_file<T: DescriptorVisitor<'proto>>(
-        &'proto self,
+    pub fn visit_messages_and_enums_in_file<T: DescriptorVisitor<'c>>(
+        &'c self,
         visitor: &mut T,
     ) -> Result<()> {
         /// Lifetime `'a` is for this descriptor's lifetime, and `'d` is for
@@ -143,17 +143,11 @@ pub enum ProtoSyntax {
     Proto3,
 }
 
-pub trait DescriptorVisitor<'proto> {
-    fn handle_msg(
-        &mut self,
-        #[allow(unused)] msg: &'proto MessageDescriptor<'proto>,
-    ) -> Result<()> {
+pub trait DescriptorVisitor<'c> {
+    fn handle_msg(&mut self, #[allow(unused)] msg: &'c MessageDescriptor<'c>) -> Result<()> {
         Ok(())
     }
-    fn handle_enum(
-        &mut self,
-        #[allow(unused)] enume: &'proto EnumDescriptor<'proto>,
-    ) -> Result<()> {
+    fn handle_enum(&mut self, #[allow(unused)] enume: &'c EnumDescriptor<'c>) -> Result<()> {
         Ok(())
     }
     fn enter_submodule(&mut self, #[allow(unused)] name: &str) -> Result<()> {

@@ -16,14 +16,14 @@ use std::fmt::Write;
 use self::message_impls::MessageImplCodeGenerator;
 use self::message_traits::MessageTraitCodeGenerator;
 
-struct Visitor<'proto> {
+struct Visitor<'c> {
     output: Indentor<String>,
-    context: Context<'proto>,
-    bumpalo_context: Context<'proto>,
-    slice_view_context: Context<'proto>,
+    context: Context<'c>,
+    bumpalo_context: Context<'c>,
+    slice_view_context: Context<'c>,
 }
-impl<'proto> DescriptorVisitor<'proto> for Visitor<'proto> {
-    fn handle_msg(&mut self, msg: &'proto MessageDescriptor<'proto>) -> Result<()> {
+impl<'c> DescriptorVisitor<'c> for Visitor<'c> {
+    fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
         let normal_impl_gen = MessageImplCodeGenerator::new(&self.context, msg);
         let bumpalo_impl_gen = MessageImplCodeGenerator::new(&self.bumpalo_context, msg);
         let slice_view_impl_gen = MessageImplCodeGenerator::new(&self.slice_view_context, msg);
@@ -36,7 +36,7 @@ impl<'proto> DescriptorVisitor<'proto> for Visitor<'proto> {
         Ok(())
     }
 
-    fn handle_enum(&mut self, enume: &'proto EnumDescriptor<'proto>) -> Result<()> {
+    fn handle_enum(&mut self, enume: &'c EnumDescriptor<'c>) -> Result<()> {
         enums::print_enum(&mut self.output, enume)
     }
 
@@ -54,7 +54,7 @@ impl<'proto> DescriptorVisitor<'proto> for Visitor<'proto> {
         Ok(())
     }
 }
-pub fn do_generate<'proto>(context: &'proto Context<'proto>) -> Result<HashMap<String, String>> {
+pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, String>> {
     let mut filenames_and_contents = HashMap::new();
     for file_desc in context.file_descriptors() {
         let file_name = file_desc.output_file_path_from_root().to_string();

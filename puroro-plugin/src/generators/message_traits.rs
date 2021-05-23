@@ -8,14 +8,14 @@ use crate::wrappers::{
 };
 use crate::{ErrorKind, Result};
 
-pub struct MessageTraitCodeGenerator<'ctx, 'proto> {
+pub struct MessageTraitCodeGenerator<'a, 'c> {
     #[allow(unused)]
-    context: &'ctx Context<'proto>,
-    msg: &'proto MessageDescriptor<'proto>,
+    context: &'a Context<'c>,
+    msg: &'c MessageDescriptor<'c>,
 }
 
-impl<'ctx, 'proto> MessageTraitCodeGenerator<'ctx, 'proto> {
-    pub fn new(context: &'ctx Context<'proto>, msg: &'proto MessageDescriptor<'proto>) -> Self {
+impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
+    pub fn new(context: &'a Context<'c>, msg: &'c MessageDescriptor<'c>) -> Self {
         Self { context, msg }
     }
     pub fn print_msg_traits<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
@@ -71,7 +71,7 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
 
     pub fn generate_getter_method_decls(
         &self,
-        field: &'proto FieldDescriptor<'proto>,
+        field: &'c FieldDescriptor<'c>,
     ) -> Result<GetterMethods> {
         Ok(match (field.label()?, field.type_()?) {
             (FieldLabel::Repeated, FieldType::Message(m)) if m.is_map_entry() => {
@@ -124,25 +124,22 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
         })
     }
 
-    pub fn trait_ident(&self, msg: &'proto MessageDescriptor<'proto>) -> Result<String> {
+    pub fn trait_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
         Ok(format!("{}Trait", msg.native_ident()?))
     }
-    pub fn trait_relative_ident(&self, msg: &'proto MessageDescriptor<'proto>) -> Result<String> {
+    pub fn trait_relative_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
         Ok(format!(
             "{}Trait",
             msg.native_ident_with_relative_path(self.msg.package()?)?
         ))
     }
-    pub fn associated_msg_type_ident(
-        &self,
-        msg: &'proto MessageDescriptor<'proto>,
-    ) -> Result<String> {
+    pub fn associated_msg_type_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
         Ok(format!("{}Type", msg.native_ident()?))
     }
 
     pub fn scalar_getter_type_name(
         &self,
-        field: &'proto FieldDescriptor<'proto>,
+        field: &'c FieldDescriptor<'c>,
         lifetime: &str,
     ) -> Result<String> {
         Ok(
@@ -173,10 +170,7 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
         )
     }
 
-    pub fn map_key_type_name(
-        &self,
-        field: &'proto FieldDescriptor<'proto>,
-    ) -> Result<Cow<'static, str>> {
+    pub fn map_key_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'static, str>> {
         Ok(
             match field
                 .type_()?

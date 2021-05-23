@@ -6,15 +6,15 @@ use crate::utils::Indentor;
 use crate::wrappers::{FieldType, MessageDescriptor};
 use crate::Result;
 
-pub struct MessageImplCodeGenerator<'ctx, 'proto> {
-    context: &'ctx Context<'proto>,
-    msg: &'proto MessageDescriptor<'proto>,
-    frag_gen: MessageImplFragmentGenerator<'ctx, 'proto>,
-    traits_gen: MessageTraitCodeGenerator<'ctx, 'proto>,
+pub struct MessageImplCodeGenerator<'a, 'c> {
+    context: &'a Context<'c>,
+    msg: &'c MessageDescriptor<'c>,
+    frag_gen: MessageImplFragmentGenerator<'a, 'c>,
+    traits_gen: MessageTraitCodeGenerator<'a, 'c>,
 }
 
-impl<'ctx, 'proto> MessageImplCodeGenerator<'ctx, 'proto> {
-    pub fn new(context: &'ctx Context<'proto>, msg: &'proto MessageDescriptor<'proto>) -> Self {
+impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
+    pub fn new(context: &'a Context<'c>, msg: &'c MessageDescriptor<'c>) -> Self {
         Self {
             context,
             msg,

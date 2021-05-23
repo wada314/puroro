@@ -8,22 +8,22 @@ use crate::{Context, ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 
 #[derive(Clone)]
-pub struct EnumDescriptor<'proto> {
-    proto: &'proto EnumDescriptorProto,
-    context: &'proto Context<'proto>,
-    parent: FileOrMessageRef<'proto>,
+pub struct EnumDescriptor<'c> {
+    proto: &'c EnumDescriptorProto,
+    context: &'c Context<'c>,
+    parent: FileOrMessageRef<'c>,
 
-    values: Vec<EnumValueDescriptor<'proto>>,
+    values: Vec<EnumValueDescriptor<'c>>,
 
     lazy_package: OnceCell<String>,
     lazy_fq_name: OnceCell<String>,
     lazy_native_bare_type_name: OnceCell<String>,
 }
-impl<'proto> EnumDescriptor<'proto> {
+impl<'c> EnumDescriptor<'c> {
     pub fn new(
-        proto: &'proto EnumDescriptorProto,
-        context: &'proto Context<'proto>,
-        parent: FileOrMessageRef<'proto>,
+        proto: &'c EnumDescriptorProto,
+        context: &'c Context<'c>,
+        parent: FileOrMessageRef<'c>,
     ) -> Self {
         Self {
             proto,
@@ -44,12 +44,12 @@ impl<'proto> EnumDescriptor<'proto> {
             detail: "Missing enum name".to_string(),
         })?)
     }
-    pub fn package(&'proto self) -> Result<&str> {
+    pub fn package(&'c self) -> Result<&str> {
         Ok(self
             .lazy_package
             .get_or_try_init(|| -> Result<_> { Ok(self.parent.package_for_child()?) })?)
     }
-    pub fn fully_qualified_name(&'proto self) -> Result<&str> {
+    pub fn fully_qualified_name(&'c self) -> Result<&str> {
         Ok(self.lazy_fq_name.get_or_try_init(|| -> Result<_> {
             Ok(format!(
                 "{package}.{name}",
@@ -58,7 +58,7 @@ impl<'proto> EnumDescriptor<'proto> {
             ))
         })?)
     }
-    pub fn values(&self) -> impl Iterator<Item = &EnumValueDescriptor<'proto>> {
+    pub fn values(&self) -> impl Iterator<Item = &EnumValueDescriptor<'c>> {
         self.values.iter()
     }
 
@@ -80,7 +80,7 @@ impl<'proto> EnumDescriptor<'proto> {
             })?)
     }
 
-    pub fn native_ident_with_relative_path(&'proto self, cur_package: &str) -> Result<String> {
+    pub fn native_ident_with_relative_path(&'c self, cur_package: &str) -> Result<String> {
         let enum_name = self.native_ident()?;
         let mut struct_package_iter = self.package()?.split('.').peekable();
         let mut cur_package_iter = cur_package.split('.').peekable();
@@ -119,13 +119,13 @@ impl Hash for EnumDescriptor<'_> {
 }
 
 #[derive(Clone)]
-pub struct EnumValueDescriptor<'proto> {
-    proto: &'proto EnumValueDescriptorProto,
-    context: &'proto Context<'proto>,
+pub struct EnumValueDescriptor<'c> {
+    proto: &'c EnumValueDescriptorProto,
+    context: &'c Context<'c>,
     lazy_native_name: OnceCell<String>,
 }
-impl<'proto> EnumValueDescriptor<'proto> {
-    pub fn new(proto: &'proto EnumValueDescriptorProto, context: &'proto Context<'proto>) -> Self {
+impl<'c> EnumValueDescriptor<'c> {
+    pub fn new(proto: &'c EnumValueDescriptorProto, context: &'c Context<'c>) -> Self {
         Self {
             proto,
             context,

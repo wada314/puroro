@@ -11,20 +11,20 @@ use ::once_cell::unsync::OnceCell;
 use super::{EnumOrMessageRef, MessageDescriptor};
 
 #[derive(Clone)]
-pub struct FieldDescriptor<'proto> {
-    proto: &'proto FieldDescriptorProto,
-    context: &'proto Context<'proto>,
-    parent: &'proto MessageDescriptor<'proto>,
+pub struct FieldDescriptor<'c> {
+    proto: &'c FieldDescriptorProto,
+    context: &'c Context<'c>,
+    parent: &'c MessageDescriptor<'c>,
 
-    lazy_type: OnceCell<FieldType<'proto>>,
+    lazy_type: OnceCell<FieldType<'c>>,
     lazy_fq_type_name: OnceCell<String>,
     lazy_native_name: OnceCell<String>,
 }
-impl<'proto> FieldDescriptor<'proto> {
+impl<'c> FieldDescriptor<'c> {
     pub fn new(
-        proto: &'proto FieldDescriptorProto,
-        context: &'proto Context<'proto>,
-        parent: &'proto MessageDescriptor<'proto>,
+        proto: &'c FieldDescriptorProto,
+        context: &'c Context<'c>,
+        parent: &'c MessageDescriptor<'c>,
     ) -> Self {
         Self {
             proto,
@@ -44,7 +44,7 @@ impl<'proto> FieldDescriptor<'proto> {
         // TODO: maybe check the default value?
         self.proto.number.unwrap_or_default()
     }
-    pub fn label(&'proto self) -> Result<FieldLabel> {
+    pub fn label(&'c self) -> Result<FieldLabel> {
         match self.proto.label {
             Some(Ok(Label::LabelOptional)) => match self.message().file().syntax()? {
                 super::ProtoSyntax::Proto2 => Ok(FieldLabel::Optional2),
@@ -63,7 +63,7 @@ impl<'proto> FieldDescriptor<'proto> {
         }
     }
 
-    pub fn type_(&'proto self) -> Result<FieldType<'proto>> {
+    pub fn type_(&'c self) -> Result<FieldType<'c>> {
         Ok(match &self.proto.type_ {
             Some(Ok(type_)) => {
                 use crate::protos::google::protobuf::field_descriptor_proto::Type;
@@ -132,7 +132,7 @@ impl<'proto> FieldDescriptor<'proto> {
         })
     }
 
-    pub fn label_tag(&'proto self) -> Result<&'static str> {
+    pub fn label_tag(&'c self) -> Result<&'static str> {
         Ok(match self.label()? {
             FieldLabel::Optional2 => "Optional2",
             FieldLabel::Optional3 => "Optional3",
@@ -141,15 +141,15 @@ impl<'proto> FieldDescriptor<'proto> {
         })
     }
 
-    pub fn package(&'proto self) -> Result<&str> {
+    pub fn package(&'c self) -> Result<&str> {
         self.parent.package()
     }
 
-    pub fn message(&'proto self) -> &'proto MessageDescriptor<'proto> {
+    pub fn message(&'c self) -> &'c MessageDescriptor<'c> {
         self.parent
     }
 
-    pub fn fully_qualified_type_name(&'proto self) -> Result<&str> {
+    pub fn fully_qualified_type_name(&'c self) -> Result<&str> {
         let type_name_in_proto = match self.proto.type_name.as_deref() {
             None | Some("") => Err(ErrorKind::InternalError {
                 detail: "Empty field type name".to_string(),
@@ -180,7 +180,7 @@ impl<'proto> FieldDescriptor<'proto> {
         })?)
     }
 
-    pub fn native_ident(&'proto self) -> Result<&str> {
+    pub fn native_ident(&'c self) -> Result<&str> {
         Ok(self.lazy_native_name.get_or_try_init(|| -> Result<_> {
             Ok(get_keyword_safe_ident(to_lower_snake_case(self.name()?))
                 .0
@@ -196,7 +196,7 @@ impl Debug for FieldDescriptor<'_> {
 }
 
 #[derive(Debug, Clone, Hash)]
-pub enum FieldType<'proto> {
+pub enum FieldType<'c> {
     Double,
     Float,
     Int32,
@@ -213,14 +213,14 @@ pub enum FieldType<'proto> {
     Group,
     String,
     Bytes,
-    Enum(&'proto super::EnumDescriptor<'proto>),
-    Message(&'proto super::MessageDescriptor<'proto>),
+    Enum(&'c super::EnumDescriptor<'c>),
+    Message(&'c super::MessageDescriptor<'c>),
 }
-impl<'proto> FieldType<'proto> {
+impl<'c> FieldType<'c> {
     pub fn native_numerical_type_name(
         &self,
         package: &str,
-    ) -> Result<std::result::Result<Cow<'static, str>, NonNumericalFieldType<'proto>>> {
+    ) -> Result<std::result::Result<Cow<'static, str>, NonNumericalFieldType<'c>>> {
         Ok(match self {
             FieldType::Double => Ok("f64".into()),
             FieldType::Float => Ok("f32".into()),
@@ -242,11 +242,11 @@ impl<'proto> FieldType<'proto> {
     }
 }
 
-pub enum NonNumericalFieldType<'proto> {
+pub enum NonNumericalFieldType<'c> {
     Group,
     String,
     Bytes,
-    Message(&'proto super::MessageDescriptor<'proto>),
+    Message(&'c super::MessageDescriptor<'c>),
 }
 
 #[derive(Debug, Clone, Hash)]
