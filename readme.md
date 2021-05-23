@@ -8,7 +8,7 @@ This library is under development and it is very possible to make breaking chang
     - [ ] default
     - [ ] extensions
 - proto2 & 3
-    - [x] Maps
+    - [ ] Maps
         - [ ] Bumpalo's `field_take_or_init.rs` implementation needs improvement because `bumpalo::boxed::Box` does not support moving out the value like `std::boxed::Box` does.
     - [ ] OneOfs
     - [ ] Anys, and other well-known types
@@ -26,7 +26,7 @@ This library is under development and it is very possible to make breaking chang
     - [ ] Required field checker
     - [ ] Other implementations
         - [x] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
-        - [ ] SliceView (name TBD) -- A viewer over a `&[u8]` slice
+        - [x] SliceView -- A viewer over a `&[u8]` slice
         - [ ] Append (name TBD) -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
     - [ ] Naming of the other implementations. Consider using a type generator class
     - [ ] Support the `allocator_api`. Waiting for the `String` support
