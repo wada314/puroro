@@ -32,7 +32,7 @@ pub trait MapEntryForNormalImpl {
     type OwnedKeyType;
     type OwnedValueType;
     fn into_tuple(self) -> (Self::OwnedKeyType, Self::OwnedValueType);
-    fn ser_kv<T: MessageSerializer, Q, R>(key: &Q, value: &R, serializer: &mut T) -> Result<()>
+    fn ser_kv<T, Q, R>(key: &Q, value: &R, serializer: &mut T) -> Result<()>
     where
         T: MessageSerializer,
         Self::OwnedKeyType: Borrow<Q>,

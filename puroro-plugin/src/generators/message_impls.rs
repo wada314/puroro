@@ -768,11 +768,12 @@ impl{gp} ::puroro_internal::MapEntryForNormalImpl for {entry_type} {{
             {take_value},
         )
     }}
-    fn ser_kv<T: ::puroro_internal::ser::MessageSerializer>(
-        key: &Self::OwnedKeyType,
-        value: &Self::OwnedValueType,
-        serializer: &mut T,
-    ) -> ::puroro::Result<()> {{
+    fn ser_kv<T, Q, R>(key: &Q, value: &R, serializer: &mut T, ) -> ::puroro::Result<()> 
+    where
+        T: ::puroro_internal::ser::MessageSerializer,
+        Self::OwnedKeyType: ::std::borrow::Borrow<Q>,
+        Self::OwnedValueType: ::std::borrow::Borrow<R>,
+    {{
         use ::puroro_internal::FieldSer;
         use ::puroro_internal::tags;
         <{owned_key_type} as FieldSer<
@@ -812,12 +813,12 @@ impl{gp} ::puroro_internal::MapEntryForSliceView<'slice> for {entry_type} {{
     type ValueGetterType = {value_getter_type};
     fn key_eq<Q>(&self, key: &Q)
     where
-        Self::OwnedKeyType: Borrow<Q>,
-        Q: Eq
+        Self::OwnedKeyType: ::std::borrow::Borrow<Q>,
+        Q: Eq + ?Sized
     {{
         <Self as {message_trait_type}>::key(self).eq(key)
     }}
-    fn value<'this>(&'this self) -> Self::ValueGetterType<'this> {{
+    fn value(&self) -> Self::ValueGetterType {{
         <Self as {message_trait_type}>::value(self)
     }}
 }}\n",
