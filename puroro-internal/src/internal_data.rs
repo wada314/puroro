@@ -86,12 +86,6 @@ impl<'slice, 'par> InternalDataForSliceViewStruct<'slice, 'par> {
         }
     }
 
-    /// Get the list of the slices which is the source of this Message.
-    /// If your purpose to get a certain field's data then make sure that field ([`SliceViewField`])'s  
-    /// variant is [`SliceViewField::FieldInMultipleSlices`]. If it is [`SliceViewField::FieldInSingleSlice`],
-    /// then you can use that enum variant's `ld_slice` field for shortcut.
-    /// Note that iterating over this iterator takes O(n^2) time where n is the iterator length.
-    /// We believe n (== the number of messages merged) is very small in the most usecases.
     pub fn ld_slices_from_parent_message(
         &self,
     ) -> impl 'par + Iterator<Item = Result<LdSlice<'slice>>> {
@@ -135,7 +129,8 @@ impl<'slice, 'par> InternalDataForSliceViewStruct<'slice, 'par> {
                         // A difficult case. The field is consist of multiple separated slices.
                         // This case can happen if the message is merged from multiple instances.
                         Either::Right(
-                            self.ld_slices_from_parent_message()
+                            self.source_ld_slices
+                                .iter()
                                 .skip_while(move |rld_slice| match rld_slice.as_ref() {
                                     Ok(ld_slice) => *ld_slice != *first_enclosing_ld_slice,
                                     Err(_) => true,
@@ -158,6 +153,30 @@ impl<'slice, 'par> InternalDataForSliceViewStruct<'slice, 'par> {
                     None
                 }
             })
+    }
+}
+
+impl<'slice, 'par> SourceLdSlices<'slice, 'par> {
+    /// Get the list of the slices which is the source of this Message.
+    /// If your purpose to get a certain field's data then make sure that field ([`SliceViewField`])'s  
+    /// variant is [`SliceViewField::FieldInMultipleSlices`]. If it is [`SliceViewField::FieldInSingleSlice`],
+    /// then you can use that enum variant's `ld_slice` field for shortcut.
+    /// Note that iterating over this iterator takes O(n^2) time where n is the iterator length.
+    /// We believe n (== the number of messages merged) is very small in the most usecases.
+    pub fn iter(&self) -> impl '_ + Iterator<Item = Result<LdSlice<'slice>>> {
+        match self.clone() {
+            SourceLdSlices::SingleLdSlice(ld_slice) => Either::Left(std::iter::once(Ok(ld_slice))),
+            SourceLdSlices::MaybeMultipleLdSlices {
+                field_in_parent,
+                field_number_in_parent,
+                parent_internal_data,
+            } => Either::Right(MultipleSourceLdSlicesIter::<'slice, 'par>::new(
+                field_number_in_parent,
+                field_in_parent,
+                parent_internal_data,
+            )),
+        }
+        .into_iter()
     }
 }
 
