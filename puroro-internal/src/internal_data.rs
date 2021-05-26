@@ -73,13 +73,13 @@ impl<'slice, 'par> InternalDataForSliceViewStruct<'slice, 'par> {
     }
 
     pub fn new_with_parent(
-        parent_field: Option<&'par SliceViewField<'slice>>,
+        field_in_parent: Option<&'par SliceViewField<'slice>>,
         field_number_in_parent: usize,
         parent_internal_data: &'par InternalDataForSliceViewStruct<'slice, 'par>,
     ) -> Self {
         Self {
             source_ld_slices: SourceLdSlices::MaybeMultipleLdSlices {
-                field_in_parent: parent_field,
+                field_in_parent,
                 field_number_in_parent,
                 parent_internal_data,
             },
