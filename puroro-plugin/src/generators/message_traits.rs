@@ -102,7 +102,7 @@ type {type_ident_gp}: {type_bound}
                 GetterMethods::OptionalField(format!(
                     "fn {name}<'this>(&'this self) -> ::std::option::Option::<{reftype}>",
                     name = field.native_ident()?,
-                    reftype = self.scalar_getter_type_name(field, "'this")?,
+                    reftype = self.scalar_getter_type_name(field, "'this", "'this")?,
                 ))
             }
             (FieldLabel::Repeated, _) => {
@@ -111,7 +111,7 @@ type {type_ident_gp}: {type_bound}
                     return_type_ident_gp: format!("{ident}<'this>", ident = type_ident.clone()),
                     return_type_bound: format!(
                         "::puroro::RepeatedField::<'this, {value}>",
-                        value = self.scalar_getter_type_name(field, "'this")?,
+                        value = self.scalar_getter_type_name(field, "'this", "'static")?,
                     ),
                     get_decl: format!(
                         "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
@@ -124,7 +124,7 @@ type {type_ident_gp}: {type_bound}
                 GetterMethods::BareField(format!(
                     "fn {name}<'this>(&'this self) -> {reftype}",
                     name = field.native_ident()?,
-                    reftype = self.scalar_getter_type_name(field, "'this")?,
+                    reftype = self.scalar_getter_type_name(field, "'this", "'this")?,
                 ))
             }
         })
@@ -175,6 +175,7 @@ type {type_ident_gp}: {type_bound}
         &self,
         field: &'c FieldDescriptor<'c>,
         this_lifetime: &'static str,
+        message_fields_parent_lifetime: &'static str,
     ) -> Result<Cow<'static, str>> {
         Ok(
             match field
@@ -190,8 +191,10 @@ type {type_ident_gp}: {type_bound}
                         NonNumericalFieldType::Message(m) => format!(
                             "<Self as {trait_name}>::{name}",
                             trait_name = self.trait_ident(self.msg)?,
-                            name =
-                                self.associated_msg_type_ident_gp(m, &[("'this", this_lifetime)])?,
+                            name = self.associated_msg_type_ident_gp(
+                                m,
+                                &[("'this", message_fields_parent_lifetime)]
+                            )?,
                         )
                         .into(),
                     };
@@ -230,7 +233,7 @@ type {type_ident_gp}: {type_bound}
         &self,
         field: &'c FieldDescriptor<'c>,
     ) -> Result<Cow<'static, str>> {
-        self.scalar_getter_type_name(field, "'this")
+        self.scalar_getter_type_name(field, "'this", "'static")
     }
 }
 
