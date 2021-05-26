@@ -808,7 +808,7 @@ impl{gp} ::puroro_internal::MapEntryForNormalImpl for {entry_type} {{
         (format!(
             "\
 {cfg}
-impl{gp} ::puroro_internal::MapEntryForSliceView<'slice> for {entry_type} {{
+impl{gp} ::puroro_internal::MapEntryForSliceViewImpl<'slice> for {entry_type} {{
     type OwnedKeyType = {owned_key_type};
     type ValueGetterType = {value_getter_type};
     fn key_eq<Q>(&self, key: &Q)
