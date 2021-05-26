@@ -98,7 +98,7 @@ where
 
     fn iter_impl(
         &'msg self,
-    ) -> impl 'msg + Iterator<Item = <TypeTag as FieldDataIntoIter<'slice, 'msg>>::Item> {
+    ) -> impl 'msg + Iterator<Item = <TypeTag as FieldDataIntoIter<'slice>>::Item> {
         self.maybe_field.into_iter().flat_map(move |field| {
             field
                 .field_data_iter(self.field_number, &self.internal_data.source_ld_slices)
@@ -114,8 +114,7 @@ where
 impl<'slice, 'msg, T, TypeTag> RepeatedField<'msg, T>
     for RepeatedSliceViewField<'slice, 'msg, TypeTag>
 where
-    'slice: 'msg,
-    T: 'msg,
+    T: 'slice,
     TypeTag: FieldDataIntoIter<'slice, Item = T>,
 {
     fn for_each<F>(&'msg self, f: F)
@@ -142,7 +141,7 @@ where
     Q: ?Sized + Hash + Eq,
     R: 'msg,
     Entry::OwnedKeyType: Borrow<Q>,
-    Entry: 'msg
+    Entry: 'slice
         + MapEntryForSliceViewImpl<'slice, ValueGetterType = R>
         + TryFrom<&'slice[u8], Error=PuroroError>
         + ToOwned<Owned = Entry>,

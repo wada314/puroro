@@ -108,11 +108,11 @@ where
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a, 'bump, T, U> RepeatedField<'a, T> for &'a ::bumpalo::collections::Vec<'bump, U>
+impl<'msg, 'bump, T, U> RepeatedField<'msg, T> for &'msg ::bumpalo::collections::Vec<'bump, U>
 where
-    &'a U: RefTypeToGetterType<Item = T>,
+    &'msg U: RefTypeToGetterType<Item = T>,
 {
-    fn for_each<F>(&'a self, f: F)
+    fn for_each<F>(&'msg self, f: F)
     where
         F: FnMut(T),
     {
@@ -121,12 +121,12 @@ where
             .for_each(f)
     }
 
-    fn boxed_iter(&'a self) -> Box<dyn 'a + Iterator<Item = T>> {
+    fn boxed_iter(&'msg self) -> Box<dyn 'msg + Iterator<Item = T>> {
         Box::new(<[U]>::iter(self).map(|x| <&U as RefTypeToGetterType>::into(x)))
     }
 
     type Iter = impl Iterator<Item = T>;
-    fn iter(&'a self) -> Self::Iter {
+    fn iter(&'msg self) -> Self::Iter {
         <[U]>::iter(self).map(|x| <&U as RefTypeToGetterType>::into(x))
     }
 }
