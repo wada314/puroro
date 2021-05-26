@@ -198,7 +198,7 @@ fn try_new_with_parent(
             ),
             "    \
     }};
-    for ld_slice in new_self.puroro_internal.source_ld_slices.iter() {
+    for ld_slice in new_self.puroro_internal.source_ld_slices.clone().iter() {
         ld_slice?.merge_into_message(&mut new_self)?;
     }
     Ok(new_self)
@@ -386,7 +386,15 @@ impl{gp} ::puroro::DeserializableFromSlice<'slice> for {ident}{gpb} {{
     fn deser_from_slice(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
         Self::try_new(slice)
     }}
-}}\n",
+}}
+{cfg}
+impl{gp} ::std::convert::TryFrom<&'slice [u8]> for {ident}{gpb} {{
+    type Error = ::puroro::PuroroError;
+    fn try_from(value: &'slice [u8]) -> ::puroro::Result<Self> {{
+        Self::try_new(value)
+    }}
+}}
+\n",
                 ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self.frag_gen.struct_generic_params(&["'slice"]),

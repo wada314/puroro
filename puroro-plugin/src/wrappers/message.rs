@@ -94,7 +94,7 @@ impl<'c> MessageDescriptor<'c> {
     pub fn is_map_entry(&self) -> bool {
         if let Some(options) = &self.proto.options {
             // TODO: Maybe need to check the [default="***"] value?
-            options.map_entry.unwrap_or_default()
+            options.map_entry.unwrap_or_default() /* TODO: FIX */ && false
         } else {
             false
         }
