@@ -88,12 +88,13 @@ impl<'slice, 'par> InternalDataForSliceViewStruct<'slice, 'par> {
 }
 
 impl<'slice, 'par> SourceLdSlices<'slice, 'par> {
-    /// Get the list of the slices which is the source of this Message.
-    /// If your purpose to get a certain field's data then make sure that field ([`SliceViewField`])'s  
+    /// Get the list of the source slices of this Message.
+    /// If your purpose to get a certain field's data then make sure that field ([`SliceViewField`])'s
     /// variant is [`SliceViewField::FieldInMultipleSlices`]. If it is [`SliceViewField::FieldInSingleSlice`],
     /// then you can use that enum variant's `ld_slice` field for shortcut.
-    /// Note that iterating over this iterator takes O(n^2) time where n is the iterator length.
-    /// We believe n (== the number of messages merged) is very small in the most usecases.
+    /// Note that iterating over this iterator takes O(n^2) time in total where n is the iterator length
+    /// (Where it is O(n) in a normal iterator).
+    /// We believe n (== the number of merged messages) is very small in most usecases.
     pub fn iter(&self) -> impl '_ + Iterator<Item = Result<LdSlice<'slice>>> {
         match self.clone() {
             SourceLdSlices::SingleLdSlice(ld_slice) => Either::Left(std::iter::once(Ok(ld_slice))),
