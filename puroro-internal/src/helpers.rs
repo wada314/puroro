@@ -4,6 +4,7 @@ pub mod field_new;
 pub mod field_ser;
 pub mod field_take_or_init;
 pub mod repeated_slice_view;
+use std::borrow::Borrow;
 use std::convert::TryFrom;
 
 pub use field_clone::FieldClone;
@@ -27,19 +28,25 @@ impl DoDefaultCheck for tags::Required {}
 impl DoDefaultCheck for tags::Optional2 {}
 impl DoDefaultCheck for tags::Repeated {}
 
-pub trait MapEntry {
-    // Note: `KeyType` (or `ValueType`) != the message's `key` (or `value`) field type.
-    // The latter may be wrapped by `Option` or `Box<>` depend on the label or the type,
-    // but the `KeyType` must be a bare type which will be used for the `HashMap`'s
-    // generic param.
-    type KeyType;
-    type ValueType;
-    fn into_tuple(self) -> (Self::KeyType, Self::ValueType);
-    fn ser_kv<T: MessageSerializer>(
-        key: &Self::KeyType,
-        value: &Self::ValueType,
-        serializer: &mut T,
-    ) -> Result<()>;
+pub trait MapEntryForNormalImpl {
+    type OwnedKeyType;
+    type OwnedValueType;
+    fn into_tuple(self) -> (Self::OwnedKeyType, Self::OwnedValueType);
+    fn ser_kv<T: MessageSerializer, Q, R>(key: &Q, value: &R, serializer: &mut T) -> Result<()>
+    where
+        T: MessageSerializer,
+        Self::OwnedKeyType: Borrow<Q>,
+        Self::OwnedValueType: Borrow<R>;
+}
+
+pub trait MapEntryForSliceViewImpl<'slice> {
+    type OwnedKeyType;
+    type ValueGetterType;
+    fn key_eq<Q>(&self, key: &Q) -> bool
+    where
+        Self::OwnedKeyType: Borrow<Q>,
+        Q: Eq + ?Sized;
+    fn value(&self) -> Self::ValueGetterType;
 }
 
 /// An alternative for `std::default::Default` just only because of `Result<Enum, i32>`.

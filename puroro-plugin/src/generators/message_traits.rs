@@ -34,11 +34,11 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                     // typedefs for message types
                     Ok(format!(
                         "\
-type {type_ident}<'this>: {trait_module}::{trait_ident}
+type {type_ident}<'this>: {trait_path}
     where Self: 'this;\n",
                         type_ident = self.associated_msg_type_ident(msg)?,
-                        trait_module = relative_path(self.msg.package()?, msg.package()?)?,
-                        trait_ident = self.trait_ident(msg)?,
+                        trait_path =
+                            self.trait_ident_with_relative_path(msg, self.msg.package()?)?,
                     ))
                 })),
                 iter(self.msg.fields().map(|field| -> Result<String> {
@@ -88,8 +88,8 @@ type {type_ident_gp}: {type_bound}
                     return_type_ident_gp: format!("{ident}<'this>", ident = type_ident.clone()),
                     return_type_bound: format!(
                         "::puroro::MapField::<'this, {key}, {value}>",
-                        key = self.map_key_type_name(key_field)?,
-                        value = self.scalar_getter_type_name(value_field, "'this")?,
+                        key = self.map_deref_borrowed_key_type_name(key_field)?,
+                        value = self.map_value_getter_type_name(value_field, "'this")?,
                     ),
                     get_decl: format!(
                         "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
@@ -130,8 +130,21 @@ type {type_ident_gp}: {type_bound}
         })
     }
 
-    pub fn trait_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
-        Ok(format!("{}Trait", msg.native_ident()?))
+    pub fn trait_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'static, str>> {
+        Ok(format!("{}Trait", msg.native_ident()?).into())
+    }
+
+    pub fn trait_ident_with_relative_path(
+        &self,
+        msg: &'c MessageDescriptor<'c>,
+        cur_package: &str,
+    ) -> Result<Cow<'static, str>> {
+        Ok(format!(
+            "{module}::{ident}",
+            module = relative_path(cur_package, msg.package()?)?,
+            ident = self.trait_ident(msg)?,
+        )
+        .into())
     }
 
     pub fn associated_msg_type_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
@@ -162,7 +175,7 @@ type {type_ident_gp}: {type_bound}
         &self,
         field: &'c FieldDescriptor<'c>,
         lifetime: &'static str,
-    ) -> Result<String> {
+    ) -> Result<Cow<'static, str>> {
         Ok(
             match field
                 .type_()?
@@ -186,12 +199,16 @@ type {type_ident_gp}: {type_bound}
                         lt = lifetime,
                         type_ = t,
                     )
+                    .into()
                 }
             },
         )
     }
 
-    pub fn map_key_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'static, str>> {
+    pub fn map_deref_borrowed_key_type_name(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+    ) -> Result<Cow<'static, str>> {
         Ok(
             match field
                 .type_()?
@@ -206,6 +223,13 @@ type {type_ident_gp}: {type_bound}
                 },
             },
         )
+    }
+
+    pub fn map_value_getter_type_name(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+    ) -> Result<Cow<'static, str>> {
+        self.scalar_getter_type_name(field, "'slice")
     }
 }
 

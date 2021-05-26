@@ -116,7 +116,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
-    pub fn field_scalar_item_type(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+    pub fn field_scalar_item_type(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+    ) -> Result<Cow<'static, str>> {
         Ok(match self.context.impl_type() {
             ImplType::Default => match field
                 .type_()?
@@ -404,5 +407,32 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             }
             _ => unimplemented!(),
         }
+    }
+
+    pub fn map_owned_key_type_name(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+    ) -> Result<Cow<'static, str>> {
+        Ok(
+            match field
+                .type_()?
+                .native_numerical_type_name(field.package()?)?
+            {
+                Ok(name) => name,
+                Err(nonnumerical_type) => match nonnumerical_type {
+                    NonNumericalFieldType::String => self.string_type().into(),
+                    _ => Err(ErrorKind::InvalidMapKey {
+                        name: field.fully_qualified_type_name()?.to_string(),
+                    })?,
+                },
+            },
+        )
+    }
+
+    pub fn map_owned_value_type_name(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+    ) -> Result<Cow<'static, str>> {
+        Ok(self.field_scalar_item_type(field)?)
     }
 }

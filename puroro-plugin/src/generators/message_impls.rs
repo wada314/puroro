@@ -35,7 +35,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
                     ImplType::Default => {
                         func(|output| self.print_msg_deser_from_slice_using_from_iter(output))
                     }
-                    ImplType::SliceView { .. } => {
+                    ImplType::SliceView => {
                         func(|output| self.print_msg_deser_from_slice_for_slice_view(output))
                     }
                 },
@@ -741,32 +741,26 @@ impl{gp} ::puroro::Message<'bump> for {struct_ident}{gpb} {{
     fn print_impl_map_entry<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         if !self.msg.is_map_entry() {
             return Ok(());
+        } else {
+            match self.context.impl_type() {
+                ImplType::Default => self.print_impl_map_entry_normal_struct(output),
+                ImplType::SliceView => self.print_impl_map_entry_slice_view_struct(output),
+            }
         }
+    }
+
+    fn print_impl_map_entry_normal<W: std::fmt::Write>(
+        &self,
+        output: &mut Indentor<W>,
+    ) -> Result<()> {
         let (key_field, value_field) = self.msg.key_value_of_map_entry()?;
         (format!(
             "\
 {cfg}
-impl{gp} ::puroro_internal::MapEntry for {entry_type} {{
-    type KeyType = {key_type};
-    type ValueType = {value_type};
-    fn ser_kv<T: ::puroro_internal::ser::MessageSerializer>(
-        key: &Self::KeyType,
-        value: &Self::ValueType,
-        serializer: &mut T,
-    ) -> ::puroro::Result<()> {{
-        use ::puroro_internal::FieldSer;
-        use ::puroro_internal::tags;
-        <{key_type} as FieldSer<
-            tags::{key_type_tag}, 
-            tags::Required>>
-            ::ser(key, serializer, 1)?;
-        <{value_type} as FieldSer<
-            tags::{value_type_tag}, 
-            tags::Required>>
-            ::ser(value, serializer, 2)?;
-        Ok(())
-    }}
-    fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {{
+impl{gp} ::puroro_internal::MapEntryForNormalImpl for {entry_type} {{
+    type OwnedKeyType = {owned_key_type};
+    type OwnedValueType = {owned_value_type};
+    fn into_tuple(self) -> (Self::OwnedKeyType, Self::OwnedValueType) {{
         use ::puroro_internal::FieldTakeOrInit;
         use ::puroro::InternalData;
         (
@@ -774,18 +768,67 @@ impl{gp} ::puroro_internal::MapEntry for {entry_type} {{
             {take_value},
         )
     }}
+    fn ser_kv<T: ::puroro_internal::ser::MessageSerializer>(
+        key: &Self::OwnedKeyType,
+        value: &Self::OwnedValueType,
+        serializer: &mut T,
+    ) -> ::puroro::Result<()> {{
+        use ::puroro_internal::FieldSer;
+        use ::puroro_internal::tags;
+        <{owned_key_type} as FieldSer<
+            tags::{key_type_tag}, 
+            tags::Required>>
+            ::ser(key, serializer, 1)?;
+        <{owned_value_type} as FieldSer<
+            tags::{value_type_tag}, 
+            tags::Required>>
+            ::ser(value, serializer, 2)?;
+        Ok(())
+    }}
 }}\n",
             entry_type = self.frag_gen.type_name_of_msg(self.msg, None)?,
             cfg = self.frag_gen.cfg_condition(),
             gp = self.frag_gen.struct_generic_params(&[]),
-            key_type = self.traits_gen.map_key_type_name(key_field)?,
+            owned_key_type = self.frag_gen.map_owned_key_type_name(key_field)?,
             key_type_tag = self.frag_gen.type_tag_ident_gp(key_field, None)?,
             take_key = self.frag_gen.field_take_or_init(key_field)?,
-            value_type = self
-                .traits_gen
-                .scalar_getter_type_name(value_field, "'par" /* TODO */)?,
+            owned_value_type = self.frag_gen.map_owned_value_type_name(value_field)?,
             value_type_tag = self.frag_gen.type_tag_ident_gp(value_field, None)?,
             take_value = self.frag_gen.field_take_or_init(value_field)?,
+        ),)
+            .write_into(output)
+    }
+
+    fn print_impl_map_entry_slice_view_struct<W: std::fmt::Write>(
+        &self,
+        output: &mut Indentor<W>,
+    ) -> Result<()> {
+        let (key_field, value_field) = self.msg.key_value_of_map_entry()?;
+        (format!(
+            "\
+{cfg}
+impl{gp} ::puroro_internal::MapEntryForSliceView<'slice> for {entry_type} {{
+    type OwnedKeyType = {owned_key_type};
+    type ValueGetterType = {value_getter_type};
+    fn key_eq<Q>(&self, key: &Q)
+    where
+        Self::OwnedKeyType: Borrow<Q>,
+        Q: Eq
+    {{
+        <Self as {message_trait_type}>::key(self).eq(key)
+    }}
+    fn value<'this>(&'this self) -> Self::ValueGetterType<'this> {{
+        <Self as {message_trait_type}>::value(self)
+    }}
+}}\n",
+            entry_type = self.frag_gen.type_name_of_msg(self.msg, None)?,
+            message_trait_type = self
+                .traits_gen
+                .trait_ident_with_relative_path(self.msg, self.msg.package()?)?,
+            cfg = self.frag_gen.cfg_condition(),
+            gp = self.frag_gen.struct_generic_params(&[]),
+            owned_key_type = self.frag_gen.map_owned_key_type_name(key_field)?,
+            value_getter_type = self.traits_gen.map_value_getter_type_name(value_field)?,
         ),)
             .write_into(output)
     }
