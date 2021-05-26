@@ -49,7 +49,7 @@ impl<'slice> SliceViewField<'slice> {
     pub fn field_data_iter<'msg, 'par>(
         &'msg self,
         field_number: usize,
-        source_ld_slices: &'msg SourceLdSlices<'slice, 'par>,
+        maybe_source_ld_slices: &'msg Option<SourceLdSlices<'slice, 'par>>,
     ) -> impl 'msg + Iterator<Item = Result<FieldData<LdSlice<'slice>>>> {
         // The iter of `ld_slice` which consists the specified field.
         // Note that this might be a smaller set when compared with the `ld_slice`s consisting
@@ -67,8 +67,9 @@ impl<'slice> SliceViewField<'slice> {
                 // A difficult case. The field is consist of multiple separated slices.
                 // This case can happen if the message is merged from multiple instances.
                 Either::Right(
-                    source_ld_slices
+                    maybe_source_ld_slices
                         .iter()
+                        .flatten()
                         .skip_while(move |rld_slice| match rld_slice.as_ref() {
                             Ok(ld_slice) => *ld_slice != *first_enclosing_ld_slice,
                             Err(_) => true,

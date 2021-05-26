@@ -53,7 +53,7 @@ impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
 
 #[derive(Debug, Clone)]
 pub struct InternalDataForSliceViewStruct<'slice, 'par> {
-    pub source_ld_slices: SourceLdSlices<'slice, 'par>,
+    pub source_ld_slices: Option<SourceLdSlices<'slice, 'par>>,
 }
 #[derive(Debug, Clone)]
 pub enum SourceLdSlices<'slice, 'par> {
@@ -66,9 +66,9 @@ pub enum SourceLdSlices<'slice, 'par> {
 }
 
 impl<'slice, 'par> InternalDataForSliceViewStruct<'slice, 'par> {
-    pub fn new(slice: &'slice [u8]) -> Self {
+    pub fn new_with_slice(slice: &'slice [u8]) -> Self {
         Self {
-            source_ld_slices: SourceLdSlices::SingleLdSlice(LdSlice::new(slice)),
+            source_ld_slices: Some(SourceLdSlices::SingleLdSlice(LdSlice::new(slice))),
         }
     }
 
@@ -78,11 +78,11 @@ impl<'slice, 'par> InternalDataForSliceViewStruct<'slice, 'par> {
         parent_internal_data: &'par InternalDataForSliceViewStruct<'slice, 'par>,
     ) -> Self {
         Self {
-            source_ld_slices: SourceLdSlices::MaybeMultipleLdSlices {
+            source_ld_slices: Some(SourceLdSlices::MaybeMultipleLdSlices {
                 field_in_parent,
                 field_number_in_parent,
                 parent_internal_data,
-            },
+            }),
         }
     }
 }
@@ -109,6 +109,14 @@ impl<'slice, 'par> SourceLdSlices<'slice, 'par> {
             )),
         }
         .into_iter()
+    }
+}
+
+impl<'slice, 'par> IntoIterator for &SourceLdSlices<'slice, 'par> {
+    type Item = Result<LdSlice<'slice>>;
+    type IntoIter = impl Iterator<Item = Result<LdSlice<'slice>>>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 

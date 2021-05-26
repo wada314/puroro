@@ -160,7 +160,7 @@ pub {decl} {{
     ) -> Result<()> {
         (
             "\
-fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
+fn try_new_with_slice(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
     let mut new_self = Self {{\n",
             indent_n(
                 2,
@@ -168,7 +168,7 @@ fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
                     self.new_method_self_members(
                         output,
                         "\
-::puroro_internal::InternalDataForSliceViewStruct::new(slice)",
+::puroro_internal::InternalDataForSliceViewStruct::new_with_slice(slice)",
                     )
                 }),
             ),
@@ -198,7 +198,7 @@ fn try_new_with_parent(
             ),
             "    \
     }};
-    for ld_slice in new_self.puroro_internal.source_ld_slices.clone().iter() {
+    for ld_slice in new_self.puroro_internal.source_ld_slices.clone().iter().flatten() {
         ld_slice?.merge_into_message(&mut new_self)?;
     }
     Ok(new_self)
@@ -384,14 +384,14 @@ impl{gp} ::puroro::DeserializableFromSlice<'slice> for {ident}{gpb} {{
 {cfg}
 impl{gp} ::puroro::DeserializableFromSlice<'slice> for {ident}{gpb} {{
     fn deser_from_slice(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
-        Self::try_new(slice)
+        Self::try_new_with_slice(slice)
     }}
 }}
 {cfg}
 impl{gp} ::std::convert::TryFrom<&'slice [u8]> for {ident}{gpb} {{
     type Error = ::puroro::PuroroError;
     fn try_from(value: &'slice [u8]) -> ::puroro::Result<Self> {{
-        Self::try_new(value)
+        Self::try_new_with_slice(value)
     }}
 }}
 \n",
@@ -498,7 +498,7 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
-        for ld_slice in self.puroro_internal.source_ld_slices.iter() {{
+        for ld_slice in self.puroro_internal.source_ld_slices.iter().flatten() {{
             serializer.serialize_raw_fields(ld_slice?.as_slice())?;
         }}
         Ok(())
