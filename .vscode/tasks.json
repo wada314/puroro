@@ -23,7 +23,7 @@
             "command": "build",
             "args": [
                 "-p",
-                "puroro-plugin"
+                "puroro*"
             ],
             "problemMatcher": [
                 "$rustc"
@@ -37,7 +37,7 @@
                 "clear": true
             },
             "group": "build",
-            "label": "rust: cargo build -p puroro-plugin"
+            "label": "rust: cargo build -p puroro*"
         },
         {
             "type": "cargo",
