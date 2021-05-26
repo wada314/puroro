@@ -97,7 +97,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
 
     pub fn is_default_available(&self) -> bool {
         match (self.context.impl_type(), self.context.alloc_type()) {
-            (ImplType::SliceView, _) | (_, AllocatorType::Bumpalo) => false,
+            (_, AllocatorType::Bumpalo) => false,
             _ => true,
         }
     }

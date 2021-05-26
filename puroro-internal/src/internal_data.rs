@@ -66,6 +66,12 @@ pub enum SourceLdSlices<'slice, 'par> {
 }
 
 impl<'slice, 'par> InternalDataForSliceViewStruct<'slice, 'par> {
+    pub fn new() -> Self {
+        Self {
+            source_ld_slices: None,
+        }
+    }
+
     pub fn new_with_slice(slice: &'slice [u8]) -> Self {
         Self {
             source_ld_slices: Some(SourceLdSlices::SingleLdSlice(LdSlice::new(slice))),

@@ -160,6 +160,22 @@ pub {decl} {{
     ) -> Result<()> {
         (
             "\
+fn new() -> Self {{
+    Self {{\n",
+            indent_n(
+                2,
+                func(|output| {
+                    self.new_method_self_members(
+                        output,
+                        "\
+::puroro_internal::InternalDataForSliceViewStruct::new()",
+                    )
+                }),
+            ),
+            "    \
+    }}
+}}
+
 fn try_new_with_slice(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
     let mut new_self = Self {{\n",
             indent_n(
