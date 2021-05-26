@@ -1,4 +1,5 @@
 use std::borrow::{Borrow, Cow};
+use std::convert::TryFrom;
 use std::hash::Hash;
 use std::intrinsics::transmute;
 use std::marker::PhantomData;
@@ -7,10 +8,9 @@ use crate::deser::LdSlice;
 use crate::types::{FieldData, SliceViewField};
 use crate::InternalDataForSliceViewStruct;
 use crate::{tags, MapEntryForSliceViewImpl};
-use crate::{ErrorKind, Result, ResultHelper};
+use crate::{ErrorKind, PuroroError, Result, ResultHelper};
 use ::itertools::{Either, Itertools};
 use ::puroro::{MapField, RepeatedField};
-use puroro::DeserializableFromSlice;
 
 pub trait FieldDataIntoIter<'slice, 'msg> {
     type Item: 'msg;
@@ -57,16 +57,18 @@ where
 }
 impl<'slice, 'msg, T> FieldDataIntoIter<'slice, 'msg> for tags::Message<T>
 where
-    T: 'msg + DeserializableFromSlice<'slice> + ToOwned<Owned = T>,
+    T: 'msg + TryFrom<&'slice [u8], Error = PuroroError> + ToOwned<Owned = T>,
     'slice: 'msg,
 {
     type Item = Cow<'msg, T>;
     type Iter = impl 'msg + Iterator<Item = Result<Self::Item>>;
     fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         if let FieldData::LengthDelimited(ld_slice) = field_data {
-            Ok(std::iter::once(Ok(Cow::Owned(
-                <T as DeserializableFromSlice>::deser_from_slice(ld_slice.as_slice())?,
-            ))))
+            Ok(std::iter::once(Ok(Cow::Owned(<T as TryFrom<
+                &'slice [u8],
+            >>::try_from(
+                ld_slice.as_slice()
+            )?))))
         } else {
             Err(ErrorKind::UnexpectedWireType)?
         }
@@ -149,7 +151,7 @@ where
     Entry::OwnedKeyType: Borrow<Q>,
     Entry: 'a
         + MapEntryForSliceViewImpl<'slice, ValueGetterType = R>
-        + DeserializableFromSlice<'slice>
+        + TryFrom<&'slice[u8], Error=PuroroError>
         + ToOwned<Owned = Entry>,
 {
     fn get(&'a self, key: &Q) -> Option<R>
