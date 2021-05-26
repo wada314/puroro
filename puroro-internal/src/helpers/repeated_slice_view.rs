@@ -6,14 +6,14 @@ use std::marker::PhantomData;
 use crate::deser::LdSlice;
 use crate::types::{FieldData, SliceViewField};
 use crate::InternalDataForSliceViewStruct;
-use crate::{tags, MapEntry};
+use crate::{tags, MapEntryForSliceViewImpl};
 use crate::{ErrorKind, Result, ResultHelper};
 use ::itertools::{Either, Itertools};
 use ::puroro::{MapField, RepeatedField};
 use puroro::DeserializableFromSlice;
 
 pub trait FieldDataIntoIter<'slice, 'msg> {
-    type Item;
+    type Item: 'msg;
     type Iter: 'msg + Iterator<Item = Result<Self::Item>>;
     fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter>;
 }
@@ -137,22 +137,26 @@ where
     }
 }
 
-impl<'slice, 'a, K, V, Entry> MapField<'a, K, V>
+#[rustfmt::skip]
+impl<'slice, 'a, Q, R, Entry> MapField<'a, Q, R>
     for RepeatedSliceViewField<'slice, 'a, tags::Message<Entry>>
 where
     'slice: 'a,
-    K: ?Sized,
-    Entry::KeyType: Hash + Eq + Borrow<K>,
-    Entry: 'a + MapEntry<ValueType = V> + DeserializableFromSlice<'slice> + ToOwned<Owned = Entry>,
+    Q: ?Sized + Hash + Eq,
+    R: 'a,
+    Entry::OwnedKeyType: Borrow<Q>,
+    Entry: 'a
+        + MapEntryForSliceViewImpl<'slice, ValueGetterType = R>
+        + DeserializableFromSlice<'slice>
+        + ToOwned<Owned = Entry>,
 {
-    fn get(&'a self, key: &K) -> Option<V>
+    fn get(&'a self, key: &Q) -> Option<R>
     where
-        K: Hash + Eq,
+        Q: Hash + Eq,
     {
         self.iter_impl().find_map(|entry| {
-            let (ekey, evalue) = entry.into_owned().into_tuple();
-            if ekey.borrow().eq(key) {
-                Some(evalue)
+            if entry.key_eq(key) {
+                Some(entry.value())
             } else {
                 None
             }

@@ -1,5 +1,4 @@
-// For ResultHelper::flatten.
-#![allow(unstable_name_collisions)]
+#![allow(unstable_name_collisions)] // For ResultHelper::flatten.
 #![cfg_attr(feature = "puroro-nightly", feature(generic_associated_types))]
 #![cfg_attr(feature = "puroro-nightly", feature(min_type_alias_impl_trait))]
 #![allow(incomplete_features)]
@@ -19,7 +18,7 @@ pub use internal_data::{
 
 pub use helpers::{
     FieldClone, FieldDeserFromIter, FieldDeserFromSlice, FieldNew, FieldSer, FieldTakeOrInit,
-    MapEntry, RepeatedSliceViewField,
+    MapEntryForNormalImpl, MapEntryForSliceViewImpl, RepeatedSliceViewField,
 };
 pub use types::SliceViewField;
 

@@ -130,33 +130,6 @@ impl<'c> MessageDescriptor<'c> {
             })?)
     }
 
-    pub fn native_ident_with_relative_path(&'c self, cur_package: &str) -> Result<String> {
-        let struct_name = self.native_ident()?;
-        let mut struct_package_iter = self.package()?.split('.').peekable();
-        let mut cur_package_iter = cur_package.split('.').peekable();
-        while let (Some(p1), Some(p2)) = (struct_package_iter.peek(), cur_package_iter.peek()) {
-            if *p1 == *p2 {
-                struct_package_iter.next();
-                cur_package_iter.next();
-            } else {
-                break;
-            }
-        }
-        let num_super = cur_package_iter.count();
-        let maybe_self = if num_super == 0 { "self::" } else { "" };
-        Ok(format!(
-            "{maybe_self}{supers}{mods}{name}",
-            name = struct_name,
-            maybe_self = maybe_self,
-            supers = std::iter::repeat("super::")
-                .take(num_super)
-                .collect::<String>(),
-            mods = struct_package_iter
-                .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
-                .collect::<String>(),
-        ))
-    }
-
     pub fn unique_msgs_from_fields(
         &'c self,
     ) -> Result<impl Iterator<Item = &'c MessageDescriptor<'c>>> {

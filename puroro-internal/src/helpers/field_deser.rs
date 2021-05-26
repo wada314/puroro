@@ -10,7 +10,7 @@ use std::hash::Hash;
 use std::intrinsics::transmute;
 use std::io::Read;
 
-use super::{DoDefaultCheck, MapEntry};
+use super::{DoDefaultCheck, MapEntryForNormalImpl};
 
 pub trait FieldDeserFromIter<TypeTag, LabelTag>
 where
@@ -635,10 +635,10 @@ define_deser_repeated_message!();
 ///////////////////////////////////////////////////////////////////////////////
 
 impl<Entry> FieldDeserFromIter<tags::Message<Entry>, tags::Repeated>
-    for HashMap<Entry::KeyType, Entry::ValueType>
+    for HashMap<Entry::OwnedKeyType, Entry::OwnedValueType>
 where
-    Entry: MapEntry + DeserializableMessageFromIter,
-    Entry::KeyType: Hash + Eq,
+    Entry: MapEntryForNormalImpl + DeserializableMessageFromIter,
+    Entry::OwnedKeyType: Hash + Eq,
 {
     type Item = Entry;
 
