@@ -78,7 +78,7 @@ pub struct RepeatedSliceViewField<'slice, 'msg, TypeTag>
 where
     TypeTag: FieldDataIntoIter<'slice, 'msg>,
 {
-    field: Option<&'msg SliceViewField<'slice>>,
+    maybe_field: Option<&'msg SliceViewField<'slice>>,
     field_number: usize,
     internal_data: &'msg InternalDataForSliceViewStruct<'slice, 'msg>,
     phantom: PhantomData<TypeTag>,
@@ -89,12 +89,12 @@ where
     TypeTag: FieldDataIntoIter<'slice, 'msg>,
 {
     pub fn new(
-        field: Option<&'msg SliceViewField<'slice>>,
+        maybe_field: Option<&'msg SliceViewField<'slice>>,
         field_number: usize,
         internal_data: &'msg InternalDataForSliceViewStruct<'slice, 'msg>,
     ) -> Self {
         Self {
-            field,
+            maybe_field,
             field_number,
             internal_data,
             phantom: PhantomData,
@@ -104,13 +104,15 @@ where
     fn iter_impl(
         &'msg self,
     ) -> impl 'msg + Iterator<Item = <TypeTag as FieldDataIntoIter<'slice, 'msg>>::Item> {
-        self.internal_data
-            .field_data_iter(self.field_number, self.field)
-            .map_ok(|field| -> Result<_> { <TypeTag as FieldDataIntoIter>::into(field) })
-            .map(|rrval| rrval.flatten())
-            .flatten_ok()
-            .map(|rrval| rrval.flatten())
-            .map(|result| result.unwrap())
+        self.maybe_field.into_iter().flat_map(move |field| {
+            field
+                .field_data_iter(self.field_number, &self.internal_data.source_ld_slices)
+                .map_ok(|field| -> Result<_> { <TypeTag as FieldDataIntoIter>::into(field) })
+                .map(|rrval| rrval.flatten())
+                .flatten_ok()
+                .map(|rrval| rrval.flatten())
+                .map(|result| result.unwrap())
+        })
     }
 }
 
