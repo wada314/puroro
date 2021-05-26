@@ -89,7 +89,7 @@ type {type_ident_gp}: {type_bound}
                     return_type_bound: format!(
                         "::puroro::MapField::<'this, {key}, {value}>",
                         key = self.map_deref_borrowed_key_type_name(key_field)?,
-                        value = self.map_value_getter_type_name(value_field, "'this")?,
+                        value = self.map_value_getter_type_name(value_field)?,
                     ),
                     get_decl: format!(
                         "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
@@ -174,7 +174,7 @@ type {type_ident_gp}: {type_bound}
     pub fn scalar_getter_type_name(
         &self,
         field: &'c FieldDescriptor<'c>,
-        lifetime: &'static str,
+        this_lifetime: &'static str,
     ) -> Result<Cow<'static, str>> {
         Ok(
             match field
@@ -190,13 +190,14 @@ type {type_ident_gp}: {type_bound}
                         NonNumericalFieldType::Message(m) => format!(
                             "<Self as {trait_name}>::{name}",
                             trait_name = self.trait_ident(self.msg)?,
-                            name = self.associated_msg_type_ident_gp(m, &[("'this", lifetime)])?,
+                            name =
+                                self.associated_msg_type_ident_gp(m, &[("'this", this_lifetime)])?,
                         )
                         .into(),
                     };
                     format!(
                         "::std::borrow::Cow::<{lt}, {type_}>",
-                        lt = lifetime,
+                        lt = this_lifetime,
                         type_ = t,
                     )
                     .into()
@@ -229,7 +230,7 @@ type {type_ident_gp}: {type_bound}
         &self,
         field: &'c FieldDescriptor<'c>,
     ) -> Result<Cow<'static, str>> {
-        self.scalar_getter_type_name(field, "'slice")
+        self.scalar_getter_type_name(field, "'this")
     }
 }
 

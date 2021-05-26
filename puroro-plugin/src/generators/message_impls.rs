@@ -40,10 +40,10 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
                     }
                 },
                 func(|output| self.print_msg_ser(output)),
-                //func(|output| self.print_impl_map_entry(output)),
             ),
             func(|output| self.print_impl_trait(output)),
             func(|output| self.print_impl_message(output)),
+            func(|output| self.print_impl_map_entry(output)),
             func(|output| self.print_impl_field_new(output)),
         )
             .write_into(output)
@@ -568,7 +568,7 @@ type {assoc_type_ident}<'this> where Self: 'this =
     )
 }}\n",
                                 decl = decl,
-                                msg = self.frag_gen.type_name_of_msg(m, None)?,
+                                msg = self.frag_gen.type_name_of_msg(m, &[("'par", "'this")])?,
                                 ident = field.native_ident()?,
                                 field_number = field.number(),
                             ),
@@ -590,7 +590,7 @@ type {assoc_type_ident}<'this> where Self: 'this =
     }})
 }}\n",
                                 decl = decl,
-                                msg = self.frag_gen.type_name_of_msg(m, None)?,
+                                msg = self.frag_gen.type_name_of_msg(m, &[("'par", "'this")])?,
                                 ident = field.native_ident()?,
                                 field_number = field.number(),
                             ),
@@ -743,8 +743,8 @@ impl{gp} ::puroro::Message<'bump> for {struct_ident}{gpb} {{
             return Ok(());
         } else {
             match self.context.impl_type() {
-                ImplType::Default => self.print_impl_map_entry_normal_struct(output),
-                ImplType::SliceView => self.print_impl_map_entry_slice_view_struct(output),
+                ImplType::Default => self.print_impl_map_entry_normal(output),
+                ImplType::SliceView => self.print_impl_map_entry_slice_view(output),
             }
         }
     }
@@ -799,7 +799,7 @@ impl{gp} ::puroro_internal::MapEntryForNormalImpl for {entry_type} {{
             .write_into(output)
     }
 
-    fn print_impl_map_entry_slice_view_struct<W: std::fmt::Write>(
+    fn print_impl_map_entry_slice_view<W: std::fmt::Write>(
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
