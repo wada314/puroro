@@ -111,7 +111,7 @@ type {type_ident_gp}: {type_bound}
                     return_type_ident_gp: format!("{ident}<'this>", ident = type_ident.clone()),
                     return_type_bound: format!(
                         "::puroro::RepeatedField::<'this, {value}>",
-                        value = self.scalar_getter_type_name(field, "'this", "'static")?,
+                        value = self.scalar_getter_type_name(field, "'this", "'this")?,
                     ),
                     get_decl: format!(
                         "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",

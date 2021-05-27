@@ -729,7 +729,7 @@ type {return_type_ident} where Self: 'this =
                                 return_type_ident = return_type_ident_gp,
                                 type_tag = self
                                     .frag_gen
-                                    .type_tag_ident_gp(field, &[("'par", "'static")])?,
+                                    .type_tag_ident_gp(field, &[("'par", "'this")])?,
                                 get_decl = get_decl,
                                 ident = field.native_ident()?,
                                 field_number = field.number(),
