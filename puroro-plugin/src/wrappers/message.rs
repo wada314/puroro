@@ -3,7 +3,7 @@ use std::hash::Hash;
 
 use super::{EnumDescriptor, FieldDescriptor, FieldType, FileDescriptor, FileOrMessageRef};
 use crate::google::protobuf::DescriptorProto;
-use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
+use crate::utils::{get_keyword_safe_ident, to_camel_case};
 use crate::{Context, ErrorKind, Result};
 use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
