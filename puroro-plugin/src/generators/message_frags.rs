@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::utils::relative_path;
+use crate::utils::{relative_path, GenericParams};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
@@ -276,39 +276,27 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    pub fn struct_generic_params(&self, params: &[&'static str]) -> String {
-        let iter = params
-            .iter()
-            .cloned()
-            .chain(
-                match self.context.alloc_type() {
-                    AllocatorType::Default => None,
-                    AllocatorType::Bumpalo => Some("'bump"),
-                }
-                .into_iter(),
-            )
-            .chain(
-                match self.context.impl_type() {
-                    ImplType::Default => None,
-                    ImplType::SliceView => Some(["'slice", "S"].iter()),
-                }
-                .into_iter()
-                .flatten()
-                .cloned(),
-            )
-            .unique();
-        if iter.clone().count() == 0 {
-            "".to_string()
-        } else {
-            format!(
-                "<{}>",
-                Itertools::intersperse(iter, ", ").collect::<String>()
-            )
+    pub fn struct_generic_params(&self) -> GenericParams {
+        match self.context.alloc_type() {
+            AllocatorType::Default => None,
+            AllocatorType::Bumpalo => Some("'bump"),
         }
+        .into_iter()
+        .chain(
+            match self.context.impl_type() {
+                ImplType::Default => None,
+                ImplType::SliceView => Some(["'slice", "S"].iter()),
+            }
+            .into_iter()
+            .flatten()
+            .cloned(),
+        )
+        .unique()
+        .collect()
     }
 
-    pub fn struct_generic_params_bounds(&self, params: &[&'static str]) -> String {
-        self.struct_generic_params(params)
+    pub fn struct_generic_params_bounds(&self) -> GenericParams {
+        self.struct_generic_params()
     }
 
     pub fn new_method_declaration(&self) -> &'static str {
