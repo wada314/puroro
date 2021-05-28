@@ -1,5 +1,5 @@
 use crate::deser::LdSlice;
-use crate::internal_data::SourceLdSlices;
+use crate::internal_data::{SliceSource, SourceLdSlices};
 use crate::variant::Variant;
 use crate::{Result, ResultHelper};
 use ::num_derive::FromPrimitive;
@@ -46,11 +46,15 @@ pub enum SliceViewField<'slice> {
 impl<'slice> SliceViewField<'slice> {
     /// Returns an iterator over the specifield field number's [`FieldData`] instance.
     /// Requires [`SourceLdSlices`] struct, which is owned by the messages's `puroro_internal` field.
-    pub fn field_data_iter<'msg, 'par>(
+    pub fn field_data_iter<'msg, 'par, S>(
         &'msg self,
         field_number: usize,
-        maybe_source_ld_slices: &'msg Option<SourceLdSlices<'slice, 'par>>,
-    ) -> impl 'msg + Iterator<Item = Result<FieldData<LdSlice<'slice>>>> {
+        source_slices: S,
+    ) -> impl 'msg + Iterator<Item = Result<FieldData<LdSlice<'slice>>>>
+    where
+        S: SliceSource<'slice>,
+        <S as SliceSource<'slice>>::Iter: 'msg,
+    {
         // The iter of `ld_slice` which consists the specified field.
         // Note that this might be a smaller set when compared with the `ld_slice`s consisting
         // the message struct. For example, even if there's a message consist of 3 separated slices,
@@ -67,9 +71,9 @@ impl<'slice> SliceViewField<'slice> {
                 // A difficult case. The field is consist of multiple separated slices.
                 // This case can happen if the message is merged from multiple instances.
                 Either::Right(
-                    maybe_source_ld_slices
-                        .iter()
-                        .flatten()
+                    source_slices
+                        .into_iter()
+                        // Iterator<Item = Result<LdSlice>>
                         .skip_while(move |rld_slice| match rld_slice.as_ref() {
                             Ok(ld_slice) => *ld_slice != *first_enclosing_ld_slice,
                             Err(_) => true,

@@ -5,6 +5,7 @@ use std::intrinsics::transmute;
 use std::marker::PhantomData;
 
 use crate::deser::LdSlice;
+use crate::internal_data::SliceSource;
 use crate::types::{FieldData, SliceViewField};
 use crate::InternalDataForSliceViewStruct;
 use crate::{tags, MapEntryForSliceViewImpl};
@@ -69,24 +70,26 @@ where
 }
 
 #[derive(Debug, Clone)]
-pub struct RepeatedSliceViewField<'slice, 'msg, TypeTag>
+pub struct RepeatedSliceViewField<'slice, 'msg, S, TypeTag>
 where
     TypeTag: FieldDataIntoIter<'slice>,
+    S: SliceSource<'slice>,
 {
     maybe_field: Option<&'msg SliceViewField<'slice>>,
     field_number: usize,
-    internal_data: &'msg InternalDataForSliceViewStruct<'slice, 'msg>,
+    internal_data: &'msg InternalDataForSliceViewStruct<'slice, S>,
     phantom: PhantomData<TypeTag>,
 }
 
-impl<'slice, 'msg, TypeTag> RepeatedSliceViewField<'slice, 'msg, TypeTag>
+impl<'slice, 'msg, S, TypeTag> RepeatedSliceViewField<'slice, 'msg, S, TypeTag>
 where
     TypeTag: FieldDataIntoIter<'slice>,
+    S: SliceSource<'slice>,
 {
     pub fn new(
         maybe_field: Option<&'msg SliceViewField<'slice>>,
         field_number: usize,
-        internal_data: &'msg InternalDataForSliceViewStruct<'slice, 'msg>,
+        internal_data: &'msg InternalDataForSliceViewStruct<'slice, S>,
     ) -> Self {
         Self {
             maybe_field,
@@ -100,22 +103,31 @@ where
         &'msg self,
     ) -> impl 'msg + Iterator<Item = <TypeTag as FieldDataIntoIter<'slice>>::Item> {
         self.maybe_field.into_iter().flat_map(move |field| {
-            field
-                .field_data_iter(self.field_number, &self.internal_data.source_ld_slices)
-                .map_ok(|field| -> Result<_> { <TypeTag as FieldDataIntoIter>::into(field) })
-                .map(|rrval| rrval.flatten())
-                .flatten_ok()
-                .map(|rrval| rrval.flatten())
-                .map(|result| result.unwrap())
+            self.internal_data
+                .maybe_source_slices
+                .clone()
+                .into_iter()
+                .flat_map(move |source_slices| {
+                    field
+                        .field_data_iter(self.field_number, source_slices.clone())
+                        .map_ok(|field| -> Result<_> {
+                            <TypeTag as FieldDataIntoIter>::into(field)
+                        })
+                        .map(|rrval| rrval.flatten())
+                        .flatten_ok()
+                        .map(|rrval| rrval.flatten())
+                        .map(|result| result.unwrap())
+                })
         })
     }
 }
 
-impl<'slice, 'msg, T, TypeTag> RepeatedField<'msg, T>
-    for RepeatedSliceViewField<'slice, 'msg, TypeTag>
+impl<'slice, 'msg, S, T, TypeTag> RepeatedField<'msg, T>
+    for RepeatedSliceViewField<'slice, 'msg, S, TypeTag>
 where
     T: 'slice,
     TypeTag: FieldDataIntoIter<'slice, Item = T>,
+    S: SliceSource<'slice>,
 {
     fn for_each<F>(&'msg self, f: F)
     where
@@ -134,12 +146,13 @@ where
 }
 
 #[rustfmt::skip]
-impl<'slice, 'msg, Q, R, Entry> MapField<'msg, Q, R>
-    for RepeatedSliceViewField<'slice, 'msg, tags::Message<Entry>>
+impl<'slice, 'msg, S, Q, R, Entry> MapField<'msg, Q, R>
+    for RepeatedSliceViewField<'slice, 'msg, S, tags::Message<Entry>>
 where
     'slice: 'msg,
     Q: ?Sized + Hash + Eq,
     R: 'msg,
+    S: SliceSource<'slice>,
     Entry::OwnedKeyType: Borrow<Q>,
     Entry: 'slice
         + MapEntryForSliceViewImpl<'slice, ValueGetterType = R>
