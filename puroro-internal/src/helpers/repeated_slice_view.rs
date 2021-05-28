@@ -70,11 +70,7 @@ where
 }
 
 #[derive(Debug, Clone)]
-pub struct RepeatedSliceViewField<'slice, 'msg, S, TypeTag>
-where
-    TypeTag: FieldDataIntoIter<'slice>,
-    S: SliceSource<'slice>,
-{
+pub struct RepeatedSliceViewField<'slice, 'msg, S, TypeTag> {
     maybe_field: Option<&'msg SliceViewField<'slice>>,
     field_number: usize,
     internal_data: &'msg InternalDataForSliceViewStruct<'slice, S>,

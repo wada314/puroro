@@ -546,7 +546,7 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
-        for ld_slice in self.puroro_internal.source_ld_slices.iter().flatten() {{
+        for ld_slice in self.puroro_internal.source_ld_slices() {{
             serializer.serialize_raw_fields(ld_slice?.as_slice())?;
         }}
         Ok(())
@@ -586,7 +586,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                 struct_ident = self.frag_gen.struct_ident(self.msg)?,
                 trait_ident = self.traits_gen.trait_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(),
+                gp = self.frag_gen.struct_generic_params().replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
                 gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
             indent((
@@ -691,7 +691,7 @@ type {assoc_type_ident}<'this> where Self: 'this =
                             ) => format!(
                                 "\
 type {return_type_ident} where Self: 'this =
-    ::puroro_internal::RepeatedSliceViewField::<'slice, 'this, ::puroro_internal::tags::{type_tag}>;
+    ::puroro_internal::RepeatedSliceViewField::<'slice, 'this, S, ::puroro_internal::tags::{type_tag}>;
 {get_decl} {{
     ::puroro_internal::RepeatedSliceViewField::new(
         self.{ident}.as_ref(),

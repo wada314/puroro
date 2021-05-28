@@ -14,7 +14,7 @@ pub mod variant;
 pub use ::puroro::{ErrorKind, PuroroError, Result};
 pub use internal_data::{
     InternalDataForBumpaloStruct, InternalDataForNormalStruct, InternalDataForSliceViewStruct,
-    SourceLdSlices,
+    SliceSource, SourceLdSlices,
 };
 
 pub use helpers::{
