@@ -609,7 +609,7 @@ type {assoc_type_ident}<'this> where Self: 'this =
                             field.type_()?,
                         ) {
                             (
-                                ImplType::SliceView { .. },
+                                ImplType::SliceView,
                                 GetterMethods::BareField(decl),
                                 FieldType::Message(m),
                             ) => format!(
@@ -676,6 +676,38 @@ type {assoc_type_ident}<'this> where Self: 'this =
                                 ident = field.native_ident()?,
                             ),
                             (
+                                ImplType::SliceView,
+                                GetterMethods::RepeatedField {
+                                    return_type_ident_gp,
+                                    get_decl,
+                                    ..
+                                }
+                                | GetterMethods::MapField {
+                                    return_type_ident_gp,
+                                    get_decl,
+                                    ..
+                                },
+                                _,
+                            ) => format!(
+                                "\
+type {return_type_ident} where Self: 'this =
+    ::puroro_internal::RepeatedSliceViewField::<'slice, 'this, ::puroro_internal::tags::{type_tag}>;
+{get_decl} {{
+    ::puroro_internal::RepeatedSliceViewField::new(
+        self.{ident}.as_ref(),
+        {field_number},
+        &self.puroro_internal,
+    )
+}}\n",
+                                return_type_ident = return_type_ident_gp,
+                                type_tag = self
+                                    .frag_gen
+                                    .type_tag_ident_gp(field, &[("'par", "'this")])?,
+                                get_decl = get_decl,
+                                ident = field.native_ident()?,
+                                field_number = field.number(),
+                            ),
+                            (
                                 ImplType::Default,
                                 GetterMethods::BareField(decl),
                                 FieldType::Message(_) | FieldType::String | FieldType::Bytes,
@@ -733,38 +765,6 @@ type {return_type_ident} where Self: 'this = &'this {type_name};
                                 type_name = self.frag_gen.field_type_name(field)?,
                                 get_decl = get_decl,
                                 ident = field.native_ident()?,
-                            ),
-                            (
-                                ImplType::SliceView,
-                                GetterMethods::RepeatedField {
-                                    return_type_ident_gp,
-                                    get_decl,
-                                    ..
-                                }
-                                | GetterMethods::MapField {
-                                    return_type_ident_gp,
-                                    get_decl,
-                                    ..
-                                },
-                                _,
-                            ) => format!(
-                                "\
-type {return_type_ident} where Self: 'this =
-    ::puroro_internal::RepeatedSliceViewField::<'slice, 'this, ::puroro_internal::tags::{type_tag}>;
-{get_decl} {{
-    ::puroro_internal::RepeatedSliceViewField::new(
-        self.{ident}.as_ref(),
-        {field_number},
-        &self.puroro_internal,
-    )
-}}\n",
-                                return_type_ident = return_type_ident_gp,
-                                type_tag = self
-                                    .frag_gen
-                                    .type_tag_ident_gp(field, &[("'par", "'this")])?,
-                                get_decl = get_decl,
-                                ident = field.native_ident()?,
-                                field_number = field.number(),
                             ),
                         },
                     )
