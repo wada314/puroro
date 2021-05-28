@@ -81,28 +81,15 @@ pub struct {ident}{gp} {{\n",
     }
 
     fn print_new_methods<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
-        (
-            format!(
-                "{cfg}\nimpl{gp} {ident}{gpb} {{\n",
-                ident = self.frag_gen.struct_ident(self.msg)?,
-                cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(),
-                gpb = self.frag_gen.struct_generic_params_bounds(),
-            ),
-            indent(
-                match (self.context.impl_type(), self.context.alloc_type()) {
-                    (ImplType::Default, _) => func(|output| self.new_method_default_impl(output)),
-                    (ImplType::SliceView { .. }, AllocatorType::Default) => {
-                        func(|output| self.new_method_slice_view_impl(output))
-                    }
-                    _ => {
-                        unreachable!()
-                    }
-                },
-            ),
-            "}}\n",
-        )
-            .write_into(output)
+        match (self.context.impl_type(), self.context.alloc_type()) {
+            (ImplType::Default, _) => self.new_method_default_impl(output),
+            (ImplType::SliceView { .. }, AllocatorType::Default) => {
+                self.new_method_slice_view_impl(output)
+            }
+            _ => {
+                unreachable!()
+            }
+        }
     }
 
     fn new_method_self_members<W: std::fmt::Write>(
@@ -127,12 +114,18 @@ pub struct {ident}{gp} {{\n",
         (
             format!(
                 "\
-pub {decl} {{
-    Self {{\n",
+{cfg}
+impl{gp} {ident}{gpb} {{
+    pub {decl} {{
+        Self {{\n",
+                ident = self.frag_gen.struct_ident(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params(),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
                 decl = self.frag_gen.new_method_declaration()
             ),
             indent_n(
-                2,
+                3,
                 func(|output| {
                     self.new_method_self_members(
                         output,
@@ -147,7 +140,8 @@ pub {decl} {{
                     )
                 }),
             ),
-            "    \
+            "        \
+        }}
     }}
 }}\n",
         )
@@ -159,11 +153,19 @@ pub {decl} {{
         output: &mut Indentor<W>,
     ) -> Result<()> {
         (
-            "\
-fn new() -> Self {{
-    Self {{\n",
+            format!(
+                "\
+{cfg}
+impl{gp} {ident}{gpb} {{
+    fn new() -> Self {{
+        Self {{\n",
+                ident = self.frag_gen.struct_ident(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params(),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
+            ),
             indent_n(
-                2,
+                3,
                 func(|output| {
                     self.new_method_self_members(
                         output,
@@ -172,14 +174,26 @@ fn new() -> Self {{
                     )
                 }),
             ),
-            "    \
+            "        \
+        }}
     }}
-}}
-
-fn try_new_with_slice(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
-    let mut new_self = Self {{\n",
+}}",
+            format!(
+                "\
+{cfg}
+impl{gp} {ident}{gpb} {{
+    fn try_new_with_slice(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
+        let mut new_self = Self {{\n",
+                ident = self.frag_gen.struct_ident(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self.frag_gen.struct_generic_params().remove("S"),
+                gpb = self
+                    .frag_gen
+                    .struct_generic_params_bounds()
+                    .replace("S", "&'slice [u8]"),
+            ),
             indent_n(
-                2,
+                3,
                 func(|output| {
                     self.new_method_self_members(
                         output,
@@ -188,36 +202,54 @@ fn try_new_with_slice(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
                     )
                 }),
             ),
-            "    \
-    }};
-    let ld_slice = ::puroro_internal::deser::LdSlice::new(slice);
-    ld_slice.merge_into_message(&mut new_self)?;
-    Ok(new_self)
-}}
-
-fn try_new_with_parent(
-    parent_field: ::std::option::Option<&'par ::puroro_internal::SliceViewField<'slice>>,
-    field_number_in_parent: usize,
-    parent_internal_data: &'par ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'par>,
-) -> ::puroro::Result<Self> {{
-    let mut new_self = Self {{\n",
+            "        \
+        }};
+        let ld_slice = ::puroro_internal::deser::LdSlice::new(slice);
+        ld_slice.merge_into_message(&mut new_self)?;
+        Ok(new_self)
+    }}
+}}",
+            format!(
+                "\
+{cfg}
+impl{gp} {ident}{gpb} {{
+    fn try_new_with_parent(
+        field_in_parent: ::std::option::Option<&'par ::puroro_internal::SliceViewField<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'par ::puroro_internal::InternalDataForSliceViewStruct<'slice, SS>,
+    ) -> ::puroro::Result<Self> {{
+        let mut new_self = Self {{\n",
+                ident = self.frag_gen.struct_ident(self.msg)?,
+                cfg = self.frag_gen.cfg_condition(),
+                gp = self
+                    .frag_gen
+                    .struct_generic_params()
+                    .remove("S")
+                    .push("'par")
+                    .push("SS"),
+                gpb = self
+                    .frag_gen
+                    .struct_generic_params_bounds()
+                    .replace("S", "::puroro_internal::SourceLdSlices<'slice, 'par, SS>"),
+            ),
             indent_n(
-                2,
+                3,
                 func(|output| {
                     self.new_method_self_members(
                         output,
                         "\
 ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
-    parent_field, field_number_in_parent, parent_internal_data)",
+    field_in_parent, field_number_in_parent, parent_internal_data)",
                     )
                 }),
             ),
-            "    \
-    }};
-    for ld_slice in new_self.puroro_internal.source_ld_slices.clone().iter().flatten() {
-        ld_slice?.merge_into_message(&mut new_self)?;
-    }
-    Ok(new_self)
+            "        \
+        }};
+        for ld_slice in new_self.puroro_internal.source_ld_slices() {{
+            ld_slice?.merge_into_message(&mut new_self)?;
+        }}
+        Ok(new_self)
+    }}
 }}\n",
         )
             .write_into(output)

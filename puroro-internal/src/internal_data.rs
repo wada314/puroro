@@ -99,6 +99,41 @@ impl<'slice> InternalDataForSliceViewStruct<'slice, &'slice [u8]> {
     }
 }
 
+impl<'slice, 'par, SS> InternalDataForSliceViewStruct<'slice, SourceLdSlices<'slice, 'par, SS>> {
+    pub fn new_with_parent(
+        field_in_parent: Option<&'par SliceViewField<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'par InternalDataForSliceViewStruct<'slice, SS>,
+    ) -> Self {
+        match field_in_parent {
+            None => Self {
+                maybe_source_slices: None,
+                phantom: PhantomData,
+            },
+            Some(_) => Self {
+                maybe_source_slices: Some(SourceLdSlices::MaybeMultipleLdSlices {
+                    field_in_parent,
+                    field_number_in_parent: field_number_in_parent,
+                    parent_internal_data: parent_internal_data,
+                }),
+                phantom: PhantomData,
+            },
+        }
+    }
+}
+
+impl<'slice, S> InternalDataForSliceViewStruct<'slice, S>
+where
+    S: SliceSource<'slice>,
+{
+    pub fn source_ld_slices(&self) -> impl Iterator<Item = Result<LdSlice<'slice>>> {
+        self.maybe_source_slices
+            .clone()
+            .into_iter()
+            .flat_map(|source| source.into_iter())
+    }
+}
+
 impl<'slice, 'par, S> SliceSource<'slice> for SourceLdSlices<'slice, 'par, S>
 where
     S: SliceSource<'slice>,
