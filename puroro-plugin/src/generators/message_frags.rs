@@ -55,7 +55,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         .into_iter();
         let generic_args_iter2 = match self.context.impl_type() {
             ImplType::Default => None,
-            ImplType::SliceView => Some(std::array::IntoIter::new(["'slice", "'par"])),
+            ImplType::SliceView => Some(std::array::IntoIter::new(["'slice", "S"])),
         }
         .into_iter()
         .flatten();
@@ -290,7 +290,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             .chain(
                 match self.context.impl_type() {
                     ImplType::Default => None,
-                    ImplType::SliceView => Some(["'slice", "'par"].iter()),
+                    ImplType::SliceView => Some(["'slice", "S"].iter()),
                 }
                 .into_iter()
                 .flatten()
@@ -403,7 +403,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 "::puroro_internal::InternalDataForBumpaloStruct<'bump>"
             }
             (ImplType::SliceView, AllocatorType::Default) => {
-                "::puroro_internal::InternalDataForSliceViewStruct<'slice, 'par>"
+                "::puroro_internal::InternalDataForSliceViewStruct<'slice, S>"
             }
             _ => unimplemented!(),
         }

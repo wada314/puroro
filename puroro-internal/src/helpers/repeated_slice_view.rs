@@ -109,7 +109,7 @@ where
                 .into_iter()
                 .flat_map(move |source_slices| {
                     field
-                        .field_data_iter(self.field_number, source_slices.clone())
+                        .field_data_iter(self.field_number, source_slices)
                         .map_ok(|field| -> Result<_> {
                             <TypeTag as FieldDataIntoIter>::into(field)
                         })

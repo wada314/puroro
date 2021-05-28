@@ -53,10 +53,7 @@ impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
 }
 
 #[derive(Debug, Clone)]
-pub struct InternalDataForSliceViewStruct<'slice, S>
-where
-    S: SliceSource<'slice>,
-{
+pub struct InternalDataForSliceViewStruct<'slice, S> {
     pub maybe_source_slices: Option<S>,
     phantom: PhantomData<&'slice ()>,
 }
@@ -75,10 +72,7 @@ impl<'slice> SliceSource<'slice> for &'slice [u8] {
 }
 
 #[derive(Debug, Clone)]
-pub enum SourceLdSlices<'slice, 'par, S>
-where
-    S: SliceSource<'slice>,
-{
+pub enum SourceLdSlices<'slice, 'par, S> {
     SingleLdSlice(LdSlice<'slice>),
     MaybeMultipleLdSlices {
         field_in_parent: Option<&'par SliceViewField<'slice>>,
@@ -87,10 +81,7 @@ where
     },
 }
 
-impl<'slice, S> InternalDataForSliceViewStruct<'slice, S>
-where
-    S: SliceSource<'slice>,
-{
+impl<'slice, S> InternalDataForSliceViewStruct<'slice, S> {
     pub fn new() -> Self {
         Self {
             maybe_source_slices: None,
