@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use super::writer::{func, indent, iter, IntoFragment};
 use crate::context::Context;
-use crate::utils::{relative_path, to_camel_case, Indentor};
+use crate::utils::{relative_path, to_camel_case, GenericParams, Indentor};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
@@ -48,21 +48,24 @@ type {type_ident}<'this>: {trait_path}
                             format!("{decl};\n", decl = decl)
                         }
                         GetterMethods::RepeatedField {
-                            return_type_ident_gp: type_ident_gp,
-                            return_type_bound: type_bound,
+                            type_ident,
+                            type_gp,
+                            type_bound,
                             get_decl,
                         }
                         | GetterMethods::MapField {
-                            return_type_ident_gp: type_ident_gp,
-                            return_type_bound: type_bound,
+                            type_ident,
+                            type_gp,
+                            type_bound,
                             get_decl,
                         } => {
                             format!(
                                 "\
-type {type_ident_gp}: {type_bound}
+type {type_ident}{type_gp}: {type_bound}
     where Self: 'this;
 {get_decl};\n",
-                                type_ident_gp = type_ident_gp,
+                                type_ident = type_ident,
+                                type_gp = type_gp,
                                 type_bound = type_bound,
                                 get_decl = get_decl
                             )
@@ -85,8 +88,9 @@ type {type_ident_gp}: {type_bound}
                 let (key_field, value_field) = m.key_value_of_map_entry()?;
                 let type_ident = format!("{}Map", to_camel_case(field.native_ident()?));
                 GetterMethods::MapField {
-                    return_type_ident_gp: format!("{ident}<'this>", ident = type_ident.clone()),
-                    return_type_bound: format!(
+                    type_ident: type_ident.clone(),
+                    type_gp: std::array::IntoIter::new(["'this"]).collect(),
+                    type_bound: format!(
                         "::puroro::MapField::<'this, {key}, {value}>",
                         key = self.map_deref_borrowed_key_type_name(key_field)?,
                         value = self.map_value_getter_type_name(value_field)?,
@@ -108,8 +112,9 @@ type {type_ident_gp}: {type_bound}
             (FieldLabel::Repeated, _) => {
                 let type_ident = format!("{}Repeated", to_camel_case(field.native_ident()?));
                 GetterMethods::RepeatedField {
-                    return_type_ident_gp: format!("{ident}<'this>", ident = type_ident.clone()),
-                    return_type_bound: format!(
+                    type_ident: type_ident.clone(),
+                    type_gp: std::array::IntoIter::new(["'this"]).collect(),
+                    type_bound: format!(
                         "::puroro::RepeatedField::<'this, {value}>",
                         value = self.scalar_getter_type_name(field, "'this", "'this")?,
                     ),
@@ -241,13 +246,15 @@ pub enum GetterMethods {
     BareField(String),
     OptionalField(String),
     RepeatedField {
-        return_type_ident_gp: String,
-        return_type_bound: String,
+        type_ident: String,
+        type_gp: GenericParams,
+        type_bound: String,
         get_decl: String,
     },
     MapField {
-        return_type_ident_gp: String,
-        return_type_bound: String,
+        type_ident: String,
+        type_gp: GenericParams,
+        type_bound: String,
         get_decl: String,
     },
 }

@@ -212,7 +212,9 @@ impl{gp} {ident}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} {ident}{gpb} {{
+impl{gp} {ident}{gpb} 
+    where ::puroro_internal::SourceLdSlices<'slice, 'par, SS>: ::puroro_internal::SliceSource<'slice>,
+{{
     fn try_new_with_parent(
         field_in_parent: ::std::option::Option<&'par ::puroro_internal::SliceViewField<'slice>>,
         field_number_in_parent: usize,
@@ -267,7 +269,10 @@ impl{gp} ::std::clone::Clone for {ident}{gpb} {{
         Self {{\n",
                 ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(),
+                gp = self
+                    .frag_gen
+                    .struct_generic_params()
+                    .replace("S", "S: ::std::clone::Clone"),
                 gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
             indent_n(
@@ -445,8 +450,15 @@ impl{gp} ::std::convert::TryFrom<&'slice [u8]> for {ident}{gpb} {{
 \n",
                 ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params().push("'slice"),
-                gpb = self.frag_gen.struct_generic_params_bounds(),
+                gp = self
+                    .frag_gen
+                    .struct_generic_params()
+                    .push("'slice")
+                    .remove("S"),
+                gpb = self
+                    .frag_gen
+                    .struct_generic_params_bounds()
+                    .replace("S", "&'slice [u8]"),
             ),
             format!(
                 "\
@@ -554,7 +566,10 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
 }}\n",
                     ident = self.frag_gen.struct_ident(self.msg)?,
                     cfg = self.frag_gen.cfg_condition(),
-                    gp = self.frag_gen.struct_generic_params(),
+                    gp = self
+                        .frag_gen
+                        .struct_generic_params()
+                        .replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
                     gpb = self.frag_gen.struct_generic_params_bounds(),
                 )
                 .into(),
@@ -570,7 +585,10 @@ impl{gp} ::puroro::Serializable for {name}{gpb} {{
 }}\n",
                 name = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(),
+                gp = self
+                    .frag_gen
+                    .struct_generic_params()
+                    .replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
                 gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
         )
@@ -678,19 +696,21 @@ type {assoc_type_ident}<'this> where Self: 'this =
                             (
                                 ImplType::SliceView,
                                 GetterMethods::RepeatedField {
-                                    return_type_ident_gp,
+                                    type_ident,
+                                    type_gp,
                                     get_decl,
                                     ..
                                 }
                                 | GetterMethods::MapField {
-                                    return_type_ident_gp,
+                                    type_ident,
+                                    type_gp,
                                     get_decl,
                                     ..
                                 },
                                 _,
                             ) => format!(
                                 "\
-type {return_type_ident} where Self: 'this =
+type {type_ident}{type_gp} where Self: 'this =
     ::puroro_internal::RepeatedSliceViewField::<'slice, 'this, S, ::puroro_internal::tags::{type_tag}>;
 {get_decl} {{
     ::puroro_internal::RepeatedSliceViewField::new(
@@ -699,7 +719,8 @@ type {return_type_ident} where Self: 'this =
         &self.puroro_internal,
     )
 }}\n",
-                                return_type_ident = return_type_ident_gp,
+                                type_ident = type_ident,
+                                type_gp = type_gp,
                                 type_tag = self
                                     .frag_gen
                                     .type_tag_ident_gp(field, &[("'par", "'this")])?,
@@ -745,23 +766,26 @@ type {return_type_ident} where Self: 'this =
                             (
                                 ImplType::Default,
                                 GetterMethods::RepeatedField {
-                                    return_type_ident_gp,
+                                    type_ident,
+                                    type_gp,
                                     get_decl,
                                     ..
                                 }
                                 | GetterMethods::MapField {
-                                    return_type_ident_gp,
+                                    type_ident,
+                                    type_gp,
                                     get_decl,
                                     ..
                                 },
                                 _,
                             ) => format!(
                                 "\
-type {return_type_ident} where Self: 'this = &'this {type_name};
+type {type_ident}{type_gp} where Self: 'this = &'this {type_name};
 {get_decl} {{
     &self.{ident}
 }}\n",
-                                return_type_ident = return_type_ident_gp,
+                                type_ident = type_ident,
+                                type_gp = type_gp,
                                 type_name = self.frag_gen.field_type_name(field)?,
                                 get_decl = get_decl,
                                 ident = field.native_ident()?,

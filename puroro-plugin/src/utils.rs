@@ -167,7 +167,17 @@ pub struct GenericParams(Vec<&'static str>);
 impl GenericParams {
     pub fn push(mut self, lt: &'static str) -> Self {
         if !self.0.contains(&lt) {
-            self.0.push(lt);
+            if lt.starts_with('\'') {
+                if let Some((insert_pos, _)) =
+                    self.0.iter().find_position(|&&s| !s.starts_with('\''))
+                {
+                    self.0.insert(insert_pos, lt);
+                } else {
+                    self.0.push(lt);
+                }
+            } else {
+                self.0.push(lt);
+            }
         }
         self
     }
