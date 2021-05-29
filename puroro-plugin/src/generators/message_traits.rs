@@ -29,50 +29,47 @@ impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
 pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 trait_ident = self.trait_ident(self.msg)?,
             ),
-            indent((
-                iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
-                    // typedefs for message types
-                    Ok(format!(
-                        "\
-type {type_ident}<'this>: {trait_path}
-    where Self: 'this;\n",
-                        type_ident = self.associated_msg_type_ident(msg)?,
-                        trait_path =
-                            self.trait_ident_with_relative_path(msg, self.msg.package()?)?,
-                    ))
-                })),
-                iter(self.msg.fields().map(|field| -> Result<String> {
-                    // getter method decls
-                    Ok(match self.generate_getter_method_decls(field)? {
-                        GetterMethods::BareField(decl) | GetterMethods::OptionalField(decl) => {
-                            format!("{decl};\n", decl = decl)
-                        }
-                        GetterMethods::RepeatedField {
-                            repeated_type_ident: type_ident,
-                            repeated_type_gp: type_gp,
-                            repeated_type_bound: type_bound,
-                            get_decl,
-                        }
-                        | GetterMethods::MapField {
-                            repeated_type_ident: type_ident,
-                            repeated_type_gp: type_gp,
-                            repeated_type_bound: type_bound,
-                            get_decl,
-                        } => {
-                            format!(
-                                "\
-type {type_ident}{type_gp}: {type_bound}
+            indent((iter(self.msg.fields().map(|field| -> Result<String> {
+                let getter_methods = self.generate_getter_method_decls(field)?;
+                let maybe_msg_decl = if let Some(AssociatedType { ident, gp, bound }) =
+                    getter_methods.maybe_msg_type
+                {
+                    format!(
+                        "type {ident}{gp}: {bound}\n",
+                        ident = ident,
+                        gp = gp,
+                        bound = bound
+                    )
+                } else {
+                    "".to_string()
+                };
+                let body = match getter_methods.field_label_type {
+                    FieldLabelType::BareField { get_decl }
+                    | FieldLabelType::OptionalField { get_decl } => {
+                        format!("{decl};\n", decl = get_decl)
+                    }
+                    FieldLabelType::RepeatedField {
+                        get_decl,
+                        repeated_type: AssociatedType { ident, gp, bound },
+                    }
+                    | FieldLabelType::MapField {
+                        get_decl,
+                        repeated_type: AssociatedType { ident, gp, bound },
+                    } => {
+                        format!(
+                            "\
+type {ident}{gp}: {bound}
     where Self: 'this;
 {get_decl};\n",
-                                type_ident = type_ident,
-                                type_gp = type_gp,
-                                type_bound = type_bound,
-                                get_decl = get_decl
-                            )
-                        }
-                    })
-                })),
-            )),
+                            ident = ident,
+                            gp = gp,
+                            bound = bound,
+                            get_decl = get_decl,
+                        )
+                    }
+                };
+                Ok(format!("{}{}", maybe_msg_decl, body))
+            })),)),
             "}}\n",
         )
             .write_into(output)
@@ -92,10 +89,11 @@ type {type_ident}{type_gp}: {type_bound}
                         ident: ident.clone(),
                         gp: std::array::IntoIter::new(["'this"]).collect(),
                         bound: format!(
-                        "::puroro::MapField::<'this, {key}, {value}>",
-                        key = self.map_deref_borrowed_key_type_name(key_field)?,
-                        value = self.map_value_getter_type_name(value_field)?,
-                    ),
+                            "::puroro::MapField::<'this, {key}, {value}>",
+                            key = self.map_deref_borrowed_key_type_name(key_field)?,
+                            value = self.map_value_getter_type_name(value_field)?,
+                        ),
+                    },
                     get_decl: format!(
                         "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
                         ident = field.native_ident()?,
@@ -104,37 +102,51 @@ type {type_ident}{type_gp}: {type_bound}
                 }
             }
             (FieldLabel::Optional2, _) | (FieldLabel::Optional3, FieldType::Message(_)) => {
-                FieldLabelType::OptionalField(format!(
-                    "fn {name}<'this>(&'this self) -> ::std::option::Option::<{reftype}>",
-                    name = field.native_ident()?,
-                    reftype = self.scalar_getter_type_name(field, "'this", "'this")?,
-                ))
-            }
-            (FieldLabel::Repeated, _) => {
-                let type_ident = format!("{}Repeated", to_camel_case(field.native_ident()?));
-                FieldLabelType::RepeatedField {
-                    repeated_type_ident: type_ident.clone(),
-                    repeated_type_gp: std::array::IntoIter::new(["'this"]).collect(),
-                    repeated_type_bound: format!(
-                        "::puroro::RepeatedField::<'this, {value}>",
-                        value = self.scalar_getter_type_name(field, "'this", "'this")?,
-                    ),
+                FieldLabelType::OptionalField {
                     get_decl: format!(
-                        "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
-                        ident = field.native_ident()?,
-                        type_ident = type_ident,
+                        "fn {name}<'this>(&'this self) -> ::std::option::Option::<{reftype}>",
+                        name = field.native_ident()?,
+                        reftype = self.scalar_getter_type_name(field, "'this", "'this")?,
                     ),
                 }
             }
-            (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
-                FieldLabelType::BareField(format!(
+            (FieldLabel::Repeated, _) => {
+                let ident = format!("{}Repeated", to_camel_case(field.native_ident()?));
+                FieldLabelType::RepeatedField {
+                    repeated_type: AssociatedType {
+                        ident: ident.clone(),
+                        gp: std::array::IntoIter::new(["'this"]).collect(),
+                        bound: format!(
+                            "::puroro::RepeatedField::<'this, {value}>",
+                            value = self.scalar_getter_type_name(field, "'this", "'this")?,
+                        ),
+                    },
+                    get_decl: format!(
+                        "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
+                        ident = field.native_ident()?,
+                        type_ident = ident,
+                    ),
+                }
+            }
+            (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => FieldLabelType::BareField {
+                get_decl: format!(
                     "fn {name}<'this>(&'this self) -> {reftype}",
                     name = field.native_ident()?,
                     reftype = self.scalar_getter_type_name(field, "'this", "'this")?,
-                ))
-            }
+                ),
+            },
         };
-        let maybe_message_associated_type = todo!();
+        let maybe_message_associated_type = match (field.label()?, field.type_()?) {
+            (FieldLabel::Repeated, FieldType::Message(m)) => {
+                let ident = format!("{}Element", to_camel_case(field.native_ident()?));
+                Some(AssociatedType {
+                    ident: ident.clone(),
+                    gp: std::array::IntoIter::new(["'this"]).collect(),
+                    bound: self.trait_ident_with_relative_path(m, self.msg.package()?),
+                })
+            }
+            _ => None,
+        };
         Ok(GetterMethods {
             maybe_msg_type: maybe_message_associated_type,
             field_label_type,
