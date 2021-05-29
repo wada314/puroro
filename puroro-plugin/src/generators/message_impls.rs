@@ -604,7 +604,10 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                 struct_ident = self.frag_gen.struct_ident(self.msg)?,
                 trait_ident = self.traits_gen.trait_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params().replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
+                gp = self
+                    .frag_gen
+                    .struct_generic_params()
+                    .replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
                 gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
             indent((
@@ -711,7 +714,12 @@ type {assoc_type_ident}<'this> where Self: 'this =
                             ) => format!(
                                 "\
 type {type_ident}{type_gp} where Self: 'this =
-    ::puroro_internal::RepeatedSliceViewField::<'slice, 'this, S, ::puroro_internal::tags::{type_tag}>;
+    ::puroro_internal::RepeatedSliceViewField::<
+        'slice,
+        'this,
+        S,
+        ::puroro_internal::tags::{type_tag}
+    >;
 {get_decl} {{
     ::puroro_internal::RepeatedSliceViewField::new(
         self.{ident}.as_ref(),
@@ -723,7 +731,7 @@ type {type_ident}{type_gp} where Self: 'this =
                                 type_gp = type_gp,
                                 type_tag = self
                                     .frag_gen
-                                    .type_tag_ident_gp(field, &[("'par", "'this")])?,
+                                    .type_tag_ident_gp(field, &[("S", "&'slice [u8]")])?,
                                 get_decl = get_decl,
                                 ident = field.native_ident()?,
                                 field_number = field.number(),

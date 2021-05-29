@@ -221,12 +221,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             FieldType::String => "String".into(),
             FieldType::Bytes => "Bytes".into(),
             FieldType::Enum(e) => format!(
-                "Enum<{module}::{ident}>",
+                "Enum::<{module}::{ident}>",
                 module = relative_path(self.msg.package()?, e.package()?)?,
                 ident = e.native_ident()?,
             ),
             FieldType::Message(m) => {
-                format!("Message<{}>", self.type_name_of_msg(m, bindings)?)
+                format!("Message::<{}>", self.type_name_of_msg(m, bindings)?)
             }
         })
     }
