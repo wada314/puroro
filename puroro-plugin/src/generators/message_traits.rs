@@ -86,19 +86,21 @@ type {ident}{gp}: {bound}
                 let ident = format!("{}Map", to_camel_case(field.native_ident()?));
                 FieldLabelType::MapField {
                     repeated_type: AssociatedType {
-                        ident: ident.clone(),
+                        ident: ident.into(),
                         gp: std::array::IntoIter::new(["'this"]).collect(),
                         bound: format!(
                             "::puroro::MapField::<'this, {key}, {value}>",
                             key = self.map_deref_borrowed_key_type_name(key_field)?,
                             value = self.map_value_getter_type_name(value_field)?,
-                        ),
+                        )
+                        .into(),
                     },
                     get_decl: format!(
                         "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
                         ident = field.native_ident()?,
                         type_ident = ident,
-                    ),
+                    )
+                    .into(),
                 }
             }
             (FieldLabel::Optional2, _) | (FieldLabel::Optional3, FieldType::Message(_)) => {
@@ -107,25 +109,28 @@ type {ident}{gp}: {bound}
                         "fn {name}<'this>(&'this self) -> ::std::option::Option::<{reftype}>",
                         name = field.native_ident()?,
                         reftype = self.scalar_getter_type_name(field, "'this", "'this")?,
-                    ),
+                    )
+                    .into(),
                 }
             }
             (FieldLabel::Repeated, _) => {
                 let ident = format!("{}Repeated", to_camel_case(field.native_ident()?));
                 FieldLabelType::RepeatedField {
                     repeated_type: AssociatedType {
-                        ident: ident.clone(),
+                        ident: ident.clone().into(),
                         gp: std::array::IntoIter::new(["'this"]).collect(),
                         bound: format!(
                             "::puroro::RepeatedField::<'this, {value}>",
                             value = self.scalar_getter_type_name(field, "'this", "'this")?,
-                        ),
+                        )
+                        .into(),
                     },
                     get_decl: format!(
                         "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
                         ident = field.native_ident()?,
                         type_ident = ident,
-                    ),
+                    )
+                    .into(),
                 }
             }
             (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => FieldLabelType::BareField {
@@ -133,16 +138,17 @@ type {ident}{gp}: {bound}
                     "fn {name}<'this>(&'this self) -> {reftype}",
                     name = field.native_ident()?,
                     reftype = self.scalar_getter_type_name(field, "'this", "'this")?,
-                ),
+                )
+                .into(),
             },
         };
         let maybe_message_associated_type = match (field.label()?, field.type_()?) {
             (FieldLabel::Repeated, FieldType::Message(m)) => {
                 let ident = format!("{}Element", to_camel_case(field.native_ident()?));
                 Some(AssociatedType {
-                    ident: ident.clone(),
+                    ident: ident.into(),
                     gp: std::array::IntoIter::new(["'this"]).collect(),
-                    bound: self.trait_ident_with_relative_path(m, self.msg.package()?),
+                    bound: self.trait_ident_with_relative_path(m, self.msg.package()?)?,
                 })
             }
             _ => None,
@@ -261,9 +267,9 @@ type {ident}{gp}: {bound}
 }
 
 pub struct AssociatedType {
-    ident: String,
-    gp: String,
-    bound: String,
+    ident: Cow<'static, str>,
+    gp: GenericParams,
+    bound: Cow<'static, str>,
 }
 
 pub struct GetterMethods {
@@ -273,17 +279,17 @@ pub struct GetterMethods {
 
 pub enum FieldLabelType {
     BareField {
-        get_decl: String,
+        get_decl: Cow<'static, str>,
     },
     OptionalField {
-        get_decl: String,
+        get_decl: Cow<'static, str>,
     },
     RepeatedField {
         repeated_type: AssociatedType,
-        get_decl: String,
+        get_decl: Cow<'static, str>,
     },
     MapField {
         repeated_type: AssociatedType,
-        get_decl: String,
+        get_decl: Cow<'static, str>,
     },
 }
