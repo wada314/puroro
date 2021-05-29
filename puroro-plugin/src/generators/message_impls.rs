@@ -699,14 +699,14 @@ type {assoc_type_ident}<'this> where Self: 'this =
                             (
                                 ImplType::SliceView,
                                 GetterMethods::RepeatedField {
-                                    type_ident,
-                                    type_gp,
+                                    repeated_type_ident: type_ident,
+                                    repeated_type_gp: type_gp,
                                     get_decl,
                                     ..
                                 }
                                 | GetterMethods::MapField {
-                                    type_ident,
-                                    type_gp,
+                                    repeated_type_ident: type_ident,
+                                    repeated_type_gp: type_gp,
                                     get_decl,
                                     ..
                                 },
@@ -774,14 +774,14 @@ type {type_ident}{type_gp} where Self: 'this =
                             (
                                 ImplType::Default,
                                 GetterMethods::RepeatedField {
-                                    type_ident,
-                                    type_gp,
+                                    repeated_type_ident: type_ident,
+                                    repeated_type_gp: type_gp,
                                     get_decl,
                                     ..
                                 }
                                 | GetterMethods::MapField {
-                                    type_ident,
-                                    type_gp,
+                                    repeated_type_ident: type_ident,
+                                    repeated_type_gp: type_gp,
                                     get_decl,
                                     ..
                                 },
