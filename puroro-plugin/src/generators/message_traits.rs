@@ -170,7 +170,7 @@ type {ident}{gp}: {bound}
                     ident: ident.into(),
                     gp: std::array::IntoIter::new(["'this"]).collect(),
                     bound: self.trait_ident_with_relative_path(m, self.msg.package()?)?,
-                    where_clause: "".into(),
+                    where_clause: "where Self: 'this".into(),
                 })
             }
             _ => None,

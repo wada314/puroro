@@ -4,7 +4,7 @@ use super::writer::{func, indent, indent_n, iter, seq, IntoFragment};
 use crate::context::{AllocatorType, Context, ImplType};
 use crate::generators::message_traits::{AssociatedType, FieldLabelType};
 use crate::utils::Indentor;
-use crate::wrappers::{FieldType, MessageDescriptor};
+use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
 use crate::Result;
 
 pub struct MessageImplCodeGenerator<'a, 'c> {
@@ -624,12 +624,18 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                 ) =
                     (getter_methods.maybe_msg_type, field.type_()?)
                 {
+                    let slice_source = if matches!(field.label()?, FieldLabel::Repeated) {
+                        "&'slice [u8]"
+                    } else {
+                        "::puroro_internal::SourceLdSlices<'slice, 'this, S>"
+                    };
                     format!(
                         "type {ident}{gp} {where_clause} = {actual_type_name};\n",
                         ident = ident,
                         gp = gp,
                         where_clause = where_clause,
-                        actual_type_name = self.frag_gen.type_name_of_msg(m, None)?,
+                        actual_type_name =
+                            self.frag_gen.type_name_of_msg(m, &[("S", slice_source)])?,
                     )
                 } else {
                     "".to_string()
@@ -739,7 +745,7 @@ type {type_ident}{type_gp} {type_where} =
     ::puroro_internal::RepeatedSliceViewField::<
         'slice,
         'this,
-        S,
+        &'slice [u8],
         ::puroro_internal::tags::{type_tag}
     >;
 {get_decl} {{

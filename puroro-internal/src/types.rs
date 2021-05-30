@@ -1,5 +1,5 @@
 use crate::deser::LdSlice;
-use crate::internal_data::{SliceSource, SourceLdSlices};
+use crate::internal_data::SliceSource;
 use crate::variant::Variant;
 use crate::{Result, ResultHelper};
 use ::num_derive::FromPrimitive;
