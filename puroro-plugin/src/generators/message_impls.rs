@@ -854,7 +854,11 @@ impl{gp} ::puroro::Message<'bump> for {struct_ident}{gpb} {{
             struct_ident = self.frag_gen.struct_ident(self.msg)?,
             internal_data_type = self.frag_gen.internal_data_type(),
             cfg = self.frag_gen.cfg_condition(),
-            gp = self.frag_gen.struct_generic_params().push("'bump"),
+            gp = self
+                .frag_gen
+                .struct_generic_params()
+                .push("'bump")
+                .replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
             gpb = self.frag_gen.struct_generic_params_bounds(),
         ),)
             .write_into(output)
