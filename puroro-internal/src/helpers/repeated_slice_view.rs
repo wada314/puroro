@@ -121,7 +121,6 @@ where
 impl<'slice, 'msg, S, T, TypeTag> RepeatedField<'msg, T>
     for RepeatedSliceViewField<'slice, 'msg, S, TypeTag>
 where
-    T: 'slice,
     TypeTag: FieldDataIntoIter<'slice, Item = T>,
     S: SliceSource<'slice>,
 {

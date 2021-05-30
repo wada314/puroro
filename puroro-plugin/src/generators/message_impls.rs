@@ -664,7 +664,10 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
     )
 }}\n",
                             decl = get_decl,
-                            msg = self.frag_gen.type_name_of_msg(m, None)?,
+                            msg = self.frag_gen.type_name_of_msg(
+                                m,
+                                &[("S", "::puroro_internal::SourceLdSlices<'slice, 'this, S>")]
+                            )?,
                             ident = field.native_ident()?,
                             field_number = field.number(),
                         )
@@ -687,7 +690,10 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
     }})
 }}\n",
                         decl = get_decl,
-                        msg = self.frag_gen.type_name_of_msg(m, None)?,
+                        msg = self.frag_gen.type_name_of_msg(
+                            m,
+                            &[("S", "::puroro_internal::SourceLdSlices<'slice, 'this, S>")]
+                        )?,
                         ident = field.native_ident()?,
                         field_number = field.number(),
                     ),
@@ -745,7 +751,7 @@ type {type_ident}{type_gp} {type_where} =
     ::puroro_internal::RepeatedSliceViewField::<
         'slice,
         'this,
-        &'slice [u8],
+        S,
         ::puroro_internal::tags::{type_tag}
     >;
 {get_decl} {{

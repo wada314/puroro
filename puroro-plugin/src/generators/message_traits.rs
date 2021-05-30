@@ -165,7 +165,7 @@ type {ident}{gp}: {bound}
         };
         let maybe_message_associated_type = match field.type_()? {
             FieldType::Message(m) => {
-                let ident = self.associated_msg_type_ident(m, field.label()?)?;
+                let ident = self.associated_msg_type_ident(field, field.label()?)?;
                 Some(AssociatedType {
                     ident: ident.into(),
                     gp: std::array::IntoIter::new(["'this"]).collect(),
@@ -200,7 +200,7 @@ type {ident}{gp}: {bound}
 
     pub fn associated_msg_type_ident(
         &self,
-        msg: &'c MessageDescriptor<'c>,
+        field: &'c FieldDescriptor<'c>,
         label: FieldLabel,
     ) -> Result<Cow<'static, str>> {
         let postfix = match label {
@@ -209,7 +209,7 @@ type {ident}{gp}: {bound}
         };
         Ok(format!(
             "{ident}{postfix}",
-            ident = msg.native_ident()?,
+            ident = to_camel_case(&field.native_ident()?),
             postfix = postfix,
         )
         .into())
@@ -217,7 +217,7 @@ type {ident}{gp}: {bound}
 
     pub fn associated_msg_type_ident_gp<'b, T>(
         &self,
-        msg: &'c MessageDescriptor<'c>,
+        field: &'c FieldDescriptor<'c>,
         label: FieldLabel,
         bindings: T,
     ) -> Result<Cow<'static, str>>
@@ -232,7 +232,7 @@ type {ident}{gp}: {bound}
         }
         Ok(format!(
             "{ident}::<{lt}>",
-            ident = self.associated_msg_type_ident(msg, label)?,
+            ident = self.associated_msg_type_ident(field, label)?,
             lt = lt
         )
         .into())
@@ -254,10 +254,11 @@ type {ident}{gp}: {bound}
                         NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
                         NonNumericalFieldType::String => "str".into(),
                         NonNumericalFieldType::Bytes => "[u8]".into(),
-                        NonNumericalFieldType::Message(m) => format!(
+                        NonNumericalFieldType::Message(_) => format!(
                             "<Self as {trait_name}>::{name}",
                             trait_name = self.trait_ident(self.msg)?,
-                            name = self.associated_msg_type_ident_gp(m, field.label()?, None,)?,
+                            name =
+                                self.associated_msg_type_ident_gp(field, field.label()?, None,)?,
                         )
                         .into(),
                     };

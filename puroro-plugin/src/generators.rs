@@ -30,8 +30,8 @@ impl<'c> DescriptorVisitor<'c> for Visitor<'c> {
         let trait_gen = MessageTraitCodeGenerator::new(&self.context, msg);
 
         trait_gen.print_msg_traits(&mut self.output)?;
-        normal_impl_gen.print_msg(&mut self.output)?;
-        bumpalo_impl_gen.print_msg(&mut self.output)?;
+        //normal_impl_gen.print_msg(&mut self.output)?;
+        //bumpalo_impl_gen.print_msg(&mut self.output)?;
         slice_view_impl_gen.print_msg(&mut self.output)?;
         Ok(())
     }
