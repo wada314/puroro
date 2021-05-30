@@ -31,14 +31,19 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
             ),
             indent((iter(self.msg.fields().map(|field| -> Result<String> {
                 let getter_methods = self.generate_getter_method_decls(field)?;
-                let maybe_msg_decl = if let Some(AssociatedType { ident, gp, bound }) =
-                    getter_methods.maybe_msg_type
+                let maybe_msg_decl = if let Some(AssociatedType {
+                    ident,
+                    gp,
+                    bound,
+                    where_clause,
+                }) = getter_methods.maybe_msg_type
                 {
                     format!(
-                        "type {ident}{gp}: {bound};\n",
+                        "type {ident}{gp}: {bound} {where_clause};\n",
                         ident = ident,
                         gp = gp,
-                        bound = bound
+                        bound = bound,
+                        where_clause = where_clause,
                     )
                 } else {
                     "".to_string()
@@ -50,21 +55,34 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                     }
                     FieldLabelType::RepeatedField {
                         get_decl,
-                        repeated_type: AssociatedType { ident, gp, bound },
+                        repeated_type:
+                            AssociatedType {
+                                ident,
+                                gp,
+                                bound,
+                                where_clause,
+                            },
                     }
                     | FieldLabelType::MapField {
                         get_decl,
-                        repeated_type: AssociatedType { ident, gp, bound },
+                        repeated_type:
+                            AssociatedType {
+                                ident,
+                                gp,
+                                bound,
+                                where_clause,
+                            },
                     } => {
                         format!(
                             "\
 type {ident}{gp}: {bound}
-    where Self: 'this;
+    {where_clause};
 {get_decl};\n",
                             ident = ident,
                             gp = gp,
                             bound = bound,
                             get_decl = get_decl,
+                            where_clause = where_clause,
                         )
                     }
                 };
@@ -95,6 +113,7 @@ type {ident}{gp}: {bound}
                             value = self.map_value_getter_type_name(value_field)?,
                         )
                         .into(),
+                        where_clause: "where Self: 'this".into(),
                     },
                     get_decl: format!(
                         "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
@@ -125,6 +144,7 @@ type {ident}{gp}: {bound}
                             value = self.scalar_getter_type_name(field, "'this")?,
                         )
                         .into(),
+                        where_clause: "where Self: 'this".into(),
                     },
                     get_decl: format!(
                         "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
@@ -143,13 +163,14 @@ type {ident}{gp}: {bound}
                 .into(),
             },
         };
-        let maybe_message_associated_type = match (field.label()?, field.type_()?) {
-            (FieldLabel::Repeated, FieldType::Message(m)) => {
-                let ident = format!("{}Element", to_camel_case(field.native_ident()?));
+        let maybe_message_associated_type = match field.type_()? {
+            FieldType::Message(m) => {
+                let ident = self.associated_msg_type_ident(m, field.label()?)?;
                 Some(AssociatedType {
                     ident: ident.into(),
                     gp: std::array::IntoIter::new(["'this"]).collect(),
                     bound: self.trait_ident_with_relative_path(m, self.msg.package()?)?,
+                    where_clause: "".into(),
                 })
             }
             _ => None,
@@ -177,12 +198,29 @@ type {ident}{gp}: {bound}
         .into())
     }
 
+    pub fn associated_msg_type_ident(
+        &self,
+        msg: &'c MessageDescriptor<'c>,
+        label: FieldLabel,
+    ) -> Result<Cow<'static, str>> {
+        let postfix = match label {
+            FieldLabel::Repeated => "Element",
+            _ => "Type",
+        };
+        Ok(format!(
+            "{ident}{postfix}",
+            ident = msg.native_ident()?,
+            postfix = postfix,
+        )
+        .into())
+    }
+
     pub fn associated_msg_type_ident_gp<'b, T>(
         &self,
         msg: &'c MessageDescriptor<'c>,
         label: FieldLabel,
         bindings: T,
-    ) -> Result<String>
+    ) -> Result<Cow<'static, str>>
     where
         T: IntoIterator<Item = &'b (&'static str, &'static str)>,
     {
@@ -192,16 +230,12 @@ type {ident}{gp}: {bound}
                 lt = to;
             }
         }
-        let postfix = match label {
-            FieldLabel::Repeated => "Element",
-            _ => "Type",
-        };
         Ok(format!(
-            "{ident}{postfix}::<{lt}>",
-            ident = msg.native_ident()?,
-            postfix = postfix,
+            "{ident}::<{lt}>",
+            ident = self.associated_msg_type_ident(msg, label)?,
             lt = lt
-        ))
+        )
+        .into())
     }
 
     pub fn scalar_getter_type_name(
@@ -270,6 +304,7 @@ pub struct AssociatedType {
     pub ident: Cow<'static, str>,
     pub gp: GenericParams,
     pub bound: Cow<'static, str>,
+    pub where_clause: Cow<'static, str>,
 }
 
 pub struct GetterMethods {

@@ -613,19 +613,27 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
             ),
             indent((iter(self.msg.fields().map(|field| -> Result<_> {
                 let getter_methods = self.traits_gen.generate_getter_method_decls(field)?;
-                let maybe_message_associated_type =
-                    if let (Some(AssociatedType { ident, gp, .. }), FieldType::Message(m)) =
-                        (getter_methods.maybe_msg_type, field.type_()?)
-                    {
-                        format!(
-                            "type {ident}{gp} = {actual_type_name};\n",
-                            ident = ident,
-                            gp = gp,
-                            actual_type_name = self.frag_gen.type_name_of_msg(m, None)?,
-                        )
-                    } else {
-                        "".to_string()
-                    };
+                let maybe_message_associated_type = if let (
+                    Some(AssociatedType {
+                        ident,
+                        gp,
+                        where_clause,
+                        ..
+                    }),
+                    FieldType::Message(m),
+                ) =
+                    (getter_methods.maybe_msg_type, field.type_()?)
+                {
+                    format!(
+                        "type {ident}{gp} {where_clause} = {actual_type_name};\n",
+                        ident = ident,
+                        gp = gp,
+                        where_clause = where_clause,
+                        actual_type_name = self.frag_gen.type_name_of_msg(m, None)?,
+                    )
+                } else {
+                    "".to_string()
+                };
                 let body = match (
                     self.context.impl_type(),
                     self.traits_gen
@@ -709,6 +717,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 AssociatedType {
                                     ident: type_ident,
                                     gp: type_gp,
+                                    where_clause: type_where,
                                     ..
                                 },
                             get_decl,
@@ -718,6 +727,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                                 AssociatedType {
                                     ident: type_ident,
                                     gp: type_gp,
+                                    where_clause: type_where,
                                     ..
                                 },
                             get_decl,
@@ -725,7 +735,7 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                         _,
                     ) => format!(
                         "\
-type {type_ident}{type_gp} =
+type {type_ident}{type_gp} {type_where} =
     ::puroro_internal::RepeatedSliceViewField::<
         'slice,
         'this,
@@ -744,6 +754,7 @@ type {type_ident}{type_gp} =
                         type_tag = self
                             .frag_gen
                             .type_tag_ident_gp(field, &[("S", "&'slice [u8]")])?,
+                        type_where = type_where,
                         get_decl = get_decl,
                         ident = field.native_ident()?,
                         field_number = field.number(),
@@ -793,6 +804,7 @@ type {type_ident}{type_gp} =
                                 AssociatedType {
                                     ident: type_ident,
                                     gp: type_gp,
+                                    where_clause: type_where_clause,
                                     ..
                                 },
                             get_decl,
@@ -802,6 +814,7 @@ type {type_ident}{type_gp} =
                                 AssociatedType {
                                     ident: type_ident,
                                     gp: type_gp,
+                                    where_clause: type_where_clause,
                                     ..
                                 },
                             get_decl,
@@ -809,13 +822,14 @@ type {type_ident}{type_gp} =
                         _,
                     ) => format!(
                         "\
-type {type_ident}{type_gp} where Self: 'this = &'this {type_name};
+type {type_ident}{type_gp} {type_where} = &'this {type_name};
 {get_decl} {{
     &self.{ident}
 }}\n",
                         type_ident = type_ident,
                         type_gp = type_gp,
                         type_name = self.frag_gen.field_type_name(field)?,
+                        type_where = type_where_clause,
                         get_decl = get_decl,
                         ident = field.native_ident()?,
                     ),
