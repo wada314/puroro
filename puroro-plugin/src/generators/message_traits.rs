@@ -35,7 +35,7 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
                     getter_methods.maybe_msg_type
                 {
                     format!(
-                        "type {ident}{gp}: {bound}\n",
+                        "type {ident}{gp}: {bound};\n",
                         ident = ident,
                         gp = gp,
                         bound = bound
@@ -83,10 +83,11 @@ type {ident}{gp}: {bound}
             (FieldLabel::Repeated, FieldType::Message(m)) if m.is_map_entry() => {
                 // Map.
                 let (key_field, value_field) = m.key_value_of_map_entry()?;
-                let ident = format!("{}Map", to_camel_case(field.native_ident()?));
+                let ident: Cow<'static, str> =
+                    format!("{}Map", to_camel_case(field.native_ident()?)).into();
                 FieldLabelType::MapField {
                     repeated_type: AssociatedType {
-                        ident: ident.into(),
+                        ident: ident.clone(),
                         gp: std::array::IntoIter::new(["'this"]).collect(),
                         bound: format!(
                             "::puroro::MapField::<'this, {key}, {value}>",
@@ -108,7 +109,7 @@ type {ident}{gp}: {bound}
                     get_decl: format!(
                         "fn {name}<'this>(&'this self) -> ::std::option::Option::<{reftype}>",
                         name = field.native_ident()?,
-                        reftype = self.scalar_getter_type_name(field, "'this", "'this")?,
+                        reftype = self.scalar_getter_type_name(field, "'this")?,
                     )
                     .into(),
                 }
@@ -121,7 +122,7 @@ type {ident}{gp}: {bound}
                         gp: std::array::IntoIter::new(["'this"]).collect(),
                         bound: format!(
                             "::puroro::RepeatedField::<'this, {value}>",
-                            value = self.scalar_getter_type_name(field, "'this", "'this")?,
+                            value = self.scalar_getter_type_name(field, "'this")?,
                         )
                         .into(),
                     },
@@ -137,7 +138,7 @@ type {ident}{gp}: {bound}
                 get_decl: format!(
                     "fn {name}<'this>(&'this self) -> {reftype}",
                     name = field.native_ident()?,
-                    reftype = self.scalar_getter_type_name(field, "'this", "'this")?,
+                    reftype = self.scalar_getter_type_name(field, "'this")?,
                 )
                 .into(),
             },
@@ -176,12 +177,10 @@ type {ident}{gp}: {bound}
         .into())
     }
 
-    pub fn associated_msg_type_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
-        Ok(format!("{}Type", msg.native_ident()?))
-    }
     pub fn associated_msg_type_ident_gp<'b, T>(
         &self,
         msg: &'c MessageDescriptor<'c>,
+        label: FieldLabel,
         bindings: T,
     ) -> Result<String>
     where
@@ -193,9 +192,14 @@ type {ident}{gp}: {bound}
                 lt = to;
             }
         }
+        let postfix = match label {
+            FieldLabel::Repeated => "Element",
+            _ => "Type",
+        };
         Ok(format!(
-            "{ident}Type::<{lt}>",
+            "{ident}{postfix}::<{lt}>",
             ident = msg.native_ident()?,
+            postfix = postfix,
             lt = lt
         ))
     }
@@ -204,7 +208,6 @@ type {ident}{gp}: {bound}
         &self,
         field: &'c FieldDescriptor<'c>,
         this_lifetime: &'static str,
-        message_fields_parent_lifetime: &'static str,
     ) -> Result<Cow<'static, str>> {
         Ok(
             match field
@@ -220,10 +223,7 @@ type {ident}{gp}: {bound}
                         NonNumericalFieldType::Message(m) => format!(
                             "<Self as {trait_name}>::{name}",
                             trait_name = self.trait_ident(self.msg)?,
-                            name = self.associated_msg_type_ident_gp(
-                                m,
-                                &[("'this", message_fields_parent_lifetime)]
-                            )?,
+                            name = self.associated_msg_type_ident_gp(m, field.label()?, None,)?,
                         )
                         .into(),
                     };
@@ -262,19 +262,19 @@ type {ident}{gp}: {bound}
         &self,
         field: &'c FieldDescriptor<'c>,
     ) -> Result<Cow<'static, str>> {
-        self.scalar_getter_type_name(field, "'this", "'static")
+        self.scalar_getter_type_name(field, "'this")
     }
 }
 
 pub struct AssociatedType {
-    ident: Cow<'static, str>,
-    gp: GenericParams,
-    bound: Cow<'static, str>,
+    pub ident: Cow<'static, str>,
+    pub gp: GenericParams,
+    pub bound: Cow<'static, str>,
 }
 
 pub struct GetterMethods {
-    maybe_msg_type: Option<AssociatedType>,
-    field_label_type: FieldLabelType,
+    pub maybe_msg_type: Option<AssociatedType>,
+    pub field_label_type: FieldLabelType,
 }
 
 pub enum FieldLabelType {

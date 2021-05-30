@@ -2,7 +2,7 @@ use super::message_frags::MessageImplFragmentGenerator;
 use super::message_traits::{GetterMethods, MessageTraitCodeGenerator};
 use super::writer::{func, indent, indent_n, iter, seq, IntoFragment};
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::generators::message_traits::AssociatedType;
+use crate::generators::message_traits::{AssociatedType, FieldLabelType};
 use crate::utils::Indentor;
 use crate::wrappers::{FieldType, MessageDescriptor};
 use crate::Result;
@@ -621,23 +621,25 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                             "type {ident}{gp} = {actual_type_name};\n",
                             ident = ident,
                             gp = gp,
-                            actual_type_name =
-                                self.frag_gen.type_name_of_msg(m, &[("'par", "'this")])?,
+                            actual_type_name = self.frag_gen.type_name_of_msg(m, None)?,
                         )
                     } else {
                         "".to_string()
                     };
                 let body = match (
                     self.context.impl_type(),
-                    self.traits_gen.generate_getter_method_decls(field)?,
+                    self.traits_gen
+                        .generate_getter_method_decls(field)?
+                        .field_label_type,
                     field.type_()?,
                 ) {
                     (
                         ImplType::SliceView,
-                        GetterMethods::BareField(decl),
+                        FieldLabelType::BareField { get_decl },
                         FieldType::Message(m),
-                    ) => format!(
-                        "\
+                    ) => {
+                        format!(
+                            "\
 {decl} {{
     ::std::borrow::Cow::Owned(
         {msg}::try_new_with_parent(
@@ -647,14 +649,15 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
         ).expect(\"Invalid input slice. Consider checking the slice content earlier (TBD).\")
     )
 }}\n",
-                        decl = decl,
-                        msg = self.frag_gen.type_name_of_msg(m, &[("'par", "'this")])?,
-                        ident = field.native_ident()?,
-                        field_number = field.number(),
-                    ),
+                            decl = get_decl,
+                            msg = self.frag_gen.type_name_of_msg(m, None)?,
+                            ident = field.native_ident()?,
+                            field_number = field.number(),
+                        )
+                    }
                     (
                         ImplType::SliceView,
-                        GetterMethods::OptionalField(decl),
+                        FieldLabelType::OptionalField { get_decl },
                         FieldType::Message(m),
                     ) => format!(
                         "\
@@ -669,54 +672,60 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
         )
     }})
 }}\n",
-                        decl = decl,
-                        msg = self.frag_gen.type_name_of_msg(m, &[("'par", "'this")])?,
+                        decl = get_decl,
+                        msg = self.frag_gen.type_name_of_msg(m, None)?,
                         ident = field.native_ident()?,
                         field_number = field.number(),
                     ),
 
                     (
                         ImplType::SliceView,
-                        GetterMethods::BareField(decl),
+                        FieldLabelType::BareField { get_decl },
                         FieldType::String | FieldType::Bytes,
                     ) => format!(
                         "\
 {decl} {{
     ::std::borrow::Cow::Borrowed(self.{ident})
 }}\n",
-                        decl = decl,
+                        decl = get_decl,
                         ident = field.native_ident()?,
                     ),
                     (
                         ImplType::SliceView,
-                        GetterMethods::OptionalField(decl),
+                        FieldLabelType::OptionalField { get_decl },
                         FieldType::String | FieldType::Bytes,
                     ) => format!(
                         "\
 {decl} {{
     self.{ident}.map(|x| ::std::borrow::Cow::Borrowed(x))
 }}\n",
-                        decl = decl,
+                        decl = get_decl,
                         ident = field.native_ident()?,
                     ),
                     (
                         ImplType::SliceView,
-                        GetterMethods::RepeatedField {
-                            repeated_type_ident: type_ident,
-                            repeated_type_gp: type_gp,
+                        FieldLabelType::RepeatedField {
+                            repeated_type:
+                                AssociatedType {
+                                    ident: type_ident,
+                                    gp: type_gp,
+                                    ..
+                                },
                             get_decl,
-                            ..
                         }
-                        | GetterMethods::MapField {
-                            repeated_type_ident: type_ident,
-                            repeated_type_gp: type_gp,
+                        | FieldLabelType::MapField {
+                            repeated_type:
+                                AssociatedType {
+                                    ident: type_ident,
+                                    gp: type_gp,
+                                    ..
+                                },
                             get_decl,
-                            ..
                         },
                         _,
                     ) => format!(
                         "\
-type {type_ident}{type_gp} where Self: 'this =
+type {type_ident}{type_gp} =
     ::puroro_internal::RepeatedSliceViewField::<
         'slice,
         'this,
@@ -741,50 +750,61 @@ type {type_ident}{type_gp} where Self: 'this =
                     ),
                     (
                         ImplType::Default,
-                        GetterMethods::BareField(decl),
+                        FieldLabelType::BareField { get_decl },
                         FieldType::Message(_) | FieldType::String | FieldType::Bytes,
                     ) => format!(
                         "\
 {decl} {{
     ::std::borrow::Cow::Borrowed(self.{ident}.as_ref())
 }}\n",
-                        decl = decl,
+                        decl = get_decl,
                         ident = field.native_ident()?
                     ),
                     (
                         ImplType::Default,
-                        GetterMethods::OptionalField(decl),
+                        FieldLabelType::OptionalField { get_decl },
                         FieldType::Message(_) | FieldType::String | FieldType::Bytes,
                     ) => format!(
                         "\
 {decl} {{
     self.{ident}.as_deref().map(|r| ::std::borrow::Cow::Borrowed(r))
 }}\n",
-                        decl = decl,
+                        decl = get_decl,
                         ident = field.native_ident()?
                     ),
 
-                    (_, GetterMethods::BareField(decl) | GetterMethods::OptionalField(decl), _) => {
+                    (
+                        _,
+                        FieldLabelType::BareField { get_decl }
+                        | FieldLabelType::OptionalField { get_decl },
+                        _,
+                    ) => {
                         format!(
                             "{decl} {{\n    self.{ident}.clone()\n}}\n",
-                            decl = decl,
+                            decl = get_decl,
                             ident = field.native_ident()?
                         )
                     }
 
                     (
                         ImplType::Default,
-                        GetterMethods::RepeatedField {
-                            repeated_type_ident: type_ident,
-                            repeated_type_gp: type_gp,
+                        FieldLabelType::RepeatedField {
+                            repeated_type:
+                                AssociatedType {
+                                    ident: type_ident,
+                                    gp: type_gp,
+                                    ..
+                                },
                             get_decl,
-                            ..
                         }
-                        | GetterMethods::MapField {
-                            repeated_type_ident: type_ident,
-                            repeated_type_gp: type_gp,
+                        | FieldLabelType::MapField {
+                            repeated_type:
+                                AssociatedType {
+                                    ident: type_ident,
+                                    gp: type_gp,
+                                    ..
+                                },
                             get_decl,
-                            ..
                         },
                         _,
                     ) => format!(
