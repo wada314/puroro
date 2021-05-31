@@ -79,8 +79,6 @@ pub trait RepeatedField<'a, T> {
     where
         F: FnMut(T);
     fn boxed_iter(&'a self) -> Box<dyn 'a + Iterator<Item = T>>;
-
-    #[cfg(feature = "puroro-nightly")]
     type Iter: Iterator<Item = T>;
     fn iter(&'a self) -> Self::Iter;
 }
