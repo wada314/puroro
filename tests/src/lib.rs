@@ -7,19 +7,27 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 
-trait Hoge {
-    type A<'lt> where Self: 'lt;
+use std::marker::PhantomData;
+
+trait Rf<'a> {
 }
-struct Hogee();
-impl Hoge for Hogee {
-    type A<'lt> where Self: 'lt = ::std::borrow::Cow<'static, str>;
+struct Rsf<'a, 'b> ( std::marker::PhantomData<(&'a (), &'b ())>);
+impl<'a, 'b> Rf<'a> for Rsf<'a, 'b> {}
+
+trait A {
+    type AA<'a> : Rf<'a> where Self: 'a;
+}
+struct B<'b>(PhantomData<&'b ()>);
+impl<'b> A for B<'b> {
+    type AA<'a> where Self: 'a = Rsf<'a, 'b>;
 }
 
 pub trait MsgTrait: ::std::clone::Clone {
     type TheMapElement<'this>: self::msg::TheMapEntryTrait where Self: 'this;
     type TheMapRepeated<'this>: ::puroro::RepeatedField::<'this, ::std::borrow::Cow::<'this, <Self as MsgTrait>::TheMapElement::<'this>>>
         where Self: 'this;
-    fn the_map<'this>(&'this self) -> Self::TheMapRepeated::<'this>;
+    type TheMapRepeated2<'this>: ::puroro::RepeatedField::<'this, ::std::borrow::Cow::<'this, str>>
+        where Self: 'this;
 }
 
 #[derive(Debug)]
@@ -48,21 +56,15 @@ impl<'slicee, S: ::puroro_internal::SliceSource<'slicee>> MsgTrait for MsgSliceV
             S,
             ::puroro_internal::tags::Message::<self::msg::TheMapEntrySliceView::<'slicee, &'slicee [u8]>>
         >;
-    fn the_map<'this>(&'this self) -> Self::TheMapRepeated::<'this> {
-        ::puroro_internal::RepeatedSliceViewField::new(
-            self.the_map.as_ref(),
-            8,
-            &self.puroro_internal,
-        )
-    }
+    type TheMapRepeated2<'this> where Self: 'this =
+        ::puroro_internal::RepeatedSliceViewField::<
+            'slicee,
+            'this,
+            S,
+            ::puroro_internal::tags::String,
+        >;
 }
 
-impl<'slice, 'bump, S: ::puroro_internal::SliceSource<'slice>> ::puroro::Message<'bump> for MsgSliceView<'slice, S> {
-    type InternalData = ::puroro_internal::InternalDataForSliceViewStruct<'slice, S>;
-    fn puroro_internal_data(&self) -> &Self::InternalData {
-        &self.puroro_internal
-    }
-}
 pub mod msg {
 pub trait TheMapEntryTrait: ::std::clone::Clone {
     fn key<'this>(&'this self) -> ::std::borrow::Cow::<'this, str>;
