@@ -9,13 +9,13 @@
 
 use std::marker::PhantomData;
 
-trait Rf<'a> {
+trait Rf<T> {
 }
 struct Rsf<'a, 'b> ( std::marker::PhantomData<(&'a (), &'b ())>);
-impl<'a, 'b> Rf<'a> for Rsf<'a, 'b> {}
+impl<'a, 'b> Rf<Cow<'b, str>> for Rsf<'a, 'b> {}
 
 trait A {
-    type AA<'a> : Rf<'a> where Self: 'a;
+    type AA<'a> : Rf<Cow<'a, str>> where Self: 'a;
 }
 struct B<'b>(PhantomData<&'b ()>);
 impl<'b> A for B<'b> {
@@ -25,20 +25,20 @@ impl<'b> A for B<'b> {
 use std::borrow::Cow;
 use ::puroro_internal::helpers::repeated_slice_view::FieldDataIntoIter;
 struct Rsvf<'slice, 'msg> (std::marker::PhantomData<(&'slice (), &'msg())>);
-impl<'slice, 'msg> ::puroro::RepeatedField<'msg, Cow<'msg, str>> for Rsvf<'slice, 'msg> 
-where ::puroro_internal::tags::String: FieldDataIntoIter<'slice, Item = Cow<'msg, str>>
+impl<'slice, 'msg> ::puroro::RepeatedField<Cow<'slice, str>> for Rsvf<'slice, 'msg> 
+where ::puroro_internal::tags::String: FieldDataIntoIter<'slice, Item = Cow<'slice, str>>
 {
     fn for_each<F>(&self, f: F)
     where
-        F: FnMut(Cow<'msg, str>) {
+        F: FnMut(Cow<'slice, str>) {
         todo!()
     }
 
-    fn boxed_iter(&self) -> Box<dyn 'msg + Iterator<Item = Cow<'msg, str>>> {
+    fn boxed_iter(&self) -> Box<dyn 'msg + Iterator<Item = Cow<'slice, str>>> {
         todo!()
     }
 
-    type Iter<'this> = std::option::IntoIter<Cow<'msg, str>>;
+    type Iter<'this> = std::option::IntoIter<Cow<'slice, str>>;
 
     fn iter(&self) -> Self::Iter<'_> {
         todo!()
@@ -47,9 +47,9 @@ where ::puroro_internal::tags::String: FieldDataIntoIter<'slice, Item = Cow<'msg
 
 pub trait MsgTrait: ::std::clone::Clone {
     type TheMapElement<'this>: self::msg::TheMapEntryTrait where Self: 'this;
-    type TheMapRepeated<'this>: ::puroro::RepeatedField::<'this, ::std::borrow::Cow::<'this, <Self as MsgTrait>::TheMapElement::<'this>>>
+    type TheMapRepeated<'this>: ::puroro::RepeatedField::<::std::borrow::Cow::<'this, <Self as MsgTrait>::TheMapElement::<'this>>>
         where Self: 'this;
-    type TheMapRepeated2<'this>: ::puroro::RepeatedField::<'this, ::std::borrow::Cow::<'this, str>>
+    type TheMapRepeated2<'this>: ::puroro::RepeatedField::<::std::borrow::Cow::<'this, str>>
         where Self: 'this;
 }
 

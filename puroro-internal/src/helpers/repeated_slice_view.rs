@@ -118,7 +118,7 @@ where
     }
 }
 
-impl<'slice, 'msg, S, T, TypeTag> RepeatedField<'msg, T>
+impl<'slice, 'msg, S, T, TypeTag> RepeatedField<T>
     for RepeatedSliceViewField<'slice, 'msg, S, TypeTag>
 where
     TypeTag: FieldDataIntoIter<'slice, Item = T>,

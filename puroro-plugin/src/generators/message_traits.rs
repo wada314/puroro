@@ -140,7 +140,7 @@ type {ident}{gp}: {bound}
                         ident: ident.clone().into(),
                         gp: std::array::IntoIter::new(["'this"]).collect(),
                         bound: format!(
-                            "::puroro::RepeatedField::<'this, {value}>",
+                            "::puroro::RepeatedField::<{value}>",
                             value = self.scalar_getter_type_name(field, "'this")?,
                         )
                         .into(),

@@ -74,7 +74,7 @@ where
     }
 }
 
-pub trait RepeatedField<'a, T> {
+pub trait RepeatedField<T> {
     fn for_each<F>(&self, f: F)
     where
         F: FnMut(T);
@@ -83,7 +83,7 @@ pub trait RepeatedField<'a, T> {
     fn iter(&self) -> Self::Iter<'_>;
 }
 
-impl<'a, T, U> RepeatedField<'a, T> for &'a Vec<U>
+impl<'a, T, U> RepeatedField<T> for &'a Vec<U>
 where
     &'a U: RefTypeToGetterType<Item = T>,
 {
@@ -106,7 +106,7 @@ where
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'msg, 'bump, T, U> RepeatedField<'msg, T> for &'msg ::bumpalo::collections::Vec<'bump, U>
+impl<'msg, 'bump, T, U> RepeatedField<T> for &'msg ::bumpalo::collections::Vec<'bump, U>
 where
     &'msg U: RefTypeToGetterType<Item = T>,
 {
