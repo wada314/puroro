@@ -124,18 +124,18 @@ where
     TypeTag: FieldDataIntoIter<'slice, Item = T>,
     S: SliceSource<'slice>,
 {
-    fn for_each<F>(&'msg self, f: F)
+    fn for_each<F>(&self, f: F)
     where
         F: FnMut(T),
     {
         self.iter_impl().for_each(f)
     }
-    fn boxed_iter(&'msg self) -> Box<dyn 'msg + Iterator<Item = T>> {
+    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>> {
         Box::new(self.iter_impl())
     }
 
-    type Iter = impl Iterator<Item = T>;
-    fn iter(&'msg self) -> Self::Iter {
+    type Iter<'this> = impl Iterator<Item = T>;
+    fn iter(&self) -> Self::Iter<'_> {
         self.iter_impl()
     }
 }

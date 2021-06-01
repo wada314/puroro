@@ -28,19 +28,19 @@ struct Rsvf<'slice, 'msg> (std::marker::PhantomData<(&'slice (), &'msg())>);
 impl<'slice, 'msg> ::puroro::RepeatedField<'msg, Cow<'msg, str>> for Rsvf<'slice, 'msg> 
 where ::puroro_internal::tags::String: FieldDataIntoIter<'slice, Item = Cow<'msg, str>>
 {
-    fn for_each<F>(&'msg self, f: F)
+    fn for_each<F>(&self, f: F)
     where
         F: FnMut(Cow<'msg, str>) {
         todo!()
     }
 
-    fn boxed_iter(&'msg self) -> Box<dyn 'msg + Iterator<Item = Cow<'msg, str>>> {
+    fn boxed_iter(&self) -> Box<dyn 'msg + Iterator<Item = Cow<'msg, str>>> {
         todo!()
     }
 
-    type Iter = std::option::IntoIter<Cow<'msg, str>>;
+    type Iter<'this> = std::option::IntoIter<Cow<'msg, str>>;
 
-    fn iter(&'msg self) -> Self::Iter {
+    fn iter(&self) -> Self::Iter<'_> {
         todo!()
     }
 }
