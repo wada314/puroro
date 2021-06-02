@@ -75,7 +75,7 @@ where
 }
 
 pub trait RepeatedField<T> {
-    fn for_each<'a, F>(&'a self, f: F)
+    fn for_each<F>(&self, f: F)
     where
         F: FnMut(T);
     fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>>;
@@ -87,7 +87,7 @@ impl<'a, T, U> RepeatedField<T> for &'a Vec<U>
 where
     &'a U: RefTypeToGetterType<Item = T>,
 {
-    fn for_each<'b, F>(&'b self, f: F)
+    fn for_each<F>(&self, f: F)
     where
         F: FnMut(T),
     {
@@ -110,7 +110,7 @@ impl<'msg, 'bump, T, U> RepeatedField<T> for &'msg ::bumpalo::collections::Vec<'
 where
     &'msg U: RefTypeToGetterType<Item = T>,
 {
-    fn for_each<'a, F>(&'a self, f: F)
+    fn for_each<F>(&self, f: F)
     where
         F: FnMut(T),
     {

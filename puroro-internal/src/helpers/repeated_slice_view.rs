@@ -126,7 +126,7 @@ where
     TypeTag: 'msg + FieldDataIntoIter<'slice, 'msg, Item = T>,
     S: SliceSource<'slice>,
 {
-    fn for_each<'a, F>(&'a self, f: F)
+    fn for_each<F>(&self, f: F)
     where
         F: FnMut(T),
     {
