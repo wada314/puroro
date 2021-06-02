@@ -1,8 +1,10 @@
+use itertools::{Either, Itertools};
+
 use crate::deser::{DeserializableMessageFromIter, LdIter, LdSlice};
-use crate::tags;
-use crate::tags::{FieldLabelTag, WireAndValueTypeTag};
 use crate::types::{FieldData, SliceViewField};
+use crate::variant;
 use crate::variant::VariantTypeTag;
+use crate::{tags, ResultHelper};
 use crate::{ErrorKind, Result};
 use std::collections::HashMap;
 use std::convert::TryFrom;
@@ -14,8 +16,8 @@ use super::{DoDefaultCheck, MapEntryForNormalImpl};
 
 pub trait FieldDeserFromIter<TypeTag, LabelTag>
 where
-    TypeTag: WireAndValueTypeTag,
-    LabelTag: FieldLabelTag,
+    TypeTag: tags::WireAndValueTypeTag,
+    LabelTag: tags::FieldLabelTag,
 {
     /// The return type of the default instance generator passed to `deser` method.
     type Item;
@@ -42,8 +44,8 @@ where
 }
 pub trait FieldDeserFromSlice<'slice, TypeTag, LabelTag>
 where
-    TypeTag: WireAndValueTypeTag,
-    LabelTag: FieldLabelTag,
+    TypeTag: tags::WireAndValueTypeTag,
+    LabelTag: tags::FieldLabelTag,
 {
     /// Deserialize binary data into this field.
     /// * `field` - A data of the field, where the wire type and (for length delimited wire
@@ -62,104 +64,138 @@ where
     ) -> Result<()>;
 }
 
-macro_rules! redirect_deser_from_slice_to_from_iter {
-    ($ty:ty, $ttag:ty, $ltag:ty $(, $gp:ident $(: $bounds:tt $(+ $bounds2:tt)+ )?)* ) => {
-        impl<'bump, 'slice $(, $gp $(: $bounds $(+ $bounds2)* )*)*>
-        FieldDeserFromSlice<'slice, $ttag, $ltag> for $ty {
-            fn deser(
-                &mut self,
-                field: FieldData<LdSlice<'slice>>,
-                _: LdSlice<'slice>,
-                _: LdSlice<'slice>,
-            ) -> Result<()> {
-                let mut ld_iter;
-                let new_field = match field {
-                    FieldData::LengthDelimited(ld_slice) => {
-                        ld_iter = LdIter::new(ld_slice.as_slice().bytes());
-                        FieldData::LengthDelimited(&mut ld_iter)
-                    }
-                    FieldData::Variant(v) => FieldData::Variant(v),
-                    FieldData::Bits32(x) => FieldData::Bits32(x),
-                    FieldData::Bits64(x) => FieldData::Bits64(x),
-                };
-                <$ty as FieldDeserFromIter<$ttag, $ltag>>::deser(
-                    self,
-                    new_field,
-                    crate::helpers::Default::default)
-            }
-        }
-    };
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // Baretype fields
 ///////////////////////////////////////////////////////////////////////////////
 
-macro_rules! define_deser_bare_variant {
-    ($ttag:ty, $ltag:ty $(, $gp:ident $(: $bounds:tt $(+ $bounds2:tt)+ )?)* ) => {
-        impl<$($gp $(: $bounds $(+ $bounds2)* )*),*>
-            FieldDeserFromIter<$ttag, $ltag> for <$ttag as VariantTypeTag>::NativeType
-        where
-            $ttag: VariantTypeTag,
-        {
-            type Item = <$ttag as VariantTypeTag>::NativeType;
-            fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _f: F) -> Result<()>
-            where
-                I: Iterator<Item = std::io::Result<u8>>,
-                F: Fn() -> Self::Item,
-            {
-                match field {
-                    FieldData::Variant(variant) => {
-                        if !<$ltag>::DO_DEFAULT_CHECK || !variant.is_zero() {
-                            *self = variant.to_native::<$ttag>()?;
-                        }
-                        Ok(())
-                    }
-                    FieldData::LengthDelimited(ld_iter) => {
-                        let mut variants = ld_iter.variants().peekable();
-                        if let None = variants.peek() {
-                            Err(ErrorKind::ZeroLengthPackedField)?
-                        }
-                        let mut last_filtered_variant = None;
-                        for rv in variants {
-                            let v = rv?;
-                            if !<$ltag>::DO_DEFAULT_CHECK || !v.is_zero() {
-                                last_filtered_variant = Some(v)
-                            }
-                        }
-                        if let Some(v) = last_filtered_variant {
-                            *self = v.to_native::<$ttag>()?;
-                        }
-                        Ok(())
-                    }
-                    _ => Err(ErrorKind::InvalidWireType)?,
-                }
+trait RequiredOrOptional3: tags::FieldLabelTag {}
+impl RequiredOrOptional3 for tags::Optional3 {}
+impl RequiredOrOptional3 for tags::Required {}
+
+fn to_variant_value_iter<V, I, F, const DO_DEFAULT_CHECK: bool>(
+    field: FieldData<&mut LdIter<I>>,
+    f: F,
+) -> impl Iterator<Item = Result<<V as variant::VariantTypeTag>::NativeType>>
+where
+    V: tags::VariantTypeTag + variant::VariantTypeTag,
+    I: Iterator<Item = std::io::Result<u8>>,
+    F: Fn() -> <V as variant::VariantTypeTag>::NativeType,
+{
+    match field {
+        FieldData::Variant(variant) => {
+            let iter = if !DO_DEFAULT_CHECK || !variant.is_zero() {
+                Some(variant.to_native::<V>());
+            } else {
+                None
             }
+            .into_iter();
+            Either::Left(iter)
         }
-        redirect_deser_from_slice_to_from_iter!(
-            <$ttag as VariantTypeTag>::NativeType,
-            $ttag,
-            $ltag
-            $(, $gp $(: $bounds $(+ $bounds2)* )*)*
-        );
-    };
+        FieldData::LengthDelimited(ld_iter) => {
+            let mut variants = ld_iter.variants().peekable();
+            if let None = variants.peek() {
+                Err(ErrorKind::ZeroLengthPackedField)?
+            }
+            let iter = variants
+                .filter_map_ok(|v| {
+                    if !DO_DEFAULT_CHECK || !v.is_zero() {
+                        Some(v.to_native::<V>())
+                    } else {
+                        None
+                    }
+                })
+                .map(|rrvalue| rrvalue.flatten());
+            Either::Right(iter)
+        }
+        _ => Err(ErrorKind::InvalidWireType)?,
+    }
 }
-define_deser_bare_variant!(tags::Int32, tags::Required);
-define_deser_bare_variant!(tags::Int64, tags::Required);
-define_deser_bare_variant!(tags::SInt32, tags::Required);
-define_deser_bare_variant!(tags::SInt64, tags::Required);
-define_deser_bare_variant!(tags::UInt32, tags::Required);
-define_deser_bare_variant!(tags::UInt64, tags::Required);
-define_deser_bare_variant!(tags::Bool, tags::Required);
-define_deser_bare_variant!(tags::Enum<T>, tags::Required, T: (TryFrom<i32, Error=i32>) + (Into<i32>));
-define_deser_bare_variant!(tags::Int32, tags::Optional3);
-define_deser_bare_variant!(tags::Int64, tags::Optional3);
-define_deser_bare_variant!(tags::SInt32, tags::Optional3);
-define_deser_bare_variant!(tags::SInt64, tags::Optional3);
-define_deser_bare_variant!(tags::UInt32, tags::Optional3);
-define_deser_bare_variant!(tags::UInt64, tags::Optional3);
-define_deser_bare_variant!(tags::Bool, tags::Optional3);
-define_deser_bare_variant!(tags::Enum<T>, tags::Optional3, T: (TryFrom<i32, Error=i32>) + (Into<i32>));
+
+// Variants, required
+impl<V> FieldDeserFromIter<(tags::wire::Variant, V), tags::Required>
+    for <V as variant::VariantTypeTag>::NativeType
+where
+    V: tags::VariantTypeTag + variant::VariantTypeTag,
+{
+    type Item = <V as variant::VariantTypeTag>::NativeType;
+
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        if let Some(var) = to_variant_value_iter::<V, I, F, false>(field, f)
+            .last()
+            .transpose()?
+        {
+            *self = var;
+        }
+        Ok(())
+    }
+}
+
+// Variants, optional2
+impl<V> FieldDeserFromIter<(tags::wire::Variant, V), tags::Optional2>
+    for Option<<V as variant::VariantTypeTag>::NativeType>
+where
+    V: tags::VariantTypeTag + variant::VariantTypeTag,
+{
+    type Item = <V as variant::VariantTypeTag>::NativeType;
+
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        let var_opt = to_variant_value_iter::<V, I, F, false>(field, f)
+            .last()
+            .transpose()?;
+        Ok(())
+    }
+}
+
+// Variants, optional3
+impl<V> FieldDeserFromIter<(tags::wire::Variant, V), tags::Optional3>
+    for <V as variant::VariantTypeTag>::NativeType
+where
+    V: tags::VariantTypeTag + variant::VariantTypeTag,
+{
+    type Item = <V as variant::VariantTypeTag>::NativeType;
+
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        if let Some(var) = to_variant_value_iter::<V, I, F, true>(field, f)
+            .last()
+            .transpose()?
+        {
+            *self = var;
+        }
+        Ok(())
+    }
+}
+
+// Variants, repeated
+impl<V> FieldDeserFromIter<(tags::wire::Variant, V), tags::Repeated>
+    for Vec<<V as variant::VariantTypeTag>::NativeType>
+where
+    V: tags::VariantTypeTag + variant::VariantTypeTag,
+{
+    type Item = <V as variant::VariantTypeTag>::NativeType;
+
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        for rvalue in to_variant_value_iter::<V, I, F, false>(field, f) {
+            self.push(rvalue?);
+        }
+        Ok(())
+    }
+}
 
 macro_rules! define_deser_bare_ld_from_iter {
     ($ty:ty, $ttag:ty, $ltag:ty, $method:ident) => {
@@ -466,7 +502,7 @@ macro_rules! define_deser_repeated_variants {
         impl<'bump $(, $gp $(: $bounds $(+ $bounds2)* )*)*>
             FieldDeserFromIter<$ttag, tags::Repeated> for $vec
         where
-            $ttag: VariantTypeTag,
+            $ttag: variant::VariantTypeTag,
         {
             type Item = <$ttag as VariantTypeTag>::NativeType;
             fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _: F) -> Result<()>
@@ -513,8 +549,8 @@ define_deser_repeated_variants!(tags::Enum<T>, T: (TryFrom<i32, Error = i32>) + 
 impl<'slice, TypeTag, LabelTag> FieldDeserFromSlice<'slice, TypeTag, LabelTag>
     for Option<SliceViewField<'slice>>
 where
-    TypeTag: WireAndValueTypeTag,
-    LabelTag: FieldLabelTag,
+    TypeTag: tags::WireAndValueTypeTag,
+    LabelTag: tags::FieldLabelTag,
 {
     fn deser(
         &mut self,

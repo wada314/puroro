@@ -8,7 +8,7 @@ pub trait WireAndValueTypeTag {}
 pub trait FieldLabelTag {}
 pub trait FieldTypeAndLabelTag {}
 
-mod value {
+pub mod value {
     use std::marker::PhantomData;
     pub struct Int32;
     pub struct UInt32;
@@ -29,7 +29,7 @@ mod value {
     pub struct Fixed64;
 }
 
-mod wire {
+pub mod wire {
     pub struct Variant;
     pub struct LengthDelimited;
     pub struct Bits32;
