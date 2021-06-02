@@ -64,26 +64,100 @@ where
     ) -> Result<()>;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Baretype fields
-///////////////////////////////////////////////////////////////////////////////
-
-trait RequiredOrOptional3: tags::FieldLabelTag {}
-impl RequiredOrOptional3 for tags::Optional3 {}
-impl RequiredOrOptional3 for tags::Required {}
-
-fn to_variant_value_iter<V, I, F, const DO_DEFAULT_CHECK: bool>(
-    field: FieldData<&mut LdIter<I>>,
-    f: F,
-) -> impl Iterator<Item = Result<<V as variant::VariantTypeTag>::NativeType>>
+impl<V, L, T> FieldDeserFromIter<(tags::wire::Variant, V), L> for T
 where
     V: tags::VariantTypeTag + variant::VariantTypeTag,
-    I: Iterator<Item = std::io::Result<u8>>,
-    F: Fn() -> <V as variant::VariantTypeTag>::NativeType,
+    L: tags::FieldLabelTag + DoDefaultCheck,
+    T: WrappedFieldType<L, <V as variant::VariantTypeTag>::NativeType>,
 {
-    match field {
+    type Item = <V as variant::VariantTypeTag>::NativeType;
+
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        let iter = to_variant_value_iter::<V, L, I>(field);
+        self.merge_items(iter)
+    }
+}
+
+trait WrappedFieldType<LabelTag, T>
+where
+    LabelTag: tags::FieldLabelTag,
+{
+    fn merge_items<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = Result<T>>;
+}
+impl<T> WrappedFieldType<tags::Required, T> for T {
+    fn merge_items<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = Result<T>>,
+    {
+        if let Some(item) = iter.last().transpose()? {
+            *self = item;
+        }
+        Ok(())
+    }
+}
+impl<T> WrappedFieldType<tags::Optional2, T> for Option<T> {
+    fn merge_items<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = Result<T>>,
+    {
+        if let Some(item) = iter.last().transpose()? {
+            *self = Some(item);
+        }
+        Ok(())
+    }
+}
+impl<T> WrappedFieldType<tags::Optional3, T> for T {
+    fn merge_items<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = Result<T>>,
+    {
+        if let Some(item) = iter.last().transpose()? {
+            *self = item;
+        }
+        Ok(())
+    }
+}
+impl<T> WrappedFieldType<tags::Repeated, T> for Vec<T> {
+    fn merge_items<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = Result<T>>,
+    {
+        for ritem in iter {
+            self.push(ritem?);
+        }
+        Ok(())
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump, T> WrappedFieldType<tags::Repeated, T> for ::bumpalo::collections::Vec<'bump, T> {
+    fn merge_items<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = Result<T>>,
+    {
+        for ritem in iter {
+            self.push(ritem?);
+        }
+        Ok(())
+    }
+}
+
+fn to_variant_value_iter<V, L, I>(
+    field: FieldData<&mut LdIter<I>>,
+) -> Result<impl Iterator<Item = Result<<V as variant::VariantTypeTag>::NativeType>>>
+where
+    V: tags::VariantTypeTag + variant::VariantTypeTag,
+    L: tags::FieldLabelTag + DoDefaultCheck,
+    I: Iterator<Item = std::io::Result<u8>>,
+{
+    Ok(match field {
         FieldData::Variant(variant) => {
-            let iter = if !DO_DEFAULT_CHECK || !variant.is_zero() {
+            let iter = if !L::DO_DEFAULT_CHECK || !variant.is_zero() {
                 Some(variant.to_native::<V>());
             } else {
                 None
@@ -98,7 +172,7 @@ where
             }
             let iter = variants
                 .filter_map_ok(|v| {
-                    if !DO_DEFAULT_CHECK || !v.is_zero() {
+                    if !L::DO_DEFAULT_CHECK || !v.is_zero() {
                         Some(v.to_native::<V>())
                     } else {
                         None
@@ -108,93 +182,7 @@ where
             Either::Right(iter)
         }
         _ => Err(ErrorKind::InvalidWireType)?,
-    }
-}
-
-// Variants, required
-impl<V> FieldDeserFromIter<(tags::wire::Variant, V), tags::Required>
-    for <V as variant::VariantTypeTag>::NativeType
-where
-    V: tags::VariantTypeTag + variant::VariantTypeTag,
-{
-    type Item = <V as variant::VariantTypeTag>::NativeType;
-
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-        F: Fn() -> Self::Item,
-    {
-        if let Some(var) = to_variant_value_iter::<V, I, F, false>(field, f)
-            .last()
-            .transpose()?
-        {
-            *self = var;
-        }
-        Ok(())
-    }
-}
-
-// Variants, optional2
-impl<V> FieldDeserFromIter<(tags::wire::Variant, V), tags::Optional2>
-    for Option<<V as variant::VariantTypeTag>::NativeType>
-where
-    V: tags::VariantTypeTag + variant::VariantTypeTag,
-{
-    type Item = <V as variant::VariantTypeTag>::NativeType;
-
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-        F: Fn() -> Self::Item,
-    {
-        let var_opt = to_variant_value_iter::<V, I, F, false>(field, f)
-            .last()
-            .transpose()?;
-        Ok(())
-    }
-}
-
-// Variants, optional3
-impl<V> FieldDeserFromIter<(tags::wire::Variant, V), tags::Optional3>
-    for <V as variant::VariantTypeTag>::NativeType
-where
-    V: tags::VariantTypeTag + variant::VariantTypeTag,
-{
-    type Item = <V as variant::VariantTypeTag>::NativeType;
-
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-        F: Fn() -> Self::Item,
-    {
-        if let Some(var) = to_variant_value_iter::<V, I, F, true>(field, f)
-            .last()
-            .transpose()?
-        {
-            *self = var;
-        }
-        Ok(())
-    }
-}
-
-// Variants, repeated
-impl<V> FieldDeserFromIter<(tags::wire::Variant, V), tags::Repeated>
-    for Vec<<V as variant::VariantTypeTag>::NativeType>
-where
-    V: tags::VariantTypeTag + variant::VariantTypeTag,
-{
-    type Item = <V as variant::VariantTypeTag>::NativeType;
-
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-        F: Fn() -> Self::Item,
-    {
-        for rvalue in to_variant_value_iter::<V, I, F, false>(field, f) {
-            self.push(rvalue?);
-        }
-        Ok(())
-    }
+    })
 }
 
 macro_rules! define_deser_bare_ld_from_iter {
