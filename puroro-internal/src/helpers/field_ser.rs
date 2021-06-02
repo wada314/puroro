@@ -3,14 +3,14 @@ use std::collections::HashMap;
 use num_traits::Zero;
 
 use crate::ser::{MessageSerializer, SerializableMessage};
-use crate::tags::{self, FieldLabelTag, FieldTypeTag};
+use crate::tags::{self, FieldLabelTag, WireAndValueTypeTag};
 use crate::Result;
 
 use super::MapEntryForNormalImpl;
 
 pub trait FieldSer<TypeTag, LabelTag>
 where
-    TypeTag: FieldTypeTag,
+    TypeTag: WireAndValueTypeTag,
     LabelTag: FieldLabelTag,
 {
     fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>

@@ -1,6 +1,6 @@
 use crate::deser::{DeserializableMessageFromIter, LdIter, LdSlice};
 use crate::tags;
-use crate::tags::{FieldLabelTag, FieldTypeTag};
+use crate::tags::{FieldLabelTag, WireAndValueTypeTag};
 use crate::types::{FieldData, SliceViewField};
 use crate::variant::VariantTypeTag;
 use crate::{ErrorKind, Result};
@@ -14,7 +14,7 @@ use super::{DoDefaultCheck, MapEntryForNormalImpl};
 
 pub trait FieldDeserFromIter<TypeTag, LabelTag>
 where
-    TypeTag: FieldTypeTag,
+    TypeTag: WireAndValueTypeTag,
     LabelTag: FieldLabelTag,
 {
     /// The return type of the default instance generator passed to `deser` method.
@@ -42,7 +42,7 @@ where
 }
 pub trait FieldDeserFromSlice<'slice, TypeTag, LabelTag>
 where
-    TypeTag: FieldTypeTag,
+    TypeTag: WireAndValueTypeTag,
     LabelTag: FieldLabelTag,
 {
     /// Deserialize binary data into this field.
@@ -513,7 +513,7 @@ define_deser_repeated_variants!(tags::Enum<T>, T: (TryFrom<i32, Error = i32>) + 
 impl<'slice, TypeTag, LabelTag> FieldDeserFromSlice<'slice, TypeTag, LabelTag>
     for Option<SliceViewField<'slice>>
 where
-    TypeTag: FieldTypeTag,
+    TypeTag: WireAndValueTypeTag,
     LabelTag: FieldLabelTag,
 {
     fn deser(
