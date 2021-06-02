@@ -42,9 +42,9 @@ impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::String {
     type Iter = impl Iterator<Item = Result<Self::Item>>;
     fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         if let FieldData::LengthDelimited(ld_slice) = field_data {
-            Ok(std::iter::once(Ok(Cow::Borrowed(unsafe {
-                transmute(ld_slice.as_slice())
-            }))))
+            Ok(std::iter::once(Ok(String::from_utf8_lossy(
+                ld_slice.as_slice(),
+            ))))
         } else {
             Err(ErrorKind::UnexpectedWireType)?
         }
