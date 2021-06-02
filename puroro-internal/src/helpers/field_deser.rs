@@ -82,6 +82,38 @@ where
     }
 }
 
+impl<L, T, S> FieldDeserFromIter<(tags::wire::LengthDelimited, tags::value::String), L> for T
+where
+    L: tags::FieldLabelTag + DoDefaultCheck,
+    T: WrappedFieldType<L, S>,
+    S: StringType,
+{
+    type Item = String;
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        if let FieldData::LengthDelimited(ld_iter) = field {
+            let expected_len = ld_iter.len();
+            let mut iter = ld_iter.chars().peekable();
+            if !L::DO_DEFAULT_CHECK || matches!(iter.peek(), Some(_)) {
+                // Do not invoke get_or_insert_with until we make sure
+                // that the input value is not empty
+                let item = self.get_or_insert_with(f);
+                item.clear();
+                item.reserve(expected_len);
+                for rv in iter {
+                    item.push(rv?);
+                }
+            }
+            Ok(())
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+
 trait WrappedFieldType<LabelTag, T>
 where
     LabelTag: tags::FieldLabelTag,
@@ -89,6 +121,9 @@ where
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = Result<T>>;
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+    where
+        F: FnOnce() -> T;
 }
 impl<T> WrappedFieldType<tags::Required, T> for T {
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
@@ -99,6 +134,12 @@ impl<T> WrappedFieldType<tags::Required, T> for T {
             *self = item;
         }
         Ok(())
+    }
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+    where
+        F: FnOnce() -> T,
+    {
+        self
     }
 }
 impl<T> WrappedFieldType<tags::Optional2, T> for Option<T> {
@@ -111,6 +152,12 @@ impl<T> WrappedFieldType<tags::Optional2, T> for Option<T> {
         }
         Ok(())
     }
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+    where
+        F: FnOnce() -> T,
+    {
+        self.get_or_insert_with(f)
+    }
 }
 impl<T> WrappedFieldType<tags::Optional3, T> for T {
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
@@ -122,8 +169,17 @@ impl<T> WrappedFieldType<tags::Optional3, T> for T {
         }
         Ok(())
     }
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+    where
+        F: FnOnce() -> T,
+    {
+        self
+    }
 }
-impl<T> WrappedFieldType<tags::Repeated, T> for Vec<T> {
+impl<T, VT> WrappedFieldType<tags::Repeated, T> for VT
+where
+    VT: VecType<T>,
+{
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = Result<T>>,
@@ -133,17 +189,63 @@ impl<T> WrappedFieldType<tags::Repeated, T> for Vec<T> {
         }
         Ok(())
     }
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+    where
+        F: FnOnce() -> T,
+    {
+        self.push((f)());
+        self.last_mut().unwrap()
+    }
+}
+
+trait VecType<T> {
+    fn push(&mut self, item: T);
+    fn last_mut(&mut self) -> Option<&mut T>;
+}
+impl<T> VecType<T> for Vec<T> {
+    fn push(&mut self, item: T) {
+        <Vec<T>>::push(self, item)
+    }
+    fn last_mut(&mut self) -> Option<&mut T> {
+        <Vec<T>>::last_mut(self)
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump, T> WrappedFieldType<tags::Repeated, T> for ::bumpalo::collections::Vec<'bump, T> {
-    fn merge_items<I>(&mut self, iter: I) -> Result<()>
-    where
-        I: Iterator<Item = Result<T>>,
-    {
-        for ritem in iter {
-            self.push(ritem?);
-        }
-        Ok(())
+impl<'bump, T> VecType<T> for ::bumpalo::collections::Vec<'bump, T> {
+    fn push(&mut self, item: T) {
+        <::bumpalo::collections::Vec<'bump, T>>::push(self, item)
+    }
+    fn last_mut(&mut self) -> Option<&mut T> {
+        <::bumpalo::collections::Vec<'bump, T>>::last_mut(self)
+    }
+}
+
+trait StringType {
+    fn push(&mut self, c: char);
+    fn clear(&mut self);
+    fn reserve(&mut self, bytes_len: usize);
+}
+impl StringType for String {
+    fn push(&mut self, c: char) {
+        <String>::push(self, c)
+    }
+    fn clear(&mut self) {
+        <String>::clear(self)
+    }
+    fn reserve(&mut self, bytes_len: usize) {
+        <String>::reserve(self, bytes_len)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> StringType for ::bumpalo::collections::String<'bump> {
+    fn push(&mut self, c: char) {
+        <::bumpalo::collections::String<'bump>>::push(self, c)
+    }
+    fn clear(&mut self) {
+        <::bumpalo::collections::String<'bump>>::clear(self)
+    }
+    fn reserve(&mut self, bytes_len: usize) {
+        <::bumpalo::collections::String<'bump>>::reserve(self, bytes_len)
     }
 }
 
