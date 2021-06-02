@@ -1,5 +1,5 @@
 use super::message_frags::MessageImplFragmentGenerator;
-use super::message_traits::{GetterMethods, MessageTraitCodeGenerator};
+use super::message_traits::MessageTraitCodeGenerator;
 use super::writer::{func, indent, indent_n, iter, seq, IntoFragment};
 use crate::context::{AllocatorType, Context, ImplType};
 use crate::generators::message_traits::{AssociatedType, FieldLabelType};

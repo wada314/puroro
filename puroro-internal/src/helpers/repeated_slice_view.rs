@@ -1,7 +1,6 @@
 use std::borrow::{Borrow, Cow};
 use std::convert::TryFrom;
 use std::hash::Hash;
-use std::intrinsics::transmute;
 use std::marker::PhantomData;
 
 use crate::deser::LdSlice;
