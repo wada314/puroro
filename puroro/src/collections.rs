@@ -77,8 +77,7 @@ where
 pub trait RepeatedField<T> {
     fn for_each<'a, F>(&'a self, f: F)
     where
-        F: FnMut(T),
-        Self: 'a;
+        F: FnMut(T);
     fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>>;
     type Iter<'this>: Iterator<Item = T>;
     fn iter(&self) -> Self::Iter<'_>;
@@ -91,7 +90,6 @@ where
     fn for_each<'b, F>(&'b self, f: F)
     where
         F: FnMut(T),
-        Self: 'b,
     {
         <[U]>::iter(self)
             .map(|x| <&U as RefTypeToGetterType>::into(x))
@@ -115,7 +113,6 @@ where
     fn for_each<'a, F>(&'a self, f: F)
     where
         F: FnMut(T),
-        Self: 'a,
     {
         <[U]>::iter(&self)
             .map(|x| <&U as RefTypeToGetterType>::into(x))

@@ -129,7 +129,6 @@ where
     fn for_each<'a, F>(&'a self, f: F)
     where
         F: FnMut(T),
-        Self: 'a,
     {
         self.iter_impl().for_each(f)
     }
