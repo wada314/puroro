@@ -8,48 +8,32 @@
 #![allow(dead_code)]
 
 use std::marker::PhantomData;
-
+/*
 trait Rf<T> {
 }
 struct Rsf<'a, 'b> ( std::marker::PhantomData<(&'a (), &'b ())>);
 impl<'a, 'b> Rf<Cow<'b, str>> for Rsf<'a, 'b> {}
 
-trait A {
-    type AA<'a> : Rf<Cow<'a, str>> where Self: 'a;
+trait A<'a, T: Rf<Cow<'a, str>>> {
 }
 struct B<'b>(PhantomData<&'b ()>);
-impl<'b> A for B<'b> {
-    type AA<'a> where Self: 'a = Rsf<'a, 'b>;
+impl<'a, 'b> A<'a, Rsf<'a, 'b>> for B<'b> {
+}
+*/
+
+trait Trait<T> {}
+struct A<'a, T: Trait<Cow<'a, str>>>(PhantomData<(&'a (), T)>);
+impl<'b, 'x> Trait<Cow<'x, str>> for &'b () {}
+struct B<'a, 'b: 'a> {
+    a: A<'a, &'b()>,
 }
 
 use std::borrow::Cow;
 use ::puroro_internal::helpers::repeated_slice_view::FieldDataIntoIter;
-struct Rsvf<'slice, 'msg> (std::marker::PhantomData<(&'slice (), &'msg())>);
-impl<'slice, 'msg> ::puroro::RepeatedField<Cow<'slice, str>> for Rsvf<'slice, 'msg> 
-where ::puroro_internal::tags::String: FieldDataIntoIter<'slice, Item = Cow<'slice, str>>
-{
-    fn for_each<F>(&self, f: F)
-    where
-        F: FnMut(Cow<'slice, str>) {
-        todo!()
-    }
-
-    fn boxed_iter(&self) -> Box<dyn 'msg + Iterator<Item = Cow<'slice, str>>> {
-        todo!()
-    }
-
-    type Iter<'this> = std::option::IntoIter<Cow<'slice, str>>;
-
-    fn iter(&self) -> Self::Iter<'_> {
-        todo!()
-    }
-}
 
 pub trait MsgTrait: ::std::clone::Clone {
     type TheMapElement<'this>: self::msg::TheMapEntryTrait where Self: 'this;
     type TheMapRepeated<'this>: ::puroro::RepeatedField::<::std::borrow::Cow::<'this, <Self as MsgTrait>::TheMapElement::<'this>>>
-        where Self: 'this;
-    type TheMapRepeated2<'this>: ::puroro::RepeatedField::<::std::borrow::Cow::<'this, str>>
         where Self: 'this;
 }
 
@@ -78,11 +62,6 @@ impl<'slicee, S: ::puroro_internal::SliceSource<'slicee>> MsgTrait for MsgSliceV
             'this,
             S,
             ::puroro_internal::tags::Message::<self::msg::TheMapEntrySliceView::<'slicee, &'slicee [u8]>>
-        >;
-    type TheMapRepeated2<'this> where Self: 'this =
-        Rsvf::<
-            'slicee,
-            'this,
         >;
 }
 
