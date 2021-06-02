@@ -17,7 +17,7 @@ This library is under development and it is very possible to make breaking chang
     - [ ] Print comments in the generated files
     - [ ] Nightly / stable features
         - [ ] Support stable (not using nightly features)
-    - [ ] More usable message traits
+    - [ ] More useful message traits
         - [ ] Mutable interface
         - [ ] Repeated field interface
         - [ ] Map interface
@@ -26,7 +26,7 @@ This library is under development and it is very possible to make breaking chang
     - [ ] Required field checker
     - [ ] Other implementations
         - [x] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
-        - [ ] SliceView -- A viewer over a `&[u8]` slice
+        - [x] SliceView -- A viewer over a `&[u8]` slice
         - [ ] Append (name TBD) -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
     - [ ] Naming of the other implementations. Consider using a type generator class
     - [ ] Support the `allocator_api`. Waiting for the `String` support
