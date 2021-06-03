@@ -68,7 +68,7 @@ impl<V, L, T> FieldDeserFromIter<(tags::wire::Variant, V), L> for T
 where
     V: tags::VariantTypeTag + variant::VariantTypeTag,
     L: tags::FieldLabelTag + DoDefaultCheck,
-    T: WrappedFieldType<L, <V as variant::VariantTypeTag>::NativeType>,
+    T: WrappedFieldType<L, Item = <V as variant::VariantTypeTag>::NativeType>,
 {
     type Item = <V as variant::VariantTypeTag>::NativeType;
 
@@ -82,11 +82,11 @@ where
     }
 }
 
-impl<L, T, S> FieldDeserFromIter<(tags::wire::LengthDelimited, tags::value::String), L> for T
+impl<L, T> FieldDeserFromIter<(tags::wire::LengthDelimited, tags::value::String), L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
-    T: WrappedFieldType<L, S>,
-    S: StringType,
+    T: WrappedFieldType<L>,
+    T::Item: StringType,
 {
     type Item = String;
     fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
@@ -114,109 +114,197 @@ where
     }
 }
 
-trait WrappedFieldType<LabelTag, T>
+impl<L, T> FieldDeserFromIter<(tags::wire::LengthDelimited, tags::value::Bytes), L> for T
+where
+    L: tags::FieldLabelTag + DoDefaultCheck,
+    T: WrappedFieldType<L>,
+    T::Item: VecType<Item = u8>,
+{
+    type Item = String;
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        if let FieldData::LengthDelimited(ld_iter) = field {
+            let expected_len = ld_iter.len();
+            let mut iter = ld_iter.bytes().peekable();
+            if !L::DO_DEFAULT_CHECK || matches!(iter.peek(), Some(_)) {
+                // Do not invoke get_or_insert_with until we make sure
+                // that the input value is not empty
+                let item = self.get_or_insert_with(f);
+                item.clear();
+                item.reserve(expected_len);
+                for rv in iter {
+                    item.push(rv?);
+                }
+            }
+            Ok(())
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+
+impl<V, L, T> FieldDeserFromIter<(tags::wire::Bits32, V), L> for T
+where
+    V: tags::Bits32TypeTag,
+    L: tags::FieldLabelTag + DoDefaultCheck,
+    T: WrappedFieldType<L>,
+    T::Item: FromBits32<Tag = V>,
+{
+    type Item = T::Item;
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        if let FieldData::Bits32(array) = field {
+            if !L::DO_DEFAULT_CHECK || array.iter().any(|b| *b != 0) {
+                *self.get_or_insert_with(f) = <T::Item as FromBits32>::from(array);
+            }
+            Ok(())
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+
+impl<V, L, T> FieldDeserFromIter<(tags::wire::Bits64, V), L> for T
+where
+    V: tags::Bits64TypeTag,
+    L: tags::FieldLabelTag + DoDefaultCheck,
+    T: WrappedFieldType<L>,
+    T::Item: FromBits64<Tag = V>,
+{
+    type Item = T::Item;
+    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+        F: Fn() -> Self::Item,
+    {
+        if let FieldData::Bits64(array) = field {
+            if !L::DO_DEFAULT_CHECK || array.iter().any(|b| *b != 0) {
+                *self.get_or_insert_with(f) = <T::Item as FromBits64>::from(array);
+            }
+            Ok(())
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+
+trait WrappedFieldType<LabelTag>
 where
     LabelTag: tags::FieldLabelTag,
 {
+    type Item;
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
     where
-        I: Iterator<Item = Result<T>>;
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+        I: Iterator<Item = Result<Self::Item>>;
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
     where
-        F: FnOnce() -> T;
+        F: FnOnce() -> Self::Item;
 }
-impl<T> WrappedFieldType<tags::Required, T> for T {
+impl<T> WrappedFieldType<tags::Required> for T {
+    type Item = T;
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
     where
-        I: Iterator<Item = Result<T>>,
+        I: Iterator<Item = Result<Self::Item>>,
     {
         if let Some(item) = iter.last().transpose()? {
             *self = item;
         }
         Ok(())
     }
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
     where
-        F: FnOnce() -> T,
+        F: FnOnce() -> Self::Item,
     {
         self
     }
 }
-impl<T> WrappedFieldType<tags::Optional2, T> for Option<T> {
+impl<T> WrappedFieldType<tags::Optional2> for Option<T> {
+    type Item = T;
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
     where
-        I: Iterator<Item = Result<T>>,
+        I: Iterator<Item = Result<Self::Item>>,
     {
         if let Some(item) = iter.last().transpose()? {
             *self = Some(item);
         }
         Ok(())
     }
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
     where
-        F: FnOnce() -> T,
+        F: FnOnce() -> Self::Item,
     {
         self.get_or_insert_with(f)
     }
 }
-impl<T> WrappedFieldType<tags::Optional3, T> for T {
+impl<T> WrappedFieldType<tags::Optional3> for T {
+    type Item = T;
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
     where
-        I: Iterator<Item = Result<T>>,
+        I: Iterator<Item = Result<Self::Item>>,
     {
         if let Some(item) = iter.last().transpose()? {
             *self = item;
         }
         Ok(())
     }
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
     where
-        F: FnOnce() -> T,
+        F: FnOnce() -> Self::Item,
     {
         self
     }
 }
-impl<T, VT> WrappedFieldType<tags::Repeated, T> for VT
+impl<VT> WrappedFieldType<tags::Repeated> for VT
 where
-    VT: VecType<T>,
+    VT: VecType,
 {
+    type Item = VT::Item;
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
     where
-        I: Iterator<Item = Result<T>>,
+        I: Iterator<Item = Result<Self::Item>>,
     {
         for ritem in iter {
             self.push(ritem?);
         }
         Ok(())
     }
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut T
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
     where
-        F: FnOnce() -> T,
+        F: FnOnce() -> Self::Item,
     {
         self.push((f)());
         self.last_mut().unwrap()
     }
 }
 
-trait VecType<T> {
-    fn push(&mut self, item: T);
-    fn last_mut(&mut self) -> Option<&mut T>;
+trait VecType {
+    type Item;
+    fn push(&mut self, item: Self::Item);
+    fn last_mut(&mut self) -> Option<&mut Self::Item>;
 }
-impl<T> VecType<T> for Vec<T> {
-    fn push(&mut self, item: T) {
-        <Vec<T>>::push(self, item)
+impl<T> VecType for Vec<T> {
+    type Item = T;
+    fn push(&mut self, item: Self::Item) {
+        <Vec<Self::Item>>::push(self, item)
     }
-    fn last_mut(&mut self) -> Option<&mut T> {
-        <Vec<T>>::last_mut(self)
+    fn last_mut(&mut self) -> Option<&mut Self::Item> {
+        <Vec<Self::Item>>::last_mut(self)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump, T> VecType<T> for ::bumpalo::collections::Vec<'bump, T> {
-    fn push(&mut self, item: T) {
-        <::bumpalo::collections::Vec<'bump, T>>::push(self, item)
+impl<'bump, T> VecType for ::bumpalo::collections::Vec<'bump, T> {
+    type Item = T;
+    fn push(&mut self, item: Self::Item) {
+        <::bumpalo::collections::Vec<'bump, Self::Item>>::push(self, item)
     }
-    fn last_mut(&mut self) -> Option<&mut T> {
-        <::bumpalo::collections::Vec<'bump, T>>::last_mut(self)
+    fn last_mut(&mut self) -> Option<&mut Self::Item> {
+        <::bumpalo::collections::Vec<'bump, Self::Item>>::last_mut(self)
     }
 }
 
@@ -246,6 +334,52 @@ impl<'bump> StringType for ::bumpalo::collections::String<'bump> {
     }
     fn reserve(&mut self, bytes_len: usize) {
         <::bumpalo::collections::String<'bump>>::reserve(self, bytes_len)
+    }
+}
+
+trait FromBits32: Sized {
+    type Tag: tags::Bits32TypeTag;
+    fn from(array: [u8; 4]) -> Self;
+}
+impl FromBits32 for f32 {
+    type Tag = tags::value::Float;
+    fn from(array: [u8; 4]) -> Self {
+        f32::from_le_bytes(array)
+    }
+}
+impl FromBits32 for u32 {
+    type Tag = tags::value::Fixed32;
+    fn from(array: [u8; 4]) -> Self {
+        u32::from_le_bytes(array)
+    }
+}
+impl FromBits32 for i32 {
+    type Tag = tags::value::SFixed32;
+    fn from(array: [u8; 4]) -> Self {
+        i32::from_le_bytes(array)
+    }
+}
+
+trait FromBits64: Sized {
+    type Tag: tags::Bits64TypeTag;
+    fn from(array: [u8; 8]) -> Self;
+}
+impl FromBits64 for f64 {
+    type Tag = tags::value::Double;
+    fn from(array: [u8; 8]) -> Self {
+        f64::from_le_bytes(array)
+    }
+}
+impl FromBits64 for u64 {
+    type Tag = tags::value::Fixed64;
+    fn from(array: [u8; 8]) -> Self {
+        u64::from_le_bytes(array)
+    }
+}
+impl FromBits64 for i64 {
+    type Tag = tags::value::SFixed64;
+    fn from(array: [u8; 8]) -> Self {
+        i64::from_le_bytes(array)
     }
 }
 
@@ -444,7 +578,6 @@ macro_rules! define_deser_bare_fixed {
                 }
             }
         }
-        redirect_deser_from_slice_to_from_iter!($ty, $ttag, $ltag);
     };
 }
 define_deser_bare_fixed!(f32, tags::Float, tags::Required, Bits32);
@@ -498,20 +631,6 @@ define_deser_optional_fields_from_bare!(
     T: (TryFrom<i32, Error = i32>) + (Into<i32>)
 );
 
-redirect_deser_from_slice_to_from_iter!(Option<i32>, tags::Int32, tags::Optional2);
-redirect_deser_from_slice_to_from_iter!(Option<i64>, tags::Int64, tags::Optional2);
-redirect_deser_from_slice_to_from_iter!(Option<i32>, tags::SInt32, tags::Optional2);
-redirect_deser_from_slice_to_from_iter!(Option<i64>, tags::SInt64, tags::Optional2);
-redirect_deser_from_slice_to_from_iter!(Option<u32>, tags::UInt32, tags::Optional2);
-redirect_deser_from_slice_to_from_iter!(Option<u64>, tags::UInt64, tags::Optional2);
-redirect_deser_from_slice_to_from_iter!(Option<bool>, tags::Bool, tags::Optional2);
-redirect_deser_from_slice_to_from_iter!(
-    Option<std::result::Result<T, i32>>,
-    tags::Enum<T>,
-    tags::Optional2,
-    T: (TryFrom<i32, Error = i32>) + (Into<i32>)
-);
-
 define_deser_optional_fields_from_bare!(String, tags::String, tags::Optional2);
 define_deser_optional_fields_from_bare!(Vec<u8>, tags::Bytes, tags::Optional2);
 #[cfg(feature = "puroro-bumpalo")]
@@ -532,13 +651,6 @@ define_deser_optional_fields_from_bare!(u32, tags::Fixed32, tags::Optional2);
 define_deser_optional_fields_from_bare!(f64, tags::Double, tags::Optional2);
 define_deser_optional_fields_from_bare!(i64, tags::SFixed64, tags::Optional2);
 define_deser_optional_fields_from_bare!(u64, tags::Fixed64, tags::Optional2);
-
-redirect_deser_from_slice_to_from_iter!(Option<f32>, tags::Float, tags::Optional2);
-redirect_deser_from_slice_to_from_iter!(Option<i32>, tags::SFixed32, tags::Optional2);
-redirect_deser_from_slice_to_from_iter!(Option<u32>, tags::Fixed32, tags::Optional2);
-redirect_deser_from_slice_to_from_iter!(Option<f64>, tags::Double, tags::Optional2);
-redirect_deser_from_slice_to_from_iter!(Option<i64>, tags::SFixed64, tags::Optional2);
-redirect_deser_from_slice_to_from_iter!(Option<u64>, tags::Fixed64, tags::Optional2);
 
 // Message. Different from the other types, it is wrapped by Option<Box<_>> for
 // the both Optional2 and Optional3.
