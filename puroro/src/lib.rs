@@ -26,7 +26,7 @@ pub trait Serializable: Sized {
 pub trait Message<'bump> {
     type InternalData: InternalData<'bump>;
     fn puroro_internal_data(&self) -> &Self::InternalData;
-    type BoxedType;
+    type BoxedType: AsMut<Self>;
     fn into_boxed(self) -> Self::BoxedType;
 }
 pub trait Enum {}

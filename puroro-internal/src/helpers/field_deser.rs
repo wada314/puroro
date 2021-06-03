@@ -89,7 +89,7 @@ where
     T: WrappedFieldType<L>,
     T::Item: StringType,
 {
-    type Item = String;
+    type Item = T::Item;
     fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
@@ -121,7 +121,7 @@ where
     T: WrappedFieldType<L>,
     T::Item: VecType<Item = u8>,
 {
-    type Item = String;
+    type Item = T::Item;
     fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
@@ -180,7 +180,7 @@ where
         F: Fn() -> Self::Item,
     {
         if let FieldData::LengthDelimited(ld_iter) = field {
-            ld_iter.deser_message(self.get_or_insert_with(|| (f)().into_boxed()))?;
+            ld_iter.deser_message(self.get_or_insert_with(|| (f)().into_boxed()).as_mut())?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?
         }
@@ -201,7 +201,7 @@ where
         F: Fn() -> Self::Item,
     {
         if let FieldData::LengthDelimited(ld_iter) = field {
-            ld_iter.deser_message(self.get_or_insert_with(|| (f)().into_boxed()))?;
+            ld_iter.deser_message(self.get_or_insert_with(|| (f)().into_boxed()).as_mut())?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?
         }
@@ -373,6 +373,8 @@ trait VecType {
     type Item;
     fn push(&mut self, item: Self::Item);
     fn last_mut(&mut self) -> Option<&mut Self::Item>;
+    fn clear(&mut self);
+    fn reserve(&mut self, bytes_len: usize);
 }
 impl<T> VecType for Vec<T> {
     type Item = T;
@@ -381,6 +383,12 @@ impl<T> VecType for Vec<T> {
     }
     fn last_mut(&mut self) -> Option<&mut Self::Item> {
         <Vec<Self::Item>>::last_mut(self)
+    }
+    fn clear(&mut self) {
+        <Vec<Self::Item>>::clear(self)
+    }
+    fn reserve(&mut self, bytes_len: usize) {
+        <Vec<Self::Item>>::reserve(self, bytes_len)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
@@ -391,6 +399,12 @@ impl<'bump, T> VecType for ::bumpalo::collections::Vec<'bump, T> {
     }
     fn last_mut(&mut self) -> Option<&mut Self::Item> {
         <::bumpalo::collections::Vec<'bump, Self::Item>>::last_mut(self)
+    }
+    fn clear(&mut self) {
+        <::bumpalo::collections::Vec<'bump, Self::Item>>::clear(self)
+    }
+    fn reserve(&mut self, bytes_len: usize) {
+        <::bumpalo::collections::Vec<'bump, Self::Item>>::reserve(self, bytes_len)
     }
 }
 
@@ -469,11 +483,12 @@ impl FromBits64 for i64 {
     }
 }
 
-fn to_variant_value_iter<V, L, I>(
-    field: FieldData<&mut LdIter<I>>,
-) -> Result<impl Iterator<Item = Result<<V as variant::VariantTypeTag>::NativeType>>>
+fn to_variant_value_iter<'a, V, L, I>(
+    field: FieldData<&'a mut LdIter<I>>,
+) -> Result<impl 'a + Iterator<Item = Result<<V as variant::VariantTypeTag>::NativeType>>>
 where
     V: tags::VariantTypeTag + variant::VariantTypeTag,
+    <V as variant::VariantTypeTag>::NativeType: 'a,
     L: tags::FieldLabelTag + DoDefaultCheck,
     I: Iterator<Item = std::io::Result<u8>>,
 {
