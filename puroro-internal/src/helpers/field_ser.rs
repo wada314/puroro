@@ -2,11 +2,12 @@ use std::collections::HashMap;
 
 use num_traits::Zero;
 
+use super::{DoDefaultCheck, MapEntryForNormalImpl, StringType, VecType, WrappedFieldType};
 use crate::ser::{MessageSerializer, SerializableMessage};
-use crate::tags::{self, FieldLabelTag, WireAndValueTypeTag};
+use crate::tags;
+use crate::tags::{FieldLabelTag, WireAndValueTypeTag};
+use crate::variant;
 use crate::Result;
-
-use super::MapEntryForNormalImpl;
 
 pub trait FieldSer<TypeTag, LabelTag>
 where
@@ -26,6 +27,71 @@ where
     match e {
         Ok(x) => i32::from(x.clone()),
         Err(i) => *i,
+    }
+}
+
+impl<V, L, T> FieldSer<(tags::wire::Variant, V), L> for T
+where
+    V: tags::VariantTypeTag + variant::VariantTypeTag,
+    L: tags::FieldLabelTag + DoDefaultCheck,
+    T: WrappedFieldType<L, Item = <V as variant::VariantTypeTag>::NativeType>,
+{
+    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    where
+        S: MessageSerializer,
+    {
+        let slice = self.as_slice();
+        if slice.len() <= 1 {
+            if let Some(item) = slice.first() {
+                let variant = V::to_variant(item)?;
+                if !L::DO_DEFAULT_CHECK || !variant.is_zero() {
+                    serializer.serialize_variant(field_number, item)?;
+                }
+            }
+        } else {
+            serializer.serialize_variants_twice(field_number, slice.iter().cloned())?;
+        }
+        Ok(())
+    }
+}
+
+impl<L, T> FieldSer<tags::String, L> for T
+where
+    L: tags::FieldLabelTag + DoDefaultCheck,
+    T: WrappedFieldType<L>,
+    T::Item: StringType,
+{
+    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    where
+        S: MessageSerializer,
+    {
+        let slice = self.as_slice();
+        for item in slice {
+            if !L::DO_DEFAULT_CHECK || item.len() != 0 {
+                serializer.serialize_bytes_twice(field_number, item.as_bytes())?
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<L, T> FieldSer<tags::Bytes, L> for T
+where
+    L: tags::FieldLabelTag + DoDefaultCheck,
+    T: WrappedFieldType<L>,
+    T::Item: VecType<Item = u8>,
+{
+    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    where
+        S: MessageSerializer,
+    {
+        let slice = self.as_slice();
+        for item in slice {
+            if !L::DO_DEFAULT_CHECK || item.len() != 0 {
+                serializer.serialize_bytes_twice(field_number, item.as_slice())?
+            }
+        }
+        Ok(())
     }
 }
 

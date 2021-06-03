@@ -76,3 +76,204 @@ impl<T: TryFrom<i32, Error = i32>> Default for ::std::result::Result<T, i32> {
         T::try_from(0i32)
     }
 }
+trait WrappedFieldType<LabelTag>
+where
+    LabelTag: tags::FieldLabelTag,
+{
+    type Item;
+    fn merge_items<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = Result<Self::Item>>;
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    where
+        F: FnOnce() -> Self::Item;
+    fn as_slice(&self) -> &[Self::Item];
+}
+impl<T> WrappedFieldType<tags::Required> for T {
+    type Item = T;
+    fn merge_items<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = Result<Self::Item>>,
+    {
+        if let Some(item) = iter.last().transpose()? {
+            *self = item;
+        }
+        Ok(())
+    }
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    where
+        F: FnOnce() -> Self::Item,
+    {
+        self
+    }
+    fn as_slice(&self) -> &[Self::Item] {
+        std::slice::from_ref(self);
+    }
+}
+impl<T> WrappedFieldType<tags::Optional2> for Option<T> {
+    type Item = T;
+    fn merge_items<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = Result<Self::Item>>,
+    {
+        if let Some(item) = iter.last().transpose()? {
+            *self = Some(item);
+        }
+        Ok(())
+    }
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    where
+        F: FnOnce() -> Self::Item,
+    {
+        self.get_or_insert_with(f)
+    }
+    fn as_slice(&self) -> &[Self::Item] {
+        match self {
+            Some(x) => std::slice::from_ref(x),
+            None => &[],
+        }
+    }
+}
+impl<T> WrappedFieldType<tags::Optional3> for T {
+    type Item = T;
+    fn merge_items<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = Result<Self::Item>>,
+    {
+        if let Some(item) = iter.last().transpose()? {
+            *self = item;
+        }
+        Ok(())
+    }
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    where
+        F: FnOnce() -> Self::Item,
+    {
+        self
+    }
+    fn as_slice(&self) -> &[Self::Item] {
+        std::slice::from_ref(self);
+    }
+}
+impl<VT> WrappedFieldType<tags::Repeated> for VT
+where
+    VT: VecType,
+{
+    type Item = VT::Item;
+    fn merge_items<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = Result<Self::Item>>,
+    {
+        for ritem in iter {
+            self.push(ritem?);
+        }
+        Ok(())
+    }
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    where
+        F: FnOnce() -> Self::Item,
+    {
+        self.push((f)());
+        self.last_mut().unwrap()
+    }
+    fn as_slice(&self) -> &[Self::Item] {
+        <Self as VecType>::as_slice(self)
+    }
+}
+
+trait VecType {
+    type Item;
+    fn len(&self) -> usize;
+    fn push(&mut self, item: Self::Item);
+    fn last_mut(&mut self) -> Option<&mut Self::Item>;
+    fn clear(&mut self);
+    fn reserve(&mut self, bytes_len: usize);
+    fn as_slice(&self) -> &[Self::Item];
+}
+impl<T> VecType for Vec<T> {
+    type Item = T;
+
+    fn len(&self) -> usize {
+        <Vec<Self::Item>>::len(self)
+    }
+    fn push(&mut self, item: Self::Item) {
+        <Vec<Self::Item>>::push(self, item)
+    }
+    fn last_mut(&mut self) -> Option<&mut Self::Item> {
+        <Vec<Self::Item>>::last_mut(self)
+    }
+    fn clear(&mut self) {
+        <Vec<Self::Item>>::clear(self)
+    }
+    fn reserve(&mut self, bytes_len: usize) {
+        <Vec<Self::Item>>::reserve(self, bytes_len)
+    }
+    fn as_slice(&self) -> &[Self::Item] {
+        <Self as AsRef<[Self::Item]>>::as_ref(self)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump, T> VecType for ::bumpalo::collections::Vec<'bump, T> {
+    type Item = T;
+    fn len(&mut self) -> usize {
+        <::bumpalo::collections::Vec<'bump, Self::Item>>::len(self)
+    }
+    fn push(&mut self, item: Self::Item) {
+        <::bumpalo::collections::Vec<'bump, Self::Item>>::push(self, item)
+    }
+    fn last_mut(&mut self) -> Option<&mut Self::Item> {
+        <::bumpalo::collections::Vec<'bump, Self::Item>>::last_mut(self)
+    }
+    fn clear(&mut self) {
+        <::bumpalo::collections::Vec<'bump, Self::Item>>::clear(self)
+    }
+    fn reserve(&mut self, bytes_len: usize) {
+        <::bumpalo::collections::Vec<'bump, Self::Item>>::reserve(self, bytes_len)
+    }
+    fn as_slice(&self) -> &[Self::Item] {
+        <Self as AsRef<[Self::Item]>>::as_ref(self)
+    }
+}
+
+trait StringType {
+    fn len(&self) -> usize;
+    fn as_bytes(&self) -> &[u8];
+    fn push(&mut self, c: char);
+    fn clear(&mut self);
+    fn reserve(&mut self, bytes_len: usize);
+}
+impl StringType for String {
+    fn len(&self) -> usize {
+        <String>::len(self)
+    }
+    fn as_bytes(&self) -> &[u8] {
+        <String>::as_bytes(self)
+    }
+    fn push(&mut self, c: char) {
+        <String>::push(self, c)
+    }
+    fn clear(&mut self) {
+        <String>::clear(self)
+    }
+    fn reserve(&mut self, bytes_len: usize) {
+        <String>::reserve(self, bytes_len)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> StringType for ::bumpalo::collections::String<'bump> {
+    fn len(&self) -> usize {
+        <::bumpalo::collections::String<'bump>>::len(self)
+    }
+    fn as_bytes(&self) -> &[u8] {
+        <::bumpalo::collections::String<'bump>>::as_bytes(self)
+    }
+    fn push(&mut self, c: char) {
+        <::bumpalo::collections::String<'bump>>::push(self, c)
+    }
+    fn clear(&mut self) {
+        <::bumpalo::collections::String<'bump>>::clear(self)
+    }
+    fn reserve(&mut self, bytes_len: usize) {
+        <::bumpalo::collections::String<'bump>>::reserve(self, bytes_len)
+    }
+}
