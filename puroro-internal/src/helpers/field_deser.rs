@@ -83,7 +83,7 @@ where
     }
 }
 
-impl<L, T> FieldDeserFromIter<(tags::wire::LengthDelimited, tags::value::String), L> for T
+impl<L, T> FieldDeserFromIter<tags::String, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
@@ -115,7 +115,7 @@ where
     }
 }
 
-impl<L, T> FieldDeserFromIter<(tags::wire::LengthDelimited, tags::value::Bytes), L> for T
+impl<L, T> FieldDeserFromIter<tags::Bytes, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
@@ -147,8 +147,7 @@ where
     }
 }
 
-impl<T> FieldDeserFromIter<(tags::wire::LengthDelimited, tags::value::Message<T>), tags::Required>
-    for Option<T>
+impl<T> FieldDeserFromIter<tags::Message<T>, tags::Required> for Option<T>
 where
     T: crate::deser::DeserializableMessageFromIter,
 {
@@ -167,8 +166,7 @@ where
     }
 }
 
-impl<'bump, T>
-    FieldDeserFromIter<(tags::wire::LengthDelimited, tags::value::Message<T>), tags::Optional2>
+impl<'bump, T> FieldDeserFromIter<tags::Message<T>, tags::Optional2>
     for Option<<T as Message<'bump>>::BoxedType>
 where
     T: crate::deser::DeserializableMessageFromIter + Message<'bump>,
@@ -188,8 +186,7 @@ where
     }
 }
 
-impl<'bump, T>
-    FieldDeserFromIter<(tags::wire::LengthDelimited, tags::value::Message<T>), tags::Optional3>
+impl<'bump, T> FieldDeserFromIter<tags::Message<T>, tags::Optional3>
     for Option<<T as Message<'bump>>::BoxedType>
 where
     T: crate::deser::DeserializableMessageFromIter + Message<'bump>,
@@ -209,9 +206,7 @@ where
     }
 }
 
-impl<'bump, T, VT>
-    FieldDeserFromIter<(tags::wire::LengthDelimited, tags::value::Message<T>), tags::Repeated>
-    for VT
+impl<'bump, T, VT> FieldDeserFromIter<tags::Message<T>, tags::Repeated> for VT
 where
     T: crate::deser::DeserializableMessageFromIter,
     VT: VecType<Item = T>,
