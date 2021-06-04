@@ -12,6 +12,7 @@ pub use field_deser::{FieldDeserFromIter, FieldDeserFromSlice};
 pub use field_new::FieldNew;
 pub use field_ser::FieldSer;
 pub use field_take_or_init::FieldTakeOrInit;
+use puroro::Message;
 pub use repeated_slice_view::RepeatedSliceViewField;
 
 use crate::ser::MessageSerializer;
@@ -179,6 +180,20 @@ where
     fn as_slice(&self) -> &[Self::Item] {
         <Self as VecType>::as_slice(self)
     }
+}
+
+trait WrappedMessageFieldType<LabelTag>
+where
+    LabelTag: tags::FieldLabelTag,
+{
+    type Item: Message;
+    fn merge_items<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = Result<Self::Item>>;
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    where
+        F: FnOnce() -> Self::Item;
+    fn as_slice(&self) -> &[Self::Item];
 }
 
 trait VecType {

@@ -162,10 +162,9 @@ where
     }
 }
 
-impl<'bump, T> FieldDeserFromIter<tags::Message<T>, tags::Optional2>
-    for Option<<T as Message<'bump>>::BoxedType>
+impl<T> FieldDeserFromIter<tags::Message<T>, tags::Optional2> for Option<<T as Message>::BoxedType>
 where
-    T: crate::deser::DeserializableMessageFromIter + Message<'bump>,
+    T: crate::deser::DeserializableMessageFromIter + Message,
 {
     type Item = T;
     fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
@@ -182,10 +181,9 @@ where
     }
 }
 
-impl<'bump, T> FieldDeserFromIter<tags::Message<T>, tags::Optional3>
-    for Option<<T as Message<'bump>>::BoxedType>
+impl<T> FieldDeserFromIter<tags::Message<T>, tags::Optional3> for Option<<T as Message>::BoxedType>
 where
-    T: crate::deser::DeserializableMessageFromIter + Message<'bump>,
+    T: crate::deser::DeserializableMessageFromIter + Message,
 {
     type Item = T;
     fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>

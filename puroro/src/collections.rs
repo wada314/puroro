@@ -64,9 +64,9 @@ impl<'a, 'bump> RefTypeToGetterType for &'a ::bumpalo::collections::Vec<'bump, u
         Cow::Borrowed(self.as_slice())
     }
 }
-impl<'a, 'bump, T> RefTypeToGetterType for &'a T
+impl<'a, T> RefTypeToGetterType for &'a T
 where
-    T: crate::Message<'bump> + ToOwned,
+    T: crate::Message + ToOwned,
 {
     type Item = Cow<'a, T>;
     fn into(self) -> Cow<'a, T> {

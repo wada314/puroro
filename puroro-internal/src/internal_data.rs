@@ -17,9 +17,9 @@ impl InternalDataForNormalStruct {
         }
     }
 }
-impl<'bump> InternalData<'bump> for InternalDataForNormalStruct {
+impl InternalData for InternalDataForNormalStruct {
     #[cfg(feature = "puroro-bumpalo")]
-    fn bumpalo(&self) -> &'bump bumpalo::Bump {
+    fn bumpalo(&self) -> &bumpalo::Bump {
         panic!("The Bumpalo data field is only available for a Bumpalo struct!")
     }
 }
@@ -46,8 +46,8 @@ impl<'bump> InternalDataForBumpaloStruct<'bump> {
         }
     }
 }
-impl<'bump> InternalData<'bump> for InternalDataForBumpaloStruct<'bump> {
-    fn bumpalo(&self) -> &'bump bumpalo::Bump {
+impl<'bump> InternalData for InternalDataForBumpaloStruct<'bump> {
+    fn bumpalo(&self) -> &bumpalo::Bump {
         self.bump
     }
 }
@@ -190,11 +190,11 @@ where
     }
 }
 
-impl<'bump, 'slice, S> InternalData<'bump> for InternalDataForSliceViewStruct<'slice, S>
+impl<'slice, S> InternalData for InternalDataForSliceViewStruct<'slice, S>
 where
     S: SliceSource<'slice>,
 {
-    fn bumpalo(&self) -> &'bump bumpalo::Bump {
+    fn bumpalo(&self) -> &bumpalo::Bump {
         panic!("The Bumpalo data field is only available for a Bumpalo struct!")
     }
 }

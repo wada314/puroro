@@ -23,15 +23,15 @@ pub trait Serializable: Sized {
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> Result<()>;
 }
 
-pub trait Message<'bump> {
-    type InternalData: InternalData<'bump>;
+pub trait Message {
+    type InternalData: InternalData;
     fn puroro_internal_data(&self) -> &Self::InternalData;
     type BoxedType: AsMut<Self>;
     fn into_boxed(self) -> Self::BoxedType;
 }
 pub trait Enum {}
 
-pub trait InternalData<'bump> {
+pub trait InternalData {
     #[cfg(feature = "puroro-bumpalo")]
-    fn bumpalo(&self) -> &'bump ::bumpalo::Bump;
+    fn bumpalo(&self) -> &::bumpalo::Bump;
 }
