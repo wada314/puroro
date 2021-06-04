@@ -200,7 +200,9 @@ where
     fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
     where
         F: FnOnce() -> Self::Item;
-    fn as_slice(&self) -> &[Self::Item];
+    fn for_each<F>(&self, f: F)
+    where
+        F: FnMut(&Self::Item);
 }
 impl<T> WrappedMessageFieldType<T, tags::Required> for T
 where
@@ -213,8 +215,11 @@ where
     {
         self
     }
-    fn as_slice(&self) -> &[Self::Item] {
-        std::slice::from_ref(self)
+    fn for_each<F>(&self, f: F)
+    where
+        F: FnMut(&Self::Item),
+    {
+        (f)(self)
     }
 }
 impl<T> WrappedMessageFieldType<T, tags::Optional2> for Option<T::BoxedType>
@@ -229,11 +234,12 @@ where
     {
         self.get_or_insert_with(|| (f)().into_boxed()).as_mut()
     }
-    fn as_slice(&self) -> &[Self::Item] {
+    fn for_each<F>(&self, f: F)
+    where
+        F: FnMut(&Self::Item),
+    {
         if let Some(boxed) = self {
-            std::slice::from_ref(boxed.as_ref())
-        } else {
-            &[]
+            (f)(boxed.as_ref())
         }
     }
 }
@@ -249,11 +255,12 @@ where
     {
         self.get_or_insert_with(|| (f)().into_boxed()).as_mut()
     }
-    fn as_slice(&self) -> &[Self::Item] {
+    fn for_each<F>(&self, f: F)
+    where
+        F: FnMut(&Self::Item),
+    {
         if let Some(boxed) = self {
-            std::slice::from_ref(boxed.as_ref())
-        } else {
-            &[]
+            (f)(boxed.as_ref())
         }
     }
 }
@@ -271,8 +278,13 @@ where
         <Self as VecType>::push(self, (f)());
         <Self as VecType>::last_mut(self).unwrap()
     }
-    fn as_slice(&self) -> &[Self::Item] {
-        self.as_slice()
+    fn for_each<F>(&self, f: F)
+    where
+        F: FnMut(&Self::Item),
+    {
+        for item in self.as_slice() {
+            (f)(item);
+        }
     }
 }
 

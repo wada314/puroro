@@ -121,10 +121,9 @@ where
     where
         S: MessageSerializer,
     {
-        let slice = self.as_slice();
-        for item in slice {
+        self.for_each(|item| {
             serializer.serialize_message_twice(field_number, item)?;
-        }
+        });
         Ok(())
     }
 }
