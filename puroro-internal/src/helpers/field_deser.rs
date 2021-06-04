@@ -9,7 +9,10 @@ use crate::{ErrorKind, Result};
 use std::collections::HashMap;
 use std::hash::Hash;
 
-use super::{DoDefaultCheck, MapEntryForNormalImpl, StringType, VecType, WrappedFieldType};
+use super::{
+    DoDefaultCheck, MapEntryForNormalImpl, StringType, VecType, WrappedFieldType,
+    WrappedMessageFieldType,
+};
 
 pub trait FieldDeserFromIter<TypeTag, LabelTag>
 where
@@ -143,11 +146,13 @@ where
     }
 }
 
-impl<T> FieldDeserFromIter<tags::Message<T>, tags::Required> for Option<T>
+impl<M, L, T> FieldDeserFromIter<tags::Message<M>, L> for T
 where
-    T: crate::deser::DeserializableMessageFromIter,
+    M: Message + crate::deser::DeserializableMessageFromIter,
+    L: tags::FieldLabelTag,
+    T: WrappedMessageFieldType<M, L, Item = M>,
 {
-    type Item = T;
+    type Item = M;
     fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
@@ -155,65 +160,6 @@ where
     {
         if let FieldData::LengthDelimited(ld_iter) = field {
             ld_iter.deser_message(self.get_or_insert_with(f))?;
-        } else {
-            Err(ErrorKind::UnexpectedWireType)?
-        }
-        Ok(())
-    }
-}
-
-impl<T> FieldDeserFromIter<tags::Message<T>, tags::Optional2> for Option<<T as Message>::BoxedType>
-where
-    T: crate::deser::DeserializableMessageFromIter + Message,
-{
-    type Item = T;
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-        F: Fn() -> Self::Item,
-    {
-        if let FieldData::LengthDelimited(ld_iter) = field {
-            ld_iter.deser_message(self.get_or_insert_with(|| (f)().into_boxed()).as_mut())?;
-        } else {
-            Err(ErrorKind::UnexpectedWireType)?
-        }
-        Ok(())
-    }
-}
-
-impl<T> FieldDeserFromIter<tags::Message<T>, tags::Optional3> for Option<<T as Message>::BoxedType>
-where
-    T: crate::deser::DeserializableMessageFromIter + Message,
-{
-    type Item = T;
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-        F: Fn() -> Self::Item,
-    {
-        if let FieldData::LengthDelimited(ld_iter) = field {
-            ld_iter.deser_message(self.get_or_insert_with(|| (f)().into_boxed()).as_mut())?;
-        } else {
-            Err(ErrorKind::UnexpectedWireType)?
-        }
-        Ok(())
-    }
-}
-
-impl<'bump, T, VT> FieldDeserFromIter<tags::Message<T>, tags::Repeated> for VT
-where
-    T: crate::deser::DeserializableMessageFromIter,
-    VT: VecType<Item = T>,
-{
-    type Item = T;
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-        F: Fn() -> Self::Item,
-    {
-        if let FieldData::LengthDelimited(ld_iter) = field {
-            self.push((f)());
-            ld_iter.deser_message(self.last_mut().unwrap())?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?
         }
@@ -352,33 +298,4 @@ where
         }
         _ => Err(ErrorKind::InvalidWireType)?,
     })
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Map field
-///////////////////////////////////////////////////////////////////////////////
-
-impl<Entry> FieldDeserFromIter<tags::Message<Entry>, tags::Repeated>
-    for HashMap<Entry::OwnedKeyType, Entry::OwnedValueType>
-where
-    Entry: MapEntryForNormalImpl + DeserializableMessageFromIter,
-    Entry::OwnedKeyType: Hash + Eq,
-{
-    type Item = Entry;
-
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-        F: Fn() -> Self::Item,
-    {
-        if let FieldData::LengthDelimited(ld_iter) = field {
-            let mut entry = (f)();
-            ld_iter.deser_message(&mut entry)?;
-            let kv = entry.into_tuple();
-            self.insert(kv.0, kv.1);
-            Ok(())
-        } else {
-            Err(ErrorKind::UnexpectedWireType)?
-        }
-    }
 }

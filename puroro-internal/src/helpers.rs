@@ -182,18 +182,98 @@ where
     }
 }
 
-trait WrappedMessageFieldType<LabelTag>
+/// Need a special treat for Message type fields because:
+///  - The wrapper type rule is diffirent with the ordinary fields:
+///  -- `required` ==> `T`
+///  -- `optional` (proto2) ==> `Option<Box<T>>`
+///  -- `optional` (proto3) ==> `Option<Box<T>>`
+///  -- _(unlabeled)_ (proto3) ==> `Option<Box<T>>`
+///  -- `repeated` ==> `Vec<T>`
+///  - Need to handle the map field.
+///
+trait WrappedMessageFieldType<MessageType, LabelTag>
 where
+    MessageType: Message,
     LabelTag: tags::FieldLabelTag,
 {
     type Item: Message;
-    fn merge_items<I>(&mut self, iter: I) -> Result<()>
-    where
-        I: Iterator<Item = Result<Self::Item>>;
     fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
     where
         F: FnOnce() -> Self::Item;
     fn as_slice(&self) -> &[Self::Item];
+}
+impl<T> WrappedMessageFieldType<T, tags::Required> for T
+where
+    T: Message,
+{
+    type Item = T;
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    where
+        F: FnOnce() -> Self::Item,
+    {
+        self
+    }
+    fn as_slice(&self) -> &[Self::Item] {
+        std::slice::from_ref(self)
+    }
+}
+impl<T> WrappedMessageFieldType<T, tags::Optional2> for Option<T::BoxedType>
+where
+    T: Message,
+    T::BoxedType: AsMut<T> + AsRef<T>,
+{
+    type Item = T;
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    where
+        F: FnOnce() -> Self::Item,
+    {
+        self.get_or_insert_with(|| (f)().into_boxed()).as_mut()
+    }
+    fn as_slice(&self) -> &[Self::Item] {
+        if let Some(boxed) = self {
+            std::slice::from_ref(boxed.as_ref())
+        } else {
+            &[]
+        }
+    }
+}
+impl<T> WrappedMessageFieldType<T, tags::Optional3> for Option<T::BoxedType>
+where
+    T: Message,
+    T::BoxedType: AsMut<T> + AsRef<T>,
+{
+    type Item = T;
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    where
+        F: FnOnce() -> Self::Item,
+    {
+        self.get_or_insert_with(|| (f)().into_boxed()).as_mut()
+    }
+    fn as_slice(&self) -> &[Self::Item] {
+        if let Some(boxed) = self {
+            std::slice::from_ref(boxed.as_ref())
+        } else {
+            &[]
+        }
+    }
+}
+impl<T, VT> WrappedMessageFieldType<T, tags::Repeated> for VT
+where
+    T: Message,
+    T::BoxedType: AsMut<T> + AsRef<T>,
+    VT: VecType<Item = T>,
+{
+    type Item = T;
+    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    where
+        F: FnOnce() -> Self::Item,
+    {
+        <Self as VecType>::push(self, (f)());
+        <Self as VecType>::last_mut(self).unwrap()
+    }
+    fn as_slice(&self) -> &[Self::Item] {
+        self.as_slice()
+    }
 }
 
 trait VecType {
