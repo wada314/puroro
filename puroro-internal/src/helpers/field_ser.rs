@@ -1,8 +1,12 @@
 use std::collections::HashMap;
 
 use num_traits::Zero;
+use puroro::Message;
 
-use super::{DoDefaultCheck, MapEntryForNormalImpl, StringType, VecType, WrappedFieldType};
+use super::{
+    DoDefaultCheck, MapEntryForNormalImpl, StringType, VecType, WrappedFieldType,
+    WrappedMessageFieldType,
+};
 use crate::ser::{MessageSerializer, SerializableMessage};
 use crate::tags;
 use crate::tags::{FieldLabelTag, WireAndValueTypeTag};
@@ -102,6 +106,24 @@ where
                         .map(|x| Ok(x)),
                 )?
             }
+        }
+        Ok(())
+    }
+}
+
+impl<L, M, T> FieldSer<tags::Message<M>, L> for T
+where
+    L: tags::FieldLabelTag + DoDefaultCheck,
+    T: WrappedMessageFieldType<M, L, Item = M>,
+    M: Message + SerializableMessage,
+{
+    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    where
+        S: MessageSerializer,
+    {
+        let slice = self.as_slice();
+        for item in slice {
+            serializer.serialize_message_twice(field_number, item)?;
         }
         Ok(())
     }

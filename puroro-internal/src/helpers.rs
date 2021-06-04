@@ -183,13 +183,13 @@ where
 }
 
 /// Need a special treat for Message type fields because:
-///  - The wrapper type rule is diffirent with the ordinary fields:
-///  -- `required` ==> `T`
-///  -- `optional` (proto2) ==> `Option<Box<T>>`
-///  -- `optional` (proto3) ==> `Option<Box<T>>`
-///  -- _(unlabeled)_ (proto3) ==> `Option<Box<T>>`
-///  -- `repeated` ==> `Vec<T>`
-///  - Need to handle the map field.
+///  * The wrapper type rule is diffirent with the ordinary fields:
+///    * `required` ==> `T`
+///    * `optional` (proto2) ==> `Option<Box<T>>`
+///    * `optional` (proto3) ==> `Option<Box<T>>`
+///    * _(unlabeled)_ (proto3) ==> `Option<Box<T>>`
+///    * `repeated` ==> `Vec<T>`
+///  * Need to handle the map fields.
 ///
 trait WrappedMessageFieldType<MessageType, LabelTag>
 where
