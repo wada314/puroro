@@ -107,7 +107,7 @@ impl<T> WrappedFieldType<tags::Required> for T {
         self
     }
     fn as_slice(&self) -> &[Self::Item] {
-        std::slice::from_ref(self);
+        std::slice::from_ref(self)
     }
 }
 impl<T> WrappedFieldType<tags::Optional2> for Option<T> {
@@ -152,7 +152,7 @@ impl<T> WrappedFieldType<tags::Optional3> for T {
         self
     }
     fn as_slice(&self) -> &[Self::Item] {
-        std::slice::from_ref(self);
+        std::slice::from_ref(self)
     }
 }
 impl<VT> WrappedFieldType<tags::Repeated> for VT
@@ -215,7 +215,7 @@ impl<T> VecType for Vec<T> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump, T> VecType for ::bumpalo::collections::Vec<'bump, T> {
     type Item = T;
-    fn len(&mut self) -> usize {
+    fn len(&self) -> usize {
         <::bumpalo::collections::Vec<'bump, Self::Item>>::len(self)
     }
     fn push(&mut self, item: Self::Item) {
