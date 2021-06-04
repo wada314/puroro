@@ -71,7 +71,10 @@ where
         let slice = self.as_slice();
         for item in slice {
             if !L::DO_DEFAULT_CHECK || item.len() != 0 {
-                serializer.serialize_bytes_twice(field_number, item.as_bytes())?
+                serializer.serialize_bytes_twice(
+                    field_number,
+                    item.as_bytes().iter().cloned().map(|x| Ok(x)),
+                )?
             }
         }
         Ok(())
@@ -93,8 +96,53 @@ where
             if !L::DO_DEFAULT_CHECK || item.len() != 0 {
                 serializer.serialize_bytes_twice(
                     field_number,
-                    <T::Item as VecType>::as_slice(item).iter(),
+                    <T::Item as VecType>::as_slice(item)
+                        .iter()
+                        .cloned()
+                        .map(|x| Ok(x)),
                 )?
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<V, L, T> FieldSer<(tags::wire::Bits32, V), L> for T
+where
+    V: tags::Bits32TypeTag,
+    L: tags::FieldLabelTag + DoDefaultCheck,
+    T: WrappedFieldType<L>,
+    T::Item: IntoBits32<Tag = V> + Clone,
+{
+    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    where
+        S: crate::ser::MessageSerializer,
+    {
+        for item in self.as_slice() {
+            let bytes = <T::Item as IntoBits32>::into(item.clone());
+            if !L::DO_DEFAULT_CHECK || bytes.iter().any(|x| *x != 0) {
+                serializer.serialize_fixed_bits::<4>(field_number, bytes)?;
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<V, L, T> FieldSer<(tags::wire::Bits64, V), L> for T
+where
+    V: tags::Bits64TypeTag,
+    L: tags::FieldLabelTag + DoDefaultCheck,
+    T: WrappedFieldType<L>,
+    T::Item: IntoBits64<Tag = V> + Clone,
+{
+    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    where
+        S: crate::ser::MessageSerializer,
+    {
+        for item in self.as_slice() {
+            let bytes = <T::Item as IntoBits64>::into(item.clone());
+            if !L::DO_DEFAULT_CHECK || bytes.iter().any(|x| *x != 0) {
+                serializer.serialize_fixed_bits::<8>(field_number, bytes)?;
             }
         }
         Ok(())
