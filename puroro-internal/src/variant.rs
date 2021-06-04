@@ -113,7 +113,7 @@ impl Variant {
 }
 
 pub trait VariantTypeTag {
-    type NativeType;
+    type NativeType: Clone;
     fn from_variant(var: &Variant) -> Result<Self::NativeType>;
     fn to_variant(val: Self::NativeType) -> Result<Variant>;
 }
@@ -190,7 +190,7 @@ impl VariantTypeTag for tags::value::Bool {
 }
 impl<T> VariantTypeTag for tags::value::Enum<T>
 where
-    T: TryFrom<i32, Error = i32> + Into<i32>,
+    T: TryFrom<i32, Error = i32> + Into<i32> + Clone,
 {
     type NativeType = std::result::Result<T, i32>;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
