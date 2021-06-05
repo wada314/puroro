@@ -857,19 +857,24 @@ type {type_ident}{type_gp} {type_where} = &'this {type_name};
         (format!(
             "\
 {cfg}
-impl{gp} ::puroro::Message<'bump> for {struct_ident}{gpb} {{
+impl{gp} ::puroro::Message for {struct_ident}{gpb} {{
     type InternalData = {internal_data_type};
     fn puroro_internal_data(&self) -> &Self::InternalData {{
         &self.puroro_internal
     }}
+    type BoxedType = {boxed_type};
+    fn into_boxed(self) -> Self::BoxedType {{
+        {box_new}
+    }}
 }}\n",
             struct_ident = self.frag_gen.struct_ident(self.msg)?,
             internal_data_type = self.frag_gen.internal_data_type(),
+            boxed_type = self.frag_gen.boxed_type("Self"),
+            box_new = self.frag_gen.box_new("self"),
             cfg = self.frag_gen.cfg_condition(),
             gp = self
                 .frag_gen
                 .struct_generic_params()
-                .push("'bump")
                 .replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
             gpb = self.frag_gen.struct_generic_params_bounds(),
         ),)

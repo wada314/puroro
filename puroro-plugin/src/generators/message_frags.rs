@@ -168,14 +168,14 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 match field.label()? {
                     FieldLabel::Optional2 => {
                         if matches!(field.type_()?, FieldType::Message(_)) {
-                            self.option_type(&self.box_type(&scalar_type)).into()
+                            self.option_type(&self.boxed_type(&scalar_type)).into()
                         } else {
                             self.option_type(&scalar_type).into()
                         }
                     }
                     FieldLabel::Optional3 => {
                         if matches!(field.type_()?, FieldType::Message(_)) {
-                            self.option_type(&self.box_type(&scalar_type)).into()
+                            self.option_type(&self.boxed_type(&scalar_type)).into()
                         } else {
                             scalar_type.into()
                         }
@@ -245,28 +245,18 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     // We need this proxy var to tell the borrow checker that we are splitting
                     // the `self`.
                     FieldType::String => {
-                        "|| ::bumpalo::collections::String::new_in(puroro_internal.bumpalo())"
-                            .into()
+                        "|| ::bumpalo::collections::String::new_in(&puroro_internal.bump)".into()
                     }
                     FieldType::Bytes => {
-                        "|| ::bumpalo::collections::Vec::new_in(puroro_internal.bumpalo())".into()
+                        "|| ::bumpalo::collections::Vec::new_in(&puroro_internal.bump)".into()
                     }
                     FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
                     FieldType::Enum(_) => "|| 0i32.try_into()".into(),
-                    FieldType::Message(m) => match field.label()? {
-                        FieldLabel::Optional2 | FieldLabel::Optional3 => format!(
-                            "|| ::bumpalo::boxed::Box::new_in({msg}::new_in(\
-                                puroro_internal.bumpalo()\
-                            ), puroro_internal.bumpalo())",
-                            msg = self.type_name_of_msg(m, None)?,
-                        )
-                        .into(),
-                        FieldLabel::Required | FieldLabel::Repeated => format!(
-                            "|| {msg}::new_in(puroro_internal.bumpalo())",
-                            msg = self.type_name_of_msg(m, None)?,
-                        )
-                        .into(),
-                    },
+                    FieldType::Message(m) => format!(
+                        "|| {msg}::new_in(&puroro_internal.bump)",
+                        msg = self.type_name_of_msg(m, None)?,
+                    )
+                    .into(),
                     _ => "::std::default::Default::default".into(),
                 },
             },
@@ -327,7 +317,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             ),
             AllocatorType::Bumpalo => format!(
                 "<{field_type} as FieldClone>::clone_in_bumpalo(\
-                    &self.{field_ident}, self.puroro_internal.bumpalo())",
+                    &self.{field_ident}, &self.puroro_internal.bump)",
                 field_ident = field_ident,
                 field_type = field_type
             ),
@@ -353,12 +343,22 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
-    fn box_type(&self, item: &str) -> String {
+    pub fn boxed_type(&self, item: &str) -> String {
         match self.context.alloc_type() {
             AllocatorType::Default => format!("::std::boxed::Box::<{item}>", item = item),
             AllocatorType::Bumpalo => {
                 format!("::bumpalo::boxed::Box::<'bump, {item}>", item = item)
             }
+        }
+    }
+
+    pub fn box_new(&self, item: &str) -> String {
+        match self.context.alloc_type() {
+            AllocatorType::Default => format!("::std::boxed::Box::new({item})", item = item),
+            AllocatorType::Bumpalo => format!(
+                "::bumpalo::boxed::Box::new_in({item}, &self.puroro_internal.bump)",
+                item = item
+            ),
         }
     }
 

@@ -34,7 +34,7 @@ pub struct InternalDataForBumpaloStruct<'bump> {
             (usize, FieldData<::bumpalo::collections::Vec<'bump, u8>>),
         >,
     >,
-    bump: &'bump ::bumpalo::Bump,
+    pub bump: &'bump ::bumpalo::Bump,
 }
 
 #[cfg(feature = "puroro-bumpalo")]
