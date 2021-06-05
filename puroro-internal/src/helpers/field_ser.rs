@@ -111,11 +111,13 @@ where
     }
 }
 
+// Note: For map implementation, `M` might not be equal to `T::Item`
 impl<L, M, T> FieldSer<tags::Message<M>, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
-    T: WrappedMessageFieldType<M, L, Item = M>,
-    M: Message + SerializableMessage,
+    T: WrappedMessageFieldType<M, L>,
+    M: Message,
+    T::Item: Message + SerializableMessage,
 {
     fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
     where
