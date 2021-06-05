@@ -1,5 +1,5 @@
 pub mod field_clone;
-pub mod field_deser;
+pub mod field_merge_from_iter;
 pub mod field_new;
 pub mod field_ser;
 pub mod field_take_or_init;
@@ -8,7 +8,7 @@ use std::borrow::Borrow;
 use std::convert::TryFrom;
 
 pub use field_clone::FieldClone;
-pub use field_deser::{FieldDeserFromIter, FieldDeserFromSlice};
+pub use field_merge_from_iter::{FieldDeserFromSlice, FieldMergeFromIter};
 pub use field_new::FieldNew;
 pub use field_ser::FieldSer;
 pub use field_take_or_init::FieldTakeOrInit;

@@ -14,11 +14,11 @@ pub mod variant;
 pub use ::puroro::{ErrorKind, PuroroError, Result};
 pub use internal_data::{
     InternalDataForBumpaloStruct, InternalDataForNormalStruct, InternalDataForSliceViewStruct,
-    SliceSource, SourceLdSlices, 
+    SliceSource, SourceLdSlices,
 };
 
 pub use helpers::{
-    FieldClone, FieldDeserFromIter, FieldDeserFromSlice, FieldNew, FieldSer, FieldTakeOrInit,
+    FieldClone, FieldDeserFromSlice, FieldMergeFromIter, FieldNew, FieldSer, FieldTakeOrInit,
     MapEntryForNormalImpl, MapEntryForSliceViewImpl, RepeatedSliceViewField,
 };
 pub use types::SliceViewField;

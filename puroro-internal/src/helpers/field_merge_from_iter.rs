@@ -14,12 +14,12 @@ use super::{
     WrappedMessageFieldType,
 };
 
-pub trait FieldDeserFromIter<TypeTag, LabelTag>
+pub trait FieldMergeFromIter<TypeTag, LabelTag>
 where
     TypeTag: tags::WireAndValueTypeTag,
     LabelTag: tags::FieldLabelTag,
 {
-    /// The return type of the default instance generator passed to `deser` method.
+    /// The return type of the default instance generator passed to `merge` method.
     type Item;
     /// Deserialize binary data into this field.
     /// * `field` - A data of the field, where the wire type and (for length delimited wire
@@ -37,7 +37,7 @@ where
     /// value, which `Default::default` cannot support.
     /// ** Message types - `Option<Box<T>>` for the both proto2 and proto3's optional types,
     /// otherwise just a raw message type. This is because of an implementation details...
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item;
@@ -56,7 +56,7 @@ where
     /// * `enclosing_slice` - Slice for this field's owner's fields. If the owner message is
     /// split into multiple instances in the input slice, then the instance of the one that
     /// this field is included.
-    fn deser(
+    fn merge(
         &mut self,
         field: FieldData<LdSlice<'slice>>,
         slice_from_this_field: LdSlice<'slice>,
@@ -64,7 +64,7 @@ where
     ) -> Result<()>;
 }
 
-impl<V, L, T> FieldDeserFromIter<(tags::wire::Variant, V), L> for T
+impl<V, L, T> FieldMergeFromIter<(tags::wire::Variant, V), L> for T
 where
     V: tags::VariantTypeTag + variant::VariantTypeTag,
     L: tags::FieldLabelTag + DoDefaultCheck,
@@ -72,7 +72,7 @@ where
 {
     type Item = <V as variant::VariantTypeTag>::NativeType;
 
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -82,14 +82,14 @@ where
     }
 }
 
-impl<L, T> FieldDeserFromIter<tags::String, L> for T
+impl<L, T> FieldMergeFromIter<tags::String, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
     T::Item: StringType,
 {
     type Item = T::Item;
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -114,14 +114,14 @@ where
     }
 }
 
-impl<L, T> FieldDeserFromIter<tags::Bytes, L> for T
+impl<L, T> FieldMergeFromIter<tags::Bytes, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
     T::Item: VecType<Item = u8>,
 {
     type Item = T::Item;
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -146,14 +146,14 @@ where
     }
 }
 
-impl<M, L, T> FieldDeserFromIter<tags::Message<M>, L> for T
+impl<M, L, T> FieldMergeFromIter<tags::Message<M>, L> for T
 where
     M: Message + crate::deser::DeserializableMessageFromIter,
     L: tags::FieldLabelTag,
     T: WrappedMessageFieldType<M, L, Item = M>,
 {
     type Item = M;
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -167,7 +167,7 @@ where
     }
 }
 
-impl<V, L, T> FieldDeserFromIter<(tags::wire::Bits32, V), L> for T
+impl<V, L, T> FieldMergeFromIter<(tags::wire::Bits32, V), L> for T
 where
     V: tags::Bits32TypeTag,
     L: tags::FieldLabelTag + DoDefaultCheck,
@@ -175,7 +175,7 @@ where
     T::Item: FromBits32<Tag = V>,
 {
     type Item = T::Item;
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -191,7 +191,7 @@ where
     }
 }
 
-impl<V, L, T> FieldDeserFromIter<(tags::wire::Bits64, V), L> for T
+impl<V, L, T> FieldMergeFromIter<(tags::wire::Bits64, V), L> for T
 where
     V: tags::Bits64TypeTag,
     L: tags::FieldLabelTag + DoDefaultCheck,
@@ -199,7 +199,7 @@ where
     T::Item: FromBits64<Tag = V>,
 {
     type Item = T::Item;
-    fn deser<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,

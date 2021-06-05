@@ -339,7 +339,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {{
-        use ::puroro_internal::FieldDeserFromIter;
+        use ::puroro_internal::FieldMergeFromIter;
         use ::puroro::InternalData;
         use ::puroro_internal::tags;
         use ::std::convert::TryInto;
@@ -357,10 +357,10 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb
                         Ok(format!(
                             "\
 {number} => {{
-    <{type_} as FieldDeserFromIter<
+    <{type_} as FieldMergeFromIter<
         tags::{type_tag}, 
         tags::{label_tag}>>
-    ::deser(&mut self.{ident}, field, {default_func})?;
+    ::merge(&mut self.{ident}, field, {default_func})?;
 }}\n",
                             number = field.number(),
                             ident = field.native_ident()?,
