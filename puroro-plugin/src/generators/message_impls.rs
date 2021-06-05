@@ -700,25 +700,11 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
 
                     (
                         ImplType::SliceView,
-                        FieldLabelType::BareField { get_decl },
+                        FieldLabelType::BareField { get_decl }
+                        | FieldLabelType::OptionalField { get_decl },
                         FieldType::String | FieldType::Bytes,
                     ) => format!(
-                        "\
-{decl} {{
-    ::std::borrow::Cow::Borrowed(self.{ident})
-}}\n",
-                        decl = get_decl,
-                        ident = field.native_ident()?,
-                    ),
-                    (
-                        ImplType::SliceView,
-                        FieldLabelType::OptionalField { get_decl },
-                        FieldType::String | FieldType::Bytes,
-                    ) => format!(
-                        "\
-{decl} {{
-    self.{ident}.map(|x| ::std::borrow::Cow::Borrowed(x))
-}}\n",
+                        "{decl} {{\n    self.{ident}\n}}\n",
                         decl = get_decl,
                         ident = field.native_ident()?,
                     ),

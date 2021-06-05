@@ -1,12 +1,15 @@
-use super::{FieldMergeFromIter, WrappedFieldType};
+use std::borrow::Cow;
+
+use super::field_merge_from_iter::{FromBits32, FromBits64};
+use super::{DoDefaultCheck, FieldMergeFromIter, WrappedFieldType};
 use crate::deser::LdIter;
 use crate::deser::LdSlice;
 use crate::tags;
 use crate::types::FieldData;
 use crate::variant;
 use crate::RepeatedSliceViewField;
-use crate::Result;
 use crate::SliceViewField;
+use crate::{ErrorKind, Result};
 
 pub trait FieldMergeFromSlice<'slice, TypeTag, LabelTag>
 where
@@ -36,6 +39,7 @@ impl NonRepeatedLabelTag for tags::Optional2 {}
 impl NonRepeatedLabelTag for tags::Optional3 {}
 
 // Variant types, non-repeated label
+// reuse the `FieldMergeFromIter`.
 impl<'slice, V, L, T> FieldMergeFromSlice<'slice, (tags::wire::Variant, V), L> for T
 where
     V: tags::VariantTypeTag + variant::VariantTypeTag,
@@ -65,6 +69,54 @@ where
     }
 }
 
+// Bytes type, non-repeated label
+impl<'slice, L, T> FieldMergeFromSlice<'slice, tags::Bytes, L> for T
+where
+    L: tags::FieldLabelTag + DoDefaultCheck + NonRepeatedLabelTag,
+    T: WrappedFieldType<L, Item = Cow<'slice, [u8]>>,
+{
+    fn merge(
+        &mut self,
+        field: FieldData<LdSlice<'slice>>,
+        _: LdSlice<'slice>,
+        _: LdSlice<'slice>,
+    ) -> Result<()> {
+        if let FieldData::LengthDelimited(ld_slice) = field {
+            let new_value = Cow::Borrowed(ld_slice.as_slice());
+            if !L::DO_DEFAULT_CHECK || !new_value.is_empty() {
+                *self.get_or_insert_with(Default::default) = new_value;
+            }
+            Ok(())
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+
+// String type, non-repeated label
+impl<'slice, L, T> FieldMergeFromSlice<'slice, tags::String, L> for T
+where
+    L: tags::FieldLabelTag + DoDefaultCheck + NonRepeatedLabelTag,
+    T: WrappedFieldType<L, Item = Cow<'slice, str>>,
+{
+    fn merge(
+        &mut self,
+        field: FieldData<LdSlice<'slice>>,
+        _: LdSlice<'slice>,
+        _: LdSlice<'slice>,
+    ) -> Result<()> {
+        if let FieldData::LengthDelimited(ld_slice) = field {
+            let new_value = String::from_utf8_lossy(ld_slice.as_slice());
+            if !L::DO_DEFAULT_CHECK || !new_value.is_empty() {
+                *self.get_or_insert_with(Default::default) = new_value;
+            }
+            Ok(())
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+
 // Message types, non-repeated label
 impl<'slice, 'msg, M, L> FieldMergeFromSlice<'slice, tags::Message<M>, L>
     for Option<SliceViewField<'slice>>
@@ -79,6 +131,58 @@ where
     ) -> Result<()> {
         update_slice_view_field(self, slice_from_this_field, enclosing_slice);
         Ok(())
+    }
+}
+
+// Bits32 types, non-repeated label
+impl<'slice, V, L, T> FieldMergeFromSlice<'slice, (tags::wire::Bits32, V), L> for T
+where
+    V: tags::Bits32TypeTag,
+    L: tags::FieldLabelTag + DoDefaultCheck + NonRepeatedLabelTag,
+    T: WrappedFieldType<L>,
+    T::Item: super::Default + FromBits32<Tag = V>,
+{
+    fn merge(
+        &mut self,
+        field: FieldData<LdSlice<'slice>>,
+        _: LdSlice<'slice>,
+        _: LdSlice<'slice>,
+    ) -> Result<()> {
+        if let FieldData::Bits32(array) = field {
+            if !L::DO_DEFAULT_CHECK || array.iter().any(|b| *b != 0) {
+                *self.get_or_insert_with(super::Default::default) =
+                    <T::Item as FromBits32>::from(array);
+            }
+            Ok(())
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+
+// Bits64 types, non-repeated label
+impl<'slice, V, L, T> FieldMergeFromSlice<'slice, (tags::wire::Bits64, V), L> for T
+where
+    V: tags::Bits64TypeTag,
+    L: tags::FieldLabelTag + DoDefaultCheck + NonRepeatedLabelTag,
+    T: WrappedFieldType<L>,
+    T::Item: super::Default + FromBits64<Tag = V>,
+{
+    fn merge(
+        &mut self,
+        field: FieldData<LdSlice<'slice>>,
+        _: LdSlice<'slice>,
+        _: LdSlice<'slice>,
+    ) -> Result<()> {
+        if let FieldData::Bits64(array) = field {
+            if !L::DO_DEFAULT_CHECK || array.iter().any(|b| *b != 0) {
+                *self.get_or_insert_with(super::Default::default) =
+                    <T::Item as FromBits64>::from(array);
+            }
+            Ok(())
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
     }
 }
 

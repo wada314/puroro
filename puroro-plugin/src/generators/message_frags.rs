@@ -140,8 +140,8 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 Ok(name) => name,
                 Err(nonnumerical_type) => match nonnumerical_type {
                     NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                    NonNumericalFieldType::String => "&'slice str".into(),
-                    NonNumericalFieldType::Bytes => "&'slice [u8]".into(),
+                    NonNumericalFieldType::String => "::std::borrow::Cow<'slice, str>".into(),
+                    NonNumericalFieldType::Bytes => "::std::borrow::Cow<'slice, [u8]>".into(),
                     NonNumericalFieldType::Message(m) => self.type_name_of_msg(m, None)?.into(),
                 },
             },
