@@ -10,6 +10,11 @@ pub use error::{ErrorKind, PuroroError};
 pub type Result<T> = std::result::Result<T, PuroroError>;
 pub use collections::{MapField, RepeatedField};
 
+// Re-exports
+#[cfg(feature = "puroro-bumpalo")]
+pub use ::bumpalo;
+pub use ::hashbrown;
+
 pub trait DeserializableFromIter {
     fn deser_from_iter<I>(&mut self, iter: &mut I) -> Result<()>
     where

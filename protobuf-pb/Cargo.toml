@@ -8,14 +8,13 @@ edition = "2018"
 [dependencies]
 puroro = { path = "../puroro" }
 puroro-internal = { path = "../puroro-internal" }
-bumpalo = { version = "3.7.0", features = ["collections", "boxed"], optional = true }
 
 [build-dependencies]
 puroro-plugin = { path = "../puroro-plugin" }
 
 [features]
 puroro-nightly = []
-puroro-bumpalo = ["bumpalo"]
+puroro-bumpalo = ["puroro/puroro-bumpalo"]
 default = [
     "puroro-nightly", 
     "puroro-bumpalo",

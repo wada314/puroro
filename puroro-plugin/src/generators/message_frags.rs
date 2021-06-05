@@ -245,10 +245,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     // We need this proxy var to tell the borrow checker that we are splitting
                     // the `self`.
                     FieldType::String => {
-                        "|| ::bumpalo::collections::String::new_in(&puroro_internal.bump)".into()
+                        "|| ::puroro::bumpalo::collections::String::new_in(&puroro_internal.bump)"
+                            .into()
                     }
                     FieldType::Bytes => {
-                        "|| ::bumpalo::collections::Vec::new_in(&puroro_internal.bump)".into()
+                        "|| ::puroro::bumpalo::collections::Vec::new_in(&puroro_internal.bump)"
+                            .into()
                     }
                     FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
                     FieldType::Enum(_) => "|| 0i32.try_into()".into(),
@@ -293,7 +295,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         match (self.context.impl_type(), self.context.alloc_type()) {
             (ImplType::Default, AllocatorType::Default) => "fn new() -> Self",
             (ImplType::Default, AllocatorType::Bumpalo) => {
-                "fn new_in(bump: &'bump ::bumpalo::Bump) -> Self"
+                "fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self"
             }
             _ => {
                 unimplemented!()
@@ -347,7 +349,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         match self.context.alloc_type() {
             AllocatorType::Default => format!("::std::boxed::Box::<{item}>", item = item),
             AllocatorType::Bumpalo => {
-                format!("::bumpalo::boxed::Box::<'bump, {item}>", item = item)
+                format!(
+                    "::puroro::bumpalo::boxed::Box::<'bump, {item}>",
+                    item = item
+                )
             }
         }
     }
@@ -358,7 +363,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             AllocatorType::Bumpalo => format!(
                 "{{
     let bump = self.puroro_internal.bump;
-    ::bumpalo::boxed::Box::new_in({item}, bump)
+    ::puroro::bumpalo::boxed::Box::new_in({item}, bump)
 }}\n",
                 item = item
             ),
@@ -369,7 +374,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         match self.context.alloc_type() {
             AllocatorType::Default => format!("::std::vec::Vec::<{item}>", item = item),
             AllocatorType::Bumpalo => {
-                format!("::bumpalo::collections::Vec::<'bump, {item}>", item = item)
+                format!(
+                    "::puroro::bumpalo::collections::Vec::<'bump, {item}>",
+                    item = item
+                )
             }
         }
     }
@@ -377,7 +385,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     fn string_type(&self) -> &'static str {
         match self.context.alloc_type() {
             AllocatorType::Default => "::std::string::String",
-            AllocatorType::Bumpalo => "::bumpalo::collections::String::<'bump>",
+            AllocatorType::Bumpalo => "::puroro::bumpalo::collections::String::<'bump>",
         }
     }
 

@@ -1000,7 +1000,7 @@ impl{gp} ::puroro_internal::FieldNew<'bump> for {name}{gpb} {{
     fn new() -> Self {{
         unimplemented!()
     }}
-    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {{
+    fn new_in_bumpalo(bump: &'bump ::puroro::bumpalo::Bump) -> Self {{
         Self::new_in(bump)
     }}
 }}\n",
