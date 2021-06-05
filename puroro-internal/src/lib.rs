@@ -18,7 +18,7 @@ pub use internal_data::{
 };
 
 pub use helpers::{
-    FieldClone, FieldDeserFromSlice, FieldMergeFromIter, FieldNew, FieldSer, FieldTakeOrInit,
+    FieldClone, FieldMergeFromSlice, FieldMergeFromIter, FieldNew, FieldSer, FieldTakeOrInit,
     MapEntryForNormalImpl, MapEntryForSliceViewImpl, RepeatedSliceViewField,
 };
 pub use types::SliceViewField;

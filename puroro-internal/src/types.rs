@@ -23,6 +23,27 @@ pub enum FieldData<T> {
     Bits32([u8; 4]),
     Bits64([u8; 8]),
 }
+impl<T> FieldData<T> {
+    pub fn as_mut(&mut self) -> FieldData<&mut T> {
+        match self {
+            FieldData::Variant(x) => FieldData::Variant(x.clone()),
+            FieldData::LengthDelimited(x) => FieldData::LengthDelimited(x),
+            FieldData::Bits32(x) => FieldData::Bits32(x.clone()),
+            FieldData::Bits64(x) => FieldData::Bits64(x.clone()),
+        }
+    }
+    pub fn map<U, F>(self, f: F) -> FieldData<U>
+    where
+        F: FnOnce(T) -> U,
+    {
+        match self {
+            FieldData::Variant(x) => FieldData::Variant(x),
+            FieldData::LengthDelimited(x) => FieldData::LengthDelimited((f)(x)),
+            FieldData::Bits32(x) => FieldData::Bits32(x),
+            FieldData::Bits64(x) => FieldData::Bits64(x),
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub enum SliceViewField<'slice> {
@@ -30,15 +51,21 @@ pub enum SliceViewField<'slice> {
     FieldInSingleSlice {
         /// A subslice of `enclosing_ld_slice` starting from this field's item.
         ld_slice: LdSlice<'slice>,
-        /// A total number of field items in the slice. Packed repeated field is counted as 1.
+        /// A total number of field items in the slice. Packed repeated field is counted as 1 field.
         count: usize,
+        /// A hint used when deserializing from the slice. Not used after the deserialization
+        /// is done.
         enclosing_ld_slice: LdSlice<'slice>,
     },
     /// The field's owner message is constructed from multiple slices (and merged then),
-    /// so we cannot store the source slice list in the stack memory.
+    /// so we cannot store the source slice list (arbitrary length) in the stack memory.
     /// In this case, we need to get the list of LdSlices from puroro_internal field.
+    /// The items of this entry are hints for optimization.
     FieldInMultipleSlices {
+        /// A total number of field items in the slice. Packed repeated field is counted as 1 field.
         count: usize,
+        /// A first source slice that this field instance appears.
+        /// We can skip parsing the source slices until this slice appears.
         first_enclosing_ld_slice: LdSlice<'slice>,
     },
 }

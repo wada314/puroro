@@ -42,27 +42,6 @@ where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item;
 }
-pub trait FieldDeserFromSlice<'slice, TypeTag, LabelTag>
-where
-    TypeTag: tags::WireAndValueTypeTag,
-    LabelTag: tags::FieldLabelTag,
-{
-    /// Deserialize binary data into this field.
-    /// * `field` - A data of the field, where the wire type and (for length delimited wire
-    /// type) the field length are already load. For variants and fixed bytes fields,
-    /// the content data is also already load.
-    /// * `slice_from_this_field` - a subslice of `enclosing_slice` starting from the field's
-    /// first byte (including the bytes for wire_type, field_number and field_length).
-    /// * `enclosing_slice` - Slice for this field's owner's fields. If the owner message is
-    /// split into multiple instances in the input slice, then the instance of the one that
-    /// this field is included.
-    fn merge(
-        &mut self,
-        field: FieldData<LdSlice<'slice>>,
-        slice_from_this_field: LdSlice<'slice>,
-        enclosing_slice: LdSlice<'slice>,
-    ) -> Result<()>;
-}
 
 impl<V, L, T> FieldMergeFromIter<(tags::wire::Variant, V), L> for T
 where
