@@ -19,7 +19,7 @@ use crate::ser::MessageSerializer;
 use crate::tags;
 use crate::Result;
 
-trait DoDefaultCheck {
+pub trait DoDefaultCheck {
     const DO_DEFAULT_CHECK: bool = false;
 }
 impl DoDefaultCheck for tags::Optional3 {
@@ -77,7 +77,7 @@ impl<T: TryFrom<i32, Error = i32>> Default for ::std::result::Result<T, i32> {
         T::try_from(0i32)
     }
 }
-trait WrappedFieldType<LabelTag>
+pub trait WrappedFieldType<LabelTag>
 where
     LabelTag: tags::FieldLabelTag,
 {
@@ -101,7 +101,7 @@ impl<T> WrappedFieldType<tags::Required> for T {
         }
         Ok(())
     }
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    fn get_or_insert_with<F>(&mut self, _: F) -> &mut Self::Item
     where
         F: FnOnce() -> Self::Item,
     {
@@ -146,7 +146,7 @@ impl<T> WrappedFieldType<tags::Optional3> for T {
         }
         Ok(())
     }
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    fn get_or_insert_with<F>(&mut self, _: F) -> &mut Self::Item
     where
         F: FnOnce() -> Self::Item,
     {
@@ -191,7 +191,7 @@ where
 ///    * `repeated` ==> `Vec<T>`
 ///  * Need to handle the map fields.
 ///
-trait WrappedMessageFieldType<MessageType, LabelTag>
+pub trait WrappedMessageFieldType<MessageType, LabelTag>
 where
     MessageType: Message,
     LabelTag: tags::FieldLabelTag,
@@ -200,46 +200,48 @@ where
     fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
     where
         F: FnOnce() -> Self::Item;
-    fn for_each<F>(&self, f: F)
+    fn try_for_each<F>(&self, f: F) -> Result<()>
     where
-        F: FnMut(&Self::Item);
+        F: FnMut(&Self::Item) -> Result<()>;
 }
-impl<T> WrappedMessageFieldType<T, tags::Required> for T
+impl<M> WrappedMessageFieldType<M, tags::Required> for M
 where
-    T: Message,
+    M: Message,
 {
-    type Item = T;
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    type Item = M;
+    fn get_or_insert_with<F>(&mut self, _: F) -> &mut Self::Item
     where
         F: FnOnce() -> Self::Item,
     {
         self
     }
-    fn for_each<F>(&self, f: F)
+    fn try_for_each<F>(&self, mut f: F) -> Result<()>
     where
-        F: FnMut(&Self::Item),
+        F: FnMut(&Self::Item) -> Result<()>,
     {
         (f)(self)
     }
 }
-impl<T> WrappedMessageFieldType<T, tags::Optional2> for Option<T::BoxedType>
+impl<M> WrappedMessageFieldType<M, tags::Optional2> for Option<M::BoxedType>
 where
-    T: Message,
-    T::BoxedType: AsMut<T> + AsRef<T>,
+    M: Message,
+    M::BoxedType: AsMut<M> + AsRef<M>,
 {
-    type Item = T;
+    type Item = M;
     fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
     where
         F: FnOnce() -> Self::Item,
     {
         self.get_or_insert_with(|| (f)().into_boxed()).as_mut()
     }
-    fn for_each<F>(&self, f: F)
+    fn try_for_each<F>(&self, mut f: F) -> Result<()>
     where
-        F: FnMut(&Self::Item),
+        F: FnMut(&Self::Item) -> Result<()>,
     {
         if let Some(boxed) = self {
             (f)(boxed.as_ref())
+        } else {
+            Ok(())
         }
     }
 }
@@ -255,12 +257,14 @@ where
     {
         self.get_or_insert_with(|| (f)().into_boxed()).as_mut()
     }
-    fn for_each<F>(&self, f: F)
+    fn try_for_each<F>(&self, mut f: F) -> Result<()>
     where
-        F: FnMut(&Self::Item),
+        F: FnMut(&Self::Item) -> Result<()>,
     {
         if let Some(boxed) = self {
             (f)(boxed.as_ref())
+        } else {
+            Ok(())
         }
     }
 }
@@ -278,17 +282,18 @@ where
         <Self as VecType>::push(self, (f)());
         <Self as VecType>::last_mut(self).unwrap()
     }
-    fn for_each<F>(&self, f: F)
+    fn try_for_each<F>(&self, mut f: F) -> Result<()>
     where
-        F: FnMut(&Self::Item),
+        F: FnMut(&Self::Item) -> Result<()>,
     {
         for item in self.as_slice() {
-            (f)(item);
+            (f)(item)?;
         }
+        Ok(())
     }
 }
 
-trait VecType {
+pub trait VecType {
     type Item;
     fn len(&self) -> usize;
     fn push(&mut self, item: Self::Item);
@@ -307,7 +312,7 @@ impl<T> VecType for Vec<T> {
         <Vec<Self::Item>>::push(self, item)
     }
     fn last_mut(&mut self) -> Option<&mut Self::Item> {
-        <Vec<Self::Item>>::last_mut(self)
+        <[Self::Item]>::last_mut(self)
     }
     fn clear(&mut self) {
         <Vec<Self::Item>>::clear(self)
@@ -329,7 +334,7 @@ impl<'bump, T> VecType for ::bumpalo::collections::Vec<'bump, T> {
         <::bumpalo::collections::Vec<'bump, Self::Item>>::push(self, item)
     }
     fn last_mut(&mut self) -> Option<&mut Self::Item> {
-        <::bumpalo::collections::Vec<'bump, Self::Item>>::last_mut(self)
+        <[Self::Item]>::last_mut(self)
     }
     fn clear(&mut self) {
         <::bumpalo::collections::Vec<'bump, Self::Item>>::clear(self)
@@ -342,7 +347,7 @@ impl<'bump, T> VecType for ::bumpalo::collections::Vec<'bump, T> {
     }
 }
 
-trait StringType {
+pub trait StringType {
     fn len(&self) -> usize;
     fn as_bytes(&self) -> &[u8];
     fn push(&mut self, c: char);

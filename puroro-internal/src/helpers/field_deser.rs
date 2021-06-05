@@ -215,7 +215,7 @@ where
     }
 }
 
-trait FromBits32: Sized {
+pub trait FromBits32: Sized {
     type Tag: tags::Bits32TypeTag;
     fn from(array: [u8; 4]) -> Self;
 }
@@ -238,7 +238,7 @@ impl FromBits32 for i32 {
     }
 }
 
-trait FromBits64: Sized {
+pub trait FromBits64: Sized {
     type Tag: tags::Bits64TypeTag;
     fn from(array: [u8; 8]) -> Self;
 }

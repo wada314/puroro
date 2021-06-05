@@ -1,6 +1,3 @@
-use std::collections::HashMap;
-
-use num_traits::Zero;
 use puroro::Message;
 
 use super::{
@@ -23,17 +20,6 @@ where
         S: crate::ser::MessageSerializer;
 }
 
-fn enum_to_i32<T>(e: &std::result::Result<T, i32>) -> i32
-where
-    i32: From<T>,
-    T: Clone,
-{
-    match e {
-        Ok(x) => i32::from(x.clone()),
-        Err(i) => *i,
-    }
-}
-
 impl<V, L, T> FieldSer<(tags::wire::Variant, V), L> for T
 where
     V: tags::VariantTypeTag + variant::VariantTypeTag,
@@ -47,9 +33,9 @@ where
         let slice = self.as_slice();
         if slice.len() <= 1 {
             if let Some(item) = slice.first() {
-                let variant = V::to_variant(*item)?;
+                let variant = V::to_variant(item.clone())?;
                 if !L::DO_DEFAULT_CHECK || !variant.is_zero() {
-                    serializer.serialize_variant::<V>(field_number, *item)?;
+                    serializer.serialize_variant::<V>(field_number, item.clone())?;
                 }
             }
         } else {
@@ -123,10 +109,10 @@ where
     where
         S: MessageSerializer,
     {
-        self.for_each(|item| {
+        self.try_for_each(|item| -> Result<_> {
             serializer.serialize_message_twice(field_number, item)?;
-        });
-        Ok(())
+            Ok(())
+        })
     }
 }
 
@@ -172,7 +158,7 @@ where
     }
 }
 
-trait IntoBits32 {
+pub trait IntoBits32 {
     type Tag: tags::Bits32TypeTag;
     fn into(self) -> [u8; 4];
 }
@@ -195,7 +181,7 @@ impl IntoBits32 for i32 {
     }
 }
 
-trait IntoBits64 {
+pub trait IntoBits64 {
     type Tag: tags::Bits64TypeTag;
     fn into(self) -> [u8; 8];
 }
@@ -221,7 +207,7 @@ impl IntoBits64 for i64 {
 ///////////////////////////////////////////////////////////////////////////////
 // Map field
 ///////////////////////////////////////////////////////////////////////////////
-
+/*
 impl<Entry> FieldSer<tags::Message<Entry>, tags::Repeated>
     for HashMap<Entry::OwnedKeyType, Entry::OwnedValueType>
 where
@@ -250,3 +236,4 @@ where
         Ok(())
     }
 }
+*/
