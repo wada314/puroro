@@ -12,7 +12,7 @@ edition = "2018"
 bumpalo = { git = "https://github.com/fitzgen/bumpalo.git", features = ["collections", "boxed"], optional = true }
 puroro = { path = "../puroro" }
 puroro-internal = { path = "../puroro-internal" }
-#protobuf-pb = { path = "../protobuf-pb" }
+protobuf-pb = { path = "../protobuf-pb" }
 sample-pb = { path = "../sample-pb" }
 
 [features]
