@@ -473,7 +473,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
         enclosing_slice: ::puroro_internal::deser::LdSlice<'slice>,
     ) -> ::puroro::Result<bool>
     {{
-        use ::puroro_internal::FieldDeserFromSlice;
+        use ::puroro_internal::FieldMergeFromSlice;
         use ::puroro_internal::tags;
         match field_number {{\n",
                 ident = self.frag_gen.struct_ident(self.msg)?,
@@ -488,10 +488,10 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
                         Ok(format!(
                             "\
 {number} => {{
-    <{type_} as FieldDeserFromSlice<
+    <{type_} as FieldMergeFromSlice<
         tags::{type_tag}, 
         tags::{label_tag}>>
-    ::deser(&mut self.{ident}, field, slice_from_this_field, enclosing_slice)?;
+    ::merge(&mut self.{ident}, field, slice_from_this_field, enclosing_slice)?;
 }}\n",
                             number = field.number(),
                             ident = field.native_ident()?,
@@ -704,7 +704,9 @@ impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
                         | FieldLabelType::OptionalField { get_decl },
                         FieldType::String | FieldType::Bytes,
                     ) => format!(
-                        "{decl} {{\n    self.{ident}\n}}\n",
+                        "{decl} {{
+    ::std::borrow::Cow::Borrowed(self.{ident}.as_ref())
+}}\n",
                         decl = get_decl,
                         ident = field.native_ident()?,
                     ),

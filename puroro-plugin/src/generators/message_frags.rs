@@ -356,7 +356,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         match self.context.alloc_type() {
             AllocatorType::Default => format!("::std::boxed::Box::new({item})", item = item),
             AllocatorType::Bumpalo => format!(
-                "::bumpalo::boxed::Box::new_in({item}, &self.puroro_internal.bump)",
+                "{{
+    let bump = self.puroro_internal.bump;
+    ::bumpalo::boxed::Box::new_in({item}, bump)
+}}\n",
                 item = item
             ),
         }

@@ -7,7 +7,6 @@ use crate::deser::LdSlice;
 use crate::tags;
 use crate::types::FieldData;
 use crate::variant;
-use crate::RepeatedSliceViewField;
 use crate::SliceViewField;
 use crate::{ErrorKind, Result};
 

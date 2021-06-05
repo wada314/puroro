@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
@@ -25,10 +26,19 @@ impl_field_new!(f32);
 impl_field_new!(f64);
 impl_field_new!(bool);
 impl_field_new!(String);
-impl_field_new!(&str);
 impl<'bump, T> FieldNew<'bump> for Vec<T> {
     fn new() -> Self {
         Default::default()
+    }
+}
+impl<'slice, 'bump> FieldNew<'bump> for Cow<'slice, str> {
+    fn new() -> Self {
+        Cow::Borrowed("")
+    }
+}
+impl<'slice, 'bump> FieldNew<'bump> for Cow<'slice, [u8]> {
+    fn new() -> Self {
+        Cow::Borrowed(&[])
     }
 }
 impl<'bump, T> FieldNew<'bump> for Option<T> {

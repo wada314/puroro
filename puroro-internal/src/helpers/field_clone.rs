@@ -1,4 +1,5 @@
 use crate::types::SliceViewField;
+use std::borrow::Cow;
 use std::collections::HashMap;
 
 /// We need this JUST ONLY for `::bumpalo::boxed::Box`, because it doesn't have
@@ -62,14 +63,25 @@ define_field_clone!(f32);
 define_field_clone!(f64);
 define_field_clone!(bool);
 define_field_clone!(String);
-define_field_clone!(&str);
 define_field_clone!(std::result::Result<T, i32>, <T: Clone>);
 define_field_clone!(Box<T>, <T: Clone>);
 define_field_clone!(Vec<T>, <T: Clone>);
-define_field_clone!(&[u8]);
 define_field_clone!(HashMap<K, V>, <K: Clone, V: Clone>);
 #[cfg(feature = "puroro-bumpalo")]
 define_field_clone!(::bumpalo::collections::Vec<'bump, T>, <T: Clone>);
 #[cfg(feature = "puroro-bumpalo")]
 define_field_clone!(::bumpalo::collections::String<'bump>);
 define_field_clone!(SliceViewField<'slice>, <'slice>);
+
+impl<'slice, 'bump, T> FieldClone<'bump> for Cow<'slice, T>
+where
+    T: ?Sized + ToOwned,
+{
+    fn clone(&self) -> Self {
+        <Self as Clone>::clone(self)
+    }
+    #[cfg(feature = "puroro-bumpalo")]
+    fn clone_in_bumpalo(&self, _: &'bump ::bumpalo::Bump) -> Self {
+        <Self as Clone>::clone(self)
+    }
+}
