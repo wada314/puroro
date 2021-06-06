@@ -34,3 +34,9 @@ impl<T, E> ResultHelper<T, E> for std::result::Result<std::result::Result<T, E>,
         self.and_then(|x| x)
     }
 }
+
+pub trait MapEntry {
+    type KeyType;
+    type ValueType;
+    fn take_kv(self) -> (Self::KeyType, Self::ValueType);
+}

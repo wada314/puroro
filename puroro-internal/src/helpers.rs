@@ -17,8 +17,11 @@ pub use field_take_or_init::FieldTakeOrInit;
 use puroro::Message;
 pub use repeated_slice_view::RepeatedSliceViewField;
 
+use crate::deser::DeserializableMessageFromIter;
+use crate::deser::LdIter;
 use crate::ser::MessageSerializer;
 use crate::tags;
+use crate::types::FieldData;
 use crate::Result;
 
 pub trait DoDefaultCheck {
@@ -292,6 +295,25 @@ where
             (f)(item)?;
         }
         Ok(())
+    }
+}
+
+struct MapEntryWrapper<T>(T);
+impl<T> DeserializableMessageFromIter for MapEntryWrapper<T> {
+    fn met_field<'a, I>(
+        &mut self,
+        field: FieldData<&'a mut LdIter<I>>,
+        field_number: usize,
+    ) -> Result<bool>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+    {
+        todo!()
+    }
+}
+impl<T> Drop for MapEntryWrapper<T> {
+    fn drop(&mut self) {
+        todo!()
     }
 }
 
