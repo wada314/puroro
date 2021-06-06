@@ -8,7 +8,6 @@ edition = "2018"
 
 [dependencies]
 puroro = { path = "../puroro" }
-bumpalo = { version = "3.7.0", features = ["collections", "boxed"], optional = true }
 num-traits = "0.2.14"
 num-derive = "0.3.3"
 utf8-decode = "1.0.1"
@@ -19,5 +18,5 @@ either_n = "0.2.0"
 
 [features]
 puroro-nightly = []
-puroro-bumpalo = ["bumpalo"]
+puroro-bumpalo = ["puroro/puroro-bumpalo"]
 default = ["puroro-nightly", "puroro-bumpalo"]

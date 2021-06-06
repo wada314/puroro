@@ -19,7 +19,7 @@ impl InternalDataForNormalStruct {
 }
 impl InternalData for InternalDataForNormalStruct {
     #[cfg(feature = "puroro-bumpalo")]
-    fn bumpalo(&self) -> &bumpalo::Bump {
+    fn bumpalo(&self) -> &crate::bumpalo::Bump {
         panic!("The Bumpalo data field is only available for a Bumpalo struct!")
     }
 }
@@ -29,17 +29,20 @@ impl InternalData for InternalDataForNormalStruct {
 pub struct InternalDataForBumpaloStruct<'bump> {
     // No hashmap implementation in bumpalo...
     unknown_fields: Option<
-        ::bumpalo::collections::Vec<
+        crate::bumpalo::collections::Vec<
             'bump,
-            (usize, FieldData<::bumpalo::collections::Vec<'bump, u8>>),
+            (
+                usize,
+                FieldData<crate::bumpalo::collections::Vec<'bump, u8>>,
+            ),
         >,
     >,
-    pub bump: &'bump ::bumpalo::Bump,
+    pub bump: &'bump crate::bumpalo::Bump,
 }
 
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> InternalDataForBumpaloStruct<'bump> {
-    pub fn new_with_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {
+    pub fn new_with_bumpalo(bump: &'bump crate::bumpalo::Bump) -> Self {
         Self {
             unknown_fields: None,
             bump,
@@ -47,7 +50,7 @@ impl<'bump> InternalDataForBumpaloStruct<'bump> {
     }
 }
 impl<'bump> InternalData for InternalDataForBumpaloStruct<'bump> {
-    fn bumpalo(&self) -> &bumpalo::Bump {
+    fn bumpalo(&self) -> &crate::bumpalo::Bump {
         self.bump
     }
 }
@@ -194,7 +197,7 @@ impl<'slice, S> InternalData for InternalDataForSliceViewStruct<'slice, S>
 where
     S: SliceSource<'slice>,
 {
-    fn bumpalo(&self) -> &bumpalo::Bump {
+    fn bumpalo(&self) -> &crate::bumpalo::Bump {
         panic!("The Bumpalo data field is only available for a Bumpalo struct!")
     }
 }

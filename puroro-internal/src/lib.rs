@@ -11,6 +11,8 @@ pub mod tags;
 pub mod types;
 pub mod variant;
 
+use ::puroro::bumpalo;
+
 pub use ::puroro::{ErrorKind, PuroroError, Result};
 pub use internal_data::{
     InternalDataForBumpaloStruct, InternalDataForNormalStruct, InternalDataForSliceViewStruct,
@@ -18,7 +20,7 @@ pub use internal_data::{
 };
 
 pub use helpers::{
-    FieldClone, FieldMergeFromSlice, FieldMergeFromIter, FieldNew, FieldSer, FieldTakeOrInit,
+    FieldClone, FieldMergeFromIter, FieldMergeFromSlice, FieldNew, FieldSer, FieldTakeOrInit,
     MapEntryForNormalImpl, MapEntryForSliceViewImpl, RepeatedSliceViewField,
 };
 pub use types::SliceViewField;

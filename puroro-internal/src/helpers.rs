@@ -327,22 +327,22 @@ impl<T> VecType for Vec<T> {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump, T> VecType for ::bumpalo::collections::Vec<'bump, T> {
+impl<'bump, T> VecType for crate::bumpalo::collections::Vec<'bump, T> {
     type Item = T;
     fn len(&self) -> usize {
-        <::bumpalo::collections::Vec<'bump, Self::Item>>::len(self)
+        <crate::bumpalo::collections::Vec<'bump, Self::Item>>::len(self)
     }
     fn push(&mut self, item: Self::Item) {
-        <::bumpalo::collections::Vec<'bump, Self::Item>>::push(self, item)
+        <crate::bumpalo::collections::Vec<'bump, Self::Item>>::push(self, item)
     }
     fn last_mut(&mut self) -> Option<&mut Self::Item> {
         <[Self::Item]>::last_mut(self)
     }
     fn clear(&mut self) {
-        <::bumpalo::collections::Vec<'bump, Self::Item>>::clear(self)
+        <crate::bumpalo::collections::Vec<'bump, Self::Item>>::clear(self)
     }
     fn reserve(&mut self, bytes_len: usize) {
-        <::bumpalo::collections::Vec<'bump, Self::Item>>::reserve(self, bytes_len)
+        <crate::bumpalo::collections::Vec<'bump, Self::Item>>::reserve(self, bytes_len)
     }
     fn as_slice(&self) -> &[Self::Item] {
         <Self as AsRef<[Self::Item]>>::as_ref(self)
@@ -374,20 +374,20 @@ impl StringType for String {
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> StringType for ::bumpalo::collections::String<'bump> {
+impl<'bump> StringType for crate::bumpalo::collections::String<'bump> {
     fn len(&self) -> usize {
-        <::bumpalo::collections::String<'bump>>::len(self)
+        <crate::bumpalo::collections::String<'bump>>::len(self)
     }
     fn as_bytes(&self) -> &[u8] {
-        <::bumpalo::collections::String<'bump>>::as_bytes(self)
+        <crate::bumpalo::collections::String<'bump>>::as_bytes(self)
     }
     fn push(&mut self, c: char) {
-        <::bumpalo::collections::String<'bump>>::push(self, c)
+        <crate::bumpalo::collections::String<'bump>>::push(self, c)
     }
     fn clear(&mut self) {
-        <::bumpalo::collections::String<'bump>>::clear(self)
+        <crate::bumpalo::collections::String<'bump>>::clear(self)
     }
     fn reserve(&mut self, bytes_len: usize) {
-        <::bumpalo::collections::String<'bump>>::reserve(self, bytes_len)
+        <crate::bumpalo::collections::String<'bump>>::reserve(self, bytes_len)
     }
 }
