@@ -1,6 +1,6 @@
 use crate::deser::LdSlice;
 use crate::types::{FieldData, SliceViewField};
-use crate::{ErrorKind, Result, ResultHelper};
+use crate::{hashbrown, ErrorKind, Result, ResultHelper};
 use ::itertools::{Either, Itertools};
 use ::puroro::InternalData;
 use ::std::collections::HashMap;
@@ -27,15 +27,11 @@ impl InternalData for InternalDataForNormalStruct {
 #[cfg(feature = "puroro-bumpalo")]
 #[derive(Debug, Clone)]
 pub struct InternalDataForBumpaloStruct<'bump> {
-    // No hashmap implementation in bumpalo...
-    unknown_fields: Option<
-        crate::bumpalo::collections::Vec<
-            'bump,
-            (
-                usize,
-                FieldData<crate::bumpalo::collections::Vec<'bump, u8>>,
-            ),
-        >,
+    unknown_fields: hashbrown::HashMap<
+        usize,
+        FieldData<crate::bumpalo::collections::Vec<'bump, u8>>,
+        hashbrown::hash_map::DefaultHashBuilder,
+        hashbrown::BumpWrapper<'bump>,
     >,
     pub bump: &'bump crate::bumpalo::Bump,
 }
@@ -44,7 +40,7 @@ pub struct InternalDataForBumpaloStruct<'bump> {
 impl<'bump> InternalDataForBumpaloStruct<'bump> {
     pub fn new_with_bumpalo(bump: &'bump crate::bumpalo::Bump) -> Self {
         Self {
-            unknown_fields: None,
+            unknown_fields: hashbrown::HashMap::new_in(hashbrown::BumpWrapper(bump)),
             bump,
         }
     }

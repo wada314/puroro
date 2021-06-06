@@ -11,7 +11,7 @@ pub mod tags;
 pub mod types;
 pub mod variant;
 
-use ::puroro::bumpalo;
+use ::puroro::{bumpalo, hashbrown};
 
 pub use ::puroro::{ErrorKind, PuroroError, Result};
 pub use internal_data::{

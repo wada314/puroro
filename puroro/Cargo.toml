@@ -12,9 +12,9 @@ num-traits = "0.2.14"
 num-derive = "0.3.3"
 either = "1.6.1"
 bumpalo = { version = "3.7.0", features = ["collections", "boxed"], optional = true }
-hashbrown = { version = "0.11", features = ["bumpalo"] }
+hashbrown = { version = "0.11" }
 
 [features]
 puroro-nightly = []
-puroro-bumpalo = ["bumpalo"]
+puroro-bumpalo = ["bumpalo", "hashbrown/bumpalo"]
 default = ["puroro-nightly", "puroro-bumpalo"]
