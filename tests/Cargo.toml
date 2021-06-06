@@ -7,7 +7,6 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bumpalo = { version = "3.7.0", features = ["collections", "boxed"], optional = true }
 puroro = { path = "../puroro" }
 puroro-internal = { path = "../puroro-internal" }
 protobuf-pb = { path = "../protobuf-pb" }
@@ -15,7 +14,7 @@ sample-pb = { path = "../sample-pb" }
 
 [features]
 puroro-nightly = []
-puroro-bumpalo = ["bumpalo"]
+puroro-bumpalo = ["puroro/puroro-bumpalo"]
 default = [
     "puroro-nightly", 
     "puroro-bumpalo",
