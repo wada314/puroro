@@ -156,11 +156,26 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     if m.is_map_entry() {
                         // Special treatment for map field
                         let (key_field, value_field) = m.key_value_of_map_entry()?;
-                        return Ok(format!(
-                            "::std::collections::HashMap<{key}, {value}>",
-                            key = self.field_scalar_item_type(key_field)?,
-                            value = self.field_scalar_item_type(value_field)?,
-                        )
+                        let key_type = self.field_scalar_item_type(key_field)?;
+                        let value_type = self.field_scalar_item_type(value_field)?;
+                        return Ok(match self.context.alloc_type() {
+                            AllocatorType::Default => format!(
+                                "::std::collections::HashMap<{key}, {value}>",
+                                key = key_type,
+                                value = value_type,
+                            ),
+                            AllocatorType::Bumpalo => format!(
+                                "\
+::puroro_internal::hashbrown::HashMap<
+    {key},
+    {value},
+    ::puroro_internal::hashbrown::hash_map::DefaultHashBuilder,
+    ::puroro_internal::hashbrown::BumpWrapper<'bump>,
+>",
+                                key = key_type,
+                                value = value_type,
+                            ),
+                        }
                         .into());
                     }
                 }

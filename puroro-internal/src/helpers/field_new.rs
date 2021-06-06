@@ -1,3 +1,4 @@
+use crate::{bumpalo, hashbrown};
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::convert::TryFrom;
@@ -5,7 +6,7 @@ use std::convert::TryFrom;
 pub trait FieldNew<'bump>: Sized {
     fn new() -> Self;
     #[cfg(feature = "puroro-bumpalo")]
-    fn new_in_bumpalo(_bump: &'bump crate::bumpalo::Bump) -> Self {
+    fn new_in_bumpalo(_bump: &'bump bumpalo::Bump) -> Self {
         Self::new()
     }
 }
@@ -60,20 +61,36 @@ where
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump, T> FieldNew<'bump> for crate::bumpalo::collections::Vec<'bump, T> {
+impl<'bump, T> FieldNew<'bump> for bumpalo::collections::Vec<'bump, T> {
     fn new() -> Self {
         unimplemented!("this field must be initialized from new_in_bumpalo!")
     }
-    fn new_in_bumpalo(bump: &'bump crate::bumpalo::Bump) -> Self {
-        crate::bumpalo::collections::Vec::new_in(bump)
+    fn new_in_bumpalo(bump: &'bump bumpalo::Bump) -> Self {
+        bumpalo::collections::Vec::new_in(bump)
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'bump> FieldNew<'bump> for crate::bumpalo::collections::String<'bump> {
+impl<'bump> FieldNew<'bump> for bumpalo::collections::String<'bump> {
     fn new() -> Self {
         unimplemented!("this field must be initialized from new_in_bumpalo!")
     }
-    fn new_in_bumpalo(bump: &'bump crate::bumpalo::Bump) -> Self {
-        crate::bumpalo::collections::String::new_in(bump)
+    fn new_in_bumpalo(bump: &'bump bumpalo::Bump) -> Self {
+        bumpalo::collections::String::new_in(bump)
+    }
+}
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump, K, V> FieldNew<'bump>
+    for hashbrown::HashMap<
+        K,
+        V,
+        hashbrown::hash_map::DefaultHashBuilder,
+        hashbrown::BumpWrapper<'bump>,
+    >
+{
+    fn new() -> Self {
+        unimplemented!("this field must be initialized from new_in_bumpalo!")
+    }
+    fn new_in_bumpalo(bump: &'bump bumpalo::Bump) -> Self {
+        hashbrown::HashMap::new_in(hashbrown::BumpWrapper(bump))
     }
 }

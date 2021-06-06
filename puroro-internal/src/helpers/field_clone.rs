@@ -1,4 +1,5 @@
 use crate::types::SliceViewField;
+use crate::{bumpalo, hashbrown};
 use std::borrow::Cow;
 use std::collections::HashMap;
 
@@ -71,6 +72,9 @@ define_field_clone!(HashMap<K, V>, <K: Clone, V: Clone>);
 define_field_clone!(crate::bumpalo::collections::Vec<'bump, T>, <T: Clone>);
 #[cfg(feature = "puroro-bumpalo")]
 define_field_clone!(crate::bumpalo::collections::String<'bump>);
+#[cfg(feature = "puroro-bumpalo")]
+define_field_clone!(hashbrown::HashMap<K, V, hashbrown::hash_map::DefaultHashBuilder,
+        hashbrown::BumpWrapper<'bump>>, <K: Clone, V: Clone>);
 define_field_clone!(SliceViewField<'slice>, <'slice>);
 
 impl<'slice, 'bump, T> FieldClone<'bump> for Cow<'slice, T>
