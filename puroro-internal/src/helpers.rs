@@ -298,22 +298,38 @@ where
     }
 }
 
-struct MapEntryWrapper<T>(T);
-impl<T> DeserializableMessageFromIter for MapEntryWrapper<T> {
-    fn met_field<'a, I>(
+struct MapEntryWrapper<'a, T, M>
+where
+    T: crate::MapEntry<KeyType = M::Key, ValueType = M::Value>,
+    M: MapType,
+{
+    entry: T,
+    map: &'a mut M,
+}
+impl<'a, T, M> DeserializableMessageFromIter for MapEntryWrapper<'a, T, M>
+where
+    T: crate::MapEntry<KeyType = M::Key, ValueType = M::Value> + DeserializableMessageFromIter,
+    M: MapType,
+{
+    fn met_field<'b, I>(
         &mut self,
-        field: FieldData<&'a mut LdIter<I>>,
+        field: FieldData<&'b mut LdIter<I>>,
         field_number: usize,
     ) -> Result<bool>
     where
         I: Iterator<Item = std::io::Result<u8>>,
     {
-        todo!()
+        self.entry.met_field(field, field_number)
     }
 }
-impl<T> Drop for MapEntryWrapper<T> {
+impl<'a, T, M> Drop for MapEntryWrapper<'a, T, M>
+where
+    T: crate::MapEntry<KeyType = M::Key, ValueType = M::Value>,
+    M: MapType,
+{
     fn drop(&mut self) {
-        todo!()
+        let (key, value) = self.entry.take_kv();
+        self.map.insert(key, value);
     }
 }
 
@@ -412,4 +428,10 @@ impl<'bump> StringType for crate::bumpalo::collections::String<'bump> {
     fn reserve(&mut self, bytes_len: usize) {
         <crate::bumpalo::collections::String<'bump>>::reserve(self, bytes_len)
     }
+}
+
+pub trait MapType {
+    type Key;
+    type Value;
+    fn insert(&mut self, key: Self::Key, value: Self::Value) -> Option<Self::Value>;
 }

@@ -38,5 +38,6 @@ impl<T, E> ResultHelper<T, E> for std::result::Result<std::result::Result<T, E>,
 pub trait MapEntry {
     type KeyType;
     type ValueType;
-    fn take_kv(self) -> (Self::KeyType, Self::ValueType);
+    // Note: &mut self, not self. The implementor may need to use std::mem::replace.
+    fn take_kv(&mut self) -> (Self::KeyType, Self::ValueType);
 }
