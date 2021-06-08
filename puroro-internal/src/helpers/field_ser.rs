@@ -55,15 +55,15 @@ where
     where
         S: MessageSerializer,
     {
-        let slice = self.as_slice();
-        for item in slice {
+        self.try_for_each(|item| -> Result<_> {
             if !L::DO_DEFAULT_CHECK || <T::Item as StringType>::len(item) != 0 {
                 serializer.serialize_bytes_twice(
                     field_number,
                     item.as_bytes().iter().cloned().map(|x| Ok(x)),
-                )?
+                )?;
             }
-        }
+            Ok(())
+        })?;
         Ok(())
     }
 }
