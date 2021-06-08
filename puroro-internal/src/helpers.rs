@@ -6,7 +6,9 @@ pub mod field_ser;
 pub mod field_take_or_init;
 pub mod repeated_slice_view;
 use std::borrow::Borrow;
+use std::collections::HashMap;
 use std::convert::TryFrom;
+use std::ops::DerefMut;
 
 pub use field_clone::FieldClone;
 pub use field_merge_from_iter::FieldMergeFromIter;
@@ -524,6 +526,45 @@ impl<'bump> BytesType for crate::bumpalo::collections::Vec<'bump, u8> {
     fn as_slice(&self) -> &[u8] {
         <bumpalo::collections::Vec<'bump, u8>>::as_slice(self)
     }
+}
+
+pub trait RepeatedMessageType<'a> {
+    type Item;
+    type RefMut: 'a;
+    fn insert_mut(&'a mut self, item: Self::Item) -> Self::RefMut;
+}
+
+impl<'a, T> RepeatedMessageType<'a> for Vec<T>
+where
+    T: 'a + Message,
+{
+    type Item = T;
+    type RefMut = &'a mut T;
+    fn insert_mut(&'a mut self, item: Self::Item) -> Self::RefMut {
+        self.push(item);
+        self.last_mut().unwrap()
+    }
+}
+
+impl<'a, K, V> RepeatedMessageType<'a> for HashMap<K, V>
+where
+    K: 'a,
+    V: 'a,
+    Entry<'a, K, V>: 'a,
+{
+    type Item = (K, V);
+    type RefMut = Entry<'a, K, V>;
+    fn insert_mut(&'a mut self, item: Self::Item) -> Self::RefMut {
+        todo!()
+    }
+}
+pub struct Entry<'a, K, V> {
+    key: K,
+    value: V,
+    map_ref: &'a mut HashMap<K, V>,
+}
+impl<'a, K, V> Drop for Entry<'a, K, V> {
+    
 }
 
 pub trait MapType {
