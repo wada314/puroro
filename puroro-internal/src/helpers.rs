@@ -159,11 +159,14 @@ impl<T> WrappedFieldType<tags::Optional2> for Option<T> {
             None => &[],
         }
     }
-    fn try_for_each<F>(&self, f: F) -> Result<()>
+    fn try_for_each<F>(&self, mut f: F) -> Result<()>
     where
         F: FnMut(&Self::Item) -> Result<()>,
     {
-        todo!()
+        if let Some(item) = self {
+            (f)(item)?;
+        }
+        Ok(())
     }
 }
 impl<T> WrappedFieldType<tags::Optional3> for T {
