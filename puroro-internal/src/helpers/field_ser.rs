@@ -1,9 +1,6 @@
 use puroro::Message;
 
-use super::{
-    DoDefaultCheck, MapEntryForNormalImpl, StringType, VecType, WrappedFieldType,
-    WrappedMessageFieldType,
-};
+use super::{BytesType, DoDefaultCheck, StringType, WrappedFieldType, WrappedMessageFieldType};
 use crate::ser::{MessageSerializer, SerializableMessage};
 use crate::tags;
 use crate::tags::{FieldLabelTag, WireAndValueTypeTag};
@@ -75,7 +72,7 @@ impl<L, T> FieldSer<tags::Bytes, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
-    T::Item: VecType<Item = u8>,
+    T::Item: BytesType,
 {
     fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
     where
@@ -86,7 +83,7 @@ where
             if !L::DO_DEFAULT_CHECK || item.len() != 0 {
                 serializer.serialize_bytes_twice(
                     field_number,
-                    <T::Item as VecType>::as_slice(item)
+                    <T::Item as BytesType>::as_slice(item)
                         .iter()
                         .cloned()
                         .map(|x| Ok(x)),

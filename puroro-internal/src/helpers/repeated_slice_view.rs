@@ -1,16 +1,15 @@
-use std::borrow::{Borrow, Cow};
+use std::borrow::Cow;
 use std::convert::TryFrom;
-use std::hash::Hash;
 use std::marker::PhantomData;
 
 use crate::deser::LdSlice;
 use crate::internal_data::SliceSource;
+use crate::tags;
 use crate::types::{FieldData, SliceViewField};
 use crate::InternalDataForSliceViewStruct;
-use crate::{tags, MapEntryForSliceViewImpl};
 use crate::{ErrorKind, PuroroError, Result, ResultHelper};
 use ::itertools::{Either, Itertools};
-use ::puroro::{MapField, RepeatedField};
+use ::puroro::RepeatedField;
 
 pub trait FieldDataIntoIter<'slice, 'a> {
     type Item;

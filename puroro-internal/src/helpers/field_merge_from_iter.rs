@@ -1,18 +1,13 @@
 use itertools::{Either, Itertools};
 use puroro::Message;
 
-use crate::deser::{DeserializableMessageFromIter, LdIter, LdSlice};
+use crate::deser::LdIter;
 use crate::types::FieldData;
 use crate::variant;
 use crate::{tags, ResultHelper};
 use crate::{ErrorKind, Result};
-use std::collections::HashMap;
-use std::hash::Hash;
 
-use super::{
-    DoDefaultCheck, MapEntryForNormalImpl, StringType, VecType, WrappedFieldType,
-    WrappedMessageFieldType,
-};
+use super::{BytesType, DoDefaultCheck, StringType, WrappedFieldType, WrappedMessageFieldType};
 
 pub trait FieldMergeFromIter<TypeTag, LabelTag>
 where
@@ -51,7 +46,7 @@ where
 {
     type Item = <V as variant::VariantTypeTag>::NativeType;
 
-    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -97,7 +92,7 @@ impl<L, T> FieldMergeFromIter<tags::Bytes, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
-    T::Item: VecType<Item = u8>,
+    T::Item: BytesType,
 {
     type Item = T::Item;
     fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>

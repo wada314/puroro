@@ -336,30 +336,17 @@ where
 
 pub trait VecType {
     type Item;
-    fn len(&self) -> usize;
     fn push(&mut self, item: Self::Item);
     fn last_mut(&mut self) -> Option<&mut Self::Item>;
-    fn clear(&mut self);
-    fn reserve(&mut self, bytes_len: usize);
     fn as_slice(&self) -> &[Self::Item];
 }
 impl<T> VecType for Vec<T> {
     type Item = T;
-
-    fn len(&self) -> usize {
-        <Vec<Self::Item>>::len(self)
-    }
     fn push(&mut self, item: Self::Item) {
         <Vec<Self::Item>>::push(self, item)
     }
     fn last_mut(&mut self) -> Option<&mut Self::Item> {
         <[Self::Item]>::last_mut(self)
-    }
-    fn clear(&mut self) {
-        <Vec<Self::Item>>::clear(self)
-    }
-    fn reserve(&mut self, bytes_len: usize) {
-        <Vec<Self::Item>>::reserve(self, bytes_len)
     }
     fn as_slice(&self) -> &[Self::Item] {
         <Self as AsRef<[Self::Item]>>::as_ref(self)
@@ -368,20 +355,11 @@ impl<T> VecType for Vec<T> {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump, T> VecType for crate::bumpalo::collections::Vec<'bump, T> {
     type Item = T;
-    fn len(&self) -> usize {
-        <bumpalo::collections::Vec<'bump, Self::Item>>::len(self)
-    }
     fn push(&mut self, item: Self::Item) {
         <bumpalo::collections::Vec<'bump, Self::Item>>::push(self, item)
     }
     fn last_mut(&mut self) -> Option<&mut Self::Item> {
         <[Self::Item]>::last_mut(self)
-    }
-    fn clear(&mut self) {
-        <bumpalo::collections::Vec<'bump, Self::Item>>::clear(self)
-    }
-    fn reserve(&mut self, bytes_len: usize) {
-        <bumpalo::collections::Vec<'bump, Self::Item>>::reserve(self, bytes_len)
     }
     fn as_slice(&self) -> &[Self::Item] {
         <Self as AsRef<[Self::Item]>>::as_ref(self)
@@ -432,14 +410,34 @@ impl<'bump> StringType for crate::bumpalo::collections::String<'bump> {
 }
 
 pub trait BytesType {
+    fn len(&self) -> usize;
     fn push(&mut self, byte: u8);
     fn clear(&mut self);
     fn reserve(&mut self, bytes_len: usize);
     fn as_slice(&self) -> &[u8];
 }
-
+impl BytesType for Vec<u8> {
+    fn len(&self) -> usize {
+        <Vec<u8>>::len(self)
+    }
+    fn push(&mut self, byte: u8) {
+        <Vec<u8>>::push(self, byte)
+    }
+    fn clear(&mut self) {
+        <Vec<u8>>::clear(self)
+    }
+    fn reserve(&mut self, bytes_len: usize) {
+        <Vec<u8>>::reserve(self, bytes_len)
+    }
+    fn as_slice(&self) -> &[u8] {
+        <Vec<u8>>::as_slice(self)
+    }
+}
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> BytesType for crate::bumpalo::collections::Vec<'bump, u8> {
+    fn len(&self) -> usize {
+        <bumpalo::collections::Vec<'bump, u8>>::len(self)
+    }
     fn push(&mut self, byte: u8) {
         <bumpalo::collections::Vec<'bump, u8>>::push(self, byte)
     }
