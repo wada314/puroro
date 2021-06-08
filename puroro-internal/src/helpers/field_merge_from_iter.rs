@@ -69,7 +69,7 @@ where
         F: Fn() -> Self::Item,
     {
         if let FieldData::LengthDelimited(ld_iter) = field {
-            let expected_len = ld_iter.len();
+            let expected_len = <LdIter<I>>::len(ld_iter);
             let mut iter = ld_iter.chars().peekable();
             if !L::DO_DEFAULT_CHECK || matches!(iter.peek(), Some(_)) {
                 // Do not invoke get_or_insert_with until we make sure
@@ -101,7 +101,7 @@ where
         F: Fn() -> Self::Item,
     {
         if let FieldData::LengthDelimited(ld_iter) = field {
-            let expected_len = ld_iter.len();
+            let expected_len = <LdIter<I>>::len(ld_iter);
             let mut iter = ld_iter.bytes().peekable();
             if !L::DO_DEFAULT_CHECK || matches!(iter.peek(), Some(_)) {
                 // Do not invoke get_or_insert_with until we make sure

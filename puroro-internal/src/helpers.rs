@@ -88,16 +88,23 @@ where
     LabelTag: tags::FieldLabelTag,
 {
     type Item;
+    fn len(&self) -> usize;
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = Result<Self::Item>>;
     fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
     where
         F: FnOnce() -> Self::Item;
+    fn try_for_each<F>(&self, f: F) -> Result<()>
+    where
+        F: FnMut(&Self::Item) -> Result<()>;
     fn as_slice(&self) -> &[Self::Item];
 }
 impl<T> WrappedFieldType<tags::Required> for T {
     type Item = T;
+    fn len(&self) -> usize {
+        1
+    }
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = Result<Self::Item>>,
@@ -116,9 +123,21 @@ impl<T> WrappedFieldType<tags::Required> for T {
     fn as_slice(&self) -> &[Self::Item] {
         std::slice::from_ref(self)
     }
+    fn try_for_each<F>(&self, mut f: F) -> Result<()>
+    where
+        F: FnMut(&Self::Item) -> Result<()>,
+    {
+        (f)(self)
+    }
 }
 impl<T> WrappedFieldType<tags::Optional2> for Option<T> {
     type Item = T;
+    fn len(&self) -> usize {
+        match self {
+            Some(_) => 1,
+            None => 0,
+        }
+    }
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = Result<Self::Item>>,
@@ -140,9 +159,18 @@ impl<T> WrappedFieldType<tags::Optional2> for Option<T> {
             None => &[],
         }
     }
+    fn try_for_each<F>(&self, f: F) -> Result<()>
+    where
+        F: FnMut(&Self::Item) -> Result<()>,
+    {
+        todo!()
+    }
 }
 impl<T> WrappedFieldType<tags::Optional3> for T {
     type Item = T;
+    fn len(&self) -> usize {
+        1
+    }
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = Result<Self::Item>>,
@@ -161,12 +189,21 @@ impl<T> WrappedFieldType<tags::Optional3> for T {
     fn as_slice(&self) -> &[Self::Item] {
         std::slice::from_ref(self)
     }
+    fn try_for_each<F>(&self, mut f: F) -> Result<()>
+    where
+        F: FnMut(&Self::Item) -> Result<()>,
+    {
+        (f)(self)
+    }
 }
 impl<VT> WrappedFieldType<tags::Repeated> for VT
 where
     VT: VecType,
 {
     type Item = VT::Item;
+    fn len(&self) -> usize {
+        <Self as VecType>::len(self)
+    }
     fn merge_items<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = Result<Self::Item>>,
@@ -185,6 +222,12 @@ where
     }
     fn as_slice(&self) -> &[Self::Item] {
         <Self as VecType>::as_slice(self)
+    }
+    fn try_for_each<F>(&self, f: F) -> Result<()>
+    where
+        F: FnMut(&Self::Item) -> Result<()>,
+    {
+        <Self as VecType>::try_for_each(self, f)
     }
 }
 
@@ -336,12 +379,19 @@ where
 
 pub trait VecType {
     type Item;
+    fn len(&self) -> usize;
     fn push(&mut self, item: Self::Item);
     fn last_mut(&mut self) -> Option<&mut Self::Item>;
     fn as_slice(&self) -> &[Self::Item];
+    fn try_for_each<F>(&self, f: F) -> Result<()>
+    where
+        F: FnMut(&Self::Item) -> Result<()>;
 }
 impl<T> VecType for Vec<T> {
     type Item = T;
+    fn len(&self) -> usize {
+        <Vec<Self::Item>>::len(self)
+    }
     fn push(&mut self, item: Self::Item) {
         <Vec<Self::Item>>::push(self, item)
     }
@@ -351,10 +401,22 @@ impl<T> VecType for Vec<T> {
     fn as_slice(&self) -> &[Self::Item] {
         <Self as AsRef<[Self::Item]>>::as_ref(self)
     }
+    fn try_for_each<F>(&self, f: F) -> Result<()>
+    where
+        F: FnMut(&Self::Item) -> Result<()>,
+    {
+        <std::slice::Iter<'_, Self::Item> as Iterator>::try_for_each(
+            &mut <[Self::Item]>::iter(self),
+            f,
+        )
+    }
 }
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump, T> VecType for crate::bumpalo::collections::Vec<'bump, T> {
     type Item = T;
+    fn len(&self) -> usize {
+        <bumpalo::collections::Vec<'bump, Self::Item>>::len(self)
+    }
     fn push(&mut self, item: Self::Item) {
         <bumpalo::collections::Vec<'bump, Self::Item>>::push(self, item)
     }
@@ -363,6 +425,15 @@ impl<'bump, T> VecType for crate::bumpalo::collections::Vec<'bump, T> {
     }
     fn as_slice(&self) -> &[Self::Item] {
         <Self as AsRef<[Self::Item]>>::as_ref(self)
+    }
+    fn try_for_each<F>(&self, f: F) -> Result<()>
+    where
+        F: FnMut(&Self::Item) -> Result<()>,
+    {
+        <std::slice::Iter<'_, Self::Item> as Iterator>::try_for_each(
+            &mut <[Self::Item]>::iter(self),
+            f,
+        )
     }
 }
 
