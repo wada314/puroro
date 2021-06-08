@@ -17,6 +17,7 @@ pub use field_take_or_init::FieldTakeOrInit;
 use puroro::Message;
 pub use repeated_slice_view::RepeatedSliceViewField;
 
+use crate::bumpalo;
 use crate::deser::DeserializableMessageFromIter;
 use crate::deser::LdIter;
 use crate::ser::MessageSerializer;
@@ -368,19 +369,19 @@ impl<T> VecType for Vec<T> {
 impl<'bump, T> VecType for crate::bumpalo::collections::Vec<'bump, T> {
     type Item = T;
     fn len(&self) -> usize {
-        <crate::bumpalo::collections::Vec<'bump, Self::Item>>::len(self)
+        <bumpalo::collections::Vec<'bump, Self::Item>>::len(self)
     }
     fn push(&mut self, item: Self::Item) {
-        <crate::bumpalo::collections::Vec<'bump, Self::Item>>::push(self, item)
+        <bumpalo::collections::Vec<'bump, Self::Item>>::push(self, item)
     }
     fn last_mut(&mut self) -> Option<&mut Self::Item> {
         <[Self::Item]>::last_mut(self)
     }
     fn clear(&mut self) {
-        <crate::bumpalo::collections::Vec<'bump, Self::Item>>::clear(self)
+        <bumpalo::collections::Vec<'bump, Self::Item>>::clear(self)
     }
     fn reserve(&mut self, bytes_len: usize) {
-        <crate::bumpalo::collections::Vec<'bump, Self::Item>>::reserve(self, bytes_len)
+        <bumpalo::collections::Vec<'bump, Self::Item>>::reserve(self, bytes_len)
     }
     fn as_slice(&self) -> &[Self::Item] {
         <Self as AsRef<[Self::Item]>>::as_ref(self)
@@ -414,19 +415,42 @@ impl StringType for String {
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> StringType for crate::bumpalo::collections::String<'bump> {
     fn len(&self) -> usize {
-        <crate::bumpalo::collections::String<'bump>>::len(self)
+        <bumpalo::collections::String<'bump>>::len(self)
     }
     fn as_bytes(&self) -> &[u8] {
-        <crate::bumpalo::collections::String<'bump>>::as_bytes(self)
+        <bumpalo::collections::String<'bump>>::as_bytes(self)
     }
     fn push(&mut self, c: char) {
-        <crate::bumpalo::collections::String<'bump>>::push(self, c)
+        <bumpalo::collections::String<'bump>>::push(self, c)
     }
     fn clear(&mut self) {
-        <crate::bumpalo::collections::String<'bump>>::clear(self)
+        <bumpalo::collections::String<'bump>>::clear(self)
     }
     fn reserve(&mut self, bytes_len: usize) {
-        <crate::bumpalo::collections::String<'bump>>::reserve(self, bytes_len)
+        <bumpalo::collections::String<'bump>>::reserve(self, bytes_len)
+    }
+}
+
+pub trait BytesType {
+    fn push(&mut self, byte: u8);
+    fn clear(&mut self);
+    fn reserve(&mut self, bytes_len: usize);
+    fn as_slice(&self) -> &[u8];
+}
+
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> BytesType for crate::bumpalo::collections::Vec<'bump, u8> {
+    fn push(&mut self, byte: u8) {
+        <bumpalo::collections::Vec<'bump, u8>>::push(self, byte)
+    }
+    fn clear(&mut self) {
+        <bumpalo::collections::Vec<'bump, u8>>::clear(self)
+    }
+    fn reserve(&mut self, bytes_len: usize) {
+        <bumpalo::collections::Vec<'bump, u8>>::reserve(self, bytes_len)
+    }
+    fn as_slice(&self) -> &[u8] {
+        <bumpalo::collections::Vec<'bump, u8>>::as_slice(self)
     }
 }
 

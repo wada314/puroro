@@ -1,10 +1,11 @@
 # puroro, a protocol buffer implementation for rust
 
-This library is under development and it is very possible to make breaking changes in near future.
+This library is under development and it is very possible to make breaking changes in very near future.
 
 ## TODOs
 - proto2
     - [ ] Groups, at least correctly ignore it (where's document!?)
+    - [ ] Enums (In proto2 we need to refuse the unknown value)
     - [ ] default
     - [ ] extensions
 - proto2 & 3
