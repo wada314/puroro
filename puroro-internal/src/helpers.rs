@@ -8,6 +8,7 @@ pub mod repeated_slice_view;
 use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::convert::TryFrom;
+use std::hash::Hash;
 use std::ops::DerefMut;
 
 pub use field_clone::FieldClone;
@@ -347,41 +348,6 @@ where
     }
 }
 
-struct MapEntryWrapper<'a, T, M>
-where
-    T: crate::MapEntry<KeyType = M::Key, ValueType = M::Value>,
-    M: MapType,
-{
-    entry: T,
-    map: &'a mut M,
-}
-impl<'a, T, M> DeserializableMessageFromIter for MapEntryWrapper<'a, T, M>
-where
-    T: crate::MapEntry<KeyType = M::Key, ValueType = M::Value> + DeserializableMessageFromIter,
-    M: MapType,
-{
-    fn met_field<'b, I>(
-        &mut self,
-        field: FieldData<&'b mut LdIter<I>>,
-        field_number: usize,
-    ) -> Result<bool>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-    {
-        self.entry.met_field(field, field_number)
-    }
-}
-impl<'a, T, M> Drop for MapEntryWrapper<'a, T, M>
-where
-    T: crate::MapEntry<KeyType = M::Key, ValueType = M::Value>,
-    M: MapType,
-{
-    fn drop(&mut self) {
-        let (key, value) = self.entry.take_kv();
-        self.map.insert(key, value);
-    }
-}
-
 pub trait VecType {
     type Item;
     fn len(&self) -> usize;
@@ -528,47 +494,89 @@ impl<'bump> BytesType for crate::bumpalo::collections::Vec<'bump, u8> {
     }
 }
 
-pub trait RepeatedMessageType<'a> {
+pub trait RepeatedMessageType<'a, Msg> {
     type Item;
     type RefMut: 'a;
     fn insert_mut(&'a mut self, item: Self::Item) -> Self::RefMut;
 }
 
-impl<'a, T> RepeatedMessageType<'a> for Vec<T>
+impl<'a, Msg> RepeatedMessageType<'a, Msg> for Vec<Msg>
 where
-    T: 'a + Message,
+    Msg: 'a + Message,
 {
-    type Item = T;
-    type RefMut = &'a mut T;
+    type Item = Msg;
+    type RefMut = &'a mut Msg;
     fn insert_mut(&'a mut self, item: Self::Item) -> Self::RefMut {
         self.push(item);
         self.last_mut().unwrap()
     }
 }
 
-impl<'a, K, V> RepeatedMessageType<'a> for HashMap<K, V>
+impl<'a, K, V, Msg> RepeatedMessageType<'a, Msg> for HashMap<K, V>
 where
-    K: 'a,
+    K: 'a + Eq + Hash,
     V: 'a,
-    Entry<'a, K, V>: 'a,
+    Msg: Message + crate::MapEntry<KeyType = K, ValueType = V>,
+    MapEntryWrapper<'a, Msg, Self>: 'a,
 {
-    type Item = (K, V);
-    type RefMut = Entry<'a, K, V>;
+    type Item = Msg;
+    type RefMut = MapEntryWrapper<'a, Msg, Self>;
     fn insert_mut(&'a mut self, item: Self::Item) -> Self::RefMut {
-        todo!()
+        MapEntryWrapper {
+            entry: item,
+            map: self,
+        }
     }
 }
-pub struct Entry<'a, K, V> {
-    key: K,
-    value: V,
-    map_ref: &'a mut HashMap<K, V>,
+
+pub struct MapEntryWrapper<'a, Msg, Map>
+where
+    Msg: crate::MapEntry<KeyType = Map::Key, ValueType = Map::Value>,
+    Map: MapType,
+{
+    entry: Msg,
+    map: &'a mut Map,
 }
-impl<'a, K, V> Drop for Entry<'a, K, V> {
-    
+impl<'a, Msg, Map> DeserializableMessageFromIter for MapEntryWrapper<'a, Msg, Map>
+where
+    Msg:
+        crate::MapEntry<KeyType = Map::Key, ValueType = Map::Value> + DeserializableMessageFromIter,
+    Map: MapType,
+{
+    fn met_field<'b, I>(
+        &mut self,
+        field: FieldData<&'b mut LdIter<I>>,
+        field_number: usize,
+    ) -> Result<bool>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+    {
+        self.entry.met_field(field, field_number)
+    }
+}
+impl<'a, T, M> Drop for MapEntryWrapper<'a, T, M>
+where
+    T: crate::MapEntry<KeyType = M::Key, ValueType = M::Value>,
+    M: MapType,
+{
+    fn drop(&mut self) {
+        let (key, value) = self.entry.take_kv();
+        self.map.insert(key, value);
+    }
 }
 
 pub trait MapType {
     type Key;
     type Value;
     fn insert(&mut self, key: Self::Key, value: Self::Value) -> Option<Self::Value>;
+}
+impl<K, V> MapType for HashMap<K, V>
+where
+    K: Eq + Hash,
+{
+    type Key = K;
+    type Value = V;
+    fn insert(&mut self, key: Self::Key, value: Self::Value) -> Option<Self::Value> {
+        <HashMap<K, V>>::insert(self, key, value)
+    }
 }
