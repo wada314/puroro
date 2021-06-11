@@ -40,4 +40,5 @@ pub trait MapEntry {
     type ValueType;
     // Note: &mut self, not self. The implementor may need to use std::mem::replace.
     fn take_kv(&mut self) -> (Self::KeyType, Self::ValueType);
+    fn from_kv(key: &Self::KeyType, value: &Self::ValueType) -> Self;
 }

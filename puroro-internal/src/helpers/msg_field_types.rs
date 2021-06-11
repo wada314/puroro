@@ -5,6 +5,7 @@ use crate::{bumpalo, hashbrown, tags};
 use puroro::Message;
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::ops::DerefMut;
 
 /// Need a special treat for Message type fields because:
 ///  * The wrapper type rule is diffirent with the ordinary fields:
@@ -21,7 +22,12 @@ where
     LabelTag: tags::FieldLabelTag,
 {
     type Item: Message;
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    type Deserable: DeserializableMessageFromIter;
+    type DeserableMut<'a>: DerefMut<Target = Self::Deserable>
+    where
+        Self: 'a,
+        Self::Item: 'a;
+    fn get_or_insert_with<F>(&mut self, f: F) -> Self::DeserableMut<'_>
     where
         F: FnOnce() -> Self::Item;
     fn try_for_each<F>(&self, f: F) -> Result<()>
@@ -30,10 +36,16 @@ where
 }
 impl<M> WrappedMessageFieldType<M, tags::Required> for M
 where
-    M: Message,
+    M: Message + DeserializableMessageFromIter,
 {
     type Item = M;
-    fn get_or_insert_with<F>(&mut self, _: F) -> &mut Self::Item
+    type Deserable = M;
+    type DeserableMut<'a>
+    where
+        Self: 'a,
+        Self::Item: 'a,
+    = &'a mut Self::Item;
+    fn get_or_insert_with<F>(&mut self, _: F) -> Self::DeserableMut<'_>
     where
         F: FnOnce() -> Self::Item,
     {
@@ -48,11 +60,17 @@ where
 }
 impl<M> WrappedMessageFieldType<M, tags::Optional2> for Option<M::BoxedType>
 where
-    M: Message,
+    M: Message + DeserializableMessageFromIter,
     M::BoxedType: AsMut<M> + AsRef<M>,
 {
     type Item = M;
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    type Deserable = M;
+    type DeserableMut<'a>
+    where
+        Self: 'a,
+        Self::Item: 'a,
+    = &'a mut Self::Item;
+    fn get_or_insert_with<F>(&mut self, f: F) -> Self::DeserableMut<'_>
     where
         F: FnOnce() -> Self::Item,
     {
@@ -69,13 +87,19 @@ where
         }
     }
 }
-impl<T> WrappedMessageFieldType<T, tags::Optional3> for Option<T::BoxedType>
+impl<M> WrappedMessageFieldType<M, tags::Optional3> for Option<M::BoxedType>
 where
-    T: Message,
-    T::BoxedType: AsMut<T> + AsRef<T>,
+    M: Message + DeserializableMessageFromIter,
+    M::BoxedType: AsMut<M> + AsRef<M>,
 {
-    type Item = T;
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    type Item = M;
+    type Deserable = M;
+    type DeserableMut<'a>
+    where
+        Self: 'a,
+        Self::Item: 'a,
+    = &'a mut Self::Item;
+    fn get_or_insert_with<F>(&mut self, f: F) -> Self::DeserableMut<'_>
     where
         F: FnOnce() -> Self::Item,
     {
@@ -92,50 +116,63 @@ where
         }
     }
 }
-impl<T, VT> WrappedMessageFieldType<T, tags::Repeated> for VT
+impl<M, RM> WrappedMessageFieldType<M, tags::Repeated> for RM
 where
-    T: Message,
-    T::BoxedType: AsMut<T> + AsRef<T>,
-    VT: RepeatedMessageType<T>,
+    M: Message + DeserializableMessageFromIter,
+    RM: RepeatedMessageType<M>,
 {
-    type Item = T;
-    fn get_or_insert_with<F>(&mut self, f: F) -> &mut Self::Item
+    type Item = M;
+    type Deserable = <RM as RepeatedMessageType<M>>::Deserable;
+    type DeserableMut<'a>
+    where
+        Self: 'a,
+        Self::Item: 'a,
+    = <RM as RepeatedMessageType<M>>::DeserableMut<'a>;
+    fn get_or_insert_with<F>(&mut self, f: F) -> Self::DeserableMut<'_>
     where
         F: FnOnce() -> Self::Item,
     {
-        <Self as RepeatedMessageType<T>>::insert_mut(self, (f)())
+        <Self as RepeatedMessageType<M>>::insert_mut(self, (f)())
     }
-    fn try_for_each<F>(&self, mut f: F) -> Result<()>
+    fn try_for_each<F>(&self, f: F) -> Result<()>
     where
         F: FnMut(&Self::Item) -> Result<()>,
     {
-        for item in self.as_slice() {
-            (f)(item)?;
-        }
+        <Self as RepeatedMessageType<M>>::try_for_each(self, f)?;
         Ok(())
     }
 }
 
 pub trait RepeatedMessageType<Msg> {
-    type Item;
-    type RefMut<'a>
+    type Deserable: DeserializableMessageFromIter;
+    type DeserableMut<'a>: DerefMut<Target = Self::Deserable>
     where
         Self: 'a;
-    fn insert_mut(&mut self, item: Self::Item) -> Self::RefMut<'_>;
+    fn insert_mut(&mut self, item: Msg) -> Self::DeserableMut<'_>;
+    fn try_for_each<F>(&self, f: F) -> Result<()>
+    where
+        F: FnMut(&Msg) -> Result<()>;
 }
 
 impl<Msg> RepeatedMessageType<Msg> for Vec<Msg>
 where
-    Msg: Message,
+    Msg: Message + DeserializableMessageFromIter,
 {
-    type Item = Msg;
-    type RefMut<'a>
+    type Deserable = Msg;
+    type DeserableMut<'a>
     where
         Self: 'a,
-    = &'a mut Msg;
-    fn insert_mut(&mut self, item: Self::Item) -> Self::RefMut<'_> {
+    = &'a mut Self::Deserable;
+    fn insert_mut(&mut self, item: Msg) -> Self::DeserableMut<'_> {
         self.push(item);
         self.last_mut().unwrap()
+    }
+    fn try_for_each<F>(&self, f: F) -> Result<()>
+    where
+        F: FnMut(&Msg) -> Result<()>,
+    {
+        <std::slice::Iter<Msg> as Iterator>::try_for_each(&mut <[Msg]>::iter(self), f)?;
+        Ok(())
     }
 }
 
@@ -144,16 +181,26 @@ where
     K: Eq + Hash,
     Msg: Message + crate::MapEntry<KeyType = K, ValueType = V>,
 {
-    type Item = Msg;
-    type RefMut<'a>
+    type Deserable = Msg;
+    type DeserableMut<'a>
     where
         Self: 'a,
     = MapEntryWrapper<'a, Msg, Self>;
-    fn insert_mut(&mut self, item: Self::Item) -> Self::RefMut<'_> {
+    fn insert_mut(&mut self, item: Msg) -> Self::DeserableMut<'_> {
         MapEntryWrapper {
             entry: item,
             map: self,
         }
+    }
+
+    fn try_for_each<F>(&self, mut f: F) -> Result<()>
+    where
+        F: FnMut(&Msg) -> Result<()>,
+    {
+        self.iter()
+            .map(|(k, v)| Msg::from_kv(k, v))
+            .try_for_each(move |msg| -> Result<_> { (f)(&msg) })?;
+        Ok(())
     }
 }
 
