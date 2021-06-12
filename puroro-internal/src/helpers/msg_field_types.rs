@@ -26,7 +26,7 @@ where
     where
         Self: 'a,
         Self::Item: 'a;
-    fn get_or_insert_with<'a, F>(&'a mut self, f: F) -> Self::DeserableMut<'_>
+    fn get_or_insert_with<'a, F>(&'a mut self, f: F) -> Self::DeserableMut<'a>
     where
         F: FnOnce() -> Self::Item,
         Self::Item: 'a;
@@ -44,7 +44,7 @@ where
         Self: 'a,
         Self::Item: 'a,
     = &'a mut Self::Item;
-    fn get_or_insert_with<'a, F>(&'a mut self, _: F) -> Self::DeserableMut<'_>
+    fn get_or_insert_with<'a, F>(&'a mut self, _: F) -> Self::DeserableMut<'a>
     where
         F: FnOnce() -> Self::Item,
         Self::Item: 'a,
@@ -69,7 +69,7 @@ where
         Self: 'a,
         Self::Item: 'a,
     = &'a mut Self::Item;
-    fn get_or_insert_with<'a, F>(&'a mut self, f: F) -> Self::DeserableMut<'_>
+    fn get_or_insert_with<'a, F>(&'a mut self, f: F) -> Self::DeserableMut<'a>
     where
         F: FnOnce() -> Self::Item,
         Self::Item: 'a,
@@ -98,7 +98,7 @@ where
         Self: 'a,
         Self::Item: 'a,
     = &'a mut Self::Item;
-    fn get_or_insert_with<'a, F>(&'a mut self, f: F) -> Self::DeserableMut<'_>
+    fn get_or_insert_with<'a, F>(&'a mut self, f: F) -> Self::DeserableMut<'a>
     where
         F: FnOnce() -> Self::Item,
         Self::Item: 'a,
@@ -127,7 +127,7 @@ where
         Self: 'a,
         Self::Item: 'a,
     = <RM as RepeatedMessageType<M>>::DeserableMut<'a>;
-    fn get_or_insert_with<'a, F>(&'a mut self, f: F) -> Self::DeserableMut<'_>
+    fn get_or_insert_with<'a, F>(&'a mut self, f: F) -> Self::DeserableMut<'a>
     where
         F: FnOnce() -> Self::Item,
         Self::Item: 'a,
