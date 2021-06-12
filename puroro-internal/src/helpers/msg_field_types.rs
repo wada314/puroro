@@ -22,11 +22,7 @@ where
     LabelTag: tags::FieldLabelTag,
 {
     type Item: Message;
-    type Deserable<'a>: MergeableMessageFromIter
-    where
-        Self: 'a,
-        Self::Item: 'a;
-    type DeserableMut<'a>: DerefMut<Target = Self::Deserable<'a>>
+    type DeserableMut<'a>: DerefMut
     where
         Self: 'a,
         Self::Item: 'a;
@@ -43,11 +39,6 @@ where
     M: Message + MergeableMessageFromIter,
 {
     type Item = M;
-    type Deserable<'a>
-    where
-        Self: 'a,
-        Self::Item: 'a,
-    = M;
     type DeserableMut<'a>
     where
         Self: 'a,
@@ -73,11 +64,6 @@ where
     M::BoxedType: AsMut<M> + AsRef<M>,
 {
     type Item = M;
-    type Deserable<'a>
-    where
-        Self: 'a,
-        Self::Item: 'a,
-    = M;
     type DeserableMut<'a>
     where
         Self: 'a,
@@ -107,11 +93,6 @@ where
     M::BoxedType: AsMut<M> + AsRef<M>,
 {
     type Item = M;
-    type Deserable<'a>
-    where
-        Self: 'a,
-        Self::Item: 'a,
-    = M;
     type DeserableMut<'a>
     where
         Self: 'a,
@@ -141,11 +122,6 @@ where
     RM: RepeatedMessageType<M>,
 {
     type Item = M;
-    type Deserable<'a>
-    where
-        Self: 'a,
-        Self::Item: 'a,
-    = <RM as RepeatedMessageType<M>>::Deserable<'a>;
     type DeserableMut<'a>
     where
         Self: 'a,
@@ -168,13 +144,10 @@ where
 }
 
 pub trait RepeatedMessageType<Msg> {
-    type Deserable<'a>: MergeableMessageFromIter
+    type DeserableMut<'a>: DerefMut
     where
         Self: 'a;
-    type DeserableMut<'a>: DerefMut<Target = Self::Deserable<'a>>
-    where
-        Self: 'a;
-    fn insert_mut(&mut self, item: Msg) -> Self::DeserableMut<'_>;
+    fn insert_mut<'a>(&'a mut self, item: Msg) -> Self::DeserableMut<'a>;
     fn try_for_each<F>(&self, f: F) -> Result<()>
     where
         F: FnMut(&Msg) -> Result<()>;
@@ -184,14 +157,10 @@ impl<Msg> RepeatedMessageType<Msg> for Vec<Msg>
 where
     Msg: Message + MergeableMessageFromIter,
 {
-    type Deserable<'a>
-    where
-        Self: 'a,
-    = Msg;
     type DeserableMut<'a>
     where
         Self: 'a,
-    = &'a mut Self::Deserable<'a>;
+    = &'a mut Msg;
     fn insert_mut(&mut self, item: Msg) -> Self::DeserableMut<'_> {
         self.push(item);
         self.last_mut().unwrap()
@@ -210,14 +179,10 @@ impl<'bump, Msg> RepeatedMessageType<Msg> for bumpalo::collections::Vec<'bump, M
 where
     Msg: Message + MergeableMessageFromIter,
 {
-    type Deserable<'a>
-    where
-        Self: 'a,
-    = Msg;
     type DeserableMut<'a>
     where
         Self: 'a,
-    = &'a mut Self::Deserable<'a>;
+    = &'a mut Msg;
     fn insert_mut(&mut self, item: Msg) -> Self::DeserableMut<'_> {
         self.push(item);
         self.last_mut().unwrap()
@@ -236,10 +201,6 @@ where
     K: Eq + Hash,
     Msg: Message + crate::MapEntry<KeyType = K, ValueType = V> + MergeableMessageFromIter,
 {
-    type Deserable<'a>
-    where
-        Self: 'a,
-    = MapEntryWrapper<'a, Msg, Self>;
     type DeserableMut<'a>
     where
         Self: 'a,
@@ -274,10 +235,6 @@ where
     K: Eq + Hash,
     Msg: Message + crate::MapEntry<KeyType = K, ValueType = V> + MergeableMessageFromIter,
 {
-    type Deserable<'a>
-    where
-        Self: 'a,
-    = MapEntryWrapper<'a, Msg, Self>;
     type DeserableMut<'a>
     where
         Self: 'a,

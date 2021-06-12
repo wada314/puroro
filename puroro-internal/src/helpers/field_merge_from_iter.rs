@@ -1,9 +1,11 @@
+use std::ops::Deref;
 use std::ops::DerefMut;
 
 use itertools::{Either, Itertools};
 use puroro::Message;
 
 use crate::deser::LdIter;
+use crate::deser::MergeableMessageFromIter;
 use crate::types::FieldData;
 use crate::variant;
 use crate::{tags, ResultHelper};
@@ -127,6 +129,8 @@ where
     M: Message + crate::deser::MergeableMessageFromIter,
     L: tags::FieldLabelTag,
     T: WrappedMessageFieldType<M, L, Item = M>,
+    for<'a> <<T as WrappedMessageFieldType<M, L>>::DeserableMut<'a> as Deref>::Target:
+        MergeableMessageFromIter,
 {
     type Item = M;
     fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
