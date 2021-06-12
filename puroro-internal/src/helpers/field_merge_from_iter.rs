@@ -124,7 +124,7 @@ where
 
 impl<M, L, T> FieldMergeFromIter<tags::Message<M>, L> for T
 where
-    M: Message + crate::deser::DeserializableMessageFromIter,
+    M: Message + crate::deser::MergeableMessageFromIter,
     L: tags::FieldLabelTag,
     T: WrappedMessageFieldType<M, L, Item = M>,
 {

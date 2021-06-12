@@ -329,7 +329,7 @@ impl{gp} ::std::default::Default for {ident}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb} {{
+impl{gp} ::puroro_internal::deser::MergeableMessageFromIter for {ident}{gpb} {{
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
@@ -386,7 +386,7 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
     where
         I: Iterator<Item = ::std::io::Result<u8>> 
     {{
-        <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
+        <Self as ::puroro_internal::deser::MergeableMessageFromIter>
             ::merge_from_iter(self, iter)
     }}
 }}\n",

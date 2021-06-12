@@ -1,4 +1,4 @@
-use crate::deser::{DeserializableMessageFromIter, LdIter};
+use crate::deser::{LdIter, MergeableMessageFromIter};
 use crate::types::FieldData;
 use crate::Result;
 use crate::{bumpalo, hashbrown, tags};
@@ -22,7 +22,7 @@ where
     LabelTag: tags::FieldLabelTag,
 {
     type Item: Message;
-    type Deserable<'a>: DeserializableMessageFromIter
+    type Deserable<'a>: MergeableMessageFromIter
     where
         Self: 'a,
         Self::Item: 'a;
@@ -40,7 +40,7 @@ where
 }
 impl<M> WrappedMessageFieldType<M, tags::Required> for M
 where
-    M: Message + DeserializableMessageFromIter,
+    M: Message + MergeableMessageFromIter,
 {
     type Item = M;
     type Deserable<'a>
@@ -69,7 +69,7 @@ where
 }
 impl<M> WrappedMessageFieldType<M, tags::Optional2> for Option<M::BoxedType>
 where
-    M: Message + DeserializableMessageFromIter,
+    M: Message + MergeableMessageFromIter,
     M::BoxedType: AsMut<M> + AsRef<M>,
 {
     type Item = M;
@@ -103,7 +103,7 @@ where
 }
 impl<M> WrappedMessageFieldType<M, tags::Optional3> for Option<M::BoxedType>
 where
-    M: Message + DeserializableMessageFromIter,
+    M: Message + MergeableMessageFromIter,
     M::BoxedType: AsMut<M> + AsRef<M>,
 {
     type Item = M;
@@ -137,7 +137,7 @@ where
 }
 impl<M, RM> WrappedMessageFieldType<M, tags::Repeated> for RM
 where
-    M: Message + DeserializableMessageFromIter,
+    M: Message + MergeableMessageFromIter,
     RM: RepeatedMessageType<M>,
 {
     type Item = M;
@@ -168,7 +168,7 @@ where
 }
 
 pub trait RepeatedMessageType<Msg> {
-    type Deserable<'a>: DeserializableMessageFromIter
+    type Deserable<'a>: MergeableMessageFromIter
     where
         Self: 'a;
     type DeserableMut<'a>: DerefMut<Target = Self::Deserable<'a>>
@@ -182,7 +182,7 @@ pub trait RepeatedMessageType<Msg> {
 
 impl<Msg> RepeatedMessageType<Msg> for Vec<Msg>
 where
-    Msg: Message + DeserializableMessageFromIter,
+    Msg: Message + MergeableMessageFromIter,
 {
     type Deserable<'a>
     where
@@ -208,7 +208,7 @@ where
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump, Msg> RepeatedMessageType<Msg> for bumpalo::collections::Vec<'bump, Msg>
 where
-    Msg: Message + DeserializableMessageFromIter,
+    Msg: Message + MergeableMessageFromIter,
 {
     type Deserable<'a>
     where
@@ -234,7 +234,7 @@ where
 impl<K, V, Msg> RepeatedMessageType<Msg> for HashMap<K, V>
 where
     K: Eq + Hash,
-    Msg: Message + crate::MapEntry<KeyType = K, ValueType = V> + DeserializableMessageFromIter,
+    Msg: Message + crate::MapEntry<KeyType = K, ValueType = V> + MergeableMessageFromIter,
 {
     type Deserable<'a>
     where
@@ -272,7 +272,7 @@ impl<'bump, K, V, Msg> RepeatedMessageType<Msg>
     >
 where
     K: Eq + Hash,
-    Msg: Message + crate::MapEntry<KeyType = K, ValueType = V> + DeserializableMessageFromIter,
+    Msg: Message + crate::MapEntry<KeyType = K, ValueType = V> + MergeableMessageFromIter,
 {
     type Deserable<'a>
     where
@@ -327,10 +327,9 @@ where
         self
     }
 }
-impl<'a, Msg, Map> DeserializableMessageFromIter for MapEntryWrapper<'a, Msg, Map>
+impl<'a, Msg, Map> MergeableMessageFromIter for MapEntryWrapper<'a, Msg, Map>
 where
-    Msg:
-        crate::MapEntry<KeyType = Map::Key, ValueType = Map::Value> + DeserializableMessageFromIter,
+    Msg: crate::MapEntry<KeyType = Map::Key, ValueType = Map::Value> + MergeableMessageFromIter,
     Map: MapType,
 {
     fn met_field<'b, I>(

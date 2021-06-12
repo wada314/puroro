@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 use std::io::Read;
 
-use super::{DeserializableMessageFromIter, LdIter, Variants};
+use super::{LdIter, MergeableMessageFromIter, Variants};
 use crate::types::{FieldData, WireType};
 use crate::variant::Variant;
 use crate::ErrorKind;
@@ -202,9 +202,9 @@ impl<'slice> Iterator for Fields<'slice> {
     }
 }
 
-pub struct FromIterToFromSlice<'a, T: DeserializableMessageFromIter>(&'a mut T);
+pub struct FromIterToFromSlice<'a, T: MergeableMessageFromIter>(&'a mut T);
 
-impl<'a, T: DeserializableMessageFromIter> FromIterToFromSlice<'a, T> {
+impl<'a, T: MergeableMessageFromIter> FromIterToFromSlice<'a, T> {
     pub fn new(from_iter: &'a mut T) -> Self {
         Self(from_iter)
     }
@@ -212,7 +212,7 @@ impl<'a, T: DeserializableMessageFromIter> FromIterToFromSlice<'a, T> {
 
 impl<'slice, 'a, T> DeserializableMessageFromSlice<'slice> for FromIterToFromSlice<'a, T>
 where
-    T: DeserializableMessageFromIter,
+    T: MergeableMessageFromIter,
 {
     fn met_field_at(
         &mut self,

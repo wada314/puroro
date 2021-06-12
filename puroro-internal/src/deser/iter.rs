@@ -5,7 +5,7 @@ use std::io::Result as IoResult;
 
 use ::num_traits::FromPrimitive;
 
-pub trait DeserializableMessageFromIter: Sized {
+pub trait MergeableMessageFromIter: Sized {
     fn met_field<'a, I>(
         &mut self,
         field: FieldData<&'a mut LdIter<I>>,
@@ -73,10 +73,7 @@ where
         Ok(result)
     }
 
-    pub fn merge_message<H: DeserializableMessageFromIter>(
-        &mut self,
-        handler: &mut H,
-    ) -> Result<()> {
+    pub fn merge_message<H: MergeableMessageFromIter>(&mut self, handler: &mut H) -> Result<()> {
         while let Some((wire_type, field_number)) = self.try_get_wire_type_and_field_number()? {
             let old_end_index = self.end;
             let field_data = match wire_type {
