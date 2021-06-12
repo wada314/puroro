@@ -18,7 +18,7 @@ where
 {
     /// The return type of the default instance generator passed to `merge` method.
     type Item;
-    /// Deserialize binary data into this field.
+    /// Deserialize & merge binary data into this field.
     /// * `field` - A data of the field, where the wire type and (for length delimited wire
     /// type) the field length are already load. For variants and fixed bytes fields,
     /// the content data is also already load.
