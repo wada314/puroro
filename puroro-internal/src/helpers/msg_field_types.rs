@@ -5,7 +5,7 @@ use crate::{bumpalo, hashbrown, tags};
 use puroro::Message;
 use std::collections::HashMap;
 use std::hash::Hash;
-use std::ops::DerefMut;
+use std::ops::{Deref, DerefMut};
 
 /// Need a special treat for Message type fields because:
 ///  * The wrapper type rule is diffirent with the ordinary fields:
@@ -22,14 +22,18 @@ where
     LabelTag: tags::FieldLabelTag,
 {
     type Item: Message;
-    type Deserable: DeserializableMessageFromIter;
-    type DeserableMut<'a>: DerefMut<Target = Self::Deserable>
+    type Deserable<'a>: DeserializableMessageFromIter
     where
         Self: 'a,
         Self::Item: 'a;
-    fn get_or_insert_with<F>(&mut self, f: F) -> Self::DeserableMut<'_>
+    type DeserableMut<'a>: DerefMut<Target = Self::Deserable<'a>>
     where
-        F: FnOnce() -> Self::Item;
+        Self: 'a,
+        Self::Item: 'a;
+    fn get_or_insert_with<'a, F>(&'a mut self, f: F) -> Self::DeserableMut<'_>
+    where
+        F: FnOnce() -> Self::Item,
+        Self::Item: 'a;
     fn try_for_each<F>(&self, f: F) -> Result<()>
     where
         F: FnMut(&Self::Item) -> Result<()>;
@@ -39,15 +43,20 @@ where
     M: Message + DeserializableMessageFromIter,
 {
     type Item = M;
-    type Deserable = M;
+    type Deserable<'a>
+    where
+        Self: 'a,
+        Self::Item: 'a,
+    = M;
     type DeserableMut<'a>
     where
         Self: 'a,
         Self::Item: 'a,
     = &'a mut Self::Item;
-    fn get_or_insert_with<F>(&mut self, _: F) -> Self::DeserableMut<'_>
+    fn get_or_insert_with<'a, F>(&'a mut self, _: F) -> Self::DeserableMut<'_>
     where
         F: FnOnce() -> Self::Item,
+        Self::Item: 'a,
     {
         self
     }
@@ -64,15 +73,20 @@ where
     M::BoxedType: AsMut<M> + AsRef<M>,
 {
     type Item = M;
-    type Deserable = M;
+    type Deserable<'a>
+    where
+        Self: 'a,
+        Self::Item: 'a,
+    = M;
     type DeserableMut<'a>
     where
         Self: 'a,
         Self::Item: 'a,
     = &'a mut Self::Item;
-    fn get_or_insert_with<F>(&mut self, f: F) -> Self::DeserableMut<'_>
+    fn get_or_insert_with<'a, F>(&'a mut self, f: F) -> Self::DeserableMut<'_>
     where
         F: FnOnce() -> Self::Item,
+        Self::Item: 'a,
     {
         self.get_or_insert_with(|| (f)().into_boxed()).as_mut()
     }
@@ -93,15 +107,20 @@ where
     M::BoxedType: AsMut<M> + AsRef<M>,
 {
     type Item = M;
-    type Deserable = M;
+    type Deserable<'a>
+    where
+        Self: 'a,
+        Self::Item: 'a,
+    = M;
     type DeserableMut<'a>
     where
         Self: 'a,
         Self::Item: 'a,
     = &'a mut Self::Item;
-    fn get_or_insert_with<F>(&mut self, f: F) -> Self::DeserableMut<'_>
+    fn get_or_insert_with<'a, F>(&'a mut self, f: F) -> Self::DeserableMut<'_>
     where
         F: FnOnce() -> Self::Item,
+        Self::Item: 'a,
     {
         self.get_or_insert_with(|| (f)().into_boxed()).as_mut()
     }
@@ -122,15 +141,20 @@ where
     RM: RepeatedMessageType<M>,
 {
     type Item = M;
-    type Deserable = <RM as RepeatedMessageType<M>>::Deserable;
+    type Deserable<'a>
+    where
+        Self: 'a,
+        Self::Item: 'a,
+    = <RM as RepeatedMessageType<M>>::Deserable<'a>;
     type DeserableMut<'a>
     where
         Self: 'a,
         Self::Item: 'a,
     = <RM as RepeatedMessageType<M>>::DeserableMut<'a>;
-    fn get_or_insert_with<F>(&mut self, f: F) -> Self::DeserableMut<'_>
+    fn get_or_insert_with<'a, F>(&'a mut self, f: F) -> Self::DeserableMut<'_>
     where
         F: FnOnce() -> Self::Item,
+        Self::Item: 'a,
     {
         <Self as RepeatedMessageType<M>>::insert_mut(self, (f)())
     }
@@ -144,8 +168,10 @@ where
 }
 
 pub trait RepeatedMessageType<Msg> {
-    type Deserable: DeserializableMessageFromIter;
-    type DeserableMut<'a>: DerefMut<Target = Self::Deserable>
+    type Deserable<'a>: DeserializableMessageFromIter
+    where
+        Self: 'a;
+    type DeserableMut<'a>: DerefMut<Target = Self::Deserable<'a>>
     where
         Self: 'a;
     fn insert_mut(&mut self, item: Msg) -> Self::DeserableMut<'_>;
@@ -158,11 +184,14 @@ impl<Msg> RepeatedMessageType<Msg> for Vec<Msg>
 where
     Msg: Message + DeserializableMessageFromIter,
 {
-    type Deserable = Msg;
+    type Deserable<'a>
+    where
+        Self: 'a,
+    = Msg;
     type DeserableMut<'a>
     where
         Self: 'a,
-    = &'a mut Self::Deserable;
+    = &'a mut Self::Deserable<'a>;
     fn insert_mut(&mut self, item: Msg) -> Self::DeserableMut<'_> {
         self.push(item);
         self.last_mut().unwrap()
@@ -179,9 +208,12 @@ where
 impl<K, V, Msg> RepeatedMessageType<Msg> for HashMap<K, V>
 where
     K: Eq + Hash,
-    Msg: Message + crate::MapEntry<KeyType = K, ValueType = V>,
+    Msg: Message + crate::MapEntry<KeyType = K, ValueType = V> + DeserializableMessageFromIter,
 {
-    type Deserable = Msg;
+    type Deserable<'a>
+    where
+        Self: 'a,
+    = MapEntryWrapper<'a, Msg, Self>;
     type DeserableMut<'a>
     where
         Self: 'a,
@@ -211,6 +243,25 @@ where
 {
     entry: Msg,
     map: &'a mut Map,
+}
+impl<'a, Msg, Map> Deref for MapEntryWrapper<'a, Msg, Map>
+where
+    Msg: crate::MapEntry<KeyType = Map::Key, ValueType = Map::Value>,
+    Map: MapType,
+{
+    type Target = Self;
+    fn deref(&self) -> &Self::Target {
+        self
+    }
+}
+impl<'a, Msg, Map> DerefMut for MapEntryWrapper<'a, Msg, Map>
+where
+    Msg: crate::MapEntry<KeyType = Map::Key, ValueType = Map::Value>,
+    Map: MapType,
+{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self
+    }
 }
 impl<'a, Msg, Map> DeserializableMessageFromIter for MapEntryWrapper<'a, Msg, Map>
 where

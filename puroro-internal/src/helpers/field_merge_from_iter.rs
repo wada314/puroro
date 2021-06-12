@@ -1,3 +1,5 @@
+use std::ops::DerefMut;
+
 use itertools::{Either, Itertools};
 use puroro::Message;
 
@@ -133,7 +135,7 @@ where
         F: Fn() -> Self::Item,
     {
         if let FieldData::LengthDelimited(ld_iter) = field {
-            ld_iter.deser_message(self.get_or_insert_with(f))?;
+            ld_iter.deser_message(self.get_or_insert_with(f).deref_mut())?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?
         }
