@@ -1,11 +1,10 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 
-use super::{EnumDescriptor, FieldDescriptor, FieldType, FileDescriptor, FileOrMessageRef};
+use super::{EnumDescriptor, FieldDescriptor, FileDescriptor, FileOrMessageRef};
 use crate::google::protobuf::DescriptorProto;
 use crate::utils::{get_keyword_safe_ident, to_camel_case};
 use crate::{Context, ErrorKind, Result};
-use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
 
 #[derive(Clone)]

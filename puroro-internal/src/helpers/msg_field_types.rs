@@ -205,7 +205,71 @@ where
     }
 }
 
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump, Msg> RepeatedMessageType<Msg> for bumpalo::collections::Vec<'bump, Msg>
+where
+    Msg: Message + DeserializableMessageFromIter,
+{
+    type Deserable<'a>
+    where
+        Self: 'a,
+    = Msg;
+    type DeserableMut<'a>
+    where
+        Self: 'a,
+    = &'a mut Self::Deserable<'a>;
+    fn insert_mut(&mut self, item: Msg) -> Self::DeserableMut<'_> {
+        self.push(item);
+        self.last_mut().unwrap()
+    }
+    fn try_for_each<F>(&self, f: F) -> Result<()>
+    where
+        F: FnMut(&Msg) -> Result<()>,
+    {
+        <std::slice::Iter<Msg> as Iterator>::try_for_each(&mut <[Msg]>::iter(self), f)?;
+        Ok(())
+    }
+}
+
 impl<K, V, Msg> RepeatedMessageType<Msg> for HashMap<K, V>
+where
+    K: Eq + Hash,
+    Msg: Message + crate::MapEntry<KeyType = K, ValueType = V> + DeserializableMessageFromIter,
+{
+    type Deserable<'a>
+    where
+        Self: 'a,
+    = MapEntryWrapper<'a, Msg, Self>;
+    type DeserableMut<'a>
+    where
+        Self: 'a,
+    = MapEntryWrapper<'a, Msg, Self>;
+    fn insert_mut(&mut self, item: Msg) -> Self::DeserableMut<'_> {
+        MapEntryWrapper {
+            entry: item,
+            map: self,
+        }
+    }
+
+    fn try_for_each<F>(&self, mut f: F) -> Result<()>
+    where
+        F: FnMut(&Msg) -> Result<()>,
+    {
+        self.iter()
+            .map(|(k, v)| Msg::from_kv(k, v))
+            .try_for_each(move |msg| -> Result<_> { (f)(&msg) })?;
+        Ok(())
+    }
+}
+
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump, K, V, Msg> RepeatedMessageType<Msg>
+    for hashbrown::HashMap<
+        K,
+        V,
+        hashbrown::hash_map::DefaultHashBuilder,
+        hashbrown::BumpWrapper<'bump>,
+    >
 where
     K: Eq + Hash,
     Msg: Message + crate::MapEntry<KeyType = K, ValueType = V> + DeserializableMessageFromIter,
