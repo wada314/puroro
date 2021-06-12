@@ -22,7 +22,7 @@ where
     /// * `field` - A data of the field, where the wire type and (for length delimited wire
     /// type) the field length are already load. For variants and fixed bytes fields,
     /// the content data is also already load.
-    /// * `f` - A function object that generates default instance of the field "item".
+    /// * `f` - A function object that generates default instance of the field `Item`.
     /// It depends on the field type what type the field item is.
     /// ** numeric types (except enum) - The corresponding rust's numeric types.
     /// Typically it's just a `Default::default`.
@@ -32,8 +32,8 @@ where
     /// It seems to be trivial and we can just use `Default::default`, but if we use a
     /// custom allocator then we need an allocator instance value to instanciate the default
     /// value, which `Default::default` cannot support.
-    /// ** Message types - `Option<Box<T>>` for the both proto2 and proto3's optional types,
-    /// otherwise just a raw message type. This is because of an implementation details...
+    /// ** Message types - A raw message type. Same as above, we cannot use `Default::default`
+    /// for custom allocator type.
     fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
