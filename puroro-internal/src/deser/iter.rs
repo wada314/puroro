@@ -19,7 +19,7 @@ pub trait DeserializableMessageFromIter: Sized {
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         let mut ld_iter = LdIter::new(iter);
-        ld_iter.deser_message(self)?;
+        ld_iter.merge_message(self)?;
         Ok(())
     }
 }
@@ -73,7 +73,7 @@ where
         Ok(result)
     }
 
-    pub fn deser_message<H: DeserializableMessageFromIter>(
+    pub fn merge_message<H: DeserializableMessageFromIter>(
         &mut self,
         handler: &mut H,
     ) -> Result<()> {
