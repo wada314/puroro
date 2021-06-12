@@ -115,17 +115,17 @@ where
 
 impl<V, L, T> FieldSer<(tags::wire::Bits32, V), L> for T
 where
-    V: tags::Bits32TypeTag,
+    V: tags::Bits32TypeTag + super::Bits32TypeTag<NativeType = T::Item>,
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
-    T::Item: IntoBits32<Tag = V> + Clone,
+    T::Item: Clone,
 {
     fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
     where
         S: crate::ser::MessageSerializer,
     {
         self.try_for_each(|item| -> Result<_> {
-            let bytes = <T::Item as IntoBits32>::into(item.clone());
+            let bytes = <V as super::Bits32TypeTag>::into_bytes(item.clone());
             if !L::DO_DEFAULT_CHECK || bytes.iter().any(|x| *x != 0) {
                 serializer.serialize_fixed_bits::<4>(field_number, bytes)?;
             }
@@ -137,69 +137,23 @@ where
 
 impl<V, L, T> FieldSer<(tags::wire::Bits64, V), L> for T
 where
-    V: tags::Bits64TypeTag,
+    V: tags::Bits64TypeTag + super::Bits64TypeTag<NativeType = T::Item>,
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
-    T::Item: IntoBits64<Tag = V> + Clone,
+    T::Item: Clone,
 {
     fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
     where
         S: crate::ser::MessageSerializer,
     {
         self.try_for_each(|item| -> Result<_> {
-            let bytes = <T::Item as IntoBits64>::into(item.clone());
+            let bytes = <V as super::Bits64TypeTag>::into_bytes(item.clone());
             if !L::DO_DEFAULT_CHECK || bytes.iter().any(|x| *x != 0) {
                 serializer.serialize_fixed_bits::<8>(field_number, bytes)?;
             }
             Ok(())
         })?;
         Ok(())
-    }
-}
-
-pub trait IntoBits32 {
-    type Tag: tags::Bits32TypeTag;
-    fn into(self) -> [u8; 4];
-}
-impl IntoBits32 for f32 {
-    type Tag = tags::value::Float;
-    fn into(self) -> [u8; 4] {
-        self.to_le_bytes()
-    }
-}
-impl IntoBits32 for u32 {
-    type Tag = tags::value::Fixed32;
-    fn into(self) -> [u8; 4] {
-        self.to_le_bytes()
-    }
-}
-impl IntoBits32 for i32 {
-    type Tag = tags::value::SFixed32;
-    fn into(self) -> [u8; 4] {
-        self.to_le_bytes()
-    }
-}
-
-pub trait IntoBits64 {
-    type Tag: tags::Bits64TypeTag;
-    fn into(self) -> [u8; 8];
-}
-impl IntoBits64 for f64 {
-    type Tag = tags::value::Double;
-    fn into(self) -> [u8; 8] {
-        self.to_le_bytes()
-    }
-}
-impl IntoBits64 for u64 {
-    type Tag = tags::value::Fixed64;
-    fn into(self) -> [u8; 8] {
-        self.to_le_bytes()
-    }
-}
-impl IntoBits64 for i64 {
-    type Tag = tags::value::SFixed64;
-    fn into(self) -> [u8; 8] {
-        self.to_le_bytes()
     }
 }
 

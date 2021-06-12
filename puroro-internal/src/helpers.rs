@@ -83,3 +83,33 @@ impl<T: TryFrom<i32, Error = i32>> Default for ::std::result::Result<T, i32> {
         T::try_from(0i32)
     }
 }
+
+pub trait Bits32TypeTag {
+    type NativeType;
+    fn from_bytes(bytes: [u8; 4]) -> Self::NativeType;
+    fn into_bytes(from: Self::NativeType) -> [u8; 4];
+}
+pub trait Bits64TypeTag {
+    type NativeType;
+    fn from_bytes(bytes: [u8; 8]) -> Self::NativeType;
+    fn into_bytes(from: Self::NativeType) -> [u8; 8];
+}
+macro_rules! impl_fixed_bytes_type_tags {
+    ($tr:ident, $tag:ty, $native:ty, $bytes:ty) => {
+        impl $tr for $tag {
+            type NativeType = $native;
+            fn from_bytes(bytes: $bytes) -> Self::NativeType {
+                <$native>::from_le_bytes(bytes)
+            }
+            fn into_bytes(from: Self::NativeType) -> $bytes {
+                <$native>::to_le_bytes(from)
+            }
+        }
+    };
+}
+impl_fixed_bytes_type_tags!(Bits32TypeTag, tags::value::Float, f32, [u8; 4]);
+impl_fixed_bytes_type_tags!(Bits32TypeTag, tags::value::Fixed32, u32, [u8; 4]);
+impl_fixed_bytes_type_tags!(Bits32TypeTag, tags::value::SFixed32, i32, [u8; 4]);
+impl_fixed_bytes_type_tags!(Bits64TypeTag, tags::value::Double, f64, [u8; 8]);
+impl_fixed_bytes_type_tags!(Bits64TypeTag, tags::value::Fixed64, u64, [u8; 8]);
+impl_fixed_bytes_type_tags!(Bits64TypeTag, tags::value::SFixed64, i64, [u8; 8]);

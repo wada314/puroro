@@ -145,10 +145,9 @@ where
 
 impl<V, L, T> FieldMergeFromIter<(tags::wire::Bits32, V), L> for T
 where
-    V: tags::Bits32TypeTag,
+    V: tags::Bits32TypeTag + super::Bits32TypeTag<NativeType = T::Item>,
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
-    T::Item: FromBits32<Tag = V>,
 {
     type Item = T::Item;
     fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
@@ -158,7 +157,7 @@ where
     {
         if let FieldData::Bits32(array) = field {
             if !L::DO_DEFAULT_CHECK || array.iter().any(|b| *b != 0) {
-                *self.get_or_insert_with(f) = <T::Item as FromBits32>::from(array);
+                *self.get_or_insert_with(f) = <V as super::Bits32TypeTag>::from_bytes(array);
             }
             Ok(())
         } else {
@@ -169,10 +168,9 @@ where
 
 impl<V, L, T> FieldMergeFromIter<(tags::wire::Bits64, V), L> for T
 where
-    V: tags::Bits64TypeTag,
+    V: tags::Bits64TypeTag + super::Bits64TypeTag<NativeType = T::Item>,
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
-    T::Item: FromBits64<Tag = V>,
 {
     type Item = T::Item;
     fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
@@ -182,58 +180,12 @@ where
     {
         if let FieldData::Bits64(array) = field {
             if !L::DO_DEFAULT_CHECK || array.iter().any(|b| *b != 0) {
-                *self.get_or_insert_with(f) = <T::Item as FromBits64>::from(array);
+                *self.get_or_insert_with(f) = <V as super::Bits64TypeTag>::from_bytes(array);
             }
             Ok(())
         } else {
             Err(ErrorKind::UnexpectedWireType)?
         }
-    }
-}
-
-pub trait FromBits32: Sized {
-    type Tag: tags::Bits32TypeTag;
-    fn from(array: [u8; 4]) -> Self;
-}
-impl FromBits32 for f32 {
-    type Tag = tags::value::Float;
-    fn from(array: [u8; 4]) -> Self {
-        f32::from_le_bytes(array)
-    }
-}
-impl FromBits32 for u32 {
-    type Tag = tags::value::Fixed32;
-    fn from(array: [u8; 4]) -> Self {
-        u32::from_le_bytes(array)
-    }
-}
-impl FromBits32 for i32 {
-    type Tag = tags::value::SFixed32;
-    fn from(array: [u8; 4]) -> Self {
-        i32::from_le_bytes(array)
-    }
-}
-
-pub trait FromBits64: Sized {
-    type Tag: tags::Bits64TypeTag;
-    fn from(array: [u8; 8]) -> Self;
-}
-impl FromBits64 for f64 {
-    type Tag = tags::value::Double;
-    fn from(array: [u8; 8]) -> Self {
-        f64::from_le_bytes(array)
-    }
-}
-impl FromBits64 for u64 {
-    type Tag = tags::value::Fixed64;
-    fn from(array: [u8; 8]) -> Self {
-        u64::from_le_bytes(array)
-    }
-}
-impl FromBits64 for i64 {
-    type Tag = tags::value::SFixed64;
-    fn from(array: [u8; 8]) -> Self {
-        i64::from_le_bytes(array)
     }
 }
 

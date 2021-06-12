@@ -1,6 +1,5 @@
 use std::borrow::Cow;
 
-use super::field_merge_from_iter::{FromBits32, FromBits64};
 use super::{DoDefaultCheck, FieldMergeFromIter, WrappedFieldType};
 use crate::deser::LdIter;
 use crate::deser::LdSlice;
@@ -136,10 +135,10 @@ where
 // Bits32 types, non-repeated label
 impl<'slice, V, L, T> FieldMergeFromSlice<'slice, (tags::wire::Bits32, V), L> for T
 where
-    V: tags::Bits32TypeTag,
+    V: tags::Bits32TypeTag + super::Bits32TypeTag<NativeType = T::Item>,
     L: tags::FieldLabelTag + DoDefaultCheck + NonRepeatedLabelTag,
     T: WrappedFieldType<L>,
-    T::Item: super::Default + FromBits32<Tag = V>,
+    T::Item: super::Default,
 {
     fn merge(
         &mut self,
@@ -150,7 +149,7 @@ where
         if let FieldData::Bits32(array) = field {
             if !L::DO_DEFAULT_CHECK || array.iter().any(|b| *b != 0) {
                 *self.get_or_insert_with(super::Default::default) =
-                    <T::Item as FromBits32>::from(array);
+                    <V as super::Bits32TypeTag>::from_bytes(array);
             }
             Ok(())
         } else {
@@ -162,10 +161,10 @@ where
 // Bits64 types, non-repeated label
 impl<'slice, V, L, T> FieldMergeFromSlice<'slice, (tags::wire::Bits64, V), L> for T
 where
-    V: tags::Bits64TypeTag,
+    V: tags::Bits64TypeTag + super::Bits64TypeTag<NativeType = T::Item>,
     L: tags::FieldLabelTag + DoDefaultCheck + NonRepeatedLabelTag,
     T: WrappedFieldType<L>,
-    T::Item: super::Default + FromBits64<Tag = V>,
+    T::Item: super::Default,
 {
     fn merge(
         &mut self,
@@ -176,7 +175,7 @@ where
         if let FieldData::Bits64(array) = field {
             if !L::DO_DEFAULT_CHECK || array.iter().any(|b| *b != 0) {
                 *self.get_or_insert_with(super::Default::default) =
-                    <T::Item as FromBits64>::from(array);
+                    <V as super::Bits64TypeTag>::from_bytes(array);
             }
             Ok(())
         } else {
