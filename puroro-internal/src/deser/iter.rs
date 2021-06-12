@@ -14,7 +14,7 @@ pub trait DeserializableMessageFromIter: Sized {
     where
         I: Iterator<Item = ::std::io::Result<u8>>;
 
-    fn deser_from_iter<I>(&mut self, iter: I) -> Result<()>
+    fn merge_from_iter<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>,
     {

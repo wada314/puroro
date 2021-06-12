@@ -102,7 +102,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
-    pub fn is_deser_from_iter_available(&self) -> bool {
+    pub fn is_merge_from_iter_available(&self) -> bool {
         match self.context.impl_type() {
             ImplType::Default => true,
             ImplType::SliceView => false,

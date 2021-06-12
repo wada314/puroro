@@ -31,7 +31,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             func(|output| self.print_clone(output)),
             func(|output| self.print_default(output)),
             (
-                func(|output| self.print_msg_deser_from_iter(output)),
+                func(|output| self.print_msg_merge_from_iter(output)),
                 match self.context.impl_type() {
                     ImplType::Default => {
                         func(|output| self.print_msg_deser_from_slice_using_from_iter(output))
@@ -318,11 +318,11 @@ impl{gp} ::std::default::Default for {ident}{gpb} {{
             .write_into(output)
     }
 
-    fn print_msg_deser_from_iter<W: std::fmt::Write>(
+    fn print_msg_merge_from_iter<W: std::fmt::Write>(
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
-        if !self.frag_gen.is_deser_from_iter_available() {
+        if !self.frag_gen.is_merge_from_iter_available() {
             return Ok(());
         }
         (
@@ -382,12 +382,12 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb
                 "\
 {cfg}
 impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
-    fn deser_from_iter<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn merge_from_iter<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>> 
     {{
         <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
-            ::deser_from_iter(self, iter)
+            ::merge_from_iter(self, iter)
     }}
 }}\n",
                 name = self.frag_gen.struct_ident(self.msg)?,

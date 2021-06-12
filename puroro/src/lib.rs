@@ -16,7 +16,7 @@ pub use ::bumpalo;
 pub use ::hashbrown;
 
 pub trait DeserializableFromIter {
-    fn deser_from_iter<I>(&mut self, iter: &mut I) -> Result<()>
+    fn merge_from_iter<I>(&mut self, iter: &mut I) -> Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
