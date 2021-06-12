@@ -6,28 +6,35 @@ use crate::deser::LdSlice;
 use crate::internal_data::SliceSource;
 use crate::tags;
 use crate::types::{FieldData, SliceViewField};
+use crate::variant;
 use crate::InternalDataForSliceViewStruct;
 use crate::{ErrorKind, PuroroError, Result, ResultHelper};
 use ::itertools::{Either, Itertools};
 use ::puroro::RepeatedField;
+
+use super::field_merge_from_iter::FromBits32;
 
 pub trait FieldDataIntoIter<'slice, 'a> {
     type Item;
     type Iter: Iterator<Item = Result<Self::Item>>;
     fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter>;
 }
-impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::value::Int32 {
-    type Item = i32;
+impl<'slice: 'a, 'a, ValueTypeTag> FieldDataIntoIter<'slice, 'a>
+    for (tags::wire::Variant, ValueTypeTag)
+where
+    ValueTypeTag: variant::VariantTypeTag,
+{
+    type Item = <ValueTypeTag as variant::VariantTypeTag>::NativeType;
     type Iter = impl Iterator<Item = Result<Self::Item>>;
     fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         Ok(match field_data {
             FieldData::Variant(variant) => {
-                Either::Left(std::iter::once(variant.to_native::<Self>()))
+                Either::Left(std::iter::once(variant.to_native::<ValueTypeTag>()))
             }
             FieldData::LengthDelimited(ld_slice) => Either::Right(
                 ld_slice
                     .variants()
-                    .map_ok(|variant| variant.to_native::<Self>())
+                    .map_ok(|variant| variant.to_native::<ValueTypeTag>())
                     .map(|rrval| rrval.flatten()),
             ),
             _ => Err(ErrorKind::UnexpectedWireType)?,
@@ -35,7 +42,7 @@ impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::value::Int32 {
         .into_iter())
     }
 }
-impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::value::String {
+impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::String {
     type Item = Cow<'a, str>;
     type Iter = impl Iterator<Item = Result<Self::Item>>;
     fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
@@ -48,7 +55,18 @@ impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::value::String {
         }
     }
 }
-impl<'slice: 'a, 'a, T> FieldDataIntoIter<'slice, 'a> for tags::value::Message<T>
+impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::Bytes {
+    type Item = Cow<'a, [u8]>;
+    type Iter = impl Iterator<Item = Result<Self::Item>>;
+    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+        if let FieldData::LengthDelimited(ld_slice) = field_data {
+            Ok(std::iter::once(Ok(Cow::Borrowed(ld_slice.as_slice()))))
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+impl<'slice: 'a, 'a, T> FieldDataIntoIter<'slice, 'a> for tags::Message<T>
 where
     T: 'slice + TryFrom<&'slice [u8], Error = PuroroError> + ToOwned<Owned = T>,
 {
