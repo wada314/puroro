@@ -36,7 +36,7 @@ where
     /// value, which `Default::default` cannot support.
     /// ** Message types - A raw message type. Same as above, we cannot use `Default::default`
     /// for custom allocator type.
-    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<I, F>(&mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item;
@@ -50,7 +50,7 @@ where
 {
     type Item = <V as variant::VariantTypeTag>::NativeType;
 
-    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, _: F) -> Result<()>
+    fn merge<I, F>(&mut self, field: FieldData<&mut LdIter<I>>, _: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -67,7 +67,7 @@ where
     T::Item: StringType,
 {
     type Item = T::Item;
-    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<I, F>(&mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -99,7 +99,7 @@ where
     T::Item: BytesType,
 {
     type Item = T::Item;
-    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<I, F>(&mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -133,7 +133,7 @@ where
         MergeableMessageFromIter,
 {
     type Item = M;
-    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<I, F>(&mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -154,7 +154,7 @@ where
     T: WrappedFieldType<L>,
 {
     type Item = T::Item;
-    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<I, F>(&mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -177,7 +177,7 @@ where
     T: WrappedFieldType<L>,
 {
     type Item = T::Item;
-    fn merge<'a, I, F>(&mut self, field: FieldData<&'a mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<I, F>(&mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
