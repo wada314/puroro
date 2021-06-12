@@ -129,7 +129,7 @@ where
     M: Message + crate::deser::MergeableMessageFromIter,
     L: tags::FieldLabelTag,
     T: WrappedMessageFieldType<M, L, Item = M>,
-    for<'a> <<T as WrappedMessageFieldType<M, L>>::DeserableMut<'a> as Deref>::Target:
+    for<'a> <<T as WrappedMessageFieldType<M, L>>::MergeableMut<'a> as Deref>::Target:
         MergeableMessageFromIter,
 {
     type Item = M;
