@@ -326,6 +326,7 @@ where
         <Self>::insert(self, key, value)
     }
 }
+#[cfg(feature = "puroro-bumpalo")]
 impl<'bump, K, V> MapType
     for hashbrown::HashMap<
         K,
