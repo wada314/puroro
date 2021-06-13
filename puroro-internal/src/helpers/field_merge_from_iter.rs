@@ -13,7 +13,7 @@ use crate::{ErrorKind, Result};
 
 use super::{BytesType, DoDefaultCheck, StringType, WrappedFieldType, WrappedMessageFieldType};
 
-pub trait FieldMergeFromIter<TypeTag, LabelTag>
+pub trait FieldMergeFromIter<'a, TypeTag, LabelTag>
 where
     TypeTag: tags::WireAndValueTypeTag,
     LabelTag: tags::FieldLabelTag,
@@ -36,13 +36,13 @@ where
     /// value, which `Default::default` cannot support.
     /// ** Message types - A raw message type. Same as above, we cannot use `Default::default`
     /// for custom allocator type.
-    fn merge<I, F>(&mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<I, F>(&'a mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item;
 }
 
-impl<V, L, T> FieldMergeFromIter<(tags::wire::Variant, V), L> for T
+impl<'a, V, L, T> FieldMergeFromIter<'a, (tags::wire::Variant, V), L> for T
 where
     V: tags::VariantTypeTag + variant::VariantTypeTag,
     L: tags::FieldLabelTag + DoDefaultCheck,
@@ -50,7 +50,7 @@ where
 {
     type Item = <V as variant::VariantTypeTag>::NativeType;
 
-    fn merge<I, F>(&mut self, field: FieldData<&mut LdIter<I>>, _: F) -> Result<()>
+    fn merge<I, F>(&'a mut self, field: FieldData<&mut LdIter<I>>, _: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -60,14 +60,14 @@ where
     }
 }
 
-impl<L, T> FieldMergeFromIter<tags::String, L> for T
+impl<'a, L, T> FieldMergeFromIter<'a, tags::String, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
     T::Item: StringType,
 {
     type Item = T::Item;
-    fn merge<I, F>(&mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<I, F>(&'a mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -92,14 +92,14 @@ where
     }
 }
 
-impl<L, T> FieldMergeFromIter<tags::Bytes, L> for T
+impl<'a, L, T> FieldMergeFromIter<'a, tags::Bytes, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
     T::Item: BytesType,
 {
     type Item = T::Item;
-    fn merge<I, F>(&mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<I, F>(&'a mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -124,16 +124,16 @@ where
     }
 }
 
-impl<M, L, T> FieldMergeFromIter<tags::Message<M>, L> for T
+impl<'a, M, L, T> FieldMergeFromIter<'a, tags::Message<M>, L> for T
 where
-    M: Message + crate::deser::MergeableMessageFromIter,
+    M: Message + MergeableMessageFromIter,
     L: tags::FieldLabelTag,
-    T: WrappedMessageFieldType<M, L, Item = M>,
-    for<'a> <<T as WrappedMessageFieldType<M, L>>::MergeableMut<'a> as Deref>::Target:
+    T: WrappedMessageFieldType<'a, M, L, Item = M>,
+    <<T as WrappedMessageFieldType<'a, M, L>>::MergeableMut as Deref>::Target:
         MergeableMessageFromIter,
 {
     type Item = M;
-    fn merge<I, F>(&mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
+    fn merge<I, F>(&'a mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
         F: Fn() -> Self::Item,
@@ -147,7 +147,7 @@ where
     }
 }
 
-impl<V, L, T> FieldMergeFromIter<(tags::wire::Bits32, V), L> for T
+impl<'a, V, L, T> FieldMergeFromIter<'a, (tags::wire::Bits32, V), L> for T
 where
     V: tags::Bits32TypeTag + super::Bits32TypeTag<NativeType = T::Item>,
     L: tags::FieldLabelTag + DoDefaultCheck,
@@ -170,7 +170,7 @@ where
     }
 }
 
-impl<V, L, T> FieldMergeFromIter<(tags::wire::Bits64, V), L> for T
+impl<'a, V, L, T> FieldMergeFromIter<'a, (tags::wire::Bits64, V), L> for T
 where
     V: tags::Bits64TypeTag + super::Bits64TypeTag<NativeType = T::Item>,
     L: tags::FieldLabelTag + DoDefaultCheck,

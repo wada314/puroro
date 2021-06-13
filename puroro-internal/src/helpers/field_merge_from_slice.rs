@@ -9,7 +9,7 @@ use crate::variant;
 use crate::SliceViewField;
 use crate::{ErrorKind, Result};
 
-pub trait FieldMergeFromSlice<'slice, TypeTag, LabelTag>
+pub trait FieldMergeFromSlice<'a, 'slice, TypeTag, LabelTag>
 where
     TypeTag: tags::WireAndValueTypeTag,
     LabelTag: tags::FieldLabelTag,
@@ -24,7 +24,7 @@ where
     /// split into multiple instances in the input slice, then the instance of the one that
     /// this field is included.
     fn merge(
-        &mut self,
+        &'a mut self,
         field: FieldData<LdSlice<'slice>>,
         slice_from_this_field: LdSlice<'slice>,
         enclosing_slice: LdSlice<'slice>,
@@ -38,12 +38,13 @@ impl NonRepeatedLabelTag for tags::Optional3 {}
 
 // Variant types, non-repeated label
 // reuse the `FieldMergeFromIter`.
-impl<'slice, V, L, T> FieldMergeFromSlice<'slice, (tags::wire::Variant, V), L> for T
+impl<'a, 'slice, V, L, T> FieldMergeFromSlice<'a, 'slice, (tags::wire::Variant, V), L> for T
 where
     V: tags::VariantTypeTag + variant::VariantTypeTag,
     L: tags::FieldLabelTag + NonRepeatedLabelTag,
     T: WrappedFieldType<L, Item = <V as variant::VariantTypeTag>::NativeType>
         + FieldMergeFromIter<
+            'a,
             (tags::wire::Variant, V),
             L,
             Item = <V as variant::VariantTypeTag>::NativeType,
@@ -51,7 +52,7 @@ where
     <V as variant::VariantTypeTag>::NativeType: super::Default,
 {
     fn merge(
-        &mut self,
+        &'a mut self,
         field: FieldData<LdSlice<'slice>>,
         _: LdSlice<'slice>,
         _: LdSlice<'slice>,
@@ -68,13 +69,13 @@ where
 }
 
 // Bytes type, non-repeated label
-impl<'slice, L, T> FieldMergeFromSlice<'slice, tags::Bytes, L> for T
+impl<'a, 'slice, L, T> FieldMergeFromSlice<'a, 'slice, tags::Bytes, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck + NonRepeatedLabelTag,
     T: WrappedFieldType<L, Item = Cow<'slice, [u8]>>,
 {
     fn merge(
-        &mut self,
+        &'a mut self,
         field: FieldData<LdSlice<'slice>>,
         _: LdSlice<'slice>,
         _: LdSlice<'slice>,
@@ -92,13 +93,13 @@ where
 }
 
 // String type, non-repeated label
-impl<'slice, L, T> FieldMergeFromSlice<'slice, tags::String, L> for T
+impl<'a, 'slice, L, T> FieldMergeFromSlice<'a, 'slice, tags::String, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck + NonRepeatedLabelTag,
     T: WrappedFieldType<L, Item = Cow<'slice, str>>,
 {
     fn merge(
-        &mut self,
+        &'a mut self,
         field: FieldData<LdSlice<'slice>>,
         _: LdSlice<'slice>,
         _: LdSlice<'slice>,
@@ -116,13 +117,13 @@ where
 }
 
 // Message types, non-repeated label
-impl<'slice, 'msg, M, L> FieldMergeFromSlice<'slice, tags::Message<M>, L>
+impl<'a, 'slice, 'msg, M, L> FieldMergeFromSlice<'a, 'slice, tags::Message<M>, L>
     for Option<SliceViewField<'slice>>
 where
     L: tags::FieldLabelTag + NonRepeatedLabelTag,
 {
     fn merge(
-        &mut self,
+        &'a mut self,
         _: FieldData<LdSlice<'slice>>,
         slice_from_this_field: LdSlice<'slice>,
         enclosing_slice: LdSlice<'slice>,
@@ -133,7 +134,7 @@ where
 }
 
 // Bits32 types, non-repeated label
-impl<'slice, V, L, T> FieldMergeFromSlice<'slice, (tags::wire::Bits32, V), L> for T
+impl<'a, 'slice, V, L, T> FieldMergeFromSlice<'a, 'slice, (tags::wire::Bits32, V), L> for T
 where
     V: tags::Bits32TypeTag + super::Bits32TypeTag<NativeType = T::Item>,
     L: tags::FieldLabelTag + DoDefaultCheck + NonRepeatedLabelTag,
@@ -141,7 +142,7 @@ where
     T::Item: super::Default,
 {
     fn merge(
-        &mut self,
+        &'a mut self,
         field: FieldData<LdSlice<'slice>>,
         _: LdSlice<'slice>,
         _: LdSlice<'slice>,
@@ -159,7 +160,7 @@ where
 }
 
 // Bits64 types, non-repeated label
-impl<'slice, V, L, T> FieldMergeFromSlice<'slice, (tags::wire::Bits64, V), L> for T
+impl<'a, 'slice, V, L, T> FieldMergeFromSlice<'a, 'slice, (tags::wire::Bits64, V), L> for T
 where
     V: tags::Bits64TypeTag + super::Bits64TypeTag<NativeType = T::Item>,
     L: tags::FieldLabelTag + DoDefaultCheck + NonRepeatedLabelTag,
@@ -167,7 +168,7 @@ where
     T::Item: super::Default,
 {
     fn merge(
-        &mut self,
+        &'a mut self,
         field: FieldData<LdSlice<'slice>>,
         _: LdSlice<'slice>,
         _: LdSlice<'slice>,
@@ -185,13 +186,13 @@ where
 }
 
 // Repeated fields
-impl<'slice, 'msg, WireAndValue> FieldMergeFromSlice<'slice, WireAndValue, tags::Repeated>
+impl<'a, 'slice, 'msg, WireAndValue> FieldMergeFromSlice<'a, 'slice, WireAndValue, tags::Repeated>
     for Option<SliceViewField<'slice>>
 where
     WireAndValue: tags::WireAndValueTypeTag,
 {
     fn merge(
-        &mut self,
+        &'a mut self,
         _: FieldData<LdSlice<'slice>>,
         slice_from_this_field: LdSlice<'slice>,
         enclosing_slice: LdSlice<'slice>,

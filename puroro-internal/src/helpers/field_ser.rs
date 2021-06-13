@@ -7,23 +7,23 @@ use crate::tags::{FieldLabelTag, WireAndValueTypeTag};
 use crate::variant;
 use crate::Result;
 
-pub trait FieldSer<TypeTag, LabelTag>
+pub trait FieldSer<'a, TypeTag, LabelTag>
 where
     TypeTag: WireAndValueTypeTag,
     LabelTag: FieldLabelTag,
 {
-    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    fn ser<S>(&'a self, serializer: &mut S, field_number: usize) -> Result<()>
     where
         S: crate::ser::MessageSerializer;
 }
 
-impl<V, L, T> FieldSer<(tags::wire::Variant, V), L> for T
+impl<'a, V, L, T> FieldSer<'a, (tags::wire::Variant, V), L> for T
 where
     V: tags::VariantTypeTag + variant::VariantTypeTag,
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L, Item = <V as variant::VariantTypeTag>::NativeType>,
 {
-    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    fn ser<S>(&'a self, serializer: &mut S, field_number: usize) -> Result<()>
     where
         S: MessageSerializer,
     {
@@ -45,13 +45,13 @@ where
     }
 }
 
-impl<L, T> FieldSer<tags::String, L> for T
+impl<'a, L, T> FieldSer<'a, tags::String, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
     T::Item: StringType,
 {
-    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    fn ser<S>(&'a self, serializer: &mut S, field_number: usize) -> Result<()>
     where
         S: MessageSerializer,
     {
@@ -68,13 +68,13 @@ where
     }
 }
 
-impl<L, T> FieldSer<tags::Bytes, L> for T
+impl<'a, L, T> FieldSer<'a, tags::Bytes, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
     T::Item: BytesType,
 {
-    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    fn ser<S>(&'a self, serializer: &mut S, field_number: usize) -> Result<()>
     where
         S: MessageSerializer,
     {
@@ -95,14 +95,14 @@ where
 }
 
 // Note: For map implementation, `M` might not be equal to `T::Item`
-impl<L, M, T> FieldSer<tags::Message<M>, L> for T
+impl<'a, L, M, T> FieldSer<'a, tags::Message<M>, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
-    T: WrappedMessageFieldType<M, L>,
+    T: WrappedMessageFieldType<'a, M, L>,
     M: Message,
     T::Item: Message + SerializableMessage,
 {
-    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    fn ser<S>(&'a self, serializer: &mut S, field_number: usize) -> Result<()>
     where
         S: MessageSerializer,
     {
@@ -113,14 +113,14 @@ where
     }
 }
 
-impl<V, L, T> FieldSer<(tags::wire::Bits32, V), L> for T
+impl<'a, V, L, T> FieldSer<'a, (tags::wire::Bits32, V), L> for T
 where
     V: tags::Bits32TypeTag + super::Bits32TypeTag<NativeType = T::Item>,
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
     T::Item: Clone,
 {
-    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    fn ser<S>(&'a self, serializer: &mut S, field_number: usize) -> Result<()>
     where
         S: crate::ser::MessageSerializer,
     {
@@ -135,14 +135,14 @@ where
     }
 }
 
-impl<V, L, T> FieldSer<(tags::wire::Bits64, V), L> for T
+impl<'a, V, L, T> FieldSer<'a, (tags::wire::Bits64, V), L> for T
 where
     V: tags::Bits64TypeTag + super::Bits64TypeTag<NativeType = T::Item>,
     L: tags::FieldLabelTag + DoDefaultCheck,
     T: WrappedFieldType<L>,
     T::Item: Clone,
 {
-    fn ser<S>(&self, serializer: &mut S, field_number: usize) -> Result<()>
+    fn ser<S>(&'a self, serializer: &mut S, field_number: usize) -> Result<()>
     where
         S: crate::ser::MessageSerializer,
     {
@@ -161,7 +161,7 @@ where
 // Map field
 ///////////////////////////////////////////////////////////////////////////////
 /*
-impl<Entry> FieldSer<tags::Message<Entry>, tags::Repeated>
+impl<Entry> FieldSer<'a, tags::Message<Entry>, tags::Repeated>
     for HashMap<Entry::OwnedKeyType, Entry::OwnedValueType>
 where
     Entry: MapEntryForNormalImpl,
