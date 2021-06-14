@@ -93,7 +93,7 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
     // Generate the submodule declarations. i.e. `pub mod xxx;`
     let prefixes = ["simple", "bumpalo", "slice_view", "enums", "traits", "tags"];
     for (package, subpackages_iter) in context.packages_with_subpackages() {
-        for prefix in prefixes {
+        for prefix in std::array::IntoIter::new(prefixes) {
             let file_name = package_to_file_path(prefix, package);
             let submodule_decls = subpackages_iter
                 .clone()
