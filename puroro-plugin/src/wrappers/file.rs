@@ -28,23 +28,7 @@ impl<'c> FileDescriptor<'c> {
             lazy_enums: Default::default(),
         }
     }
-    pub fn output_file_path_from_root(&'c self, prefix: &str) -> String {
-        if prefix.is_empty() && self.package().is_empty() {
-            "mod.rs".to_string()
-        } else {
-            let package_items = prefix
-                .split('.')
-                .chain(self.package().split('.'))
-                .filter(|p| !p.is_empty()) // because `"".split('.').next() == Some("")`
-                ;
-            Itertools::intersperse(
-                package_items.map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
-                "/".to_string(),
-            )
-            .collect::<String>()
-                + ".rs"
-        }
-    }
+
     pub fn syntax(&self) -> Result<ProtoSyntax> {
         match self.proto.syntax.as_deref() {
             Some("proto2") | Some("") | None => Ok(ProtoSyntax::Proto2),

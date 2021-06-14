@@ -138,8 +138,8 @@ pub fn iter_package_to_root(package: &str) -> impl Iterator<Item = &str> {
 }
 
 pub fn relative_path(cur_package: &str, dst_package: &str) -> Result<String> {
-    let mut dst_iter = dst_package.split('.').peekable();
-    let mut cur_iter = cur_package.split('.').peekable();
+    let mut dst_iter = dst_package.split('.').filter(|p| !p.is_empty()).peekable();
+    let mut cur_iter = cur_package.split('.').filter(|p| !p.is_empty()).peekable();
     while let (Some(p1), Some(p2)) = (dst_iter.peek(), cur_iter.peek()) {
         if *p1 == *p2 {
             dst_iter.next();
@@ -161,6 +161,29 @@ pub fn relative_path(cur_package: &str, dst_package: &str) -> Result<String> {
         Itertools::intersperse(maybe_self.chain(supers).chain(mods), "::".into())
             .collect::<String>(),
     )
+}
+
+// e.g. From <root mod>::simple::package::* to <root mod>::traits::package::*
+pub fn relative_path_over_namespaces(
+    cur_package: &str,
+    dst_package: &str,
+    dst_prefix: &str,
+) -> Result<String> {
+    let supers = std::iter::repeat("super::")
+        .take(cur_package.split('.').filter(|p| !p.is_empty()).count() + 1)
+        .collect::<String>();
+    let prefix = get_keyword_safe_ident(&to_lower_snake_case(dst_prefix));
+    let dst_module = dst_package
+        .split('.')
+        .filter(|p| !p.is_empty())
+        .map(|p| format!("::{}", get_keyword_safe_ident(&to_lower_snake_case(p))))
+        .collect::<String>();
+    Ok(format!(
+        "{supers}{prefix}{dst_module}",
+        supers = supers,
+        prefix = prefix,
+        dst_module = dst_module,
+    ))
 }
 
 pub struct GenericParams(Vec<&'static str>);

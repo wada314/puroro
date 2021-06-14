@@ -2,7 +2,9 @@ use std::borrow::Cow;
 
 use super::writer::{func, indent, iter, IntoFragment};
 use crate::context::Context;
-use crate::utils::{relative_path, to_camel_case, GenericParams, Indentor};
+use crate::utils::{
+    relative_path, relative_path_over_namespaces, to_camel_case, GenericParams, Indentor,
+};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
@@ -169,7 +171,7 @@ type {ident}{gp}: {bound}
                 Some(AssociatedType {
                     ident: ident.into(),
                     gp: std::array::IntoIter::new(["'this"]).collect(),
-                    bound: self.trait_ident_with_relative_path(m, self.msg.package()?)?,
+                    bound: self.trait_path_from_trait(m, self.msg.package()?)?,
                     where_clause: "where Self: 'this".into(),
                 })
             }
@@ -185,7 +187,7 @@ type {ident}{gp}: {bound}
         Ok(format!("{}Trait", msg.native_ident()?).into())
     }
 
-    pub fn trait_ident_with_relative_path(
+    pub fn trait_path_from_trait(
         &self,
         msg: &'c MessageDescriptor<'c>,
         cur_package: &str,
@@ -193,6 +195,19 @@ type {ident}{gp}: {bound}
         Ok(format!(
             "{module}::{ident}",
             module = relative_path(cur_package, msg.package()?)?,
+            ident = self.trait_ident(msg)?,
+        )
+        .into())
+    }
+
+    pub fn trait_path_from_struct(
+        &self,
+        msg: &'c MessageDescriptor<'c>,
+        cur_package: &str,
+    ) -> Result<Cow<'static, str>> {
+        Ok(format!(
+            "{module}::{ident}",
+            module = relative_path_over_namespaces(cur_package, self.msg.package()?, "traits")?,
             ident = self.trait_ident(msg)?,
         )
         .into())
@@ -255,8 +270,7 @@ type {ident}{gp}: {bound}
                         NonNumericalFieldType::String => "str".into(),
                         NonNumericalFieldType::Bytes => "[u8]".into(),
                         NonNumericalFieldType::Message(_) => format!(
-                            "<Self as {trait_name}>::{name}",
-                            trait_name = self.trait_ident(self.msg)?,
+                            "Self::{name}",
                             name =
                                 self.associated_msg_type_ident_gp(field, field.label()?, None,)?,
                         )

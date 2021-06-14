@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::utils::{relative_path, GenericParams};
+use crate::utils::{relative_path, relative_path_over_namespaces, GenericParams};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
@@ -217,7 +217,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             FieldType::Bytes => "Bytes".into(),
             FieldType::Enum(e) => format!(
                 "Enum::<{module}::{ident}>",
-                module = relative_path(self.msg.package()?, e.package()?)?,
+                module = relative_path_over_namespaces(self.msg.package()?, e.package()?, "enums")?,
                 ident = e.native_ident()?,
             ),
             FieldType::Message(m) => {

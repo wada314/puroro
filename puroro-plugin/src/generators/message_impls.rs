@@ -601,9 +601,11 @@ impl{gp} ::puroro::Serializable for {name}{gpb} {{
             format!(
                 "\
 {cfg}
-impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
+impl{gp} {trait_path} for {struct_ident}{gpb} {{\n",
                 struct_ident = self.msg.native_ident()?,
-                trait_ident = self.traits_gen.trait_ident(self.msg)?,
+                trait_path = self
+                    .traits_gen
+                    .trait_path_from_struct(self.msg, self.msg.package()?)?,
                 cfg = self.frag_gen.cfg_condition(),
                 gp = self
                     .frag_gen
@@ -967,7 +969,7 @@ impl{gp} ::puroro_internal::MapEntryForSliceViewImpl<'slice> for {entry_type} {{
             entry_type = self.frag_gen.type_name_of_msg(self.msg, None)?,
             message_trait_type = self
                 .traits_gen
-                .trait_ident_with_relative_path(self.msg, self.msg.package()?)?,
+                .trait_path_from_struct(self.msg, self.msg.package()?)?,
             cfg = self.frag_gen.cfg_condition(),
             gp = self.frag_gen.struct_generic_params(),
             owned_key_type = self.frag_gen.map_owned_key_type_name(key_field)?,
