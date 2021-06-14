@@ -114,7 +114,7 @@ impl<'c> Context<'c> {
 
     pub fn packages_with_subpackages(
         &'c self,
-    ) -> impl Iterator<Item = (&'c str, impl Iterator<Item = &'c str>)> {
+    ) -> impl Iterator<Item = (&'c str, impl Iterator<Item = &'c str> + Clone)> {
         let map = self.lazy_packages_with_subpackages_map.get_or_init(|| {
             let mut map: HashMap<&'c str, HashSet<&'c str>> = HashMap::new();
             for file in self.file_descriptors() {

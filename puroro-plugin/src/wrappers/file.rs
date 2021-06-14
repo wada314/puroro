@@ -17,7 +17,6 @@ pub struct FileDescriptor<'c> {
 
     lazy_messages: OnceCell<Vec<MessageDescriptor<'c>>>,
     lazy_enums: OnceCell<Vec<EnumDescriptor<'c>>>,
-    lazy_output_file_path_from_root: OnceCell<String>,
 }
 impl<'c> FileDescriptor<'c> {
     pub fn new(proto: &'c FileDescriptorProto, context: &'c Context<'c>) -> Self {
@@ -27,24 +26,24 @@ impl<'c> FileDescriptor<'c> {
 
             lazy_messages: Default::default(),
             lazy_enums: Default::default(),
-            lazy_output_file_path_from_root: Default::default(),
         }
     }
-    pub fn output_file_path_from_root(&'c self) -> &str {
-        self.lazy_output_file_path_from_root.get_or_init(|| {
-            if self.package().is_empty() {
-                "mod.rs".to_string()
-            } else {
-                Itertools::intersperse(
-                    self.package()
-                        .split('.')
-                        .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
-                    "/".to_string(),
-                )
-                .collect::<String>()
-                    + ".rs"
-            }
-        })
+    pub fn output_file_path_from_root(&'c self, prefix: &str) -> String {
+        if prefix.is_empty() && self.package().is_empty() {
+            "mod.rs".to_string()
+        } else {
+            let package_items = prefix
+                .split('.')
+                .chain(self.package().split('.'))
+                .filter(|p| !p.is_empty()) // because `"".split('.').next() == Some("")`
+                ;
+            Itertools::intersperse(
+                package_items.map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
+                "/".to_string(),
+            )
+            .collect::<String>()
+                + ".rs"
+        }
     }
     pub fn syntax(&self) -> Result<ProtoSyntax> {
         match self.proto.syntax.as_deref() {
