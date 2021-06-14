@@ -18,26 +18,6 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         Self { context, msg }
     }
 
-    /// A raw generated struct identifier.
-    /// e.g. "FieldDescriptorProto", "DescriptorProtoBumpalo"
-    pub fn struct_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
-        let postfix1 = match self.context.impl_type() {
-            ImplType::Default => "",
-            ImplType::SliceView => "SliceView",
-        };
-        let postfix2 = match self.context.alloc_type() {
-            AllocatorType::Default => "",
-            AllocatorType::Bumpalo => "Bumpalo",
-        };
-        Ok(format!(
-            "{name}{postfix1}{postfix2}",
-            name = msg.native_ident()?,
-            postfix1 = postfix1,
-            postfix2 = postfix2,
-        )
-        .into())
-    }
-
     /// A type name of the struct with a relative path from the current msg.
     /// Includes generic param bounds if there is any.
     pub fn type_name_of_msg<'b, T>(
@@ -76,13 +56,13 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             Ok(format!(
                 "{module}::{ident}",
                 module = relative_path(self.msg.package()?, msg.package()?)?,
-                ident = self.struct_ident(msg)?,
+                ident = msg.native_ident()?,
             ))
         } else {
             Ok(format!(
                 "{module}::{ident}::<{gargs}>",
                 module = relative_path(self.msg.package()?, msg.package()?)?,
-                ident = self.struct_ident(msg)?,
+                ident = msg.native_ident()?,
                 gargs = generic_args,
             ))
         }
