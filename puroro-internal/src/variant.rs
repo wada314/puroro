@@ -1,5 +1,5 @@
-use crate::tags;
 use crate::{ErrorKind, Result};
+use ::puroro::tags;
 use std::convert::TryFrom;
 use std::io::Result as IoResult;
 use std::io::Write;

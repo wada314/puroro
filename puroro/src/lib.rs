@@ -3,8 +3,10 @@
 #![cfg_attr(feature = "puroro-nightly", feature(min_type_alias_impl_trait))]
 #![allow(incomplete_features)]
 
+mod apply;
 mod collections;
 mod error;
+pub mod tags;
 
 pub use error::{ErrorKind, PuroroError};
 pub type Result<T> = std::result::Result<T, PuroroError>;

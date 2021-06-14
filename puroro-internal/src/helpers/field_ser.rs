@@ -2,10 +2,10 @@ use puroro::Message;
 
 use super::{BytesType, DoDefaultCheck, StringType, WrappedFieldType, WrappedMessageFieldType};
 use crate::ser::{MessageSerializer, SerializableMessage};
-use crate::tags;
-use crate::tags::{FieldLabelTag, WireAndValueTypeTag};
 use crate::variant;
 use crate::Result;
+use ::puroro::tags;
+use ::puroro::tags::{FieldLabelTag, WireAndValueTypeTag};
 
 pub trait FieldSer<'a, TypeTag, LabelTag>
 where

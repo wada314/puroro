@@ -4,12 +4,12 @@ use std::marker::PhantomData;
 
 use crate::deser::LdSlice;
 use crate::internal_data::SliceSource;
-use crate::tags;
 use crate::types::{FieldData, SliceViewField};
 use crate::variant;
 use crate::InternalDataForSliceViewStruct;
 use crate::{ErrorKind, PuroroError, Result, ResultHelper};
 use ::itertools::{Either, Itertools};
+use ::puroro::tags;
 use ::puroro::RepeatedField;
 
 pub trait FieldDataIntoIter<'slice, 'a> {

@@ -22,8 +22,8 @@ pub use msg_field_types::{MapEntryWrapper, MapType, RepeatedMessageType, Wrapped
 pub use repeated_slice_view::RepeatedSliceViewField;
 
 use crate::ser::MessageSerializer;
-use crate::tags;
 use crate::Result;
+use ::puroro::tags;
 
 pub trait DoDefaultCheck {
     const DO_DEFAULT_CHECK: bool = false;

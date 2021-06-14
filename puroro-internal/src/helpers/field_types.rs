@@ -1,5 +1,6 @@
+use crate::bumpalo;
 use crate::Result;
-use crate::{bumpalo, tags};
+use ::puroro::tags;
 
 pub trait WrappedFieldType<LabelTag>
 where

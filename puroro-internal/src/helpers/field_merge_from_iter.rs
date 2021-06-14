@@ -1,6 +1,7 @@
 use std::ops::Deref;
 use std::ops::DerefMut;
 
+use ::puroro::tags;
 use itertools::{Either, Itertools};
 use puroro::Message;
 
@@ -8,7 +9,7 @@ use crate::deser::LdIter;
 use crate::deser::MergeableMessageFromIter;
 use crate::types::FieldData;
 use crate::variant;
-use crate::{tags, ResultHelper};
+use crate::ResultHelper;
 use crate::{ErrorKind, Result};
 
 use super::{BytesType, DoDefaultCheck, StringType, WrappedFieldType, WrappedMessageFieldType};

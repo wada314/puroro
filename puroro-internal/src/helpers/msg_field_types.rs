@@ -1,7 +1,8 @@
 use crate::deser::{LdIter, MergeableMessageFromIter};
 use crate::types::FieldData;
 use crate::Result;
-use crate::{bumpalo, hashbrown, tags};
+use crate::{bumpalo, hashbrown};
+use ::puroro::tags;
 use puroro::Message;
 use std::collections::HashMap;
 use std::hash::Hash;

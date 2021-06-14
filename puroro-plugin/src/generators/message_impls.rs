@@ -341,7 +341,7 @@ impl{gp} ::puroro_internal::deser::MergeableMessageFromIter for {ident}{gpb} {{
     {{
         use ::puroro_internal::FieldMergeFromIter;
         use ::puroro::InternalData;
-        use ::puroro_internal::tags;
+        use ::puroro::tags;
         use ::std::convert::TryInto;
         let puroro_internal = &self.puroro_internal;
         match field_number {{\n",
@@ -474,7 +474,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
     ) -> ::puroro::Result<bool>
     {{
         use ::puroro_internal::FieldMergeFromSlice;
-        use ::puroro_internal::tags;
+        use ::puroro::tags;
         match field_number {{\n",
                 ident = self.frag_gen.struct_ident(self.msg)?,
                 cfg = self.frag_gen.cfg_condition(),
@@ -524,7 +524,7 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
         use ::puroro_internal::FieldSer;
-        use ::puroro_internal::tags;\n",
+        use ::puroro::tags;\n",
                         ident = self.frag_gen.struct_ident(self.msg)?,
                         cfg = self.frag_gen.cfg_condition(),
                         gp = self.frag_gen.struct_generic_params(),
@@ -751,7 +751,7 @@ type {type_ident}{type_gp} {type_where} =
         'slice,
         'this,
         S,
-        ::puroro_internal::tags::{type_tag}
+        ::puroro::tags::{type_tag}
     >;
 {get_decl} {{
     ::puroro_internal::RepeatedSliceViewField::new(
@@ -917,7 +917,7 @@ impl{gp} ::puroro_internal::MapEntryForNormalImpl for {entry_type} {{
         Self::OwnedValueType: ::std::borrow::Borrow<R>,
     {{
         use ::puroro_internal::FieldSer;
-        use ::puroro_internal::tags;
+        use ::puroro::tags;
         <{owned_key_type} as FieldSer<
             tags::{key_type_tag}, 
             tags::Required>>

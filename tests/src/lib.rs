@@ -6,7 +6,7 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 
-use ::puroro_internal::tags;
+use ::puroro::tags;
 
 #[derive(Debug)]
 pub struct CodeGeneratorResponse {

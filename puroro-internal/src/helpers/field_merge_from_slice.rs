@@ -3,11 +3,11 @@ use std::borrow::Cow;
 use super::{DoDefaultCheck, FieldMergeFromIter, WrappedFieldType};
 use crate::deser::LdIter;
 use crate::deser::LdSlice;
-use crate::tags;
 use crate::types::FieldData;
 use crate::variant;
 use crate::SliceViewField;
 use crate::{ErrorKind, Result};
+use ::puroro::tags;
 
 pub trait FieldMergeFromSlice<'a, 'slice, TypeTag, LabelTag>
 where
