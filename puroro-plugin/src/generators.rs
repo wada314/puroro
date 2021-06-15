@@ -99,7 +99,12 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
                 .clone()
                 .map(|p| {
                     format!(
-                        "pub mod {name};\n",
+                        "{maybe_cfg}pub mod {name};\n",
+                        maybe_cfg = if p == "bumpalo" {
+                            r#"#[cfg(feature = "puroro-bumpalo")]\n"#
+                        } else {
+                            ""
+                        },
                         name = get_keyword_safe_ident(&to_lower_snake_case(p))
                     )
                 })
