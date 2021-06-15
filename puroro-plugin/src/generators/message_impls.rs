@@ -11,7 +11,7 @@ pub struct MessageImplCodeGenerator<'a, 'c> {
     context: &'a Context<'c>,
     msg: &'c MessageDescriptor<'c>,
     frag_gen: MessageImplFragmentGenerator<'a, 'c>,
-    traits_gen: MessageTraitCodeGenerator<'a, 'c>,
+    traits_gen: MessageTraitCodeGenerator<'c>,
 }
 
 impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
@@ -20,7 +20,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             context,
             msg,
             frag_gen: MessageImplFragmentGenerator::new(context, msg),
-            traits_gen: MessageTraitCodeGenerator::new(context, msg),
+            traits_gen: MessageTraitCodeGenerator::new(msg),
         }
     }
 

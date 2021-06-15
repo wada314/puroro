@@ -1,6 +1,7 @@
 mod enums;
 mod message_frags;
 mod message_impls;
+mod message_tags;
 mod message_traits;
 mod writer;
 
@@ -14,6 +15,7 @@ use std::collections::HashMap;
 use std::fmt::Write;
 
 use self::message_impls::MessageImplCodeGenerator;
+use self::message_tags::MessageTagCodeGenerator;
 use self::message_traits::MessageTraitCodeGenerator;
 
 static FILE_HEADER: &str = "\
@@ -73,7 +75,6 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
             let file_name = package_to_file_path("traits", file_desc.package());
             let mut visitor = TraitGeneratingVisitor {
                 output: Indentor::new(FILE_HEADER.to_string()),
-                context: context.clone(),
             };
             file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
             filenames_and_contents.insert(file_name, visitor.output.into_inner());
@@ -177,13 +178,12 @@ impl<'c> DescriptorVisitor<'c> for MessageGeneratingVisitor<'c> {
     }
 }
 
-struct TraitGeneratingVisitor<'c> {
+struct TraitGeneratingVisitor {
     output: Indentor<String>,
-    context: Context<'c>,
 }
-impl<'c> DescriptorVisitor<'c> for TraitGeneratingVisitor<'c> {
+impl<'c> DescriptorVisitor<'c> for TraitGeneratingVisitor {
     fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
-        let trait_gen = MessageTraitCodeGenerator::new(&self.context, msg);
+        let trait_gen = MessageTraitCodeGenerator::new(msg);
         trait_gen.print_msg_traits(&mut self.output)?;
         Ok(())
     }
@@ -220,8 +220,10 @@ struct TagGeneratingVisitor {
     output: Indentor<String>,
 }
 impl<'c> DescriptorVisitor<'c> for TagGeneratingVisitor {
-    fn handle_msg(&mut self, _: &'c MessageDescriptor<'c>) -> Result<()> {
-        Ok(()) //todo!()
+    fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
+        let tags_gen = MessageTagCodeGenerator::new(&msg);
+        tags_gen.print_msg_tag(&mut self.output)?;
+        Ok(())
     }
     fn handle_enum(&mut self, _: &'c EnumDescriptor<'c>) -> Result<()> {
         Ok(())

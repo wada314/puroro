@@ -1,7 +1,6 @@
 use std::borrow::Cow;
 
 use super::writer::{func, indent, iter, IntoFragment};
-use crate::context::Context;
 use crate::utils::{
     relative_path, relative_path_over_namespaces, to_camel_case, GenericParams, Indentor,
 };
@@ -10,16 +9,15 @@ use crate::wrappers::{
 };
 use crate::{ErrorKind, Result};
 
-pub struct MessageTraitCodeGenerator<'a, 'c> {
-    #[allow(unused)]
-    context: &'a Context<'c>,
+pub struct MessageTraitCodeGenerator<'c> {
     msg: &'c MessageDescriptor<'c>,
 }
 
-impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
-    pub fn new(context: &'a Context<'c>, msg: &'c MessageDescriptor<'c>) -> Self {
-        Self { context, msg }
+impl<'c> MessageTraitCodeGenerator<'c> {
+    pub fn new(msg: &'c MessageDescriptor<'c>) -> Self {
+        Self { msg }
     }
+
     pub fn print_msg_traits<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (func(|output| self.print_msg_base_trait(output)),).write_into(output)
     }
