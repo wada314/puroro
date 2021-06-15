@@ -2,13 +2,11 @@ use std::fmt::Debug;
 
 use crate::error::ErrorKind;
 use crate::google::protobuf::FileDescriptorProto;
-use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::Context;
 use crate::Result;
 
 use super::{EnumDescriptor, FileOrMessageRef, MessageDescriptor};
 use ::once_cell::unsync::OnceCell;
-use itertools::Itertools;
 
 #[derive(Clone)]
 pub struct FileDescriptor<'c> {
