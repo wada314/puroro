@@ -1,5 +1,5 @@
 use super::writer::{func, indent, iter, IntoFragment};
-use crate::utils::Indentor;
+use crate::utils::{relative_path_over_namespaces, Indentor};
 use crate::wrappers::MessageDescriptor;
 use crate::Result;
 
@@ -14,6 +14,16 @@ impl<'c> MessageTagCodeGenerator<'c> {
 
     pub fn print_msg_tag<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         let ident = format!("{}Tag", self.msg.native_ident()?);
-        (format!("pub struct {ident}();\n\n", ident = ident),).write_into(output)
+        (
+            format!("pub struct {ident}();\n\n", ident = ident),
+            format!(
+                "\
+impl ::puroro::MessageTag for {ident} {{
+}}
+\n",
+                ident = ident,
+            ),
+        )
+            .write_into(output)
     }
 }

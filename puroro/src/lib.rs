@@ -38,6 +38,9 @@ pub trait Message {
 }
 pub trait Enum {}
 
+pub trait MessageTag {}
+pub trait IsMsgImplOfTag<T: MessageTag> {}
+
 pub trait InternalData {
     #[cfg(feature = "puroro-bumpalo")]
     fn bumpalo(&self) -> &::bumpalo::Bump;
