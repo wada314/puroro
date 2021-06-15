@@ -198,15 +198,11 @@ type {ident}{gp}: {bound}
         .into())
     }
 
-    pub fn trait_path_from_struct(
-        &self,
-        msg: &'c MessageDescriptor<'c>,
-        cur_package: &str,
-    ) -> Result<Cow<'static, str>> {
+    pub fn trait_path_from_struct(&self, cur_package: &str) -> Result<Cow<'static, str>> {
         Ok(format!(
             "{module}::{ident}",
             module = relative_path_over_namespaces(cur_package, self.msg.package()?, "traits")?,
-            ident = self.trait_ident(msg)?,
+            ident = self.trait_ident(self.msg)?,
         )
         .into())
     }

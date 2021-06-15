@@ -39,7 +39,7 @@ pub trait Message {
 pub trait Enum {}
 
 pub trait MessageTag {}
-pub trait IsMsgImplOfTag<T: MessageTag> {}
+pub trait IsMessageImplOfTag<T: MessageTag> {}
 
 pub trait InternalData {
     #[cfg(feature = "puroro-bumpalo")]

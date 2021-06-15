@@ -1,4 +1,5 @@
 use super::message_frags::MessageImplFragmentGenerator;
+use super::message_tags::MessageTagCodeGenerator;
 use super::message_traits::MessageTraitCodeGenerator;
 use super::writer::{func, indent, indent_n, iter, seq, IntoFragment};
 use crate::context::{AllocatorType, Context, ImplType};
@@ -12,6 +13,7 @@ pub struct MessageImplCodeGenerator<'a, 'c> {
     msg: &'c MessageDescriptor<'c>,
     frag_gen: MessageImplFragmentGenerator<'a, 'c>,
     traits_gen: MessageTraitCodeGenerator<'c>,
+    tags_gen: MessageTagCodeGenerator<'c>,
 }
 
 impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
@@ -21,6 +23,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             msg,
             frag_gen: MessageImplFragmentGenerator::new(context, msg),
             traits_gen: MessageTraitCodeGenerator::new(msg),
+            tags_gen: MessageTagCodeGenerator::new(msg),
         }
     }
 
@@ -42,10 +45,13 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
                 },
                 func(|output| self.print_msg_ser(output)),
             ),
-            func(|output| self.print_impl_trait(output)),
-            func(|output| self.print_impl_message(output)),
-            func(|output| self.print_impl_map_entry(output)),
-            func(|output| self.print_impl_field_new(output)),
+            (
+                func(|output| self.print_impl_trait(output)),
+                func(|output| self.print_impl_message(output)),
+                func(|output| self.print_impl_is_message_impl_of_tag(output)),
+                func(|output| self.print_impl_map_entry(output)),
+                func(|output| self.print_impl_field_new(output)),
+            ),
         )
             .write_into(output)
     }
@@ -587,7 +593,7 @@ impl{gp} {trait_path} for {struct_ident}{gpb} {{\n",
                 struct_ident = self.msg.native_ident()?,
                 trait_path = self
                     .traits_gen
-                    .trait_path_from_struct(self.msg, self.msg.package()?)?,
+                    .trait_path_from_struct(self.msg.package()?)?,
                 gp = self
                     .frag_gen
                     .struct_generic_params()
@@ -864,6 +870,26 @@ impl{gp} ::puroro::Message for {struct_ident}{gpb} {{
             .write_into(output)
     }
 
+    fn print_impl_is_message_impl_of_tag<W: std::fmt::Write>(
+        &self,
+        output: &mut Indentor<W>,
+    ) -> Result<()> {
+        (format!(
+            "\
+impl{gp} ::puroro::IsMessageImplOfTag<{tag}> for {struct_ident}{gpb} {{
+}}
+\n",
+            struct_ident = self.msg.native_ident()?,
+            tag = self.tags_gen.tag_path_from_struct(self.msg.package()?)?,
+            gp = self
+                .frag_gen
+                .struct_generic_params()
+                .replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
+            gpb = self.frag_gen.struct_generic_params_bounds(),
+        ),)
+            .write_into(output)
+    }
+
     fn print_impl_map_entry<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         if !self.msg.is_map_entry() {
             return Ok(());
@@ -950,7 +976,7 @@ impl{gp} ::puroro_internal::MapEntryForSliceViewImpl<'slice> for {entry_type} {{
             entry_type = self.frag_gen.type_name_of_msg(self.msg, None)?,
             message_trait_type = self
                 .traits_gen
-                .trait_path_from_struct(self.msg, self.msg.package()?)?,
+                .trait_path_from_struct(self.msg.package()?)?,
             gp = self.frag_gen.struct_generic_params(),
             owned_key_type = self.frag_gen.map_owned_key_type_name(key_field)?,
             value_getter_type = self.traits_gen.map_value_getter_type_name(value_field)?,

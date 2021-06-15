@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use super::writer::{func, indent, iter, IntoFragment};
 use crate::utils::{relative_path_over_namespaces, Indentor};
 use crate::wrappers::MessageDescriptor;
@@ -25,5 +27,18 @@ impl ::puroro::MessageTag for {ident} {{
             ),
         )
             .write_into(output)
+    }
+
+    pub fn tag_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'static, str>> {
+        Ok(format!("{}Tag", msg.native_ident()?).into())
+    }
+
+    pub fn tag_path_from_struct(&self, cur_package: &str) -> Result<Cow<'static, str>> {
+        Ok(format!(
+            "{module}::{ident}",
+            module = relative_path_over_namespaces(cur_package, self.msg.package()?, "tags")?,
+            ident = self.tag_ident(self.msg)?,
+        )
+        .into())
     }
 }
