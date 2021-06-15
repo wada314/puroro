@@ -68,13 +68,6 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
-    pub fn cfg_condition(&self) -> &'static str {
-        match self.context.alloc_type() {
-            AllocatorType::Bumpalo => "#[cfg(feature = \"puroro-bumpalo\")]",
-            _ => "",
-        }
-    }
-
     pub fn is_default_available(&self) -> bool {
         match (self.context.impl_type(), self.context.alloc_type()) {
             (_, AllocatorType::Bumpalo) => false,
