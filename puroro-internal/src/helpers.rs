@@ -4,8 +4,8 @@ pub mod field_merge_from_slice;
 pub mod field_new;
 pub mod field_ser;
 pub mod field_take_or_init;
-pub mod field_types;
-pub mod msg_field_types;
+pub mod field_wrappers;
+pub mod msg_field_wrappers;
 pub mod repeated_slice_view;
 use std::borrow::Borrow;
 
@@ -17,8 +17,8 @@ pub use field_merge_from_slice::FieldMergeFromSlice;
 pub use field_new::FieldNew;
 pub use field_ser::FieldSer;
 pub use field_take_or_init::FieldTakeOrInit;
-pub use field_types::{BytesType, StringType, VecType, WrappedFieldType};
-pub use msg_field_types::{MapEntryWrapper, MapType, RepeatedMessageType, WrappedMessageFieldType};
+pub use field_wrappers::{BytesType, StringType, VecType, WrappedFieldType};
+pub use msg_field_wrappers::{MapEntryWrapper, MapType, RepeatedMessageType, WrappedMessageFieldType};
 pub use repeated_slice_view::RepeatedSliceViewField;
 
 use crate::ser::MessageSerializer;
