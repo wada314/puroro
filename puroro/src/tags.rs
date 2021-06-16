@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub trait ValueTypeTag {}
 pub trait VariantTypeTag: ValueTypeTag {}
 pub trait LengthDelimitedTypeTag: ValueTypeTag {}
@@ -7,6 +9,8 @@ pub trait WireTypeTag {}
 pub trait WireAndValueTypeTag {}
 pub trait FieldLabelTag {}
 pub trait FieldTypeAndLabelTag {}
+
+pub trait ImplTypeTag {}
 
 pub mod value {
     use std::marker::PhantomData;
@@ -64,6 +68,11 @@ pub struct Optional3;
 /// Only available in proto2.
 pub struct Required;
 
+// Proto struct implementation types.
+pub struct SimpleStruct;
+pub struct Bumpalo<'bump>(PhantomData<&'bump ()>);
+pub struct SliceView<'slice>(PhantomData<&'slice ()>);
+
 impl ValueTypeTag for value::Int32 {}
 impl ValueTypeTag for value::Int64 {}
 impl ValueTypeTag for value::UInt32 {}
@@ -117,3 +126,7 @@ impl FieldLabelTag for Repeated {}
 impl FieldLabelTag for Optional2 {}
 impl FieldLabelTag for Optional3 {}
 impl FieldLabelTag for Required {}
+
+impl ImplTypeTag for SimpleStruct {}
+impl<'bump> ImplTypeTag for Bumpalo<'bump> {}
+impl<'slice> ImplTypeTag for SliceView<'slice> {}

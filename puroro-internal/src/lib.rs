@@ -4,6 +4,7 @@
 #![allow(incomplete_features)]
 
 pub mod deser;
+pub mod field_type_gen;
 pub mod helpers;
 pub mod internal_data;
 pub mod ser;

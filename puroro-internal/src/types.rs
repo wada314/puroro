@@ -45,6 +45,10 @@ impl<T> FieldData<T> {
     }
 }
 
+/// A field type used by slice_view impl, for the fields which are:
+/// * Repeated, or
+/// * Any of String, Bytes, Message types.
+/// i.e. For the fields which do not have fixed bytes length.
 #[derive(Debug, Clone)]
 pub enum SliceViewField<'slice> {
     /// This field is embedded in a single slice. Simple.
@@ -59,10 +63,11 @@ pub enum SliceViewField<'slice> {
     },
     /// The field's owner message is constructed from multiple slices (and merged then),
     /// so we cannot store the source slice list (arbitrary length) in the stack memory.
-    /// In this case, we need to get the list of LdSlices from puroro_internal field.
+    /// In this case, we need to ask for the list of `LdSlice`s to `puroro_internal` field.
     /// The items of this entry are hints for optimization.
     FieldInMultipleSlices {
-        /// A total number of field items in the slice. Packed repeated field is counted as 1 field.
+        /// A total number of field items in the slice. Packed repeated field is counted as 1 item.
+        /// We can terminate parsing the source slices when the number of items has reached this number.
         count: usize,
         /// A first source slice that this field instance appears.
         /// We can skip parsing the source slices until this slice appears.

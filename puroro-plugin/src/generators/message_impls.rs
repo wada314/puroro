@@ -180,7 +180,8 @@ impl{gp} {ident}{gpb} {{
             "        \
         }}
     }}
-}}",
+}}
+\n",
             format!(
                 "\
 impl{gp} {ident}{gpb} {{
@@ -209,7 +210,8 @@ impl{gp} {ident}{gpb} {{
         ld_slice.merge_into_message(&mut new_self)?;
         Ok(new_self)
     }}
-}}",
+}}
+\n",
             format!(
                 "\
 impl{gp} {ident}{gpb} 
