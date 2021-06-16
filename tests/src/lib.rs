@@ -6,7 +6,7 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 
-use ::puroro::apply::ApplyToField;
+use ::puroro::apply::FieldVisitor;
 use ::puroro::tags;
 
 pub struct Msg {
@@ -38,51 +38,67 @@ impl ::puroro::IsMessageImplOfTag<SubMsgTag> for SubMsgTag {}
 
 struct Visitor();
 
-impl<MTag, MType> ApplyToField<tags::Repeated, tags::Message<MTag>, Vec<MType>, (), ()> for Visitor
+impl<MTag, MType> FieldVisitor<tags::Repeated, tags::Message<MTag>, Vec<MType>, (), ()> for Visitor
 where
     MTag: ::puroro::MessageTag,
-    MType: ::puroro::IsMessageImplOfTag<MTag>,
+    MType: ::puroro::IsMessageImplOfTag<MTag> + VisitFieldsAcceptor<Self, ()>,
 {
-    fn apply(&mut self, field: &Vec<MType>, _: usize) -> Result<(), ()> {
-        for item in field {}
+    fn visit(&mut self, field: &Vec<MType>, _: usize) -> Result<(), ()> {
+        for item in field {
+            <MType as VisitFieldsAcceptor<Self, ()>>::visit_fields(item, self)?;
+        }
         Ok(())
     }
 }
 
-impl Msg {
-    fn apply_to_fields<F, E>(&self, f: &mut F) -> Result<(), E>
-    where
-        F: AppliableToMsgFields<E>,
-    {
-        f.apply(&self.the_map, 1)?;
+trait VisitFieldsAcceptor<F, E> {
+    fn visit_fields(&self, f: &mut F) -> Result<(), E>;
+}
+
+impl<F, E> VisitFieldsAcceptor<F, E> for Msg
+where
+    F: AppliableToMsgFields<E>,
+{
+    fn visit_fields(&self, f: &mut F) -> Result<(), E> {
+        f.visit(&self.the_map, 1)?;
         Ok(())
     }
 }
 
-impl TheMapEntry {
-    fn apply_to_fields<F, E>(&self, f: &mut F) -> Result<(), E>
-    where
-        F: AppliableToTheMapEntryFields<E>,
-    {
-        f.apply(&self.key, 1)?;
-        f.apply(&self.value, 2)?;
+impl<F, E> VisitFieldsAcceptor<F, E> for TheMapEntry
+where
+    F: AppliableToTheMapEntryFields<E>,
+{
+    fn visit_fields(&self, f: &mut F) -> Result<(), E> {
+        f.visit(&self.key, 1)?;
+        f.visit(&self.value, 2)?;
+        Ok(())
+    }
+}
+
+impl<F, E> VisitFieldsAcceptor<F, E> for SubMsg
+where
+    F: AppliableToSubMsgFields<E>,
+{
+    fn visit_fields(&self, f: &mut F) -> Result<(), E> {
+        f.visit(&self.sub_msg, 1)?;
         Ok(())
     }
 }
 
 trait AppliableToMsgFields<E>:
-    ApplyToField<tags::Repeated, tags::Message<TheMapEntryTag>, Vec<TheMapEntry>, (), E>
+    FieldVisitor<tags::Repeated, tags::Message<TheMapEntryTag>, Vec<TheMapEntry>, (), E>
 {
 }
 
 trait AppliableToTheMapEntryFields<E>:
-    ApplyToField<tags::Optional3, tags::Message<SubMsgTag>, Option<Box<SubMsg>>, (), E>
-    + ApplyToField<tags::Optional3, tags::String, String, (), E>
+    FieldVisitor<tags::Optional3, tags::Message<SubMsgTag>, Option<Box<SubMsg>>, (), E>
+    + FieldVisitor<tags::Optional3, tags::String, String, (), E>
 {
 }
 
 trait AppliableToSubMsgFields<E>:
-    ApplyToField<tags::Optional3, tags::Message<SubMsgTag>, Option<SubMsg>, (), E>
+    FieldVisitor<tags::Optional3, tags::Message<SubMsgTag>, Option<Box<SubMsg>>, (), E>
 {
 }
 
