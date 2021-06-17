@@ -26,6 +26,7 @@ pub use helpers::{
 };
 pub use types::SliceViewField;
 
+// A utility for Result.
 trait ResultHelper<T, E> {
     fn flatten(self) -> std::result::Result<T, E>;
 }
@@ -35,10 +36,23 @@ impl<T, E> ResultHelper<T, E> for std::result::Result<std::result::Result<T, E>,
     }
 }
 
+// A trait for map entry message type.
 pub trait MapEntry {
     type KeyType;
     type ValueType;
     // Note: &mut self, not self. The implementor may need to use std::mem::replace.
     fn take_kv(&mut self) -> (Self::KeyType, Self::ValueType);
     fn from_kv(key: &Self::KeyType, value: &Self::ValueType) -> Self;
+}
+
+// A function-like-trait that takes message tag type and returns corresponding
+// impl struct type. Every impl struct needs to implement this manually.
+pub trait GetSimpleStructImplFor {
+    type Type;
+}
+pub trait GetBumpaloStructImplFor<'bump> {
+    type Type;
+}
+pub trait GetSliceViewStructImplFor<'slice> {
+    type Type;
 }
