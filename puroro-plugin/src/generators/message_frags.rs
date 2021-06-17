@@ -208,8 +208,13 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "String".into(),
             FieldType::Bytes => "Bytes".into(),
-            FieldType::Enum(e) => format!(
-                "Enum::<{module}::{ident}>",
+            FieldType::Enum2(e) => format!(
+                "Enum2::<{module}::{ident}>",
+                module = relative_path_over_namespaces(self.msg.package()?, e.package()?, "enums")?,
+                ident = e.native_ident()?,
+            ),
+            FieldType::Enum3(e) => format!(
+                "Enum3::<{module}::{ident}>",
                 module = relative_path_over_namespaces(self.msg.package()?, e.package()?, "enums")?,
                 ident = e.native_ident()?,
             ),
@@ -224,7 +229,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             ImplType::Default => match self.context.alloc_type() {
                 AllocatorType::Default => match field.type_()? {
                     FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                    FieldType::Enum(_) => "|| 0i32.try_into()".into(),
+                    FieldType::Enum2(_) => "|| 0i32.try_into()".into(),
                     _ => "::std::default::Default::default".into(),
                 },
                 AllocatorType::Bumpalo => match field.type_()? {
@@ -241,7 +246,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             .into()
                     }
                     FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                    FieldType::Enum(_) => "|| 0i32.try_into()".into(),
+                    FieldType::Enum2(_) => "|| 0i32.try_into()".into(),
                     FieldType::Message(m) => format!(
                         "|| {msg}::new_in(&puroro_internal.bump)",
                         msg = self.type_name_of_msg(m, None)?,

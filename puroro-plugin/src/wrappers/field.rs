@@ -104,7 +104,7 @@ impl<'c> FieldDescriptor<'c> {
                         .context
                         .fq_name_to_desc(self.fully_qualified_type_name()?)?
                     {
-                        Some(EnumOrMessageRef::Enum(e)) => FieldType::Enum(e),
+                        Some(EnumOrMessageRef::Enum(e)) => FieldType::Enum2(e),
                         _ => Err(ErrorKind::InternalError {
                             detail: format!(
                                 "The field desc for {}.{} says its `type` is `TYPE_ENUM`, \
@@ -125,7 +125,10 @@ impl<'c> FieldDescriptor<'c> {
                 .context
                 .fq_name_to_desc(self.fully_qualified_type_name()?)?
             {
-                Some(EnumOrMessageRef::Enum(e)) => FieldType::Enum(e),
+                Some(EnumOrMessageRef::Enum(e)) => match self.message().file().syntax()? {
+                    super::ProtoSyntax::Proto2 => FieldType::Enum2(e),
+                    super::ProtoSyntax::Proto3 => FieldType::Enum3(e),
+                },
                 Some(EnumOrMessageRef::Message(m)) => FieldType::Message(m),
                 _ => Err(ErrorKind::UnknownTypeName {
                     name: self.proto.type_name.clone().unwrap_or("".to_string()),
@@ -214,7 +217,8 @@ pub enum FieldType<'c> {
     Group,
     String,
     Bytes,
-    Enum(&'c super::EnumDescriptor<'c>),
+    Enum2(&'c super::EnumDescriptor<'c>),
+    Enum3(&'c super::EnumDescriptor<'c>),
     Message(&'c super::MessageDescriptor<'c>),
 }
 impl<'c> FieldType<'c> {
@@ -233,7 +237,13 @@ impl<'c> FieldType<'c> {
             FieldType::Group => Err(NonNumericalFieldType::Group),
             FieldType::String => Err(NonNumericalFieldType::String),
             FieldType::Bytes => Err(NonNumericalFieldType::Bytes),
-            FieldType::Enum(e) => Ok(format!(
+            FieldType::Enum2(e) => Ok(format!(
+                "{module}::{ident}",
+                module = relative_path_over_namespaces(package, e.package()?, "enums")?,
+                ident = e.native_ident()?,
+            )
+            .into()),
+            FieldType::Enum3(e) => Ok(format!(
                 "::std::result::Result<{module}::{ident}, i32>",
                 module = relative_path_over_namespaces(package, e.package()?, "enums")?,
                 ident = e.native_ident()?,
