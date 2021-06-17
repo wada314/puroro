@@ -36,9 +36,6 @@ pub trait Message {
     type BoxedType: AsMut<Self>;
     fn into_boxed(self) -> Self::BoxedType;
 }
-pub trait BumpaloMessage<'bump> {
-    fn bump(&self) -> &'bump bumpalo::Bump;
-}
 pub trait Enum {}
 
 pub trait MessageTag {}
