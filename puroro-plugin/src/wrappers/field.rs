@@ -1,8 +1,8 @@
 use std::borrow::Cow;
 use std::fmt::Debug;
 
-use crate::google::protobuf::field_descriptor_proto::Label;
 use crate::google::protobuf::FieldDescriptorProto;
+use crate::protos::enums::google::protobuf::field_descriptor_proto::Label;
 use crate::utils::{
     get_keyword_safe_ident, iter_package_to_root, relative_path_over_namespaces,
     to_lower_snake_case,
@@ -49,7 +49,7 @@ impl<'c> FieldDescriptor<'c> {
     }
     pub fn label(&'c self) -> Result<FieldLabel> {
         match self.proto.label {
-            Some(Ok(Label::LabelOptional)) => match self.message().file().syntax()? {
+            Some(Label::LabelOptional) => match self.message().file().syntax()? {
                 super::ProtoSyntax::Proto2 => Ok(FieldLabel::Optional2),
                 super::ProtoSyntax::Proto3 => {
                     if self.proto.proto3_optional.unwrap_or_default() {
@@ -59,17 +59,16 @@ impl<'c> FieldDescriptor<'c> {
                     }
                 }
             },
-            Some(Ok(Label::LabelRepeated)) => Ok(FieldLabel::Repeated),
-            Some(Ok(Label::LabelRequired)) => Ok(FieldLabel::Required),
-            Some(Err(id)) => Err(ErrorKind::UnknownLabelId { id })?,
+            Some(Label::LabelRepeated) => Ok(FieldLabel::Repeated),
+            Some(Label::LabelRequired) => Ok(FieldLabel::Required),
             None => Err(ErrorKind::UnknownLabelId { id: 0 })?,
         }
     }
 
     pub fn type_(&'c self) -> Result<FieldType<'c>> {
         Ok(match &self.proto.type_ {
-            Some(Ok(type_)) => {
-                use crate::protos::google::protobuf::field_descriptor_proto::Type;
+            Some(type_) => {
+                use crate::protos::enums::google::protobuf::field_descriptor_proto::Type;
                 match type_ {
                     Type::TypeDouble => FieldType::Double,
                     Type::TypeFloat => FieldType::Float,
@@ -121,7 +120,7 @@ impl<'c> FieldDescriptor<'c> {
                     Type::TypeSint64 => FieldType::SInt64,
                 }
             }
-            Some(Err(0)) | None => match self
+            None => match self
                 .context
                 .fq_name_to_desc(self.fully_qualified_type_name()?)?
             {
@@ -134,7 +133,6 @@ impl<'c> FieldDescriptor<'c> {
                     name: self.proto.type_name.clone().unwrap_or("".to_string()),
                 })?,
             },
-            Some(Err(id)) => Err(ErrorKind::UnknownFieldTypeId { id: *id })?,
         })
     }
 
