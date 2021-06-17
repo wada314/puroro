@@ -85,6 +85,38 @@ where
     type Type = Vec<<M as GetSimpleStructImplFor>::Type>;
 }
 
+// Bumpalo, all labels, variant types
+impl<'bump, L, V> FieldTypeGen<(L, (tags::wire::Variant, V))> for tags::Bumpalo<'bump>
+where
+    V: tags::VariantTypeTag,
+    <V as tags::VariantTypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::Bumpalo<'bump>>,
+{
+    type Type = <<V as tags::VariantTypeTag>::NativeType as TypicalWrapperTypeFor<
+        L,
+        tags::Bumpalo<'bump>,
+    >>::Type;
+}
+
+// Bumpalo, all labels, String & Bytes types
+impl<'bump, L> FieldTypeGen<(L, tags::String)> for tags::Bumpalo<'bump>
+where
+    bumpalo::collections::String<'bump>: TypicalWrapperTypeFor<L, tags::Bumpalo<'bump>>,
+{
+    type Type = <bumpalo::collections::String<'bump> as TypicalWrapperTypeFor<
+        L,
+        tags::Bumpalo<'bump>,
+    >>::Type;
+}
+impl<'bump, L> FieldTypeGen<(L, tags::Bytes)> for tags::Bumpalo<'bump>
+where
+    bumpalo::collections::String<'bump>: TypicalWrapperTypeFor<L, tags::Bumpalo<'bump>>,
+{
+    type Type = <bumpalo::collections::String<'bump> as TypicalWrapperTypeFor<
+        L,
+        tags::Bumpalo<'bump>,
+    >>::Type;
+}
+
 // Bumpalo, each labels, message types
 impl<'bump, M> FieldTypeGen<(tags::Required, tags::Message<M>)> for tags::Bumpalo<'bump>
 where
