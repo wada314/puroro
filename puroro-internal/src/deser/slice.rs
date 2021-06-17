@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 use std::io::Read;
 
-use super::{DeserializableMessageFromIter, LdIter, Variants};
+use super::{LdIter, MergeableMessageFromIter, Variants};
 use crate::types::{FieldData, WireType};
 use crate::variant::Variant;
 use crate::ErrorKind;
@@ -18,9 +18,8 @@ pub trait DeserializableMessageFromSlice<'slice> {
     ) -> Result<bool>;
 }
 
-/// Length delimited field's data. Typically it's a list of message fields,
-/// but maybe it's String or Bytes or packed variants data.
-/// A wrapper over slice which stores maybe multiple fields data.
+/// Length delimited field's data. Typically it's a list of fields of a message,
+/// but maybe it's a String or Bytes or packed variants data.
 /// Ld = Length delimited = wiretype==2
 #[derive(Debug, Clone)]
 pub struct LdSlice<'slice> {
@@ -31,9 +30,9 @@ impl<'slice> LdSlice<'slice> {
         Self { slice }
     }
 
-    pub fn deser_message<H: DeserializableMessageFromSlice<'slice>>(
+    pub fn merge_into_message<T: DeserializableMessageFromSlice<'slice>>(
         &self,
-        handler: &mut H,
+        message: &mut T,
     ) -> Result<()> {
         let mut fields = self.fields();
 
@@ -41,7 +40,7 @@ impl<'slice> LdSlice<'slice> {
             let field = rfield?;
             let mut ld_slice_from_this_field = self.clone();
             ld_slice_from_this_field.skip_until_start_of(field.slice);
-            if !handler.met_field_at(
+            if !message.met_field_at(
                 field.data,
                 field.number,
                 ld_slice_from_this_field,
@@ -203,9 +202,9 @@ impl<'slice> Iterator for Fields<'slice> {
     }
 }
 
-pub struct FromIterToFromSlice<'a, T: DeserializableMessageFromIter>(&'a mut T);
+pub struct FromIterToFromSlice<'a, T: MergeableMessageFromIter>(&'a mut T);
 
-impl<'a, T: DeserializableMessageFromIter> FromIterToFromSlice<'a, T> {
+impl<'a, T: MergeableMessageFromIter> FromIterToFromSlice<'a, T> {
     pub fn new(from_iter: &'a mut T) -> Self {
         Self(from_iter)
     }
@@ -213,7 +212,7 @@ impl<'a, T: DeserializableMessageFromIter> FromIterToFromSlice<'a, T> {
 
 impl<'slice, 'a, T> DeserializableMessageFromSlice<'slice> for FromIterToFromSlice<'a, T>
 where
-    T: DeserializableMessageFromIter,
+    T: MergeableMessageFromIter,
 {
     fn met_field_at(
         &mut self,

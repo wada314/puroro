@@ -1,8 +1,12 @@
+use std::borrow::Cow;
 use std::fmt::Debug;
 
 use crate::google::protobuf::field_descriptor_proto::Label;
 use crate::google::protobuf::FieldDescriptorProto;
-use crate::utils::{get_keyword_safe_ident, iter_package_to_root, to_lower_snake_case};
+use crate::utils::{
+    get_keyword_safe_ident, iter_package_to_root, relative_path_over_namespaces,
+    to_lower_snake_case,
+};
 use crate::Context;
 use crate::{ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
@@ -100,7 +104,7 @@ impl<'c> FieldDescriptor<'c> {
                         .context
                         .fq_name_to_desc(self.fully_qualified_type_name()?)?
                     {
-                        Some(EnumOrMessageRef::Enum(e)) => FieldType::Enum(e),
+                        Some(EnumOrMessageRef::Enum(e)) => FieldType::Enum2(e),
                         _ => Err(ErrorKind::InternalError {
                             detail: format!(
                                 "The field desc for {}.{} says its `type` is `TYPE_ENUM`, \
@@ -121,7 +125,10 @@ impl<'c> FieldDescriptor<'c> {
                 .context
                 .fq_name_to_desc(self.fully_qualified_type_name()?)?
             {
-                Some(EnumOrMessageRef::Enum(e)) => FieldType::Enum(e),
+                Some(EnumOrMessageRef::Enum(e)) => match self.message().file().syntax()? {
+                    super::ProtoSyntax::Proto2 => FieldType::Enum2(e),
+                    super::ProtoSyntax::Proto3 => FieldType::Enum3(e),
+                },
                 Some(EnumOrMessageRef::Message(m)) => FieldType::Message(m),
                 _ => Err(ErrorKind::UnknownTypeName {
                     name: self.proto.type_name.clone().unwrap_or("".to_string()),
@@ -210,35 +217,47 @@ pub enum FieldType<'c> {
     Group,
     String,
     Bytes,
-    Enum(&'c super::EnumDescriptor<'c>),
+    Enum2(&'c super::EnumDescriptor<'c>),
+    Enum3(&'c super::EnumDescriptor<'c>),
     Message(&'c super::MessageDescriptor<'c>),
 }
 impl<'c> FieldType<'c> {
-    pub fn native_trivial_type_name(
+    pub fn native_numerical_type_name(
         &self,
-    ) -> std::result::Result<&'static str, NonTrivialFieldType<'c>> {
-        match self {
-            FieldType::Double => Ok("f64"),
-            FieldType::Float => Ok("f32"),
-            FieldType::Int32 | FieldType::SInt32 | FieldType::SFixed32 => Ok("i32"),
-            FieldType::Int64 | FieldType::SInt64 | FieldType::SFixed64 => Ok("i64"),
-            FieldType::UInt32 | FieldType::Fixed32 => Ok("u32"),
-            FieldType::UInt64 | FieldType::Fixed64 => Ok("u64"),
-            FieldType::Bool => Ok("bool"),
-            FieldType::Group => Err(NonTrivialFieldType::Group),
-            FieldType::String => Err(NonTrivialFieldType::String),
-            FieldType::Bytes => Err(NonTrivialFieldType::Bytes),
-            FieldType::Enum(e) => Err(NonTrivialFieldType::Enum(e)),
-            FieldType::Message(m) => Err(NonTrivialFieldType::Message(m)),
-        }
+        package: &str,
+    ) -> Result<std::result::Result<Cow<'static, str>, NonNumericalFieldType<'c>>> {
+        Ok(match self {
+            FieldType::Double => Ok("f64".into()),
+            FieldType::Float => Ok("f32".into()),
+            FieldType::Int32 | FieldType::SInt32 | FieldType::SFixed32 => Ok("i32".into()),
+            FieldType::Int64 | FieldType::SInt64 | FieldType::SFixed64 => Ok("i64".into()),
+            FieldType::UInt32 | FieldType::Fixed32 => Ok("u32".into()),
+            FieldType::UInt64 | FieldType::Fixed64 => Ok("u64".into()),
+            FieldType::Bool => Ok("bool".into()),
+            FieldType::Group => Err(NonNumericalFieldType::Group),
+            FieldType::String => Err(NonNumericalFieldType::String),
+            FieldType::Bytes => Err(NonNumericalFieldType::Bytes),
+            FieldType::Enum2(e) => Ok(format!(
+                "{module}::{ident}",
+                module = relative_path_over_namespaces(package, e.package()?, "enums")?,
+                ident = e.native_ident()?,
+            )
+            .into()),
+            FieldType::Enum3(e) => Ok(format!(
+                "::std::result::Result<{module}::{ident}, i32>",
+                module = relative_path_over_namespaces(package, e.package()?, "enums")?,
+                ident = e.native_ident()?,
+            )
+            .into()),
+            FieldType::Message(m) => Err(NonNumericalFieldType::Message(m)),
+        })
     }
 }
 
-pub enum NonTrivialFieldType<'c> {
+pub enum NonNumericalFieldType<'c> {
     Group,
     String,
     Bytes,
-    Enum(&'c super::EnumDescriptor<'c>),
     Message(&'c super::MessageDescriptor<'c>),
 }
 

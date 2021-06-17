@@ -82,7 +82,7 @@ where
     Fragment::Iter(Box::new(iter.map(|rv| rv.map(|v| v.into())))
         as Box<dyn Iterator<Item = Result<Fragment<'w, W>>>>)
 }
-pub fn func<'w, 'p, W, F>(f: F) -> Fragment<'w, W>
+pub fn func<'w, W, F>(f: F) -> Fragment<'w, W>
 where
     F: 'w + FnOnce(&mut Indentor<W>) -> Result<()>,
 {

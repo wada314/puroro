@@ -1,16 +1,12 @@
 #![cfg_attr(feature = "puroro-nightly", feature(backtrace))]
 #![cfg_attr(feature = "puroro-nightly", feature(generic_associated_types))]
 #![cfg_attr(feature = "puroro-nightly", feature(min_type_alias_impl_trait))]
+#![allow(incomplete_features)]
 
 mod context;
 mod error;
 mod generators;
-#[cfg(feature = "stage1")]
-mod stage1;
-#[cfg(feature = "stage2")]
-mod stage2;
-#[cfg(feature = "stage3")]
-mod stage3;
+mod protos;
 mod utils;
 mod wrappers;
 
@@ -24,18 +20,10 @@ type Result<T> = std::result::Result<T, GeneratorError>;
 use std::io::Read;
 use std::io::{stdin, stdout};
 
-mod protos {
-    #[cfg(feature = "stage1")]
-    pub use crate::stage1::*;
-    #[cfg(feature = "stage2")]
-    pub use crate::stage2::google;
-    #[cfg(feature = "stage3")]
-    pub use crate::stage3::google;
-}
-use google::protobuf::compiler::{
+pub use protos::google;
+use protos::google::protobuf::compiler::{
     code_generator_response, CodeGeneratorRequest, CodeGeneratorResponse,
 };
-pub use protos::google;
 
 fn main() -> Result<()> {
     let mut cgreq = CodeGeneratorRequest::default();

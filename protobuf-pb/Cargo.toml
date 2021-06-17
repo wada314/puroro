@@ -1,0 +1,21 @@
+[package]
+name = "protobuf-pb"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+puroro = { path = "../puroro" }
+puroro-internal = { path = "../puroro-internal" }
+
+[build-dependencies]
+puroro-plugin = { path = "../puroro-plugin" }
+
+[features]
+puroro-nightly = []
+puroro-bumpalo = ["puroro/puroro-bumpalo"]
+default = [
+    "puroro-nightly", 
+    "puroro-bumpalo",
+]

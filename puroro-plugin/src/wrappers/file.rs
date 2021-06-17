@@ -2,13 +2,11 @@ use std::fmt::Debug;
 
 use crate::error::ErrorKind;
 use crate::google::protobuf::FileDescriptorProto;
-use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
 use crate::Context;
 use crate::Result;
 
 use super::{EnumDescriptor, FileOrMessageRef, MessageDescriptor};
 use ::once_cell::unsync::OnceCell;
-use itertools::Itertools;
 
 #[derive(Clone)]
 pub struct FileDescriptor<'c> {
@@ -17,7 +15,6 @@ pub struct FileDescriptor<'c> {
 
     lazy_messages: OnceCell<Vec<MessageDescriptor<'c>>>,
     lazy_enums: OnceCell<Vec<EnumDescriptor<'c>>>,
-    lazy_output_file_path_from_root: OnceCell<String>,
 }
 impl<'c> FileDescriptor<'c> {
     pub fn new(proto: &'c FileDescriptorProto, context: &'c Context<'c>) -> Self {
@@ -27,25 +24,9 @@ impl<'c> FileDescriptor<'c> {
 
             lazy_messages: Default::default(),
             lazy_enums: Default::default(),
-            lazy_output_file_path_from_root: Default::default(),
         }
     }
-    pub fn output_file_path_from_root(&'c self) -> &str {
-        self.lazy_output_file_path_from_root.get_or_init(|| {
-            if self.package().is_empty() {
-                "mod.rs".to_string()
-            } else {
-                Itertools::intersperse(
-                    self.package()
-                        .split('.')
-                        .map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
-                    "/".to_string(),
-                )
-                .collect::<String>()
-                    + ".rs"
-            }
-        })
-    }
+
     pub fn syntax(&self) -> Result<ProtoSyntax> {
         match self.proto.syntax.as_deref() {
             Some("proto2") | Some("") | None => Ok(ProtoSyntax::Proto2),

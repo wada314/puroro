@@ -11,11 +11,10 @@ thiserror = "1.0.24"
 num-traits = "0.2.14"
 num-derive = "0.3.3"
 either = "1.6.1"
-# Requires this commit to be included:
-# https://github.com/fitzgen/bumpalo/commit/e9adce57a54fff2a12994ec8a5797ea041083c1c
-bumpalo = { git = "https://github.com/fitzgen/bumpalo.git", features = ["collections", "boxed"], optional = true }
+bumpalo = { version = "3.7.0", features = ["collections", "boxed"], optional = true }
+hashbrown = { version = "0.11" }
 
 [features]
 puroro-nightly = []
-puroro-bumpalo = ["bumpalo"]
+puroro-bumpalo = ["bumpalo", "hashbrown/bumpalo"]
 default = ["puroro-nightly", "puroro-bumpalo"]

@@ -8,9 +8,6 @@ edition = "2018"
 
 [dependencies]
 puroro = { path = "../puroro" }
-# Requires this commit to be included:
-# https://github.com/fitzgen/bumpalo/commit/e9adce57a54fff2a12994ec8a5797ea041083c1c
-bumpalo = { git = "https://github.com/fitzgen/bumpalo.git", features = ["collections", "boxed"], optional = true }
 num-traits = "0.2.14"
 num-derive = "0.3.3"
 utf8-decode = "1.0.1"
@@ -21,5 +18,5 @@ either_n = "0.2.0"
 
 [features]
 puroro-nightly = []
-puroro-bumpalo = ["bumpalo"]
+puroro-bumpalo = ["puroro/puroro-bumpalo"]
 default = ["puroro-nightly", "puroro-bumpalo"]

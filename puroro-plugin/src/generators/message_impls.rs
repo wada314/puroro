@@ -1,16 +1,19 @@
 use super::message_frags::MessageImplFragmentGenerator;
-use super::message_traits::{GetterMethods, MessageTraitCodeGenerator};
+use super::message_tags::MessageTagCodeGenerator;
+use super::message_traits::MessageTraitCodeGenerator;
 use super::writer::{func, indent, indent_n, iter, seq, IntoFragment};
 use crate::context::{AllocatorType, Context, ImplType};
+use crate::generators::message_traits::{AssociatedType, FieldLabelType};
 use crate::utils::Indentor;
-use crate::wrappers::{FieldType, MessageDescriptor};
+use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
 use crate::Result;
 
 pub struct MessageImplCodeGenerator<'a, 'c> {
     context: &'a Context<'c>,
     msg: &'c MessageDescriptor<'c>,
     frag_gen: MessageImplFragmentGenerator<'a, 'c>,
-    traits_gen: MessageTraitCodeGenerator<'a, 'c>,
+    traits_gen: MessageTraitCodeGenerator<'c>,
+    tags_gen: MessageTagCodeGenerator<'c>,
 }
 
 impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
@@ -19,7 +22,8 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             context,
             msg,
             frag_gen: MessageImplFragmentGenerator::new(context, msg),
-            traits_gen: MessageTraitCodeGenerator::new(context, msg),
+            traits_gen: MessageTraitCodeGenerator::new(msg),
+            tags_gen: MessageTagCodeGenerator::new(msg),
         }
     }
 
@@ -30,21 +34,24 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             func(|output| self.print_clone(output)),
             func(|output| self.print_default(output)),
             (
-                func(|output| self.print_msg_deser_from_iter(output)),
+                func(|output| self.print_msg_merge_from_iter(output)),
                 match self.context.impl_type() {
                     ImplType::Default => {
                         func(|output| self.print_msg_deser_from_slice_using_from_iter(output))
                     }
-                    ImplType::SliceView { .. } => {
+                    ImplType::SliceView => {
                         func(|output| self.print_msg_deser_from_slice_for_slice_view(output))
                     }
                 },
                 func(|output| self.print_msg_ser(output)),
-                func(|output| self.print_impl_map_entry(output)),
             ),
-            func(|output| self.print_impl_trait(output)),
-            func(|output| self.print_impl_message(output)),
-            func(|output| self.print_impl_field_new(output)),
+            (
+                func(|output| self.print_impl_trait(output)),
+                func(|output| self.print_impl_message(output)),
+                func(|output| self.print_impl_is_message_impl_of_tag(output)),
+                func(|output| self.print_impl_map_entry(output)),
+                func(|output| self.print_impl_field_new(output)),
+            ),
         )
             .write_into(output)
     }
@@ -53,12 +60,10 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
         (
             format!(
                 "\
-{cfg}
 #[derive(Debug)]
 pub struct {ident}{gp} {{\n",
-                ident = self.frag_gen.struct_ident(self.msg)?,
-                cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(&[]),
+                ident = self.msg.native_ident()?,
+                gp = self.frag_gen.struct_generic_params(),
             ),
             indent((
                 iter(self.msg.fields().map(|field| {
@@ -66,7 +71,7 @@ pub struct {ident}{gp} {{\n",
                         "{vis}{name}: {type_},\n",
                         vis = self.frag_gen.field_visibility(),
                         name = field.native_ident()?,
-                        type_ = self.frag_gen.field_type_for(field)?,
+                        type_ = self.frag_gen.field_type_name(field)?,
                     ))
                 })),
                 format!(
@@ -75,34 +80,22 @@ pub struct {ident}{gp} {{\n",
                 ),
             )),
             "\
-}}\n",
+}}
+\n",
         )
             .write_into(output)
     }
 
     fn print_new_methods<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
-        (
-            format!(
-                "{cfg}\nimpl{gp} {ident}{gpb} {{\n",
-                ident = self.frag_gen.struct_ident(self.msg)?,
-                cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(&[]),
-                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-            ),
-            indent(
-                match (self.context.impl_type(), self.context.alloc_type()) {
-                    (ImplType::Default, _) => func(|output| self.new_method_default_impl(output)),
-                    (ImplType::SliceView { .. }, AllocatorType::Default) => {
-                        func(|output| self.new_method_slice_view_impl(output))
-                    }
-                    _ => {
-                        unreachable!()
-                    }
-                },
-            ),
-            "}}\n",
-        )
-            .write_into(output)
+        match (self.context.impl_type(), self.context.alloc_type()) {
+            (ImplType::Default, _) => self.new_method_default_impl(output),
+            (ImplType::SliceView { .. }, AllocatorType::Default) => {
+                self.new_method_slice_view_impl(output)
+            }
+            _ => {
+                unreachable!()
+            }
+        }
     }
 
     fn new_method_self_members<W: std::fmt::Write>(
@@ -127,12 +120,16 @@ pub struct {ident}{gp} {{\n",
         (
             format!(
                 "\
-pub {decl} {{
-    Self {{\n",
+impl{gp} {ident}{gpb} {{
+    pub {decl} {{
+        Self {{\n",
+                ident = self.msg.native_ident()?,
+                gp = self.frag_gen.struct_generic_params(),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
                 decl = self.frag_gen.new_method_declaration()
             ),
             indent_n(
-                2,
+                3,
                 func(|output| {
                     self.new_method_self_members(
                         output,
@@ -147,9 +144,11 @@ pub {decl} {{
                     )
                 }),
             ),
-            "    \
+            "        \
+        }}
     }}
-}}\n",
+}}
+\n",
         )
             .write_into(output)
     }
@@ -159,51 +158,103 @@ pub {decl} {{
         output: &mut Indentor<W>,
     ) -> Result<()> {
         (
-            "\
-fn try_new(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
-    let mut new_self = Self {{\n",
+            format!(
+                "\
+impl{gp} {ident}{gpb} {{
+    fn new() -> Self {{
+        Self {{\n",
+                ident = self.msg.native_ident()?,
+                gp = self.frag_gen.struct_generic_params(),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
+            ),
             indent_n(
-                2,
+                3,
                 func(|output| {
                     self.new_method_self_members(
                         output,
                         "\
-::puroro_internal::InternalDataForSliceViewStruct::new(slice)",
+::puroro_internal::InternalDataForSliceViewStruct::new()",
                     )
                 }),
             ),
-            "    \
-    }};
-    for ld_slice in new_self.puroro_internal.slices() {
-        ld_slice?.deser_message(&mut new_self)?;
-    }
-    Ok(new_self)
+            "        \
+        }}
+    }}
 }}
-
-fn try_new_with_parent(
-    parent_field: &'p ::std::option::Option<::puroro_internal::SliceViewField<'slice>>,
-    field_number_in_parent: usize,
-    parent_internal_data: &'p ::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>,
-) -> ::puroro::Result<Self> {{
-    let mut new_self = Self {{\n",
+\n",
+            format!(
+                "\
+impl{gp} {ident}{gpb} {{
+    fn try_new_with_slice(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
+        let mut new_self = Self {{\n",
+                ident = self.msg.native_ident()?,
+                gp = self.frag_gen.struct_generic_params().remove("S"),
+                gpb = self
+                    .frag_gen
+                    .struct_generic_params_bounds()
+                    .replace("S", "&'slice [u8]"),
+            ),
             indent_n(
-                2,
+                3,
+                func(|output| {
+                    self.new_method_self_members(
+                        output,
+                        "\
+::puroro_internal::InternalDataForSliceViewStruct::new_with_slice(slice)",
+                    )
+                }),
+            ),
+            "        \
+        }};
+        let ld_slice = ::puroro_internal::deser::LdSlice::new(slice);
+        ld_slice.merge_into_message(&mut new_self)?;
+        Ok(new_self)
+    }}
+}}
+\n",
+            format!(
+                "\
+impl{gp} {ident}{gpb} 
+    where ::puroro_internal::SourceLdSlices<'slice, 'par, SS>: ::puroro_internal::SliceSource<'slice>,
+{{
+    fn try_new_with_parent(
+        field_in_parent: ::std::option::Option<&'par ::puroro_internal::SliceViewField<'slice>>,
+        field_number_in_parent: usize,
+        parent_internal_data: &'par ::puroro_internal::InternalDataForSliceViewStruct<'slice, SS>,
+    ) -> ::puroro::Result<Self> {{
+        let mut new_self = Self {{\n",
+                ident = self.msg.native_ident()?,
+                gp = self
+                    .frag_gen
+                    .struct_generic_params()
+                    .remove("S")
+                    .push("'par")
+                    .push("SS"),
+                gpb = self
+                    .frag_gen
+                    .struct_generic_params_bounds()
+                    .replace("S", "::puroro_internal::SourceLdSlices<'slice, 'par, SS>"),
+            ),
+            indent_n(
+                3,
                 func(|output| {
                     self.new_method_self_members(
                         output,
                         "\
 ::puroro_internal::InternalDataForSliceViewStruct::new_with_parent(
-    parent_field, field_number_in_parent, parent_internal_data)",
+    field_in_parent, field_number_in_parent, parent_internal_data)",
                     )
                 }),
             ),
-            "    \
-    }};
-    for ld_slice in new_self.puroro_internal.slices() {
-        ld_slice?.deser_message(&mut new_self)?;
-    }
-    Ok(new_self)
-}}\n",
+            "        \
+        }};
+        for ld_slice in new_self.puroro_internal.source_ld_slices() {{
+            ld_slice?.merge_into_message(&mut new_self)?;
+        }}
+        Ok(new_self)
+    }}
+}}
+\n",
         )
             .write_into(output)
     }
@@ -212,16 +263,16 @@ fn try_new_with_parent(
         (
             format!(
                 "\
-{cfg}
 impl{gp} ::std::clone::Clone for {ident}{gpb} {{
     fn clone(&self) -> Self {{
-        use ::puroro_internal::FieldClone;
         use ::puroro::InternalData;
         Self {{\n",
-                ident = self.frag_gen.struct_ident(self.msg)?,
-                cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(&[]),
-                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+                ident = self.msg.native_ident()?,
+                gp = self
+                    .frag_gen
+                    .struct_generic_params()
+                    .replace("S", "S: ::std::clone::Clone"),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
             indent_n(
                 3,
@@ -229,10 +280,7 @@ impl{gp} ::std::clone::Clone for {ident}{gpb} {{
                     Ok(format!(
                         "{ident}: {clone},\n",
                         ident = field.native_ident()?,
-                        clone = self.frag_gen.field_clone(
-                            field.native_ident()?,
-                            &self.frag_gen.field_type_for(field)?
-                        ),
+                        clone = self.frag_gen.field_clone(field)?,
                     ))
                 })),
             ),
@@ -240,7 +288,8 @@ impl{gp} ::std::clone::Clone for {ident}{gpb} {{
             puroro_internal: self.puroro_internal.clone(),
         }}
     }}
-}}\n",
+}}
+\n",
         )
             .write_into(output)
     }
@@ -251,32 +300,30 @@ impl{gp} ::std::clone::Clone for {ident}{gpb} {{
         }
         (format!(
             "\
-{cfg}
 impl{gp} ::std::default::Default for {ident}{gpb} {{
     fn default() -> Self {{
         Self::new()
     }}
-}}\n",
-            ident = self.frag_gen.struct_ident(self.msg)?,
-            cfg = self.frag_gen.cfg_condition(),
-            gp = self.frag_gen.struct_generic_params(&[]),
-            gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+}}
+\n",
+            ident = self.msg.native_ident()?,
+            gp = self.frag_gen.struct_generic_params(),
+            gpb = self.frag_gen.struct_generic_params_bounds(),
         ),)
             .write_into(output)
     }
 
-    fn print_msg_deser_from_iter<W: std::fmt::Write>(
+    fn print_msg_merge_from_iter<W: std::fmt::Write>(
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
-        if !self.frag_gen.is_deser_from_iter_available() {
+        if !self.frag_gen.is_merge_from_iter_available() {
             return Ok(());
         }
         (
             format!(
                 "\
-{cfg}
-impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb} {{
+impl{gp} ::puroro_internal::deser::MergeableMessageFromIter for {ident}{gpb} {{
     fn met_field<'a, 'b, I>(
         &mut self,
         field: ::puroro_internal::types::FieldData<
@@ -286,16 +333,15 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb
     where
         I: Iterator<Item = ::std::io::Result<u8>>
     {{
-        use ::puroro_internal::FieldDeserFromIter;
+        use ::puroro_internal::FieldMergeFromIter;
         use ::puroro::InternalData;
-        use ::puroro_internal::tags;
+        use ::puroro::tags;
         use ::std::convert::TryInto;
         let puroro_internal = &self.puroro_internal;
         match field_number {{\n",
-                ident = self.frag_gen.struct_ident(self.msg)?,
-                cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(&[]),
-                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+                ident = self.msg.native_ident()?,
+                gp = self.frag_gen.struct_generic_params(),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
             indent_n(
                 3,
@@ -304,15 +350,15 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb
                         Ok(format!(
                             "\
 {number} => {{
-    <{type_} as FieldDeserFromIter<
+    <{type_} as FieldMergeFromIter<
         tags::{type_tag}, 
         tags::{label_tag}>>
-    ::deser(&mut self.{ident}, field, {default_func})?;
+    ::merge(&mut self.{ident}, field, {default_func})?;
 }}\n",
                             number = field.number(),
                             ident = field.native_ident()?,
-                            type_ = self.frag_gen.field_type_for(field)?,
-                            type_tag = self.frag_gen.type_tag_for(field)?,
+                            type_ = self.frag_gen.field_type_name(field)?,
+                            type_tag = self.frag_gen.type_tag_ident_gp(field, None)?,
                             label_tag = field.label_tag()?,
                             default_func = self.frag_gen.default_func_for(field)?,
                         ))
@@ -324,23 +370,23 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromIter for {ident}{gpb
         }}
         Ok(true)
     }}
-}}\n",
+}}
+\n",
             format!(
                 "\
-{cfg}
 impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
-    fn deser_from_iter<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
+    fn merge_from_iter<I>(&mut self, iter: &mut I) -> ::puroro::Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>> 
     {{
-        <Self as ::puroro_internal::deser::DeserializableMessageFromIter>
-            ::deser_from_iter(self, iter)
+        <Self as ::puroro_internal::deser::MergeableMessageFromIter>
+            ::merge_from_iter(self, iter)
     }}
-}}\n",
-                name = self.frag_gen.struct_ident(self.msg)?,
-                cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(&[]),
-                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+}}
+\n",
+                name = self.msg.native_ident()?,
+                gp = self.frag_gen.struct_generic_params(),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
         )
             .write_into(output)
@@ -350,23 +396,28 @@ impl{gp} ::puroro::DeserializableFromIter for {name}{gpb} {{
         &self,
         output: &mut Indentor<W>,
     ) -> Result<()> {
+        if !self.frag_gen.is_default_available() {
+            return Ok(());
+        }
         (format!(
             "\
-{cfg}
-impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
-    fn deser_from_slice(&mut self, slice: &[u8]) -> ::puroro::Result<()> {{
-        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(self);
+impl{gp} ::puroro::DeserializableFromSlice<'slice> for {ident}{gpb} {{
+    fn deser_from_slice(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
+        let mut message = ::std::default::Default::default();
+        let mut from_slice = ::puroro_internal::deser::FromIterToFromSlice::new(
+            &mut message
+        );
         let wrapped_slice = ::puroro_internal::deser::LdSlice::new(slice);
-        wrapped_slice.deser_message(&mut from_slice)?;
-        Ok(())
+        wrapped_slice.merge_into_message(&mut from_slice)?;
+        Ok(message)
     }}
-}}\n",
-            ident = self.frag_gen.struct_ident(self.msg)?,
-            cfg = self.frag_gen.cfg_condition(),
-            gp = self.frag_gen.struct_generic_params(&[]),
-            gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-        ),)
-            .write_into(output)
+}}
+\n",
+            ident = self.msg.native_ident()?,
+            gp = self.frag_gen.struct_generic_params().push("'slice"),
+            gpb = self.frag_gen.struct_generic_params_bounds(),
+        ))
+        .write_into(output)
     }
 
     fn print_msg_deser_from_slice_for_slice_view<W: std::fmt::Write>(
@@ -376,7 +427,32 @@ impl{gp} ::puroro::DeserializableFromSlice for {ident}{gpb} {{
         (
             format!(
                 "\
-{cfg}
+impl{gp} ::puroro::DeserializableFromSlice<'slice> for {ident}{gpb} {{
+    fn deser_from_slice(slice: &'slice [u8]) -> ::puroro::Result<Self> {{
+        Self::try_new_with_slice(slice)
+    }}
+}}
+
+impl{gp} ::std::convert::TryFrom<&'slice [u8]> for {ident}{gpb} {{
+    type Error = ::puroro::PuroroError;
+    fn try_from(value: &'slice [u8]) -> ::puroro::Result<Self> {{
+        Self::try_new_with_slice(value)
+    }}
+}}
+\n",
+                ident = self.msg.native_ident()?,
+                gp = self
+                    .frag_gen
+                    .struct_generic_params()
+                    .push("'slice")
+                    .remove("S"),
+                gpb = self
+                    .frag_gen
+                    .struct_generic_params_bounds()
+                    .replace("S", "&'slice [u8]"),
+            ),
+            format!(
+                "\
 impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {ident}{gpb} {{
     fn met_field_at(
         &mut self,
@@ -386,13 +462,12 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
         enclosing_slice: ::puroro_internal::deser::LdSlice<'slice>,
     ) -> ::puroro::Result<bool>
     {{
-        use ::puroro_internal::FieldDeserFromSlice;
-        use ::puroro_internal::tags;
+        use ::puroro_internal::FieldMergeFromSlice;
+        use ::puroro::tags;
         match field_number {{\n",
-                ident = self.frag_gen.struct_ident(self.msg)?,
-                cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(&[]),
-                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+                ident = self.msg.native_ident()?,
+                gp = self.frag_gen.struct_generic_params(),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
             indent_n(
                 3,
@@ -401,15 +476,16 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
                         Ok(format!(
                             "\
 {number} => {{
-    <{type_} as FieldDeserFromSlice<
+    <{type_} as FieldMergeFromSlice<
         tags::{type_tag}, 
         tags::{label_tag}>>
-    ::deser(&mut self.{ident}, field, slice_from_this_field, enclosing_slice)?;
-}}\n",
+    ::merge(&mut self.{ident}, field, slice_from_this_field, enclosing_slice)?;
+}}
+\n",
                             number = field.number(),
                             ident = field.native_ident()?,
-                            type_ = self.frag_gen.field_type_for(field)?,
-                            type_tag = self.frag_gen.type_tag_for(field)?,
+                            type_ = self.frag_gen.field_type_name(field)?,
+                            type_tag = self.frag_gen.type_tag_ident_gp(field, None)?,
                             label_tag = field.label_tag()?,
                         ))
                     })),
@@ -420,7 +496,8 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
         }}
         Ok(true)
     }}
-}}\n",
+}}
+\n",
         )
             .write_into(output)
     }
@@ -431,17 +508,15 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
                 ImplType::Default => seq((
                     format!(
                         "\
-{cfg}
 impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
         use ::puroro_internal::FieldSer;
-        use ::puroro_internal::tags;\n",
-                        ident = self.frag_gen.struct_ident(self.msg)?,
-                        cfg = self.frag_gen.cfg_condition(),
-                        gp = self.frag_gen.struct_generic_params(&[]),
-                        gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+        use ::puroro::tags;\n",
+                        ident = self.msg.native_ident()?,
+                        gp = self.frag_gen.struct_generic_params(),
+                        gpb = self.frag_gen.struct_generic_params_bounds(),
                     ),
                     indent_n::<_, W>(
                         2,
@@ -454,8 +529,8 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
     ::ser(&self.{ident}, serializer, {number})?;\n",
                                 number = field.number(),
                                 ident = field.native_ident()?,
-                                type_ = self.frag_gen.field_type_for(field)?,
-                                type_tag = self.frag_gen.type_tag_for(field)?,
+                                type_ = self.frag_gen.field_type_name(field)?,
+                                type_tag = self.frag_gen.type_tag_ident_gp(field, None)?,
                                 label_tag = field.label_tag()?,
                             ))
                         })),
@@ -463,41 +538,46 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
                     "        \
         Ok(())
     }}
-}}\n",
+}}
+\n",
                 )),
-                ImplType::SliceView { .. } => format!(
+                ImplType::SliceView => format!(
                     "\
-{cfg}
 impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
     fn serialize<T: ::puroro_internal::ser::MessageSerializer>(
         &self, serializer: &mut T) -> ::puroro::Result<()>
     {{
-        for ld_slice in self.puroro_internal.slices() {{
+        for ld_slice in self.puroro_internal.source_ld_slices() {{
             serializer.serialize_raw_fields(ld_slice?.as_slice())?;
         }}
         Ok(())
     }}
-}}\n",
-                    ident = self.frag_gen.struct_ident(self.msg)?,
-                    cfg = self.frag_gen.cfg_condition(),
-                    gp = self.frag_gen.struct_generic_params(&[]),
-                    gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+}}
+\n",
+                    ident = self.msg.native_ident()?,
+                    gp = self
+                        .frag_gen
+                        .struct_generic_params()
+                        .replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
+                    gpb = self.frag_gen.struct_generic_params_bounds(),
                 )
                 .into(),
             },
             format!(
                 "\
-{cfg}
 impl{gp} ::puroro::Serializable for {name}{gpb} {{
     fn serialize<W: std::io::Write>(&self, write: &mut W) -> ::puroro::Result<()> {{
         let mut serializer = ::puroro_internal::ser::default_serializer(write);
         <Self as ::puroro_internal::ser::SerializableMessage>::serialize(self, &mut serializer)
     }}
-}}\n",
-                name = self.frag_gen.struct_ident(self.msg)?,
-                cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(&[]),
-                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+}}
+\n",
+                name = self.msg.native_ident()?,
+                gp = self
+                    .frag_gen
+                    .struct_generic_params()
+                    .replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
         )
             .write_into(output)
@@ -507,167 +587,303 @@ impl{gp} ::puroro::Serializable for {name}{gpb} {{
         (
             format!(
                 "\
-{cfg}
-impl{gp} {trait_ident} for {struct_ident}{gpb} {{\n",
-                struct_ident = self.frag_gen.struct_ident(self.msg)?,
-                trait_ident = self.traits_gen.trait_ident(self.msg)?,
-                cfg = self.frag_gen.cfg_condition(),
-                gp = self.frag_gen.struct_generic_params(&[]),
-                gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+impl{gp} {trait_path} for {struct_ident}{gpb} {{\n",
+                struct_ident = self.msg.native_ident()?,
+                trait_path = self
+                    .traits_gen
+                    .trait_path_from_struct(self.msg.package()?)?,
+                gp = self
+                    .frag_gen
+                    .struct_generic_params()
+                    .replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
-            indent((
-                iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
-                    // typedefs for message types
-                    Ok(format!(
-                        "type {assoc_type_ident} = {actual_type_name}{gpb};\n",
-                        assoc_type_ident = self.traits_gen.associated_msg_type_ident(msg)?,
-                        actual_type_name = self.frag_gen.struct_ident_with_relative_path(msg)?,
-                        gpb = self.frag_gen.struct_generic_params_bounds(&[]),
-                    ))
-                })),
-                iter(self.msg.fields().map(|field| -> Result<_> {
-                    Ok(
-                        match (
-                            self.traits_gen.generate_getter_method_decls(field)?,
-                            self.context.impl_type(),
-                            field.type_()?,
-                        ) {
-                            (
-                                GetterMethods::BareField(decl),
-                                ImplType::SliceView { .. },
-                                FieldType::Message(m),
-                            ) => format!(
-                                "\
+            indent((iter(self.msg.fields().map(|field| -> Result<_> {
+                let getter_methods = self.traits_gen.generate_getter_method_decls(field)?;
+                let maybe_message_associated_type = if let (
+                    Some(AssociatedType {
+                        ident,
+                        gp,
+                        where_clause,
+                        ..
+                    }),
+                    FieldType::Message(m),
+                ) =
+                    (getter_methods.maybe_msg_type, field.type_()?)
+                {
+                    let slice_source = if matches!(field.label()?, FieldLabel::Repeated) {
+                        "&'slice [u8]"
+                    } else {
+                        "::puroro_internal::SourceLdSlices<'slice, 'this, S>"
+                    };
+                    format!(
+                        "type {ident}{gp} {where_clause} = {actual_type_name};\n",
+                        ident = ident,
+                        gp = gp,
+                        where_clause = where_clause,
+                        actual_type_name =
+                            self.frag_gen.type_name_of_msg(m, &[("S", slice_source)])?,
+                    )
+                } else {
+                    "".to_string()
+                };
+                let body = match (
+                    self.context.impl_type(),
+                    self.traits_gen
+                        .generate_getter_method_decls(field)?
+                        .field_label_type,
+                    field.type_()?,
+                ) {
+                    (
+                        ImplType::SliceView,
+                        FieldLabelType::BareField { get_decl },
+                        FieldType::Message(m),
+                    ) => {
+                        format!(
+                            "\
 {decl} {{
-    {msg}::try_new_with_parent(
-        self.{ident}.as_ref(),
-        {field_number},
-        &self.puroro_internal
-    ).expect(\"Invalid input slice. Consider checking the slice content earlier (TBD).\")
-}}\n",
-                                decl = decl,
-                                msg = self.frag_gen.type_name_of_msg(m)?,
-                                ident = field.native_ident()?,
-                                field_number = field.number(),
-                            ),
-                            (
-                                GetterMethods::OptionalField(decl),
-                                ImplType::SliceView { .. },
-                                FieldType::Message(m),
-                            ) => format!(
-                                "\
-{decl} {{
-    if self.{ident}.is_some() {{
+    ::std::borrow::Cow::Owned(
         {msg}::try_new_with_parent(
-            self.{ident}.as_ref(),
+            self.{ident}.clone(),
             {field_number},
             &self.puroro_internal
         ).expect(\"Invalid input slice. Consider checking the slice content earlier (TBD).\")
-    }} else {{
-        None
-    }}
+    )
 }}\n",
-                                decl = decl,
-                                msg = self.frag_gen.type_name_of_msg(m)?,
-                                ident = field.native_ident()?,
-                                field_number = field.number(),
-                            ),
-
-                            (
-                                GetterMethods::BareField(decl),
-                                ImplType::Default,
-                                FieldType::Message(_) | FieldType::String | FieldType::Bytes,
-                            ) => format!(
-                                "{decl} {{\n    self.{ident}.as_ref()\n}}\n",
-                                decl = decl,
-                                ident = field.native_ident()?
-                            ),
-                            (
-                                GetterMethods::OptionalField(decl),
-                                ImplType::Default,
-                                FieldType::Message(_) | FieldType::String | FieldType::Bytes,
-                            ) => format!(
-                                "{decl} {{\n    self.{ident}.as_deref()\n}}\n",
-                                decl = decl,
-                                ident = field.native_ident()?
-                            ),
-
-                            (
-                                GetterMethods::BareField(decl) | GetterMethods::OptionalField(decl),
-                                _,
-                                _,
-                            ) => format!(
-                                "{decl} {{\n    self.{ident}.clone()\n}}\n",
-                                decl = decl,
-                                ident = field.native_ident()?
-                            ),
-
-                            (
-                                GetterMethods::RepeatedField {
-                                    return_type_ident_gp: return_type_ident,
-                                    return_type_bound: _,
-                                    get_decl,
-                                }
-                                | GetterMethods::MapField {
-                                    return_type_ident,
-                                    return_type_bound: _,
-                                    get_decl,
+                            decl = get_decl,
+                            msg = self.frag_gen.type_name_of_msg(
+                                m,
+                                &[("S", "::puroro_internal::SourceLdSlices<'slice, 'this, S>")]
+                            )?,
+                            ident = field.native_ident()?,
+                            field_number = field.number(),
+                        )
+                    }
+                    (
+                        ImplType::SliceView,
+                        FieldLabelType::OptionalField { get_decl },
+                        FieldType::Message(m),
+                    ) => format!(
+                        "\
+{decl} {{
+    self.{ident}.as_ref().map(|field| {{
+        ::std::borrow::Cow::Owned(
+            {msg}::try_new_with_parent(
+                ::std::option::Option::Some(field),
+                {field_number},
+                &self.puroro_internal
+            ).expect(\"Invalid input slice. Consider checking the slice content earlier (TBD).\")
+        )
+    }})
+}}\n",
+                        decl = get_decl,
+                        msg = self.frag_gen.type_name_of_msg(
+                            m,
+                            &[("S", "::puroro_internal::SourceLdSlices<'slice, 'this, S>")]
+                        )?,
+                        ident = field.native_ident()?,
+                        field_number = field.number(),
+                    ),
+                    (
+                        ImplType::SliceView,
+                        FieldLabelType::BareField { get_decl },
+                        FieldType::String | FieldType::Bytes,
+                    ) => format!(
+                        "{decl} {{
+    ::std::borrow::Cow::Borrowed(self.{ident}.as_ref())
+}}\n",
+                        decl = get_decl,
+                        ident = field.native_ident()?,
+                    ),
+                    (
+                        ImplType::SliceView,
+                        FieldLabelType::OptionalField { get_decl },
+                        FieldType::String | FieldType::Bytes,
+                    ) => format!(
+                        "{decl} {{
+    self.{ident}.as_ref().map(|x| {{
+        ::std::borrow::Cow::Borrowed(x.as_ref())
+    }})
+}}\n",
+                        decl = get_decl,
+                        ident = field.native_ident()?,
+                    ),
+                    (
+                        ImplType::SliceView,
+                        FieldLabelType::RepeatedField {
+                            repeated_type:
+                                AssociatedType {
+                                    ident: type_ident,
+                                    gp: type_gp,
+                                    where_clause: type_where,
+                                    ..
                                 },
-                                ImplType::Default,
-                                _,
-                            ) => format!(
-                                "\
-type {return_type_ident} where Self: 'a = &'a {type_name};
+                            get_decl,
+                        }
+                        | FieldLabelType::MapField {
+                            repeated_type:
+                                AssociatedType {
+                                    ident: type_ident,
+                                    gp: type_gp,
+                                    where_clause: type_where,
+                                    ..
+                                },
+                            get_decl,
+                        },
+                        _,
+                    ) => format!(
+                        "\
+type {type_ident}{type_gp} {type_where} =
+    ::puroro_internal::RepeatedSliceViewField::<
+        'slice,
+        'this,
+        S,
+        ::puroro::tags::{type_tag}
+    >;
+{get_decl} {{
+    ::puroro_internal::RepeatedSliceViewField::new(
+        self.{ident}.as_ref(),
+        {field_number},
+        &self.puroro_internal,
+    )
+}}\n",
+                        type_ident = type_ident,
+                        type_gp = type_gp,
+                        type_tag = self
+                            .frag_gen
+                            .type_tag_ident_gp(field, &[("S", "&'slice [u8]")])?,
+                        type_where = type_where,
+                        get_decl = get_decl,
+                        ident = field.native_ident()?,
+                        field_number = field.number(),
+                    ),
+                    (
+                        ImplType::Default,
+                        FieldLabelType::BareField { get_decl },
+                        FieldType::Message(_) | FieldType::String | FieldType::Bytes,
+                    ) => format!(
+                        "\
+{decl} {{
+    ::std::borrow::Cow::Borrowed(self.{ident}.as_ref())
+}}\n",
+                        decl = get_decl,
+                        ident = field.native_ident()?
+                    ),
+                    (
+                        ImplType::Default,
+                        FieldLabelType::OptionalField { get_decl },
+                        FieldType::Message(_) | FieldType::String | FieldType::Bytes,
+                    ) => format!(
+                        "\
+{decl} {{
+    self.{ident}.as_deref().map(|r| ::std::borrow::Cow::Borrowed(r))
+}}\n",
+                        decl = get_decl,
+                        ident = field.native_ident()?
+                    ),
+
+                    (
+                        _,
+                        FieldLabelType::BareField { get_decl }
+                        | FieldLabelType::OptionalField { get_decl },
+                        _,
+                    ) => {
+                        format!(
+                            "{decl} {{\n    self.{ident}.clone()\n}}\n",
+                            decl = get_decl,
+                            ident = field.native_ident()?
+                        )
+                    }
+
+                    (
+                        ImplType::Default,
+                        FieldLabelType::RepeatedField {
+                            repeated_type:
+                                AssociatedType {
+                                    ident: type_ident,
+                                    gp: type_gp,
+                                    where_clause: type_where_clause,
+                                    ..
+                                },
+                            get_decl,
+                        }
+                        | FieldLabelType::MapField {
+                            repeated_type:
+                                AssociatedType {
+                                    ident: type_ident,
+                                    gp: type_gp,
+                                    where_clause: type_where_clause,
+                                    ..
+                                },
+                            get_decl,
+                        },
+                        _,
+                    ) => format!(
+                        "\
+type {type_ident}{type_gp} {type_where} = &'this {type_name};
 {get_decl} {{
     &self.{ident}
 }}\n",
-                                return_type_ident = return_type_ident,
-                                type_name = self.frag_gen.field_type_for(field)?,
-                                get_decl = get_decl,
-                                ident = field.native_ident()?,
-                            ),
-                            (
-                                GetterMethods::RepeatedField {
-                                    return_type_ident_gp: return_type_ident,
-                                    return_type_bound: _,
-                                    get_decl,
-                                },
-                                ImplType::SliceView { .. },
-                                _,
-                            ) => todo!(),
-                            (
-                                GetterMethods::MapField {
-                                    return_type_ident,
-                                    return_type_bound: _,
-                                    get_decl,
-                                },
-                                ImplType::SliceView { .. },
-                                _,
-                            ) => todo!(),
-                        },
-                    )
-                })),
-            )),
-            "}}\n",
+                        type_ident = type_ident,
+                        type_gp = type_gp,
+                        type_name = self.frag_gen.field_type_name(field)?,
+                        type_where = type_where_clause,
+                        get_decl = get_decl,
+                        ident = field.native_ident()?,
+                    ),
+                };
+                Ok(format!("{}{}", maybe_message_associated_type, body))
+            })),)),
+            "}}\n\n",
         )
             .write_into(output)
     }
 
     fn print_impl_message<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
-        (format!(
-            "\
-{cfg}
-impl{gp} ::puroro::Message<'bump> for {struct_ident}{gpb} {{
+        (
+            format!(
+                "\
+impl{gp} ::puroro::Message for {struct_ident}{gpb} {{
     type InternalData = {internal_data_type};
     fn puroro_internal_data(&self) -> &Self::InternalData {{
         &self.puroro_internal
     }}
-}}\n",
-            struct_ident = self.frag_gen.struct_ident(self.msg)?,
-            internal_data_type = self.frag_gen.internal_data_type(),
-            cfg = self.frag_gen.cfg_condition(),
-            gp = self.frag_gen.struct_generic_params(&["'bump"]),
-            gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+    type BoxedType = {boxed_type};
+    fn into_boxed(self) -> Self::BoxedType {{\n",
+                struct_ident = self.msg.native_ident()?,
+                internal_data_type = self.frag_gen.internal_data_type(),
+                boxed_type = self.frag_gen.boxed_type("Self"),
+                gp = self
+                    .frag_gen
+                    .struct_generic_params()
+                    .replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
+                gpb = self.frag_gen.struct_generic_params_bounds(),
+            ),
+            indent_n(2, self.frag_gen.box_new("self")),
+            "    \
+    }}
+}}
+\n",
+        )
+            .write_into(output)
+    }
+
+    fn print_impl_is_message_impl_of_tag<W: std::fmt::Write>(
+        &self,
+        output: &mut Indentor<W>,
+    ) -> Result<()> {
+        (format!(
+            "\
+impl{gp} ::puroro::IsMessageImplOfTag<{tag}> for {struct_ident}{gpb} {{
+}}
+\n",
+            struct_ident = self.msg.native_ident()?,
+            tag = self.tags_gen.tag_path_from_struct(self.msg.package()?)?,
+            gp = self
+                .frag_gen
+                .struct_generic_params()
+                .replace("S", "S: ::puroro_internal::SliceSource<'slice>"),
+            gpb = self.frag_gen.struct_generic_params_bounds(),
         ),)
             .write_into(output)
     }
@@ -675,48 +891,93 @@ impl{gp} ::puroro::Message<'bump> for {struct_ident}{gpb} {{
     fn print_impl_map_entry<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         if !self.msg.is_map_entry() {
             return Ok(());
+        } else {
+            match self.context.impl_type() {
+                ImplType::Default => self.print_impl_map_entry_normal(output),
+                ImplType::SliceView => self.print_impl_map_entry_slice_view(output),
+            }
         }
+    }
+
+    fn print_impl_map_entry_normal<W: std::fmt::Write>(
+        &self,
+        output: &mut Indentor<W>,
+    ) -> Result<()> {
         let (key_field, value_field) = self.msg.key_value_of_map_entry()?;
         (format!(
             "\
-{cfg}
-impl{gp} ::puroro_internal::MapEntry for {entry_type} {{
-    type KeyType = {key_type};
-    type ValueType = {value_type};
-    fn ser_kv<T: ::puroro_internal::ser::MessageSerializer>(
-        key: &Self::KeyType,
-        value: &Self::ValueType,
-        serializer: &mut T,
-    ) -> ::puroro::Result<()> {{
-        use ::puroro_internal::FieldSer;
-        use ::puroro_internal::tags;
-        <{key_type} as FieldSer<
-            tags::{key_type_tag}, 
-            tags::Required>>
-            ::ser(key, serializer, 1)?;
-        <{value_type} as FieldSer<
-            tags::{value_type_tag}, 
-            tags::Required>>
-            ::ser(value, serializer, 2)?;
-        Ok(())
-    }}
-    fn into_tuple(self) -> (Self::KeyType, Self::ValueType) {{
+impl{gp} ::puroro_internal::MapEntryForNormalImpl for {entry_type} {{
+    type OwnedKeyType = {owned_key_type};
+    type OwnedValueType = {owned_value_type};
+    fn into_tuple(self) -> (Self::OwnedKeyType, Self::OwnedValueType) {{
         use ::puroro_internal::FieldTakeOrInit;
+        use ::puroro::InternalData;
         (
             {take_key}, 
             {take_value},
         )
     }}
-}}\n",
-            entry_type = self.frag_gen.type_name_of_msg(self.msg)?,
-            cfg = self.frag_gen.cfg_condition(),
-            gp = self.frag_gen.struct_generic_params(&[]),
-            key_type = self.frag_gen.field_scalar_item_type_for(key_field)?,
-            key_type_tag = self.frag_gen.type_tag_for(key_field)?,
+    fn ser_kv<T, Q, R>(key: &Q, value: &R, serializer: &mut T, ) -> ::puroro::Result<()> 
+    where
+        T: ::puroro_internal::ser::MessageSerializer,
+        Self::OwnedKeyType: ::std::borrow::Borrow<Q>,
+        Self::OwnedValueType: ::std::borrow::Borrow<R>,
+    {{
+        use ::puroro_internal::FieldSer;
+        use ::puroro::tags;
+        <{owned_key_type} as FieldSer<
+            tags::{key_type_tag}, 
+            tags::Required>>
+            ::ser(key, serializer, 1)?;
+        <{owned_value_type} as FieldSer<
+            tags::{value_type_tag}, 
+            tags::Required>>
+            ::ser(value, serializer, 2)?;
+        Ok(())
+    }}
+}}
+\n",
+            entry_type = self.frag_gen.type_name_of_msg(self.msg, None)?,
+            gp = self.frag_gen.struct_generic_params(),
+            owned_key_type = self.frag_gen.map_owned_key_type_name(key_field)?,
+            key_type_tag = self.frag_gen.type_tag_ident_gp(key_field, None)?,
             take_key = self.frag_gen.field_take_or_init(key_field)?,
-            value_type = self.frag_gen.field_scalar_item_type_for(value_field)?,
-            value_type_tag = self.frag_gen.type_tag_for(value_field)?,
+            owned_value_type = self.frag_gen.map_owned_value_type_name(value_field)?,
+            value_type_tag = self.frag_gen.type_tag_ident_gp(value_field, None)?,
             take_value = self.frag_gen.field_take_or_init(value_field)?,
+        ),)
+            .write_into(output)
+    }
+
+    fn print_impl_map_entry_slice_view<W: std::fmt::Write>(
+        &self,
+        output: &mut Indentor<W>,
+    ) -> Result<()> {
+        let (key_field, value_field) = self.msg.key_value_of_map_entry()?;
+        (format!(
+            "\
+impl{gp} ::puroro_internal::MapEntryForSliceViewImpl<'slice> for {entry_type} {{
+    type OwnedKeyType = {owned_key_type};
+    type ValueGetterType = {value_getter_type};
+    fn key_eq<Q>(&self, key: &Q)
+    where
+        Self::OwnedKeyType: ::std::borrow::Borrow<Q>,
+        Q: Eq + ?Sized
+    {{
+        <Self as {message_trait_type}>::key(self).eq(key)
+    }}
+    fn value(&self) -> Self::ValueGetterType {{
+        <Self as {message_trait_type}>::value(self)
+    }}
+}}
+\n",
+            entry_type = self.frag_gen.type_name_of_msg(self.msg, None)?,
+            message_trait_type = self
+                .traits_gen
+                .trait_path_from_struct(self.msg.package()?)?,
+            gp = self.frag_gen.struct_generic_params(),
+            owned_key_type = self.frag_gen.map_owned_key_type_name(key_field)?,
+            value_getter_type = self.traits_gen.map_value_getter_type_name(value_field)?,
         ),)
             .write_into(output)
     }
@@ -731,28 +992,28 @@ impl{gp} ::puroro_internal::FieldNew<'a> for {name}{gpb} {{
     fn new() -> Self {{
         Default::default()
     }}
-}}\n",
-                        name = self.frag_gen.struct_ident(self.msg)?,
-                        gp = self.frag_gen.struct_generic_params(&["'a"]),
-                        gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+}}
+\n",
+                        name = self.msg.native_ident()?,
+                        gp = self.frag_gen.struct_generic_params().push("'a"),
+                        gpb = self.frag_gen.struct_generic_params_bounds(),
                     )
                 }
                 (ImplType::Default, AllocatorType::Bumpalo) => {
                     format!(
                         "\
-{cfg}
 impl{gp} ::puroro_internal::FieldNew<'bump> for {name}{gpb} {{
     fn new() -> Self {{
         unimplemented!()
     }}
-    fn new_in_bumpalo(bump: &'bump ::bumpalo::Bump) -> Self {{
+    fn new_in_bumpalo(bump: &'bump ::puroro::bumpalo::Bump) -> Self {{
         Self::new_in(bump)
     }}
-}}\n",
-                        cfg = self.frag_gen.cfg_condition(),
-                        name = self.frag_gen.struct_ident(self.msg)?,
-                        gp = self.frag_gen.struct_generic_params(&[]),
-                        gpb = self.frag_gen.struct_generic_params_bounds(&[]),
+}}
+\n",
+                        name = self.msg.native_ident()?,
+                        gp = self.frag_gen.struct_generic_params(),
+                        gpb = self.frag_gen.struct_generic_params_bounds(),
                     )
                 }
                 _ => "".to_string(),

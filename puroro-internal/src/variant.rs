@@ -1,5 +1,5 @@
-use crate::tags::{Bool, Enum, Int32, Int64, SInt32, SInt64, UInt32, UInt64};
 use crate::{ErrorKind, Result};
+use ::puroro::tags;
 use std::convert::TryFrom;
 use std::io::Result as IoResult;
 use std::io::Write;
@@ -102,25 +102,25 @@ macro_rules! define_convert_methods {
     };
 }
 impl Variant {
-    define_convert_methods!(UInt32, to_u32, from_u32);
-    define_convert_methods!(UInt64, to_u64, from_u64);
-    define_convert_methods!(SInt32, to_si32, from_si32);
-    define_convert_methods!(SInt64, to_si64, from_si64);
-    define_convert_methods!(Int32, to_i32, from_i32);
-    define_convert_methods!(Int64, to_i64, from_i64);
-    define_convert_methods!(Bool, to_bool, from_bool);
+    define_convert_methods!(tags::value::UInt32, to_u32, from_u32);
+    define_convert_methods!(tags::value::UInt64, to_u64, from_u64);
+    define_convert_methods!(tags::value::SInt32, to_si32, from_si32);
+    define_convert_methods!(tags::value::SInt64, to_si64, from_si64);
+    define_convert_methods!(tags::value::Int32, to_i32, from_i32);
+    define_convert_methods!(tags::value::Int64, to_i64, from_i64);
+    define_convert_methods!(tags::value::Bool, to_bool, from_bool);
     define_convert_methods!(RustUsize, to_usize, from_usize);
 }
 
 pub trait VariantTypeTag {
-    type NativeType;
+    type NativeType: Clone;
     fn from_variant(var: &Variant) -> Result<Self::NativeType>;
     fn to_variant(val: Self::NativeType) -> Result<Variant>;
 }
 
 pub struct RustUsize();
 
-impl VariantTypeTag for Int32 {
+impl VariantTypeTag for tags::value::Int32 {
     type NativeType = i32;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i32::try_from(i64::from_le_bytes(var.0))?)
@@ -129,7 +129,7 @@ impl VariantTypeTag for Int32 {
         Ok(Variant::new(i64::to_le_bytes(i64::from(val))))
     }
 }
-impl VariantTypeTag for UInt32 {
+impl VariantTypeTag for tags::value::UInt32 {
     type NativeType = u32;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(u32::try_from(u64::from_le_bytes(var.0))?)
@@ -138,7 +138,7 @@ impl VariantTypeTag for UInt32 {
         Ok(Variant::new(u64::to_le_bytes(u64::from(val))))
     }
 }
-impl VariantTypeTag for SInt32 {
+impl VariantTypeTag for tags::value::SInt32 {
     type NativeType = i32;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i32::try_from(var.to_sint()?)?)
@@ -148,7 +148,7 @@ impl VariantTypeTag for SInt32 {
     }
 }
 
-impl VariantTypeTag for Int64 {
+impl VariantTypeTag for tags::value::Int64 {
     type NativeType = i64;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i64::from_le_bytes(var.0))
@@ -157,7 +157,7 @@ impl VariantTypeTag for Int64 {
         Ok(Variant::new(i64::to_le_bytes(val)))
     }
 }
-impl VariantTypeTag for UInt64 {
+impl VariantTypeTag for tags::value::UInt64 {
     type NativeType = u64;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(u64::from_le_bytes(var.0))
@@ -166,7 +166,7 @@ impl VariantTypeTag for UInt64 {
         Ok(Variant::new(u64::to_le_bytes(val)))
     }
 }
-impl VariantTypeTag for SInt64 {
+impl VariantTypeTag for tags::value::SInt64 {
     type NativeType = i64;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(var.to_sint()?)
@@ -175,7 +175,7 @@ impl VariantTypeTag for SInt64 {
         Ok(Variant::from_sint(val))
     }
 }
-impl VariantTypeTag for Bool {
+impl VariantTypeTag for tags::value::Bool {
     type NativeType = bool;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         match u64::from_le_bytes(var.0) {
@@ -188,9 +188,23 @@ impl VariantTypeTag for Bool {
         Ok(Variant::new(u64::to_le_bytes(if val { 1 } else { 0 })))
     }
 }
-impl<T> VariantTypeTag for Enum<T>
+impl<T> VariantTypeTag for tags::value::Enum2<T>
 where
-    T: TryFrom<i32, Error = i32> + Into<i32>,
+    T: TryFrom<i32, Error = i32> + Into<i32> + Clone,
+{
+    type NativeType = T;
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
+        Ok(T::try_from(i32::try_from(i64::from_le_bytes(var.0))?)
+            .map_err(|i| ErrorKind::UnknownEnumVariant(i))?)
+    }
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+        let int_val = T::into(val);
+        Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))
+    }
+}
+impl<T> VariantTypeTag for tags::value::Enum3<T>
+where
+    T: TryFrom<i32, Error = i32> + Into<i32> + Clone,
 {
     type NativeType = std::result::Result<T, i32>;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {

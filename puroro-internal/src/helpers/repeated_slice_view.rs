@@ -1,49 +1,220 @@
+use std::borrow::Cow;
+use std::convert::TryFrom;
 use std::marker::PhantomData;
 
-use crate::tags;
+use crate::deser::LdSlice;
+use crate::internal_data::SliceSource;
 use crate::types::{FieldData, SliceViewField};
-use crate::variant::VariantTypeTag;
+use crate::variant;
 use crate::InternalDataForSliceViewStruct;
-use crate::{ErrorKind, Result, ResultHelper};
-use ::itertools::Itertools;
+use crate::{ErrorKind, PuroroError, Result, ResultHelper};
+use ::itertools::{Either, Itertools};
+use ::puroro::tags;
 use ::puroro::RepeatedField;
-use itertools::Either;
+
+pub trait FieldDataIntoIter<'slice, 'a> {
+    type Item;
+    type Iter: Iterator<Item = Result<Self::Item>>;
+    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter>;
+}
+impl<'slice: 'a, 'a, ValueTypeTag> FieldDataIntoIter<'slice, 'a>
+    for (tags::wire::Variant, ValueTypeTag)
+where
+    ValueTypeTag: variant::VariantTypeTag,
+{
+    type Item = <ValueTypeTag as variant::VariantTypeTag>::NativeType;
+    type Iter = impl Iterator<Item = Result<Self::Item>>;
+    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+        Ok(match field_data {
+            FieldData::Variant(variant) => {
+                Either::Left(std::iter::once(variant.to_native::<ValueTypeTag>()))
+            }
+            FieldData::LengthDelimited(ld_slice) => Either::Right(
+                ld_slice
+                    .variants()
+                    .map_ok(|variant| variant.to_native::<ValueTypeTag>())
+                    .map(|rrval| rrval.flatten()),
+            ),
+            _ => Err(ErrorKind::UnexpectedWireType)?,
+        }
+        .into_iter())
+    }
+}
+impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::String {
+    type Item = Cow<'a, str>;
+    type Iter = impl Iterator<Item = Result<Self::Item>>;
+    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+        if let FieldData::LengthDelimited(ld_slice) = field_data {
+            Ok(std::iter::once(Ok(String::from_utf8_lossy(
+                ld_slice.as_slice(),
+            ))))
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::Bytes {
+    type Item = Cow<'a, [u8]>;
+    type Iter = impl Iterator<Item = Result<Self::Item>>;
+    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+        if let FieldData::LengthDelimited(ld_slice) = field_data {
+            Ok(std::iter::once(Ok(Cow::Borrowed(ld_slice.as_slice()))))
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+impl<'slice: 'a, 'a, T> FieldDataIntoIter<'slice, 'a> for tags::Message<T>
+where
+    T: 'slice + TryFrom<&'slice [u8], Error = PuroroError> + ToOwned<Owned = T>,
+{
+    type Item = Cow<'a, T>;
+    type Iter = impl Iterator<Item = Result<Self::Item>>;
+    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+        if let FieldData::LengthDelimited(ld_slice) = field_data {
+            Ok(std::iter::once(Ok(Cow::Owned(<T as TryFrom<
+                &'slice [u8],
+            >>::try_from(
+                ld_slice.as_slice()
+            )?))))
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+impl<'slice: 'a, 'a, ValueTypeTag> FieldDataIntoIter<'slice, 'a>
+    for (tags::wire::Bits32, ValueTypeTag)
+where
+    ValueTypeTag: super::Bits32TypeTag,
+{
+    type Item = <ValueTypeTag as super::Bits32TypeTag>::NativeType;
+    type Iter = impl Iterator<Item = Result<Self::Item>>;
+    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+        if let FieldData::Bits32(bytes) = field_data {
+            Ok(std::iter::once(Ok(
+                <ValueTypeTag as super::Bits32TypeTag>::from_bytes(bytes),
+            )))
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
+impl<'slice: 'a, 'a, ValueTypeTag> FieldDataIntoIter<'slice, 'a>
+    for (tags::wire::Bits64, ValueTypeTag)
+where
+    ValueTypeTag: super::Bits64TypeTag,
+{
+    type Item = <ValueTypeTag as super::Bits64TypeTag>::NativeType;
+    type Iter = impl Iterator<Item = Result<Self::Item>>;
+    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+        if let FieldData::Bits64(bytes) = field_data {
+            Ok(std::iter::once(Ok(
+                <ValueTypeTag as super::Bits64TypeTag>::from_bytes(bytes),
+            )))
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
-pub struct RepeatedSliceViewField<'slice, 'p, TypeTag>
-where
-    TypeTag: tags::FieldTypeTag,
-{
-    field: &'p Option<SliceViewField<'slice>>,
+pub struct RepeatedSliceViewField<'slice, 'msg, S, TypeTag> {
+    maybe_field: Option<&'msg SliceViewField<'slice>>,
     field_number: usize,
-    internal_data: &'p InternalDataForSliceViewStruct<'slice, 'p>,
+    internal_data: &'msg InternalDataForSliceViewStruct<'slice, S>,
     phantom: PhantomData<TypeTag>,
 }
 
-impl<'slice, 'p> RepeatedSliceViewField<'slice, 'p, tags::Int32> {
-    pub fn iter_impl(
+impl<'slice, 'msg, S, TypeTag> RepeatedSliceViewField<'slice, 'msg, S, TypeTag>
+where
+    TypeTag: 'msg + FieldDataIntoIter<'slice, 'msg>,
+    S: SliceSource<'slice>,
+{
+    pub fn new(
+        maybe_field: Option<&'msg SliceViewField<'slice>>,
+        field_number: usize,
+        internal_data: &'msg InternalDataForSliceViewStruct<'slice, S>,
+    ) -> Self {
+        Self {
+            maybe_field,
+            field_number,
+            internal_data,
+            phantom: PhantomData,
+        }
+    }
+
+    fn iter_impl(
         &self,
-    ) -> impl '_ + Iterator<Item = <tags::Int32 as VariantTypeTag>::NativeType> {
-        self.internal_data
-            .field_data_iter(self.field_number, self.field)
-            .map_ok(|field| -> Result<_ /* impl Iterator<Item=Result<i32>> */> {
-                Ok(match field {
-                    FieldData::Variant(variant) => {
-                        Either::Left(std::iter::once(variant.to_native::<tags::Int32>()))
-                    }
-                    FieldData::LengthDelimited(ld_slice) => Either::Right(
-                        ld_slice
-                            .variants()
-                            .map_ok(|variant| variant.to_native::<tags::Int32>())
-                            .map(|rrval| rrval.flatten()),
-                    ),
-                    _ => Err(ErrorKind::UnexpectedWireType)?,
-                }
-                .into_iter()) // Result<Iterator<Item=Result<<tags::Int32 as VariantTypeTag>::NativeType>>>
-            })
-            .map(|rrval| rrval.flatten())
-            .flatten_ok()
-            .map(|rrval| rrval.flatten())
-            .map(|result| result.unwrap())
+    ) -> impl 'msg + Iterator<Item = <TypeTag as FieldDataIntoIter<'slice, 'msg>>::Item> {
+        let field_number = self.field_number;
+        let internal_data = self.internal_data;
+        self.maybe_field.clone().into_iter().flat_map(move |field| {
+            internal_data
+                .maybe_source_slices
+                .clone()
+                .into_iter()
+                .flat_map(move |source_slices| {
+                    field
+                        .field_data_iter(field_number, source_slices)
+                        .map_ok(|field| -> Result<_> {
+                            <TypeTag as FieldDataIntoIter>::into(field)
+                        })
+                        .map(|rrval| rrval.flatten())
+                        .flatten_ok()
+                        .map(|rrval| rrval.flatten())
+                        .map(|result| result.unwrap())
+                })
+        })
     }
 }
+
+impl<'slice, 'msg, S, T, TypeTag> RepeatedField<T>
+    for RepeatedSliceViewField<'slice, 'msg, S, TypeTag>
+where
+    TypeTag: 'msg + FieldDataIntoIter<'slice, 'msg, Item = T>,
+    S: SliceSource<'slice>,
+{
+    fn for_each<F>(&self, f: F)
+    where
+        F: FnMut(T),
+    {
+        self.iter_impl().for_each(f)
+    }
+    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>> {
+        Box::new(self.iter_impl())
+    }
+
+    type Iter<'this> = impl Iterator<Item = T>;
+    fn iter(&self) -> Self::Iter<'_> {
+        self.iter_impl()
+    }
+}
+/*
+#[rustfmt::skip]
+impl<'slice, 'msg, S, Q, R, Entry> MapField<'msg, Q, R>
+    for RepeatedSliceViewField<'slice, 'msg, S, tags::Message<Entry>>
+where
+    'slice: 'msg,
+    Q: ?Sized + Hash + Eq,
+    R: 'msg,
+    S: SliceSource<'slice>,
+    Entry::OwnedKeyType: Borrow<Q>,
+    Entry: 'slice
+        + MapEntryForSliceViewImpl<'slice, ValueGetterType = R>
+        + TryFrom<&'slice[u8], Error=PuroroError>
+        + ToOwned<Owned = Entry>,
+{
+    fn get(&'msg self, key: &Q) -> Option<R>
+    where
+        Q: Hash + Eq,
+    {
+        self.iter_impl().find_map(|entry| {
+            if entry.key_eq(key) {
+                Some(entry.value())
+            } else {
+                None
+            }
+        })
+    }
+}
+*/

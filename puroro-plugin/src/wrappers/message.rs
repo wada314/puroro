@@ -1,11 +1,10 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 
-use super::{EnumDescriptor, FieldDescriptor, FieldType, FileDescriptor, FileOrMessageRef};
+use super::{EnumDescriptor, FieldDescriptor, FileDescriptor, FileOrMessageRef};
 use crate::google::protobuf::DescriptorProto;
-use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
+use crate::utils::{get_keyword_safe_ident, to_camel_case};
 use crate::{Context, ErrorKind, Result};
-use ::itertools::Itertools;
 use ::once_cell::unsync::OnceCell;
 
 #[derive(Clone)]
@@ -94,7 +93,7 @@ impl<'c> MessageDescriptor<'c> {
     pub fn is_map_entry(&self) -> bool {
         if let Some(options) = &self.proto.options {
             // TODO: Maybe need to check the [default="***"] value?
-            options.map_entry.unwrap_or_default()
+            options.map_entry.unwrap_or_default() /* TODO: FIX */ && false
         } else {
             false
         }
@@ -128,68 +127,6 @@ impl<'c> MessageDescriptor<'c> {
             .get_or_try_init(|| -> Result<_> {
                 Ok(get_keyword_safe_ident(&to_camel_case(self.name()?)))
             })?)
-    }
-
-    pub fn native_ident_with_relative_path(&'c self, cur_package: &str) -> Result<String> {
-        let struct_name = self.native_ident()?;
-        let mut struct_package_iter = self.package()?.split('.').peekable();
-        let mut cur_package_iter = cur_package.split('.').peekable();
-        while let (Some(p1), Some(p2)) = (struct_package_iter.peek(), cur_package_iter.peek()) {
-            if *p1 == *p2 {
-                struct_package_iter.next();
-                cur_package_iter.next();
-            } else {
-                break;
-            }
-        }
-        let num_super = cur_package_iter.count();
-        let maybe_self = if num_super == 0 { "self::" } else { "" };
-        Ok(format!(
-            "{maybe_self}{supers}{mods}{name}",
-            name = struct_name,
-            maybe_self = maybe_self,
-            supers = std::iter::repeat("super::")
-                .take(num_super)
-                .collect::<String>(),
-            mods = struct_package_iter
-                .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
-                .collect::<String>(),
-        ))
-    }
-
-    pub fn unique_msgs_from_fields(
-        &'c self,
-    ) -> Result<impl Iterator<Item = &'c MessageDescriptor<'c>>> {
-        // Not only the fields directly owned by this message,
-        // we need to cehck the fields of the map field's keys and value fields.
-        let maps_fields = self
-            .fields()
-            .filter_map(|field| match field.type_() {
-                Ok(FieldType::Message(m)) if m.is_map_entry() => Some(m),
-                _ => None,
-            })
-            .flat_map(|msg| {
-                match msg.key_value_of_map_entry() {
-                    Ok((key_field, value_field)) => {
-                        Some(std::array::IntoIter::new([key_field, value_field]))
-                    }
-                    _ => None,
-                }
-                .into_iter()
-                .flatten()
-            });
-
-        Ok(self
-            .fields()
-            .chain(maps_fields)
-            .filter_map(|field| {
-                if let Ok(FieldType::Message(m)) = field.type_() {
-                    Some(m)
-                } else {
-                    None
-                }
-            })
-            .unique_by(|msg| msg.fully_qualified_name().unwrap_or_default()))
     }
 
     pub fn key_value_of_map_entry(

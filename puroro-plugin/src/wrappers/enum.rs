@@ -3,7 +3,7 @@ use std::hash::Hash;
 
 use super::FileOrMessageRef;
 use crate::google::protobuf::{EnumDescriptorProto, EnumValueDescriptorProto};
-use crate::utils::{get_keyword_safe_ident, to_camel_case, to_lower_snake_case};
+use crate::utils::{get_keyword_safe_ident, to_camel_case};
 use crate::{Context, ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 
@@ -58,8 +58,13 @@ impl<'c> EnumDescriptor<'c> {
             ))
         })?)
     }
-    pub fn values(&self) -> impl Iterator<Item = &EnumValueDescriptor<'c>> {
+    pub fn values(&'c self) -> impl Iterator<Item = &EnumValueDescriptor<'c>> {
         self.values.iter()
+    }
+    pub fn first_value(&'c self) -> Result<&EnumValueDescriptor<'c>> {
+        Ok(self.values().next().ok_or(ErrorKind::EmptyEnum {
+            name: self.fully_qualified_name()?.to_string(),
+        })?)
     }
 
     /// Returns a Rust identifier which can be used for enum definition:
@@ -76,30 +81,6 @@ impl<'c> EnumDescriptor<'c> {
             .get_or_try_init(|| -> Result<_> {
                 Ok(get_keyword_safe_ident(&to_camel_case(self.name()?)))
             })?)
-    }
-
-    pub fn native_ident_with_relative_path(&'c self, cur_package: &str) -> Result<String> {
-        let enum_name = self.native_ident()?;
-        let mut struct_package_iter = self.package()?.split('.').peekable();
-        let mut cur_package_iter = cur_package.split('.').peekable();
-        while let (Some(p1), Some(p2)) = (struct_package_iter.peek(), cur_package_iter.peek()) {
-            if *p1 == *p2 {
-                struct_package_iter.next();
-                cur_package_iter.next();
-            } else {
-                break;
-            }
-        }
-        Ok(format!(
-            "{supers}{mods}{name}",
-            name = enum_name,
-            supers = std::iter::repeat("super::")
-                .take(cur_package_iter.count())
-                .collect::<String>(),
-            mods = struct_package_iter
-                .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
-                .collect::<String>(),
-        ))
     }
 }
 

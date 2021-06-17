@@ -1,21 +1,23 @@
+use std::borrow::Cow;
+
 use super::writer::{func, indent, iter, IntoFragment};
-use crate::context::Context;
-use crate::utils::{to_camel_case, Indentor};
+use crate::utils::{
+    relative_path, relative_path_over_namespaces, to_camel_case, GenericParams, Indentor,
+};
 use crate::wrappers::{
-    FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonTrivialFieldType,
+    FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
 use crate::{ErrorKind, Result};
 
-pub struct MessageTraitCodeGenerator<'a, 'c> {
-    #[allow(unused)]
-    context: &'a Context<'c>,
+pub struct MessageTraitCodeGenerator<'c> {
     msg: &'c MessageDescriptor<'c>,
 }
 
-impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
-    pub fn new(context: &'a Context<'c>, msg: &'c MessageDescriptor<'c>) -> Self {
-        Self { context, msg }
+impl<'c> MessageTraitCodeGenerator<'c> {
+    pub fn new(msg: &'c MessageDescriptor<'c>) -> Self {
+        Self { msg }
     }
+
     pub fn print_msg_traits<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
         (func(|output| self.print_msg_base_trait(output)),).write_into(output)
     }
@@ -27,48 +29,65 @@ impl<'a, 'c> MessageTraitCodeGenerator<'a, 'c> {
 pub trait {trait_ident}: ::std::clone::Clone {{\n",
                 trait_ident = self.trait_ident(self.msg)?,
             ),
-            indent((
-                iter(self.msg.unique_msgs_from_fields()?.map(|msg| {
-                    // typedefs for message types
-                    Ok(format!(
-                        "type {type_name}: {trait_rel_ident};\n",
-                        type_name = self.associated_msg_type_ident(msg)?,
-                        trait_rel_ident = self.trait_relative_ident(msg)?,
-                    ))
-                })),
-                iter(self.msg.fields().map(|field| -> Result<String> {
-                    // getter method decls
-                    Ok(match self.generate_getter_method_decls(field)? {
-                        GetterMethods::BareField(decl) | GetterMethods::OptionalField(decl) => {
-                            format!("{decl};\n", decl = decl)
-                        }
-                        GetterMethods::RepeatedField {
-                            return_type_ident_gp: type_ident_gp,
-                            return_type_bound: type_bound,
-                            get_decl,
-                        } => {
-                            format!(
-                                "type {type_ident_gp}: {type_bound} where Self: 'a;\n{get_decl};\n",
-                                type_ident_gp = type_ident_gp,
-                                type_bound = type_bound,
-                                get_decl = get_decl
-                            )
-                        }
-                        GetterMethods::MapField {
-                            return_type_ident: type_ident,
-                            return_type_bound: type_bound,
-                            get_decl,
-                        } => {
-                            format!(
-                                "type {type_ident}: {type_bound};\n{get_decl};\n",
-                                type_ident = type_ident,
-                                type_bound = type_bound,
-                                get_decl = get_decl
-                            )
-                        }
-                    })
-                })),
-            )),
+            indent((iter(self.msg.fields().map(|field| -> Result<String> {
+                let getter_methods = self.generate_getter_method_decls(field)?;
+                let maybe_msg_decl = if let Some(AssociatedType {
+                    ident,
+                    gp,
+                    bound,
+                    where_clause,
+                }) = getter_methods.maybe_msg_type
+                {
+                    format!(
+                        "type {ident}{gp}: {bound} {where_clause};\n",
+                        ident = ident,
+                        gp = gp,
+                        bound = bound,
+                        where_clause = where_clause,
+                    )
+                } else {
+                    "".to_string()
+                };
+                let body = match getter_methods.field_label_type {
+                    FieldLabelType::BareField { get_decl }
+                    | FieldLabelType::OptionalField { get_decl } => {
+                        format!("{decl};\n", decl = get_decl)
+                    }
+                    FieldLabelType::RepeatedField {
+                        get_decl,
+                        repeated_type:
+                            AssociatedType {
+                                ident,
+                                gp,
+                                bound,
+                                where_clause,
+                            },
+                    }
+                    | FieldLabelType::MapField {
+                        get_decl,
+                        repeated_type:
+                            AssociatedType {
+                                ident,
+                                gp,
+                                bound,
+                                where_clause,
+                            },
+                    } => {
+                        format!(
+                            "\
+type {ident}{gp}: {bound}
+    {where_clause};
+{get_decl};\n",
+                            ident = ident,
+                            gp = gp,
+                            bound = bound,
+                            get_decl = get_decl,
+                            where_clause = where_clause,
+                        )
+                    }
+                };
+                Ok(format!("{}{}", maybe_msg_decl, body))
+            })),)),
             "}}\n",
         )
             .write_into(output)
@@ -78,148 +97,243 @@ pub trait {trait_ident}: ::std::clone::Clone {{\n",
         &self,
         field: &'c FieldDescriptor<'c>,
     ) -> Result<GetterMethods> {
-        Ok(match (field.label()?, field.type_()?) {
+        let field_label_type = match (field.label()?, field.type_()?) {
             (FieldLabel::Repeated, FieldType::Message(m)) if m.is_map_entry() => {
                 // Map.
                 let (key_field, value_field) = m.key_value_of_map_entry()?;
-                let type_ident = format!("{}Map", to_camel_case(field.native_ident()?));
-                GetterMethods::MapField {
-                    return_type_ident: type_ident.clone(),
-                    return_type_bound: format!(
-                        "::puroro::MapField<{key}, {value}>",
-                        key = self.scalar_deref_type_name(key_field)?,
-                        value = self.scalar_deref_type_name(value_field)?,
-                    ),
+                let ident: Cow<'static, str> =
+                    format!("{}Map", to_camel_case(field.native_ident()?)).into();
+                FieldLabelType::MapField {
+                    repeated_type: AssociatedType {
+                        ident: ident.clone(),
+                        gp: std::array::IntoIter::new(["'this"]).collect(),
+                        bound: format!(
+                            "::puroro::MapField::<'this, {key}, {value}>",
+                            key = self.map_deref_borrowed_key_type_name(key_field)?,
+                            value = self.map_value_getter_type_name(value_field)?,
+                        )
+                        .into(),
+                        where_clause: "where Self: 'this".into(),
+                    },
                     get_decl: format!(
-                        "fn {ident}(&self) -> &Self::{type_ident}",
+                        "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
                         ident = field.native_ident()?,
-                        type_ident = type_ident,
-                    ),
+                        type_ident = ident,
+                    )
+                    .into(),
                 }
             }
             (FieldLabel::Optional2, _) | (FieldLabel::Optional3, FieldType::Message(_)) => {
-                GetterMethods::OptionalField(format!(
-                    "fn {name}(&self) -> ::std::option::Option<{reftype}>",
-                    name = field.native_ident()?,
-                    reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
-                ))
+                FieldLabelType::OptionalField {
+                    get_decl: format!(
+                        "fn {name}<'this>(&'this self) -> ::std::option::Option::<{reftype}>",
+                        name = field.native_ident()?,
+                        reftype = self.scalar_getter_type_name(field, "'this")?,
+                    )
+                    .into(),
+                }
             }
             (FieldLabel::Repeated, _) => {
-                let type_ident = format!("{}Repeated", to_camel_case(field.native_ident()?));
-                GetterMethods::RepeatedField {
-                    return_type_ident_gp: format!("{ident}<'a>", ident = type_ident.clone()),
-                    return_type_bound: format!(
-                        "::puroro::RepeatedField<'a, {value}>",
-                        value = self.repeated_item_type_name(field)?,
-                    ),
+                let ident = format!("{}Repeated", to_camel_case(field.native_ident()?));
+                FieldLabelType::RepeatedField {
+                    repeated_type: AssociatedType {
+                        ident: ident.clone().into(),
+                        gp: std::array::IntoIter::new(["'this"]).collect(),
+                        bound: format!(
+                            "::puroro::RepeatedField::<{value}>",
+                            value = self.scalar_getter_type_name(field, "'this")?,
+                        )
+                        .into(),
+                        where_clause: "where Self: 'this".into(),
+                    },
                     get_decl: format!(
-                        "fn {ident}<'a>(&'a self) -> Self::{type_ident}<'a>",
+                        "fn {ident}<'this>(&'this self) -> Self::{type_ident}::<'this>",
                         ident = field.native_ident()?,
-                        type_ident = type_ident,
-                    ),
+                        type_ident = ident,
+                    )
+                    .into(),
                 }
             }
-            (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => {
-                GetterMethods::BareField(format!(
-                    "fn {name}(&self) -> {reftype}",
+            (FieldLabel::Required, _) | (FieldLabel::Optional3, _) => FieldLabelType::BareField {
+                get_decl: format!(
+                    "fn {name}<'this>(&'this self) -> {reftype}",
                     name = field.native_ident()?,
-                    reftype = self.scalar_maybe_ref_type_name(field, "'_")?,
-                ))
+                    reftype = self.scalar_getter_type_name(field, "'this")?,
+                )
+                .into(),
+            },
+        };
+        let maybe_message_associated_type = match field.type_()? {
+            FieldType::Message(m) => {
+                let ident = self.associated_msg_type_ident(field, field.label()?)?;
+                Some(AssociatedType {
+                    ident: ident.into(),
+                    gp: std::array::IntoIter::new(["'this"]).collect(),
+                    bound: self.trait_path_from_trait(m, self.msg.package()?)?,
+                    where_clause: "where Self: 'this".into(),
+                })
             }
+            _ => None,
+        };
+        Ok(GetterMethods {
+            maybe_msg_type: maybe_message_associated_type,
+            field_label_type,
         })
     }
 
-    pub fn trait_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
-        Ok(format!("{}Trait", msg.native_ident()?))
+    pub fn trait_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'static, str>> {
+        Ok(format!("{}Trait", msg.native_ident()?).into())
     }
-    pub fn trait_relative_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
+
+    pub fn trait_path_from_trait(
+        &self,
+        msg: &'c MessageDescriptor<'c>,
+        cur_package: &str,
+    ) -> Result<Cow<'static, str>> {
         Ok(format!(
-            "{}Trait",
-            msg.native_ident_with_relative_path(self.msg.package()?)?
-        ))
-    }
-    pub fn associated_msg_type_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
-        Ok(format!("{}Type", msg.native_ident()?))
-    }
-
-    pub fn scalar_deref_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
-        Ok(match field.type_()?.native_trivial_type_name() {
-            Ok(name) => name.into(),
-            Err(nontrivial_type) => match nontrivial_type {
-                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                NonTrivialFieldType::String => format!("str").into(),
-                NonTrivialFieldType::Bytes => format!("[u8]").into(),
-                NonTrivialFieldType::Enum(e) => format!(
-                    "::std::result::Result<{type_}, i32>",
-                    type_ = e.native_ident_with_relative_path(self.msg.package()?)?
-                )
-                .into(),
-                NonTrivialFieldType::Message(m) => {
-                    format!("Self::{name}", name = self.associated_msg_type_ident(m)?).into()
-                }
-            },
-        })
+            "{module}::{ident}",
+            module = relative_path(cur_package, msg.package()?)?,
+            ident = self.trait_ident(msg)?,
+        )
+        .into())
     }
 
-    pub fn repeated_item_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
-        Ok(match field.type_()?.native_trivial_type_name() {
-            Ok(name) => name.into(),
-            Err(nontrivial_type) => match nontrivial_type {
-                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                NonTrivialFieldType::String => format!("::std::borrow::Cow<'a, str>").into(),
-                NonTrivialFieldType::Bytes => format!("::std::borrow::Cow<'a, [u8]>").into(),
-                NonTrivialFieldType::Enum(e) => format!(
-                    "::std::result::Result<{type_}, i32>",
-                    type_ = e.native_ident_with_relative_path(self.msg.package()?)?
-                )
-                .into(),
-                NonTrivialFieldType::Message(m) => format!(
-                    "::std::borrow::Cow<'a, Self::{name}>",
-                    name = self.associated_msg_type_ident(m)?
-                )
-                .into(),
-            },
-        })
+    pub fn trait_path_from_struct(&self, cur_package: &str) -> Result<Cow<'static, str>> {
+        Ok(format!(
+            "{module}::{ident}",
+            module = relative_path_over_namespaces(cur_package, self.msg.package()?, "traits")?,
+            ident = self.trait_ident(self.msg)?,
+        )
+        .into())
     }
 
-    pub fn scalar_maybe_ref_type_name(
+    pub fn associated_msg_type_ident(
         &self,
         field: &'c FieldDescriptor<'c>,
-        lifetime: &str,
-    ) -> Result<String> {
-        Ok(match field.type_()?.native_trivial_type_name() {
-            Ok(name) => name.into(),
-            Err(nontrivial_type) => match nontrivial_type {
-                NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                NonTrivialFieldType::String => format!("&{lt} str", lt = lifetime).into(),
-                NonTrivialFieldType::Bytes => format!("&{lt} [u8]", lt = lifetime).into(),
-                NonTrivialFieldType::Enum(e) => format!(
-                    "::std::result::Result<{type_}, i32>",
-                    type_ = e.native_ident_with_relative_path(field.package()?)?
-                )
-                .into(),
-                NonTrivialFieldType::Message(m) => format!(
-                    "&{lt} Self::{name}",
-                    lt = lifetime,
-                    name = self.associated_msg_type_ident(m)?
-                )
-                .into(),
+        label: FieldLabel,
+    ) -> Result<Cow<'static, str>> {
+        let postfix = match label {
+            FieldLabel::Repeated => "Element",
+            _ => "Type",
+        };
+        Ok(format!(
+            "{ident}{postfix}",
+            ident = to_camel_case(&field.native_ident()?),
+            postfix = postfix,
+        )
+        .into())
+    }
+
+    pub fn associated_msg_type_ident_gp<'b, T>(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+        label: FieldLabel,
+        bindings: T,
+    ) -> Result<Cow<'static, str>>
+    where
+        T: IntoIterator<Item = &'b (&'static str, &'static str)>,
+    {
+        let mut lt = "'this";
+        for &(from, to) in bindings {
+            if lt == from {
+                lt = to;
+            }
+        }
+        Ok(format!(
+            "{ident}::<{lt}>",
+            ident = self.associated_msg_type_ident(field, label)?,
+            lt = lt
+        )
+        .into())
+    }
+
+    pub fn scalar_getter_type_name(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+        this_lifetime: &'static str,
+    ) -> Result<Cow<'static, str>> {
+        Ok(
+            match field
+                .type_()?
+                .native_numerical_type_name(field.package()?)?
+            {
+                Ok(name) => name.into(),
+                Err(nonnumerical_type) => {
+                    let t: Cow<str> = match nonnumerical_type {
+                        NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                        NonNumericalFieldType::String => "str".into(),
+                        NonNumericalFieldType::Bytes => "[u8]".into(),
+                        NonNumericalFieldType::Message(_) => format!(
+                            "Self::{name}",
+                            name =
+                                self.associated_msg_type_ident_gp(field, field.label()?, None,)?,
+                        )
+                        .into(),
+                    };
+                    format!(
+                        "::std::borrow::Cow::<{lt}, {type_}>",
+                        lt = this_lifetime,
+                        type_ = t,
+                    )
+                    .into()
+                }
             },
-        })
+        )
+    }
+
+    pub fn map_deref_borrowed_key_type_name(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+    ) -> Result<Cow<'static, str>> {
+        Ok(
+            match field
+                .type_()?
+                .native_numerical_type_name(field.package()?)?
+            {
+                Ok(name) => name,
+                Err(nonnumerical_type) => match nonnumerical_type {
+                    NonNumericalFieldType::String => "str".into(),
+                    _ => Err(ErrorKind::InvalidMapKey {
+                        name: field.fully_qualified_type_name()?.to_string(),
+                    })?,
+                },
+            },
+        )
+    }
+
+    pub fn map_value_getter_type_name(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+    ) -> Result<Cow<'static, str>> {
+        self.scalar_getter_type_name(field, "'this")
     }
 }
 
-pub enum GetterMethods {
-    BareField(String),
-    OptionalField(String),
+pub struct AssociatedType {
+    pub ident: Cow<'static, str>,
+    pub gp: GenericParams,
+    pub bound: Cow<'static, str>,
+    pub where_clause: Cow<'static, str>,
+}
+
+pub struct GetterMethods {
+    pub maybe_msg_type: Option<AssociatedType>,
+    pub field_label_type: FieldLabelType,
+}
+
+pub enum FieldLabelType {
+    BareField {
+        get_decl: Cow<'static, str>,
+    },
+    OptionalField {
+        get_decl: Cow<'static, str>,
+    },
     RepeatedField {
-        return_type_ident_gp: String,
-        return_type_bound: String,
-        get_decl: String,
+        repeated_type: AssociatedType,
+        get_decl: Cow<'static, str>,
     },
     MapField {
-        return_type_ident: String,
-        return_type_bound: String,
-        get_decl: String,
+        repeated_type: AssociatedType,
+        get_decl: Cow<'static, str>,
     },
 }

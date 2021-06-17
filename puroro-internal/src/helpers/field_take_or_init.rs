@@ -2,7 +2,7 @@ use super::FieldNew;
 pub trait FieldTakeOrInit<'bump, T>: Sized {
     fn take_or_init(self) -> T;
     #[cfg(feature = "puroro-bumpalo")]
-    fn take_or_init_in_bumpalo(self, _bump: &'bump ::bumpalo::Bump) -> T {
+    fn take_or_init_in_bumpalo(self, _bump: &'bump crate::bumpalo::Bump) -> T {
         self.take_or_init()
     }
 }
@@ -24,7 +24,7 @@ where
         }
     }
     #[cfg(feature = "puroro-bumpalo")]
-    fn take_or_init_in_bumpalo(self, bump: &'bump ::bumpalo::Bump) -> T {
+    fn take_or_init_in_bumpalo(self, bump: &'bump crate::bumpalo::Bump) -> T {
         match self {
             Some(x) => x,
             None => FieldNew::new_in_bumpalo(bump),
@@ -43,7 +43,7 @@ where
         }
     }
     #[cfg(feature = "puroro-bumpalo")]
-    fn take_or_init_in_bumpalo(self, bump: &'bump ::bumpalo::Bump) -> T {
+    fn take_or_init_in_bumpalo(self, bump: &'bump crate::bumpalo::Bump) -> T {
         match self {
             Some(x) => *x,
             None => FieldNew::new_in_bumpalo(bump),
@@ -53,7 +53,7 @@ where
 
 // Because bumpalo's Box cannot move out the value, we need to use
 // Clone instead...
-impl<'bump, T> FieldTakeOrInit<'bump, T> for Option<::bumpalo::boxed::Box<'bump, T>>
+impl<'bump, T> FieldTakeOrInit<'bump, T> for Option<crate::bumpalo::boxed::Box<'bump, T>>
 where
     T: Sized + FieldNew<'bump> + Clone,
 {
@@ -64,7 +64,7 @@ where
         }
     }
     #[cfg(feature = "puroro-bumpalo")]
-    fn take_or_init_in_bumpalo(self, bump: &'bump ::bumpalo::Bump) -> T {
+    fn take_or_init_in_bumpalo(self, bump: &'bump crate::bumpalo::Bump) -> T {
         match self {
             Some(x) => x.clone(),
             None => FieldNew::new_in_bumpalo(bump),

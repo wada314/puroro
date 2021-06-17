@@ -1,5 +1,5 @@
 [package]
-name = "test_generated"
+name = "tests"
 version = "0.1.0"
 authors = ["Shohei Wada <pc@wada314.jp>"]
 edition = "2018"
@@ -9,13 +9,12 @@ edition = "2018"
 [dependencies]
 puroro = { path = "../puroro" }
 puroro-internal = { path = "../puroro-internal" }
-# Requires this commit to be included:
-# https://github.com/fitzgen/bumpalo/commit/e9adce57a54fff2a12994ec8a5797ea041083c1c
-bumpalo = { git = "https://github.com/fitzgen/bumpalo.git", features = ["collections", "boxed"], optional = true }
+protobuf-pb = { path = "../protobuf-pb" }
+sample-pb = { path = "../sample-pb" }
 
 [features]
 puroro-nightly = []
-puroro-bumpalo = ["bumpalo"]
+puroro-bumpalo = ["puroro/puroro-bumpalo"]
 default = [
     "puroro-nightly", 
     "puroro-bumpalo",

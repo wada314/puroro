@@ -3,9 +3,9 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::utils::{get_keyword_safe_ident, to_lower_snake_case};
+use crate::utils::{relative_path, relative_path_over_namespaces, GenericParams};
 use crate::wrappers::{
-    FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonTrivialFieldType,
+    FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
 use crate::{ErrorKind, Result};
 
@@ -18,61 +18,16 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         Self { context, msg }
     }
 
-    /// A raw generated struct identifier.
-    /// e.g. "FieldDescriptorProto", "DescriptorProtoBumpalo"
-    pub fn struct_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'c, str>> {
-        let postfix1 = match self.context.impl_type() {
-            ImplType::Default => "",
-            ImplType::SliceView { .. } => "SliceView",
-        };
-        let postfix2 = match self.context.alloc_type() {
-            AllocatorType::Default => "",
-            AllocatorType::Bumpalo => "Bumpalo",
-        };
-        Ok(format!(
-            "{name}{postfix1}{postfix2}",
-            name = msg.native_ident()?,
-            postfix1 = postfix1,
-            postfix2 = postfix2,
-        )
-        .into())
-    }
-
-    /// A struct ident with relative path from the given package.
-    /// Note this is still not a typename; the generic params are not bound.
-    pub fn struct_ident_with_relative_path(
-        &self,
-        msg: &'c MessageDescriptor<'c>,
-    ) -> Result<String> {
-        let struct_name = self.struct_ident(msg)?;
-        let mut struct_package_iter = msg.package()?.split('.').peekable();
-        let mut cur_package_iter = self.msg.package()?.split('.').peekable();
-        while let (Some(p1), Some(p2)) = (struct_package_iter.peek(), cur_package_iter.peek()) {
-            if *p1 == *p2 {
-                struct_package_iter.next();
-                cur_package_iter.next();
-            } else {
-                break;
-            }
-        }
-        let super_count = cur_package_iter.count();
-        let maybe_self = if super_count == 0 { "self::" } else { "" };
-        Ok(format!(
-            "{maybe_self}{supers}{mods}{name}",
-            name = struct_name,
-            maybe_self = maybe_self,
-            supers = std::iter::repeat("super::")
-                .take(super_count)
-                .collect::<String>(),
-            mods = struct_package_iter
-                .map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)) + "::")
-                .collect::<String>(),
-        ))
-    }
-
     /// A type name of the struct with a relative path from the current msg.
     /// Includes generic param bounds if there is any.
-    pub fn type_name_of_msg(&self, msg: &'c MessageDescriptor<'c>) -> Result<String> {
+    pub fn type_name_of_msg<'b, T>(
+        &self,
+        msg: &'c MessageDescriptor<'c>,
+        bindings: T,
+    ) -> Result<String>
+    where
+        T: IntoIterator<Item = &'b (&'static str, &'static str)>,
+    {
         let generic_args_iter1 = match self.context.alloc_type() {
             AllocatorType::Default => None,
             AllocatorType::Bumpalo => Some("'bump"),
@@ -80,100 +35,120 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         .into_iter();
         let generic_args_iter2 = match self.context.impl_type() {
             ImplType::Default => None,
-            ImplType::SliceView { .. } => Some(std::array::IntoIter::new(["'slice", "'p"])),
+            ImplType::SliceView => Some(std::array::IntoIter::new(["'slice", "S"])),
         }
         .into_iter()
         .flatten();
-        let generic_args_iter = generic_args_iter1.chain(generic_args_iter2);
-        if generic_args_iter.clone().count() == 0 {
-            Ok(self.struct_ident_with_relative_path(msg)?)
-        } else {
-            let generic_args = Itertools::intersperse(generic_args_iter, ", ").collect::<String>();
+        // Replace bindings
+        let mut generic_args_vec = generic_args_iter1
+            .chain(generic_args_iter2)
+            .collect::<Vec<_>>();
+        for &(from, to) in bindings {
+            for i in 0..generic_args_vec.len() {
+                if generic_args_vec[i] == from {
+                    generic_args_vec[i] = to;
+                }
+            }
+        }
+        let generic_args =
+            Itertools::intersperse(generic_args_vec.into_iter(), ", ").collect::<String>();
+        if generic_args.is_empty() {
             Ok(format!(
-                "{name}<{gargs}>",
-                name = self.struct_ident_with_relative_path(msg)?,
+                "{module}::{ident}",
+                module = relative_path(self.msg.package()?, msg.package()?)?,
+                ident = msg.native_ident()?,
+            ))
+        } else {
+            Ok(format!(
+                "{module}::{ident}::<{gargs}>",
+                module = relative_path(self.msg.package()?, msg.package()?)?,
+                ident = msg.native_ident()?,
                 gargs = generic_args,
             ))
         }
     }
 
-    pub fn cfg_condition(&self) -> &'static str {
-        match self.context.alloc_type() {
-            AllocatorType::Bumpalo => "#[cfg(feature = \"puroro-bumpalo\")]",
-            _ => "",
-        }
-    }
-
     pub fn is_default_available(&self) -> bool {
         match (self.context.impl_type(), self.context.alloc_type()) {
-            (ImplType::SliceView { .. }, _) | (_, AllocatorType::Bumpalo) => false,
+            (_, AllocatorType::Bumpalo) => false,
             _ => true,
         }
     }
 
-    pub fn is_deser_from_iter_available(&self) -> bool {
+    pub fn is_merge_from_iter_available(&self) -> bool {
         match self.context.impl_type() {
             ImplType::Default => true,
-            ImplType::SliceView { .. } => false,
+            ImplType::SliceView => false,
         }
     }
 
     pub fn field_visibility(&self) -> &'static str {
         match self.context.impl_type() {
             ImplType::Default => "pub ",
-            ImplType::SliceView { .. } => "",
+            ImplType::SliceView => "",
         }
     }
 
-    pub fn field_scalar_item_type_for(
+    pub fn field_scalar_item_type(
         &self,
         field: &'c FieldDescriptor<'c>,
-    ) -> Result<Cow<'c, str>> {
+    ) -> Result<Cow<'static, str>> {
         Ok(match self.context.impl_type() {
-            ImplType::Default => match field.type_()?.native_trivial_type_name() {
-                Ok(name) => name.into(),
-                Err(nontrivial_type) => match nontrivial_type {
-                    NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                    NonTrivialFieldType::String => self.string_type().into(),
-                    NonTrivialFieldType::Bytes => self.vec_type("u8").into(),
-                    NonTrivialFieldType::Enum(e) => format!(
-                        "::std::result::Result<{type_}, i32>",
-                        type_ = e.native_ident_with_relative_path(field.package()?)?
-                    )
-                    .into(),
-                    NonTrivialFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
+            ImplType::Default => match field
+                .type_()?
+                .native_numerical_type_name(field.package()?)?
+            {
+                Ok(name) => name,
+                Err(nonnumerical_type) => match nonnumerical_type {
+                    NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                    NonNumericalFieldType::String => self.string_type().into(),
+                    NonNumericalFieldType::Bytes => self.vec_type("u8").into(),
+                    NonNumericalFieldType::Message(m) => self.type_name_of_msg(m, None)?.into(),
                 },
             },
-            ImplType::SliceView { .. } => match field.type_()?.native_trivial_type_name() {
-                Ok(name) => name.into(),
-                Err(nontrivial_type) => match nontrivial_type {
-                    NonTrivialFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                    NonTrivialFieldType::String => "&'slice str".into(),
-                    NonTrivialFieldType::Bytes => "&'slice [u8]".into(),
-                    NonTrivialFieldType::Enum(e) => format!(
-                        "::std::result::Result<{type_}, i32>",
-                        type_ = e.native_ident_with_relative_path(field.package()?)?
-                    )
-                    .into(),
-                    NonTrivialFieldType::Message(m) => self.type_name_of_msg(m)?.into(),
+            ImplType::SliceView => match field
+                .type_()?
+                .native_numerical_type_name(field.package()?)?
+            {
+                Ok(name) => name,
+                Err(nonnumerical_type) => match nonnumerical_type {
+                    NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                    NonNumericalFieldType::String => "::std::borrow::Cow<'slice, str>".into(),
+                    NonNumericalFieldType::Bytes => "::std::borrow::Cow<'slice, [u8]>".into(),
+                    NonNumericalFieldType::Message(m) => self.type_name_of_msg(m, None)?.into(),
                 },
             },
         })
     }
 
-    pub fn field_type_for(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
-        let scalar_type = self.field_scalar_item_type_for(field)?;
+    pub fn field_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+        let scalar_type = self.field_scalar_item_type(field)?;
         Ok(match self.context.impl_type() {
             ImplType::Default => {
                 if let FieldType::Message(m) = field.type_()? {
                     if m.is_map_entry() {
                         // Special treatment for map field
                         let (key_field, value_field) = m.key_value_of_map_entry()?;
-                        return Ok(format!(
-                            "::std::collections::HashMap<{key}, {value}>",
-                            key = self.field_scalar_item_type_for(key_field)?,
-                            value = self.field_scalar_item_type_for(value_field)?,
-                        )
+                        let key_type = self.field_scalar_item_type(key_field)?;
+                        let value_type = self.field_scalar_item_type(value_field)?;
+                        return Ok(match self.context.alloc_type() {
+                            AllocatorType::Default => format!(
+                                "::std::collections::HashMap<{key}, {value}>",
+                                key = key_type,
+                                value = value_type,
+                            ),
+                            AllocatorType::Bumpalo => format!(
+                                "\
+::puroro_internal::hashbrown::HashMap<
+    {key},
+    {value},
+    ::puroro_internal::hashbrown::hash_map::DefaultHashBuilder,
+    ::puroro_internal::hashbrown::BumpWrapper<'bump>,
+>",
+                                key = key_type,
+                                value = value_type,
+                            ),
+                        }
                         .into());
                     }
                 }
@@ -181,26 +156,14 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 match field.label()? {
                     FieldLabel::Optional2 => {
                         if matches!(field.type_()?, FieldType::Message(_)) {
-                            format!(
-                                "::std::option::Option<{boxed_type}>",
-                                boxed_type = self.box_type(scalar_type.as_ref()),
-                            )
-                            .into()
+                            self.option_type(&self.boxed_type(&scalar_type)).into()
                         } else {
-                            format!(
-                                "::std::option::Option<{scalar_type}>",
-                                scalar_type = scalar_type,
-                            )
-                            .into()
+                            self.option_type(&scalar_type).into()
                         }
                     }
                     FieldLabel::Optional3 => {
                         if matches!(field.type_()?, FieldType::Message(_)) {
-                            format!(
-                                "::std::option::Option<{boxed_type}>",
-                                boxed_type = self.box_type(scalar_type.as_ref()),
-                            )
-                            .into()
+                            self.option_type(&self.boxed_type(&scalar_type)).into()
                         } else {
                             scalar_type.into()
                         }
@@ -209,21 +172,25 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     FieldLabel::Repeated => self.vec_type(scalar_type.as_ref()).into(),
                 }
             }
-            ImplType::SliceView { .. } => match (field.label()?, field.type_()?) {
+            ImplType::SliceView => match (field.label()?, field.type_()?) {
                 (FieldLabel::Repeated, _) | (_, FieldType::Message(_)) => {
-                    "::std::option::Option<::puroro_internal::SliceViewField<'slice>>".into()
+                    let item = "::puroro_internal::SliceViewField::<'slice>";
+                    self.option_type(item).into()
                 }
-                (FieldLabel::Optional2, _) => format!(
-                    "::std::option::Option<{scalar_type}>",
-                    scalar_type = scalar_type,
-                )
-                .into(),
+                (FieldLabel::Optional2, _) => self.option_type(&scalar_type).into(),
                 _ => scalar_type.into(),
             },
         })
     }
 
-    pub fn type_tag_for(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+    pub fn type_tag_ident_gp<'b, T>(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+        bindings: T,
+    ) -> Result<String>
+    where
+        T: IntoIterator<Item = &'b (&'static str, &'static str)>,
+    {
         Ok(match field.type_()? {
             FieldType::Double => "Double".into(),
             FieldType::Float => "Float".into(),
@@ -241,12 +208,18 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "String".into(),
             FieldType::Bytes => "Bytes".into(),
-            FieldType::Enum(e) => format!(
-                "Enum<{}>",
-                e.native_ident_with_relative_path(self.msg.package()?)?,
+            FieldType::Enum2(e) => format!(
+                "Enum2::<{module}::{ident}>",
+                module = relative_path_over_namespaces(self.msg.package()?, e.package()?, "enums")?,
+                ident = e.native_ident()?,
+            ),
+            FieldType::Enum3(e) => format!(
+                "Enum3::<{module}::{ident}>",
+                module = relative_path_over_namespaces(self.msg.package()?, e.package()?, "enums")?,
+                ident = e.native_ident()?,
             ),
             FieldType::Message(m) => {
-                format!("Message<{}>", self.type_name_of_msg(m,)?)
+                format!("Message::<{}>", self.type_name_of_msg(m, bindings)?)
             }
         })
     }
@@ -256,7 +229,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             ImplType::Default => match self.context.alloc_type() {
                 AllocatorType::Default => match field.type_()? {
                     FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                    FieldType::Enum(_) => "|| 0i32.try_into()".into(),
+                    FieldType::Enum2(e) => format!(
+                        "|| {v}i32.try_into().unwrap()",
+                        v = e.first_value()?.number()
+                    )
+                    .into(),
+                    FieldType::Enum3(_) => "|| 0i32.try_into()".into(),
                     _ => "::std::default::Default::default".into(),
                 },
                 AllocatorType::Bumpalo => match field.type_()? {
@@ -265,75 +243,62 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     // We need this proxy var to tell the borrow checker that we are splitting
                     // the `self`.
                     FieldType::String => {
-                        "|| ::bumpalo::collections::String::new_in(puroro_internal.bumpalo())"
+                        "|| ::puroro::bumpalo::collections::String::new_in(&puroro_internal.bump)"
                             .into()
                     }
                     FieldType::Bytes => {
-                        "|| ::bumpalo::collections::Vec::new_in(puroro_internal.bumpalo())".into()
+                        "|| ::puroro::bumpalo::collections::Vec::new_in(&puroro_internal.bump)"
+                            .into()
                     }
                     FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                    FieldType::Enum(_) => "|| 0i32.try_into()".into(),
-                    FieldType::Message(m) => match field.label()? {
-                        FieldLabel::Optional2 | FieldLabel::Optional3 => format!(
-                            "|| ::bumpalo::boxed::Box::new_in({msg}::new_in(\
-                                puroro_internal.bumpalo()\
-                            ), puroro_internal.bumpalo())",
-                            msg = self.struct_ident_with_relative_path(m)?,
-                        )
-                        .into(),
-                        FieldLabel::Required | FieldLabel::Repeated => format!(
-                            "|| {msg}::new_in(puroro_internal.bumpalo())",
-                            msg = self.struct_ident_with_relative_path(m)?,
-                        )
-                        .into(),
-                    },
+                    FieldType::Enum2(e) => format!(
+                        "|| {v}i32.try_into().unwrap()",
+                        v = e.first_value()?.number()
+                    )
+                    .into(),
+                    FieldType::Enum3(_) => "|| 0i32.try_into()".into(),
+                    FieldType::Message(m) => format!(
+                        "|| {msg}::new_in(&puroro_internal.bump)",
+                        msg = self.type_name_of_msg(m, None)?,
+                    )
+                    .into(),
                     _ => "::std::default::Default::default".into(),
                 },
             },
-            ImplType::SliceView { .. } => {
+            ImplType::SliceView => {
                 unimplemented!()
             }
         })
     }
 
-    pub fn struct_generic_params(&self, params: &[&'static str]) -> String {
-        let iter = params
-            .iter()
-            .cloned()
-            .chain(
-                match self.context.alloc_type() {
-                    AllocatorType::Default => None,
-                    AllocatorType::Bumpalo => Some("'bump"),
-                }
-                .into_iter(),
-            )
-            .chain(
-                match self.context.impl_type() {
-                    ImplType::Default => None,
-                    ImplType::SliceView { .. } => Some("'slice, 'p"),
-                }
-                .into_iter(),
-            )
-            .unique();
-        if iter.clone().count() == 0 {
-            "".to_string()
-        } else {
-            format!(
-                "<{}>",
-                Itertools::intersperse(iter, ", ").collect::<String>()
-            )
+    pub fn struct_generic_params(&self) -> GenericParams {
+        match self.context.alloc_type() {
+            AllocatorType::Default => None,
+            AllocatorType::Bumpalo => Some("'bump"),
         }
+        .into_iter()
+        .chain(
+            match self.context.impl_type() {
+                ImplType::Default => None,
+                ImplType::SliceView => Some(["'slice", "S"].iter()),
+            }
+            .into_iter()
+            .flatten()
+            .cloned(),
+        )
+        .unique()
+        .collect()
     }
 
-    pub fn struct_generic_params_bounds(&self, params: &[&'static str]) -> String {
-        self.struct_generic_params(params)
+    pub fn struct_generic_params_bounds(&self) -> GenericParams {
+        self.struct_generic_params()
     }
 
     pub fn new_method_declaration(&self) -> &'static str {
         match (self.context.impl_type(), self.context.alloc_type()) {
             (ImplType::Default, AllocatorType::Default) => "fn new() -> Self",
             (ImplType::Default, AllocatorType::Bumpalo) => {
-                "fn new_in(bump: &'bump ::bumpalo::Bump) -> Self"
+                "fn new_in(bump: &'bump ::puroro::bumpalo::Bump) -> Self"
             }
             _ => {
                 unimplemented!()
@@ -348,20 +313,30 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
-    pub fn field_clone(&self, field_ident: &str, field_type: &str) -> String {
-        match self.context.alloc_type() {
-            AllocatorType::Default => format!(
-                "<{field_type} as FieldClone>::clone(&self.{field_ident})",
-                field_ident = field_ident,
-                field_type = field_type
-            ),
-            AllocatorType::Bumpalo => format!(
-                "<{field_type} as FieldClone>::clone_in_bumpalo(\
-                    &self.{field_ident}, self.puroro_internal.bumpalo())",
-                field_ident = field_ident,
-                field_type = field_type
-            ),
-        }
+    pub fn field_clone(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+        Ok(
+            match (self.context.alloc_type(), field.label()?, field.type_()?) {
+                (
+                    AllocatorType::Bumpalo,
+                    FieldLabel::Optional2 | FieldLabel::Optional3,
+                    FieldType::Message(_),
+                ) => {
+                    format!(
+                        "self.{ident}.as_ref().map(\
+                            |v| ::puroro::bumpalo::boxed::Box::new_in(\
+                                (*v).clone(), &self.puroro_internal.bump))",
+                        ident = field.native_ident()?
+                    )
+                }
+                _ => {
+                    format!(
+                        "<{field_type} as Clone>::clone(&self.{ident})",
+                        field_type = self.field_type_name(field)?,
+                        ident = field.native_ident()?
+                    )
+                }
+            },
+        )
     }
 
     pub fn field_take_or_init(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
@@ -370,40 +345,65 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 "<{field_type} as FieldTakeOrInit<{taken_type}>>\
                     ::take_or_init(self.{ident})",
                 ident = field.native_ident()?,
-                field_type = self.field_type_for(field)?,
-                taken_type = self.field_scalar_item_type_for(field)?,
+                field_type = self.field_type_name(field)?,
+                taken_type = self.field_scalar_item_type(field)?,
             ),
             AllocatorType::Bumpalo => format!(
                 "<{field_type} as FieldTakeOrInit<{taken_type}>>\
                     ::take_or_init_in_bumpalo(self.{ident}, self.puroro_internal.bumpalo())",
                 ident = field.native_ident()?,
-                field_type = self.field_type_for(field)?,
-                taken_type = self.field_scalar_item_type_for(field)?,
+                field_type = self.field_type_name(field)?,
+                taken_type = self.field_scalar_item_type(field)?,
             ),
         })
     }
 
-    pub fn box_type(&self, item: &str) -> String {
+    pub fn boxed_type(&self, item: &str) -> String {
         match self.context.alloc_type() {
-            AllocatorType::Default => format!("::std::boxed::Box<{item}>", item = item),
-            AllocatorType::Bumpalo => format!("::bumpalo::boxed::Box<'bump, {item}>", item = item),
-        }
-    }
-
-    pub fn vec_type(&self, item: &str) -> String {
-        match self.context.alloc_type() {
-            AllocatorType::Default => format!("::std::vec::Vec<{item}>", item = item),
+            AllocatorType::Default => format!("::std::boxed::Box::<{item}>", item = item),
             AllocatorType::Bumpalo => {
-                format!("::bumpalo::collections::Vec<'bump, {item}>", item = item)
+                format!(
+                    "::puroro::bumpalo::boxed::Box::<'bump, {item}>",
+                    item = item
+                )
             }
         }
     }
 
-    pub fn string_type(&self) -> &'static str {
+    pub fn box_new(&self, item: &str) -> String {
+        match self.context.alloc_type() {
+            AllocatorType::Default => format!("::std::boxed::Box::new({item})", item = item),
+            AllocatorType::Bumpalo => format!(
+                "{{
+    let bump = self.puroro_internal.bump;
+    ::puroro::bumpalo::boxed::Box::new_in({item}, bump)
+}}\n",
+                item = item
+            ),
+        }
+    }
+
+    fn vec_type(&self, item: &str) -> String {
+        match self.context.alloc_type() {
+            AllocatorType::Default => format!("::std::vec::Vec::<{item}>", item = item),
+            AllocatorType::Bumpalo => {
+                format!(
+                    "::puroro::bumpalo::collections::Vec::<'bump, {item}>",
+                    item = item
+                )
+            }
+        }
+    }
+
+    fn string_type(&self) -> &'static str {
         match self.context.alloc_type() {
             AllocatorType::Default => "::std::string::String",
-            AllocatorType::Bumpalo => "::bumpalo::collections::String<'bump>",
+            AllocatorType::Bumpalo => "::puroro::bumpalo::collections::String::<'bump>",
         }
+    }
+
+    fn option_type(&self, item: &str) -> String {
+        format!("::std::option::Option::<{item}>", item = item)
     }
 
     pub fn internal_data_type(&self) -> &'static str {
@@ -414,10 +414,37 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             (ImplType::Default, AllocatorType::Bumpalo) => {
                 "::puroro_internal::InternalDataForBumpaloStruct<'bump>"
             }
-            (ImplType::SliceView { .. }, AllocatorType::Default) => {
-                "::puroro_internal::InternalDataForSliceViewStruct<'slice, 'p>"
+            (ImplType::SliceView, AllocatorType::Default) => {
+                "::puroro_internal::InternalDataForSliceViewStruct<'slice, S>"
             }
             _ => unimplemented!(),
         }
+    }
+
+    pub fn map_owned_key_type_name(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+    ) -> Result<Cow<'static, str>> {
+        Ok(
+            match field
+                .type_()?
+                .native_numerical_type_name(field.package()?)?
+            {
+                Ok(name) => name,
+                Err(nonnumerical_type) => match nonnumerical_type {
+                    NonNumericalFieldType::String => self.string_type().into(),
+                    _ => Err(ErrorKind::InvalidMapKey {
+                        name: field.fully_qualified_type_name()?.to_string(),
+                    })?,
+                },
+            },
+        )
+    }
+
+    pub fn map_owned_value_type_name(
+        &self,
+        field: &'c FieldDescriptor<'c>,
+    ) -> Result<Cow<'static, str>> {
+        Ok(self.field_scalar_item_type(field)?)
     }
 }

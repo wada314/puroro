@@ -1,4 +1,9 @@
+use crate::Result;
 use ::lazy_static::lazy_static;
+use itertools::Itertools;
+use std::borrow::Cow;
+use std::fmt::Display;
+use std::iter::FromIterator;
 use std::{collections::HashSet, fmt::Write};
 
 pub struct Indentor<W> {
@@ -130,4 +135,104 @@ pub fn iter_package_to_root(package: &str) -> impl Iterator<Item = &str> {
             Some("")
         }
     })
+}
+
+pub fn relative_path(cur_package: &str, dst_package: &str) -> Result<String> {
+    let mut dst_iter = dst_package.split('.').filter(|p| !p.is_empty()).peekable();
+    let mut cur_iter = cur_package.split('.').filter(|p| !p.is_empty()).peekable();
+    while let (Some(p1), Some(p2)) = (dst_iter.peek(), cur_iter.peek()) {
+        if *p1 == *p2 {
+            dst_iter.next();
+            cur_iter.next();
+        } else {
+            break;
+        }
+    }
+    let super_count = cur_iter.count();
+    let maybe_self = if super_count == 0 {
+        Some(Cow::Borrowed("self"))
+    } else {
+        None
+    }
+    .into_iter();
+    let supers = std::iter::repeat("super".into()).take(super_count);
+    let mods = dst_iter.map(|s| get_keyword_safe_ident(&to_lower_snake_case(s)).into());
+    Ok(
+        Itertools::intersperse(maybe_self.chain(supers).chain(mods), "::".into())
+            .collect::<String>(),
+    )
+}
+
+// e.g. From <root mod>::simple::package::* to <root mod>::traits::package::*
+pub fn relative_path_over_namespaces(
+    cur_package: &str,
+    dst_package: &str,
+    dst_prefix: &str,
+) -> Result<String> {
+    let supers = std::iter::repeat("super::")
+        .take(cur_package.split('.').filter(|p| !p.is_empty()).count() + 1)
+        .collect::<String>();
+    let prefix = get_keyword_safe_ident(&to_lower_snake_case(dst_prefix));
+    let dst_module = dst_package
+        .split('.')
+        .filter(|p| !p.is_empty())
+        .map(|p| format!("::{}", get_keyword_safe_ident(&to_lower_snake_case(p))))
+        .collect::<String>();
+    Ok(format!(
+        "{supers}{prefix}{dst_module}",
+        supers = supers,
+        prefix = prefix,
+        dst_module = dst_module,
+    ))
+}
+
+pub struct GenericParams(Vec<&'static str>);
+impl GenericParams {
+    pub fn push(mut self, lt: &'static str) -> Self {
+        if !self.0.contains(&lt) {
+            if lt.starts_with('\'') {
+                if let Some((insert_pos, _)) =
+                    self.0.iter().find_position(|&&s| !s.starts_with('\''))
+                {
+                    self.0.insert(insert_pos, lt);
+                } else {
+                    self.0.push(lt);
+                }
+            } else {
+                self.0.push(lt);
+            }
+        }
+        self
+    }
+    pub fn remove(self, lt: &'static str) -> Self {
+        Self(self.0.into_iter().filter(move |s| *s != lt).collect())
+    }
+    pub fn replace(self, from: &'static str, to: &'static str) -> Self {
+        Self(
+            self.0
+                .into_iter()
+                .map(move |s| if s == from { to } else { s })
+                .collect(),
+        )
+    }
+}
+impl FromIterator<&'static str> for GenericParams {
+    fn from_iter<T: IntoIterator<Item = &'static str>>(iter: T) -> Self {
+        Self(Vec::from_iter(iter))
+    }
+}
+impl Display for GenericParams {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut iter = self.0.iter();
+        if let Some(first) = iter.next() {
+            f.write_char('<')?;
+            f.write_str(*first)?;
+            for item in iter {
+                f.write_str(", ")?;
+                f.write_str(*item)?;
+            }
+            f.write_char('>')?;
+        }
+        Ok(())
+    }
 }
