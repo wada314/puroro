@@ -14,6 +14,7 @@ pub trait RefTypeToGetterType {
     fn into(self) -> Self::Item;
 }
 
+// TODO: support proto2 enum!
 macro_rules! define_trivial_v2f {
     ($ty:ty) => {
         impl RefTypeToGetterType for &'_ $ty {
