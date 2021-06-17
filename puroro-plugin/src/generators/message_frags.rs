@@ -229,7 +229,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             ImplType::Default => match self.context.alloc_type() {
                 AllocatorType::Default => match field.type_()? {
                     FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                    FieldType::Enum2(_) => "|| 0i32.try_into()".into(),
+                    FieldType::Enum2(e) => format!(
+                        "|| {v}i32.try_into().unwrap()",
+                        v = e.first_value()?.number()
+                    )
+                    .into(),
+                    FieldType::Enum3(_) => "|| 0i32.try_into()".into(),
                     _ => "::std::default::Default::default".into(),
                 },
                 AllocatorType::Bumpalo => match field.type_()? {
@@ -246,7 +251,11 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             .into()
                     }
                     FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                    FieldType::Enum2(_) => "|| 0i32.try_into().unwrap()".into(),
+                    FieldType::Enum2(e) => format!(
+                        "|| {v}i32.try_into().unwrap()",
+                        v = e.first_value()?.number()
+                    )
+                    .into(),
                     FieldType::Enum3(_) => "|| 0i32.try_into()".into(),
                     FieldType::Message(m) => format!(
                         "|| {msg}::new_in(&puroro_internal.bump)",
@@ -313,7 +322,9 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     FieldType::Message(_),
                 ) => {
                     format!(
-                        "self.{ident}.clone_in_bumpalo(&self.puroro_internal.bump)",
+                        "self.{ident}.as_ref().map(\
+                            |v| ::puroro::bumpalo::boxed::Box::new_in(\
+                                (*v).clone(), &self.puroro_internal.bump))",
                         ident = field.native_ident()?
                     )
                 }

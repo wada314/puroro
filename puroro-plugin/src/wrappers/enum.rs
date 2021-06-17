@@ -58,8 +58,13 @@ impl<'c> EnumDescriptor<'c> {
             ))
         })?)
     }
-    pub fn values(&self) -> impl Iterator<Item = &EnumValueDescriptor<'c>> {
+    pub fn values(&'c self) -> impl Iterator<Item = &EnumValueDescriptor<'c>> {
         self.values.iter()
+    }
+    pub fn first_value(&'c self) -> Result<&EnumValueDescriptor<'c>> {
+        Ok(self.values().next().ok_or(ErrorKind::EmptyEnum {
+            name: self.fully_qualified_name()?.to_string(),
+        })?)
     }
 
     /// Returns a Rust identifier which can be used for enum definition:

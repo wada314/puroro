@@ -49,7 +49,6 @@ where
             L,
             Item = <V as variant::VariantTypeTag>::NativeType,
         >,
-    <V as variant::VariantTypeTag>::NativeType: super::Default,
 {
     fn merge(
         &'a mut self,
@@ -62,7 +61,7 @@ where
         <T as FieldMergeFromIter<(tags::wire::Variant, V), L>>::merge(
             self,
             iter_field.as_mut(),
-            super::Default::default,
+            || unimplemented!(),
         )?;
         Ok(())
     }

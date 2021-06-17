@@ -265,7 +265,6 @@ impl{gp} {ident}{gpb}
                 "\
 impl{gp} ::std::clone::Clone for {ident}{gpb} {{
     fn clone(&self) -> Self {{
-        use ::puroro_internal::FieldClone;
         use ::puroro::InternalData;
         Self {{\n",
                 ident = self.msg.native_ident()?,
