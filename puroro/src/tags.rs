@@ -1,10 +1,18 @@
 use std::marker::PhantomData;
 
 pub trait ValueTypeTag {}
-pub trait VariantTypeTag: ValueTypeTag {}
-pub trait LengthDelimitedTypeTag: ValueTypeTag {}
-pub trait Bits32TypeTag: ValueTypeTag {}
-pub trait Bits64TypeTag: ValueTypeTag {}
+pub trait VariantTypeTag: ValueTypeTag {
+    type NativeType;
+}
+pub trait LengthDelimitedTypeTag: ValueTypeTag {
+    // For this type, NativeType is not trivial so we do not define it at here.
+}
+pub trait Bits32TypeTag: ValueTypeTag {
+    type NativeType;
+}
+pub trait Bits64TypeTag: ValueTypeTag {
+    type NativeType;
+}
 pub trait WireTypeTag {}
 pub trait WireAndValueTypeTag {}
 pub trait FieldLabelTag {}
@@ -94,27 +102,57 @@ impl ValueTypeTag for value::Fixed64 {}
 impl ValueTypeTag for value::SFixed32 {}
 impl ValueTypeTag for value::SFixed64 {}
 
-impl VariantTypeTag for value::Int32 {}
-impl VariantTypeTag for value::Int64 {}
-impl VariantTypeTag for value::UInt32 {}
-impl VariantTypeTag for value::UInt64 {}
-impl VariantTypeTag for value::SInt32 {}
-impl VariantTypeTag for value::SInt64 {}
-impl VariantTypeTag for value::Bool {}
-impl<T> VariantTypeTag for value::Enum2<T> {}
-impl<T> VariantTypeTag for value::Enum3<T> {}
+impl VariantTypeTag for value::Int32 {
+    type NativeType = i32;
+}
+impl VariantTypeTag for value::Int64 {
+    type NativeType = i64;
+}
+impl VariantTypeTag for value::UInt32 {
+    type NativeType = u32;
+}
+impl VariantTypeTag for value::UInt64 {
+    type NativeType = u64;
+}
+impl VariantTypeTag for value::SInt32 {
+    type NativeType = i32;
+}
+impl VariantTypeTag for value::SInt64 {
+    type NativeType = i64;
+}
+impl VariantTypeTag for value::Bool {
+    type NativeType = bool;
+}
+impl<T> VariantTypeTag for value::Enum2<T> {
+    type NativeType = T;
+}
+impl<T> VariantTypeTag for value::Enum3<T> {
+    type NativeType = Result<T, i32>;
+}
 
 impl LengthDelimitedTypeTag for value::String {}
 impl LengthDelimitedTypeTag for value::Bytes {}
 impl<T> LengthDelimitedTypeTag for value::Message<T> {}
 
-impl Bits32TypeTag for value::Fixed32 {}
-impl Bits32TypeTag for value::SFixed32 {}
-impl Bits32TypeTag for value::Float {}
+impl Bits32TypeTag for value::Fixed32 {
+    type NativeType = u32;
+}
+impl Bits32TypeTag for value::SFixed32 {
+    type NativeType = i32;
+}
+impl Bits32TypeTag for value::Float {
+    type NativeType = f32;
+}
 
-impl Bits64TypeTag for value::Fixed64 {}
-impl Bits64TypeTag for value::SFixed64 {}
-impl Bits64TypeTag for value::Double {}
+impl Bits64TypeTag for value::Fixed64 {
+    type NativeType = u64;
+}
+impl Bits64TypeTag for value::SFixed64 {
+    type NativeType = i64;
+}
+impl Bits64TypeTag for value::Double {
+    type NativeType = f64;
+}
 
 impl WireTypeTag for wire::Variant {}
 impl WireTypeTag for wire::LengthDelimited {}
