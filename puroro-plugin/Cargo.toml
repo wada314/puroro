@@ -7,8 +7,8 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-puroro = { git = "ssh://git@github.com/wada314/puroro", rev = "ef0ec1" }
-puroro-internal = { git = "ssh://git@github.com/wada314/puroro", rev = "ef0ec1" }
+puroro = { git = "ssh://git@github.com/wada314/puroro", rev = "d29da0c" }
+puroro-internal = { git = "ssh://git@github.com/wada314/puroro", rev = "d29da0c" }
 num-derive = "0.3.3"
 num-traits = "0.2.14"
 itertools = "0.10.0"

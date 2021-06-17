@@ -100,12 +100,7 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
                 .clone()
                 .map(|p| {
                     format!(
-                        "{maybe_cfg}pub mod {name};\n",
-                        maybe_cfg = if p == "bumpalo" {
-                            r#"#[cfg(feature = "puroro-bumpalo")]\n"#
-                        } else {
-                            ""
-                        },
+                        "pub mod {name};\n",
                         name = get_keyword_safe_ident(&to_lower_snake_case(p))
                     )
                 })
@@ -121,7 +116,17 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
     let root_file_name = package_to_file_path("", "");
     let prefix_mods = prefixes
         .iter()
-        .map(|p| format!("pub mod {};\n", p))
+        .map(|p| {
+            format!(
+                "{maybe_cfg}pub mod {name};\n",
+                maybe_cfg = if *p == "bumpalo" {
+                    "#[cfg(feature = \"puroro-bumpalo\")]\n"
+                } else {
+                    ""
+                },
+                name = p
+            )
+        })
         .collect::<String>();
     filenames_and_contents.insert(root_file_name, prefix_mods);
 

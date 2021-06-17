@@ -10,8 +10,8 @@ mod protos;
 mod utils;
 mod wrappers;
 
-use ::puroro::DeserializableFromIter;
 use ::puroro::Serializable;
+use ::puroro_internal::deser::MergeableMessageFromIter;
 use context::Context;
 
 use error::{ErrorKind, GeneratorError};
@@ -20,14 +20,14 @@ type Result<T> = std::result::Result<T, GeneratorError>;
 use std::io::Read;
 use std::io::{stdin, stdout};
 
-pub use protos::google;
-use protos::google::protobuf::compiler::{
+pub use protos::simple::google;
+use protos::simple::google::protobuf::compiler::{
     code_generator_response, CodeGeneratorRequest, CodeGeneratorResponse,
 };
 
 fn main() -> Result<()> {
     let mut cgreq = CodeGeneratorRequest::default();
-    cgreq.deser_from_iter(&mut stdin().bytes()).unwrap();
+    cgreq.merge_from_iter(&mut stdin().bytes()).unwrap();
     let context = Context::new(
         &cgreq,
         context::ImplType::Default,
