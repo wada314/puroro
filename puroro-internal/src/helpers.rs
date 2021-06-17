@@ -1,4 +1,3 @@
-pub mod field_clone;
 pub mod field_merge_from_iter;
 pub mod field_merge_from_slice;
 pub mod field_new;
@@ -11,14 +10,15 @@ use std::borrow::Borrow;
 
 use std::convert::TryFrom;
 
-pub use field_clone::FieldClone;
 pub use field_merge_from_iter::FieldMergeFromIter;
 pub use field_merge_from_slice::FieldMergeFromSlice;
 pub use field_new::FieldNew;
 pub use field_ser::FieldSer;
 pub use field_take_or_init::FieldTakeOrInit;
 pub use field_wrappers::{BytesType, StringType, VecType, WrappedFieldType};
-pub use msg_field_wrappers::{MapEntryWrapper, MapType, RepeatedMessageType, WrappedMessageFieldType};
+pub use msg_field_wrappers::{
+    MapEntryWrapper, MapType, RepeatedMessageType, WrappedMessageFieldType,
+};
 pub use repeated_slice_view::RepeatedSliceViewField;
 
 use crate::ser::MessageSerializer;

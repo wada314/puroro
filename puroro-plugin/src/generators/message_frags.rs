@@ -246,7 +246,8 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                             .into()
                     }
                     FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                    FieldType::Enum2(_) => "|| 0i32.try_into()".into(),
+                    FieldType::Enum2(_) => "|| 0i32.try_into().unwrap()".into(),
+                    FieldType::Enum3(_) => "|| 0i32.try_into()".into(),
                     FieldType::Message(m) => format!(
                         "|| {msg}::new_in(&puroro_internal.bump)",
                         msg = self.type_name_of_msg(m, None)?,
@@ -303,20 +304,28 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
-    pub fn field_clone(&self, field_ident: &str, field_type: &str) -> String {
-        match self.context.alloc_type() {
-            AllocatorType::Default => format!(
-                "<{field_type} as FieldClone>::clone(&self.{field_ident})",
-                field_ident = field_ident,
-                field_type = field_type
-            ),
-            AllocatorType::Bumpalo => format!(
-                "<{field_type} as FieldClone>::clone_in_bumpalo(\
-                    &self.{field_ident}, &self.puroro_internal.bump)",
-                field_ident = field_ident,
-                field_type = field_type
-            ),
-        }
+    pub fn field_clone(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {
+        Ok(
+            match (self.context.alloc_type(), field.label()?, field.type_()?) {
+                (
+                    AllocatorType::Bumpalo,
+                    FieldLabel::Optional2 | FieldLabel::Optional3,
+                    FieldType::Message(_),
+                ) => {
+                    format!(
+                        "self.{ident}.clone_in_bumpalo(&self.puroro_internal.bump)",
+                        ident = field.native_ident()?
+                    )
+                }
+                _ => {
+                    format!(
+                        "<{field_type} as Clone>::clone(&self.{ident})",
+                        field_type = self.field_type_name(field)?,
+                        ident = field.native_ident()?
+                    )
+                }
+            },
+        )
     }
 
     pub fn field_take_or_init(&self, field: &'c FieldDescriptor<'c>) -> Result<String> {

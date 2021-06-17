@@ -281,10 +281,7 @@ impl{gp} ::std::clone::Clone for {ident}{gpb} {{
                     Ok(format!(
                         "{ident}: {clone},\n",
                         ident = field.native_ident()?,
-                        clone = self.frag_gen.field_clone(
-                            field.native_ident()?,
-                            &self.frag_gen.field_type_name(field)?
-                        ),
+                        clone = self.frag_gen.field_clone(field)?,
                     ))
                 })),
             ),
