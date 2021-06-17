@@ -188,11 +188,11 @@ impl<'c> MessageGeneratingVisitor<'c> {
                 .map(|s| format!(".{}", s))
                 .collect::<String>()
         );
-        (format!(
+        self.output.write_fmt(format_args!(
             "pub use {path}::*;\n\n",
             path = relative_path_over_namespaces(&cur_package, &cur_package, "enums")?
-        ),)
-            .write_into(&mut self.output)
+        ))?;
+        Ok(())
     }
 }
 impl<'c> DescriptorVisitor<'c> for MessageGeneratingVisitor<'c> {
