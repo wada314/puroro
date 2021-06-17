@@ -33,6 +33,8 @@ pub enum ErrorKind {
     BoolParseError,
     #[error("Found a packed repeated field, but its length was zero.")]
     ZeroLengthPackedField,
+    #[error("Unknown enum variant.")]
+    UnknownEnumVariant(i32),
     #[error("The bytestream iterator returned an error: {0}")]
     IteratorError(#[from] std::io::Error),
     #[error("The formatter returned an error: {0}")]

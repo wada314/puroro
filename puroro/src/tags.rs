@@ -23,7 +23,8 @@ pub mod value {
     pub struct Bool;
     pub struct Bytes;
     pub struct String;
-    pub struct Enum<T>(PhantomData<T>);
+    pub struct Enum2<T>(PhantomData<T>);
+    pub struct Enum3<T>(PhantomData<T>);
     pub struct Message<T>(PhantomData<T>);
     pub struct Float;
     pub struct Double;
@@ -47,7 +48,8 @@ pub type Int64 = (wire::Variant, value::Int64);
 pub type SInt64 = (wire::Variant, value::SInt64);
 pub type UInt64 = (wire::Variant, value::UInt64);
 pub type Bool = (wire::Variant, value::Bool);
-pub type Enum<T> = (wire::Variant, value::Enum<T>);
+pub type Enum2<T> = (wire::Variant, value::Enum2<T>);
+pub type Enum3<T> = (wire::Variant, value::Enum3<T>);
 pub type String = (wire::LengthDelimited, value::String);
 pub type Bytes = (wire::LengthDelimited, value::Bytes);
 pub type Message<T> = (wire::LengthDelimited, value::Message<T>);
@@ -82,7 +84,8 @@ impl ValueTypeTag for value::SInt64 {}
 impl ValueTypeTag for value::Bool {}
 impl ValueTypeTag for value::Bytes {}
 impl ValueTypeTag for value::String {}
-impl<T> ValueTypeTag for value::Enum<T> {}
+impl<T> ValueTypeTag for value::Enum2<T> {}
+impl<T> ValueTypeTag for value::Enum3<T> {}
 impl<T> ValueTypeTag for value::Message<T> {}
 impl ValueTypeTag for value::Float {}
 impl ValueTypeTag for value::Double {}
@@ -98,7 +101,8 @@ impl VariantTypeTag for value::UInt64 {}
 impl VariantTypeTag for value::SInt32 {}
 impl VariantTypeTag for value::SInt64 {}
 impl VariantTypeTag for value::Bool {}
-impl<T> VariantTypeTag for value::Enum<T> {}
+impl<T> VariantTypeTag for value::Enum2<T> {}
+impl<T> VariantTypeTag for value::Enum3<T> {}
 
 impl LengthDelimitedTypeTag for value::String {}
 impl LengthDelimitedTypeTag for value::Bytes {}

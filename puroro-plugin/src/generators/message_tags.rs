@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::writer::{func, indent, iter, IntoFragment};
+use super::writer::IntoFragment;
 use crate::utils::{relative_path_over_namespaces, Indentor};
 use crate::wrappers::MessageDescriptor;
 use crate::Result;

@@ -188,7 +188,21 @@ impl VariantTypeTag for tags::value::Bool {
         Ok(Variant::new(u64::to_le_bytes(if val { 1 } else { 0 })))
     }
 }
-impl<T> VariantTypeTag for tags::value::Enum<T>
+impl<T> VariantTypeTag for tags::value::Enum2<T>
+where
+    T: TryFrom<i32, Error = i32> + Into<i32> + Clone,
+{
+    type NativeType = T;
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
+        Ok(T::try_from(i32::try_from(i64::from_le_bytes(var.0))?)
+            .map_err(|i| ErrorKind::UnknownEnumVariant(i))?)
+    }
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+        let int_val = T::into(val);
+        Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))
+    }
+}
+impl<T> VariantTypeTag for tags::value::Enum3<T>
 where
     T: TryFrom<i32, Error = i32> + Into<i32> + Clone,
 {
