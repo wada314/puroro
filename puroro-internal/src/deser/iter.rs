@@ -30,7 +30,7 @@ where
 {
     iter: I,
     index: usize,
-    end: usize,
+    end: Option<usize>,
 }
 
 impl<I> LdIter<I>
@@ -41,12 +41,12 @@ where
         Self {
             iter,
             index: 0,
-            end: usize::MAX,
+            end: None,
         }
     }
 
-    pub fn len(&self) -> usize {
-        self.end - self.index
+    pub fn len(&self) -> Option<usize> {
+        self.end.clone().map(|e| e - self.index)
     }
 
     fn try_get_wire_type_and_field_number(&mut self) -> Result<Option<(WireType, usize)>> {
@@ -83,7 +83,7 @@ where
                 }
                 WireType::LengthDelimited => {
                     let field_length = Variant::decode_bytes(self)?.to_usize()?;
-                    self.end = self.index + field_length;
+                    self.end = Some(self.index + field_length);
                     FieldData::LengthDelimited(self.by_ref())
                 }
                 WireType::Bits32 => FieldData::Bits32(self.next_bytes::<4>()?),
@@ -118,7 +118,7 @@ where
 {
     type Item = std::io::Result<u8>;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index >= self.end {
+        if self.index >= self.end.unwrap_or(usize::MAX) {
             None
         } else {
             let result = self.iter.next();

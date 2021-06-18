@@ -74,14 +74,16 @@ where
         F: Fn() -> Self::Item,
     {
         if let FieldData::LengthDelimited(ld_iter) = field {
-            let expected_len = <LdIter<I>>::len(ld_iter);
+            let maybe_expected_len = <LdIter<I>>::len(ld_iter);
             let mut iter = ld_iter.chars().peekable();
             if !L::DO_DEFAULT_CHECK || matches!(iter.peek(), Some(_)) {
                 // Do not invoke get_or_insert_with until we make sure
                 // that the input value is not empty
                 let item = self.get_or_insert_with(f);
                 item.clear();
-                item.reserve(expected_len);
+                if let Some(expected_len) = maybe_expected_len {
+                    item.reserve(expected_len);
+                }
                 for rv in iter {
                     item.push(rv?);
                 }
@@ -106,14 +108,16 @@ where
         F: Fn() -> Self::Item,
     {
         if let FieldData::LengthDelimited(ld_iter) = field {
-            let expected_len = <LdIter<I>>::len(ld_iter);
+            let maybe_expected_len = <LdIter<I>>::len(ld_iter);
             let mut iter = ld_iter.bytes().peekable();
             if !L::DO_DEFAULT_CHECK || matches!(iter.peek(), Some(_)) {
                 // Do not invoke get_or_insert_with until we make sure
                 // that the input value is not empty
                 let item = self.get_or_insert_with(f);
                 item.clear();
-                item.reserve(expected_len);
+                if let Some(expected_len) = maybe_expected_len {
+                    item.reserve(expected_len);
+                }
                 for rv in iter {
                     item.push(rv?);
                 }
