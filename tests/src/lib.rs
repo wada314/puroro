@@ -116,8 +116,7 @@ mod tests {
     #[test]
     fn test1() {
         let slice = [0x08, 0x96, 0x01];
-        let mut test1_simple = sample_pb::simple::sample2::Test1::new();
-        <sample_pb::simple::sample2::Test1 as ::puroro::DeserializableFromSlice>::deser_from_slice(
+        let test1_simple = <sample_pb::simple::sample2::Test1 as ::puroro::DeserializableFromSlice>::deser_from_slice(
             &slice,
         )
         .unwrap();
