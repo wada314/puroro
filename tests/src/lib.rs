@@ -146,4 +146,49 @@ mod tests {
             sample_pb::slice_view::sample2::Test2::<_>::try_from(&slice as &[u8]).unwrap();
         assert_eq!(Some("testing"), test2_slice_view.b().as_deref());
     }
+
+    #[test]
+    fn test3() {
+        use sample_pb::traits::sample2::{Test1Trait, Test3Trait};
+        use std::convert::TryFrom;
+        let slice = [0x1a, 0x03, 0x08, 0x96, 0x01];
+
+        let test3_simple = <sample_pb::simple::sample2::Test3 as ::puroro::DeserializableFromSlice>::deser_from_slice(
+            &slice,
+        )
+        .unwrap();
+        assert!(test3_simple.c().is_some());
+        let test1_simple = test3_simple.c().unwrap();
+        assert_eq!(Some(150), test1_simple.a());
+
+        let test3_slice_view =
+            sample_pb::slice_view::sample2::Test3::<_>::try_from(&slice as &[u8]).unwrap();
+        assert!(test3_slice_view.c().is_some());
+        let test1_slice_view = test3_slice_view.c().unwrap();
+        assert_eq!(Some(150), test1_slice_view.a());
+    }
+
+    #[test]
+    fn test4() {
+        use ::puroro::RepeatedField;
+        use sample_pb::traits::sample2::Test4Trait;
+        use std::convert::TryFrom;
+        let slice = [0x22, 0x06, 0x03, 0x8E, 0x02, 0x9E, 0xA7, 0x05];
+
+        let test1_simple = <sample_pb::simple::sample2::Test4 as ::puroro::DeserializableFromSlice>::deser_from_slice(
+            &slice,
+        )
+        .unwrap();
+        assert_eq!(
+            test1_simple.d().iter().collect::<Vec<_>>(),
+            vec![3, 270, 86942]
+        );
+
+        let test1_slice_view =
+            sample_pb::slice_view::sample2::Test4::<_>::try_from(&slice as &[u8]).unwrap();
+        assert_eq!(
+            test1_slice_view.d().iter().collect::<Vec<_>>(),
+            vec![3, 270, 86942]
+        );
+    }
 }
