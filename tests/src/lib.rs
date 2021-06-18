@@ -175,19 +175,19 @@ mod tests {
         use std::convert::TryFrom;
         let slice = [0x22, 0x06, 0x03, 0x8E, 0x02, 0x9E, 0xA7, 0x05];
 
-        let test1_simple = <sample_pb::simple::sample2::Test4 as ::puroro::DeserializableFromSlice>::deser_from_slice(
+        let test4_simple = <sample_pb::simple::sample2::Test4 as ::puroro::DeserializableFromSlice>::deser_from_slice(
             &slice,
         )
         .unwrap();
         assert_eq!(
-            test1_simple.d().iter().collect::<Vec<_>>(),
+            test4_simple.d().iter().collect::<Vec<_>>(),
             vec![3, 270, 86942]
         );
 
-        let test1_slice_view =
+        let test4_slice_view =
             sample_pb::slice_view::sample2::Test4::<_>::try_from(&slice as &[u8]).unwrap();
         assert_eq!(
-            test1_slice_view.d().iter().collect::<Vec<_>>(),
+            test4_slice_view.d().iter().collect::<Vec<_>>(),
             vec![3, 270, 86942]
         );
     }
