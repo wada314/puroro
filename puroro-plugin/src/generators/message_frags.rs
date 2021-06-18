@@ -121,6 +121,10 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         })
     }
 
+    pub fn field_type_name2(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
+        todo!()
+    }
+
     pub fn field_type_name(&self, field: &'c FieldDescriptor<'c>) -> Result<Cow<'c, str>> {
         let scalar_type = self.field_scalar_item_type(field)?;
         Ok(match self.context.impl_type() {

@@ -136,7 +136,7 @@ impl<'c> FieldDescriptor<'c> {
         })
     }
 
-    pub fn label_tag(&'c self) -> Result<&'static str> {
+    pub fn label_tag_ident(&'c self) -> Result<&'static str> {
         Ok(match self.label()? {
             FieldLabel::Optional2 => "Optional2",
             FieldLabel::Optional3 => "Optional3",
