@@ -8,7 +8,6 @@ mod writer;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::generators::writer::IntoFragment;
 use crate::utils::{
     get_keyword_safe_ident, relative_path_over_namespaces, to_lower_snake_case, Indentor,
 };

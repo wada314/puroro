@@ -4,7 +4,7 @@ use super::message_traits::MessageTraitCodeGenerator;
 use super::writer::{func, indent, indent_n, iter, seq, IntoFragment};
 use crate::context::{AllocatorType, Context, ImplType};
 use crate::generators::message_traits::{AssociatedType, FieldLabelType};
-use crate::utils::{relative_path_over_namespaces, Indentor};
+use crate::utils::Indentor;
 use crate::wrappers::{FieldLabel, FieldType, MessageDescriptor};
 use crate::Result;
 

@@ -115,11 +115,35 @@ mod tests {
 
     #[test]
     fn test1() {
+        use sample_pb::traits::sample2::Test1Trait;
+        use std::convert::TryFrom;
         let slice = [0x08, 0x96, 0x01];
+
         let test1_simple = <sample_pb::simple::sample2::Test1 as ::puroro::DeserializableFromSlice>::deser_from_slice(
             &slice,
         )
         .unwrap();
-        assert_eq!(Some(150), test1_simple.a);
+        assert_eq!(Some(150), test1_simple.a());
+
+        let test1_slice_view =
+            sample_pb::slice_view::sample2::Test1::<_>::try_from(&slice as &[u8]).unwrap();
+        assert_eq!(Some(150), test1_slice_view.a());
+    }
+
+    #[test]
+    fn test2() {
+        use sample_pb::traits::sample2::Test2Trait;
+        use std::convert::TryFrom;
+        let slice = [0x12, 0x07, 0x74, 0x65, 0x73, 0x74, 0x69, 0x6e, 0x67];
+
+        let test2_simple = <sample_pb::simple::sample2::Test2 as ::puroro::DeserializableFromSlice>::deser_from_slice(
+            &slice,
+        )
+        .unwrap();
+        assert_eq!(Some("testing"), test2_simple.b().as_deref());
+
+        let test2_slice_view =
+            sample_pb::slice_view::sample2::Test2::<_>::try_from(&slice as &[u8]).unwrap();
+        assert_eq!(Some("testing"), test2_slice_view.b().as_deref());
     }
 }
