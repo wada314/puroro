@@ -49,6 +49,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
                 func(|output| self.print_impl_trait(output)),
                 func(|output| self.print_impl_message(output)),
                 func(|output| self.print_impl_is_message_impl_of_tag(output)),
+                func(|output| self.print_impl_get_impl_for(output)),
                 func(|output| self.print_impl_map_entry(output)),
                 func(|output| self.print_impl_field_new(output)),
             ),
@@ -865,6 +866,37 @@ impl{gp} ::puroro::Message for {struct_ident}{gpb} {{
 }}
 \n",
         )
+            .write_into(output)
+    }
+
+    fn print_impl_get_impl_for<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+        let getter_trait_path = match (self.context.impl_type(), self.context.alloc_type()) {
+            (ImplType::Default, AllocatorType::Default) => {
+                "::puroro_internal::GetSimpleStructImplFor"
+            }
+            (ImplType::Default, AllocatorType::Bumpalo) => {
+                "::puroro_internal::GetBumpaloStructImplFor<'bump>"
+            }
+            (ImplType::SliceView, AllocatorType::Default) => {
+                "::puroro_internal::GetSliceViewStructImplFor<'slice>"
+            }
+            (ImplType::SliceView, AllocatorType::Bumpalo) => unreachable!(),
+        };
+        (format!(
+            "\
+impl{gp} {trait_path} for {tag_path} {{
+    type Type = {struct_ident}{gpb};
+}}
+\n",
+            struct_ident = self.msg.native_ident()?,
+            tag_path = self.tags_gen.tag_path_from_struct(self.msg.package()?)?,
+            trait_path = getter_trait_path,
+            gp = self.frag_gen.struct_generic_params_bounds().remove("S"),
+            gpb = self
+                .frag_gen
+                .struct_generic_params()
+                .replace("S", "&'slice [u8]"),
+        ),)
             .write_into(output)
     }
 
