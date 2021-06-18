@@ -28,7 +28,7 @@ fn main() {
 
     let protoc_exe = env::var("PURORO_PROTOC_PATH").unwrap_or("protoc".to_string());
     let protoc_status = Command::new(&protoc_exe)
-        .arg("sample.proto")
+        .arg("sample2.proto")
         .arg(format!(
             "--plugin=protoc-gen-rust={}",
             plugin_exe_path.to_str().unwrap()

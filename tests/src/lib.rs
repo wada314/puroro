@@ -9,6 +9,8 @@
 use ::puroro::apply::FieldVisitor;
 use ::puroro::tags;
 
+use ::sample_pb;
+
 pub struct Msg {
     pub the_map: ::std::vec::Vec<self::TheMapEntry>,
     puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
@@ -109,5 +111,16 @@ mod tests {
     #[test]
     fn it_works() {
         assert_eq!(2 + 2, 4);
+    }
+
+    #[test]
+    fn test1() {
+        let slice = [0x08, 0x96, 0x01];
+        let mut test1_simple = sample_pb::simple::sample2::Test1::new();
+        <sample_pb::simple::sample2::Test1 as ::puroro::DeserializableFromSlice>::deser_from_slice(
+            &slice,
+        )
+        .unwrap();
+        assert_eq!(Some(150), test1_simple.a);
     }
 }

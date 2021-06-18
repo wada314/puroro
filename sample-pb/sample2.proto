@@ -1,5 +1,5 @@
-syntax = "proto3";
-package hoge;
+syntax = "proto2";
+package sample2;
 
 message Msg {
     //int64 ival = 1;
@@ -19,4 +19,20 @@ message Msg {
     //repeated SubMsg rsubmsg = 6;
     //SubMsg.SubSubMsg subsubmsg = 7;
     map<string, SubMsg> the_map = 8;
+}
+
+message Test1 {
+  optional int32 a = 1;
+}
+
+message Test2 {
+  optional string b = 2;
+}
+
+message Test3 {
+  optional Test1 c = 3;
+}
+
+message Test4 {
+  repeated int32 d = 4 [packed=true];
 }
