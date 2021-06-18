@@ -117,6 +117,28 @@ where
     >>::Type;
 }
 
+// Bumpalo, all labels, fixed32 / 64 types
+impl<'bump, L, V> FieldTypeGen<(L, (tags::wire::Bits32, V))> for tags::Bumpalo<'bump>
+where
+    V: tags::Bits32TypeTag,
+    <V as tags::Bits32TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::Bumpalo<'bump>>,
+{
+    type Type = <<V as tags::Bits32TypeTag>::NativeType as TypicalWrapperTypeFor<
+        L,
+        tags::Bumpalo<'bump>,
+    >>::Type;
+}
+impl<'bump, L, V> FieldTypeGen<(L, (tags::wire::Bits64, V))> for tags::Bumpalo<'bump>
+where
+    V: tags::Bits64TypeTag,
+    <V as tags::Bits64TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::Bumpalo<'bump>>,
+{
+    type Type = <<V as tags::Bits64TypeTag>::NativeType as TypicalWrapperTypeFor<
+        L,
+        tags::Bumpalo<'bump>,
+    >>::Type;
+}
+
 // Bumpalo, each labels, message types
 impl<'bump, M> FieldTypeGen<(tags::Required, tags::Message<M>)> for tags::Bumpalo<'bump>
 where
@@ -149,27 +171,46 @@ where
     type Type = bumpalo::collections::Vec<'bump, <M as GetBumpaloStructImplFor<'bump>>::Type>;
 }
 
-// SliceView, each labels, message types
-impl<'slice, M> FieldTypeGen<(tags::Required, tags::Message<M>)> for tags::SliceView<'slice>
+// SliceView, all labels, variant types
+impl<'slice, L, V> FieldTypeGen<(L, (tags::wire::Variant, V))> for tags::SliceView<'slice>
 where
-    M: GetSliceViewStructImplFor<'slice>,
-    <M as GetSliceViewStructImplFor<'slice>>::Type: ::puroro::Message,
+    V: tags::VariantTypeTag,
+    <V as tags::VariantTypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SliceView<'slice>>,
+{
+    type Type = <<V as tags::VariantTypeTag>::NativeType as TypicalWrapperTypeFor<
+        L,
+        tags::SliceView<'slice>,
+    >>::Type;
+}
+
+// SliceView, all labels, String / bytes / message types
+impl<'slice, L, V> FieldTypeGen<(L, (tags::wire::LengthDelimited, V))> for tags::SliceView<'slice>
+where
+    V: tags::LengthDelimitedTypeTag,
 {
     type Type = crate::SliceViewField<'slice>;
 }
-impl<'slice, M> FieldTypeGen<(tags::Optional2, tags::Message<M>)> for tags::SliceView<'slice>
+
+// SliceView, all labels, fixed32 / 64 types
+impl<'slice, L, V> FieldTypeGen<(L, (tags::wire::Bits32, V))> for tags::SliceView<'slice>
 where
-    M: GetSliceViewStructImplFor<'slice>,
-    <M as GetSliceViewStructImplFor<'slice>>::Type: ::puroro::Message,
+    V: tags::Bits32TypeTag,
+    <V as tags::Bits32TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SliceView<'slice>>,
 {
-    type Type = crate::SliceViewField<'slice>;
+    type Type = <<V as tags::Bits32TypeTag>::NativeType as TypicalWrapperTypeFor<
+        L,
+        tags::SliceView<'slice>,
+    >>::Type;
 }
-impl<'slice, M> FieldTypeGen<(tags::Optional3, tags::Message<M>)> for tags::SliceView<'slice>
+impl<'slice, L, V> FieldTypeGen<(L, (tags::wire::Bits64, V))> for tags::SliceView<'slice>
 where
-    M: GetSliceViewStructImplFor<'slice>,
-    <M as GetSliceViewStructImplFor<'slice>>::Type: ::puroro::Message,
+    V: tags::Bits64TypeTag,
+    <V as tags::Bits64TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SliceView<'slice>>,
 {
-    type Type = crate::SliceViewField<'slice>;
+    type Type = <<V as tags::Bits64TypeTag>::NativeType as TypicalWrapperTypeFor<
+        L,
+        tags::SliceView<'slice>,
+    >>::Type;
 }
 
 // A helper trait for simplifying the code.
@@ -212,4 +253,7 @@ impl<'slice, T> TypicalWrapperTypeFor<tags::Optional2, tags::SliceView<'slice>> 
 }
 impl<'slice, T> TypicalWrapperTypeFor<tags::Optional3, tags::SliceView<'slice>> for T {
     type Type = T;
+}
+impl<'slice, T> TypicalWrapperTypeFor<tags::Repeated, tags::SliceView<'slice>> for T {
+    type Type = crate::SliceViewField<'slice>;
 }
