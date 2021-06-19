@@ -27,7 +27,7 @@ impl<'c> MessageTraitCodeGenerator<'c> {
             format!(
                 "\
 pub trait {trait_ident}: ::std::clone::Clone {{\n",
-                trait_ident = self.trait_ident(self.msg)?,
+                trait_ident = self.msg.native_trait_ident()?,
             ),
             indent((iter(self.msg.fields().map(|field| -> Result<String> {
                 let getter_methods = self.generate_getter_method_decls(field)?;
@@ -181,10 +181,6 @@ type {ident}{gp}: {bound}
         })
     }
 
-    pub fn trait_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'static, str>> {
-        Ok(format!("{}Trait", msg.native_ident()?).into())
-    }
-
     pub fn trait_path_from_trait(
         &self,
         msg: &'c MessageDescriptor<'c>,
@@ -193,7 +189,7 @@ type {ident}{gp}: {bound}
         Ok(format!(
             "{module}::{ident}",
             module = relative_path(cur_package, msg.package()?)?,
-            ident = self.trait_ident(msg)?,
+            ident = msg.native_trait_ident()?,
         )
         .into())
     }
@@ -202,7 +198,7 @@ type {ident}{gp}: {bound}
         Ok(format!(
             "{module}::{ident}",
             module = relative_path_over_namespaces(self.msg.package()?, "traits")?,
-            ident = self.trait_ident(self.msg)?,
+            ident = self.msg.native_trait_ident()?,
         )
         .into())
     }

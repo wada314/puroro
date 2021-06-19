@@ -15,29 +15,27 @@ impl<'c> MessageTagCodeGenerator<'c> {
     }
 
     pub fn print_msg_tag<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
-        let ident = format!("{}Tag", self.msg.native_ident()?);
         (
-            format!("pub struct {ident}();\n\n", ident = ident),
+            format!(
+                "pub struct {ident}();\n\n",
+                ident = self.msg.native_tag_ident()?
+            ),
             format!(
                 "\
 impl ::puroro::MessageTag for {ident} {{
 }}
 \n",
-                ident = ident,
+                ident = self.msg.native_tag_ident()?,
             ),
         )
             .write_into(output)
-    }
-
-    pub fn tag_ident(&self, msg: &'c MessageDescriptor<'c>) -> Result<Cow<'static, str>> {
-        Ok(format!("{}Tag", msg.native_ident()?).into())
     }
 
     pub fn tag_path_from_struct(&self, cur_package: &str) -> Result<Cow<'static, str>> {
         Ok(format!(
             "{module}::{ident}",
             module = relative_path_over_namespaces(self.msg.package()?, "tags")?,
-            ident = self.tag_ident(self.msg)?,
+            ident = self.msg.native_tag_ident()?,
         )
         .into())
     }
