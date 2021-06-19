@@ -164,14 +164,7 @@ pub fn relative_path(cur_package: &str, dst_package: &str) -> Result<String> {
 }
 
 // e.g. From <root mod>::simple::package::* to <root mod>::traits::package::*
-pub fn relative_path_over_namespaces(
-    cur_package: &str,
-    dst_package: &str,
-    dst_prefix: &str,
-) -> Result<String> {
-    let supers = std::iter::repeat("super::")
-        .take(cur_package.split('.').filter(|p| !p.is_empty()).count() + 1)
-        .collect::<String>();
+pub fn relative_path_over_namespaces(dst_package: &str, dst_prefix: &str) -> Result<String> {
     let prefix = get_keyword_safe_ident(&to_lower_snake_case(dst_prefix));
     let dst_module = dst_package
         .split('.')
@@ -179,8 +172,7 @@ pub fn relative_path_over_namespaces(
         .map(|p| format!("::{}", get_keyword_safe_ident(&to_lower_snake_case(p))))
         .collect::<String>();
     Ok(format!(
-        "{supers}{prefix}{dst_module}",
-        supers = supers,
+        "puroro_root::{prefix}{dst_module}",
         prefix = prefix,
         dst_module = dst_module,
     ))

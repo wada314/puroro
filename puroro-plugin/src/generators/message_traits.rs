@@ -201,7 +201,7 @@ type {ident}{gp}: {bound}
     pub fn trait_path_from_struct(&self, cur_package: &str) -> Result<Cow<'static, str>> {
         Ok(format!(
             "{module}::{ident}",
-            module = relative_path_over_namespaces(cur_package, self.msg.package()?, "traits")?,
+            module = relative_path_over_namespaces(self.msg.package()?, "traits")?,
             ident = self.trait_ident(self.msg)?,
         )
         .into())

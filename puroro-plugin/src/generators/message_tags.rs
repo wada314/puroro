@@ -36,7 +36,7 @@ impl ::puroro::MessageTag for {ident} {{
     pub fn tag_path_from_struct(&self, cur_package: &str) -> Result<Cow<'static, str>> {
         Ok(format!(
             "{module}::{ident}",
-            module = relative_path_over_namespaces(cur_package, self.msg.package()?, "tags")?,
+            module = relative_path_over_namespaces(self.msg.package()?, "tags")?,
             ident = self.tag_ident(self.msg)?,
         )
         .into())

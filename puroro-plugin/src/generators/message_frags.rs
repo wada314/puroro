@@ -214,12 +214,12 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
             FieldType::Bytes => "Bytes".into(),
             FieldType::Enum2(e) => format!(
                 "Enum2::<{module}::{ident}>",
-                module = relative_path_over_namespaces(self.msg.package()?, e.package()?, "enums")?,
+                module = relative_path_over_namespaces(e.package()?, "enums")?,
                 ident = e.native_ident()?,
             ),
             FieldType::Enum3(e) => format!(
                 "Enum3::<{module}::{ident}>",
-                module = relative_path_over_namespaces(self.msg.package()?, e.package()?, "enums")?,
+                module = relative_path_over_namespaces(e.package()?, "enums")?,
                 ident = e.native_ident()?,
             ),
             FieldType::Message(m) => {

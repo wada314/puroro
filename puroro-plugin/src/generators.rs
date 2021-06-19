@@ -185,9 +185,9 @@ fn print_puroro_root(
             .collect::<String>()
     );
     output.write_fmt(format_args!(
-        "mod puroro_root {{ use {supers}; }}\n",
+        "mod puroro_root {{ pub use {supers}; }}\n",
         supers = std::iter::repeat("super::")
-            .take(cur_package.split('.').filter(|p| !p.is_empty()).count() + 1)
+            .take(cur_package.split('.').filter(|p| !p.is_empty()).count() + 2)
             .chain(std::iter::once("*"))
             .collect::<String>()
     ))?;
@@ -213,7 +213,7 @@ impl<'c> MessageGeneratingVisitor<'c> {
         );
         self.output.write_fmt(format_args!(
             "pub use {path}::*;\n\n",
-            path = relative_path_over_namespaces(&cur_package, &cur_package, "enums")?
+            path = relative_path_over_namespaces(&cur_package, "enums")?
         ))?;
         Ok(())
     }

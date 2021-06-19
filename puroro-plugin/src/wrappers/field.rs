@@ -237,13 +237,13 @@ impl<'c> FieldType<'c> {
             FieldType::Bytes => Err(NonNumericalFieldType::Bytes),
             FieldType::Enum2(e) => Ok(format!(
                 "{module}::{ident}",
-                module = relative_path_over_namespaces(package, e.package()?, "enums")?,
+                module = relative_path_over_namespaces(e.package()?, "enums")?,
                 ident = e.native_ident()?,
             )
             .into()),
             FieldType::Enum3(e) => Ok(format!(
                 "::std::result::Result<{module}::{ident}, i32>",
-                module = relative_path_over_namespaces(package, e.package()?, "enums")?,
+                module = relative_path_over_namespaces(e.package()?, "enums")?,
                 ident = e.native_ident()?,
             )
             .into()),
