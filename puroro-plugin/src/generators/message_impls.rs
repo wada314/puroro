@@ -359,7 +359,7 @@ impl{gp} ::puroro_internal::deser::MergeableMessageFromIter for {ident}{gpb} {{
                             number = field.number(),
                             ident = field.native_ident()?,
                             type_ = self.frag_gen.field_type_name(field)?,
-                            type_tag = self.frag_gen.type_tag_ident_gp(field, None)?,
+                            type_tag = field.type_tag_ident_gp()?,
                             label_tag = field.label_tag_ident()?,
                             default_func = self.frag_gen.default_func_for(field)?,
                         ))
@@ -486,7 +486,7 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
                             number = field.number(),
                             ident = field.native_ident()?,
                             type_ = self.frag_gen.field_type_name(field)?,
-                            type_tag = self.frag_gen.type_tag_ident_gp(field, None)?,
+                            type_tag = field.type_tag_ident_gp()?,
                             label_tag = field.label_tag_ident()?,
                         ))
                     })),
@@ -531,7 +531,7 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
                                 number = field.number(),
                                 ident = field.native_ident()?,
                                 type_ = self.frag_gen.field_type_name(field)?,
-                                type_tag = self.frag_gen.type_tag_ident_gp(field, None)?,
+                                type_tag = field.type_tag_ident_gp()?,
                                 label_tag = field.label_tag_ident()?,
                             ))
                         })),

@@ -145,6 +145,40 @@ impl<'c> FieldDescriptor<'c> {
         })
     }
 
+    pub fn type_tag_ident_gp(&'c self) -> Result<String> {
+        Ok(match self.type_()? {
+            FieldType::Double => "Double".into(),
+            FieldType::Float => "Float".into(),
+            FieldType::Int32 => "Int32".into(),
+            FieldType::Int64 => "Int64".into(),
+            FieldType::UInt32 => "UInt32".into(),
+            FieldType::UInt64 => "UInt64".into(),
+            FieldType::SInt32 => "SInt32".into(),
+            FieldType::SInt64 => "SInt64".into(),
+            FieldType::Fixed32 => "Fixed32".into(),
+            FieldType::Fixed64 => "Fixed64".into(),
+            FieldType::SFixed32 => "SFixed32".into(),
+            FieldType::SFixed64 => "SFixed64".into(),
+            FieldType::Bool => "Bool".into(),
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => "String".into(),
+            FieldType::Bytes => "Bytes".into(),
+            FieldType::Enum2(e) => format!(
+                "Enum2::<{module}::{ident}>",
+                module = relative_path_over_namespaces(e.package()?, "enums")?,
+                ident = e.native_ident()?,
+            ),
+            FieldType::Enum3(e) => format!(
+                "Enum3::<{module}::{ident}>",
+                module = relative_path_over_namespaces(e.package()?, "enums")?,
+                ident = e.native_ident()?,
+            ),
+            FieldType::Message(m) => {
+                format!("Message::<{}>", m.native_tag_path()?)
+            }
+        })
+    }
+
     pub fn package(&'c self) -> Result<&str> {
         self.parent.package()
     }
