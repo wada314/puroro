@@ -590,9 +590,7 @@ impl{gp} ::puroro::Serializable for {name}{gpb} {{
                 "\
 impl{gp} {trait_path} for {struct_ident}{gpb} {{\n",
                 struct_ident = self.msg.native_ident()?,
-                trait_path = self
-                    .traits_gen
-                    .trait_path_from_struct(self.msg.package()?)?,
+                trait_path = self.msg.native_trait_path()?,
                 gp = self
                     .frag_gen
                     .struct_generic_params()
@@ -750,9 +748,7 @@ type {type_ident}{type_gp} {type_where} =
 }}\n",
                         type_ident = type_ident,
                         type_gp = type_gp,
-                        type_tag = self
-                            .frag_gen
-                            .type_tag_ident_gp(field, &[("S", "&'slice [u8]")])?,
+                        type_tag = field.type_tag_ident_gp()?,
                         type_where = type_where,
                         get_decl = get_decl,
                         ident = field.native_ident()?,
@@ -972,10 +968,10 @@ impl{gp} ::puroro_internal::MapEntryForNormalImpl for {entry_type} {{
             entry_type = self.frag_gen.type_name_of_msg(self.msg, None)?,
             gp = self.frag_gen.struct_generic_params(),
             owned_key_type = self.frag_gen.map_owned_key_type_name(key_field)?,
-            key_type_tag = self.frag_gen.type_tag_ident_gp(key_field, None)?,
+            key_type_tag = key_field.type_tag_ident_gp()?,
             take_key = self.frag_gen.field_take_or_init(key_field)?,
             owned_value_type = self.frag_gen.map_owned_value_type_name(value_field)?,
-            value_type_tag = self.frag_gen.type_tag_ident_gp(value_field, None)?,
+            value_type_tag = value_field.type_tag_ident_gp()?,
             take_value = self.frag_gen.field_take_or_init(value_field)?,
         ),)
             .write_into(output)
@@ -1004,9 +1000,7 @@ impl{gp} ::puroro_internal::MapEntryForSliceViewImpl<'slice> for {entry_type} {{
 }}
 \n",
             entry_type = self.frag_gen.type_name_of_msg(self.msg, None)?,
-            message_trait_type = self
-                .traits_gen
-                .trait_path_from_struct(self.msg.package()?)?,
+            message_trait_type = self.msg.native_trait_path()?,
             gp = self.frag_gen.struct_generic_params(),
             owned_key_type = self.frag_gen.map_owned_key_type_name(key_field)?,
             value_getter_type = self.traits_gen.map_value_getter_type_name(value_field)?,

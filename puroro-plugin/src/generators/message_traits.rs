@@ -194,15 +194,6 @@ type {ident}{gp}: {bound}
         .into())
     }
 
-    pub fn trait_path_from_struct(&self, cur_package: &str) -> Result<Cow<'static, str>> {
-        Ok(format!(
-            "{module}::{ident}",
-            module = relative_path_over_namespaces(self.msg.package()?, "traits")?,
-            ident = self.msg.native_trait_ident()?,
-        )
-        .into())
-    }
-
     pub fn associated_msg_type_ident(
         &self,
         field: &'c FieldDescriptor<'c>,
@@ -248,53 +239,42 @@ type {ident}{gp}: {bound}
         field: &'c FieldDescriptor<'c>,
         this_lifetime: &'static str,
     ) -> Result<Cow<'static, str>> {
-        Ok(
-            match field
-                .type_()?
-                .native_numerical_type_name(field.package()?)?
-            {
-                Ok(name) => name.into(),
-                Err(nonnumerical_type) => {
-                    let t: Cow<str> = match nonnumerical_type {
-                        NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-                        NonNumericalFieldType::String => "str".into(),
-                        NonNumericalFieldType::Bytes => "[u8]".into(),
-                        NonNumericalFieldType::Message(_) => format!(
-                            "Self::{name}",
-                            name =
-                                self.associated_msg_type_ident_gp(field, field.label()?, None,)?,
-                        )
-                        .into(),
-                    };
-                    format!(
-                        "::std::borrow::Cow::<{lt}, {type_}>",
-                        lt = this_lifetime,
-                        type_ = t,
+        Ok(match field.type_()?.native_numerical_type_name()? {
+            Ok(name) => name.into(),
+            Err(nonnumerical_type) => {
+                let t: Cow<str> = match nonnumerical_type {
+                    NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+                    NonNumericalFieldType::String => "str".into(),
+                    NonNumericalFieldType::Bytes => "[u8]".into(),
+                    NonNumericalFieldType::Message(_) => format!(
+                        "Self::{name}",
+                        name = self.associated_msg_type_ident_gp(field, field.label()?, None,)?,
                     )
-                    .into()
-                }
-            },
-        )
+                    .into(),
+                };
+                format!(
+                    "::std::borrow::Cow::<{lt}, {type_}>",
+                    lt = this_lifetime,
+                    type_ = t,
+                )
+                .into()
+            }
+        })
     }
 
     pub fn map_deref_borrowed_key_type_name(
         &self,
         field: &'c FieldDescriptor<'c>,
     ) -> Result<Cow<'static, str>> {
-        Ok(
-            match field
-                .type_()?
-                .native_numerical_type_name(field.package()?)?
-            {
-                Ok(name) => name,
-                Err(nonnumerical_type) => match nonnumerical_type {
-                    NonNumericalFieldType::String => "str".into(),
-                    _ => Err(ErrorKind::InvalidMapKey {
-                        name: field.fully_qualified_type_name()?.to_string(),
-                    })?,
-                },
+        Ok(match field.type_()?.native_numerical_type_name()? {
+            Ok(name) => name,
+            Err(nonnumerical_type) => match nonnumerical_type {
+                NonNumericalFieldType::String => "str".into(),
+                _ => Err(ErrorKind::InvalidMapKey {
+                    name: field.fully_qualified_type_name()?.to_string(),
+                })?,
             },
-        )
+        })
     }
 
     pub fn map_value_getter_type_name(

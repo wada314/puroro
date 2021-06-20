@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::utils::{relative_path, relative_path_over_namespaces, GenericParams};
+use crate::utils::{relative_path, GenericParams};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
@@ -94,10 +94,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         field: &'c FieldDescriptor<'c>,
     ) -> Result<Cow<'static, str>> {
         Ok(match self.context.impl_type() {
-            ImplType::Default => match field
-                .type_()?
-                .native_numerical_type_name(field.package()?)?
-            {
+            ImplType::Default => match field.type_()?.native_numerical_type_name()? {
                 Ok(name) => name,
                 Err(nonnumerical_type) => match nonnumerical_type {
                     NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
@@ -106,10 +103,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     NonNumericalFieldType::Message(m) => self.type_name_of_msg(m, None)?.into(),
                 },
             },
-            ImplType::SliceView => match field
-                .type_()?
-                .native_numerical_type_name(field.package()?)?
-            {
+            ImplType::SliceView => match field.type_()?.native_numerical_type_name()? {
                 Ok(name) => name,
                 Err(nonnumerical_type) => match nonnumerical_type {
                     NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
@@ -384,20 +378,15 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         &self,
         field: &'c FieldDescriptor<'c>,
     ) -> Result<Cow<'static, str>> {
-        Ok(
-            match field
-                .type_()?
-                .native_numerical_type_name(field.package()?)?
-            {
-                Ok(name) => name,
-                Err(nonnumerical_type) => match nonnumerical_type {
-                    NonNumericalFieldType::String => self.string_type().into(),
-                    _ => Err(ErrorKind::InvalidMapKey {
-                        name: field.fully_qualified_type_name()?.to_string(),
-                    })?,
-                },
+        Ok(match field.type_()?.native_numerical_type_name()? {
+            Ok(name) => name,
+            Err(nonnumerical_type) => match nonnumerical_type {
+                NonNumericalFieldType::String => self.string_type().into(),
+                _ => Err(ErrorKind::InvalidMapKey {
+                    name: field.fully_qualified_type_name()?.to_string(),
+                })?,
             },
-        )
+        })
     }
 
     pub fn map_owned_value_type_name(

@@ -179,10 +179,6 @@ impl<'c> FieldDescriptor<'c> {
         })
     }
 
-    pub fn package(&'c self) -> Result<&str> {
-        self.parent.package()
-    }
-
     pub fn message(&'c self) -> &'c MessageDescriptor<'c> {
         self.parent
     }
@@ -256,7 +252,6 @@ pub enum FieldType<'c> {
 impl<'c> FieldType<'c> {
     pub fn native_numerical_type_name(
         &self,
-        package: &str,
     ) -> Result<std::result::Result<Cow<'static, str>, NonNumericalFieldType<'c>>> {
         Ok(match self {
             FieldType::Double => Ok("f64".into()),
