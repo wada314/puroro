@@ -7,7 +7,7 @@ use crate::internal_data::SliceSource;
 use crate::types::{FieldData, SliceViewField};
 use crate::variant;
 use crate::InternalDataForSliceViewStruct;
-use crate::{ErrorKind, PuroroError, Result, ResultHelper};
+use crate::{ErrorKind, GetSliceViewStructImplFor, PuroroError, Result, ResultHelper};
 use ::itertools::{Either, Itertools};
 use ::puroro::tags;
 use ::puroro::RepeatedField;
@@ -64,15 +64,17 @@ impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::Bytes {
         }
     }
 }
-impl<'slice: 'a, 'a, T> FieldDataIntoIter<'slice, 'a> for tags::Message<T>
+impl<'slice: 'a, 'a, MessageTag> FieldDataIntoIter<'slice, 'a> for tags::Message<MessageTag>
 where
-    T: 'slice + TryFrom<&'slice [u8], Error = PuroroError> + ToOwned<Owned = T>,
+    MessageTag: 'slice + GetSliceViewStructImplFor<'slice> + ToOwned<Owned = MessageTag>,
+    <MessageTag as GetSliceViewStructImplFor<'slice>>::Type:
+        TryFrom<&'slice [u8], Error = PuroroError>,
 {
-    type Item = Cow<'a, T>;
+    type Item = Cow<'a, MessageTag>;
     type Iter = impl Iterator<Item = Result<Self::Item>>;
     fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         if let FieldData::LengthDelimited(ld_slice) = field_data {
-            Ok(std::iter::once(Ok(Cow::Owned(<T as TryFrom<
+            Ok(std::iter::once(Ok(Cow::Owned(<MessageTag as TryFrom<
                 &'slice [u8],
             >>::try_from(
                 ld_slice.as_slice()
