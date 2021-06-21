@@ -141,7 +141,7 @@ impl<'c> MessageDescriptor<'c> {
     }
     pub fn native_tag_ident(&self) -> Result<&str> {
         Ok(self
-            .lazy_native_trait_ident
+            .lazy_native_tag_ident
             .get_or_try_init(|| -> Result<_> { Ok(format!("{}Tag", self.native_ident()?)) })?)
     }
     pub fn native_tag_path(&'c self) -> Result<&str> {
