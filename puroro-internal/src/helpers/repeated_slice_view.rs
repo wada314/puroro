@@ -7,7 +7,7 @@ use crate::internal_data::SliceSource;
 use crate::types::{FieldData, SliceViewField};
 use crate::variant;
 use crate::InternalDataForSliceViewStruct;
-use crate::{ErrorKind, GetSliceViewStructImplFor, PuroroError, Result, ResultHelper};
+use crate::{ErrorKind, PuroroError, Result, ResultHelper};
 use ::itertools::{Either, Itertools};
 use ::puroro::tags;
 use ::puroro::RepeatedField;
