@@ -3,7 +3,7 @@ use crate::types::FieldData;
 use crate::Result;
 use crate::{bumpalo, hashbrown};
 use ::puroro::tags;
-use puroro::Message;
+use puroro::{IsMessageImplOfTag, Message};
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::ops::{Deref, DerefMut};
@@ -17,12 +17,11 @@ use std::ops::{Deref, DerefMut};
 ///    * `repeated` ==> `Vec<T>`
 ///  * Need to handle the map fields.
 ///
-pub trait WrappedMessageFieldType<'a, MessageType, LabelTag>
+pub trait WrappedMessageFieldType<'a, MessageTag, LabelTag>
 where
-    MessageType: Message,
     LabelTag: tags::FieldLabelTag,
 {
-    type Item: Message;
+    type Item;
     type MergeableMut: DerefMut;
     fn get_or_insert_with<F>(&'a mut self, f: F) -> Self::MergeableMut
     where
@@ -31,9 +30,9 @@ where
     where
         F: FnMut(&Self::Item) -> Result<()>;
 }
-impl<'a, M> WrappedMessageFieldType<'a, M, tags::Required> for M
+impl<'a, MessageTag, M> WrappedMessageFieldType<'a, MessageTag, tags::Required> for M
 where
-    M: 'a + Message + MergeableMessageFromIter,
+    M: 'a + Message + MergeableMessageFromIter + IsMessageImplOfTag<MessageTag>,
 {
     type Item = M;
     type MergeableMut = &'a mut Self::Item;
@@ -50,88 +49,98 @@ where
         (f)(self)
     }
 }
-impl<'a, M> WrappedMessageFieldType<'a, M, tags::Optional2> for Option<M::BoxedType>
+impl<'a, MessageTag, BoxedType> WrappedMessageFieldType<'a, MessageTag, tags::Optional2>
+    for Option<BoxedType>
 where
-    M: 'a + Message + MergeableMessageFromIter,
-    M::BoxedType: 'a + AsMut<M> + AsRef<M>,
+    BoxedType: Deref + DerefMut,
+    <BoxedType as Deref>::Target: 'a
+        + Message<BoxedType = BoxedType>
+        + MergeableMessageFromIter
+        + IsMessageImplOfTag<MessageTag>,
 {
-    type Item = M;
+    type Item = <BoxedType as Deref>::Target;
     type MergeableMut = &'a mut Self::Item;
     fn get_or_insert_with<F>(&'a mut self, f: F) -> Self::MergeableMut
     where
         F: FnOnce() -> Self::Item,
     {
-        self.get_or_insert_with(|| (f)().into_boxed()).as_mut()
+        <Option<BoxedType>>::get_or_insert_with(self, || (f)().into_boxed()).deref_mut()
     }
     fn try_for_each<F>(&'a self, mut f: F) -> Result<()>
     where
         F: FnMut(&Self::Item) -> Result<()>,
     {
         if let Some(boxed) = self {
-            (f)(boxed.as_ref())
+            (f)(boxed.deref())
         } else {
             Ok(())
         }
     }
 }
-impl<'a, M> WrappedMessageFieldType<'a, M, tags::Optional3> for Option<M::BoxedType>
+impl<'a, MessageTag, BoxedType> WrappedMessageFieldType<'a, MessageTag, tags::Optional3>
+    for Option<BoxedType>
 where
-    M: 'a + Message + MergeableMessageFromIter,
-    M::BoxedType: AsMut<M> + AsRef<M>,
+    BoxedType: Deref + DerefMut,
+    <BoxedType as Deref>::Target: 'a
+        + Message<BoxedType = BoxedType>
+        + MergeableMessageFromIter
+        + IsMessageImplOfTag<MessageTag>,
 {
-    type Item = M;
+    type Item = <BoxedType as Deref>::Target;
     type MergeableMut = &'a mut Self::Item;
     fn get_or_insert_with<F>(&'a mut self, f: F) -> Self::MergeableMut
     where
         F: FnOnce() -> Self::Item,
     {
-        self.get_or_insert_with(|| (f)().into_boxed()).as_mut()
+        <Option<BoxedType>>::get_or_insert_with(self, || (f)().into_boxed()).deref_mut()
     }
     fn try_for_each<F>(&'a self, mut f: F) -> Result<()>
     where
         F: FnMut(&Self::Item) -> Result<()>,
     {
         if let Some(boxed) = self {
-            (f)(boxed.as_ref())
+            (f)(boxed.deref())
         } else {
             Ok(())
         }
     }
 }
-impl<'a, M, RM> WrappedMessageFieldType<'a, M, tags::Repeated> for RM
+impl<'a, MessageTag, RM> WrappedMessageFieldType<'a, MessageTag, tags::Repeated> for RM
 where
-    M: Message + MergeableMessageFromIter,
-    RM: RepeatedMessageType<'a, M>,
+    <RM as RepeatedMessageType<'a>>::MessageType: Message + MergeableMessageFromIter,
+    RM: RepeatedMessageType<'a>,
 {
-    type Item = M;
-    type MergeableMut = <RM as RepeatedMessageType<'a, M>>::MergeableMut;
+    type Item = <RM as RepeatedMessageType<'a>>::MessageType;
+    type MergeableMut = <RM as RepeatedMessageType<'a>>::MergeableMut;
     fn get_or_insert_with<F>(&'a mut self, f: F) -> Self::MergeableMut
     where
         F: FnOnce() -> Self::Item,
     {
-        <Self as RepeatedMessageType<M>>::insert_mut(self, (f)())
+        <Self as RepeatedMessageType>::insert_mut(self, (f)())
     }
     fn try_for_each<F>(&'a self, f: F) -> Result<()>
     where
         F: FnMut(&Self::Item) -> Result<()>,
     {
-        <Self as RepeatedMessageType<M>>::try_for_each(self, f)?;
+        <Self as RepeatedMessageType>::try_for_each(self, f)?;
         Ok(())
     }
 }
 
-pub trait RepeatedMessageType<'a, Msg> {
+pub trait RepeatedMessageType<'a> {
+    type MessageType;
     type MergeableMut: DerefMut;
-    fn insert_mut(&'a mut self, item: Msg) -> Self::MergeableMut;
+    fn insert_mut(&'a mut self, item: Self::MessageType) -> Self::MergeableMut;
     fn try_for_each<F>(&'a self, f: F) -> Result<()>
     where
-        F: FnMut(&Msg) -> Result<()>;
+        F: FnMut(&Self::MessageType) -> Result<()>;
 }
 
-impl<'a, Msg> RepeatedMessageType<'a, Msg> for Vec<Msg>
+impl<'a, Msg> RepeatedMessageType<'a> for Vec<Msg>
 where
     Msg: 'a + Message + MergeableMessageFromIter,
 {
+    type MessageType = Msg;
     type MergeableMut = &'a mut Msg;
     fn insert_mut(&'a mut self, item: Msg) -> Self::MergeableMut {
         self.push(item);
@@ -147,10 +156,11 @@ where
 }
 
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a, 'bump, Msg> RepeatedMessageType<'a, Msg> for bumpalo::collections::Vec<'bump, Msg>
+impl<'a, 'bump, Msg> RepeatedMessageType<'a> for bumpalo::collections::Vec<'bump, Msg>
 where
     Msg: 'a + Message + MergeableMessageFromIter,
 {
+    type MessageType = Msg;
     type MergeableMut = &'a mut Msg;
     fn insert_mut(&'a mut self, item: Msg) -> Self::MergeableMut {
         self.push(item);
@@ -165,12 +175,14 @@ where
     }
 }
 
-impl<'a, K, V, Msg> RepeatedMessageType<'a, Msg> for HashMap<K, V>
+/*
+impl<'a, K, V, Msg> RepeatedMessageType<'a> for HashMap<K, V>
 where
     K: Eq + Hash,
     Msg: 'a + Message + crate::MapEntry<KeyType = K, ValueType = V> + MergeableMessageFromIter,
     Self: 'a,
 {
+    type MessageType = Msg;
     type MergeableMut = MapEntryWrapper<'a, Msg, Self>;
     fn insert_mut(&'a mut self, item: Msg) -> Self::MergeableMut {
         MapEntryWrapper {
@@ -191,7 +203,7 @@ where
 }
 
 #[cfg(feature = "puroro-bumpalo")]
-impl<'a, 'bump, K, V, Msg> RepeatedMessageType<'a, Msg>
+impl<'a, 'bump, K, V, Msg> RepeatedMessageType<'a>
     for hashbrown::HashMap<
         K,
         V,
@@ -203,6 +215,7 @@ where
     Msg: 'a + Message + crate::MapEntry<KeyType = K, ValueType = V> + MergeableMessageFromIter,
     Self: 'a,
 {
+    type MessageType = Msg;
     type MergeableMut
     where
         Self: 'a,
@@ -224,7 +237,7 @@ where
         Ok(())
     }
 }
-
+*/
 pub struct MapEntryWrapper<'a, Msg, Map>
 where
     Msg: crate::MapEntry<KeyType = Map::Key, ValueType = Map::Value>,

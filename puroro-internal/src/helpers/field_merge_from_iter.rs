@@ -129,15 +129,15 @@ where
     }
 }
 
-impl<'a, M, L, T> FieldMergeFromIter<'a, tags::Message<M>, L> for T
+impl<'a, MessageTag, L, T> FieldMergeFromIter<'a, tags::Message<MessageTag>, L> for T
 where
-    M: Message + MergeableMessageFromIter,
     L: tags::FieldLabelTag,
-    T: WrappedMessageFieldType<'a, M, L, Item = M>,
-    <<T as WrappedMessageFieldType<'a, M, L>>::MergeableMut as Deref>::Target:
+    T: WrappedMessageFieldType<'a, MessageTag, L>,
+    <T as WrappedMessageFieldType<'a, MessageTag, L>>::Item: Message + MergeableMessageFromIter,
+    <<T as WrappedMessageFieldType<'a, MessageTag, L>>::MergeableMut as Deref>::Target:
         MergeableMessageFromIter,
 {
-    type Item = M;
+    type Item = <T as WrappedMessageFieldType<'a, MessageTag, L>>::Item;
     fn merge<I, F>(&'a mut self, field: FieldData<&mut LdIter<I>>, f: F) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
