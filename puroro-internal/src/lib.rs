@@ -54,5 +54,5 @@ pub trait GetBumpaloStructImplFor<'bump> {
     type Type: 'bump;
 }
 pub trait GetSliceViewStructImplFor<'slice, S = &'slice [u8]> {
-    type Type;
+    type Type: 'slice;
 }
