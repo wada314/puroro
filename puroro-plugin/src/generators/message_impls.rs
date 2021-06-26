@@ -215,7 +215,7 @@ impl{gp} {ident}{gpb} {{
 impl{gp} {ident}{gpb} 
     where ::puroro_internal::SourceLdSlices<'slice, 'par, SS>: ::puroro_internal::SliceSource<'slice>,
 {{
-    fn try_new_with_parent(
+    pub(crate) fn try_new_with_parent(
         field_in_parent: ::std::option::Option<&'par ::puroro_internal::SliceViewField<'slice>>,
         field_number_in_parent: usize,
         parent_internal_data: &'par ::puroro_internal::InternalDataForSliceViewStruct<'slice, SS>,
@@ -640,7 +640,7 @@ impl{gp} {trait_path} for {struct_ident}{gpb} {{\n",
 {decl} {{
     ::std::borrow::Cow::Owned(
         {msg}::try_new_with_parent(
-            self.{ident}.clone(),
+            self.{ident}.as_ref(),
             {field_number},
             &self.puroro_internal
         ).expect(\"Invalid input slice. Consider checking the slice content earlier (TBD).\")
