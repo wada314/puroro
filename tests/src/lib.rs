@@ -13,9 +13,35 @@ use ::sample_pb;
 use sample_pb::simple::sample2::Msg;
 use sample_pb::tags::sample2::MsgTag;
 
+pub trait GetFieldDefaultValueType {
+    type Type;
+}
+impl<L, V> GetFieldDefaultValueType for (L, (tags::wire::Variant, V))
+where
+    L: tags::FieldLabelTag,
+    V: tags::VariantTypeTag,
+{
+    type Type = <V as tags::VariantTypeTag>::NativeType;
+}
+impl<L> GetFieldDefaultValueType for (L, tags::String)
+where
+    L: tags::FieldLabelTag,
+{
+    type Type = &'static str;
+}
+
 pub trait FieldInfo {
-    // Something like (tags::Repeated, (tags::wire::Variant, tags::value::Int32))
-    type WireAndValueTypeTag: tags::FieldLabelAndTypeTag;
+    // Something like (tags::Repeated, (tags::wire::Variant, tags::value::Int32)).
+    type LabelAndTypeTag: tags::FieldLabelAndTypeTag;
+
+    // Returns a default value specified by proto2's [default = ???] annotation,
+    // if it's available.
+    // This method is not available for message and map type fields.
+    fn field_default_value(
+        &self,
+    ) -> Option<<Self::LabelAndTypeTag as GetFieldDefaultValueType>::Type>
+    where
+        Self::LabelAndTypeTag: GetFieldDefaultValueType;
 }
 
 pub trait FieldInfoOf<const FIELD_NUMBER: usize> {
@@ -24,7 +50,15 @@ pub trait FieldInfoOf<const FIELD_NUMBER: usize> {
 
 pub struct MsgTagField1;
 impl FieldInfo for MsgTagField1 {
-    type WireAndValueTypeTag = (tags::Required, tags::Int32);
+    type LabelAndTypeTag = (tags::Required, tags::Int32);
+    fn field_default_value(
+        &self,
+    ) -> Option<<Self::LabelAndTypeTag as GetFieldDefaultValueType>::Type>
+    where
+        Self::LabelAndTypeTag: GetFieldDefaultValueType,
+    {
+        Some(3)
+    }
 }
 impl FieldInfoOf<1> for MsgTag {
     type Type = MsgTagField1;

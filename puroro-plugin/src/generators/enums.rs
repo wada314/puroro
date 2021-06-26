@@ -116,7 +116,7 @@ fn print_enum_default<'c, W: std::fmt::Write>(
     (format!(
         "\
 impl ::std::default::Default for {ident} {{
-    fn new() -> Self {{
+    fn default() -> Self {{
         Self::{value_ident}
     }}
 }}\n",
