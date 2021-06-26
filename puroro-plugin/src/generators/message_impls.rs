@@ -1,5 +1,4 @@
 use super::message_frags::MessageImplFragmentGenerator;
-use super::message_tags::MessageTagCodeGenerator;
 use super::message_traits::MessageTraitCodeGenerator;
 use super::writer::{func, indent, indent_n, iter, seq, IntoFragment};
 use crate::context::{AllocatorType, Context, ImplType};
@@ -13,7 +12,6 @@ pub struct MessageImplCodeGenerator<'a, 'c> {
     msg: &'c MessageDescriptor<'c>,
     frag_gen: MessageImplFragmentGenerator<'a, 'c>,
     traits_gen: MessageTraitCodeGenerator<'c>,
-    tags_gen: MessageTagCodeGenerator<'c>,
 }
 
 impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
@@ -23,7 +21,6 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             msg,
             frag_gen: MessageImplFragmentGenerator::new(context, msg),
             traits_gen: MessageTraitCodeGenerator::new(msg),
-            tags_gen: MessageTagCodeGenerator::new(msg),
         }
     }
 
@@ -885,7 +882,7 @@ impl{gp} {trait_path} for {tag_path} {{
 }}
 \n",
             struct_ident = self.msg.native_ident()?,
-            tag_path = self.tags_gen.tag_path_from_struct(self.msg.package()?)?,
+            tag_path = self.msg.native_tag_path()?,
             trait_path = getter_trait_path,
             gp = self.frag_gen.struct_generic_params_bounds().remove("S"),
             gpb = self
@@ -906,7 +903,7 @@ impl{gp} ::puroro::IsMessageImplOfTag<{tag}> for {struct_ident}{gpb} {{
 }}
 \n",
             struct_ident = self.msg.native_ident()?,
-            tag = self.tags_gen.tag_path_from_struct(self.msg.package()?)?,
+            tag = self.msg.native_tag_path()?,
             gp = self
                 .frag_gen
                 .struct_generic_params()

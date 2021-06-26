@@ -1,9 +1,7 @@
 use std::borrow::Cow;
 
 use super::writer::{func, indent, iter, IntoFragment};
-use crate::utils::{
-    relative_path, relative_path_over_namespaces, to_camel_case, GenericParams, Indentor,
-};
+use crate::utils::{relative_path, to_camel_case, GenericParams, Indentor};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
