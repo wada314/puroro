@@ -180,7 +180,11 @@ mod tests {
         )
         .unwrap();
         assert_eq!(
-            test4_simple.d().iter().collect::<Vec<_>>(),
+            // WTF!
+            <&Vec<i32> as ::puroro::RepeatedField<::puroro::tags::Int32, i32>>::iter(
+                &test4_simple.d()
+            )
+            .collect::<Vec<_>>(),
             vec![3, 270, 86942]
         );
 
