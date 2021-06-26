@@ -24,6 +24,7 @@ This library is under development and it is very possible to make breaking chang
         - [ ] Map interface
     - [ ] Keep unknown fields
     - [x] Deserializer from a slice
+    - [ ] Custom deserializer
     - [ ] Required field checker
     - [ ] Other implementations
         - [x] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
