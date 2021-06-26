@@ -10,16 +10,65 @@ use ::puroro::apply::FieldVisitor;
 use ::puroro::tags;
 
 use ::sample_pb;
+use sample_pb::simple::sample2::Msg;
+use sample_pb::tags::sample2::MsgTag;
 
 pub trait FieldInfo {
     // Something like (tags::Repeated, (tags::wire::Variant, tags::value::Int32))
-    type WireAndValueTypeTag: tags::WireAndValueTypeTag;
-
-    fn default_value(&self);
+    type WireAndValueTypeTag: tags::FieldLabelAndTypeTag;
 }
 
 pub trait FieldInfoOf<const FIELD_NUMBER: usize> {
     type Type: FieldInfo;
+}
+
+pub struct MsgTagField1;
+impl FieldInfo for MsgTagField1 {
+    type WireAndValueTypeTag = (tags::Required, tags::Int32);
+}
+impl FieldInfoOf<1> for MsgTag {
+    type Type = MsgTagField1;
+}
+
+pub trait FieldImplInfo {
+    type FieldInfoType: FieldInfo;
+    // Something like tags::SimpleStruct
+    type ImplTypeTag: tags::ImplTypeTag;
+
+    fn field_new(
+        &self,
+    ) -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
+        <Self::FieldInfoType as FieldInfo>::WireAndValueTypeTag,
+    >>::Type
+    where
+        Self::ImplTypeTag: ::puroro_internal::FieldTypeGen<
+            <Self::FieldInfoType as FieldInfo>::WireAndValueTypeTag,
+        >;
+}
+
+pub trait FieldImplInfoOf<const FIELD_NUMBER: usize> {
+    type Type: FieldImplInfo;
+}
+
+pub struct MsgField1Info;
+impl FieldImplInfo for MsgField1Info {
+    type FieldInfoType = MsgTagField1;
+    type ImplTypeTag = tags::SimpleStruct;
+    fn field_new(
+        &self,
+    ) -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
+        <Self::FieldInfoType as FieldInfo>::WireAndValueTypeTag,
+    >>::Type
+    where
+        Self::ImplTypeTag: ::puroro_internal::FieldTypeGen<
+            <Self::FieldInfoType as FieldInfo>::WireAndValueTypeTag,
+        >,
+    {
+        0
+    }
+}
+impl FieldImplInfoOf<1> for Msg {
+    type Type = MsgField1Info;
 }
 
 #[cfg(test)]

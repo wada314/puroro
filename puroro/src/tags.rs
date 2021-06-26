@@ -16,7 +16,7 @@ pub trait Bits64TypeTag: ValueTypeTag {
 pub trait WireTypeTag {}
 pub trait WireAndValueTypeTag {}
 pub trait FieldLabelTag {}
-pub trait FieldTypeAndLabelTag {}
+pub trait FieldLabelAndTypeTag {}
 
 pub trait ImplTypeTag {}
 
@@ -168,6 +168,13 @@ impl FieldLabelTag for Repeated {}
 impl FieldLabelTag for Optional2 {}
 impl FieldLabelTag for Optional3 {}
 impl FieldLabelTag for Required {}
+
+impl<L, V> FieldLabelAndTypeTag for (L, V)
+where
+    L: FieldLabelTag,
+    V: WireAndValueTypeTag,
+{
+}
 
 impl ImplTypeTag for SimpleStruct {}
 impl<'bump> ImplTypeTag for Bumpalo<'bump> {}
