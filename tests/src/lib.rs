@@ -36,12 +36,7 @@ pub trait FieldInfo {
 
     // Returns a default value specified by proto2's [default = ???] annotation,
     // if it's available.
-    // This method is not available for message and map type fields.
-    fn field_default_value(
-        &self,
-    ) -> Option<<Self::LabelAndTypeTag as GetFieldDefaultValueType>::Type>
-    where
-        Self::LabelAndTypeTag: GetFieldDefaultValueType;
+    const FIELD_DEFAULT_VALUE: Option<<Self::LabelAndTypeTag as GetFieldDefaultValueType>::Type>;
 }
 
 pub trait FieldInfoOf<const FIELD_NUMBER: usize> {
@@ -51,14 +46,7 @@ pub trait FieldInfoOf<const FIELD_NUMBER: usize> {
 pub struct MsgTagField1;
 impl FieldInfo for MsgTagField1 {
     type LabelAndTypeTag = (tags::Required, tags::Int32);
-    fn field_default_value(
-        &self,
-    ) -> Option<<Self::LabelAndTypeTag as GetFieldDefaultValueType>::Type>
-    where
-        Self::LabelAndTypeTag: GetFieldDefaultValueType,
-    {
-        Some(3)
-    }
+    const FIELD_DEFAULT_VALUE: Option<i32> = Some(3);
 }
 impl FieldInfoOf<1> for MsgTag {
     type Type = MsgTagField1;
@@ -72,12 +60,11 @@ pub trait FieldImplInfo {
     fn field_new(
         &self,
     ) -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
-        <Self::FieldInfoType as FieldInfo>::WireAndValueTypeTag,
+        <Self::FieldInfoType as FieldInfo>::LabelAndTypeTag,
     >>::Type
     where
-        Self::ImplTypeTag: ::puroro_internal::FieldTypeGen<
-            <Self::FieldInfoType as FieldInfo>::WireAndValueTypeTag,
-        >;
+        Self::ImplTypeTag:
+            ::puroro_internal::FieldTypeGen<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>;
 }
 
 pub trait FieldImplInfoOf<const FIELD_NUMBER: usize> {
@@ -91,14 +78,12 @@ impl FieldImplInfo for MsgField1Info {
     fn field_new(
         &self,
     ) -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
-        <Self::FieldInfoType as FieldInfo>::WireAndValueTypeTag,
+        <Self::FieldInfoType as FieldInfo>::LabelAndTypeTag,
     >>::Type
     where
-        Self::ImplTypeTag: ::puroro_internal::FieldTypeGen<
-            <Self::FieldInfoType as FieldInfo>::WireAndValueTypeTag,
-        >,
+        Self::ImplTypeTag:
+            ::puroro_internal::FieldTypeGen<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>,
     {
-        0
     }
 }
 impl FieldImplInfoOf<1> for Msg {
