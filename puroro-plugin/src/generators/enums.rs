@@ -57,6 +57,16 @@ impl ::std::convert::From<{name}> for i32 {{
 }}\n",
             name = enume.native_ident()?
         ),
+        format!(
+            "\
+impl<'bump> ::puroro_internal::FieldNew<'bump> for {ident} {{
+    fn new() -> Self {{
+        Self::{value_ident}
+    }}
+}}\n",
+            ident = enume.native_ident()?,
+            value_ident = enume.first_value()?.native_name()?,
+        ),
     )
         .write_into(output)
 }
