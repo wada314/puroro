@@ -13,6 +13,7 @@ This library is under development and it is very possible to make breaking chang
         - [ ] Bumpalo's `field_take_or_init.rs` implementation needs improvement because `bumpalo::boxed::Box` does not support moving out the value like `std::boxed::Box` does.
     - [ ] OneOfs
     - [ ] Anys, and other well-known types
+    - [ ] Enum allow-alias option
     - [ ] Unit tests
     - [ ] Write document!!
     - [ ] Print comments in the generated files

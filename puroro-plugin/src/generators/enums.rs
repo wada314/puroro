@@ -12,6 +12,7 @@ pub fn print_enum<'c, W: std::fmt::Write>(
         func(|output| print_enum_try_from(output, enume)),
         func(|output| print_enum_from(output, enume)),
         func(|output| print_enum_field_new(output, enume)),
+        func(|output| print_enum_default(output, enume)),
     )
         .write_into(output)
 }
@@ -98,6 +99,23 @@ fn print_enum_field_new<'c, W: std::fmt::Write>(
     (format!(
         "\
 impl<'bump> ::puroro_internal::FieldNew<'bump> for {ident} {{
+    fn new() -> Self {{
+        Self::{value_ident}
+    }}
+}}\n",
+        ident = enume.native_ident()?,
+        value_ident = enume.first_value()?.native_name()?,
+    ),)
+        .write_into(output)
+}
+
+fn print_enum_default<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    enume: &'c EnumDescriptor<'c>,
+) -> Result<()> {
+    (format!(
+        "\
+impl ::std::default::Default for {ident} {{
     fn new() -> Self {{
         Self::{value_ident}
     }}
