@@ -1,6 +1,5 @@
+use crate::{tags, IsMessageImplOfTag};
 use std::borrow::{Borrow, Cow};
-use std::collections::HashMap;
-use std::hash::Hash;
 
 /// Used for a normal proto impl which is using a `Vec` as a repeated field
 /// value container.
@@ -9,73 +8,73 @@ use std::hash::Hash;
 ///  * For string type: `Cow<'a, str>`
 ///  * For bytes type: `Cow<'a, [u8]>`
 ///  * For message type: `Cow<'a, T>`.
-pub trait RefTypeToGetterType {
+pub trait RefTypeToGetterType<TypeTag> {
     type Item;
     fn into(self) -> Self::Item;
 }
 
-// TODO: support proto2 enum!
-macro_rules! define_trivial_v2f {
-    ($ty:ty) => {
-        impl RefTypeToGetterType for &'_ $ty {
-            type Item = $ty;
-            fn into(self) -> $ty {
-                self.clone()
-            }
-        }
-    };
+impl<'a, V> RefTypeToGetterType<(tags::wire::Variant, V)>
+    for &'a <V as tags::VariantTypeTag>::NativeType
+where
+    V: tags::VariantTypeTag,
+    <V as tags::VariantTypeTag>::NativeType: Clone,
+{
+    type Item = <V as tags::VariantTypeTag>::NativeType;
+    fn into(self) -> Self::Item {
+        self.clone()
+    }
 }
-define_trivial_v2f!(i32);
-define_trivial_v2f!(i64);
-define_trivial_v2f!(u32);
-define_trivial_v2f!(u64);
-define_trivial_v2f!(f32);
-define_trivial_v2f!(f64);
-define_trivial_v2f!(bool);
-impl<T: Clone> RefTypeToGetterType for &'_ std::result::Result<T, i32> {
-    type Item = std::result::Result<T, i32>;
-    fn into(self) -> std::result::Result<T, i32> {
+impl<'a, T> RefTypeToGetterType<tags::Bytes> for &'a T
+where
+    T: Borrow<[u8]>,
+{
+    type Item = Cow<'a, [u8]>;
+    fn into(self) -> Self::Item {
+        Cow::Borrowed(self.borrow())
+    }
+}
+impl<'a, T> RefTypeToGetterType<tags::String> for &'a T
+where
+    T: Borrow<str>,
+{
+    type Item = Cow<'a, str>;
+    fn into(self) -> Self::Item {
+        Cow::Borrowed(self.borrow())
+    }
+}
+impl<'a, T, M> RefTypeToGetterType<tags::Message<M>> for &'a T
+where
+    T: 'a + Borrow<T> + Clone + IsMessageImplOfTag<M>,
+{
+    type Item = Cow<'a, T>;
+    fn into(self) -> Self::Item {
+        Cow::Borrowed(self.borrow())
+    }
+}
+impl<'a, V> RefTypeToGetterType<(tags::wire::Bits32, V)>
+    for &'a <V as tags::Bits32TypeTag>::NativeType
+where
+    V: tags::Bits32TypeTag,
+    <V as tags::Bits32TypeTag>::NativeType: Clone,
+{
+    type Item = <V as tags::Bits32TypeTag>::NativeType;
+    fn into(self) -> Self::Item {
+        self.clone()
+    }
+}
+impl<'a, V> RefTypeToGetterType<(tags::wire::Bits64, V)>
+    for &'a <V as tags::Bits64TypeTag>::NativeType
+where
+    V: tags::Bits64TypeTag,
+    <V as tags::Bits64TypeTag>::NativeType: Clone,
+{
+    type Item = <V as tags::Bits64TypeTag>::NativeType;
+    fn into(self) -> Self::Item {
         self.clone()
     }
 }
 
-impl<'a> RefTypeToGetterType for &'a String {
-    type Item = Cow<'a, str>;
-    fn into(self) -> Cow<'a, str> {
-        Cow::Borrowed(self.as_str())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'a, 'bump> RefTypeToGetterType for &'a ::bumpalo::collections::String<'bump> {
-    type Item = Cow<'a, str>;
-    fn into(self) -> Cow<'a, str> {
-        Cow::Borrowed(self.as_str())
-    }
-}
-impl<'a> RefTypeToGetterType for &'a Vec<u8> {
-    type Item = Cow<'a, [u8]>;
-    fn into(self) -> Cow<'a, [u8]> {
-        Cow::Borrowed(self.as_slice())
-    }
-}
-#[cfg(feature = "puroro-bumpalo")]
-impl<'a, 'bump> RefTypeToGetterType for &'a ::bumpalo::collections::Vec<'bump, u8> {
-    type Item = Cow<'a, [u8]>;
-    fn into(self) -> Cow<'a, [u8]> {
-        Cow::Borrowed(self.as_slice())
-    }
-}
-impl<'a, T> RefTypeToGetterType for &'a T
-where
-    T: crate::Message + ToOwned,
-{
-    type Item = Cow<'a, T>;
-    fn into(self) -> Cow<'a, T> {
-        Cow::Borrowed(self)
-    }
-}
-
-pub trait RepeatedField<T> {
+pub trait RepeatedField<TypeTag, T> {
     fn for_each<F>(&self, f: F)
     where
         F: FnMut(T);
@@ -84,52 +83,53 @@ pub trait RepeatedField<T> {
     fn iter(&self) -> Self::Iter<'_>;
 }
 
-impl<'a, T, U> RepeatedField<T> for &'a Vec<U>
+impl<'a, TypeTag, T, U> RepeatedField<TypeTag, T> for &'a Vec<U>
 where
-    &'a U: RefTypeToGetterType<Item = T>,
+    &'a U: RefTypeToGetterType<TypeTag, Item = T>,
 {
     fn for_each<F>(&self, f: F)
     where
         F: FnMut(T),
     {
         <[U]>::iter(self)
-            .map(|x| <&U as RefTypeToGetterType>::into(x))
+            .map(|x| <&U as RefTypeToGetterType<TypeTag>>::into(x))
             .for_each(f)
     }
 
     fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>> {
-        Box::new(<[U]>::iter(self).map(|x| <&U as RefTypeToGetterType>::into(x)))
+        Box::new(<[U]>::iter(self).map(|x| <&U as RefTypeToGetterType<TypeTag>>::into(x)))
     }
 
     type Iter<'this> = impl Iterator<Item = T>;
     fn iter(&self) -> Self::Iter<'_> {
-        <[U]>::iter(self).map(|x| <&U as RefTypeToGetterType>::into(x))
+        <[U]>::iter(self).map(|x| <&U as RefTypeToGetterType<TypeTag>>::into(x))
     }
 }
 #[cfg(feature = "puroro-bumpalo")]
-impl<'msg, 'bump, T, U> RepeatedField<T> for &'msg ::bumpalo::collections::Vec<'bump, U>
+impl<'msg, 'bump, TypeTag, T, U> RepeatedField<TypeTag, T>
+    for &'msg ::bumpalo::collections::Vec<'bump, U>
 where
-    &'msg U: RefTypeToGetterType<Item = T>,
+    &'msg U: RefTypeToGetterType<TypeTag, Item = T>,
 {
     fn for_each<F>(&self, f: F)
     where
         F: FnMut(T),
     {
         <[U]>::iter(&self)
-            .map(|x| <&U as RefTypeToGetterType>::into(x))
+            .map(|x| <&U as RefTypeToGetterType<TypeTag>>::into(x))
             .for_each(f)
     }
 
     fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>> {
-        Box::new(<[U]>::iter(self).map(|x| <&U as RefTypeToGetterType>::into(x)))
+        Box::new(<[U]>::iter(self).map(|x| <&U as RefTypeToGetterType<TypeTag>>::into(x)))
     }
 
     type Iter<'this> = impl Iterator<Item = T>;
     fn iter(&self) -> Self::Iter<'_> {
-        <[U]>::iter(self).map(|x| <&U as RefTypeToGetterType>::into(x))
+        <[U]>::iter(self).map(|x| <&U as RefTypeToGetterType<TypeTag>>::into(x))
     }
 }
-
+/*
 pub trait MapField<'msg, Q, R>
 where
     Q: ?Sized,
@@ -143,7 +143,7 @@ impl<'msg, Q, R, K, V> MapField<'msg, Q, R> for &'msg HashMap<K, V>
 where
     Q: ?Sized,
     K: Hash + Eq + Borrow<Q>,
-    &'msg V: RefTypeToGetterType<Item = R>,
+    &'msg V: RefTypeToGetterType<TypeTag, Item = R>,
 {
     fn get(&self, key: &Q) -> Option<R>
     where
@@ -152,3 +152,4 @@ where
         <HashMap<K, V>>::get(self, key).map(|x| <&V as RefTypeToGetterType>::into(x))
     }
 }
+*/

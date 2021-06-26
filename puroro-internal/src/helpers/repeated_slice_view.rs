@@ -206,7 +206,8 @@ where
     }
 }
 
-impl<'slice, 'msg, S, TypeTag> RepeatedField<<TypeTag as ItemTypeForTag<'slice, 'msg>>::Type>
+impl<'slice, 'msg, S, TypeTag>
+    RepeatedField<TypeTag, <TypeTag as ItemTypeForTag<'slice, 'msg>>::Type>
     for RepeatedSliceViewField<'slice, 'msg, S, TypeTag>
 where
     TypeTag: 'msg + ItemTypeForTag<'slice, 'msg>,

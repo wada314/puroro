@@ -758,7 +758,8 @@ type {type_ident}{type_gp} {type_where} =
                     ) => format!(
                         "\
 {decl} {{
-    ::std::borrow::Cow::Borrowed(self.{ident}.as_ref())
+    use ::std::borrow::Borrow;
+    ::std::borrow::Cow::Borrowed(self.{ident}.borrow())
 }}\n",
                         decl = get_decl,
                         ident = field.native_ident()?

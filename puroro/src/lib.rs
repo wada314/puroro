@@ -10,7 +10,7 @@ pub mod tags;
 
 pub use error::{ErrorKind, PuroroError};
 pub type Result<T> = std::result::Result<T, PuroroError>;
-pub use collections::{MapField, RepeatedField};
+pub use collections::RepeatedField;
 
 // Re-exports
 #[cfg(feature = "puroro-bumpalo")]
