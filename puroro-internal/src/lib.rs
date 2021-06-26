@@ -29,11 +29,7 @@ pub use types::SliceViewField;
 
 // Message common interface (only used by internal puroro code, not by library user)
 pub trait MessageInternal: ::puroro::Message {
-    fn field_default_value_for_tag<LabelAndTypeTag>(
-        &self,
-    ) -> <Self::ImplTypeTag as FieldTypeGen<LabelAndTypeTag>>::Type
-    where
-        Self::ImplTypeTag: FieldTypeGen<LabelAndTypeTag>;
+    fn field_default_value<const FIELD_NUMBER: usize>(&self) -> (); // TODO!
 }
 
 // A utility for Result.

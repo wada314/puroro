@@ -11,97 +11,15 @@ use ::puroro::tags;
 
 use ::sample_pb;
 
-pub struct Msg {
-    pub the_map: ::std::vec::Vec<self::TheMapEntry>,
-    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
-}
-pub struct MsgTag();
-impl ::puroro::MessageTag for MsgTag {}
-impl ::puroro::IsMessageImplOfTag<MsgTag> for Msg {}
+pub trait FieldInfo {
+    // Something like (tags::Repeated, (tags::wire::Variant, tags::value::Int32))
+    type WireAndValueTypeTag: tags::WireAndValueTypeTag;
 
-#[derive(Debug)]
-pub struct TheMapEntry {
-    pub key: ::std::string::String,
-    pub value: ::std::option::Option<::std::boxed::Box<self::SubMsg>>,
-    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
-}
-pub struct TheMapEntryTag();
-impl ::puroro::MessageTag for TheMapEntryTag {}
-impl ::puroro::IsMessageImplOfTag<TheMapEntryTag> for TheMapEntry {}
-
-#[derive(Debug)]
-pub struct SubMsg {
-    pub sub_msg: ::std::option::Option<::std::boxed::Box<self::SubMsg>>,
-    puroro_internal: ::puroro_internal::InternalDataForNormalStruct,
-}
-pub struct SubMsgTag();
-impl ::puroro::MessageTag for SubMsgTag {}
-impl ::puroro::IsMessageImplOfTag<SubMsgTag> for SubMsgTag {}
-
-struct Visitor();
-
-impl<MTag, MType> FieldVisitor<tags::Repeated, tags::Message<MTag>, Vec<MType>, (), ()> for Visitor
-where
-    MTag: ::puroro::MessageTag,
-    MType: ::puroro::IsMessageImplOfTag<MTag> + VisitFieldsAcceptor<Self, ()>,
-{
-    fn visit(&mut self, field: &Vec<MType>, _: usize) -> Result<(), ()> {
-        for item in field {
-            <MType as VisitFieldsAcceptor<Self, ()>>::visit_fields(item, self)?;
-        }
-        Ok(())
-    }
+    fn default_value(&self);
 }
 
-trait VisitFieldsAcceptor<F, E> {
-    fn visit_fields(&self, f: &mut F) -> Result<(), E>;
-}
-
-impl<F, E> VisitFieldsAcceptor<F, E> for Msg
-where
-    F: AppliableToMsgFields<E>,
-{
-    fn visit_fields(&self, f: &mut F) -> Result<(), E> {
-        f.visit(&self.the_map, 1)?;
-        Ok(())
-    }
-}
-
-impl<F, E> VisitFieldsAcceptor<F, E> for TheMapEntry
-where
-    F: AppliableToTheMapEntryFields<E>,
-{
-    fn visit_fields(&self, f: &mut F) -> Result<(), E> {
-        f.visit(&self.key, 1)?;
-        f.visit(&self.value, 2)?;
-        Ok(())
-    }
-}
-
-impl<F, E> VisitFieldsAcceptor<F, E> for SubMsg
-where
-    F: AppliableToSubMsgFields<E>,
-{
-    fn visit_fields(&self, f: &mut F) -> Result<(), E> {
-        f.visit(&self.sub_msg, 1)?;
-        Ok(())
-    }
-}
-
-trait AppliableToMsgFields<E>:
-    FieldVisitor<tags::Repeated, tags::Message<TheMapEntryTag>, Vec<TheMapEntry>, (), E>
-{
-}
-
-trait AppliableToTheMapEntryFields<E>:
-    FieldVisitor<tags::Optional3, tags::Message<SubMsgTag>, Option<Box<SubMsg>>, (), E>
-    + FieldVisitor<tags::Optional3, tags::String, String, (), E>
-{
-}
-
-trait AppliableToSubMsgFields<E>:
-    FieldVisitor<tags::Optional3, tags::Message<SubMsgTag>, Option<Box<SubMsg>>, (), E>
-{
+pub trait FieldInfoOf<const FIELD_NUMBER: usize> {
+    type Type: FieldInfo;
 }
 
 #[cfg(test)]
