@@ -5,26 +5,65 @@ use std::marker::PhantomData;
 use crate::deser::LdSlice;
 use crate::internal_data::SliceSource;
 use crate::types::{FieldData, SliceViewField};
-use crate::variant;
 use crate::InternalDataForSliceViewStruct;
+use crate::{variant, GetSliceViewStructImplFor};
 use crate::{ErrorKind, PuroroError, Result, ResultHelper};
 use ::itertools::{Either, Itertools};
 use ::puroro::tags;
 use ::puroro::RepeatedField;
+use puroro::IsMessageImplOfTag;
 
-pub trait FieldDataIntoIter<'slice, 'a> {
-    type Item;
-    type Iter: Iterator<Item = Result<Self::Item>>;
-    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter>;
+trait Captures<'a> {}
+impl<'a, T: ?Sized> Captures<'a> for T {}
+
+pub trait ItemTypeForTag<'slice, 'msg> {
+    type Type;
 }
-impl<'slice: 'a, 'a, ValueTypeTag> FieldDataIntoIter<'slice, 'a>
-    for (tags::wire::Variant, ValueTypeTag)
+impl<'slice, 'msg, V> ItemTypeForTag<'slice, 'msg> for (tags::wire::Variant, V)
+where
+    V: tags::VariantTypeTag,
+{
+    type Type = <V as tags::VariantTypeTag>::NativeType;
+}
+impl<'slice, 'msg> ItemTypeForTag<'slice, 'msg> for tags::Bytes {
+    type Type = Cow<'msg, [u8]>;
+}
+impl<'slice, 'msg> ItemTypeForTag<'slice, 'msg> for tags::String {
+    type Type = Cow<'msg, str>;
+}
+impl<'slice, 'msg, MessageTag> ItemTypeForTag<'slice, 'msg> for tags::Message<MessageTag>
+where
+    MessageTag: GetSliceViewStructImplFor<'slice>,
+    <MessageTag as GetSliceViewStructImplFor<'slice>>::Type: 'msg + ToOwned,
+    'slice: 'msg,
+{
+    type Type = Cow<'msg, <MessageTag as GetSliceViewStructImplFor<'slice>>::Type>;
+}
+impl<'slice, 'msg, V> ItemTypeForTag<'slice, 'msg> for (tags::wire::Bits32, V)
+where
+    V: tags::Bits32TypeTag,
+{
+    type Type = <V as tags::Bits32TypeTag>::NativeType;
+}
+impl<'slice, 'msg, V> ItemTypeForTag<'slice, 'msg> for (tags::wire::Bits64, V)
+where
+    V: tags::Bits64TypeTag,
+{
+    type Type = <V as tags::Bits64TypeTag>::NativeType;
+}
+
+pub trait IterFromFieldData<'slice, 'a, WireAndTypeTag>: Sized {
+    type Iter: Iterator<Item = Result<Self>>;
+    fn from(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter>;
+}
+impl<'slice: 'a, 'a, ValueTypeTag>
+    IterFromFieldData<'slice, 'a, (tags::wire::Variant, ValueTypeTag)>
+    for <ValueTypeTag as variant::VariantTypeTag>::NativeType
 where
     ValueTypeTag: variant::VariantTypeTag,
 {
-    type Item = <ValueTypeTag as variant::VariantTypeTag>::NativeType;
-    type Iter = impl Iterator<Item = Result<Self::Item>>;
-    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+    type Iter = impl Iterator<Item = Result<Self>>;
+    fn from(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         Ok(match field_data {
             FieldData::Variant(variant) => {
                 Either::Left(std::iter::once(variant.to_native::<ValueTypeTag>()))
@@ -40,10 +79,9 @@ where
         .into_iter())
     }
 }
-impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::String {
-    type Item = Cow<'a, str>;
-    type Iter = impl Iterator<Item = Result<Self::Item>>;
-    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+impl<'slice: 'a, 'a> IterFromFieldData<'slice, 'a, tags::String> for Cow<'a, str> {
+    type Iter = impl Iterator<Item = Result<Self>>;
+    fn from(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         if let FieldData::LengthDelimited(ld_slice) = field_data {
             Ok(std::iter::once(Ok(String::from_utf8_lossy(
                 ld_slice.as_slice(),
@@ -53,10 +91,9 @@ impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::String {
         }
     }
 }
-impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::Bytes {
-    type Item = Cow<'a, [u8]>;
-    type Iter = impl Iterator<Item = Result<Self::Item>>;
-    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+impl<'slice: 'a, 'a> IterFromFieldData<'slice, 'a, tags::Bytes> for Cow<'a, [u8]> {
+    type Iter = impl Iterator<Item = Result<Self>>;
+    fn from(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         if let FieldData::LengthDelimited(ld_slice) = field_data {
             Ok(std::iter::once(Ok(Cow::Borrowed(ld_slice.as_slice()))))
         } else {
@@ -64,15 +101,18 @@ impl<'slice: 'a, 'a> FieldDataIntoIter<'slice, 'a> for tags::Bytes {
         }
     }
 }
-impl<'slice: 'a, 'a, T> FieldDataIntoIter<'slice, 'a> for tags::Message<T>
+impl<'slice: 'a, 'a, Message, MessageTag> IterFromFieldData<'slice, 'a, tags::Message<MessageTag>>
+    for Cow<'a, Message>
 where
-    T: 'slice + TryFrom<&'slice [u8], Error = PuroroError> + ToOwned<Owned = T>,
+    Message: 'a
+        + ToOwned<Owned = Message>
+        + TryFrom<&'slice [u8], Error = PuroroError>
+        + IsMessageImplOfTag<MessageTag>,
 {
-    type Item = Cow<'a, T>;
-    type Iter = impl Iterator<Item = Result<Self::Item>>;
-    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+    type Iter = impl Iterator<Item = Result<Self>>;
+    fn from(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         if let FieldData::LengthDelimited(ld_slice) = field_data {
-            Ok(std::iter::once(Ok(Cow::Owned(<T as TryFrom<
+            Ok(std::iter::once(Ok(Cow::Owned(<Message as TryFrom<
                 &'slice [u8],
             >>::try_from(
                 ld_slice.as_slice()
@@ -82,14 +122,13 @@ where
         }
     }
 }
-impl<'slice: 'a, 'a, ValueTypeTag> FieldDataIntoIter<'slice, 'a>
-    for (tags::wire::Bits32, ValueTypeTag)
+impl<'slice: 'a, 'a, ValueTypeTag> IterFromFieldData<'slice, 'a, (tags::wire::Bits32, ValueTypeTag)>
+    for <ValueTypeTag as super::Bits32TypeTag>::NativeType
 where
     ValueTypeTag: super::Bits32TypeTag,
 {
-    type Item = <ValueTypeTag as super::Bits32TypeTag>::NativeType;
-    type Iter = impl Iterator<Item = Result<Self::Item>>;
-    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+    type Iter = impl Iterator<Item = Result<Self>>;
+    fn from(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         if let FieldData::Bits32(bytes) = field_data {
             Ok(std::iter::once(Ok(
                 <ValueTypeTag as super::Bits32TypeTag>::from_bytes(bytes),
@@ -99,14 +138,13 @@ where
         }
     }
 }
-impl<'slice: 'a, 'a, ValueTypeTag> FieldDataIntoIter<'slice, 'a>
-    for (tags::wire::Bits64, ValueTypeTag)
+impl<'slice: 'a, 'a, ValueTypeTag> IterFromFieldData<'slice, 'a, (tags::wire::Bits64, ValueTypeTag)>
+    for <ValueTypeTag as super::Bits64TypeTag>::NativeType
 where
     ValueTypeTag: super::Bits64TypeTag,
 {
-    type Item = <ValueTypeTag as super::Bits64TypeTag>::NativeType;
-    type Iter = impl Iterator<Item = Result<Self::Item>>;
-    fn into(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
+    type Iter = impl Iterator<Item = Result<Self>>;
+    fn from(field_data: FieldData<LdSlice<'slice>>) -> Result<Self::Iter> {
         if let FieldData::Bits64(bytes) = field_data {
             Ok(std::iter::once(Ok(
                 <ValueTypeTag as super::Bits64TypeTag>::from_bytes(bytes),
@@ -127,7 +165,6 @@ pub struct RepeatedSliceViewField<'slice, 'msg, S, TypeTag> {
 
 impl<'slice, 'msg, S, TypeTag> RepeatedSliceViewField<'slice, 'msg, S, TypeTag>
 where
-    TypeTag: 'msg + FieldDataIntoIter<'slice, 'msg>,
     S: SliceSource<'slice>,
 {
     pub fn new(
@@ -143,9 +180,12 @@ where
         }
     }
 
-    fn iter_impl(
-        &self,
-    ) -> impl 'msg + Iterator<Item = <TypeTag as FieldDataIntoIter<'slice, 'msg>>::Item> {
+    fn iter_impl<Item>(&self) -> impl 'msg + Iterator<Item = Item> + Captures<'slice>
+    where
+        Item: 'msg + IterFromFieldData<'slice, 'msg, TypeTag>,
+        TypeTag: 'msg,
+        'slice: 'msg,
+    {
         let field_number = self.field_number;
         let internal_data = self.internal_data;
         self.maybe_field.clone().into_iter().flat_map(move |field| {
@@ -156,9 +196,7 @@ where
                 .flat_map(move |source_slices| {
                     field
                         .field_data_iter(field_number, source_slices)
-                        .map_ok(|field| -> Result<_> {
-                            <TypeTag as FieldDataIntoIter>::into(field)
-                        })
+                        .map_ok(<Item as IterFromFieldData<'slice, 'msg, TypeTag>>::from)
                         .map(|rrval| rrval.flatten())
                         .flatten_ok()
                         .map(|rrval| rrval.flatten())
@@ -168,23 +206,28 @@ where
     }
 }
 
-impl<'slice, 'msg, S, T, TypeTag> RepeatedField<T>
+impl<'slice, 'msg, S, TypeTag>
+    RepeatedField<TypeTag, <TypeTag as ItemTypeForTag<'slice, 'msg>>::Type>
     for RepeatedSliceViewField<'slice, 'msg, S, TypeTag>
 where
-    TypeTag: 'msg + FieldDataIntoIter<'slice, 'msg, Item = T>,
+    TypeTag: 'msg + ItemTypeForTag<'slice, 'msg>,
     S: SliceSource<'slice>,
+    <TypeTag as ItemTypeForTag<'slice, 'msg>>::Type:
+        'msg + IterFromFieldData<'slice, 'msg, TypeTag>,
 {
     fn for_each<F>(&self, f: F)
     where
-        F: FnMut(T),
+        F: FnMut(<TypeTag as ItemTypeForTag<'slice, 'msg>>::Type),
     {
         self.iter_impl().for_each(f)
     }
-    fn boxed_iter(&self) -> Box<dyn '_ + Iterator<Item = T>> {
+    fn boxed_iter(
+        &self,
+    ) -> Box<dyn '_ + Iterator<Item = <TypeTag as ItemTypeForTag<'slice, 'msg>>::Type>> {
         Box::new(self.iter_impl())
     }
 
-    type Iter<'this> = impl Iterator<Item = T>;
+    type Iter<'this> = impl Iterator<Item = <TypeTag as ItemTypeForTag<'slice, 'msg>>::Type>;
     fn iter(&self) -> Self::Iter<'_> {
         self.iter_impl()
     }

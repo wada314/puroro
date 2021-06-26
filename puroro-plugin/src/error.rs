@@ -11,8 +11,6 @@ pub struct GeneratorError {
 pub enum ErrorKind {
     #[error(r#"A conflicted identifier was found: "{name}""#)]
     ConflictedName { name: String },
-    #[error(r#"Unknown enum value ({id}) was found in the field descriptor's type field."#)]
-    UnknownFieldTypeId { id: i32 },
     #[error(r#"Unknown enum vvalue({id}) was found in the field descriptor's label field."#)]
     UnknownLabelId { id: i32 },
     #[error(r#"The type name "{name}" is not found in any other input .proto files."#)]

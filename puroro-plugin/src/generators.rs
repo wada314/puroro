@@ -8,7 +8,9 @@ mod writer;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::utils::{get_keyword_safe_ident, to_lower_snake_case, Indentor};
+use crate::utils::{
+    get_keyword_safe_ident, relative_path_over_namespaces, to_lower_snake_case, Indentor,
+};
 use crate::wrappers::{DescriptorVisitor, EnumDescriptor, MessageDescriptor};
 use crate::Result;
 use std::collections::HashMap;
@@ -33,6 +35,8 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
             let mut visitor = MessageGeneratingVisitor {
                 output: Indentor::new(FILE_HEADER.to_string()),
                 context: context.clone(),
+                package: file_desc.package().to_string(),
+                submodules: Vec::new(),
             };
             file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
             filenames_and_contents.insert(file_name, visitor.output.into_inner());
@@ -44,6 +48,8 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
             let mut visitor = MessageGeneratingVisitor {
                 output: Indentor::new(FILE_HEADER.to_string()),
                 context: context.with_alloc_type(AllocatorType::Bumpalo),
+                package: file_desc.package().to_string(),
+                submodules: Vec::new(),
             };
             file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
             filenames_and_contents.insert(file_name, visitor.output.into_inner());
@@ -55,6 +61,8 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
             let mut visitor = MessageGeneratingVisitor {
                 output: Indentor::new(FILE_HEADER.to_string()),
                 context: context.with_impl_type(ImplType::SliceView),
+                package: file_desc.package().to_string(),
+                submodules: Vec::new(),
             };
             file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
             filenames_and_contents.insert(file_name, visitor.output.into_inner());
@@ -75,6 +83,8 @@ pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, Strin
             let file_name = package_to_file_path("traits", file_desc.package());
             let mut visitor = TraitGeneratingVisitor {
                 output: Indentor::new(FILE_HEADER.to_string()),
+                package: file_desc.package().to_string(),
+                submodules: Vec::new(),
             };
             file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
             filenames_and_contents.insert(file_name, visitor.output.into_inner());
@@ -153,53 +163,116 @@ fn package_to_file_path(prefix: &str, package: &str) -> String {
 
 fn enter_submodule(output: &mut Indentor<String>, name: &str) -> Result<()> {
     let mod_name = get_keyword_safe_ident(&to_lower_snake_case(name));
-    output.write_fmt(format_args!("pub mod {name} {{\n", name = mod_name))?;
+    output.write_fmt(format_args!("pub mod {name} {{\n\n", name = mod_name))?;
     Ok(())
 }
 fn exit_submodule(output: &mut Indentor<String>, name: &str) -> Result<()> {
     let mod_name = get_keyword_safe_ident(&to_lower_snake_case(name));
-    output.write_fmt(format_args!("}} // mod {name}\n", name = mod_name))?;
+    output.write_fmt(format_args!("}} // mod {name}\n\n", name = mod_name))?;
+    Ok(())
+}
+fn print_puroro_root(
+    output: &mut Indentor<String>,
+    package: &str,
+    submodules: &Vec<String>,
+) -> Result<()> {
+    let cur_package = format!(
+        "{}{}",
+        package,
+        submodules
+            .iter()
+            .map(|s| format!(".{}", s))
+            .collect::<String>()
+    );
+    output.write_fmt(format_args!(
+        "mod puroro_root {{ pub use {supers}; }}\n",
+        supers = std::iter::repeat("super::")
+            .take(cur_package.split('.').filter(|p| !p.is_empty()).count() + 2)
+            .chain(std::iter::once("*"))
+            .collect::<String>()
+    ))?;
     Ok(())
 }
 
 struct MessageGeneratingVisitor<'c> {
     output: Indentor<String>,
     context: Context<'c>,
+    package: String,
+    submodules: Vec<String>,
+}
+
+impl<'c> MessageGeneratingVisitor<'c> {
+    pub fn print_use_enums(&mut self) -> Result<()> {
+        let cur_package = format!(
+            "{}{}",
+            self.package,
+            self.submodules
+                .iter()
+                .map(|s| format!(".{}", s))
+                .collect::<String>()
+        );
+        self.output.write_fmt(format_args!(
+            "pub use {path}::*;\n\n",
+            path = relative_path_over_namespaces(&cur_package, "enums")?
+        ))?;
+        Ok(())
+    }
 }
 impl<'c> DescriptorVisitor<'c> for MessageGeneratingVisitor<'c> {
+    fn file_header(&mut self) -> Result<()> {
+        self.print_use_enums()?;
+        print_puroro_root(&mut self.output, &self.package, &self.submodules)?;
+        Ok(())
+    }
     fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
         let impl_gen = MessageImplCodeGenerator::new(&self.context, msg);
         impl_gen.print_msg(&mut self.output)?;
         Ok(())
     }
-    fn handle_enum(&mut self, _: &'c EnumDescriptor<'c>) -> Result<()> {
+    fn enter_submodule(&mut self, name: &str) -> Result<()> {
+        enter_submodule(&mut self.output, name)?;
+        self.submodules.push(name.to_string());
+        self.print_use_enums()?;
+        print_puroro_root(&mut self.output, &self.package, &self.submodules)?;
         Ok(())
     }
-    fn enter_submodule(&mut self, name: &str) -> Result<()> {
-        enter_submodule(&mut self.output, name)
-    }
     fn exit_submodule(&mut self, name: &str) -> Result<()> {
-        exit_submodule(&mut self.output, name)
+        exit_submodule(&mut self.output, name)?;
+        self.submodules.pop();
+        Ok(())
     }
 }
 
 struct TraitGeneratingVisitor {
     output: Indentor<String>,
+    package: String,
+    submodules: Vec<String>,
 }
 impl<'c> DescriptorVisitor<'c> for TraitGeneratingVisitor {
+    fn file_header(&mut self) -> Result<()> {
+        print_puroro_root(&mut self.output, &self.package, &self.submodules)?;
+        Ok(())
+    }
     fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
         let trait_gen = MessageTraitCodeGenerator::new(msg);
         trait_gen.print_msg_traits(&mut self.output)?;
         Ok(())
     }
-    fn handle_enum(&mut self, _: &'c EnumDescriptor<'c>) -> Result<()> {
+    fn handle_enum(&mut self, #[allow(unused)] enume: &'c EnumDescriptor<'c>) -> Result<()> {
         Ok(())
     }
+
     fn enter_submodule(&mut self, name: &str) -> Result<()> {
-        enter_submodule(&mut self.output, name)
+        enter_submodule(&mut self.output, name)?;
+        self.submodules.push(name.to_string());
+        print_puroro_root(&mut self.output, &self.package, &self.submodules)?;
+        Ok(())
     }
+
     fn exit_submodule(&mut self, name: &str) -> Result<()> {
-        exit_submodule(&mut self.output, name)
+        exit_submodule(&mut self.output, name)?;
+        self.submodules.pop();
+        Ok(())
     }
 }
 
@@ -207,9 +280,6 @@ struct EnumGeneratingVisitor {
     output: Indentor<String>,
 }
 impl<'c> DescriptorVisitor<'c> for EnumGeneratingVisitor {
-    fn handle_msg(&mut self, _: &'c MessageDescriptor<'c>) -> Result<()> {
-        Ok(())
-    }
     fn handle_enum(&mut self, enume: &'c EnumDescriptor<'c>) -> Result<()> {
         enums::print_enum(&mut self.output, enume)
     }
@@ -228,9 +298,6 @@ impl<'c> DescriptorVisitor<'c> for TagGeneratingVisitor {
     fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
         let tags_gen = MessageTagCodeGenerator::new(&msg);
         tags_gen.print_msg_tag(&mut self.output)?;
-        Ok(())
-    }
-    fn handle_enum(&mut self, _: &'c EnumDescriptor<'c>) -> Result<()> {
         Ok(())
     }
     fn enter_submodule(&mut self, name: &str) -> Result<()> {

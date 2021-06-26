@@ -10,7 +10,7 @@ pub mod tags;
 
 pub use error::{ErrorKind, PuroroError};
 pub type Result<T> = std::result::Result<T, PuroroError>;
-pub use collections::{MapField, RepeatedField};
+pub use collections::RepeatedField;
 
 // Re-exports
 #[cfg(feature = "puroro-bumpalo")]
@@ -36,13 +36,10 @@ pub trait Message {
     type BoxedType: AsMut<Self>;
     fn into_boxed(self) -> Self::BoxedType;
 }
-pub trait BumpaloMessage<'bump> {
-    fn bump(&self) -> &'bump bumpalo::Bump;
-}
 pub trait Enum {}
 
 pub trait MessageTag {}
-pub trait IsMessageImplOfTag<T: MessageTag> {}
+pub trait IsMessageImplOfTag<Tag> {}
 
 pub trait InternalData {
     #[cfg(feature = "puroro-bumpalo")]

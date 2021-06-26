@@ -1,5 +1,4 @@
 use super::message_frags::MessageImplFragmentGenerator;
-use super::message_tags::MessageTagCodeGenerator;
 use super::message_traits::MessageTraitCodeGenerator;
 use super::writer::{func, indent, indent_n, iter, seq, IntoFragment};
 use crate::context::{AllocatorType, Context, ImplType};
@@ -13,7 +12,6 @@ pub struct MessageImplCodeGenerator<'a, 'c> {
     msg: &'c MessageDescriptor<'c>,
     frag_gen: MessageImplFragmentGenerator<'a, 'c>,
     traits_gen: MessageTraitCodeGenerator<'c>,
-    tags_gen: MessageTagCodeGenerator<'c>,
 }
 
 impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
@@ -23,7 +21,6 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
             msg,
             frag_gen: MessageImplFragmentGenerator::new(context, msg),
             traits_gen: MessageTraitCodeGenerator::new(msg),
-            tags_gen: MessageTagCodeGenerator::new(msg),
         }
     }
 
@@ -49,6 +46,7 @@ impl<'a, 'c> MessageImplCodeGenerator<'a, 'c> {
                 func(|output| self.print_impl_trait(output)),
                 func(|output| self.print_impl_message(output)),
                 func(|output| self.print_impl_is_message_impl_of_tag(output)),
+                func(|output| self.print_impl_get_impl_for(output)),
                 func(|output| self.print_impl_map_entry(output)),
                 func(|output| self.print_impl_field_new(output)),
             ),
@@ -217,7 +215,7 @@ impl{gp} {ident}{gpb} {{
 impl{gp} {ident}{gpb} 
     where ::puroro_internal::SourceLdSlices<'slice, 'par, SS>: ::puroro_internal::SliceSource<'slice>,
 {{
-    fn try_new_with_parent(
+    pub(crate) fn try_new_with_parent(
         field_in_parent: ::std::option::Option<&'par ::puroro_internal::SliceViewField<'slice>>,
         field_number_in_parent: usize,
         parent_internal_data: &'par ::puroro_internal::InternalDataForSliceViewStruct<'slice, SS>,
@@ -358,8 +356,8 @@ impl{gp} ::puroro_internal::deser::MergeableMessageFromIter for {ident}{gpb} {{
                             number = field.number(),
                             ident = field.native_ident()?,
                             type_ = self.frag_gen.field_type_name(field)?,
-                            type_tag = self.frag_gen.type_tag_ident_gp(field, None)?,
-                            label_tag = field.label_tag()?,
+                            type_tag = field.type_tag_ident_gp()?,
+                            label_tag = field.label_tag_ident()?,
                             default_func = self.frag_gen.default_func_for(field)?,
                         ))
                     })),
@@ -485,8 +483,8 @@ impl{gp} ::puroro_internal::deser::DeserializableMessageFromSlice<'slice> for {i
                             number = field.number(),
                             ident = field.native_ident()?,
                             type_ = self.frag_gen.field_type_name(field)?,
-                            type_tag = self.frag_gen.type_tag_ident_gp(field, None)?,
-                            label_tag = field.label_tag()?,
+                            type_tag = field.type_tag_ident_gp()?,
+                            label_tag = field.label_tag_ident()?,
                         ))
                     })),
                     "_ => Err(::puroro::ErrorKind::UnexpectedFieldId)?,\n",
@@ -530,8 +528,8 @@ impl{gp} ::puroro_internal::ser::SerializableMessage for {ident}{gpb} {{
                                 number = field.number(),
                                 ident = field.native_ident()?,
                                 type_ = self.frag_gen.field_type_name(field)?,
-                                type_tag = self.frag_gen.type_tag_ident_gp(field, None)?,
-                                label_tag = field.label_tag()?,
+                                type_tag = field.type_tag_ident_gp()?,
+                                label_tag = field.label_tag_ident()?,
                             ))
                         })),
                     ),
@@ -589,9 +587,7 @@ impl{gp} ::puroro::Serializable for {name}{gpb} {{
                 "\
 impl{gp} {trait_path} for {struct_ident}{gpb} {{\n",
                 struct_ident = self.msg.native_ident()?,
-                trait_path = self
-                    .traits_gen
-                    .trait_path_from_struct(self.msg.package()?)?,
+                trait_path = self.msg.native_trait_path()?,
                 gp = self
                     .frag_gen
                     .struct_generic_params()
@@ -644,7 +640,7 @@ impl{gp} {trait_path} for {struct_ident}{gpb} {{\n",
 {decl} {{
     ::std::borrow::Cow::Owned(
         {msg}::try_new_with_parent(
-            self.{ident}.clone(),
+            self.{ident}.as_ref(),
             {field_number},
             &self.puroro_internal
         ).expect(\"Invalid input slice. Consider checking the slice content earlier (TBD).\")
@@ -749,9 +745,7 @@ type {type_ident}{type_gp} {type_where} =
 }}\n",
                         type_ident = type_ident,
                         type_gp = type_gp,
-                        type_tag = self
-                            .frag_gen
-                            .type_tag_ident_gp(field, &[("S", "&'slice [u8]")])?,
+                        type_tag = field.type_tag_ident_gp()?,
                         type_where = type_where,
                         get_decl = get_decl,
                         ident = field.native_ident()?,
@@ -764,7 +758,8 @@ type {type_ident}{type_gp} {type_where} =
                     ) => format!(
                         "\
 {decl} {{
-    ::std::borrow::Cow::Borrowed(self.{ident}.as_ref())
+    use ::std::borrow::Borrow;
+    ::std::borrow::Cow::Borrowed(self.{ident}.borrow())
 }}\n",
                         decl = get_decl,
                         ident = field.native_ident()?
@@ -868,6 +863,37 @@ impl{gp} ::puroro::Message for {struct_ident}{gpb} {{
             .write_into(output)
     }
 
+    fn print_impl_get_impl_for<W: std::fmt::Write>(&self, output: &mut Indentor<W>) -> Result<()> {
+        let getter_trait_path = match (self.context.impl_type(), self.context.alloc_type()) {
+            (ImplType::Default, AllocatorType::Default) => {
+                "::puroro_internal::GetSimpleStructImplFor"
+            }
+            (ImplType::Default, AllocatorType::Bumpalo) => {
+                "::puroro_internal::GetBumpaloStructImplFor<'bump>"
+            }
+            (ImplType::SliceView, AllocatorType::Default) => {
+                "::puroro_internal::GetSliceViewStructImplFor<'slice>"
+            }
+            (ImplType::SliceView, AllocatorType::Bumpalo) => unreachable!(),
+        };
+        (format!(
+            "\
+impl{gp} {trait_path} for {tag_path} {{
+    type Type = {struct_ident}{gpb};
+}}
+\n",
+            struct_ident = self.msg.native_ident()?,
+            tag_path = self.msg.native_tag_path()?,
+            trait_path = getter_trait_path,
+            gp = self.frag_gen.struct_generic_params_bounds().remove("S"),
+            gpb = self
+                .frag_gen
+                .struct_generic_params()
+                .replace("S", "&'slice [u8]"),
+        ),)
+            .write_into(output)
+    }
+
     fn print_impl_is_message_impl_of_tag<W: std::fmt::Write>(
         &self,
         output: &mut Indentor<W>,
@@ -878,7 +904,7 @@ impl{gp} ::puroro::IsMessageImplOfTag<{tag}> for {struct_ident}{gpb} {{
 }}
 \n",
             struct_ident = self.msg.native_ident()?,
-            tag = self.tags_gen.tag_path_from_struct(self.msg.package()?)?,
+            tag = self.msg.native_tag_path()?,
             gp = self
                 .frag_gen
                 .struct_generic_params()
@@ -940,10 +966,10 @@ impl{gp} ::puroro_internal::MapEntryForNormalImpl for {entry_type} {{
             entry_type = self.frag_gen.type_name_of_msg(self.msg, None)?,
             gp = self.frag_gen.struct_generic_params(),
             owned_key_type = self.frag_gen.map_owned_key_type_name(key_field)?,
-            key_type_tag = self.frag_gen.type_tag_ident_gp(key_field, None)?,
+            key_type_tag = key_field.type_tag_ident_gp()?,
             take_key = self.frag_gen.field_take_or_init(key_field)?,
             owned_value_type = self.frag_gen.map_owned_value_type_name(value_field)?,
-            value_type_tag = self.frag_gen.type_tag_ident_gp(value_field, None)?,
+            value_type_tag = value_field.type_tag_ident_gp()?,
             take_value = self.frag_gen.field_take_or_init(value_field)?,
         ),)
             .write_into(output)
@@ -972,9 +998,7 @@ impl{gp} ::puroro_internal::MapEntryForSliceViewImpl<'slice> for {entry_type} {{
 }}
 \n",
             entry_type = self.frag_gen.type_name_of_msg(self.msg, None)?,
-            message_trait_type = self
-                .traits_gen
-                .trait_path_from_struct(self.msg.package()?)?,
+            message_trait_type = self.msg.native_trait_path()?,
             gp = self.frag_gen.struct_generic_params(),
             owned_key_type = self.frag_gen.map_owned_key_type_name(key_field)?,
             value_getter_type = self.traits_gen.map_value_getter_type_name(value_field)?,

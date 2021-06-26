@@ -136,7 +136,7 @@ impl<'c> FieldDescriptor<'c> {
         })
     }
 
-    pub fn label_tag(&'c self) -> Result<&'static str> {
+    pub fn label_tag_ident(&'c self) -> Result<&'static str> {
         Ok(match self.label()? {
             FieldLabel::Optional2 => "Optional2",
             FieldLabel::Optional3 => "Optional3",
@@ -145,8 +145,38 @@ impl<'c> FieldDescriptor<'c> {
         })
     }
 
-    pub fn package(&'c self) -> Result<&str> {
-        self.parent.package()
+    pub fn type_tag_ident_gp(&'c self) -> Result<String> {
+        Ok(match self.type_()? {
+            FieldType::Double => "Double".into(),
+            FieldType::Float => "Float".into(),
+            FieldType::Int32 => "Int32".into(),
+            FieldType::Int64 => "Int64".into(),
+            FieldType::UInt32 => "UInt32".into(),
+            FieldType::UInt64 => "UInt64".into(),
+            FieldType::SInt32 => "SInt32".into(),
+            FieldType::SInt64 => "SInt64".into(),
+            FieldType::Fixed32 => "Fixed32".into(),
+            FieldType::Fixed64 => "Fixed64".into(),
+            FieldType::SFixed32 => "SFixed32".into(),
+            FieldType::SFixed64 => "SFixed64".into(),
+            FieldType::Bool => "Bool".into(),
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => "String".into(),
+            FieldType::Bytes => "Bytes".into(),
+            FieldType::Enum2(e) => format!(
+                "Enum2::<{module}::{ident}>",
+                module = relative_path_over_namespaces(e.package()?, "enums")?,
+                ident = e.native_ident()?,
+            ),
+            FieldType::Enum3(e) => format!(
+                "Enum3::<{module}::{ident}>",
+                module = relative_path_over_namespaces(e.package()?, "enums")?,
+                ident = e.native_ident()?,
+            ),
+            FieldType::Message(m) => {
+                format!("Message::<{}>", m.native_tag_path()?)
+            }
+        })
     }
 
     pub fn message(&'c self) -> &'c MessageDescriptor<'c> {
@@ -222,7 +252,6 @@ pub enum FieldType<'c> {
 impl<'c> FieldType<'c> {
     pub fn native_numerical_type_name(
         &self,
-        package: &str,
     ) -> Result<std::result::Result<Cow<'static, str>, NonNumericalFieldType<'c>>> {
         Ok(match self {
             FieldType::Double => Ok("f64".into()),
@@ -237,13 +266,13 @@ impl<'c> FieldType<'c> {
             FieldType::Bytes => Err(NonNumericalFieldType::Bytes),
             FieldType::Enum2(e) => Ok(format!(
                 "{module}::{ident}",
-                module = relative_path_over_namespaces(package, e.package()?, "enums")?,
+                module = relative_path_over_namespaces(e.package()?, "enums")?,
                 ident = e.native_ident()?,
             )
             .into()),
             FieldType::Enum3(e) => Ok(format!(
                 "::std::result::Result<{module}::{ident}, i32>",
-                module = relative_path_over_namespaces(package, e.package()?, "enums")?,
+                module = relative_path_over_namespaces(e.package()?, "enums")?,
                 ident = e.native_ident()?,
             )
             .into()),

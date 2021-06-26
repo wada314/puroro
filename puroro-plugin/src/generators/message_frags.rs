@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use itertools::Itertools;
 
 use crate::context::{AllocatorType, Context, ImplType};
-use crate::utils::{relative_path, relative_path_over_namespaces, GenericParams};
+use crate::utils::{relative_path, GenericParams};
 use crate::wrappers::{
     FieldDescriptor, FieldLabel, FieldType, MessageDescriptor, NonNumericalFieldType,
 };
@@ -94,10 +94,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         field: &'c FieldDescriptor<'c>,
     ) -> Result<Cow<'static, str>> {
         Ok(match self.context.impl_type() {
-            ImplType::Default => match field
-                .type_()?
-                .native_numerical_type_name(field.package()?)?
-            {
+            ImplType::Default => match field.type_()?.native_numerical_type_name()? {
                 Ok(name) => name,
                 Err(nonnumerical_type) => match nonnumerical_type {
                     NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
@@ -106,10 +103,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                     NonNumericalFieldType::Message(m) => self.type_name_of_msg(m, None)?.into(),
                 },
             },
-            ImplType::SliceView => match field
-                .type_()?
-                .native_numerical_type_name(field.package()?)?
-            {
+            ImplType::SliceView => match field.type_()?.native_numerical_type_name()? {
                 Ok(name) => name,
                 Err(nonnumerical_type) => match nonnumerical_type {
                     NonNumericalFieldType::Group => Err(ErrorKind::GroupNotSupported)?,
@@ -180,47 +174,6 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
                 (FieldLabel::Optional2, _) => self.option_type(&scalar_type).into(),
                 _ => scalar_type.into(),
             },
-        })
-    }
-
-    pub fn type_tag_ident_gp<'b, T>(
-        &self,
-        field: &'c FieldDescriptor<'c>,
-        bindings: T,
-    ) -> Result<String>
-    where
-        T: IntoIterator<Item = &'b (&'static str, &'static str)>,
-    {
-        Ok(match field.type_()? {
-            FieldType::Double => "Double".into(),
-            FieldType::Float => "Float".into(),
-            FieldType::Int32 => "Int32".into(),
-            FieldType::Int64 => "Int64".into(),
-            FieldType::UInt32 => "UInt32".into(),
-            FieldType::UInt64 => "UInt64".into(),
-            FieldType::SInt32 => "SInt32".into(),
-            FieldType::SInt64 => "SInt64".into(),
-            FieldType::Fixed32 => "Fixed32".into(),
-            FieldType::Fixed64 => "Fixed64".into(),
-            FieldType::SFixed32 => "SFixed32".into(),
-            FieldType::SFixed64 => "SFixed64".into(),
-            FieldType::Bool => "Bool".into(),
-            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => "String".into(),
-            FieldType::Bytes => "Bytes".into(),
-            FieldType::Enum2(e) => format!(
-                "Enum2::<{module}::{ident}>",
-                module = relative_path_over_namespaces(self.msg.package()?, e.package()?, "enums")?,
-                ident = e.native_ident()?,
-            ),
-            FieldType::Enum3(e) => format!(
-                "Enum3::<{module}::{ident}>",
-                module = relative_path_over_namespaces(self.msg.package()?, e.package()?, "enums")?,
-                ident = e.native_ident()?,
-            ),
-            FieldType::Message(m) => {
-                format!("Message::<{}>", self.type_name_of_msg(m, bindings)?)
-            }
         })
     }
 
@@ -425,20 +378,15 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         &self,
         field: &'c FieldDescriptor<'c>,
     ) -> Result<Cow<'static, str>> {
-        Ok(
-            match field
-                .type_()?
-                .native_numerical_type_name(field.package()?)?
-            {
-                Ok(name) => name,
-                Err(nonnumerical_type) => match nonnumerical_type {
-                    NonNumericalFieldType::String => self.string_type().into(),
-                    _ => Err(ErrorKind::InvalidMapKey {
-                        name: field.fully_qualified_type_name()?.to_string(),
-                    })?,
-                },
+        Ok(match field.type_()?.native_numerical_type_name()? {
+            Ok(name) => name,
+            Err(nonnumerical_type) => match nonnumerical_type {
+                NonNumericalFieldType::String => self.string_type().into(),
+                _ => Err(ErrorKind::InvalidMapKey {
+                    name: field.fully_qualified_type_name()?.to_string(),
+                })?,
             },
-        )
+        })
     }
 
     pub fn map_owned_value_type_name(

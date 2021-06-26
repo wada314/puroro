@@ -1,0 +1,60 @@
+syntax = "proto2";
+package sample2;
+
+message Msg {
+    required int32 i32_req = 1;
+    optional int32 i32_opt = 2;
+    repeated int32 i32_rep = 3;
+    
+    required bytes bytes_req = 4;
+    optional bytes bytes_opt = 5;
+    repeated bytes bytes_rep = 6;
+    
+    required string string_req = 7;
+    optional string string_opt = 8;
+    repeated string string_rep = 9;
+    
+    message SubMsg {
+    }
+
+    required SubMsg submsg_req = 10;
+    optional SubMsg submsg_opt = 11;
+    repeated SubMsg submsg_rep = 12;
+
+    required float f32_req = 13;
+    optional float f32_opt = 14;
+    repeated float f32_rep = 15;
+
+    required SubEnum subenum_req = 16;
+    optional SubEnum subenum_opt = 17;
+    repeated SubEnum subenum_rep = 18;
+
+    enum SubEnum {
+        APPLE = 0;
+        BANANA = 1;
+        CHOCOLATE = 2;
+    }
+    
+    // We don't allow this because it makes infinite recursive definition
+    // required Msg msg_req = 19; 
+    optional Msg msg_opt = 20;
+    repeated Msg msg_rep = 21;
+
+    map<string, SubMsg> map = 22;
+}
+
+message Test1 {
+  optional int32 a = 1;
+}
+
+message Test2 {
+  optional string b = 2;
+}
+
+message Test3 {
+  optional Test1 c = 3;
+}
+
+message Test4 {
+  repeated int32 d = 4 [packed=true];
+}

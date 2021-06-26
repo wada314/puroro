@@ -1,4 +1,4 @@
-use puroro::Message;
+use puroro::{IsMessageImplOfTag, Message};
 
 use super::{BytesType, DoDefaultCheck, StringType, WrappedFieldType, WrappedMessageFieldType};
 use crate::ser::{MessageSerializer, SerializableMessage};
@@ -95,12 +95,11 @@ where
 }
 
 // Note: For map implementation, `M` might not be equal to `T::Item`
-impl<'a, L, M, T> FieldSer<'a, tags::Message<M>, L> for T
+impl<'a, L, MessageTag, T> FieldSer<'a, tags::Message<MessageTag>, L> for T
 where
     L: tags::FieldLabelTag + DoDefaultCheck,
-    T: WrappedMessageFieldType<'a, M, L>,
-    M: Message,
-    T::Item: Message + SerializableMessage,
+    T: WrappedMessageFieldType<'a, MessageTag, L>,
+    T::Item: Message + SerializableMessage + IsMessageImplOfTag<MessageTag>,
 {
     fn ser<S>(&'a self, serializer: &mut S, field_number: usize) -> Result<()>
     where

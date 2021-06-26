@@ -3,7 +3,7 @@ use std::hash::Hash;
 
 use super::{EnumDescriptor, FieldDescriptor, FileDescriptor, FileOrMessageRef};
 use crate::google::protobuf::DescriptorProto;
-use crate::utils::{get_keyword_safe_ident, to_camel_case};
+use crate::utils::{get_keyword_safe_ident, relative_path_over_namespaces, to_camel_case};
 use crate::{Context, ErrorKind, Result};
 use ::once_cell::unsync::OnceCell;
 
@@ -20,7 +20,11 @@ pub struct MessageDescriptor<'c> {
     lazy_package: OnceCell<String>,
     lazy_path_to_root_mod: OnceCell<String>,
     lazy_fq_name: OnceCell<String>,
-    lazy_native_bare_type_name: OnceCell<String>,
+    lazy_native_tag_path: OnceCell<String>,
+    lazy_native_trait_path: OnceCell<String>,
+    lazy_native_ident: OnceCell<String>,
+    lazy_native_trait_ident: OnceCell<String>,
+    lazy_native_tag_ident: OnceCell<String>,
     lazy_native_type_name_from_root: OnceCell<String>,
 }
 impl<'c> MessageDescriptor<'c> {
@@ -39,7 +43,11 @@ impl<'c> MessageDescriptor<'c> {
             lazy_package: Default::default(),
             lazy_path_to_root_mod: Default::default(),
             lazy_fq_name: Default::default(),
-            lazy_native_bare_type_name: Default::default(),
+            lazy_native_tag_path: Default::default(),
+            lazy_native_trait_path: Default::default(),
+            lazy_native_ident: Default::default(),
+            lazy_native_trait_ident: Default::default(),
+            lazy_native_tag_ident: Default::default(),
             lazy_native_type_name_from_root: Default::default(),
         }
     }
@@ -122,10 +130,38 @@ impl<'c> MessageDescriptor<'c> {
     /// Returns a Rust identifier without mod path,
     /// without distinguishing between repeated / optional labels.
     pub fn native_ident(&self) -> Result<&str> {
+        Ok(self.lazy_native_ident.get_or_try_init(|| -> Result<_> {
+            Ok(get_keyword_safe_ident(&to_camel_case(self.name()?)))
+        })?)
+    }
+    pub fn native_trait_ident(&self) -> Result<&str> {
         Ok(self
-            .lazy_native_bare_type_name
+            .lazy_native_trait_ident
+            .get_or_try_init(|| -> Result<_> { Ok(format!("{}Trait", self.native_ident()?)) })?)
+    }
+    pub fn native_tag_ident(&self) -> Result<&str> {
+        Ok(self
+            .lazy_native_tag_ident
+            .get_or_try_init(|| -> Result<_> { Ok(format!("{}Tag", self.native_ident()?)) })?)
+    }
+    pub fn native_tag_path(&'c self) -> Result<&str> {
+        Ok(self.lazy_native_tag_path.get_or_try_init(|| -> Result<_> {
+            Ok(format!(
+                "{module}::{ident}",
+                module = relative_path_over_namespaces(self.package()?, "tags")?,
+                ident = self.native_tag_ident()?,
+            ))
+        })?)
+    }
+    pub fn native_trait_path(&'c self) -> Result<&str> {
+        Ok(self
+            .lazy_native_trait_path
             .get_or_try_init(|| -> Result<_> {
-                Ok(get_keyword_safe_ident(&to_camel_case(self.name()?)))
+                Ok(format!(
+                    "{module}::{ident}",
+                    module = relative_path_over_namespaces(self.package()?, "traits")?,
+                    ident = self.native_trait_ident()?,
+                ))
             })?)
     }
 

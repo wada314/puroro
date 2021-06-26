@@ -72,6 +72,7 @@ impl<'c> FileDescriptor<'c> {
         /// Lifetime `'a` is for this descriptor's lifetime, and `'d` is for
         /// the context's lifetime.
         enum Task<'a, 'd> {
+            FileHeader,
             HandleMsg(&'a MessageDescriptor<'d>),
             HandleEnum(&'a EnumDescriptor<'d>),
             EnterSubmodule(&'a str),
@@ -81,10 +82,14 @@ impl<'c> FileDescriptor<'c> {
             .messages()
             .map(|msg| Task::HandleMsg(msg))
             .chain(self.enums().map(|enume| Task::HandleEnum(enume)))
+            .chain(std::iter::once(Task::FileHeader))
             .collect::<Vec<_>>();
 
         while let Some(task) = tasks.pop() {
             match task {
+                Task::FileHeader => {
+                    visitor.file_header()?;
+                }
                 Task::HandleMsg(msg) => {
                     visitor.handle_msg(msg)?;
                     if msg.nested_messages().next().is_some() || msg.enums().next().is_some() {
@@ -123,6 +128,9 @@ pub enum ProtoSyntax {
 }
 
 pub trait DescriptorVisitor<'c> {
+    fn file_header(&mut self) -> Result<()> {
+        Ok(())
+    }
     fn handle_msg(&mut self, #[allow(unused)] msg: &'c MessageDescriptor<'c>) -> Result<()> {
         Ok(())
     }
