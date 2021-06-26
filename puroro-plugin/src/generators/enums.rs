@@ -1,9 +1,22 @@
-use super::writer::{indent, indent_n, iter, IntoFragment};
+use super::writer::{func, indent, indent_n, iter, IntoFragment};
 use crate::utils::Indentor;
 use crate::wrappers::EnumDescriptor;
 use crate::Result;
 
 pub fn print_enum<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    enume: &'c EnumDescriptor<'c>,
+) -> Result<()> {
+    (
+        func(|output| print_enum_body(output, enume)),
+        func(|output| print_enum_try_from(output, enume)),
+        func(|output| print_enum_from(output, enume)),
+        func(|output| print_enum_field_new(output, enume)),
+    )
+        .write_into(output)
+}
+
+fn print_enum_body<'c, W: std::fmt::Write>(
     output: &mut Indentor<W>,
     enume: &'c EnumDescriptor<'c>,
 ) -> Result<()> {
@@ -23,6 +36,15 @@ pub enum {name} {{\n",
         })),)),
         "\
 }}\n",
+    )
+        .write_into(output)
+}
+
+fn print_enum_try_from<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    enume: &'c EnumDescriptor<'c>,
+) -> Result<()> {
+    (
         format!(
             "\
 impl ::std::convert::TryFrom<i32> for {name} {{
@@ -48,25 +70,40 @@ impl ::std::convert::TryFrom<i32> for {name} {{
         }}
     }}
 }}\n",
-        format!(
-            "\
+    )
+        .write_into(output)
+}
+
+fn print_enum_from<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    enume: &'c EnumDescriptor<'c>,
+) -> Result<()> {
+    // Possibly failing, not good...
+    (format!(
+        "\
 impl ::std::convert::From<{name}> for i32 {{
     fn from(val: {name}) -> i32 {{
         val as i32
     }}
 }}\n",
-            name = enume.native_ident()?
-        ),
-        format!(
-            "\
+        name = enume.native_ident()?
+    ),)
+        .write_into(output)
+}
+
+fn print_enum_field_new<'c, W: std::fmt::Write>(
+    output: &mut Indentor<W>,
+    enume: &'c EnumDescriptor<'c>,
+) -> Result<()> {
+    (format!(
+        "\
 impl<'bump> ::puroro_internal::FieldNew<'bump> for {ident} {{
     fn new() -> Self {{
         Self::{value_ident}
     }}
 }}\n",
-            ident = enume.native_ident()?,
-            value_ident = enume.first_value()?.native_name()?,
-        ),
-    )
+        ident = enume.native_ident()?,
+        value_ident = enume.first_value()?.native_name()?,
+    ),)
         .write_into(output)
 }
