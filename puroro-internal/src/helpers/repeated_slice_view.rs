@@ -16,22 +16,22 @@ use puroro::IsMessageImplOfTag;
 trait Captures<'a> {}
 impl<'a, T: ?Sized> Captures<'a> for T {}
 
-pub trait ItemTypeForTag<'msg, 'slice> {
+pub trait ItemTypeForTag<'slice, 'msg> {
     type Type;
 }
-impl<'msg, 'slice, V> ItemTypeForTag<'msg, 'slice> for (tags::wire::Variant, V)
+impl<'slice, 'msg, V> ItemTypeForTag<'slice, 'msg> for (tags::wire::Variant, V)
 where
     V: tags::VariantTypeTag,
 {
     type Type = <V as tags::VariantTypeTag>::NativeType;
 }
-impl<'msg, 'slice> ItemTypeForTag<'msg, 'slice> for tags::Bytes {
+impl<'slice, 'msg> ItemTypeForTag<'slice, 'msg> for tags::Bytes {
     type Type = Cow<'msg, [u8]>;
 }
-impl<'msg, 'slice> ItemTypeForTag<'msg, 'slice> for tags::String {
+impl<'slice, 'msg> ItemTypeForTag<'slice, 'msg> for tags::String {
     type Type = Cow<'msg, str>;
 }
-impl<'msg, 'slice, MessageTag> ItemTypeForTag<'msg, 'slice> for tags::Message<MessageTag>
+impl<'slice, 'msg, MessageTag> ItemTypeForTag<'slice, 'msg> for tags::Message<MessageTag>
 where
     MessageTag: GetSliceViewStructImplFor<'slice>,
     <MessageTag as GetSliceViewStructImplFor<'slice>>::Type: 'msg + ToOwned,
@@ -39,13 +39,13 @@ where
 {
     type Type = Cow<'msg, <MessageTag as GetSliceViewStructImplFor<'slice>>::Type>;
 }
-impl<'msg, 'slice, V> ItemTypeForTag<'msg, 'slice> for (tags::wire::Bits32, V)
+impl<'slice, 'msg, V> ItemTypeForTag<'slice, 'msg> for (tags::wire::Bits32, V)
 where
     V: tags::Bits32TypeTag,
 {
     type Type = <V as tags::Bits32TypeTag>::NativeType;
 }
-impl<'msg, 'slice, V> ItemTypeForTag<'msg, 'slice> for (tags::wire::Bits64, V)
+impl<'slice, 'msg, V> ItemTypeForTag<'slice, 'msg> for (tags::wire::Bits64, V)
 where
     V: tags::Bits64TypeTag,
 {
