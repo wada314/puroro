@@ -855,10 +855,14 @@ impl{gp} ::puroro::Message for {struct_ident}{gpb} {{
                 gpb = self.frag_gen.struct_generic_params_bounds(),
             ),
             indent_n(2, self.frag_gen.box_new("self")),
-            "    \
+            format!(
+                "    \
     }}
+    type ImplTypeTag = ::puroro::tags::{impl_tag_ident};
 }}
 \n",
+                impl_tag_ident = self.frag_gen.impl_tag_type_ident_gp(),
+            ),
         )
             .write_into(output)
     }

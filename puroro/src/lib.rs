@@ -33,8 +33,11 @@ pub trait Serializable: Sized {
 pub trait Message {
     type InternalData: InternalData;
     fn puroro_internal_data(&self) -> &Self::InternalData;
+
     type BoxedType: AsMut<Self>;
     fn into_boxed(self) -> Self::BoxedType;
+
+    type ImplTypeTag: tags::ImplTypeTag;
 }
 pub trait Enum {}
 

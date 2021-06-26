@@ -374,6 +374,15 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         }
     }
 
+    pub fn impl_tag_type_ident_gp(&self) -> &'static str {
+        match (self.context.impl_type(), self.context.alloc_type()) {
+            (ImplType::Default, AllocatorType::Default) => "SimpleStruct",
+            (ImplType::Default, AllocatorType::Bumpalo) => "Bumpalo<'bump>",
+            (ImplType::SliceView, AllocatorType::Default) => "SliceView<'slice>",
+            (ImplType::SliceView, AllocatorType::Bumpalo) => unimplemented!(),
+        }
+    }
+
     pub fn map_owned_key_type_name(
         &self,
         field: &'c FieldDescriptor<'c>,

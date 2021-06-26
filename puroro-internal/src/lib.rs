@@ -15,6 +15,7 @@ pub mod variant;
 pub use ::puroro::{bumpalo, hashbrown};
 
 pub use ::puroro::{ErrorKind, PuroroError, Result};
+pub use field_type_gen::FieldTypeGen;
 pub use internal_data::{
     InternalDataForBumpaloStruct, InternalDataForNormalStruct, InternalDataForSliceViewStruct,
     SliceSource, SourceLdSlices,
@@ -25,6 +26,15 @@ pub use helpers::{
     MapEntryForNormalImpl, MapEntryForSliceViewImpl, RepeatedSliceViewField,
 };
 pub use types::SliceViewField;
+
+// Message common interface (only used by internal puroro code, not by library user)
+pub trait MessageInternal: ::puroro::Message {
+    fn field_default_value_for_tag<LabelAndTypeTag>(
+        &self,
+    ) -> <Self::ImplTypeTag as FieldTypeGen<LabelAndTypeTag>>::Type
+    where
+        Self::ImplTypeTag: FieldTypeGen<LabelAndTypeTag>;
+}
 
 // A utility for Result.
 trait ResultHelper<T, E> {
