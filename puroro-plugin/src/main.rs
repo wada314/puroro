@@ -12,7 +12,7 @@ use ::puroro::Serializable;
 use ::puroro_internal::deser::MergeableMessageFromIter;
 use itertools::Itertools;
 
-use error::GeneratorError;
+use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
 
 use std::collections::{HashMap, HashSet};

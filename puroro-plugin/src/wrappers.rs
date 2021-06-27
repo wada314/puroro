@@ -1,13 +1,18 @@
+use crate::protos::enums::google::protobuf::field_descriptor_proto::Type as FieldTypeProto;
+use crate::protos::simple::google::protobuf;
 use crate::utils;
+use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::std::borrow::Borrow;
 use ::std::iter;
+use protobuf::{DescriptorProto, EnumDescriptorProto, FieldDescriptorProto};
 
 #[derive(Debug, Clone)]
 pub struct Message {
     pub rust_ident: String,
     pub proto_package: Vec<String>,
     pub proto_outer_messages: Vec<String>,
+    pub fields: Vec<Field>,
 }
 
 #[derive(Debug, Clone)]
@@ -45,7 +50,26 @@ pub enum FieldType {
     Message(Message),
 }
 
-impl Enum {
+impl Message {
+    pub fn try_from_proto<'a, I, J>(
+        proto: &DescriptorProto,
+        package: I,
+        outer_messages: J,
+    ) -> Result<Self>
+    where
+        I: Iterator<Item = &'a str> + Clone,
+        J: Iterator<Item = &'a str> + Clone,
+    {
+        let proto_name = proto.name.clone().ok_or(ErrorKind::EmptyInputField {
+            name: "DescriptorProto.name".to_string(),
+        })?;
+        Ok(Self {
+            rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
+            proto_package: package.map_into().collect_vec(),
+            proto_outer_messages: outer_messages.map_into().collect_vec(),
+        })
+    }
+
     pub fn rust_absolute_path(&self) -> String {
         format!(
             "{path}::{ident}",
@@ -55,6 +79,75 @@ impl Enum {
             ),
             ident = self.rust_ident
         )
+    }
+}
+
+impl Enum {
+    pub fn try_from_proto<'a, I, J>(
+        proto: &EnumDescriptorProto,
+        package: I,
+        outer_messages: J,
+    ) -> Result<Self>
+    where
+        I: Iterator<Item = &'a str> + Clone,
+        J: Iterator<Item = &'a str> + Clone,
+    {
+        let proto_name = proto.name.clone().ok_or(ErrorKind::EmptyInputField {
+            name: "EnumDescriptorProto.name".to_string(),
+        })?;
+        Ok(Self {
+            rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
+            proto_package: package.map_into().collect_vec(),
+            proto_outer_messages: outer_messages.map_into().collect_vec(),
+        })
+    }
+
+    pub fn rust_absolute_path(&self) -> String {
+        format!(
+            "{path}::{ident}",
+            path = make_module_path(
+                self.proto_package.iter().map(|s| s.borrow()),
+                self.proto_outer_messages.iter().map(|s| s.borrow())
+            ),
+            ident = self.rust_ident
+        )
+    }
+}
+
+impl Field {
+    pub fn try_from_proto(proto: &FieldDescriptorProto) -> Result<Self> {
+        let proto_name = proto.name.clone().ok_or(ErrorKind::EmptyInputField {
+            name: "FieldDescriptorProto.name".to_string(),
+        })?;
+        Ok(Self {
+            rust_ident: utils::get_keyword_safe_ident(&utils::to_lower_snake_case(&proto_name)),
+            proto_type: todo!(),
+        })
+    }
+}
+
+impl FieldType {
+    pub fn try_from_type_proto(proto_type: &FieldTypeProto) -> Result<Self> {
+        Ok(match proto_type {
+            FieldTypeProto::TypeDouble => FieldType::Double,
+            FieldTypeProto::TypeFloat => FieldType::Float,
+            FieldTypeProto::TypeInt64 => FieldType::Int64,
+            FieldTypeProto::TypeUint64 => FieldType::UInt64,
+            FieldTypeProto::TypeInt32 => FieldType::Int32,
+            FieldTypeProto::TypeFixed64 => FieldType::Fixed64,
+            FieldTypeProto::TypeFixed32 => FieldType::Fixed32,
+            FieldTypeProto::TypeBool => FieldType::Bool,
+            FieldTypeProto::TypeString => FieldType::String,
+            FieldTypeProto::TypeGroup => FieldType::Group,
+            FieldTypeProto::TypeMessage => FieldType::Message(todo!()),
+            FieldTypeProto::TypeBytes => FieldType::Bytes,
+            FieldTypeProto::TypeUint32 => FieldType::UInt32,
+            FieldTypeProto::TypeEnum => FieldType::Enum(todo!()),
+            FieldTypeProto::TypeSfixed32 => FieldType::SFixed32,
+            FieldTypeProto::TypeSfixed64 => FieldType::SFixed64,
+            FieldTypeProto::TypeSint32 => FieldType::SInt32,
+            FieldTypeProto::TypeSint64 => FieldType::SInt64,
+        })
     }
 }
 

@@ -3,12 +3,14 @@
 pub struct GeneratorError {
     #[from]
     kind: ErrorKind,
-    #[cfg(feature = "nightly")]
+    #[cfg(feature = "puroro-nightly")]
     backtrace: std::backtrace::Backtrace,
 }
 
 #[derive(Debug, ::thiserror::Error)]
 pub enum ErrorKind {
+    #[error(r#"A field "{name}" should note be empty."#)]
+    EmptyInputField { name: String },
     #[error(r#"A conflicted identifier was found: "{name}""#)]
     ConflictedName { name: String },
     #[error(r#"Unknown enum vvalue({id}) was found in the field descriptor's label field."#)]
@@ -36,7 +38,7 @@ impl From<std::fmt::Error> for GeneratorError {
     fn from(e: std::fmt::Error) -> Self {
         Self {
             kind: ErrorKind::WriteError { source: e },
-            #[cfg(feature = "nightly")]
+            #[cfg(feature = "puroro-nightly")]
             backtrace: std::backtrace::Backtrace::capture(),
         }
     }
@@ -45,7 +47,7 @@ impl From<::puroro::PuroroError> for GeneratorError {
     fn from(e: ::puroro::PuroroError) -> Self {
         Self {
             kind: ErrorKind::PuroroError { source: e },
-            #[cfg(feature = "nightly")]
+            #[cfg(feature = "puroro-nightly")]
             backtrace: std::backtrace::Backtrace::capture(),
         }
     }
