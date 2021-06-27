@@ -9,12 +9,10 @@ edition = "2018"
 [dependencies]
 puroro = { git = "ssh://git@github.com/wada314/puroro", rev = "d29da0c" }
 puroro-internal = { git = "ssh://git@github.com/wada314/puroro", rev = "d29da0c" }
-num-derive = "0.3.3"
-num-traits = "0.2.14"
+askama = "0.10"
 itertools = "0.10.0"
 lazy_static = "1.4.0"
 thiserror = "1.0.24"
-once_cell = "1.7.2"
 
 [features]
 puroro-nightly = []
