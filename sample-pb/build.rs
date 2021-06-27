@@ -8,7 +8,7 @@ fn main() {
     println!("cargo:rerun-if-changed=../puroro-plugin");
     println!("cargo:rerun-if-changed=../purotobuf");
     println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed=sample.proto");
+    println!("cargo:rerun-if-changed=sample2.proto");
 
     let out_dir = env::var("OUT_DIR").unwrap();
     let cargo_status = Command::new("cargo")

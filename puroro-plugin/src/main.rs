@@ -17,6 +17,7 @@ use std::io::Read;
 use std::io::{stdin, stdout};
 
 pub use protos::simple::google;
+use protos::simple::google::protobuf::compiler::code_generator_response::File;
 use protos::simple::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 
 fn main() -> Result<()> {
@@ -24,6 +25,10 @@ fn main() -> Result<()> {
     cgreq.merge_from_iter(&mut stdin().bytes()).unwrap();
 
     let mut cgres = CodeGeneratorResponse::default();
+    let mut mod_rs = File::default();
+    mod_rs.name = Some("mod.rs".to_string());
+    mod_rs.content = Some("".to_string());
+    cgres.file.push(mod_rs);
     cgres.serialize(&mut stdout())?;
     Ok(())
 }
