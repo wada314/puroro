@@ -4,7 +4,7 @@
 #![allow(incomplete_features)]
 
 pub mod deser;
-pub mod field_type_gen;
+pub mod get_field_type;
 pub mod helpers;
 pub mod internal_data;
 pub mod ser;
@@ -15,7 +15,7 @@ pub mod variant;
 pub use ::puroro::{bumpalo, hashbrown};
 
 pub use ::puroro::{ErrorKind, PuroroError, Result};
-pub use field_type_gen::FieldTypeGen;
+pub use get_field_type::GetFieldType;
 pub use internal_data::{
     InternalDataForBumpaloStruct, InternalDataForSimpleStruct, InternalDataForSliceViewStruct,
     SliceSource, SourceLdSlices,

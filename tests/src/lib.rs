@@ -81,12 +81,12 @@ pub trait FieldImplInfo {
     // Something like tags::SimpleStruct
     type ImplTypeTag: tags::ImplTypeTag;
 
-    fn field_new() -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
+    fn field_new() -> <Self::ImplTypeTag as ::puroro_internal::GetFieldType<
         <Self::FieldInfoType as FieldInfo>::LabelAndTypeTag,
     >>::Type
     where
         Self::ImplTypeTag:
-            ::puroro_internal::FieldTypeGen<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>;
+            ::puroro_internal::GetFieldType<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>;
 }
 
 pub trait FieldImplInfoOf<const FIELD_NUMBER: usize> {
@@ -97,12 +97,12 @@ pub struct MsgField1Info;
 impl FieldImplInfo for MsgField1Info {
     type FieldInfoType = MsgTagField1;
     type ImplTypeTag = tags::SimpleStruct;
-    fn field_new() -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
+    fn field_new() -> <Self::ImplTypeTag as ::puroro_internal::GetFieldType<
         <Self::FieldInfoType as FieldInfo>::LabelAndTypeTag,
     >>::Type
     where
         Self::ImplTypeTag:
-            ::puroro_internal::FieldTypeGen<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>,
+            ::puroro_internal::GetFieldType<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>,
     {
         Self::FieldInfoType::FIELD_DEFAULT_VALUE.unwrap_or(Default::default())
     }
@@ -115,12 +115,12 @@ pub struct MsgField9Info<'bump>(std::marker::PhantomData<&'bump ()>);
 impl<'bump> FieldImplInfo for MsgField9Info<'bump> {
     type FieldInfoType = MsgTagField9;
     type ImplTypeTag = tags::Bumpalo<'bump>;
-    fn field_new() -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
+    fn field_new() -> <Self::ImplTypeTag as ::puroro_internal::GetFieldType<
         <Self::FieldInfoType as FieldInfo>::LabelAndTypeTag,
     >>::Type
     where
         Self::ImplTypeTag:
-            ::puroro_internal::FieldTypeGen<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>,
+            ::puroro_internal::GetFieldType<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>,
     {
         todo!()
     }
@@ -131,12 +131,12 @@ impl FieldImplInfo for MsgField10Info {
     type FieldInfoType = MsgTagField10;
     type ImplTypeTag = tags::SimpleStruct;
 
-    fn field_new() -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
+    fn field_new() -> <Self::ImplTypeTag as ::puroro_internal::GetFieldType<
         <Self::FieldInfoType as FieldInfo>::LabelAndTypeTag,
     >>::Type
     where
         Self::ImplTypeTag:
-            ::puroro_internal::FieldTypeGen<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>,
+            ::puroro_internal::GetFieldType<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>,
     {
         Default::default()
     }

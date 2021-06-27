@@ -3,12 +3,12 @@ use ::puroro::{bumpalo, tags};
 
 // MAPS???
 
-pub trait FieldTypeGen<WireAndValueTag> {
+pub trait GetFieldType<WireAndValueTag> {
     type Type;
 }
 
 // SimpleStruct, all labels, variant types
-impl<L, V> FieldTypeGen<(L, (tags::wire::Variant, V))> for tags::SimpleStruct
+impl<L, V> GetFieldType<(L, (tags::wire::Variant, V))> for tags::SimpleStruct
 where
     V: tags::VariantTypeTag,
     <V as tags::VariantTypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SimpleStruct>,
@@ -20,13 +20,13 @@ where
 }
 
 // SimpleStruct, all labels, String & Bytes
-impl<L> FieldTypeGen<(L, tags::String)> for tags::SimpleStruct
+impl<L> GetFieldType<(L, tags::String)> for tags::SimpleStruct
 where
     String: TypicalWrapperTypeFor<L, tags::SimpleStruct>,
 {
     type Type = <String as TypicalWrapperTypeFor<L, tags::SimpleStruct>>::Type;
 }
-impl<L> FieldTypeGen<(L, tags::Bytes)> for tags::SimpleStruct
+impl<L> GetFieldType<(L, tags::Bytes)> for tags::SimpleStruct
 where
     Vec<u8>: TypicalWrapperTypeFor<L, tags::SimpleStruct>,
 {
@@ -34,7 +34,7 @@ where
 }
 
 // SimpleStruct, all labels, fixed32 / fixed64 types
-impl<L, V> FieldTypeGen<(L, (tags::wire::Bits32, V))> for tags::SimpleStruct
+impl<L, V> GetFieldType<(L, (tags::wire::Bits32, V))> for tags::SimpleStruct
 where
     V: tags::Bits32TypeTag,
     <V as tags::Bits32TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SimpleStruct>,
@@ -44,7 +44,7 @@ where
         tags::SimpleStruct,
     >>::Type;
 }
-impl<L, V> FieldTypeGen<(L, (tags::wire::Bits64, V))> for tags::SimpleStruct
+impl<L, V> GetFieldType<(L, (tags::wire::Bits64, V))> for tags::SimpleStruct
 where
     V: tags::Bits64TypeTag,
     <V as tags::Bits64TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SimpleStruct>,
@@ -56,28 +56,28 @@ where
 }
 
 // SimpleStruct, each labels, message types
-impl<M> FieldTypeGen<(tags::Required, tags::Message<M>)> for tags::SimpleStruct
+impl<M> GetFieldType<(tags::Required, tags::Message<M>)> for tags::SimpleStruct
 where
     M: GetSimpleStructImplFor,
     <M as GetSimpleStructImplFor>::Type: ::puroro::Message,
 {
     type Type = <M as GetSimpleStructImplFor>::Type;
 }
-impl<M> FieldTypeGen<(tags::Optional2, tags::Message<M>)> for tags::SimpleStruct
+impl<M> GetFieldType<(tags::Optional2, tags::Message<M>)> for tags::SimpleStruct
 where
     M: GetSimpleStructImplFor,
     <M as GetSimpleStructImplFor>::Type: ::puroro::Message,
 {
     type Type = Option<<<M as GetSimpleStructImplFor>::Type as ::puroro::Message>::BoxedType>;
 }
-impl<M> FieldTypeGen<(tags::Optional3, tags::Message<M>)> for tags::SimpleStruct
+impl<M> GetFieldType<(tags::Optional3, tags::Message<M>)> for tags::SimpleStruct
 where
     M: GetSimpleStructImplFor,
     <M as GetSimpleStructImplFor>::Type: ::puroro::Message,
 {
     type Type = Option<<<M as GetSimpleStructImplFor>::Type as ::puroro::Message>::BoxedType>;
 }
-impl<M> FieldTypeGen<(tags::Repeated, tags::Message<M>)> for tags::SimpleStruct
+impl<M> GetFieldType<(tags::Repeated, tags::Message<M>)> for tags::SimpleStruct
 where
     M: GetSimpleStructImplFor,
     <M as GetSimpleStructImplFor>::Type: ::puroro::Message,
@@ -86,7 +86,7 @@ where
 }
 
 // Bumpalo, all labels, variant types
-impl<'bump, L, V> FieldTypeGen<(L, (tags::wire::Variant, V))> for tags::Bumpalo<'bump>
+impl<'bump, L, V> GetFieldType<(L, (tags::wire::Variant, V))> for tags::Bumpalo<'bump>
 where
     V: tags::VariantTypeTag,
     <V as tags::VariantTypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::Bumpalo<'bump>>,
@@ -98,7 +98,7 @@ where
 }
 
 // Bumpalo, all labels, String & Bytes types
-impl<'bump, L> FieldTypeGen<(L, tags::String)> for tags::Bumpalo<'bump>
+impl<'bump, L> GetFieldType<(L, tags::String)> for tags::Bumpalo<'bump>
 where
     bumpalo::collections::String<'bump>: TypicalWrapperTypeFor<L, tags::Bumpalo<'bump>>,
 {
@@ -107,7 +107,7 @@ where
         tags::Bumpalo<'bump>,
     >>::Type;
 }
-impl<'bump, L> FieldTypeGen<(L, tags::Bytes)> for tags::Bumpalo<'bump>
+impl<'bump, L> GetFieldType<(L, tags::Bytes)> for tags::Bumpalo<'bump>
 where
     bumpalo::collections::String<'bump>: TypicalWrapperTypeFor<L, tags::Bumpalo<'bump>>,
 {
@@ -118,7 +118,7 @@ where
 }
 
 // Bumpalo, all labels, fixed32 / 64 types
-impl<'bump, L, V> FieldTypeGen<(L, (tags::wire::Bits32, V))> for tags::Bumpalo<'bump>
+impl<'bump, L, V> GetFieldType<(L, (tags::wire::Bits32, V))> for tags::Bumpalo<'bump>
 where
     V: tags::Bits32TypeTag,
     <V as tags::Bits32TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::Bumpalo<'bump>>,
@@ -128,7 +128,7 @@ where
         tags::Bumpalo<'bump>,
     >>::Type;
 }
-impl<'bump, L, V> FieldTypeGen<(L, (tags::wire::Bits64, V))> for tags::Bumpalo<'bump>
+impl<'bump, L, V> GetFieldType<(L, (tags::wire::Bits64, V))> for tags::Bumpalo<'bump>
 where
     V: tags::Bits64TypeTag,
     <V as tags::Bits64TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::Bumpalo<'bump>>,
@@ -140,14 +140,14 @@ where
 }
 
 // Bumpalo, each labels, message types
-impl<'bump, M> FieldTypeGen<(tags::Required, tags::Message<M>)> for tags::Bumpalo<'bump>
+impl<'bump, M> GetFieldType<(tags::Required, tags::Message<M>)> for tags::Bumpalo<'bump>
 where
     M: GetBumpaloStructImplFor<'bump>,
     <M as GetBumpaloStructImplFor<'bump>>::Type: ::puroro::Message,
 {
     type Type = <M as GetBumpaloStructImplFor<'bump>>::Type;
 }
-impl<'bump, M> FieldTypeGen<(tags::Optional2, tags::Message<M>)> for tags::Bumpalo<'bump>
+impl<'bump, M> GetFieldType<(tags::Optional2, tags::Message<M>)> for tags::Bumpalo<'bump>
 where
     M: GetBumpaloStructImplFor<'bump>,
     <M as GetBumpaloStructImplFor<'bump>>::Type: ::puroro::Message,
@@ -155,7 +155,7 @@ where
     type Type =
         Option<<<M as GetBumpaloStructImplFor<'bump>>::Type as ::puroro::Message>::BoxedType>;
 }
-impl<'bump, M> FieldTypeGen<(tags::Optional3, tags::Message<M>)> for tags::Bumpalo<'bump>
+impl<'bump, M> GetFieldType<(tags::Optional3, tags::Message<M>)> for tags::Bumpalo<'bump>
 where
     M: GetBumpaloStructImplFor<'bump>,
     <M as GetBumpaloStructImplFor<'bump>>::Type: ::puroro::Message,
@@ -163,7 +163,7 @@ where
     type Type =
         Option<<<M as GetBumpaloStructImplFor<'bump>>::Type as ::puroro::Message>::BoxedType>;
 }
-impl<'bump, M> FieldTypeGen<(tags::Repeated, tags::Message<M>)> for tags::Bumpalo<'bump>
+impl<'bump, M> GetFieldType<(tags::Repeated, tags::Message<M>)> for tags::Bumpalo<'bump>
 where
     M: GetBumpaloStructImplFor<'bump>,
     <M as GetBumpaloStructImplFor<'bump>>::Type: 'bump + ::puroro::Message,
@@ -172,7 +172,7 @@ where
 }
 
 // SliceView, all labels, variant types
-impl<'slice, L, V> FieldTypeGen<(L, (tags::wire::Variant, V))> for tags::SliceView<'slice>
+impl<'slice, L, V> GetFieldType<(L, (tags::wire::Variant, V))> for tags::SliceView<'slice>
 where
     V: tags::VariantTypeTag,
     <V as tags::VariantTypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SliceView<'slice>>,
@@ -184,7 +184,7 @@ where
 }
 
 // SliceView, all labels, String / bytes / message types
-impl<'slice, L, V> FieldTypeGen<(L, (tags::wire::LengthDelimited, V))> for tags::SliceView<'slice>
+impl<'slice, L, V> GetFieldType<(L, (tags::wire::LengthDelimited, V))> for tags::SliceView<'slice>
 where
     V: tags::LengthDelimitedTypeTag,
 {
@@ -192,7 +192,7 @@ where
 }
 
 // SliceView, all labels, fixed32 / 64 types
-impl<'slice, L, V> FieldTypeGen<(L, (tags::wire::Bits32, V))> for tags::SliceView<'slice>
+impl<'slice, L, V> GetFieldType<(L, (tags::wire::Bits32, V))> for tags::SliceView<'slice>
 where
     V: tags::Bits32TypeTag,
     <V as tags::Bits32TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SliceView<'slice>>,
@@ -202,7 +202,7 @@ where
         tags::SliceView<'slice>,
     >>::Type;
 }
-impl<'slice, L, V> FieldTypeGen<(L, (tags::wire::Bits64, V))> for tags::SliceView<'slice>
+impl<'slice, L, V> GetFieldType<(L, (tags::wire::Bits64, V))> for tags::SliceView<'slice>
 where
     V: tags::Bits64TypeTag,
     <V as tags::Bits64TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SliceView<'slice>>,
