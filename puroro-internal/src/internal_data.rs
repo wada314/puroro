@@ -7,17 +7,17 @@ use ::std::collections::HashMap;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
-pub struct InternalDataForNormalStruct {
-    unknown_fields: Option<HashMap<usize, FieldData<Vec<u8>>>>,
+pub struct InternalDataForSimpleStruct {
+    unknown_fields: HashMap<usize, FieldData<Vec<u8>>>,
 }
-impl InternalDataForNormalStruct {
+impl InternalDataForSimpleStruct {
     pub fn new() -> Self {
         Self {
-            unknown_fields: None,
+            unknown_fields: HashMap::new(),
         }
     }
 }
-impl InternalData for InternalDataForNormalStruct {
+impl InternalData for InternalDataForSimpleStruct {
     #[cfg(feature = "puroro-bumpalo")]
     fn bumpalo(&self) -> &crate::bumpalo::Bump {
         panic!("The Bumpalo data field is only available for a Bumpalo struct!")
@@ -142,9 +142,6 @@ where
     /// If your purpose to get a certain field's data then make sure that field ([`SliceViewField`])'s
     /// variant is [`SliceViewField::FieldInMultipleSlices`]. If it is [`SliceViewField::FieldInSingleSlice`],
     /// then you can use that enum variant's `ld_slice` field for shortcut.
-    /// Note that iterating over this iterator takes O(n^2) time in total where n is the iterator length
-    /// (Where it is O(n) in a normal iterator).
-    /// We believe n (== the number of merged messages) is very small in most usecases.
     fn into_iter(self) -> Self::Iter {
         match self.clone() {
             SourceLdSlices::SingleLdSlice(ld_slice) => Either::Left(std::iter::once(Ok(ld_slice))),

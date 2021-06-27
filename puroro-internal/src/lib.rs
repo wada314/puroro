@@ -17,7 +17,7 @@ pub use ::puroro::{bumpalo, hashbrown};
 pub use ::puroro::{ErrorKind, PuroroError, Result};
 pub use field_type_gen::FieldTypeGen;
 pub use internal_data::{
-    InternalDataForBumpaloStruct, InternalDataForNormalStruct, InternalDataForSliceViewStruct,
+    InternalDataForBumpaloStruct, InternalDataForSimpleStruct, InternalDataForSliceViewStruct,
     SliceSource, SourceLdSlices,
 };
 

@@ -362,7 +362,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
     pub fn internal_data_type(&self) -> &'static str {
         match (self.context.impl_type(), self.context.alloc_type()) {
             (ImplType::Default, AllocatorType::Default) => {
-                "::puroro_internal::InternalDataForNormalStruct"
+                "::puroro_internal::InternalDataForSimpleStruct"
             }
             (ImplType::Default, AllocatorType::Bumpalo) => {
                 "::puroro_internal::InternalDataForBumpaloStruct<'bump>"

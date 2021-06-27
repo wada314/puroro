@@ -133,7 +133,7 @@ impl{gp} {ident}{gpb} {{
                         output,
                         match self.context.alloc_type() {
                             AllocatorType::Default => {
-                                "::puroro_internal::InternalDataForNormalStruct::new()"
+                                "::puroro_internal::InternalDataForSimpleStruct::new()"
                             }
                             AllocatorType::Bumpalo => {
                                 "::puroro_internal::InternalDataForBumpaloStruct::new_with_bumpalo(bump)"
