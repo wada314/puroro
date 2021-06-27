@@ -1,1 +1,4 @@
+{% for subpackage in subpackages -%}
+pub mod {{ subpackage }};
+{% endfor -%}
 // Hello!
