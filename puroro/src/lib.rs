@@ -6,11 +6,13 @@
 pub mod apply;
 mod collections;
 mod error;
+mod pow;
 pub mod tags;
 
 pub use error::{ErrorKind, PuroroError};
 pub type Result<T> = std::result::Result<T, PuroroError>;
 pub use collections::RepeatedField;
+pub use pow::Pow;
 
 // Re-exports
 #[cfg(feature = "puroro-bumpalo")]
