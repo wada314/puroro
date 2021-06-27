@@ -1,4 +1,19 @@
-{% for subpackage in subpackages -%}
+{%- for subpackage in subpackages %}
 pub mod {{ subpackage }};
-{% endfor -%}
+{%- endfor %}
+
+{%- match file %}
+{%- when Some with (file) %}
+// package {{ file.package | unwrap_or_default }}
+
+{% for message in file.message_type %}
+pub struct {{ message.name | unwrap_or_default }} {
+    {%- for field in message.field %}
+    pub {{ field.name | unwrap_or_default }}: i32,
+    {%- endfor %}
+}
+{% endfor %} {# for message in file.message_type #}
+
+{%- else %}     {# match file #}
+{%- endmatch %} {# match file #}
 // Hello!

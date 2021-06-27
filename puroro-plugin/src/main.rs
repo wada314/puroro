@@ -71,6 +71,14 @@ pub struct Variables {
     subpackages: HashSet<String>,
     file: Option<FileDescriptorProto>,
 }
+mod filters {
+    pub fn unwrap_or_default<T>(val: &Option<T>) -> ::askama::Result<T>
+    where
+        T: Default + Clone,
+    {
+        Ok(val.clone().unwrap_or_default())
+    }
+}
 
 fn main() -> Result<()> {
     let mut cgreq = CodeGeneratorRequest::default();
