@@ -5,21 +5,31 @@ use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
 use ::std::borrow::Borrow;
 use ::std::iter;
+use ::std::ops::Deref;
+use ::std::rc::{Rc, Weak};
 use protobuf::{DescriptorProto, EnumDescriptorProto, FieldDescriptorProto};
+
+#[derive(Debug, Clone)]
+pub struct InputFile {
+    pub messages: Vec<Rc<Message>>,
+    pub enums: Vec<Rc<Enum>>,
+}
 
 #[derive(Debug, Clone)]
 pub struct Message {
     pub rust_ident: String,
-    pub proto_package: Vec<String>,
-    pub proto_outer_messages: Vec<String>,
+    pub proto_package: Rc<Vec<String>>,
+    pub proto_outer_messages: Rc<Vec<String>>,
     pub fields: Vec<Field>,
+    pub nested_messages: Vec<Rc<Message>>,
+    pub nested_enums: Vec<Rc<Enum>>,
 }
 
 #[derive(Debug, Clone)]
 pub struct Enum {
     pub rust_ident: String,
-    pub proto_package: Vec<String>,
-    pub proto_outer_messages: Vec<String>,
+    pub proto_package: Rc<Vec<String>>,
+    pub proto_outer_messages: Rc<Vec<String>>,
 }
 
 #[derive(Debug, Clone)]
@@ -46,27 +56,51 @@ pub enum FieldType {
     Group,
     String,
     Bytes,
-    Enum(Enum),
-    Message(Message),
+    Enum(Rc<Enum>),
+    Message(Weak<Message>),
 }
 
 impl Message {
-    pub fn try_from_proto<'a, I, J>(
-        proto: &DescriptorProto,
-        package: I,
-        outer_messages: J,
-    ) -> Result<Self>
-    where
-        I: Iterator<Item = &'a str> + Clone,
-        J: Iterator<Item = &'a str> + Clone,
-    {
-        let proto_name = proto.name.clone().ok_or(ErrorKind::EmptyInputField {
+    pub fn try_from_proto(
+        proto: DescriptorProto,
+        package: Rc<Vec<String>>,
+        outer_messages: Rc<Vec<String>>,
+    ) -> Result<Self> {
+        let proto_name = proto.name.ok_or(ErrorKind::EmptyInputField {
             name: "DescriptorProto.name".to_string(),
         })?;
+        let new_outer_messages = Rc::new({
+            let mut v = outer_messages.deref().clone();
+            v.push(proto_name.clone());
+            v
+        });
         Ok(Self {
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
-            proto_package: package.map_into().collect_vec(),
-            proto_outer_messages: outer_messages.map_into().collect_vec(),
+            proto_package: package.clone(),
+            proto_outer_messages: outer_messages.clone(),
+            fields: Vec::new(), // delayed initialize
+            nested_messages: proto
+                .nested_type
+                .into_iter()
+                .map(|proto| -> Result<_> {
+                    Ok(Rc::new(Message::try_from_proto(
+                        proto,
+                        package.clone(),
+                        new_outer_messages.clone(),
+                    )?))
+                })
+                .collect::<Result<Vec<_>>>()?,
+            nested_enums: proto
+                .enum_type
+                .into_iter()
+                .map(|proto| -> Result<_> {
+                    Ok(Rc::new(Enum::try_from_proto(
+                        proto,
+                        package.clone(),
+                        new_outer_messages.clone(),
+                    )?))
+                })
+                .collect::<Result<Vec<_>>>()?,
         })
     }
 
@@ -83,22 +117,18 @@ impl Message {
 }
 
 impl Enum {
-    pub fn try_from_proto<'a, I, J>(
-        proto: &EnumDescriptorProto,
-        package: I,
-        outer_messages: J,
-    ) -> Result<Self>
-    where
-        I: Iterator<Item = &'a str> + Clone,
-        J: Iterator<Item = &'a str> + Clone,
-    {
-        let proto_name = proto.name.clone().ok_or(ErrorKind::EmptyInputField {
+    pub fn try_from_proto(
+        proto: EnumDescriptorProto,
+        package: Rc<Vec<String>>,
+        outer_messages: Rc<Vec<String>>,
+    ) -> Result<Self> {
+        let proto_name = proto.name.ok_or(ErrorKind::EmptyInputField {
             name: "EnumDescriptorProto.name".to_string(),
         })?;
         Ok(Self {
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
-            proto_package: package.map_into().collect_vec(),
-            proto_outer_messages: outer_messages.map_into().collect_vec(),
+            proto_package: package,
+            proto_outer_messages: outer_messages,
         })
     }
 
@@ -115,8 +145,8 @@ impl Enum {
 }
 
 impl Field {
-    pub fn try_from_proto(proto: &FieldDescriptorProto) -> Result<Self> {
-        let proto_name = proto.name.clone().ok_or(ErrorKind::EmptyInputField {
+    pub fn try_from_proto(proto: FieldDescriptorProto) -> Result<Self> {
+        let proto_name = proto.name.ok_or(ErrorKind::EmptyInputField {
             name: "FieldDescriptorProto.name".to_string(),
         })?;
         Ok(Self {
@@ -127,7 +157,7 @@ impl Field {
 }
 
 impl FieldType {
-    pub fn try_from_type_proto(proto_type: &FieldTypeProto) -> Result<Self> {
+    pub fn try_from_type_proto(proto_type: FieldTypeProto) -> Result<Self> {
         Ok(match proto_type {
             FieldTypeProto::TypeDouble => FieldType::Double,
             FieldTypeProto::TypeFloat => FieldType::Float,
