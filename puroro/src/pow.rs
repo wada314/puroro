@@ -10,7 +10,7 @@ use std::ops::Deref;
 /// `Cow::into_owned()` method. In other words, though this type supports
 /// owned => borrowed conversion using `borrow()` method, not vice versa.
 ///
-/// We need this custom Cow type because the owned type might want to use a
+/// We (may) need this custom Cow type because the owned type might want to use a
 /// custom allocator: e.g. [`bumpalo::collections::String<'bump>`].
 pub enum Pow<'a, B, O = <B as ToOwned>::Owned>
 where
