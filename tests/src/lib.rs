@@ -29,10 +29,16 @@ where
 {
     type Type = &'static str;
 }
+impl<L, M> GetFieldDefaultValueType for (L, tags::Message<M>)
+where
+    L: tags::FieldLabelTag,
+{
+    type Type = ();
+}
 
 pub trait FieldInfo {
     // Something like (tags::Repeated, (tags::wire::Variant, tags::value::Int32)).
-    type LabelAndTypeTag: tags::FieldLabelAndTypeTag;
+    type LabelAndTypeTag: tags::FieldLabelAndTypeTag + GetFieldDefaultValueType;
 
     // Returns a default value specified by proto2's [default = ???] annotation,
     // if it's available.
@@ -52,14 +58,30 @@ impl FieldInfoOf<1> for MsgTag {
     type Type = MsgTagField1;
 }
 
+pub struct MsgTagField9;
+impl FieldInfo for MsgTagField9 {
+    type LabelAndTypeTag = (tags::Repeated, tags::String);
+    const FIELD_DEFAULT_VALUE: Option<&'static str> = Some("hello!");
+}
+impl FieldInfoOf<9> for MsgTag {
+    type Type = MsgTagField9;
+}
+
+pub struct MsgTagField10;
+impl FieldInfo for MsgTagField10 {
+    type LabelAndTypeTag = (tags::Required, tags::Message<MsgTag>);
+    const FIELD_DEFAULT_VALUE: Option<()> = None;
+}
+impl FieldInfoOf<10> for MsgTag {
+    type Type = MsgTagField10;
+}
+
 pub trait FieldImplInfo {
     type FieldInfoType: FieldInfo;
     // Something like tags::SimpleStruct
     type ImplTypeTag: tags::ImplTypeTag;
 
-    fn field_new(
-        &self,
-    ) -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
+    fn field_new() -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
         <Self::FieldInfoType as FieldInfo>::LabelAndTypeTag,
     >>::Type
     where
@@ -75,19 +97,52 @@ pub struct MsgField1Info;
 impl FieldImplInfo for MsgField1Info {
     type FieldInfoType = MsgTagField1;
     type ImplTypeTag = tags::SimpleStruct;
-    fn field_new(
-        &self,
-    ) -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
+    fn field_new() -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
         <Self::FieldInfoType as FieldInfo>::LabelAndTypeTag,
     >>::Type
     where
         Self::ImplTypeTag:
             ::puroro_internal::FieldTypeGen<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>,
     {
+        Self::FieldInfoType::FIELD_DEFAULT_VALUE.unwrap_or(Default::default())
     }
 }
 impl FieldImplInfoOf<1> for Msg {
     type Type = MsgField1Info;
+}
+
+pub struct MsgField9Info<'bump>(std::marker::PhantomData<&'bump ()>);
+impl<'bump> FieldImplInfo for MsgField9Info<'bump> {
+    type FieldInfoType = MsgTagField9;
+    type ImplTypeTag = tags::Bumpalo<'bump>;
+    fn field_new() -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
+        <Self::FieldInfoType as FieldInfo>::LabelAndTypeTag,
+    >>::Type
+    where
+        Self::ImplTypeTag:
+            ::puroro_internal::FieldTypeGen<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>,
+    {
+        todo!()
+    }
+}
+
+pub struct MsgField10Info;
+impl FieldImplInfo for MsgField10Info {
+    type FieldInfoType = MsgTagField10;
+    type ImplTypeTag = tags::SimpleStruct;
+
+    fn field_new() -> <Self::ImplTypeTag as ::puroro_internal::FieldTypeGen<
+        <Self::FieldInfoType as FieldInfo>::LabelAndTypeTag,
+    >>::Type
+    where
+        Self::ImplTypeTag:
+            ::puroro_internal::FieldTypeGen<<Self::FieldInfoType as FieldInfo>::LabelAndTypeTag>,
+    {
+        Default::default()
+    }
+}
+impl FieldImplInfoOf<10> for Msg {
+    type Type = MsgField10Info;
 }
 
 #[cfg(test)]
