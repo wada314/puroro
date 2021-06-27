@@ -378,7 +378,7 @@ impl<'a, 'c> MessageImplFragmentGenerator<'a, 'c> {
         match (self.context.impl_type(), self.context.alloc_type()) {
             (ImplType::Default, AllocatorType::Default) => "SimpleStruct",
             (ImplType::Default, AllocatorType::Bumpalo) => "Bumpalo<'bump>",
-            (ImplType::SliceView, AllocatorType::Default) => "SliceView<'slice>",
+            (ImplType::SliceView, AllocatorType::Default) => "SliceView<'slice, S>",
             (ImplType::SliceView, AllocatorType::Bumpalo) => unimplemented!(),
         }
     }

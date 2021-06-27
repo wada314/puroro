@@ -172,19 +172,20 @@ where
 }
 
 // SliceView, all labels, variant types
-impl<'slice, L, V> GetFieldType<(L, (tags::wire::Variant, V))> for tags::SliceView<'slice>
+impl<'slice, L, V, S> GetFieldType<(L, (tags::wire::Variant, V))> for tags::SliceView<'slice, S>
 where
     V: tags::VariantTypeTag,
-    <V as tags::VariantTypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SliceView<'slice>>,
+    <V as tags::VariantTypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SliceView<'slice, S>>,
 {
     type Type = <<V as tags::VariantTypeTag>::NativeType as TypicalWrapperTypeFor<
         L,
-        tags::SliceView<'slice>,
+        tags::SliceView<'slice, S>,
     >>::Type;
 }
 
 // SliceView, all labels, String / bytes / message types
-impl<'slice, L, V> GetFieldType<(L, (tags::wire::LengthDelimited, V))> for tags::SliceView<'slice>
+impl<'slice, L, V, S> GetFieldType<(L, (tags::wire::LengthDelimited, V))>
+    for tags::SliceView<'slice, S>
 where
     V: tags::LengthDelimitedTypeTag,
 {
@@ -192,24 +193,24 @@ where
 }
 
 // SliceView, all labels, fixed32 / 64 types
-impl<'slice, L, V> GetFieldType<(L, (tags::wire::Bits32, V))> for tags::SliceView<'slice>
+impl<'slice, L, V, S> GetFieldType<(L, (tags::wire::Bits32, V))> for tags::SliceView<'slice, S>
 where
     V: tags::Bits32TypeTag,
-    <V as tags::Bits32TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SliceView<'slice>>,
+    <V as tags::Bits32TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SliceView<'slice, S>>,
 {
     type Type = <<V as tags::Bits32TypeTag>::NativeType as TypicalWrapperTypeFor<
         L,
-        tags::SliceView<'slice>,
+        tags::SliceView<'slice, S>,
     >>::Type;
 }
-impl<'slice, L, V> GetFieldType<(L, (tags::wire::Bits64, V))> for tags::SliceView<'slice>
+impl<'slice, L, V, S> GetFieldType<(L, (tags::wire::Bits64, V))> for tags::SliceView<'slice, S>
 where
     V: tags::Bits64TypeTag,
-    <V as tags::Bits64TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SliceView<'slice>>,
+    <V as tags::Bits64TypeTag>::NativeType: TypicalWrapperTypeFor<L, tags::SliceView<'slice, S>>,
 {
     type Type = <<V as tags::Bits64TypeTag>::NativeType as TypicalWrapperTypeFor<
         L,
-        tags::SliceView<'slice>,
+        tags::SliceView<'slice, S>,
     >>::Type;
 }
 
@@ -245,15 +246,15 @@ where
 {
     type Type = crate::bumpalo::collections::Vec<'bump, T>;
 }
-impl<'slice, T> TypicalWrapperTypeFor<tags::Required, tags::SliceView<'slice>> for T {
+impl<'slice, T, S> TypicalWrapperTypeFor<tags::Required, tags::SliceView<'slice, S>> for T {
     type Type = T;
 }
-impl<'slice, T> TypicalWrapperTypeFor<tags::Optional2, tags::SliceView<'slice>> for T {
+impl<'slice, T, S> TypicalWrapperTypeFor<tags::Optional2, tags::SliceView<'slice, S>> for T {
     type Type = Option<T>;
 }
-impl<'slice, T> TypicalWrapperTypeFor<tags::Optional3, tags::SliceView<'slice>> for T {
+impl<'slice, T, S> TypicalWrapperTypeFor<tags::Optional3, tags::SliceView<'slice, S>> for T {
     type Type = T;
 }
-impl<'slice, T> TypicalWrapperTypeFor<tags::Repeated, tags::SliceView<'slice>> for T {
+impl<'slice, T, S> TypicalWrapperTypeFor<tags::Repeated, tags::SliceView<'slice, S>> for T {
     type Type = crate::SliceViewField<'slice>;
 }

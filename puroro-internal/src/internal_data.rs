@@ -2,14 +2,23 @@ use crate::deser::LdSlice;
 use crate::types::{FieldData, SliceViewField};
 use crate::{hashbrown, ErrorKind, Result, ResultHelper};
 use ::itertools::{Either, Itertools};
+use ::puroro::tags;
 use ::puroro::InternalData;
 use ::std::collections::HashMap;
 use std::marker::PhantomData;
+
+pub trait GetInternalDataType {
+    type Type: InternalData;
+}
 
 #[derive(Debug, Clone)]
 pub struct InternalDataForSimpleStruct {
     unknown_fields: HashMap<usize, FieldData<Vec<u8>>>,
 }
+impl GetInternalDataType for tags::SimpleStruct {
+    type Type = InternalDataForSimpleStruct;
+}
+
 impl InternalDataForSimpleStruct {
     pub fn new() -> Self {
         Self {
@@ -35,6 +44,10 @@ pub struct InternalDataForBumpaloStruct<'bump> {
     >,
     pub bump: &'bump crate::bumpalo::Bump,
 }
+#[cfg(feature = "puroro-bumpalo")]
+impl<'bump> GetInternalDataType for tags::Bumpalo<'bump> {
+    type Type = InternalDataForBumpaloStruct<'bump>;
+}
 
 #[cfg(feature = "puroro-bumpalo")]
 impl<'bump> InternalDataForBumpaloStruct<'bump> {
@@ -55,6 +68,9 @@ impl<'bump> InternalData for InternalDataForBumpaloStruct<'bump> {
 pub struct InternalDataForSliceViewStruct<'slice, S> {
     pub maybe_source_slices: Option<S>,
     phantom: PhantomData<&'slice ()>,
+}
+impl<'slice, S> GetInternalDataType for tags::SliceView<'slice, S> {
+    type Type = InternalDataForSliceViewStruct<'slice, S>;
 }
 
 pub trait SliceSource<'slice>: Clone {
@@ -186,10 +202,7 @@ where
     }
 }
 
-impl<'slice, S> InternalData for InternalDataForSliceViewStruct<'slice, S>
-where
-    S: SliceSource<'slice>,
-{
+impl<'slice, S> InternalData for InternalDataForSliceViewStruct<'slice, S> {
     fn bumpalo(&self) -> &crate::bumpalo::Bump {
         panic!("The Bumpalo data field is only available for a Bumpalo struct!")
     }

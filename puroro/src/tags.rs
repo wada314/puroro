@@ -81,7 +81,7 @@ pub struct Required;
 // Proto struct implementation types.
 pub struct SimpleStruct;
 pub struct Bumpalo<'bump>(PhantomData<&'bump ()>);
-pub struct SliceView<'slice>(PhantomData<&'slice ()>);
+pub struct SliceView<'slice, S>(PhantomData<(&'slice (), S)>);
 
 impl ValueTypeTag for value::Int32 {}
 impl ValueTypeTag for value::Int64 {}
@@ -178,4 +178,4 @@ where
 
 impl ImplTypeTag for SimpleStruct {}
 impl<'bump> ImplTypeTag for Bumpalo<'bump> {}
-impl<'slice> ImplTypeTag for SliceView<'slice> {}
+impl<'slice, S> ImplTypeTag for SliceView<'slice, S> {}
