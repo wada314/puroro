@@ -1,3 +1,5 @@
+// A generated source code by puroro library
+
 {%- for subpackage in subpackages %}
 pub mod {{ subpackage }};
 {%- endfor %}

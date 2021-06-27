@@ -12,7 +12,15 @@ fn main() {
 
     let out_dir = env::var("OUT_DIR").unwrap();
     let cargo_status = Command::new("cargo")
-        .args(&["build", "-v", "-p", "puroro-plugin", "--target-dir"])
+        .args(&[
+            "build",
+            "-v",
+            "--bin",
+            "puroro-plugin",
+            "-p",
+            "puroro-plugin",
+            "--target-dir",
+        ])
         .arg(&out_dir)
         .status()
         .unwrap();

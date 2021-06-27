@@ -11,6 +11,7 @@ use protobuf::{DescriptorProto, EnumDescriptorProto, FieldDescriptorProto};
 
 #[derive(Debug, Clone)]
 pub struct InputFile {
+    pub package: Rc<Vec<String>>,
     pub messages: Vec<Rc<Message>>,
     pub enums: Vec<Rc<Enum>>,
 }
@@ -18,8 +19,8 @@ pub struct InputFile {
 #[derive(Debug, Clone)]
 pub struct Message {
     pub rust_ident: String,
-    pub proto_package: Rc<Vec<String>>,
-    pub proto_outer_messages: Rc<Vec<String>>,
+    pub package: Rc<Vec<String>>,
+    pub outer_messages: Rc<Vec<String>>,
     pub fields: Vec<Field>,
     pub nested_messages: Vec<Rc<Message>>,
     pub nested_enums: Vec<Rc<Enum>>,
@@ -28,8 +29,8 @@ pub struct Message {
 #[derive(Debug, Clone)]
 pub struct Enum {
     pub rust_ident: String,
-    pub proto_package: Rc<Vec<String>>,
-    pub proto_outer_messages: Rc<Vec<String>>,
+    pub package: Rc<Vec<String>>,
+    pub outer_messages: Rc<Vec<String>>,
 }
 
 #[derive(Debug, Clone)]
@@ -60,6 +61,11 @@ pub enum FieldType {
     Message(Weak<Message>),
 }
 
+pub enum MessageOrEnum {
+    Message(Rc<Message>),
+    Enum(Rc<Enum>),
+}
+
 impl Message {
     pub fn try_from_proto(
         proto: DescriptorProto,
@@ -76,8 +82,8 @@ impl Message {
         });
         Ok(Self {
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
-            proto_package: package.clone(),
-            proto_outer_messages: outer_messages.clone(),
+            package: package.clone(),
+            outer_messages: outer_messages.clone(),
             fields: Vec::new(), // delayed initialize
             nested_messages: proto
                 .nested_type
@@ -108,8 +114,8 @@ impl Message {
         format!(
             "{path}::{ident}",
             path = make_module_path(
-                self.proto_package.iter().map(|s| s.borrow()),
-                self.proto_outer_messages.iter().map(|s| s.borrow())
+                self.package.iter().map(|s| s.borrow()),
+                self.outer_messages.iter().map(|s| s.borrow())
             ),
             ident = self.rust_ident
         )
@@ -127,8 +133,8 @@ impl Enum {
         })?;
         Ok(Self {
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
-            proto_package: package,
-            proto_outer_messages: outer_messages,
+            package: package,
+            outer_messages: outer_messages,
         })
     }
 
@@ -136,8 +142,8 @@ impl Enum {
         format!(
             "{path}::{ident}",
             path = make_module_path(
-                self.proto_package.iter().map(|s| s.borrow()),
-                self.proto_outer_messages.iter().map(|s| s.borrow())
+                self.package.iter().map(|s| s.borrow()),
+                self.outer_messages.iter().map(|s| s.borrow())
             ),
             ident = self.rust_ident
         )
