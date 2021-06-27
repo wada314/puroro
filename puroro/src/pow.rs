@@ -45,21 +45,29 @@ where
     }
 }
 
-impl<'a, O> Display for Pow<'a, str, O>
+impl<'a, B, O> Display for Pow<'a, B, O>
 where
-    O: Borrow<str>,
+    B: 'a + ?Sized + ToOwned + Display,
+    O: Borrow<B> + Display,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_fmt(format_args!("{}", <Self as Borrow<str>>::borrow(self)))
+        match *self {
+            Pow::Borrowed(borrowed) => <B as Display>::fmt(borrowed, f),
+            Pow::Owned(ref owned) => <O as Display>::fmt(owned, f),
+        }
     }
 }
 
-impl<'a, O> Debug for Pow<'a, str, O>
+impl<'a, B, O> Debug for Pow<'a, B, O>
 where
-    O: Borrow<str>,
+    B: 'a + ?Sized + ToOwned + Debug,
+    O: Borrow<B> + Debug,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_fmt(format_args!("{:?}", <Self as Borrow<str>>::borrow(self)))
+        match *self {
+            Pow::Borrowed(borrowed) => <B as Debug>::fmt(borrowed, f),
+            Pow::Owned(ref owned) => <O as Debug>::fmt(owned, f),
+        }
     }
 }
 
