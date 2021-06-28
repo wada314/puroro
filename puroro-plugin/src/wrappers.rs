@@ -16,7 +16,7 @@ use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct Context {
-    lazy_input_files: OnceCell<Vec<Rc<InputFile>>>,
+    input_files: Vec<Rc<InputFile>>,
     lazy_fqtn_to_type_map: OnceCell<HashMap<String, MessageOrEnum>>,
 }
 
@@ -88,23 +88,75 @@ impl Context {
         //  2. Context::lazy_fqtn_to_type_map,
         //  3. Message::lazy_fields
         // because the latters refer the formers.
-        let context = Rc::new(Context {
-            lazy_input_files: OnceCell::new(),
+        let context = Rc::new_cyclic(|weak_context| Context {
+            input_files: proto
+                .proto_file
+                .into_iter()
+                .map(|file| InputFile::try_from_proto(weak_context.clone(), file))
+                .collect::<Result<Vec<_>>>()
+                .expect("I need try_new_cyclic..."),
             lazy_fqtn_to_type_map: OnceCell::new(),
         });
+        todo!("initialize the map");
         Ok(context)
     }
 }
 
 impl InputFile {
-    pub fn try_from_proto(context: Rc<Context>, proto: FileDescriptorProto) -> Result<Rc<Self>> {
-        todo!()
+    pub fn try_from_proto(context: Weak<Context>, proto: FileDescriptorProto) -> Result<Rc<Self>> {
+        // Can be simplified if we can use #![feature(arc_new_cyclic)] feature:
+        // https://github.com/rust-lang/rust/issues/75861
+        let package = Rc::new(
+            proto
+                .package
+                .unwrap_or_default()
+                .split('.')
+                .filter_map(|p| {
+                    if p.is_empty() {
+                        None
+                    } else {
+                        Some(p.to_string())
+                    }
+                })
+                .collect_vec(),
+        );
+        let proto_messages = proto.message_type;
+        let proto_enums = proto.enum_type;
+        let mut file = Rc::new_cyclic(|file| Self {
+            context: context,
+            package: Clone::clone(&package),
+            messages: proto_messages
+                .into_iter()
+                .map(|m| {
+                    Message::try_from_proto(
+                        file.clone(),
+                        m,
+                        Clone::clone(&package),
+                        Rc::new(Vec::new()),
+                    )
+                })
+                .collect::<Result<Vec<_>>>()
+                .expect("I need try_new_cyclic..."),
+            enums: proto_enums
+                .into_iter()
+                .map(|e| {
+                    Enum::try_from_proto(
+                        file.clone(),
+                        e,
+                        Clone::clone(&package),
+                        Rc::new(Vec::new()),
+                    )
+                })
+                .collect::<Result<Vec<_>>>()
+                .expect("I need try_new_cyclic..."),
+        });
+        Ok(file)
     }
 }
 
 impl Message {
     pub fn try_from_proto(
-        input_file: Rc<InputFile>,
+        input_file: Weak<InputFile>,
         proto: DescriptorProto,
         package: Rc<Vec<String>>,
         outer_messages: Rc<Vec<String>>,
@@ -117,18 +169,19 @@ impl Message {
             v.push(proto_name.clone());
             v
         });
-        Ok(Rc::new(Self {
-            input_file: Rc::downgrade(&input_file),
+        let message = Rc::new(Self {
+            input_file: Clone::clone(&input_file),
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
             package: package.clone(),
             outer_messages: outer_messages.clone(),
-            lazy_fields: OnceCell::new(), // delayed initialize
+            // delay initialize. do it after Context::lazy_fqtn_to_type_map is initialized!
+            lazy_fields: OnceCell::new(),
             nested_messages: proto
                 .nested_type
                 .into_iter()
                 .map(|proto| -> Result<_> {
                     Ok(Message::try_from_proto(
-                        input_file.clone(),
+                        Clone::clone(&input_file),
                         proto,
                         package.clone(),
                         new_outer_messages.clone(),
@@ -140,14 +193,15 @@ impl Message {
                 .into_iter()
                 .map(|proto| -> Result<_> {
                     Ok(Enum::try_from_proto(
-                        input_file.clone(),
+                        Clone::clone(&input_file),
                         proto,
                         package.clone(),
                         new_outer_messages.clone(),
                     )?)
                 })
                 .collect::<Result<Vec<_>>>()?,
-        }))
+        });
+        Ok(message)
     }
 
     pub fn rust_absolute_path(&self) -> String {
@@ -183,7 +237,7 @@ impl Message {
 
 impl Enum {
     pub fn try_from_proto(
-        input_file: Rc<InputFile>,
+        input_file: Weak<InputFile>,
         proto: EnumDescriptorProto,
         package: Rc<Vec<String>>,
         outer_messages: Rc<Vec<String>>,
@@ -192,7 +246,7 @@ impl Enum {
             name: "EnumDescriptorProto.name".to_string(),
         })?;
         Ok(Rc::new(Self {
-            input_file: Rc::downgrade(&input_file),
+            input_file: input_file,
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
             package: package,
             outer_messages: outer_messages,
