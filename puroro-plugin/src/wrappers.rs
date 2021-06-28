@@ -34,7 +34,7 @@ pub struct Message {
     rust_ident: String,
     package: Rc<Vec<String>>,
     outer_messages: Rc<Vec<String>>,
-    lazy_fields: OnceCell<Vec<Field>>,
+    fields: Vec<Field>,
     nested_messages: Vec<Rc<Message>>,
     nested_enums: Vec<Rc<Enum>>,
 }
@@ -247,15 +247,20 @@ impl Message {
             v.push(proto_name.clone());
             v
         });
-        let message = Rc::new(Self {
+        let proto_field = proto.field;
+        let proto_nested_type = proto.nested_type;
+        let proto_enum_type = proto.enum_type;
+        let message = Rc::new_cyclic(|message| Self {
             input_file: Clone::clone(&input_file),
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
             package: package.clone(),
             outer_messages: outer_messages.clone(),
-            // delay initialize. do it after Context::lazy_fqtn_to_type_map is initialized!
-            lazy_fields: OnceCell::new(),
-            nested_messages: proto
-                .nested_type
+            fields: proto_field
+                .into_iter()
+                .map(|f| Field::try_from_proto(Clone::clone(message), f))
+                .collect::<Result<Vec<_>>>()
+                .expect("I need try_new_cyclic..."),
+            nested_messages: proto_nested_type
                 .into_iter()
                 .map(|proto| -> Result<_> {
                     Ok(Message::try_from_proto(
@@ -265,9 +270,9 @@ impl Message {
                         new_outer_messages.clone(),
                     )?)
                 })
-                .collect::<Result<Vec<_>>>()?,
-            nested_enums: proto
-                .enum_type
+                .collect::<Result<Vec<_>>>()
+                .expect("I need try_new_cyclic..."),
+            nested_enums: proto_enum_type
                 .into_iter()
                 .map(|proto| -> Result<_> {
                     Ok(Enum::try_from_proto(
@@ -277,7 +282,8 @@ impl Message {
                         new_outer_messages.clone(),
                     )?)
                 })
-                .collect::<Result<Vec<_>>>()?,
+                .collect::<Result<Vec<_>>>()
+                .expect("I need try_new_cyclic..."),
         });
         Ok(message)
     }
@@ -308,7 +314,7 @@ impl Message {
         &self.outer_messages
     }
     pub fn fields(&self) -> &[Field] {
-        todo!()
+        &self.fields
     }
     pub fn nested_messages(&self) -> &[Rc<Message>] {
         &self.nested_messages
