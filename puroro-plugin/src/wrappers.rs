@@ -14,7 +14,7 @@ use protobuf::compiler::CodeGeneratorRequest;
 use protobuf::{DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto};
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Context {
     input_files: Vec<Rc<InputFile>>,
     lazy_fqtn_to_type_map: Lazy<HashMap<String, MessageOrEnum>>,
@@ -71,7 +71,7 @@ pub enum FieldType {
     Group,
     String,
     Bytes,
-    Enum(Rc<Enum>),
+    Enum(Weak<Enum>),
     Message(Weak<Message>),
 }
 
@@ -98,6 +98,14 @@ impl Context {
             lazy_fqtn_to_type_map: Lazy::new(|| todo!()),
         });
         Ok(context)
+    }
+
+    fn visit_message_or_enums<F>(&self, mut f: F) -> Result<()>
+    where
+        F: FnMut(MessageOrEnum) -> Result<()>,
+    {
+        let mut visit_queue = Vec::new()
+        Ok(())
     }
 }
 
@@ -148,6 +156,10 @@ impl InputFile {
                 .expect("I need try_new_cyclic..."),
         });
         Ok(file)
+    }
+
+    fn messages(&self) -> impl Iterator<Item = &Message> {
+        self.messages.iter().map(|rrc| &**rrc)
     }
 }
 
