@@ -20,7 +20,7 @@ pub struct Context {
     lazy_fqtn_to_type_map: OnceCell<HashMap<String, MessageOrEnum>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct InputFile {
     context: Weak<Context>,
     package: Rc<Vec<String>>,
@@ -28,7 +28,7 @@ pub struct InputFile {
     enums: Vec<Rc<Enum>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Message {
     input_file: Weak<InputFile>,
     rust_ident: String,
@@ -39,7 +39,7 @@ pub struct Message {
     nested_enums: Vec<Rc<Enum>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Enum {
     input_file: Weak<InputFile>,
     rust_ident: String,
@@ -47,13 +47,13 @@ pub struct Enum {
     outer_messages: Rc<Vec<String>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Field {
     rust_ident: String,
     proto_type: FieldType,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum FieldType {
     Double,
     Float,
@@ -75,7 +75,7 @@ pub enum FieldType {
     Message(Weak<Message>),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum MessageOrEnum {
     Message(Rc<Message>),
     Enum(Rc<Enum>),
@@ -345,7 +345,7 @@ impl Enum {
 }
 
 impl Field {
-    pub fn try_from_proto(proto: FieldDescriptorProto) -> Result<Self> {
+    pub fn try_from_proto(message: Weak<Message>, proto: FieldDescriptorProto) -> Result<Self> {
         let proto_name = proto.name.ok_or(ErrorKind::EmptyInputField {
             name: "FieldDescriptorProto.name".to_string(),
         })?;
