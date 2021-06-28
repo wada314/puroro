@@ -51,10 +51,12 @@ pub struct Enum {
 pub struct Field {
     message: Weak<Message>,
     rust_ident: String,
-    lazy_proto_type: Lazy<FieldType>,
+    lazy_proto_type: OnceCell<FieldType>,
+    proto_type_name: String,
+    proto_type_enum: FieldTypeProto,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum FieldType {
     Double,
     Float,
@@ -361,10 +363,16 @@ impl Field {
         let proto_name = proto.name.ok_or(ErrorKind::EmptyInputField {
             name: "FieldDescriptorProto.name".to_string(),
         })?;
+        let proto_type_name = proto.type_name.unwrap_or_default();
+        let proto_type_enum = proto.type_.ok_or(ErrorKind::InternalError {
+            detail: "currently we are assuming the field type enum is always set.".to_string(),
+        })?;
         Ok(Self {
-            message,
+            message: Clone::clone(&message),
             rust_ident: utils::get_keyword_safe_ident(&utils::to_lower_snake_case(&proto_name)),
-            lazy_proto_type: todo!(),
+            proto_type_name,
+            proto_type_enum,
+            lazy_proto_type: OnceCell::new(),
         })
     }
 
@@ -373,13 +381,25 @@ impl Field {
             detail: "Failed to upgrade a Weak<> pointer.".to_string(),
         })?)
     }
+
+    pub fn field_type(&self) -> Result<FieldType> {
+        self.lazy_proto_type
+            .get_or_try_init(|| {
+                FieldType::try_from_type_proto(
+                    Clone::clone(&self.message),
+                    &self.proto_type_enum,
+                    &self.proto_type_name,
+                )
+            })
+            .map(|x| x.clone())
+    }
 }
 
 impl FieldType {
     pub fn try_from_type_proto(
         message: Weak<Message>,
-        proto_type_enum: FieldTypeProto,
-        proto_type_name: String,
+        proto_type_enum: &FieldTypeProto,
+        proto_type_name: &str,
     ) -> Result<Self> {
         let context = message
             .upgrade()
@@ -402,7 +422,7 @@ impl FieldType {
             FieldTypeProto::TypeMessage => match context.get_type_from_fqtn(&proto_type_name) {
                 Some(MessageOrEnum::Message(m)) => FieldType::Message(Rc::downgrade(m)),
                 _ => Err(ErrorKind::UnknownTypeName {
-                    name: proto_type_name,
+                    name: proto_type_name.to_string(),
                 })?,
             },
             FieldTypeProto::TypeBytes => FieldType::Bytes,
@@ -410,7 +430,7 @@ impl FieldType {
             FieldTypeProto::TypeEnum => match context.get_type_from_fqtn(&proto_type_name) {
                 Some(MessageOrEnum::Enum(e)) => FieldType::Enum(Rc::downgrade(e)),
                 _ => Err(ErrorKind::UnknownTypeName {
-                    name: proto_type_name,
+                    name: proto_type_name.to_string(),
                 })?,
             },
             FieldTypeProto::TypeSfixed32 => FieldType::SFixed32,
