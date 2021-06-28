@@ -84,6 +84,10 @@ mod filters {
 fn main() -> Result<()> {
     let mut cgreq = CodeGeneratorRequest::default();
     cgreq.merge_from_iter(&mut stdin().bytes()).unwrap();
+
+    #[allow(unused)]
+    let wrapped_cgreq = wrappers::Context::try_from_proto(cgreq.clone())?;
+
     let mut cgres = CodeGeneratorResponse::default();
     let mut mod_rs = File::default();
     mod_rs.name = Some("mod.rs".to_string());

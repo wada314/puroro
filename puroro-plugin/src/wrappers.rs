@@ -5,7 +5,7 @@ use crate::protos::simple::google::protobuf;
 use crate::utils;
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
-use ::once_cell::unsync::OnceCell;
+use ::once_cell::unsync::{Lazy, OnceCell};
 use ::std::borrow::Borrow;
 use ::std::iter;
 use ::std::ops::Deref;
@@ -17,7 +17,7 @@ use std::collections::HashMap;
 #[derive(Debug, Clone)]
 pub struct Context {
     input_files: Vec<Rc<InputFile>>,
-    lazy_fqtn_to_type_map: OnceCell<HashMap<String, MessageOrEnum>>,
+    lazy_fqtn_to_type_map: Lazy<HashMap<String, MessageOrEnum>>,
 }
 
 #[derive(Debug, Clone)]
@@ -95,17 +95,14 @@ impl Context {
                 .map(|file| InputFile::try_from_proto(weak_context.clone(), file))
                 .collect::<Result<Vec<_>>>()
                 .expect("I need try_new_cyclic..."),
-            lazy_fqtn_to_type_map: OnceCell::new(),
+            lazy_fqtn_to_type_map: Lazy::new(|| todo!()),
         });
-        todo!("initialize the map");
         Ok(context)
     }
 }
 
 impl InputFile {
     pub fn try_from_proto(context: Weak<Context>, proto: FileDescriptorProto) -> Result<Rc<Self>> {
-        // Can be simplified if we can use #![feature(arc_new_cyclic)] feature:
-        // https://github.com/rust-lang/rust/issues/75861
         let package = Rc::new(
             proto
                 .package
