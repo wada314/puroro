@@ -12,12 +12,12 @@ use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 use protobuf::compiler::CodeGeneratorRequest;
 use protobuf::{DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto};
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 
 #[derive(Debug)]
 pub struct Context {
     input_files: Vec<Rc<InputFile>>,
-    lazy_fqtn_to_type_map: Lazy<HashMap<String, MessageOrEnum>>,
+    lazy_fqtn_to_type_map: OnceCell<HashMap<String, MessageOrEnum>>,
 }
 
 #[derive(Debug, Clone)]
@@ -95,16 +95,72 @@ impl Context {
                 .map(|file| InputFile::try_from_proto(weak_context.clone(), file))
                 .collect::<Result<Vec<_>>>()
                 .expect("I need try_new_cyclic..."),
-            lazy_fqtn_to_type_map: Lazy::new(|| todo!()),
+            lazy_fqtn_to_type_map: OnceCell::new(),
         });
+        context
+            .lazy_fqtn_to_type_map
+            .set(context.generate_fqtn_to_type_map()?);
         Ok(context)
+    }
+
+    pub fn input_files(&self) -> &[Rc<InputFile>] {
+        &self.input_files
+    }
+
+    pub fn get_type_from_fqtn(&self, fqtn: &str) -> Option<&MessageOrEnum> {
+        let fqtn = fqtn.trim_start_matches('.');
+        self.lazy_fqtn_to_type_map
+            .get()
+            .and_then(|map| map.get(fqtn))
+    }
+
+    fn generate_fqtn_to_type_map(&self) -> Result<HashMap<String, MessageOrEnum>> {
+        let mut map = HashMap::new();
+        self.visit_message_or_enums(|more| {
+            map.insert(more.fully_qualified_type_name(), more);
+            Ok(())
+        })?;
+        Ok(map)
     }
 
     fn visit_message_or_enums<F>(&self, mut f: F) -> Result<()>
     where
         F: FnMut(MessageOrEnum) -> Result<()>,
     {
-        let mut visit_queue = Vec::new()
+        let mut visit_queue = VecDeque::new();
+        // init queue
+        for file in self.input_files() {
+            visit_queue.extend(
+                file.messages()
+                    .iter()
+                    .map(|m| MessageOrEnum::Message(Clone::clone(m))),
+            );
+            visit_queue.extend(
+                file.enums()
+                    .iter()
+                    .map(|e| MessageOrEnum::Enum(Clone::clone(e))),
+            );
+        }
+        while let Some(item) = visit_queue.pop_front() {
+            // extend queue for the item's children
+            if let MessageOrEnum::Message(submsg) = &item {
+                visit_queue.extend(
+                    submsg
+                        .nested_messages()
+                        .iter()
+                        .map(|m| MessageOrEnum::Message(Clone::clone(m))),
+                );
+                visit_queue.extend(
+                    submsg
+                        .nested_enums()
+                        .iter()
+                        .map(|e| MessageOrEnum::Enum(Clone::clone(e))),
+                );
+            }
+            // visit
+            (f)(item)?;
+        }
+
         Ok(())
     }
 }
@@ -158,8 +214,12 @@ impl InputFile {
         Ok(file)
     }
 
-    fn messages(&self) -> impl Iterator<Item = &Message> {
-        self.messages.iter().map(|rrc| &**rrc)
+    fn messages(&self) -> &[Rc<Message>] {
+        &self.messages
+    }
+
+    fn enums(&self) -> &[Rc<Enum>] {
+        &self.enums
     }
 }
 
@@ -262,6 +322,16 @@ impl Enum {
         }))
     }
 
+    pub fn rust_ident(&self) -> &str {
+        &self.rust_ident
+    }
+    pub fn package(&self) -> &[String] {
+        &self.package
+    }
+    pub fn outer_messages(&self) -> &[String] {
+        &self.outer_messages
+    }
+
     pub fn rust_absolute_path(&self) -> String {
         format!(
             "{path}::{ident}",
@@ -308,6 +378,23 @@ impl FieldType {
             FieldTypeProto::TypeSint32 => FieldType::SInt32,
             FieldTypeProto::TypeSint64 => FieldType::SInt64,
         })
+    }
+}
+
+impl MessageOrEnum {
+    fn fully_qualified_type_name(&self) -> String {
+        match self {
+            MessageOrEnum::Message(m) => m
+                .package()
+                .iter()
+                .chain(m.outer_messages().iter())
+                .join("."),
+            MessageOrEnum::Enum(e) => e
+                .package()
+                .iter()
+                .chain(e.outer_messages().iter())
+                .join("."),
+        }
     }
 }
 
