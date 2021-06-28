@@ -10,6 +10,7 @@ use ::std::borrow::Borrow;
 use ::std::iter;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
+use protobuf::compiler::CodeGeneratorRequest;
 use protobuf::{DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto};
 use std::collections::HashMap;
 
@@ -80,8 +81,23 @@ pub enum MessageOrEnum {
     Enum(Rc<Enum>),
 }
 
+impl Context {
+    pub fn try_from_proto(proto: CodeGeneratorRequest) -> Result<Rc<Context>> {
+        // lazy fields initialization order is important.
+        //  1. Context::lazy_input_files,
+        //  2. Context::lazy_fqtn_to_type_map,
+        //  3. Message::lazy_fields
+        // because the latters refer the formers.
+        let context = Rc::new(Context {
+            lazy_input_files: OnceCell::new(),
+            lazy_fqtn_to_type_map: OnceCell::new(),
+        });
+        Ok(context)
+    }
+}
+
 impl InputFile {
-    pub fn try_from_proto(context: Rc<Context>, proto: FileDescriptorProto) -> Result<Self> {
+    pub fn try_from_proto(context: Rc<Context>, proto: FileDescriptorProto) -> Result<Rc<Self>> {
         todo!()
     }
 }
@@ -92,7 +108,7 @@ impl Message {
         proto: DescriptorProto,
         package: Rc<Vec<String>>,
         outer_messages: Rc<Vec<String>>,
-    ) -> Result<Self> {
+    ) -> Result<Rc<Self>> {
         let proto_name = proto.name.ok_or(ErrorKind::EmptyInputField {
             name: "DescriptorProto.name".to_string(),
         })?;
@@ -101,7 +117,7 @@ impl Message {
             v.push(proto_name.clone());
             v
         });
-        Ok(Self {
+        Ok(Rc::new(Self {
             input_file: Rc::downgrade(&input_file),
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
             package: package.clone(),
@@ -111,27 +127,27 @@ impl Message {
                 .nested_type
                 .into_iter()
                 .map(|proto| -> Result<_> {
-                    Ok(Rc::new(Message::try_from_proto(
+                    Ok(Message::try_from_proto(
                         input_file.clone(),
                         proto,
                         package.clone(),
                         new_outer_messages.clone(),
-                    )?))
+                    )?)
                 })
                 .collect::<Result<Vec<_>>>()?,
             nested_enums: proto
                 .enum_type
                 .into_iter()
                 .map(|proto| -> Result<_> {
-                    Ok(Rc::new(Enum::try_from_proto(
+                    Ok(Enum::try_from_proto(
                         input_file.clone(),
                         proto,
                         package.clone(),
                         new_outer_messages.clone(),
-                    )?))
+                    )?)
                 })
                 .collect::<Result<Vec<_>>>()?,
-        })
+        }))
     }
 
     pub fn rust_absolute_path(&self) -> String {
@@ -171,16 +187,16 @@ impl Enum {
         proto: EnumDescriptorProto,
         package: Rc<Vec<String>>,
         outer_messages: Rc<Vec<String>>,
-    ) -> Result<Self> {
+    ) -> Result<Rc<Self>> {
         let proto_name = proto.name.ok_or(ErrorKind::EmptyInputField {
             name: "EnumDescriptorProto.name".to_string(),
         })?;
-        Ok(Self {
+        Ok(Rc::new(Self {
             input_file: Rc::downgrade(&input_file),
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
             package: package,
             outer_messages: outer_messages,
-        })
+        }))
     }
 
     pub fn rust_absolute_path(&self) -> String {
