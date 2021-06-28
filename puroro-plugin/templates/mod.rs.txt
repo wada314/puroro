@@ -11,7 +11,7 @@ pub mod {{ subpackage }};
 {% for message in file.message_type %}
 pub struct {{ message.name | unwrap_or_default }} {
     {%- for field in message.field %}
-    pub {{ field.name | unwrap_or_default }}: i32, // {{ field.type_name | unwrap_or_default }}
+    pub {{ field.name | unwrap_or_default }}: i32, // name = "{{ field.type_name | unwrap_or_default }}", type = "{{ field.type_ | show_opt_enum }}"
     {%- endfor %}
 }
 {% endfor %} {# for message in file.message_type #}

@@ -79,6 +79,13 @@ mod filters {
     {
         Ok(val.clone().unwrap_or_default())
     }
+    pub fn show_opt_enum<E>(val: &Option<E>) -> ::askama::Result<i32>
+    where
+        i32: From<E>,
+        E: Clone,
+    {
+        Ok(val.as_ref().map_or(-1, |e| i32::from(e.clone())))
+    }
 }
 
 fn main() -> Result<()> {
