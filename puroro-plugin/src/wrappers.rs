@@ -1,42 +1,55 @@
+#![allow(unused)]
+
 use crate::protos::enums::google::protobuf::field_descriptor_proto::Type as FieldTypeProto;
 use crate::protos::simple::google::protobuf;
 use crate::utils;
 use crate::{ErrorKind, Result};
 use ::itertools::Itertools;
+use ::once_cell::unsync::OnceCell;
 use ::std::borrow::Borrow;
 use ::std::iter;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
-use protobuf::{DescriptorProto, EnumDescriptorProto, FieldDescriptorProto};
+use protobuf::{DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto};
+use std::collections::HashMap;
+
+#[derive(Debug, Clone)]
+pub struct Context {
+    lazy_input_files: OnceCell<Vec<Rc<InputFile>>>,
+    lazy_fqtn_to_type_map: OnceCell<HashMap<String, MessageOrEnum>>,
+}
 
 #[derive(Debug, Clone)]
 pub struct InputFile {
-    pub package: Rc<Vec<String>>,
-    pub messages: Vec<Rc<Message>>,
-    pub enums: Vec<Rc<Enum>>,
+    context: Weak<Context>,
+    package: Rc<Vec<String>>,
+    messages: Vec<Rc<Message>>,
+    enums: Vec<Rc<Enum>>,
 }
 
 #[derive(Debug, Clone)]
 pub struct Message {
-    pub rust_ident: String,
-    pub package: Rc<Vec<String>>,
-    pub outer_messages: Rc<Vec<String>>,
-    pub fields: Vec<Field>,
-    pub nested_messages: Vec<Rc<Message>>,
-    pub nested_enums: Vec<Rc<Enum>>,
+    input_file: Weak<InputFile>,
+    rust_ident: String,
+    package: Rc<Vec<String>>,
+    outer_messages: Rc<Vec<String>>,
+    lazy_fields: OnceCell<Vec<Field>>,
+    nested_messages: Vec<Rc<Message>>,
+    nested_enums: Vec<Rc<Enum>>,
 }
 
 #[derive(Debug, Clone)]
 pub struct Enum {
-    pub rust_ident: String,
-    pub package: Rc<Vec<String>>,
-    pub outer_messages: Rc<Vec<String>>,
+    input_file: Weak<InputFile>,
+    rust_ident: String,
+    package: Rc<Vec<String>>,
+    outer_messages: Rc<Vec<String>>,
 }
 
 #[derive(Debug, Clone)]
 pub struct Field {
-    pub rust_ident: String,
-    pub proto_type: FieldType,
+    rust_ident: String,
+    proto_type: FieldType,
 }
 
 #[derive(Debug, Clone)]
@@ -61,13 +74,21 @@ pub enum FieldType {
     Message(Weak<Message>),
 }
 
+#[derive(Debug, Clone)]
 pub enum MessageOrEnum {
     Message(Rc<Message>),
     Enum(Rc<Enum>),
 }
 
+impl InputFile {
+    pub fn try_from_proto(context: Rc<Context>, proto: FileDescriptorProto) -> Result<Self> {
+        todo!()
+    }
+}
+
 impl Message {
     pub fn try_from_proto(
+        input_file: Rc<InputFile>,
         proto: DescriptorProto,
         package: Rc<Vec<String>>,
         outer_messages: Rc<Vec<String>>,
@@ -81,15 +102,17 @@ impl Message {
             v
         });
         Ok(Self {
+            input_file: Rc::downgrade(&input_file),
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
             package: package.clone(),
             outer_messages: outer_messages.clone(),
-            fields: Vec::new(), // delayed initialize
+            lazy_fields: OnceCell::new(), // delayed initialize
             nested_messages: proto
                 .nested_type
                 .into_iter()
                 .map(|proto| -> Result<_> {
                     Ok(Rc::new(Message::try_from_proto(
+                        input_file.clone(),
                         proto,
                         package.clone(),
                         new_outer_messages.clone(),
@@ -101,6 +124,7 @@ impl Message {
                 .into_iter()
                 .map(|proto| -> Result<_> {
                     Ok(Rc::new(Enum::try_from_proto(
+                        input_file.clone(),
                         proto,
                         package.clone(),
                         new_outer_messages.clone(),
@@ -120,10 +144,30 @@ impl Message {
             ident = self.rust_ident
         )
     }
+
+    pub fn rust_ident(&self) -> &str {
+        &self.rust_ident
+    }
+    pub fn package(&self) -> &[String] {
+        &self.package
+    }
+    pub fn outer_messages(&self) -> &[String] {
+        &self.outer_messages
+    }
+    pub fn fields(&self) -> &[Field] {
+        todo!()
+    }
+    pub fn nested_messages(&self) -> &[Rc<Message>] {
+        &self.nested_messages
+    }
+    pub fn nested_enums(&self) -> &[Rc<Enum>] {
+        &self.nested_enums
+    }
 }
 
 impl Enum {
     pub fn try_from_proto(
+        input_file: Rc<InputFile>,
         proto: EnumDescriptorProto,
         package: Rc<Vec<String>>,
         outer_messages: Rc<Vec<String>>,
@@ -132,6 +176,7 @@ impl Enum {
             name: "EnumDescriptorProto.name".to_string(),
         })?;
         Ok(Self {
+            input_file: Rc::downgrade(&input_file),
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
             package: package,
             outer_messages: outer_messages,
