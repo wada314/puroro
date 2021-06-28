@@ -4,6 +4,7 @@ use crate::protos::enums::google::protobuf::field_descriptor_proto::Type as Fiel
 use crate::protos::simple::google::protobuf;
 use crate::utils;
 use crate::{ErrorKind, Result};
+use ::askama::Template;
 use ::itertools::Itertools;
 use ::once_cell::unsync::{Lazy, OnceCell};
 use ::std::borrow::Borrow;
@@ -28,7 +29,8 @@ pub struct InputFile {
     enums: Vec<Rc<Enum>>,
 }
 
-#[derive(Debug)]
+#[derive(Template, Default, Debug)]
+#[template(path = "message.rs.txt")]
 pub struct Message {
     input_file: Weak<InputFile>,
     rust_ident: String,
@@ -221,6 +223,10 @@ impl InputFile {
         Ok(self.context.upgrade().ok_or(ErrorKind::InternalError {
             detail: "Failed to upgrade a Weak<> pointer.".to_string(),
         })?)
+    }
+
+    pub fn package(&self) -> &[String] {
+        &self.package
     }
 
     pub fn messages(&self) -> &[Rc<Message>] {

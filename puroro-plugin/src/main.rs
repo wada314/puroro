@@ -19,10 +19,10 @@ type Result<T> = std::result::Result<T, GeneratorError>;
 use std::collections::{HashMap, HashSet};
 use std::io::Read;
 use std::io::{stdin, stdout};
+use std::rc::Rc;
 
 use google::protobuf::compiler::code_generator_response::File;
 use google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
-use google::protobuf::FileDescriptorProto;
 pub use protos::simple::google;
 
 use askama::Template;
@@ -67,10 +67,10 @@ fn package_to_filename(package: &str) -> String {
 }
 
 #[derive(Template, Default)]
-#[template(path = "mod.rs.txt")]
-pub struct Variables {
+#[template(path = "file.rs.txt")]
+pub struct OutputFile {
     subpackages: HashSet<String>,
-    file: Option<FileDescriptorProto>,
+    file: Option<Rc<wrappers::InputFile>>,
 }
 mod filters {
     pub fn unwrap_or_default<T>(val: &Option<T>) -> ::askama::Result<T>
@@ -99,27 +99,27 @@ fn main() -> Result<()> {
     let mut mod_rs = File::default();
     mod_rs.name = Some("mod.rs".to_string());
     let package_to_subpackage_map = make_package_to_subpackages_map(&cgreq.proto_file);
-    let package_to_file_descriptor_map = cgreq
-        .proto_file
-        .into_iter()
-        .map(|file| (file.package.clone().unwrap_or_default(), file))
+    let package_to_file_descriptor_map = wrapped_cgreq
+        .input_files()
+        .iter()
+        .map(|file| (file.package().iter().join("."), Clone::clone(file)))
         .collect::<HashMap<_, _>>();
     // merge 2 hashmaps
-    let mut package_to_variables = HashMap::<String, Variables>::new();
+    let mut package_to_out_file = HashMap::<String, OutputFile>::new();
     for (package, subpackages) in package_to_subpackage_map {
-        package_to_variables
+        package_to_out_file
             .entry(package)
             .or_insert_with(Default::default)
             .subpackages = subpackages;
     }
     for (package, file) in package_to_file_descriptor_map {
-        package_to_variables
+        package_to_out_file
             .entry(package)
             .or_insert_with(Default::default)
             .file = Some(file);
     }
 
-    for (package, variables) in package_to_variables {
+    for (package, variables) in package_to_out_file {
         let filename = package_to_filename(&package);
         let contents = variables.render().unwrap();
 

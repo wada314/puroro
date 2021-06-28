@@ -1,0 +1,17 @@
+// A generated source code by puroro library
+
+{%- for subpackage in subpackages %}
+pub mod {{ subpackage }};
+{%- endfor %}
+
+{%- match file %}
+{%- when Some with (file) %}
+// package {{ file.package() | join(".") }}
+
+{% for message in file.messages() %}
+{{ message }}
+{% endfor %} {# for message in file.messages #}
+
+{%- else %}     {# match file #}
+{%- endmatch %} {# match file #}
+// Hello!

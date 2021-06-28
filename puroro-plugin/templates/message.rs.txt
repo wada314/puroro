@@ -1,0 +1,4 @@
+
+struct {{ self.rust_ident() }} {
+
+}
