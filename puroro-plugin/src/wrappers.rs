@@ -34,6 +34,7 @@ pub struct InputFile {
 pub struct Message {
     input_file: Weak<InputFile>,
     rust_ident: String,
+    proto_name: String,
     package: Rc<Vec<String>>,
     outer_messages: Rc<Vec<String>>,
     fields: Vec<Field>,
@@ -45,6 +46,7 @@ pub struct Message {
 pub struct Enum {
     input_file: Weak<InputFile>,
     rust_ident: String,
+    proto_name: String,
     package: Rc<Vec<String>>,
     outer_messages: Rc<Vec<String>>,
 }
@@ -259,6 +261,7 @@ impl Message {
         let message = Rc::new_cyclic(|message| Self {
             input_file: Clone::clone(&input_file),
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
+            proto_name,
             package: package.clone(),
             outer_messages: outer_messages.clone(),
             fields: proto_field
@@ -313,6 +316,9 @@ impl Message {
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
     }
+    pub fn proto_name(&self) -> &str {
+        &self.proto_name
+    }
     pub fn package(&self) -> &[String] {
         &self.package
     }
@@ -343,6 +349,7 @@ impl Enum {
         Ok(Rc::new(Self {
             input_file: input_file,
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
+            proto_name,
             package: package,
             outer_messages: outer_messages,
         }))
@@ -350,6 +357,9 @@ impl Enum {
 
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
+    }
+    pub fn proto_name(&self) -> &str {
+        &self.proto_name
     }
     pub fn package(&self) -> &[String] {
         &self.package
@@ -468,11 +478,13 @@ impl MessageOrEnum {
                 .package()
                 .iter()
                 .chain(m.outer_messages().iter())
+                .chain(iter::once(&m.proto_name().to_string()))
                 .join("."),
             MessageOrEnum::Enum(e) => e
                 .package()
                 .iter()
                 .chain(e.outer_messages().iter())
+                .chain(iter::once(&e.proto_name().to_string()))
                 .join("."),
         }
     }
