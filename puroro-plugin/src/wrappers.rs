@@ -388,6 +388,10 @@ impl Field {
         })
     }
 
+    pub fn rust_ident(&self) -> &str {
+        &self.rust_ident
+    }
+
     pub fn message(&self) -> Result<Rc<Message>> {
         Ok(self.message.upgrade().ok_or(ErrorKind::InternalError {
             detail: "Failed to upgrade a Weak<> pointer.".to_string(),
@@ -450,6 +454,10 @@ impl FieldType {
             FieldTypeProto::TypeSint32 => FieldType::SInt32,
             FieldTypeProto::TypeSint64 => FieldType::SInt64,
         })
+    }
+
+    pub fn hoge(&self) -> String {
+        format!("{:?}", self)
     }
 }
 

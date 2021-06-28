@@ -1,4 +1,6 @@
 
 struct {{ self.rust_ident() }} {
-
+    {% for field in self.fields() -%}
+    pub {{ field.rust_ident() }}: {{ field.field_type().unwrap().hoge() }},
+    {% endfor %}
 }
