@@ -49,8 +49,9 @@ pub struct Enum {
 
 #[derive(Debug)]
 pub struct Field {
+    message: Weak<Message>,
     rust_ident: String,
-    proto_type: FieldType,
+    lazy_proto_type: Lazy<FieldType>,
 }
 
 #[derive(Debug)]
@@ -214,11 +215,17 @@ impl InputFile {
         Ok(file)
     }
 
-    fn messages(&self) -> &[Rc<Message>] {
+    pub fn context(&self) -> Result<Rc<Context>> {
+        Ok(self.context.upgrade().ok_or(ErrorKind::InternalError {
+            detail: "Failed to upgrade a Weak<> pointer.".to_string(),
+        })?)
+    }
+
+    pub fn messages(&self) -> &[Rc<Message>] {
         &self.messages
     }
 
-    fn enums(&self) -> &[Rc<Enum>] {
+    pub fn enums(&self) -> &[Rc<Enum>] {
         &self.enums
     }
 }
@@ -284,6 +291,11 @@ impl Message {
         )
     }
 
+    pub fn input_file(&self) -> Result<Rc<InputFile>> {
+        Ok(self.input_file.upgrade().ok_or(ErrorKind::InternalError {
+            detail: "Failed to upgrade a Weak<> pointer.".to_string(),
+        })?)
+    }
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
     }
@@ -350,15 +362,33 @@ impl Field {
             name: "FieldDescriptorProto.name".to_string(),
         })?;
         Ok(Self {
+            message,
             rust_ident: utils::get_keyword_safe_ident(&utils::to_lower_snake_case(&proto_name)),
-            proto_type: todo!(),
+            lazy_proto_type: todo!(),
         })
+    }
+
+    pub fn message(&self) -> Result<Rc<Message>> {
+        Ok(self.message.upgrade().ok_or(ErrorKind::InternalError {
+            detail: "Failed to upgrade a Weak<> pointer.".to_string(),
+        })?)
     }
 }
 
 impl FieldType {
-    pub fn try_from_type_proto(proto_type: FieldTypeProto) -> Result<Self> {
-        Ok(match proto_type {
+    pub fn try_from_type_proto(
+        message: Weak<Message>,
+        proto_type_enum: FieldTypeProto,
+        proto_type_name: String,
+    ) -> Result<Self> {
+        let context = message
+            .upgrade()
+            .ok_or(ErrorKind::InternalError {
+                detail: "Failed to upgrade a Weak<> pointer.".to_string(),
+            })?
+            .input_file()?
+            .context()?;
+        Ok(match proto_type_enum {
             FieldTypeProto::TypeDouble => FieldType::Double,
             FieldTypeProto::TypeFloat => FieldType::Float,
             FieldTypeProto::TypeInt64 => FieldType::Int64,
@@ -369,10 +399,20 @@ impl FieldType {
             FieldTypeProto::TypeBool => FieldType::Bool,
             FieldTypeProto::TypeString => FieldType::String,
             FieldTypeProto::TypeGroup => FieldType::Group,
-            FieldTypeProto::TypeMessage => FieldType::Message(todo!()),
+            FieldTypeProto::TypeMessage => match context.get_type_from_fqtn(&proto_type_name) {
+                Some(MessageOrEnum::Message(m)) => FieldType::Message(Rc::downgrade(m)),
+                _ => Err(ErrorKind::UnknownTypeName {
+                    name: proto_type_name,
+                })?,
+            },
             FieldTypeProto::TypeBytes => FieldType::Bytes,
             FieldTypeProto::TypeUint32 => FieldType::UInt32,
-            FieldTypeProto::TypeEnum => FieldType::Enum(todo!()),
+            FieldTypeProto::TypeEnum => match context.get_type_from_fqtn(&proto_type_name) {
+                Some(MessageOrEnum::Enum(e)) => FieldType::Enum(Rc::downgrade(e)),
+                _ => Err(ErrorKind::UnknownTypeName {
+                    name: proto_type_name,
+                })?,
+            },
             FieldTypeProto::TypeSfixed32 => FieldType::SFixed32,
             FieldTypeProto::TypeSfixed64 => FieldType::SFixed64,
             FieldTypeProto::TypeSint32 => FieldType::SInt32,
