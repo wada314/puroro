@@ -34,6 +34,7 @@ pub struct InputFile {
 pub struct Message {
     input_file: Weak<InputFile>,
     rust_ident: String,
+    rust_nested_module_ident: String,
     proto_name: String,
     package: Rc<Vec<String>>,
     outer_messages: Rc<Vec<String>>,
@@ -261,6 +262,9 @@ impl Message {
         let message = Rc::new_cyclic(|message| Self {
             input_file: Clone::clone(&input_file),
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
+            rust_nested_module_ident: utils::get_keyword_safe_ident(&utils::to_lower_snake_case(
+                &proto_name,
+            )),
             proto_name,
             package: package.clone(),
             outer_messages: outer_messages.clone(),
@@ -315,6 +319,9 @@ impl Message {
     }
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
+    }
+    pub fn rust_nested_module_ident(&self) -> &str {
+        &self.rust_nested_module_ident
     }
     pub fn proto_name(&self) -> &str {
         &self.proto_name

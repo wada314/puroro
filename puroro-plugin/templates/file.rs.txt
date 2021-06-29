@@ -8,10 +8,30 @@ pub mod {{ subpackage }};
 {%- when Some with (file) %}
 // package {{ file.package() | join(".") }}
 
-{% for message in file.messages() %}
-{{ message }}
-{% endfor %} {# for message in file.messages #}
+{#- Message structs -#}
 
-{%- else %}     {# match file #}
-{%- endmatch %} {# match file #}
-// Hello!
+{%- for message in file.messages() %}
+{{ message }}
+{%- endfor %} {#- for message in file.messages #}
+
+{#- Nested message & enum module #}
+
+mod puroro_nested {
+{%- for message in file.messages() %}
+{%- if message.nested_messages().len() + message.nested_enums().len() > 0 %}
+
+mod {{ message.rust_nested_module_ident() }} {
+{%- for submessage in message.nested_messages() %}
+{{ submessage }}
+{%- endfor %} {#- {% for submessage in message.nested_messages() %} #}
+
+} // mod {{ message.rust_nested_module_ident() }}
+{%- endif %}
+{%- endfor %} {#- for message in file.messages #}
+
+} // mod puroro_nested
+
+use self::puroro_nested::*;
+
+{%- else %}     {#- match file #}
+{%- endmatch %} {#- match file #}
