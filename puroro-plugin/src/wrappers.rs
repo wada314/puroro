@@ -1,6 +1,8 @@
 #![allow(unused)]
 
-use crate::protos::enums::google::protobuf::field_descriptor_proto::Type as FieldTypeProto;
+use crate::protos::enums::google::protobuf::field_descriptor_proto::{
+    Label as FieldLabelProto, Type as FieldTypeProto,
+};
 use crate::protos::simple::google::protobuf;
 use crate::utils;
 use crate::{ErrorKind, Result};
@@ -59,6 +61,7 @@ pub struct Field {
     lazy_proto_type: OnceCell<FieldType>,
     proto_type_name: String,
     proto_type_enum: FieldTypeProto,
+    label: FieldLabel,
 }
 
 #[derive(Debug, Clone)]
@@ -81,6 +84,14 @@ pub enum FieldType {
     Bytes,
     Enum(Weak<Enum>),
     Message(Weak<Message>),
+}
+
+#[derive(Debug, Clone)]
+pub enum FieldLabel {
+    Required,
+    Optional,
+    Unlabeled,
+    Repeated,
 }
 
 #[derive(Debug)]
@@ -400,12 +411,27 @@ impl Field {
         let proto_type_enum = proto.type_.ok_or(ErrorKind::InternalError {
             detail: "currently we are assuming the field type enum is always set.".to_string(),
         })?;
+        let proto_label = proto.label.ok_or(ErrorKind::InternalError {
+            detail: "currently we are assuming the field label enum is always set.".to_string(),
+        })?;
+        let proto_is_optional3 = proto.proto3_optional.unwrap_or_default();
         Ok(Self {
             message: Clone::clone(&message),
             rust_ident: utils::get_keyword_safe_ident(&utils::to_lower_snake_case(&proto_name)),
             proto_type_name,
             proto_type_enum,
             lazy_proto_type: OnceCell::new(),
+            label: if proto_is_optional3 {
+                FieldLabel::Optional
+            } else {
+                match proto_label {
+                    FieldLabelProto::LabelOptional => {
+                        todo!("proto2 / proto3")
+                    }
+                    FieldLabelProto::LabelRequired => FieldLabel::Required,
+                    FieldLabelProto::LabelRepeated => FieldLabel::Repeated,
+                }
+            },
         })
     }
 
