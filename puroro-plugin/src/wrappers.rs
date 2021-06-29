@@ -341,6 +341,10 @@ impl Message {
     pub fn nested_enums(&self) -> &[Rc<Enum>] {
         &self.nested_enums
     }
+
+    pub fn has_nested_items(&self) -> bool {
+        self.nested_messages().len() + self.nested_enums().len() > 0
+    }
 }
 
 impl Enum {

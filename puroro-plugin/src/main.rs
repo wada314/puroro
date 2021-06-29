@@ -78,6 +78,11 @@ pub struct OutputFile {
 pub struct Messages {
     messages: Vec<Rc<wrappers::Message>>,
 }
+impl Messages {
+    pub fn has_nested_items(&self) -> bool {
+        self.messages.iter().any(|m| m.has_nested_items())
+    }
+}
 
 mod filters {
     use super::*;

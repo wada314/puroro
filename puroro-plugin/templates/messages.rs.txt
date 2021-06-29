@@ -1,16 +1,16 @@
-
 {%- for message in messages %}
 {{ message }}
 {%- endfor %}
 
 {#- Nested message & enum module #}
 
+{%- if self.has_nested_items() %}
+
 mod puroro_nested {
 {%- for message in messages %}
 {%- if message.nested_messages().len() + message.nested_enums().len() > 0 %}
 
 mod {{ message.rust_nested_module_ident() }} {
-
 {{ message.nested_messages() | render_messages }}
 
 } // mod {{ message.rust_nested_module_ident() }}
@@ -20,3 +20,5 @@ mod {{ message.rust_nested_module_ident() }} {
 } // mod puroro_nested
 
 use self::puroro_nested::*;
+
+{%- endif %}
