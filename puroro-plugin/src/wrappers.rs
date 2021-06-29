@@ -526,18 +526,16 @@ where
     J: Iterator<Item = &'a str> + Clone,
 {
     let package = package.map(|s| utils::get_keyword_safe_ident(s));
-    let maybe_puroro_nested = if outer_messages.clone().count() == 0 {
-        None
-    } else {
-        Some("puroro_nested".to_string())
-    }
-    .into_iter();
-    let outer_messages =
-        outer_messages.map(|s| utils::get_keyword_safe_ident(&utils::to_lower_snake_case(s)));
+
+    let outer_messages = outer_messages.map(|s| {
+        format!(
+            "puroro_nested::{}",
+            utils::get_keyword_safe_ident(&utils::to_lower_snake_case(s))
+        )
+    });
     let mut modules_iter = iter::once("self".to_string())
         .chain(iter::once("puroro_root".to_string()))
         .chain(package)
-        .chain(maybe_puroro_nested)
         .chain(outer_messages);
     modules_iter.join("::")
 }
