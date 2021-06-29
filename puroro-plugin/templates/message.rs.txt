@@ -1,6 +1,6 @@
 
 struct {{ self.rust_ident() }} {
     {% for field in self.fields() -%}
-    pub {{ field.rust_ident() }}: i32, //{{ field.field_type().unwrap().hoge() }}
+    pub {{ field.rust_ident() }}: i32, //{{ field.field_type().unwrap().tag_ident().unwrap() }}
     {% endfor %}
 }

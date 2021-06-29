@@ -477,8 +477,41 @@ impl FieldType {
         })
     }
 
-    pub fn hoge(&self) -> String {
-        format!("{:?}", self)
+    pub fn tag_ident(&self) -> Result<String> {
+        Ok(match *self {
+            FieldType::Double => "Double".into(),
+            FieldType::Float => "Float".into(),
+            FieldType::Int32 => "Int32".into(),
+            FieldType::Int64 => "Int64".into(),
+            FieldType::UInt32 => "UInt32".into(),
+            FieldType::UInt64 => "UInt64".into(),
+            FieldType::SInt32 => "SInt32".into(),
+            FieldType::SInt64 => "SInt64".into(),
+            FieldType::Fixed32 => "Fixed32".into(),
+            FieldType::Fixed64 => "Fixed64".into(),
+            FieldType::SFixed32 => "SFixed32".into(),
+            FieldType::SFixed64 => "SFixed64".into(),
+            FieldType::Bool => "Bool".into(),
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => "String".into(),
+            FieldType::Bytes => "Bytes".into(),
+            FieldType::Enum(ref e) => format!(
+                "Enum::<{}>",
+                Weak::upgrade(e)
+                    .ok_or(ErrorKind::InternalError {
+                        detail: "Failed to upgrade a Weak<> pointer.".to_string(),
+                    })?
+                    .rust_absolute_path()
+            ),
+            FieldType::Message(ref m) => format!(
+                "Message::<{}>",
+                Weak::upgrade(m)
+                    .ok_or(ErrorKind::InternalError {
+                        detail: "Failed to upgrade a Weak<> pointer.".to_string(),
+                    })?
+                    .rust_absolute_path()
+            ),
+        })
     }
 }
 
