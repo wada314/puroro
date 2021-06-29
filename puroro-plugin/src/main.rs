@@ -72,19 +72,19 @@ pub struct OutputFile {
     subpackages: HashSet<String>,
     file: Option<Rc<wrappers::InputFile>>,
 }
+
+#[derive(Template, Default)]
+#[template(path = "messages.rs.txt")]
+pub struct Messages {
+    messages: Vec<Rc<wrappers::Message>>,
+}
+
 mod filters {
-    pub fn unwrap_or_default<T>(val: &Option<T>) -> ::askama::Result<T>
-    where
-        T: Default + Clone,
-    {
-        Ok(val.clone().unwrap_or_default())
-    }
-    pub fn show_opt_enum<E>(val: &Option<E>) -> ::askama::Result<i32>
-    where
-        i32: From<E>,
-        E: Clone,
-    {
-        Ok(val.as_ref().map_or(-1, |e| i32::from(e.clone())))
+    use super::*;
+    pub fn render_messages(messages: &[Rc<wrappers::Message>]) -> ::askama::Result<Messages> {
+        Ok(Messages {
+            messages: messages.to_vec(),
+        })
     }
 }
 

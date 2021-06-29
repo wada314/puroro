@@ -10,28 +10,7 @@ pub mod {{ subpackage }};
 
 {#- Message structs -#}
 
-{%- for message in file.messages() %}
-{{ message }}
-{%- endfor %} {#- for message in file.messages #}
-
-{#- Nested message & enum module #}
-
-mod puroro_nested {
-{%- for message in file.messages() %}
-{%- if message.nested_messages().len() + message.nested_enums().len() > 0 %}
-
-mod {{ message.rust_nested_module_ident() }} {
-{%- for submessage in message.nested_messages() %}
-{{ submessage }}
-{%- endfor %} {#- {% for submessage in message.nested_messages() %} #}
-
-} // mod {{ message.rust_nested_module_ident() }}
-{%- endif %}
-{%- endfor %} {#- for message in file.messages #}
-
-} // mod puroro_nested
-
-use self::puroro_nested::*;
+{{ file.messages() | render_messages }}
 
 {%- else %}     {#- match file #}
 {%- endmatch %} {#- match file #}
