@@ -1,4 +1,5 @@
 
+#[allow(unused)]
 pub struct {{ self.message.rust_ident() }}<ImplTag> 
 where ImplTag:
     {%- for field in self.message.unique_type_fields() %}
