@@ -13,6 +13,11 @@ pub type Result<T> = std::result::Result<T, PuroroError>;
 pub use ::bumpalo;
 pub use ::hashbrown;
 
+pub trait Message {
+    // TODO!!! How should I implement a deserializer??
+    fn get_field_with_number(&self) -> ();
+}
+
 pub trait StructInternalTypeGen {
     type Type;
 }
