@@ -1,6 +1,8 @@
 
 {% for enume in self.enums %}
 pub enum {{ enume.rust_ident() }} {
-
+    {%- for value in enume.values() %}
+    {{ value.rust_ident() }} = {{ value.number() }},
+    {%- endfor %}
 }
 {% endfor %}

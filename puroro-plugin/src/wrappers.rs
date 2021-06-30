@@ -53,6 +53,7 @@ pub struct Enum {
     proto_name: String,
     package: Rc<Vec<String>>,
     outer_messages: Rc<Vec<String>>,
+    values: Vec<EnumValue>,
 }
 
 #[derive(Debug)]
@@ -65,6 +66,12 @@ pub struct Field {
     proto_label: FieldLabelProto,
     proto_is_optional3: bool,
     lazy_label: OnceCell<FieldLabel>,
+}
+
+#[derive(Debug)]
+pub struct EnumValue {
+    rust_ident: String,
+    number: i32,
 }
 
 #[derive(Debug, Clone)]
@@ -407,12 +414,22 @@ impl Enum {
         let proto_name = proto.name.ok_or(ErrorKind::EmptyInputField {
             name: "EnumDescriptorProto.name".to_string(),
         })?;
+        let proto_value = proto.value;
         Ok(Rc::new(Self {
             input_file: input_file,
             rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
             proto_name,
             package: package,
             outer_messages: outer_messages,
+            values: proto_value
+                .into_iter()
+                .map(|v| EnumValue {
+                    rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(
+                        &v.name.unwrap_or_default(),
+                    )),
+                    number: v.number.unwrap_or_default(),
+                })
+                .collect_vec(),
         }))
     }
 
@@ -427,6 +444,9 @@ impl Enum {
     }
     pub fn outer_messages(&self) -> &[String] {
         &self.outer_messages
+    }
+    pub fn values(&self) -> &[EnumValue] {
+        &self.values
     }
 
     pub fn rust_absolute_path(&self) -> String {
@@ -507,6 +527,15 @@ impl Field {
                 })
             })
             .map(|l| l.clone())
+    }
+}
+
+impl EnumValue {
+    pub fn rust_ident(&self) -> &str {
+        &self.rust_ident
+    }
+    pub fn number(&self) -> i32 {
+        self.number
     }
 }
 
