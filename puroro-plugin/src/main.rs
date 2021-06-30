@@ -87,6 +87,12 @@ pub struct Message {
 }
 
 #[derive(Template)]
+#[template(path = "trait.rs.txt")]
+pub struct Trait {
+    message: Rc<wrappers::Message>,
+}
+
+#[derive(Template)]
 #[template(path = "enums.rs.txt")]
 pub struct Enums {
     enums: Vec<Rc<wrappers::Enum>>,
@@ -115,6 +121,11 @@ mod filters {
         Ok(Message {
             message: Clone::clone(message),
             visibility: "",
+        })
+    }
+    pub fn render_trait(message: &Rc<wrappers::Message>) -> ::askama::Result<Trait> {
+        Ok(Trait {
+            message: Clone::clone(message),
         })
     }
     pub fn render_enums(enums: &[Rc<wrappers::Enum>]) -> ::askama::Result<Enums> {

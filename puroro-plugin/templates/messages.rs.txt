@@ -1,4 +1,6 @@
 
+{#- ################ Structs ################ #}
+
 pub mod puroro_structs {
 
 pub mod public {
@@ -27,7 +29,20 @@ mod puroro_root {
 pub type {{ message.rust_ident() }} = self::puroro_structs::public::{{ message.rust_ident() }}<::puroro_internal::SimpleImpl>;
 {%- endfor %}
 
-{#- Nested message & enum module #}
+{#- ################ Traits ################ #}
+
+pub mod puroro_traits {
+mod puroro_root {
+    pub use super::super::puroro_root::*;
+}
+
+{%- for message in self.messages %}
+{{ message|render_trait }}
+{%- endfor %}
+
+} // mod puroro_traits
+
+{#- ################ Nested ################ #}
 
 {%- if self.has_nested_items() %}
 
