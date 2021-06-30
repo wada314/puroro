@@ -16,6 +16,7 @@ use ::std::rc::{Rc, Weak};
 use protobuf::compiler::CodeGeneratorRequest;
 use protobuf::{DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto};
 use std::collections::{HashMap, VecDeque};
+use std::hash::Hash;
 
 #[derive(Debug)]
 pub struct Context {
@@ -376,6 +377,23 @@ impl Message {
 
     pub fn has_nested_items(&self) -> bool {
         self.nested_messages().len() + self.nested_enums().len() > 0
+    }
+    pub fn unique_type_fields(&self) -> Vec<&Field> {
+        self.fields()
+            .iter()
+            .unique_by(|field| {
+                (
+                    field
+                        .field_type()
+                        .and_then(|ft| ft.tag_ident())
+                        .unwrap_or("".to_string()),
+                    field
+                        .field_label()
+                        .map(|fl| fl.tag_ident().to_string())
+                        .unwrap_or("".to_string()),
+                )
+            })
+            .collect_vec()
     }
 }
 

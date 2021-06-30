@@ -13,10 +13,10 @@ pub type Result<T> = std::result::Result<T, PuroroError>;
 pub use ::bumpalo;
 pub use ::hashbrown;
 
-trait StructInternalTypeGen {
+pub trait StructInternalTypeGen {
     type Type;
 }
 
-trait FieldTypeGen<LT: tags::FieldLabelAndTypeTag> {
+pub trait FieldTypeGen<LT: tags::FieldLabelAndTypeTag> {
     type Type;
 }

@@ -3,8 +3,8 @@ pub mod puroro_structs {
 
 pub mod public {
 
-mod puroro_root {
-    use super::super::super::puroro_root::*;
+pub mod puroro_root {
+    pub use super::super::super::puroro_root::*;
 }
 {%- for message in self.messages %}
 {{ message|render_public_message }}
