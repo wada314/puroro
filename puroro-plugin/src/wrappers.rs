@@ -66,6 +66,8 @@ pub struct Field {
     proto_label: FieldLabelProto,
     proto_is_optional3: bool,
     lazy_label: OnceCell<FieldLabel>,
+    number: i32,
+    lazy_label_and_type_tag: OnceCell<String>,
 }
 
 #[derive(Debug)]
@@ -474,6 +476,7 @@ impl Field {
             detail: "currently we are assuming the field label enum is always set.".to_string(),
         })?;
         let proto_is_optional3 = proto.proto3_optional.unwrap_or_default();
+        let proto_number = proto.number.unwrap_or_default();
         Ok(Self {
             message: Clone::clone(&message),
             rust_ident: utils::get_keyword_safe_ident(&utils::to_lower_snake_case(&proto_name)),
@@ -483,19 +486,19 @@ impl Field {
             proto_label,
             proto_is_optional3,
             lazy_label: OnceCell::new(),
+            number: proto_number,
+            lazy_label_and_type_tag: OnceCell::new(),
         })
     }
 
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
     }
-
     pub fn message(&self) -> Result<Rc<Message>> {
         Ok(self.message.upgrade().ok_or(ErrorKind::InternalError {
             detail: "Failed to upgrade a Weak<> pointer.".to_string(),
         })?)
     }
-
     pub fn field_type(&self) -> Result<FieldType> {
         self.lazy_proto_type
             .get_or_try_init(|| {
@@ -507,7 +510,6 @@ impl Field {
             })
             .map(|x| x.clone())
     }
-
     pub fn field_label(&self) -> Result<FieldLabel> {
         self.lazy_label
             .get_or_try_init(|| {
@@ -527,6 +529,21 @@ impl Field {
                 })
             })
             .map(|l| l.clone())
+    }
+    pub fn number(&self) -> i32 {
+        self.number
+    }
+
+    pub fn label_and_type_tag(&self) -> Result<&str> {
+        Ok(&self
+            .lazy_label_and_type_tag
+            .get_or_try_init(|| -> Result<_> {
+                Ok(format!(
+                    "(::puroro::tags::{label}, ::puroro::tags::{vtype})",
+                    label = self.field_label()?.tag_ident(),
+                    vtype = self.field_type()?.tag_ident()?
+                ))
+            })?)
     }
 }
 

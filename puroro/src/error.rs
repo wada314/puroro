@@ -25,8 +25,8 @@ pub enum ErrorKind {
     UnexpectedWireType,
     #[error("Unexpected field type. e.g. Expected int32, but found a uint64 field.")]
     UnexpectedFieldType,
-    #[error("Unexpected field number. In protobuf standard, the deserializer should accept this though.")]
-    UnexpectedFieldId,
+    #[error("Unknown field number. This should be recoverable.")]
+    UnknownFieldNumber,
     #[error("An internal error while converting enum from / into integer type.")]
     EnumConvertError,
     #[error("Failed to parse a boolean value.")]

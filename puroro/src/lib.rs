@@ -25,7 +25,8 @@ pub trait FunctorForFieldMut {
 
 pub trait Message {
     type ImplTypeTag;
-    fn apply_to_field_with_number<F>(&mut self, number: i32, f: F) -> Result<()>
+    // TODO: When the field does not exists
+    fn apply_mut_to_field_with_number<F>(&mut self, number: i32, f: F) -> Result<()>
     where
         F: FunctorForFieldMut<ImplTypeTag = Self::ImplTypeTag>;
 }
