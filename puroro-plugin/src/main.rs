@@ -86,6 +86,12 @@ pub struct Message {
     visibility: &'static str, // "pub " or ""
 }
 
+#[derive(Template)]
+#[template(path = "enums.rs.txt")]
+pub struct Enums {
+    enums: Vec<Rc<wrappers::Enum>>,
+}
+
 impl Messages {
     pub fn has_nested_items(&self) -> bool {
         self.messages.iter().any(|m| m.has_nested_items())
@@ -109,6 +115,11 @@ mod filters {
         Ok(Message {
             message: Clone::clone(message),
             visibility: "",
+        })
+    }
+    pub fn render_enums(enums: &[Rc<wrappers::Enum>]) -> ::askama::Result<Enums> {
+        Ok(Enums {
+            enums: enums.to_vec(),
         })
     }
 }

@@ -14,7 +14,7 @@ pub mod puroro_root {
 pub mod private {
     
 mod puroro_root {
-    use super::super::super::puroro_root::*;
+    pub use super::super::super::puroro_root::*;
 }
 {%- for message in self.messages %}
 {{ message|render_private_message }}
@@ -24,7 +24,7 @@ mod puroro_root {
 } // mod puroro_structs
 
 {%- for message in self.messages %}
-pub type {{ message.rust_ident() }} = self::puroro_structs::public::{{ message.rust_ident() }};
+pub type {{ message.rust_ident() }} = self::puroro_structs::public::{{ message.rust_ident() }}<::puroro_internal::SimpleImpl>;
 {%- endfor %}
 
 {#- Nested message & enum module #}
@@ -38,10 +38,11 @@ pub mod puroro_nested {
 
 pub mod {{ message.rust_nested_module_ident() }} {
 mod puroro_root {
-    use super::super::super::puroro_root::*;
+    pub use super::super::super::puroro_root::*;
 }
 
 {{ message.nested_messages()|render_messages }}
+{{ message.nested_enums()|render_enums }}
 
 } // mod {{ message.rust_nested_module_ident() }}
 {%- endif %}

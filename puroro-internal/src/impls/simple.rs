@@ -1,7 +1,11 @@
-use ::puroro::{tags, FieldTypeGen};
+use ::puroro::{tags, FieldTypeGen, StructInternalTypeGen};
 
-struct SimpleImpl;
+pub struct SimpleImpl;
 
 impl<T: tags::FieldLabelAndTypeTag> FieldTypeGen<T> for SimpleImpl {
     type Type = i32;
+}
+
+impl StructInternalTypeGen for SimpleImpl {
+    type Type = ();
 }

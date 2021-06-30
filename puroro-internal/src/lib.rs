@@ -7,3 +7,5 @@ pub mod variant;
 pub use ::puroro::{bumpalo, hashbrown};
 
 pub use ::puroro::{ErrorKind, PuroroError, Result};
+
+pub use impls::simple::SimpleImpl;

@@ -1,0 +1,6 @@
+
+{% for enume in self.enums %}
+pub enum {{ enume.rust_ident() }} {
+
+}
+{% endfor %}

@@ -4,14 +4,22 @@ where ImplTag:
     {%- for field in self.message.unique_type_fields() %}
     ::puroro::FieldTypeGen<(
         ::puroro::tags::{{ field.field_label().unwrap().tag_ident() }},
-        ::puroro::tags::{{ field.field_type().unwrap().tag_ident().unwrap() }}, 
+        (
+            ::puroro::tags::Proto2,
+            ::puroro::tags::{{ field.field_type().unwrap().tag_ident().unwrap() }},
+        ),
     )> +
     {%- endfor %}
+    ::puroro::StructInternalTypeGen,
 {
     {% for field in self.message.fields() -%}
     {{ self.visibility }}{{ field.rust_ident() }}: <ImplTag as ::puroro::FieldTypeGen<(
         ::puroro::tags::{{ field.field_label().unwrap().tag_ident() }},
-        ::puroro::tags::{{ field.field_type().unwrap().tag_ident().unwrap() }}, 
+        (
+            ::puroro::tags::Proto2,
+            ::puroro::tags::{{ field.field_type().unwrap().tag_ident().unwrap() }}, 
+        ),
     )>>::Type,
     {% endfor %}
+    puroro_internal: <ImplTag as ::puroro::StructInternalTypeGen>::Type,
 }

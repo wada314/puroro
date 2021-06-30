@@ -6,7 +6,7 @@ pub mod {{ subpackage }};
 
 {%- match file %}
 {%- when Some with (file) %}
-// package {{ file.package() | join(".") }}
+// package {{ file.package()|join(".") }}
 
 pub mod puroro_root {
     pub use super::{{ file.rust_path_to_root_module() }}::*;
@@ -14,7 +14,11 @@ pub mod puroro_root {
 
 {#- Message structs #}
 
-{{ file.messages() | render_messages }}
+{{ file.messages()|render_messages }}
+
+{#- Enums #}
+
+{{ file.enums()|render_enums }}
 
 {%- else %}     {#- match file #}
 {%- endmatch %} {#- match file #}
