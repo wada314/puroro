@@ -1,24 +1,43 @@
 use std::marker::PhantomData;
 
+/// A tag type corresponding to the field's type.
+/// e.g. Int32, Float, String, Message<M>
 pub trait ValueTypeTag {}
-pub trait VariantTypeTag: ValueTypeTag {
-    type NativeType;
-}
-pub trait LengthDelimitedTypeTag: ValueTypeTag {
-    // For this type, NativeType is not trivial so we do not define it at here.
-}
-pub trait Bits32TypeTag: ValueTypeTag {
-    type NativeType;
-}
-pub trait Bits64TypeTag: ValueTypeTag {
-    type NativeType;
-}
-pub trait WireTypeTag {}
-pub trait WireAndValueTypeTag {}
-pub trait FieldLabelTag {}
-pub trait FieldLabelAndTypeTag {}
 
+/// A tag type corresponding to the field's type which is the wire type is variant.
+/// e.g. Int32, UInt64
+pub trait VariantValueTypeTag: ValueTypeTag {}
+
+/// A tag type corresponding to the field's type which is the wire type is length delimited.
+/// e.g. String, Message<M>
+pub trait LengthDelimitedValueTypeTag: ValueTypeTag {}
+
+/// A tag type corresponding to the field's type which is the wire type is 32 bits.
+/// e.g. Float, Fixed32
+pub trait Bits32ValueTypeTag: ValueTypeTag {}
+
+/// A tag type corresponding to the field's type which is the wire type is 64 bits.
+/// e.g. Double, Fixed64
+pub trait Bits64ValueTypeTag: ValueTypeTag {}
+
+/// A tag type corresponding to the field's wire type.
+/// e.g. Variant, LengthDelimited, Bytes32
+pub trait WireTypeTag {}
+
+/// A tag type corresponding to the proto syntax.
+/// Proto2 or Proto3.
 pub trait ProtoSyntaxTag {}
+
+/// A tuple of (`ProtoSyntaxTag`, `WireTypeTag`, `ValueTypeTag`).
+pub trait FieldTypeTag {}
+
+/// A tag type corresponding to the field label.
+/// e.g. Optional, Repeated, Required
+pub trait FieldLabelTag {}
+
+/// A tuple of (`FieldLabelTag`, `FieldTypeTag`).
+/// TODO: Maybe map type should have its own tag type.
+pub trait FieldLabelAndTypeTag {}
 
 pub trait ImplTypeTag {}
 
@@ -68,6 +87,7 @@ pub type Double = (wire::Bits64, value::Double);
 pub type Fixed64 = (wire::Bits64, value::Fixed64);
 pub type SFixed64 = (wire::Bits64, value::SFixed64);
 
+
 /// A repeated field, which is available in both proto2 and proto3.
 pub struct Repeated;
 /// Proto2 optional field || Proto3 explicitly optional marked field.
@@ -104,64 +124,59 @@ impl ValueTypeTag for value::Fixed64 {}
 impl ValueTypeTag for value::SFixed32 {}
 impl ValueTypeTag for value::SFixed64 {}
 
-impl VariantTypeTag for value::Int32 {
-    type NativeType = i32;
-}
-impl VariantTypeTag for value::Int64 {
-    type NativeType = i64;
-}
-impl VariantTypeTag for value::UInt32 {
-    type NativeType = u32;
-}
-impl VariantTypeTag for value::UInt64 {
-    type NativeType = u64;
-}
-impl VariantTypeTag for value::SInt32 {
-    type NativeType = i32;
-}
-impl VariantTypeTag for value::SInt64 {
-    type NativeType = i64;
-}
-impl VariantTypeTag for value::Bool {
-    type NativeType = bool;
-}
-impl<T> VariantTypeTag for value::Enum<T> {
-    type NativeType = T;
-}
+impl VariantValueTypeTag for value::Int32 {}
+impl VariantValueTypeTag for value::Int64 {}
+impl VariantValueTypeTag for value::UInt32 {}
+impl VariantValueTypeTag for value::UInt64 {}
+impl VariantValueTypeTag for value::SInt32 {}
+impl VariantValueTypeTag for value::SInt64 {}
+impl VariantValueTypeTag for value::Bool {}
+impl<T> VariantValueTypeTag for value::Enum<T> {}
 
-impl LengthDelimitedTypeTag for value::String {}
-impl LengthDelimitedTypeTag for value::Bytes {}
-impl<T> LengthDelimitedTypeTag for value::Message<T> {}
+impl LengthDelimitedValueTypeTag for value::String {}
+impl LengthDelimitedValueTypeTag for value::Bytes {}
+impl<T> LengthDelimitedValueTypeTag for value::Message<T> {}
 
-impl Bits32TypeTag for value::Fixed32 {
-    type NativeType = u32;
-}
-impl Bits32TypeTag for value::SFixed32 {
-    type NativeType = i32;
-}
-impl Bits32TypeTag for value::Float {
-    type NativeType = f32;
-}
+impl Bits32ValueTypeTag for value::Fixed32 {}
+impl Bits32ValueTypeTag for value::SFixed32 {}
+impl Bits32ValueTypeTag for value::Float {}
 
-impl Bits64TypeTag for value::Fixed64 {
-    type NativeType = u64;
-}
-impl Bits64TypeTag for value::SFixed64 {
-    type NativeType = i64;
-}
-impl Bits64TypeTag for value::Double {
-    type NativeType = f64;
-}
+impl Bits64ValueTypeTag for value::Fixed64 {}
+impl Bits64ValueTypeTag for value::SFixed64 {}
+impl Bits64ValueTypeTag for value::Double {}
 
 impl WireTypeTag for wire::Variant {}
 impl WireTypeTag for wire::LengthDelimited {}
 impl WireTypeTag for wire::Bits32 {}
 impl WireTypeTag for wire::Bits64 {}
 
-impl<T> WireAndValueTypeTag for (wire::Variant, T) where T: VariantTypeTag {}
-impl<T> WireAndValueTypeTag for (wire::LengthDelimited, T) where T: LengthDelimitedTypeTag {}
-impl<T> WireAndValueTypeTag for (wire::Bits32, T) where T: Bits32TypeTag {}
-impl<T> WireAndValueTypeTag for (wire::Bits64, T) where T: Bits64TypeTag {}
+impl ProtoSyntaxTag for Proto2 {}
+impl ProtoSyntaxTag for Proto3 {}
+
+impl<S, T> FieldTypeTag for (S, wire::Variant, T)
+where
+    S: ProtoSyntaxTag,
+    T: VariantValueTypeTag,
+{
+}
+impl<S, T> FieldTypeTag for (S, wire::LengthDelimited, T)
+where
+    S: ProtoSyntaxTag,
+    T: LengthDelimitedValueTypeTag,
+{
+}
+impl<S, T> FieldTypeTag for (S, wire::Bits32, T)
+where
+    S: ProtoSyntaxTag,
+    T: Bits32ValueTypeTag,
+{
+}
+impl<S, T> FieldTypeTag for (S, wire::Bits64, T)
+where
+    S: ProtoSyntaxTag,
+    T: Bits64ValueTypeTag,
+{
+}
 
 impl FieldLabelTag for Repeated {}
 impl FieldLabelTag for Optional {}
@@ -171,13 +186,10 @@ impl FieldLabelTag for Required {}
 impl<L, V> FieldLabelAndTypeTag for (L, V)
 where
     L: FieldLabelTag,
-    V: WireAndValueTypeTag,
+    V: FieldTypeTag,
 {
 }
 
 impl ImplTypeTag for SimpleStruct {}
 impl<'bump> ImplTypeTag for Bumpalo<'bump> {}
 impl<'slice, S> ImplTypeTag for SliceView<'slice, S> {}
-
-impl ProtoSyntaxTag for Proto2 {}
-impl ProtoSyntaxTag for Proto3 {}

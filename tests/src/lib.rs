@@ -19,9 +19,9 @@ pub trait GetFieldDefaultValueType {
 impl<L, V> GetFieldDefaultValueType for (L, (tags::wire::Variant, V))
 where
     L: tags::FieldLabelTag,
-    V: tags::VariantTypeTag,
+    V: tags::VariantValueTypeTag,
 {
-    type Type = <V as tags::VariantTypeTag>::NativeType;
+    type Type = <V as tags::VariantValueTypeTag>::NativeType;
 }
 impl<L> GetFieldDefaultValueType for (L, tags::String)
 where
