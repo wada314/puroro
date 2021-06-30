@@ -12,3 +12,11 @@ pub type Result<T> = std::result::Result<T, PuroroError>;
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::hashbrown;
+
+trait StructInternalTypeGen {
+    type Type;
+}
+
+trait FieldTypeGen<LT: tags::FieldLabelAndTypeTag> {
+    type Type;
+}

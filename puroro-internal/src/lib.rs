@@ -1,5 +1,6 @@
 #![allow(unstable_name_collisions)] // For ResultHelper::flatten.
 
+pub mod impls;
 pub mod variant;
 
 // Re-exporting library modules
