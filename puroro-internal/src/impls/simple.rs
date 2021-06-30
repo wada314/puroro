@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use ::puroro::{tags, FieldTypeGen, StructInternalTypeGen};
 
 pub struct SimpleImpl;
+impl tags::ImplTypeTag for SimpleImpl {}
 
 // For variant types
 impl<L, S, V> FieldTypeGen<(L, (S, tags::wire::Variant<V>))> for SimpleImpl
@@ -91,10 +92,14 @@ impl<S, M> FieldTypeGen<(tags::Repeated, (S, tags::Message<M>))> for SimpleImpl 
     type Type = Vec<M>;
 }
 
+// Struct's internal type generator
+
 impl StructInternalTypeGen for SimpleImpl {
+    // TODO
     type Type = ();
 }
 
+// Utilities
 pub trait LabelWrappedType<L> {
     type Type;
 }

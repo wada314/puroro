@@ -1,12 +1,12 @@
 use std::marker::PhantomData;
 
-/// A tag type corresponding to the field's type.
+/// A tag trait for types corresponding to the field's type.
 /// e.g. Int32, Float, String, Message<M>
 /// This type actually consist of two tags for generics specialization:
 /// `wire::wire_tag<value::value_tag>`.
 pub trait ValueTypeTag {}
 
-/// A tag type corresponding to the proto syntax.
+/// A tag trait for types corresponding to the proto syntax.
 /// Proto2 or Proto3.
 pub trait ProtoSyntaxTag {}
 
@@ -18,7 +18,7 @@ pub trait NumericalFieldTypeTag: FieldTypeTag {
     type NativeType: Clone;
 }
 
-/// A tag type corresponding to the field label.
+/// A tag trait for types corresponding to the field label.
 /// e.g. Optional, Repeated, Required
 pub trait FieldLabelTag {}
 
@@ -26,6 +26,8 @@ pub trait FieldLabelTag {}
 /// TODO: Maybe map type should have its own tag type.
 pub trait FieldLabelAndTypeTag {}
 
+/// A tag trait for implementations of the proto message.
+/// e.g. Simple, Bumpalo, SliceView
 pub trait ImplTypeTag {}
 
 pub mod value {
@@ -84,11 +86,6 @@ pub struct Optional;
 pub struct Unlabeled;
 /// Only available in proto2.
 pub struct Required;
-
-// Proto struct implementation types.
-pub struct SimpleStruct;
-pub struct Bumpalo<'bump>(PhantomData<&'bump ()>);
-pub struct SliceView<'slice, S>(PhantomData<(&'slice (), S)>);
 
 pub struct Proto2;
 pub struct Proto3;
@@ -168,7 +165,3 @@ where
 //    V: FieldTypeTag,
 {
 }
-
-impl ImplTypeTag for SimpleStruct {}
-impl<'bump> ImplTypeTag for Bumpalo<'bump> {}
-impl<'slice, S> ImplTypeTag for SliceView<'slice, S> {}

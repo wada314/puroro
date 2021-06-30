@@ -13,15 +13,31 @@ pub type Result<T> = std::result::Result<T, PuroroError>;
 pub use ::bumpalo;
 pub use ::hashbrown;
 
-pub trait Message {
-    // TODO!!! How should I implement a deserializer??
-    fn get_field_with_number(&self) -> ();
+pub trait FunctorForFieldMut {
+    type ImplTypeTag;
+    fn apply_mut<LabelAndType>(
+        &mut self,
+        field: &mut <Self::ImplTypeTag as FieldTypeGen<LabelAndType>>::Type,
+    ) -> Result<()>
+    where
+        Self::ImplTypeTag: FieldTypeGen<LabelAndType>;
 }
 
-pub trait StructInternalTypeGen {
+pub trait Message {
+    type ImplTypeTag;
+    fn apply_to_field_with_number<F>(&mut self, number: i32, f: F) -> Result<()>
+    where
+        F: FunctorForFieldMut<ImplTypeTag = Self::ImplTypeTag>;
+}
+
+pub trait StructInternalTypeGen: tags::ImplTypeTag {
     type Type;
 }
 
-pub trait FieldTypeGen<LT: tags::FieldLabelAndTypeTag> {
+pub trait FieldTypeGen<LT>: tags::ImplTypeTag
+// Not setting these bounds for code simplicity
+// where
+//    LT: tags::FieldLabelAndTypeTag,
+{
     type Type;
 }
