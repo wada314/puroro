@@ -5,7 +5,7 @@ where ImplTag:
     ::puroro::FieldTypeGen<(
         ::puroro::tags::{{ field.field_label().unwrap().tag_ident() }},
         (
-            ::puroro::tags::Proto2,
+            ::puroro::tags::{{ self.message.input_file().unwrap().syntax().tag_ident() }},
             ::puroro::tags::{{ field.field_type().unwrap().tag_ident().unwrap() }},
         ),
     )> +
@@ -16,7 +16,7 @@ where ImplTag:
     {{ self.visibility }}{{ field.rust_ident() }}: <ImplTag as ::puroro::FieldTypeGen<(
         ::puroro::tags::{{ field.field_label().unwrap().tag_ident() }},
         (
-            ::puroro::tags::Proto2,
+            ::puroro::tags::{{ self.message.input_file().unwrap().syntax().tag_ident() }},
             ::puroro::tags::{{ field.field_type().unwrap().tag_ident().unwrap() }}, 
         ),
     )>>::Type,

@@ -539,6 +539,15 @@ impl EnumValue {
     }
 }
 
+impl ProtoSyntax {
+    pub fn tag_ident(&self) -> &str {
+        match *self {
+            ProtoSyntax::Proto2 => "Proto2",
+            ProtoSyntax::Proto3 => "Proto3",
+        }
+    }
+}
+
 impl FieldType {
     pub fn try_from_type_proto(
         message: Weak<Message>,

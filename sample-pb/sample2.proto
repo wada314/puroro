@@ -15,6 +15,7 @@ message Msg {
     repeated string string_rep = 9;
     
     message SubMsg {
+        optional Msg msg = 1;
     }
 
     required SubMsg submsg_req = 10;
