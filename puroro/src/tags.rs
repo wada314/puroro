@@ -2,33 +2,15 @@ use std::marker::PhantomData;
 
 /// A tag type corresponding to the field's type.
 /// e.g. Int32, Float, String, Message<M>
+/// This type actually consist of two tags for generics specialization:
+/// `(wire::wire_tag, value::value_tag)`.
 pub trait ValueTypeTag {}
-
-/// A tag type corresponding to the field's type which is the wire type is variant.
-/// e.g. Int32, UInt64
-pub trait VariantValueTypeTag: ValueTypeTag {}
-
-/// A tag type corresponding to the field's type which is the wire type is length delimited.
-/// e.g. String, Message<M>
-pub trait LengthDelimitedValueTypeTag: ValueTypeTag {}
-
-/// A tag type corresponding to the field's type which is the wire type is 32 bits.
-/// e.g. Float, Fixed32
-pub trait Bits32ValueTypeTag: ValueTypeTag {}
-
-/// A tag type corresponding to the field's type which is the wire type is 64 bits.
-/// e.g. Double, Fixed64
-pub trait Bits64ValueTypeTag: ValueTypeTag {}
-
-/// A tag type corresponding to the field's wire type.
-/// e.g. Variant, LengthDelimited, Bytes32
-pub trait WireTypeTag {}
 
 /// A tag type corresponding to the proto syntax.
 /// Proto2 or Proto3.
 pub trait ProtoSyntaxTag {}
 
-/// A tuple of (`ProtoSyntaxTag`, `WireTypeTag`, `ValueTypeTag`).
+/// A tuple of (`ProtoSyntaxTag`, `ValueTypeTag`).
 pub trait FieldTypeTag {}
 
 /// A tag type corresponding to the field label.
@@ -87,7 +69,6 @@ pub type Double = (wire::Bits64, value::Double);
 pub type Fixed64 = (wire::Bits64, value::Fixed64);
 pub type SFixed64 = (wire::Bits64, value::SFixed64);
 
-
 /// A repeated field, which is available in both proto2 and proto3.
 pub struct Repeated;
 /// Proto2 optional field || Proto3 explicitly optional marked field.
@@ -106,75 +87,31 @@ pub struct SliceView<'slice, S>(PhantomData<(&'slice (), S)>);
 pub struct Proto2;
 pub struct Proto3;
 
-impl ValueTypeTag for value::Int32 {}
-impl ValueTypeTag for value::Int64 {}
-impl ValueTypeTag for value::UInt32 {}
-impl ValueTypeTag for value::UInt64 {}
-impl ValueTypeTag for value::SInt32 {}
-impl ValueTypeTag for value::SInt64 {}
-impl ValueTypeTag for value::Bool {}
-impl ValueTypeTag for value::Bytes {}
-impl ValueTypeTag for value::String {}
-impl<T> ValueTypeTag for value::Enum<T> {}
-impl<T> ValueTypeTag for value::Message<T> {}
-impl ValueTypeTag for value::Float {}
-impl ValueTypeTag for value::Double {}
-impl ValueTypeTag for value::Fixed32 {}
-impl ValueTypeTag for value::Fixed64 {}
-impl ValueTypeTag for value::SFixed32 {}
-impl ValueTypeTag for value::SFixed64 {}
-
-impl VariantValueTypeTag for value::Int32 {}
-impl VariantValueTypeTag for value::Int64 {}
-impl VariantValueTypeTag for value::UInt32 {}
-impl VariantValueTypeTag for value::UInt64 {}
-impl VariantValueTypeTag for value::SInt32 {}
-impl VariantValueTypeTag for value::SInt64 {}
-impl VariantValueTypeTag for value::Bool {}
-impl<T> VariantValueTypeTag for value::Enum<T> {}
-
-impl LengthDelimitedValueTypeTag for value::String {}
-impl LengthDelimitedValueTypeTag for value::Bytes {}
-impl<T> LengthDelimitedValueTypeTag for value::Message<T> {}
-
-impl Bits32ValueTypeTag for value::Fixed32 {}
-impl Bits32ValueTypeTag for value::SFixed32 {}
-impl Bits32ValueTypeTag for value::Float {}
-
-impl Bits64ValueTypeTag for value::Fixed64 {}
-impl Bits64ValueTypeTag for value::SFixed64 {}
-impl Bits64ValueTypeTag for value::Double {}
-
-impl WireTypeTag for wire::Variant {}
-impl WireTypeTag for wire::LengthDelimited {}
-impl WireTypeTag for wire::Bits32 {}
-impl WireTypeTag for wire::Bits64 {}
+impl ValueTypeTag for Int32 {}
+impl ValueTypeTag for Int64 {}
+impl ValueTypeTag for UInt32 {}
+impl ValueTypeTag for UInt64 {}
+impl ValueTypeTag for SInt32 {}
+impl ValueTypeTag for SInt64 {}
+impl ValueTypeTag for Bool {}
+impl ValueTypeTag for Bytes {}
+impl ValueTypeTag for String {}
+impl<T> ValueTypeTag for Enum<T> {}
+impl<T> ValueTypeTag for Message<T> {}
+impl ValueTypeTag for Float {}
+impl ValueTypeTag for Double {}
+impl ValueTypeTag for Fixed32 {}
+impl ValueTypeTag for Fixed64 {}
+impl ValueTypeTag for SFixed32 {}
+impl ValueTypeTag for SFixed64 {}
 
 impl ProtoSyntaxTag for Proto2 {}
 impl ProtoSyntaxTag for Proto3 {}
 
-impl<S, T> FieldTypeTag for (S, wire::Variant, T)
+impl<S, T> FieldTypeTag for (S, T)
 where
     S: ProtoSyntaxTag,
-    T: VariantValueTypeTag,
-{
-}
-impl<S, T> FieldTypeTag for (S, wire::LengthDelimited, T)
-where
-    S: ProtoSyntaxTag,
-    T: LengthDelimitedValueTypeTag,
-{
-}
-impl<S, T> FieldTypeTag for (S, wire::Bits32, T)
-where
-    S: ProtoSyntaxTag,
-    T: Bits32ValueTypeTag,
-{
-}
-impl<S, T> FieldTypeTag for (S, wire::Bits64, T)
-where
-    S: ProtoSyntaxTag,
-    T: Bits64ValueTypeTag,
+    T: ValueTypeTag,
 {
 }
 

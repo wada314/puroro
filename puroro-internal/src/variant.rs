@@ -75,7 +75,7 @@ impl Variant {
 
     fn to_sint(&self) -> Result<i64> {
         // decode zigzag encoding for sint32 and sint64.
-        let x = self.to_i64()?;
+        let x = self.to_native::<(tags::Proto2, tags::Int64)>()?;
         Ok((x ^ (0 - (x & 1))) >> 1)
     }
     fn from_sint(x: i64) -> Self {
@@ -91,36 +91,13 @@ impl Variant {
     }
 }
 
-macro_rules! define_convert_methods {
-    ($vtype:ty, $toname:ident, $fromname:ident) => {
-        pub fn $toname(&self) -> Result<<$vtype as VariantTypeTag>::NativeType> {
-            self.to_native::<$vtype>()
-        }
-        pub fn $fromname(val: <$vtype as VariantTypeTag>::NativeType) -> Result<Variant> {
-            <$vtype as VariantTypeTag>::to_variant(val)
-        }
-    };
-}
-impl Variant {
-    define_convert_methods!(tags::value::UInt32, to_u32, from_u32);
-    define_convert_methods!(tags::value::UInt64, to_u64, from_u64);
-    define_convert_methods!(tags::value::SInt32, to_si32, from_si32);
-    define_convert_methods!(tags::value::SInt64, to_si64, from_si64);
-    define_convert_methods!(tags::value::Int32, to_i32, from_i32);
-    define_convert_methods!(tags::value::Int64, to_i64, from_i64);
-    define_convert_methods!(tags::value::Bool, to_bool, from_bool);
-    define_convert_methods!(RustUsize, to_usize, from_usize);
-}
-
 pub trait VariantTypeTag {
     type NativeType: Clone;
     fn from_variant(var: &Variant) -> Result<Self::NativeType>;
     fn to_variant(val: Self::NativeType) -> Result<Variant>;
 }
 
-pub struct RustUsize();
-
-impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::Int32) {
+impl<P> VariantTypeTag for (P, tags::Int32) {
     type NativeType = i32;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i32::try_from(i64::from_le_bytes(var.0))?)
@@ -129,7 +106,7 @@ impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::Int32) {
         Ok(Variant::new(i64::to_le_bytes(i64::from(val))))
     }
 }
-impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::UInt32) {
+impl<P> VariantTypeTag for (P, tags::UInt32) {
     type NativeType = u32;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(u32::try_from(u64::from_le_bytes(var.0))?)
@@ -138,7 +115,7 @@ impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::UInt32) {
         Ok(Variant::new(u64::to_le_bytes(u64::from(val))))
     }
 }
-impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::SInt32) {
+impl<P> VariantTypeTag for (P, tags::SInt32) {
     type NativeType = i32;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i32::try_from(var.to_sint()?)?)
@@ -148,7 +125,7 @@ impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::SInt32) {
     }
 }
 
-impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::Int64) {
+impl<P> VariantTypeTag for (P, tags::Int64) {
     type NativeType = i64;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i64::from_le_bytes(var.0))
@@ -157,7 +134,7 @@ impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::Int64) {
         Ok(Variant::new(i64::to_le_bytes(val)))
     }
 }
-impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::UInt64) {
+impl<P> VariantTypeTag for (P, tags::UInt64) {
     type NativeType = u64;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(u64::from_le_bytes(var.0))
@@ -166,7 +143,7 @@ impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::UInt64) {
         Ok(Variant::new(u64::to_le_bytes(val)))
     }
 }
-impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::SInt64) {
+impl<P> VariantTypeTag for (P, tags::SInt64) {
     type NativeType = i64;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(var.to_sint()?)
@@ -175,7 +152,7 @@ impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::SInt64) {
         Ok(Variant::from_sint(val))
     }
 }
-impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::Bool) {
+impl<P> VariantTypeTag for (P, tags::Bool) {
     type NativeType = bool;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         match u64::from_le_bytes(var.0) {
@@ -188,7 +165,7 @@ impl<P> VariantTypeTag for (P, tags::wire::Variant, tags::value::Bool) {
         Ok(Variant::new(u64::to_le_bytes(if val { 1 } else { 0 })))
     }
 }
-impl<T> VariantTypeTag for (tags::Proto2, tags::wire::Variant, tags::value::Enum<T>)
+impl<T> VariantTypeTag for (tags::Proto2, tags::Enum<T>)
 where
     T: TryFrom<i32, Error = i32> + Into<i32> + Clone,
 {
@@ -202,7 +179,7 @@ where
         Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))
     }
 }
-impl<T> VariantTypeTag for (tags::Proto3, tags::wire::Variant, tags::value::Enum<T>)
+impl<T> VariantTypeTag for (tags::Proto3, tags::Enum<T>)
 where
     T: TryFrom<i32, Error = i32> + Into<i32> + Clone,
 {
@@ -216,15 +193,6 @@ where
             Err(i) => i,
         };
         Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))
-    }
-}
-impl VariantTypeTag for RustUsize {
-    type NativeType = usize;
-    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
-        Ok(usize::try_from(u64::from_le_bytes(var.0))?)
-    }
-    fn to_variant(val: Self::NativeType) -> Result<Variant> {
-        Ok(Variant::new(u64::to_le_bytes(u64::try_from(val)?)))
     }
 }
 
@@ -280,7 +248,7 @@ mod tests {
             let mut iter = input.bytes();
             let v = Variant::decode_bytes(&mut iter)?;
             assert_eq!(collect_iter(iter), Vec::<u8>::new());
-            v.to_u32()
+            v.to_native::<(tags::Proto2, tags::UInt32)>()
         }
         assert_eq!(get_u32(&[0x00]).unwrap(), 0);
         assert_eq!(get_u32(&[0x01]).unwrap(), 1);
@@ -308,7 +276,7 @@ mod tests {
             let mut iter = input.bytes();
             let v = Variant::decode_bytes(&mut iter)?;
             assert_eq!(collect_iter(iter), Vec::<u8>::new());
-            v.to_si32()
+            v.to_native::<(tags::Proto2, tags::SInt32)>()
         }
         assert_eq!(get_si32(&[0x00]).unwrap(), 0);
         assert_eq!(get_si32(&[0x01]).unwrap(), -1);
