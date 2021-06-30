@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 /// A tag type corresponding to the field's type.
 /// e.g. Int32, Float, String, Message<M>
 /// This type actually consist of two tags for generics specialization:
-/// `(wire::wire_tag, value::value_tag)`.
+/// `wire::wire_tag<value::value_tag>`.
 pub trait ValueTypeTag {}
 
 /// A tag type corresponding to the proto syntax.
@@ -45,29 +45,30 @@ pub mod value {
 }
 
 pub mod wire {
-    pub struct Variant;
-    pub struct LengthDelimited;
-    pub struct Bits32;
-    pub struct Bits64;
+    use ::std::marker::PhantomData;
+    pub struct Variant<V>(PhantomData<V>);
+    pub struct LengthDelimited<V>(PhantomData<V>);
+    pub struct Bits32<V>(PhantomData<V>);
+    pub struct Bits64<V>(PhantomData<V>);
 }
 
-pub type Int32 = (wire::Variant, value::Int32);
-pub type SInt32 = (wire::Variant, value::SInt32);
-pub type UInt32 = (wire::Variant, value::UInt32);
-pub type Int64 = (wire::Variant, value::Int64);
-pub type SInt64 = (wire::Variant, value::SInt64);
-pub type UInt64 = (wire::Variant, value::UInt64);
-pub type Bool = (wire::Variant, value::Bool);
-pub type Enum<T> = (wire::Variant, value::Enum<T>);
-pub type String = (wire::LengthDelimited, value::String);
-pub type Bytes = (wire::LengthDelimited, value::Bytes);
-pub type Message<T> = (wire::LengthDelimited, value::Message<T>);
-pub type Float = (wire::Bits32, value::Float);
-pub type Fixed32 = (wire::Bits32, value::Fixed32);
-pub type SFixed32 = (wire::Bits32, value::SFixed32);
-pub type Double = (wire::Bits64, value::Double);
-pub type Fixed64 = (wire::Bits64, value::Fixed64);
-pub type SFixed64 = (wire::Bits64, value::SFixed64);
+pub type Int32 = wire::Variant<value::Int32>;
+pub type SInt32 = wire::Variant<value::SInt32>;
+pub type UInt32 = wire::Variant<value::UInt32>;
+pub type Int64 = wire::Variant<value::Int64>;
+pub type SInt64 = wire::Variant<value::SInt64>;
+pub type UInt64 = wire::Variant<value::UInt64>;
+pub type Bool = wire::Variant<value::Bool>;
+pub type String = wire::LengthDelimited<value::String>;
+pub type Bytes = wire::LengthDelimited<value::Bytes>;
+pub type Float = wire::Bits32<value::Float>;
+pub type Fixed32 = wire::Bits32<value::Fixed32>;
+pub type SFixed32 = wire::Bits32<value::SFixed32>;
+pub type Double = wire::Bits64<value::Double>;
+pub type Fixed64 = wire::Bits64<value::Fixed64>;
+pub type SFixed64 = wire::Bits64<value::SFixed64>;
+pub type Enum<T> = wire::Variant<value::Enum<T>>;
+pub type Message<T> = wire::LengthDelimited<value::Message<T>>;
 
 /// A repeated field, which is available in both proto2 and proto3.
 pub struct Repeated;
