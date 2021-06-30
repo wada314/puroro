@@ -17,4 +17,11 @@ impl ::std::convert::TryFrom<i32> for {{ enume.rust_ident() }} {
         })
     }
 }
+
+impl ::std::convert::From<{{ enume.rust_ident() }}> for i32 {
+    fn from(value: {{ enume.rust_ident() }}) -> i32 {
+        value as i32
+    }
+}
+
 {% endfor %}
