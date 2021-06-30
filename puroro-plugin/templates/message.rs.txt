@@ -2,25 +2,11 @@
 #[allow(unused)]
 pub struct {{ self.message.rust_ident() }}<ImplTag> 
 where ImplTag:
-    {%- for field in self.message.unique_type_fields() %}
-    ::puroro::FieldTypeGen<(
-        ::puroro::tags::{{ field.field_label().unwrap().tag_ident() }},
-        (
-            ::puroro::tags::{{ self.message.input_file().unwrap().syntax().tag_ident() }},
-            ::puroro::tags::{{ field.field_type().unwrap().tag_ident().unwrap() }},
-        ),
-    )> +
-    {%- endfor %}
+    super::super::puroro_traits::{{ self.message.rust_ident() }}TraitTypeGen +
     ::puroro::StructInternalTypeGen,
 {
     {% for field in self.message.fields() -%}
-    {{ self.visibility }}{{ field.rust_ident() }}: <ImplTag as ::puroro::FieldTypeGen<(
-        ::puroro::tags::{{ field.field_label().unwrap().tag_ident() }},
-        (
-            ::puroro::tags::{{ self.message.input_file().unwrap().syntax().tag_ident() }},
-            ::puroro::tags::{{ field.field_type().unwrap().tag_ident().unwrap() }}, 
-        ),
-    )>>::Type,
+    {{ self.visibility }}{{ field.rust_ident() }}: <ImplTag as ::puroro::FieldTypeGen<(::puroro::tags::{{ field.field_label().unwrap().tag_ident() }}, (::puroro::tags::{{ self.message.input_file().unwrap().syntax().tag_ident() }}, ::puroro::tags::{{ field.field_type().unwrap().tag_ident().unwrap() }}, ))>>::Type,
     {% endfor %}
     puroro_internal: <ImplTag as ::puroro::StructInternalTypeGen>::Type,
 }
