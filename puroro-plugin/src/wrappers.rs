@@ -32,8 +32,7 @@ pub struct InputFile {
     syntax: ProtoSyntax,
 }
 
-#[derive(Template, Default, Debug)]
-#[template(path = "message.rs.txt")]
+#[derive(Debug)]
 pub struct Message {
     input_file: Weak<InputFile>,
     rust_ident: String,
@@ -573,6 +572,17 @@ impl FieldType {
                     .rust_absolute_path()
             ),
         })
+    }
+}
+
+impl FieldLabel {
+    pub fn tag_ident(&self) -> &str {
+        match *self {
+            FieldLabel::Required => "Required",
+            FieldLabel::Optional => "Optional",
+            FieldLabel::Unlabeled => "Unlabeled",
+            FieldLabel::Repeated => "Repeated",
+        }
     }
 }
 

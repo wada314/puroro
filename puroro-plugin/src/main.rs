@@ -78,6 +78,14 @@ pub struct OutputFile {
 pub struct Messages {
     messages: Vec<Rc<wrappers::Message>>,
 }
+
+#[derive(Template)]
+#[template(path = "message.rs.txt")]
+pub struct Message {
+    message: Rc<wrappers::Message>,
+    visibility: &'static str, // "pub " or ""
+}
+
 impl Messages {
     pub fn has_nested_items(&self) -> bool {
         self.messages.iter().any(|m| m.has_nested_items())
@@ -89,6 +97,18 @@ mod filters {
     pub fn render_messages(messages: &[Rc<wrappers::Message>]) -> ::askama::Result<Messages> {
         Ok(Messages {
             messages: messages.to_vec(),
+        })
+    }
+    pub fn render_public_message(message: &Rc<wrappers::Message>) -> ::askama::Result<Message> {
+        Ok(Message {
+            message: Clone::clone(message),
+            visibility: "pub ",
+        })
+    }
+    pub fn render_private_message(message: &Rc<wrappers::Message>) -> ::askama::Result<Message> {
+        Ok(Message {
+            message: Clone::clone(message),
+            visibility: "",
         })
     }
 }

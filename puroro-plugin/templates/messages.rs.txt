@@ -1,17 +1,34 @@
-{%- for message in messages %}
-{{ message }}
+
+pub mod puroro_structs {
+
+pub mod public {
+{%- for message in self.messages %}
+{{ message|render_public_message }}
+{%- endfor %}
+}
+
+pub mod private {
+{%- for message in self.messages %}
+{{ message|render_private_message }}
+{%- endfor %}
+}
+
+} // mod puroro_struct
+
+{%- for message in self.messages %}
+pub type {{ message.rust_ident() }} = self::puroro_structs::public::{{ message.rust_ident() }};
 {%- endfor %}
 
 {#- Nested message & enum module #}
 
 {%- if self.has_nested_items() %}
 
-mod puroro_nested {
+pub mod puroro_nested {
 {%- for message in messages %}
 {%- if message.nested_messages().len() + message.nested_enums().len() > 0 %}
 
-mod {{ message.rust_nested_module_ident() }} {
-{{ message.nested_messages() | render_messages }}
+pub mod {{ message.rust_nested_module_ident() }} {
+{{ message.nested_messages()|render_messages }}
 
 } // mod {{ message.rust_nested_module_ident() }}
 {%- endif %}
@@ -19,6 +36,6 @@ mod {{ message.rust_nested_module_ident() }} {
 
 } // mod puroro_nested
 
-use self::puroro_nested::*;
+pub use self::puroro_nested::*;
 
 {%- endif %}
