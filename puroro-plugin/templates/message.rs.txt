@@ -19,7 +19,7 @@ where
         ::puroro::StructInternalTypeGen,
 {
     type ImplTypeTag = ImplTag;
-    fn apply_mut_to_field_with_number<F>(&mut self, number: i32, f: F) -> ::puroro::Result<()>
+    fn apply_mut_to_field_with_number<F>(&mut self, number: i32, mut f: F) -> ::puroro::Result<()>
     where
         F: ::puroro::FunctorForFieldMut<ImplTypeTag = Self::ImplTypeTag> 
     {

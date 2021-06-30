@@ -539,8 +539,10 @@ impl Field {
             .lazy_label_and_type_tag
             .get_or_try_init(|| -> Result<_> {
                 Ok(format!(
-                    "(::puroro::tags::{label}, ::puroro::tags::{vtype})",
+                    "(::puroro::tags::{label}, \
+                        (::puroro::tags::{syntax}, ::puroro::tags::{vtype}))",
                     label = self.field_label()?.tag_ident(),
+                    syntax = self.message()?.input_file()?.syntax().tag_ident(),
                     vtype = self.field_type()?.tag_ident()?
                 ))
             })?)
