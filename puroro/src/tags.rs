@@ -163,8 +163,9 @@ impl FieldLabelTag for Required {}
 
 impl<L, V> FieldLabelAndTypeTag for (L, V)
 where
-    L: FieldLabelTag,
-    V: FieldTypeTag,
+// Not setting these bounds for code simplicity
+//    L: FieldLabelTag,
+//    V: FieldTypeTag,
 {
 }
 
