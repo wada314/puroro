@@ -1,6 +1,6 @@
 
 pub struct {{ self.message.rust_ident() }} {
     {% for field in self.message.fields() -%}
-    {{ self.visibility }}{{ field.rust_ident() }}: i32, //{{ field.field_type().unwrap().tag_ident().unwrap() }}
+    {{ self.visibility }}{{ field.rust_ident() }}: i32, //::puroro::tags::{{ field.field_type().unwrap().tag_ident().unwrap() }}, ::puroro::tags::{{ field.field_label().unwrap().tag_ident() }}
     {% endfor %}
 }

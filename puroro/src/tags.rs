@@ -18,6 +18,8 @@ pub trait WireAndValueTypeTag {}
 pub trait FieldLabelTag {}
 pub trait FieldLabelAndTypeTag {}
 
+pub trait ProtoSyntaxTag {}
+
 pub trait ImplTypeTag {}
 
 pub mod value {
@@ -31,8 +33,7 @@ pub mod value {
     pub struct Bool;
     pub struct Bytes;
     pub struct String;
-    pub struct Enum2<T>(PhantomData<T>);
-    pub struct Enum3<T>(PhantomData<T>);
+    pub struct Enum<T>(PhantomData<T>);
     pub struct Message<T>(PhantomData<T>);
     pub struct Float;
     pub struct Double;
@@ -56,8 +57,7 @@ pub type Int64 = (wire::Variant, value::Int64);
 pub type SInt64 = (wire::Variant, value::SInt64);
 pub type UInt64 = (wire::Variant, value::UInt64);
 pub type Bool = (wire::Variant, value::Bool);
-pub type Enum2<T> = (wire::Variant, value::Enum2<T>);
-pub type Enum3<T> = (wire::Variant, value::Enum3<T>);
+pub type Enum<T> = (wire::Variant, value::Enum<T>);
 pub type String = (wire::LengthDelimited, value::String);
 pub type Bytes = (wire::LengthDelimited, value::Bytes);
 pub type Message<T> = (wire::LengthDelimited, value::Message<T>);
@@ -71,10 +71,10 @@ pub type SFixed64 = (wire::Bits64, value::SFixed64);
 /// A repeated field, which is available in both proto2 and proto3.
 pub struct Repeated;
 /// Proto2 optional field || Proto3 explicitly optional marked field.
-pub struct Optional2;
+pub struct Optional;
 
 /// Proto3 unlabeled field.
-pub struct Optional3;
+pub struct Unlabeled;
 /// Only available in proto2.
 pub struct Required;
 
@@ -82,6 +82,9 @@ pub struct Required;
 pub struct SimpleStruct;
 pub struct Bumpalo<'bump>(PhantomData<&'bump ()>);
 pub struct SliceView<'slice, S>(PhantomData<(&'slice (), S)>);
+
+pub struct Proto2;
+pub struct Proto3;
 
 impl ValueTypeTag for value::Int32 {}
 impl ValueTypeTag for value::Int64 {}
@@ -92,8 +95,7 @@ impl ValueTypeTag for value::SInt64 {}
 impl ValueTypeTag for value::Bool {}
 impl ValueTypeTag for value::Bytes {}
 impl ValueTypeTag for value::String {}
-impl<T> ValueTypeTag for value::Enum2<T> {}
-impl<T> ValueTypeTag for value::Enum3<T> {}
+impl<T> ValueTypeTag for value::Enum<T> {}
 impl<T> ValueTypeTag for value::Message<T> {}
 impl ValueTypeTag for value::Float {}
 impl ValueTypeTag for value::Double {}
@@ -123,11 +125,8 @@ impl VariantTypeTag for value::SInt64 {
 impl VariantTypeTag for value::Bool {
     type NativeType = bool;
 }
-impl<T> VariantTypeTag for value::Enum2<T> {
+impl<T> VariantTypeTag for value::Enum<T> {
     type NativeType = T;
-}
-impl<T> VariantTypeTag for value::Enum3<T> {
-    type NativeType = Result<T, i32>;
 }
 
 impl LengthDelimitedTypeTag for value::String {}
@@ -165,8 +164,8 @@ impl<T> WireAndValueTypeTag for (wire::Bits32, T) where T: Bits32TypeTag {}
 impl<T> WireAndValueTypeTag for (wire::Bits64, T) where T: Bits64TypeTag {}
 
 impl FieldLabelTag for Repeated {}
-impl FieldLabelTag for Optional2 {}
-impl FieldLabelTag for Optional3 {}
+impl FieldLabelTag for Optional {}
+impl FieldLabelTag for Unlabeled {}
 impl FieldLabelTag for Required {}
 
 impl<L, V> FieldLabelAndTypeTag for (L, V)
@@ -179,3 +178,6 @@ where
 impl ImplTypeTag for SimpleStruct {}
 impl<'bump> ImplTypeTag for Bumpalo<'bump> {}
 impl<'slice, S> ImplTypeTag for SliceView<'slice, S> {}
+
+impl ProtoSyntaxTag for Proto2 {}
+impl ProtoSyntaxTag for Proto3 {}
