@@ -8,7 +8,11 @@ pub mod {{ subpackage }};
 {%- when Some with (file) %}
 // package {{ file.package() | join(".") }}
 
-{#- Message structs -#}
+mod puroro_root {
+    use super::{{ file.rust_path_to_root_module() }}::*;
+}
+
+{#- Message structs #}
 
 {{ file.messages() | render_messages }}
 

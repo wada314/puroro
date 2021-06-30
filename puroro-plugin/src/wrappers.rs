@@ -259,17 +259,17 @@ impl InputFile {
     pub fn package(&self) -> &[String] {
         &self.package
     }
-
     pub fn messages(&self) -> &[Rc<Message>] {
         &self.messages
     }
-
     pub fn enums(&self) -> &[Rc<Enum>] {
         &self.enums
     }
-
     pub fn syntax(&self) -> ProtoSyntax {
         self.syntax.clone()
+    }
+    pub fn rust_path_to_root_module(&self) -> String {
+        iter::repeat("super").take(self.package().len()).join("::")
     }
 }
 

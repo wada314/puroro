@@ -2,18 +2,26 @@
 pub mod puroro_structs {
 
 pub mod public {
+
+mod puroro_root {
+    use super::super::super::puroro_root::*;
+}
 {%- for message in self.messages %}
 {{ message|render_public_message }}
 {%- endfor %}
 }
 
 pub mod private {
+    
+mod puroro_root {
+    use super::super::super::puroro_root::*;
+}
 {%- for message in self.messages %}
 {{ message|render_private_message }}
 {%- endfor %}
 }
 
-} // mod puroro_struct
+} // mod puroro_structs
 
 {%- for message in self.messages %}
 pub type {{ message.rust_ident() }} = self::puroro_structs::public::{{ message.rust_ident() }};
@@ -24,10 +32,15 @@ pub type {{ message.rust_ident() }} = self::puroro_structs::public::{{ message.r
 {%- if self.has_nested_items() %}
 
 pub mod puroro_nested {
+
 {%- for message in messages %}
 {%- if message.nested_messages().len() + message.nested_enums().len() > 0 %}
 
 pub mod {{ message.rust_nested_module_ident() }} {
+mod puroro_root {
+    use super::super::super::puroro_root::*;
+}
+
 {{ message.nested_messages()|render_messages }}
 
 } // mod {{ message.rust_nested_module_ident() }}
