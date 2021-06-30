@@ -91,14 +91,12 @@ impl Variant {
     }
 }
 
-pub trait VariantTypeTag {
-    type NativeType: Clone;
+pub trait VariantTypeTag: tags::NumericalFieldTypeTag {
     fn from_variant(var: &Variant) -> Result<Self::NativeType>;
     fn to_variant(val: Self::NativeType) -> Result<Variant>;
 }
 
-impl<P> VariantTypeTag for (P, tags::Int32) {
-    type NativeType = i32;
+impl<S> VariantTypeTag for (S, tags::Int32) {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i32::try_from(i64::from_le_bytes(var.0))?)
     }
@@ -106,8 +104,7 @@ impl<P> VariantTypeTag for (P, tags::Int32) {
         Ok(Variant::new(i64::to_le_bytes(i64::from(val))))
     }
 }
-impl<P> VariantTypeTag for (P, tags::UInt32) {
-    type NativeType = u32;
+impl<S> VariantTypeTag for (S, tags::UInt32) {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(u32::try_from(u64::from_le_bytes(var.0))?)
     }
@@ -115,8 +112,7 @@ impl<P> VariantTypeTag for (P, tags::UInt32) {
         Ok(Variant::new(u64::to_le_bytes(u64::from(val))))
     }
 }
-impl<P> VariantTypeTag for (P, tags::SInt32) {
-    type NativeType = i32;
+impl<S> VariantTypeTag for (S, tags::SInt32) {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i32::try_from(var.to_sint()?)?)
     }
@@ -125,8 +121,7 @@ impl<P> VariantTypeTag for (P, tags::SInt32) {
     }
 }
 
-impl<P> VariantTypeTag for (P, tags::Int64) {
-    type NativeType = i64;
+impl<S> VariantTypeTag for (S, tags::Int64) {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i64::from_le_bytes(var.0))
     }
@@ -134,8 +129,7 @@ impl<P> VariantTypeTag for (P, tags::Int64) {
         Ok(Variant::new(i64::to_le_bytes(val)))
     }
 }
-impl<P> VariantTypeTag for (P, tags::UInt64) {
-    type NativeType = u64;
+impl<S> VariantTypeTag for (S, tags::UInt64) {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(u64::from_le_bytes(var.0))
     }
@@ -143,8 +137,7 @@ impl<P> VariantTypeTag for (P, tags::UInt64) {
         Ok(Variant::new(u64::to_le_bytes(val)))
     }
 }
-impl<P> VariantTypeTag for (P, tags::SInt64) {
-    type NativeType = i64;
+impl<S> VariantTypeTag for (S, tags::SInt64) {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(var.to_sint()?)
     }
@@ -152,8 +145,7 @@ impl<P> VariantTypeTag for (P, tags::SInt64) {
         Ok(Variant::from_sint(val))
     }
 }
-impl<P> VariantTypeTag for (P, tags::Bool) {
-    type NativeType = bool;
+impl<S> VariantTypeTag for (S, tags::Bool) {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         match u64::from_le_bytes(var.0) {
             0 => Ok(false),
@@ -169,7 +161,6 @@ impl<T> VariantTypeTag for (tags::Proto2, tags::Enum<T>)
 where
     T: TryFrom<i32, Error = i32> + Into<i32> + Clone,
 {
-    type NativeType = T;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(T::try_from(i32::try_from(i64::from_le_bytes(var.0))?)
             .map_err(|i| ErrorKind::UnknownEnumVariant(i))?)
@@ -183,7 +174,6 @@ impl<T> VariantTypeTag for (tags::Proto3, tags::Enum<T>)
 where
     T: TryFrom<i32, Error = i32> + Into<i32> + Clone,
 {
-    type NativeType = std::result::Result<T, i32>;
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(T::try_from(i32::try_from(i64::from_le_bytes(var.0))?))
     }

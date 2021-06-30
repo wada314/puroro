@@ -13,6 +13,11 @@ pub trait ProtoSyntaxTag {}
 /// A tuple of (`ProtoSyntaxTag`, `ValueTypeTag`).
 pub trait FieldTypeTag {}
 
+/// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
+pub trait NumericalFieldTypeTag: FieldTypeTag {
+    type NativeType: Clone;
+}
+
 /// A tag type corresponding to the field label.
 /// e.g. Optional, Repeated, Required
 pub trait FieldLabelTag {}
@@ -111,9 +116,44 @@ impl ProtoSyntaxTag for Proto3 {}
 
 impl<S, T> FieldTypeTag for (S, T)
 where
-    S: ProtoSyntaxTag,
-    T: ValueTypeTag,
+// Not setting these bounds for code simplicity
+//S: ProtoSyntaxTag,
+//T: ValueTypeTag,
 {
+}
+
+impl<S> NumericalFieldTypeTag for (S, Int32) {
+    type NativeType = i32;
+}
+impl<S> NumericalFieldTypeTag for (S, UInt32) {
+    type NativeType = u32;
+}
+impl<S> NumericalFieldTypeTag for (S, SInt32) {
+    type NativeType = i32;
+}
+impl<S> NumericalFieldTypeTag for (S, Float) {
+    type NativeType = f32;
+}
+impl<S> NumericalFieldTypeTag for (S, Int64) {
+    type NativeType = i64;
+}
+impl<S> NumericalFieldTypeTag for (S, UInt64) {
+    type NativeType = u64;
+}
+impl<S> NumericalFieldTypeTag for (S, SInt64) {
+    type NativeType = i64;
+}
+impl<S> NumericalFieldTypeTag for (S, Double) {
+    type NativeType = f64;
+}
+impl<S> NumericalFieldTypeTag for (S, Bool) {
+    type NativeType = bool;
+}
+impl<T: Clone> NumericalFieldTypeTag for (Proto2, Enum<T>) {
+    type NativeType = T;
+}
+impl<T: Clone> NumericalFieldTypeTag for (Proto3, Enum<T>) {
+    type NativeType = ::std::result::Result<T, i32>;
 }
 
 impl FieldLabelTag for Repeated {}
