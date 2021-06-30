@@ -29,6 +29,7 @@ pub struct InputFile {
     package: Rc<Vec<String>>,
     messages: Vec<Rc<Message>>,
     enums: Vec<Rc<Enum>>,
+    syntax: ProtoSyntax,
 }
 
 #[derive(Template, Default, Debug)]
@@ -61,7 +62,15 @@ pub struct Field {
     lazy_proto_type: OnceCell<FieldType>,
     proto_type_name: String,
     proto_type_enum: FieldTypeProto,
-    label: FieldLabel,
+    proto_label: FieldLabelProto,
+    proto_is_optional3: bool,
+    lazy_label: OnceCell<FieldLabel>,
+}
+
+#[derive(Debug, Clone)]
+pub enum ProtoSyntax {
+    Proto2,
+    Proto3,
 }
 
 #[derive(Debug, Clone)]
@@ -202,6 +211,7 @@ impl InputFile {
         );
         let proto_messages = proto.message_type;
         let proto_enums = proto.enum_type;
+        let proto_syntax = proto.syntax;
         let mut file = Rc::new_cyclic(|file| Self {
             context: context,
             package: Clone::clone(&package),
@@ -229,6 +239,14 @@ impl InputFile {
                 })
                 .collect::<Result<Vec<_>>>()
                 .expect("I need try_new_cyclic..."),
+            syntax: match proto_syntax.as_deref() {
+                Some("proto2") | None => ProtoSyntax::Proto2,
+                Some("proto3") => ProtoSyntax::Proto3,
+                Some(syntax) => Err(ErrorKind::UnknownProtoSyntax {
+                    name: syntax.to_owned(),
+                })
+                .expect("I need try_new_cyclic..."),
+            },
         });
         Ok(file)
     }
@@ -249,6 +267,10 @@ impl InputFile {
 
     pub fn enums(&self) -> &[Rc<Enum>] {
         &self.enums
+    }
+
+    pub fn syntax(&self) -> ProtoSyntax {
+        self.syntax.clone()
     }
 }
 
@@ -421,17 +443,9 @@ impl Field {
             proto_type_name,
             proto_type_enum,
             lazy_proto_type: OnceCell::new(),
-            label: if proto_is_optional3 {
-                FieldLabel::Optional
-            } else {
-                match proto_label {
-                    FieldLabelProto::LabelOptional => {
-                        todo!("proto2 / proto3")
-                    }
-                    FieldLabelProto::LabelRequired => FieldLabel::Required,
-                    FieldLabelProto::LabelRepeated => FieldLabel::Repeated,
-                }
-            },
+            proto_label,
+            proto_is_optional3,
+            lazy_label: OnceCell::new(),
         })
     }
 
@@ -455,6 +469,27 @@ impl Field {
                 )
             })
             .map(|x| x.clone())
+    }
+
+    pub fn field_label(&self) -> Result<FieldLabel> {
+        self.lazy_label
+            .get_or_try_init(|| {
+                Ok(if self.proto_is_optional3 {
+                    FieldLabel::Optional
+                } else {
+                    match self.proto_label {
+                        FieldLabelProto::LabelOptional => {
+                            match self.message()?.input_file()?.syntax() {
+                                ProtoSyntax::Proto2 => FieldLabel::Optional,
+                                ProtoSyntax::Proto3 => FieldLabel::Unlabeled,
+                            }
+                        }
+                        FieldLabelProto::LabelRequired => FieldLabel::Required,
+                        FieldLabelProto::LabelRepeated => FieldLabel::Repeated,
+                    }
+                })
+            })
+            .map(|l| l.clone())
     }
 }
 
