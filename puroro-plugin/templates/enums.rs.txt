@@ -5,4 +5,16 @@ pub enum {{ enume.rust_ident() }} {
     {{ value.rust_ident() }} = {{ value.number() }},
     {%- endfor %}
 }
+
+impl ::std::convert::TryFrom<i32> for {{ enume.rust_ident() }} {
+    type Error = i32;
+    fn try_from(value: i32) -> ::std::result::Result<Self, i32> {
+        ::std::result::Result::Ok(match value {
+            {%- for value in enume.values() %}
+            {{ value.number() }} => {{ enume.rust_ident() }}::{{ value.rust_ident() }},
+            {%- endfor %}
+            _ => Err(value)?,
+        })
+    }
+}
 {% endfor %}
