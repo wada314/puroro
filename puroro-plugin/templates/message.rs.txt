@@ -2,7 +2,7 @@
 #[allow(unused)]
 pub struct {{ self.message.rust_ident() }}<ImplTag> 
 where ImplTag:
-    super::super::puroro_traits::{{ self.message.rust_ident() }}TraitTypeGen +
+    super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
     ::puroro::StructInternalTypeGen,
 {
     {% for field in self.message.fields() -%}

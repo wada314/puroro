@@ -42,6 +42,8 @@ mod puroro_root {
 
 } // mod puroro_traits
 
+pub use self::puroro_traits::*;
+
 {#- ################ Nested ################ #}
 
 {%- if self.has_nested_items() %}
