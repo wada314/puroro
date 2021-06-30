@@ -3,25 +3,27 @@
 
 pub mod puroro_structs {
 
-pub mod public {
+    pub mod public {
 
-pub mod puroro_root {
-    pub use super::super::super::puroro_root::*;
-}
-{%- for message in self.messages %}
-{{ message|render_public_message }}
-{%- endfor %}
-}
+        pub mod puroro_root {
+            pub use super::super::super::puroro_root::*;
+        }
 
-pub mod private {
+        {%- for message in self.messages %}
+        {{ message|render_public_message|indent(8) }}
+        {%- endfor %}
+    }
+
+    pub mod private {
     
-mod puroro_root {
-    pub use super::super::super::puroro_root::*;
-}
-{%- for message in self.messages %}
-{{ message|render_private_message }}
-{%- endfor %}
-}
+        mod puroro_root {
+            pub use super::super::super::puroro_root::*;
+        }
+
+        {%- for message in self.messages %}
+        {{ message|render_private_message|indent(8) }}
+        {%- endfor %}
+    }
 
 } // mod puroro_structs
 
@@ -32,13 +34,13 @@ pub type {{ message.rust_ident() }} = self::puroro_structs::public::{{ message.r
 {#- ################ Traits ################ #}
 
 pub mod puroro_traits {
-mod puroro_root {
-    pub use super::super::puroro_root::*;
-}
+    mod puroro_root {
+        pub use super::super::puroro_root::*;
+    }
 
-{%- for message in self.messages %}
-{{ message|render_trait }}
-{%- endfor %}
+    {%- for message in self.messages %}
+    {{ message|render_trait|indent(4) }}
+    {%- endfor %}
 
 } // mod puroro_traits
 
