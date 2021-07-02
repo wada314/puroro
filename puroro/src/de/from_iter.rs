@@ -38,20 +38,39 @@ where
     type Item = <I as Iterator>::Item;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let retval = match self.end_stack.last() {
+        match self.end_stack.last() {
             Some(end) => {
                 if self.pos < *end {
+                    self.pos += 1;
                     self.iter.next()
                 } else {
                     None
                 }
             }
-            None => self.iter.next(),
-        };
-        self.pos += 1;
-        retval
+            None => {
+                self.pos += 1;
+                self.iter.next()
+            }
+        }
     }
 }
 
 #[test]
-fn test_scoped_iter() {}
+fn test_scoped_iter() {
+    let s1 = ScopedIter::new("abcdefg".chars());
+    assert_eq!("abcdefg", s1.collect::<String>());
+
+    let s2 = ScopedIter::new_with_len("abcdefg".chars(), 5);
+    assert_eq!("abcde", s2.collect::<String>());
+
+    let mut s3 = ScopedIter::new("abcdefg".chars());
+    s3.push_scope(5);
+    assert_eq!("abcde", s3.collect::<String>());
+
+    let mut s4 = ScopedIter::new("abcdefg".chars());
+    assert_eq!(Some('a'), s4.next());
+    s4.push_scope(5);
+    assert_eq!("bcdef", s4.by_ref().collect::<String>());
+    s4.pop_scope();
+    assert_eq!("g", s4.by_ref().collect::<String>());
+}
