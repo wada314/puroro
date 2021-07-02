@@ -3,8 +3,9 @@
 
 mod error;
 
+pub mod de;
 pub mod tags;
-
+pub mod variant;
 pub use error::{ErrorKind, PuroroError};
 pub type Result<T> = std::result::Result<T, PuroroError>;
 
