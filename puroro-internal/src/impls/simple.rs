@@ -48,10 +48,10 @@ where
 // For length delimited types
 
 impl FieldTypeGen<(tags::Required, (tags::Proto2, tags::Bytes))> for SimpleImpl {
-    type Type = Cow<'static, [u8]>;
+    type Type = Option<Cow<'static, [u8]>>;
 }
 impl FieldTypeGen<(tags::Optional, (tags::Proto2, tags::Bytes))> for SimpleImpl {
-    type Type = Cow<'static, [u8]>;
+    type Type = Option<Cow<'static, [u8]>>;
 }
 impl FieldTypeGen<(tags::Unlabeled, (tags::Proto3, tags::Bytes))> for SimpleImpl {
     type Type = Vec<u8>;
@@ -64,10 +64,10 @@ impl<S> FieldTypeGen<(tags::Repeated, (S, tags::Bytes))> for SimpleImpl {
 }
 
 impl FieldTypeGen<(tags::Required, (tags::Proto2, tags::String))> for SimpleImpl {
-    type Type = Cow<'static, str>;
+    type Type = Option<Cow<'static, str>>;
 }
 impl FieldTypeGen<(tags::Optional, (tags::Proto2, tags::String))> for SimpleImpl {
-    type Type = Cow<'static, str>;
+    type Type = Option<Cow<'static, str>>;
 }
 impl FieldTypeGen<(tags::Unlabeled, (tags::Proto3, tags::String))> for SimpleImpl {
     type Type = String;
