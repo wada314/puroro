@@ -1,9 +1,19 @@
 use super::{FieldData, WireType};
 use crate::tags;
 use crate::variant::Variant;
+use crate::ErrorKind;
 use crate::{FieldTypeGen, FunctorForFieldMut, Message, Result};
 use ::std::convert::TryFrom as _;
 use ::std::io::Result as IoResult;
+
+pub trait ImplIsDeserializableFromIter<LabelAndType>: FieldTypeGen<LabelAndType> {
+    fn deser_field<I>(
+        field: &mut <Self as FieldTypeGen<LabelAndType>>::Type,
+        input: FieldData<I>,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = IoResult<u8>>;
+}
 
 fn deser_from_iter<Msg, I>(message: &mut Msg, input_iter: I) -> Result<()>
 where
@@ -25,7 +35,22 @@ where
             Ok(())
         }
         Some((wire_type, field_number)) => {
-            let mut functor = DeserFieldFunctor::<<Msg as Message>::ImplTypeTag>::new();
+            let field_data = match wire_type {
+                WireType::Variant => FieldData::Variant(Variant::decode_bytes(iter)?),
+                WireType::Bits32 => todo!(),
+                WireType::Bits64 => todo!(),
+                WireType::LengthDelimited => {
+                    let length = usize::try_from(Variant::decode_bytes(iter)?.to_i32()?)
+                        .map_err(|_| ErrorKind::InvalidFieldLength)?;
+                    iter.push_scope(length);
+                    FieldData::LengthDelimited(iter)
+                }
+                WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
+            };
+            let mut functor = DeserFieldFunctor::<<Msg as Message>::ImplTypeTag, _>::new(
+                wire_type.clone(),
+                field_data,
+            );
             message.apply_mut_to_field_with_number(field_number, functor)
         }
     }
@@ -121,19 +146,23 @@ fn test_scoped_iter() {
     assert_eq!("g", s4.by_ref().collect::<String>());
 }
 
-struct DeserFieldFunctor<ImplTag> {
+struct DeserFieldFunctor<'a, ImplTag, I> {
     phantom: std::marker::PhantomData<ImplTag>,
+    wire_type: WireType,
+    field_data: FieldData<&'a mut I>,
 }
 
-impl<ImplTag> DeserFieldFunctor<ImplTag> {
-    fn new() -> Self {
+impl<'a, ImplTag, I> DeserFieldFunctor<'a, ImplTag, I> {
+    fn new(wire_type: WireType, field_data: FieldData<&'a mut I>) -> Self {
         Self {
             phantom: std::marker::PhantomData,
+            wire_type,
+            field_data,
         }
     }
 }
 
-impl<ImplTag> FunctorForFieldMut for DeserFieldFunctor<ImplTag> {
+impl<'a, ImplTag, I> FunctorForFieldMut for DeserFieldFunctor<'a, ImplTag, I> {
     type ImplTypeTag = ImplTag;
     fn apply_mut<LabelAndType>(
         &mut self,

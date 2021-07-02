@@ -39,7 +39,7 @@ pub enum ErrorKind {
     IteratorError(#[from] std::io::Error),
     #[error("The formatter returned an error: {0}")]
     FormatterError(#[from] std::fmt::Error),
-    #[error("The string length is not correct.")]
+    #[error("The length of given field is not valid (Mostly a negative number).")]
     InvalidFieldLength,
     #[error("Internal error in SliceView struct.")]
     InvalidSliceViewType,
