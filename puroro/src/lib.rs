@@ -14,10 +14,6 @@ pub type Result<T> = std::result::Result<T, PuroroError>;
 pub use ::bumpalo;
 pub use ::hashbrown;
 
-pub trait Apply<Arg> {
-    type Type;
-}
-
 pub trait FnOnceForField {
     type ImplTypeTag;
     fn apply<LabelAndType>(
