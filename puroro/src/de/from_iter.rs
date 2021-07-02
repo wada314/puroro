@@ -1,7 +1,7 @@
 use super::{FieldData, WireType};
 use crate::tags;
 use crate::variant::Variant;
-use crate::Result;
+use crate::{FieldTypeGen, FunctorForFieldMut, Message, Result};
 use ::std::convert::TryFrom as _;
 use ::std::io::Result as IoResult;
 
@@ -11,15 +11,24 @@ where
     I: Iterator<Item = IoResult<u8>>,
 {
     let mut scoped_iter = ScopedIter::new(input_iter);
-    deser_from_scoped_iter(message, scoped_iter)
+    deser_from_scoped_iter(message, &mut scoped_iter)
 }
 
-fn deser_from_scoped_iter<Msg, I>(message: &mut Msg, input_iter: ScopedIter<I>) -> Result<()>
+fn deser_from_scoped_iter<Msg, I>(message: &mut Msg, iter: &mut ScopedIter<I>) -> Result<()>
 where
     Msg: crate::Message,
     I: Iterator<Item = IoResult<u8>>,
 {
-    todo!()
+    match try_get_wire_type_and_field_number(iter)? {
+        None => {
+            // reached at the end of this message.
+            Ok(())
+        }
+        Some((wire_type, field_number)) => {
+            let mut functor = DeserFieldFunctor::<<Msg as Message>::ImplTypeTag>::new();
+            message.apply_mut_to_field_with_number(field_number, functor)
+        }
+    }
 }
 
 fn try_get_wire_type_and_field_number<I>(iter: &mut I) -> Result<Option<(WireType, i32)>>
@@ -110,4 +119,29 @@ fn test_scoped_iter() {
     assert_eq!("bcdef", s4.by_ref().collect::<String>());
     s4.pop_scope();
     assert_eq!("g", s4.by_ref().collect::<String>());
+}
+
+struct DeserFieldFunctor<ImplTag> {
+    phantom: std::marker::PhantomData<ImplTag>,
+}
+
+impl<ImplTag> DeserFieldFunctor<ImplTag> {
+    fn new() -> Self {
+        Self {
+            phantom: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<ImplTag> FunctorForFieldMut for DeserFieldFunctor<ImplTag> {
+    type ImplTypeTag = ImplTag;
+    fn apply_mut<LabelAndType>(
+        &mut self,
+        field: &mut <Self::ImplTypeTag as FieldTypeGen<LabelAndType>>::Type,
+    ) -> Result<()>
+    where
+        Self::ImplTypeTag: FieldTypeGen<LabelAndType>,
+    {
+        todo!()
+    }
 }
