@@ -72,6 +72,10 @@ impl Variant {
     pub fn from_native<T: VariantTypeTag>(val: T::NativeType) -> Result<Variant> {
         T::to_variant(val)
     }
+    /// A shortcut of `to_native::<(tags::Proto2, tags::Int32)>()`.
+    pub fn to_i32(&self) -> Result<i32> {
+        self.to_native::<(tags::Proto2, tags::Int32)>()
+    }
 
     fn to_sint(&self) -> Result<i64> {
         // decode zigzag encoding for sint32 and sint64.

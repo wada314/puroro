@@ -19,8 +19,8 @@ pub enum ErrorKind {
     InvalidFieldLabel,
     #[error("A variant integer type is longer than 10 bytes.")]
     TooLargeVariant,
-    #[error("Invalid wire type.")]
-    InvalidWireType,
+    #[error("Invalid wire type value: {0}.")]
+    InvalidWireType(i32),
     #[error("Unexpected wire type. e.g. Expected int32, but found a message field.")]
     UnexpectedWireType,
     #[error("Unexpected field type. e.g. Expected int32, but found a uint64 field.")]

@@ -1,3 +1,40 @@
+use super::{FieldData, WireType};
+use crate::tags;
+use crate::variant::Variant;
+use crate::Result;
+use ::std::convert::TryFrom as _;
+use ::std::io::Result as IoResult;
+
+fn deser_from_iter<Msg, I>(message: &mut Msg, input_iter: I) -> Result<()>
+where
+    Msg: crate::Message,
+    I: Iterator<Item = IoResult<u8>>,
+{
+    let mut scoped_iter = ScopedIter::new(input_iter);
+    deser_from_scoped_iter(message, scoped_iter)
+}
+
+fn deser_from_scoped_iter<Msg, I>(message: &mut Msg, input_iter: ScopedIter<I>) -> Result<()>
+where
+    Msg: crate::Message,
+    I: Iterator<Item = IoResult<u8>>,
+{
+    todo!()
+}
+
+fn try_get_wire_type_and_field_number<I>(iter: &mut I) -> Result<Option<(WireType, i32)>>
+where
+    I: Iterator<Item = IoResult<u8>>,
+{
+    let mut peekable = iter.peekable();
+    if let None = peekable.peek() {
+        // Found EOF at first byte. Successfull failure.
+        return Ok(None);
+    }
+    let key = Variant::decode_bytes(&mut peekable)?.to_i32()?;
+    Ok(Some((WireType::try_from(key & 0x07)?, (key >> 3))))
+}
+
 struct ScopedIter<I> {
     iter: I,
     pos: usize,
