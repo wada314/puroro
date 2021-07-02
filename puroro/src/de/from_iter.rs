@@ -35,10 +35,24 @@ where
             Ok(())
         }
         Some((wire_type, field_number)) => {
+            fn byte<I: Iterator<Item = IoResult<u8>>>(iter: &mut I) -> Result<u8> {
+                Ok(iter.next().ok_or(ErrorKind::UnexpectedInputTermination)??)
+            }
             let field_data = match wire_type {
                 WireType::Variant => FieldData::Variant(Variant::decode_bytes(iter)?),
-                WireType::Bits32 => todo!(),
-                WireType::Bits64 => todo!(),
+                WireType::Bits32 => {
+                    FieldData::Bits32([byte(iter)?, byte(iter)?, byte(iter)?, byte(iter)?])
+                }
+                WireType::Bits64 => FieldData::Bits64([
+                    byte(iter)?,
+                    byte(iter)?,
+                    byte(iter)?,
+                    byte(iter)?,
+                    byte(iter)?,
+                    byte(iter)?,
+                    byte(iter)?,
+                    byte(iter)?,
+                ]),
                 WireType::LengthDelimited => {
                     let length = usize::try_from(Variant::decode_bytes(iter)?.to_i32()?)
                         .map_err(|_| ErrorKind::InvalidFieldLength)?;
