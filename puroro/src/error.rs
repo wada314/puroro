@@ -19,8 +19,8 @@ pub enum ErrorKind {
     InvalidFieldLabel,
     #[error("A variant integer type is longer than 10 bytes.")]
     TooLargeVariant,
-    #[error("Invalid wire type.")]
-    InvalidWireType,
+    #[error("Invalid wire type value: {0}.")]
+    InvalidWireType(i32),
     #[error("Unexpected wire type. e.g. Expected int32, but found a message field.")]
     UnexpectedWireType,
     #[error("Unexpected field type. e.g. Expected int32, but found a uint64 field.")]
@@ -39,7 +39,7 @@ pub enum ErrorKind {
     IteratorError(#[from] std::io::Error),
     #[error("The formatter returned an error: {0}")]
     FormatterError(#[from] std::fmt::Error),
-    #[error("The string length is not correct.")]
+    #[error("The length of given field is not valid (Mostly a negative number).")]
     InvalidFieldLength,
     #[error("Internal error in SliceView struct.")]
     InvalidSliceViewType,

@@ -7,6 +7,15 @@ pub trait {{ self.message.rust_ident() }}TraitAggregatedTypeGen :
 {
 }
 
+#[allow(unused)]
+pub trait {{ self.message.rust_ident() }}TraitFieldsApplicable<T>
+where T: 
+{%- for field in self.message.unique_type_fields() %}
+    ::puroro::Apply<(::puroro::tags::{{ field.field_label().unwrap().tag_ident() }}, (::puroro::tags::{{ self.message.input_file().unwrap().syntax().tag_ident() }}, ::puroro::tags::{{ field.field_type().unwrap().tag_ident().unwrap() }}))> +
+{%- endfor %}
+{
+}    
+
 impl<T> {{ self.message.rust_ident() }}TraitAggregatedTypeGen for T
 where T:
 {%- for field in self.message.unique_type_fields() %}

@@ -3,8 +3,9 @@
 
 mod error;
 
+pub mod de;
 pub mod tags;
-
+pub mod variant;
 pub use error::{ErrorKind, PuroroError};
 pub type Result<T> = std::result::Result<T, PuroroError>;
 
@@ -13,10 +14,14 @@ pub type Result<T> = std::result::Result<T, PuroroError>;
 pub use ::bumpalo;
 pub use ::hashbrown;
 
-pub trait FunctorForFieldMut {
+pub trait Apply<Arg> {
+    type Type;
+}
+
+pub trait FnOnceForField {
     type ImplTypeTag;
-    fn apply_mut<LabelAndType>(
-        &mut self,
+    fn apply<LabelAndType>(
+        self,
         field: &mut <Self::ImplTypeTag as FieldTypeGen<LabelAndType>>::Type,
     ) -> Result<()>
     where
@@ -28,7 +33,7 @@ pub trait Message {
     // TODO: When the field does not exists
     fn apply_mut_to_field_with_number<F>(&mut self, number: i32, f: F) -> Result<()>
     where
-        F: FunctorForFieldMut<ImplTypeTag = Self::ImplTypeTag>;
+        F: FnOnceForField<ImplTypeTag = Self::ImplTypeTag>;
 }
 
 pub trait StructInternalTypeGen: tags::ImplTypeTag {
