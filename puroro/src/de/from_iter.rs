@@ -1,5 +1,4 @@
 use super::{FieldData, WireType};
-use crate::tags;
 use crate::variant::Variant;
 use crate::ErrorKind;
 use crate::{FieldTypeGen, FnOnceForField, Message, Result};
