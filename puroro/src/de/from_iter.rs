@@ -64,10 +64,7 @@ where
                 }
                 WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
             };
-            let functor = DeserFieldFnOnce::<<Msg as Message>::ImplTypeTag, _>::new(
-                wire_type.clone(),
-                field_data,
-            );
+            let functor = DeserFieldFnOnce::<<Msg as Message>::ImplTypeTag, _>::new(field_data);
             message.apply_mut_to_field_with_number(field_number, functor)
         }
     }
@@ -165,15 +162,13 @@ fn test_scoped_iter() {
 
 struct DeserFieldFnOnce<'a, ImplTag, I> {
     phantom: std::marker::PhantomData<ImplTag>,
-    wire_type: WireType,
     field_data: FieldData<&'a mut I>,
 }
 
 impl<'a, ImplTag, I> DeserFieldFnOnce<'a, ImplTag, I> {
-    fn new(wire_type: WireType, field_data: FieldData<&'a mut I>) -> Self {
+    fn new(field_data: FieldData<&'a mut I>) -> Self {
         Self {
             phantom: std::marker::PhantomData,
-            wire_type,
             field_data,
         }
     }
