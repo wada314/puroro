@@ -14,22 +14,8 @@ pub type Result<T> = std::result::Result<T, PuroroError>;
 pub use ::bumpalo;
 pub use ::hashbrown;
 
-pub trait FnOnceForField {
-    type ImplTypeTag;
-    fn apply<LabelAndType>(
-        self,
-        field: &mut <Self::ImplTypeTag as FieldTypeGen<LabelAndType>>::Type,
-    ) -> Result<()>
-    where
-        Self::ImplTypeTag: FieldTypeGen<LabelAndType>;
-}
-
 pub trait Message {
     type ImplTypeTag;
-    // TODO: When the field does not exists
-    fn apply_mut_to_field_with_number<F>(&mut self, number: i32, f: F) -> Result<()>
-    where
-        F: FnOnceForField<ImplTypeTag = Self::ImplTypeTag>;
 }
 
 pub trait StructInternalTypeGen: tags::ImplTypeTag {

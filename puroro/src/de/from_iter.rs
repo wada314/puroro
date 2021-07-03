@@ -1,7 +1,7 @@
 use super::{FieldData, WireType};
 use crate::variant::Variant;
 use crate::ErrorKind;
-use crate::{FieldTypeGen, FnOnceForField, Message, Result};
+use crate::{FieldTypeGen, Message, Result};
 use ::std::convert::TryFrom as _;
 use ::std::io::Result as IoResult;
 
@@ -63,8 +63,8 @@ where
                 }
                 WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
             };
-            let functor = DeserFieldFnOnce::<<Msg as Message>::ImplTypeTag, _>::new(field_data);
-            message.apply_mut_to_field_with_number(field_number, functor)
+            // do something with field_data, field_number, message
+            todo!()
         }
     }
 }
@@ -157,35 +157,4 @@ fn test_scoped_iter() {
     assert_eq!("bcdef", s4.by_ref().collect::<String>());
     s4.pop_scope();
     assert_eq!("g", s4.by_ref().collect::<String>());
-}
-
-struct DeserFieldFnOnce<'a, ImplTag, I> {
-    phantom: std::marker::PhantomData<ImplTag>,
-    field_data: FieldData<&'a mut I>,
-}
-
-impl<'a, ImplTag, I> DeserFieldFnOnce<'a, ImplTag, I> {
-    fn new(field_data: FieldData<&'a mut I>) -> Self {
-        Self {
-            phantom: std::marker::PhantomData,
-            field_data,
-        }
-    }
-}
-
-impl<'a, ImplTag, I> FnOnceForField for DeserFieldFnOnce<'a, ImplTag, I>
-where
-    I: Iterator<Item = IoResult<u8>>,
-    ImplTag: ImplIsDeserializableFromIter,
-{
-    type ImplTypeTag = ImplTag;
-    fn apply<LabelAndType>(
-        self,
-        field: &mut <Self::ImplTypeTag as FieldTypeGen<LabelAndType>>::Type,
-    ) -> Result<()>
-    where
-        Self::ImplTypeTag: FieldTypeGen<LabelAndType>,
-    {
-        <Self::ImplTypeTag as ImplIsDeserializableFromIter>::deser_field(field, self.field_data)
-    }
 }
