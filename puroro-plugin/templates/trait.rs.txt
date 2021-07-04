@@ -1,4 +1,5 @@
 
+{#- ################# puroro::TypeGen ################# -#}
 #[allow(unused)]
 pub trait {{ self.message.rust_ident() }}TraitAggregatedTypeGen :
 {%- for field in self.message.unique_type_fields() %}
@@ -14,3 +15,22 @@ where T:
 {%- endfor %}
 {
 }
+
+{#- ################# puroro::DeserFieldFromBytesIter ################# -#}
+#[allow(unused)]
+pub trait {{ self.message.rust_ident() }}TraitAggregatedDeserFromIter :
+{%- for field in self.message.unique_type_fields() %}
+    ::puroro::DeserFieldFromBytesIter<{{ field.label_and_type_tag().unwrap() }}> +
+{%- endfor %}
+{
+}
+
+impl<T> {{ self.message.rust_ident() }}TraitAggregatedDeserFromIter for T
+where T:
+{%- for field in self.message.unique_type_fields() %}
+    ::puroro::DeserFieldFromBytesIter<{{ field.label_and_type_tag().unwrap() }}> +
+{%- endfor %}
+{
+}
+
+
