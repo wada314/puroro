@@ -19,6 +19,11 @@ pub use ::hashbrown;
 pub trait Message {
     type ImplTypeTag;
 }
+pub trait DeserFromBytesIter {
+    fn deser_from_bytes_iter<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>;
+}
 
 pub trait StructInternalTypeGen: tags::ImplTypeTag {
     type Type;

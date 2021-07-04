@@ -18,3 +18,17 @@ where ImplTag:
 {
     type ImplTypeTag = ImplTag;
 }
+
+impl<ImplTag> ::puroro::DeserFromBytesIter for {{ self.message.rust_ident() }}<ImplTag>
+where ImplTag:
+    super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedDeserFromIter +
+    ::puroro::StructInternalTypeGen,
+{
+    fn deser_from_bytes_iter<I>(&mut self, iter: I) -> ::puroro::Result<()>
+    where
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
+    {
+        todo!()
+    }
+}
+
