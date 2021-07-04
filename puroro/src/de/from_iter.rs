@@ -2,7 +2,7 @@ use super::{FieldData, WireType};
 use crate::variant::Variant;
 use crate::DeserFromBytesIter;
 use crate::ErrorKind;
-use crate::{FieldTypeGen, Message, Result};
+use crate::{Message, Result};
 use ::std::convert::TryFrom as _;
 use ::std::io::Result as IoResult;
 

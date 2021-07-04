@@ -1,7 +1,7 @@
 
 use ::std::borrow::Cow;
 use ::puroro::{tags, FieldTypeGen};
-use super::SimpleImpl;
+use super::{SimpleImpl, LabelWrappedType};
 
 // For variant types
 impl<L, S, V> FieldTypeGen<(L, (S, tags::wire::Variant<V>))> for SimpleImpl
@@ -88,22 +88,4 @@ impl<S, M> FieldTypeGen<(tags::Unlabeled, (S, tags::Message<M>))> for SimpleImpl
 }
 impl<S, M> FieldTypeGen<(tags::Repeated, (S, tags::Message<M>))> for SimpleImpl {
     type Type = Vec<M>;
-}
-
-// Utilities
-pub trait LabelWrappedType<L> {
-    type Type;
-}
-impl<T> LabelWrappedType<tags::Required> for T {
-    // TODO: Revisit... T or Option<T>
-    type Type = Option<T>;
-}
-impl<T> LabelWrappedType<tags::Optional> for T {
-    type Type = Option<T>;
-}
-impl<T> LabelWrappedType<tags::Unlabeled> for T {
-    type Type = T;
-}
-impl<T> LabelWrappedType<tags::Repeated> for T {
-    type Type = Vec<T>;
 }
