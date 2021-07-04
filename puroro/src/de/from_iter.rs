@@ -82,20 +82,20 @@ where
     Ok(Some((WireType::try_from(key & 0x07)?, (key >> 3))))
 }
 
-struct ScopedIter<I> {
+pub struct ScopedIter<I> {
     iter: I,
     pos: usize,
     end_stack: Vec<usize>,
 }
 impl<I> ScopedIter<I> {
-    fn new(iter: I) -> Self {
+    pub fn new(iter: I) -> Self {
         Self {
             iter,
             pos: 0,
             end_stack: Vec::new(),
         }
     }
-    fn new_with_len(iter: I, len: usize) -> Self {
+    pub fn new_with_len(iter: I, len: usize) -> Self {
         Self {
             iter,
             pos: 0,
