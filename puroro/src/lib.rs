@@ -6,7 +6,6 @@ mod error;
 pub mod de;
 pub mod tags;
 pub mod variant;
-use de::from_iter::ScopedIter;
 pub use error::{ErrorKind, PuroroError};
 pub type Result<T> = std::result::Result<T, PuroroError>;
 pub use de::FieldData;
@@ -16,11 +15,20 @@ pub use de::FieldData;
 pub use ::bumpalo;
 pub use ::hashbrown;
 
+use de::from_iter::ScopedIter;
+
 pub trait Message {
     type ImplTypeTag;
 }
 pub trait DeserFromBytesIter {
-    fn deser_from_bytes_iter<I>(&mut self, iter: I) -> Result<()>
+    fn deser<I>(&mut self, iter: I) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>;
+    fn deser_field<I>(
+        &mut self,
+        field_number: i32,
+        data: FieldData<&mut ScopedIter<I>>,
+    ) -> Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
