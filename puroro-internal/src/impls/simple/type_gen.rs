@@ -1,84 +1,63 @@
-use super::{LabelWrappedType, SimpleImpl};
+use super::{LabelWrappedType, LabelWrappedLDType, SimpleImpl};
 use puroro::{tags, FieldTypeGen};
 use std::borrow::Cow;
 
 // For variant types
-impl<L, S, V> FieldTypeGen<(L, (S, tags::wire::Variant<V>))> for SimpleImpl
+impl<L, X, V> FieldTypeGen<(L, (X, tags::wire::Variant<V>))> for SimpleImpl
 where
-    (S, tags::wire::Variant<V>): tags::NumericalFieldTypeTag,
-    <(S, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
+    (X, tags::wire::Variant<V>): tags::NumericalFieldTypeTag,
+    <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
 {
     type Type = <
-        <(S, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType 
+        <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType 
             as LabelWrappedType<L>
     >::Type;
 }
 // For bits32 types
-impl<L, S, V> FieldTypeGen<(L, (S, tags::wire::Bits32<V>))> for SimpleImpl
+impl<L, X, V> FieldTypeGen<(L, (X, tags::wire::Bits32<V>))> for SimpleImpl
 where
-    (S, tags::wire::Bits32<V>): tags::NumericalFieldTypeTag,
-    <(S, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
+    (X, tags::wire::Bits32<V>): tags::NumericalFieldTypeTag,
+    <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
 {
     type Type = <
-        <(S, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType 
+        <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType 
             as LabelWrappedType<L>
     >::Type;
 }
 // For bits64 types
-impl<L, S, V> FieldTypeGen<(L, (S, tags::wire::Bits64<V>))> for SimpleImpl
+impl<L, X, V> FieldTypeGen<(L, (X, tags::wire::Bits64<V>))> for SimpleImpl
 where
-    (S, tags::wire::Bits64<V>): tags::NumericalFieldTypeTag,
-    <(S, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
+    (X, tags::wire::Bits64<V>): tags::NumericalFieldTypeTag,
+    <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
 {
     type Type = <
-        <(S, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType 
+        <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType 
             as LabelWrappedType<L>
     >::Type;
 }
 
 // For length delimited types
 
-impl FieldTypeGen<(tags::Required, (tags::Proto2, tags::Bytes))> for SimpleImpl {
-    type Type = Option<Cow<'static, [u8]>>;
+impl<L, X> FieldTypeGen<(L, (X, tags::Bytes))> for SimpleImpl 
+where [u8]: LabelWrappedLDType<L, X>
+{
+    type Type = <[u8] as LabelWrappedLDType<L, X>>::Type;
 }
-impl FieldTypeGen<(tags::Optional, (tags::Proto2, tags::Bytes))> for SimpleImpl {
-    type Type = Option<Cow<'static, [u8]>>;
-}
-impl FieldTypeGen<(tags::Unlabeled, (tags::Proto3, tags::Bytes))> for SimpleImpl {
-    type Type = Vec<u8>;
-}
-impl FieldTypeGen<(tags::Optional, (tags::Proto3, tags::Bytes))> for SimpleImpl {
-    type Type = Option<Vec<u8>>;
-}
-impl<S> FieldTypeGen<(tags::Repeated, (S, tags::Bytes))> for SimpleImpl {
-    type Type = Vec<Vec<u8>>;
+impl<L, X> FieldTypeGen<(L, (X, tags::String))> for SimpleImpl 
+where str: LabelWrappedLDType<L, X>
+{
+    type Type = <str as LabelWrappedLDType<L, X>>::Type;
 }
 
-impl FieldTypeGen<(tags::Required, (tags::Proto2, tags::String))> for SimpleImpl {
-    type Type = Option<Cow<'static, str>>;
-}
-impl FieldTypeGen<(tags::Optional, (tags::Proto2, tags::String))> for SimpleImpl {
-    type Type = Option<Cow<'static, str>>;
-}
-impl FieldTypeGen<(tags::Unlabeled, (tags::Proto3, tags::String))> for SimpleImpl {
-    type Type = String;
-}
-impl FieldTypeGen<(tags::Optional, (tags::Proto3, tags::String))> for SimpleImpl {
-    type Type = Option<String>;
-}
-impl<S> FieldTypeGen<(tags::Repeated, (S, tags::String))> for SimpleImpl {
-    type Type = Vec<String>;
-}
-
-impl<S, M> FieldTypeGen<(tags::Required, (S, tags::Message<M>))> for SimpleImpl {
+impl<X, M> FieldTypeGen<(tags::Required, (X, tags::Message<M>))> for SimpleImpl {
     type Type = Option<Box<M>>;
 }
-impl<S, M> FieldTypeGen<(tags::Optional, (S, tags::Message<M>))> for SimpleImpl {
+impl<X, M> FieldTypeGen<(tags::Optional, (X, tags::Message<M>))> for SimpleImpl {
     type Type = Option<Box<M>>;
 }
-impl<S, M> FieldTypeGen<(tags::Unlabeled, (S, tags::Message<M>))> for SimpleImpl {
+impl<X, M> FieldTypeGen<(tags::Unlabeled, (X, tags::Message<M>))> for SimpleImpl {
     type Type = Option<Box<M>>;
 }
-impl<S, M> FieldTypeGen<(tags::Repeated, (S, tags::Message<M>))> for SimpleImpl {
+impl<X, M> FieldTypeGen<(tags::Repeated, (X, tags::Message<M>))> for SimpleImpl {
     type Type = Vec<M>;
 }

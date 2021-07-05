@@ -1,5 +1,7 @@
 mod type_gen;
 
+use ::std::borrow::Cow;
+
 use puroro::variant;
 use puroro::{tags, DeserFieldFromBytesIter, Result, StructInternalTypeGen};
 
@@ -14,6 +16,7 @@ impl StructInternalTypeGen for SimpleImpl {
 }
 
 // deser from iterator
+// deser from iterator, into variant type fields
 impl<L, V, S> DeserFieldFromBytesIter<(L, (S, tags::wire::Variant<V>))> for SimpleImpl
 where
     // The type tag has corresponding Rust numerical type,
@@ -36,7 +39,10 @@ where
             puroro::FieldData::Variant(variant) => {
                 // todo: proto3 default value check
                 let native = variant.to_native::<(S, tags::wire::Variant<V>)>()?;
-                *LabelWrappedType::<L>::get_or_insert_with(field, <(S, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::default) = native;
+                *LabelWrappedType::<L>::get_or_insert_with(
+                    field,
+                    <(S, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::default
+                ) = native;
             },
             puroro::FieldData::LengthDelimited(_) => todo!(),
             puroro::FieldData::Bits32(_) => todo!(),
@@ -47,6 +53,14 @@ where
 }
 
 // Utilities
+
+/// A utility type-function which returns a type wrapped by `Option` or `Vec` according
+/// to the label (e.g. `optional` => `Option`).
+/// Can be applied for every types except length delimited types (String, Bytes, Message).
+/// - `optional` => `Option<T>`
+/// - `required` => `Option<T>` // Needs revisit!!
+/// - (unlabeled) => `T`
+/// - `repeated` => `Vec<T>`
 pub trait LabelWrappedType<L> {
     type Type;
     fn get_or_insert_with<F>(wrapped: &mut Self::Type, f: F) -> &mut Self
@@ -89,6 +103,79 @@ impl<T> LabelWrappedType<tags::Repeated> for T {
         F: FnOnce() -> Self,
     {
         wrapped.push((f)());
+        wrapped.last_mut().unwrap()
+    }
+}
+
+/// A custom version of `LabelWrappedType` for String and Bytes.
+///
+/// - proto2:
+///   - `optional` => `Option<Cow<'static, T>>`
+///   - `required` => `Option<Cow<'static, T>>` // Needs revisit!!
+///   - `repeated` => `Vec<T>`
+/// - proto3:
+///   - (unlabeled) => `T`
+///   - `optional` => `Option<T>`
+///   - `repeated` => `Vec<T>`
+pub trait LabelWrappedLDType<L, X>: ToOwned
+where
+    <Self as ToOwned>::Owned: Default,
+{
+    type Type;
+    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned;
+}
+impl<T> LabelWrappedLDType<tags::Required, tags::Proto2> for T
+where
+    T: ToOwned + 'static,
+    <T as ToOwned>::Owned: Default,
+{
+    type Type = Option<Cow<'static, T>>;
+    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
+        wrapped
+            .get_or_insert_with(|| Cow::Owned(Default::default()))
+            .to_mut()
+    }
+}
+impl<T> LabelWrappedLDType<tags::Optional, tags::Proto2> for T
+where
+    T: ToOwned + 'static,
+    <T as ToOwned>::Owned: Default,
+{
+    type Type = Option<Cow<'static, T>>;
+    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
+        wrapped
+            .get_or_insert_with(|| Cow::Owned(Default::default()))
+            .to_mut()
+    }
+}
+impl<T> LabelWrappedLDType<tags::Unlabeled, tags::Proto3> for T
+where
+    T: ToOwned + 'static,
+    <T as ToOwned>::Owned: Default,
+{
+    type Type = <T as ToOwned>::Owned;
+    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
+        wrapped
+    }
+}
+impl<T> LabelWrappedLDType<tags::Optional, tags::Proto3> for T
+where
+    T: ToOwned + 'static,
+    <T as ToOwned>::Owned: Default,
+{
+    type Type = Option<<T as ToOwned>::Owned>;
+    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
+        wrapped.get_or_insert_with(Default::default)
+    }
+}
+impl<T, X> LabelWrappedLDType<tags::Repeated, X> for T
+where
+    T: ToOwned + 'static,
+    <T as ToOwned>::Owned: Default,
+{
+    type Type = Vec<<T as ToOwned>::Owned>;
+    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
+        wrapped.push(Default::default());
         wrapped.last_mut().unwrap()
     }
 }
