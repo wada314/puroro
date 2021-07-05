@@ -1,3 +1,4 @@
+use std::convert::TryFrom;
 use std::marker::PhantomData;
 
 /// A tag trait for types corresponding to the field's type.
@@ -16,6 +17,7 @@ pub trait FieldTypeTag {}
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
 pub trait NumericalFieldTypeTag: FieldTypeTag {
     type NativeType: Clone;
+    fn default() -> Self::NativeType;
 }
 
 /// A tag trait for types corresponding to the field label.
@@ -121,36 +123,69 @@ where
 
 impl<S> NumericalFieldTypeTag for (S, Int32) {
     type NativeType = i32;
+    fn default() -> Self::NativeType {
+        0
+    }
 }
 impl<S> NumericalFieldTypeTag for (S, UInt32) {
     type NativeType = u32;
+    fn default() -> Self::NativeType {
+        0
+    }
 }
 impl<S> NumericalFieldTypeTag for (S, SInt32) {
     type NativeType = i32;
+    fn default() -> Self::NativeType {
+        0
+    }
 }
 impl<S> NumericalFieldTypeTag for (S, Float) {
     type NativeType = f32;
+    fn default() -> Self::NativeType {
+        0.0
+    }
 }
 impl<S> NumericalFieldTypeTag for (S, Int64) {
     type NativeType = i64;
+    fn default() -> Self::NativeType {
+        0
+    }
 }
 impl<S> NumericalFieldTypeTag for (S, UInt64) {
     type NativeType = u64;
+    fn default() -> Self::NativeType {
+        0
+    }
 }
 impl<S> NumericalFieldTypeTag for (S, SInt64) {
     type NativeType = i64;
+    fn default() -> Self::NativeType {
+        0
+    }
 }
 impl<S> NumericalFieldTypeTag for (S, Double) {
     type NativeType = f64;
+    fn default() -> Self::NativeType {
+        0.0
+    }
 }
 impl<S> NumericalFieldTypeTag for (S, Bool) {
     type NativeType = bool;
+    fn default() -> Self::NativeType {
+        false
+    }
 }
-impl<T: Clone> NumericalFieldTypeTag for (Proto2, Enum<T>) {
+impl<T: Clone + Default> NumericalFieldTypeTag for (Proto2, Enum<T>) {
     type NativeType = T;
+    fn default() -> Self::NativeType {
+        Default::default()
+    }
 }
-impl<T: Clone> NumericalFieldTypeTag for (Proto3, Enum<T>) {
+impl<T: Clone + TryFrom<i32, Error = i32>> NumericalFieldTypeTag for (Proto3, Enum<T>) {
     type NativeType = ::std::result::Result<T, i32>;
+    fn default() -> Self::NativeType {
+        <T as TryFrom<i32>>::try_from(0)
+    }
 }
 
 impl FieldLabelTag for Repeated {}
