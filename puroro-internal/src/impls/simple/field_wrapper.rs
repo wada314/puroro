@@ -40,7 +40,7 @@ impl<T> LabelWrappedType<tags::Optional> for T {
 }
 impl<T> LabelWrappedType<tags::Unlabeled> for T {
     type Type = T;
-    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
+    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, _: F) -> &mut Self {
         wrapped
     }
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {

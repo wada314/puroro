@@ -142,3 +142,28 @@ where
         Ok(())
     }
 }
+
+// Bytes
+impl<L, X> DeserFieldFromBytesIter<(L, (X, tags::Bytes))> for SimpleImpl
+where
+    [u8]: LabelWrappedLDType<L, X>,
+    Self: FieldTypeGen<(L, (X, tags::Bytes)), Type = <[u8] as LabelWrappedLDType<L, X>>::Type>,
+{
+    fn deser_from_scoped_bytes_iter<I>(
+        field: &mut <Self as FieldTypeGen<(L, (X, tags::Bytes))>>::Type,
+        data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+    {
+        match data {
+            FieldData::LengthDelimited(iter) => {
+                // TODO: do proto3 default value check
+                let bytes = iter.collect::<::std::io::Result<Vec<_>>>()?;
+                *<[u8] as LabelWrappedLDType<L, X>>::get_or_insert_default(field) = bytes;
+            }
+            _ => Err(ErrorKind::UnexpectedWireType)?,
+        }
+        Ok(())
+    }
+}
