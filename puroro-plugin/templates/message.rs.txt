@@ -17,6 +17,11 @@ where ImplTag:
     ::puroro::StructInternalTypeGen,
 {
     type ImplTypeTag = ImplTag;
+    fn new_with_internal_data(
+        internal_data: <Self::ImplTypeTag as ::puroro::StructInternalTypeGen>::Type,
+    ) -> Self {
+        todo!()
+    }
 }
 
 impl<ImplTag> ::puroro::DeserFromBytesIter for {{ self.message.rust_ident() }}<ImplTag>
@@ -43,11 +48,22 @@ where ImplTag:
             {%- for field in self.message.fields() %}
             {{ field.number() }} => <ImplTag as ::puroro::DeserFieldFromBytesIter<
                 {{ field.label_and_type_tag().unwrap() }}>
-            >::deser_from_scoped_bytes_iter(&mut self.{{ field.rust_ident() }}, data),
+            >::deser_from_scoped_bytes_iter(&mut self.{{ field.rust_ident() }}, data, &self.puroro_internal),
             {%- endfor %}
 
             _ => ::std::result::Result::Err(::puroro::ErrorKind::UnknownFieldNumber)?,
         }
+    }
+}
+
+impl<ImplTag> ::std::default::Default for {{ self.message.rust_ident() }}<ImplTag>
+where 
+    ImplTag: super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedDeserFromIter +
+        ::puroro::StructInternalTypeGen,
+    <ImplTag as ::puroro::StructInternalTypeGen>::Type: ::std::default::Default,
+{
+    fn default() -> Self {
+        <Self as ::puroro::Message>::new_with_internal_data(::std::default::Default::default())
     }
 }
 

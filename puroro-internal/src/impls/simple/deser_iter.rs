@@ -4,7 +4,7 @@ use puroro::de::from_iter::Variants;
 use puroro::variant;
 use puroro::{
     tags, DeserFieldFromBytesIter, DeserFromBytesIter, ErrorKind, FieldData, FieldTypeGen, Message,
-    Result,
+    Result, StructInternalTypeGen,
 };
 
 // deser from iterator
@@ -24,6 +24,7 @@ where
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(L, (X, tags::wire::Variant<V>))>>::Type,
         data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
@@ -67,6 +68,7 @@ where
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(L, (X, tags::wire::Bits32Or64<V, _1>))>>::Type,
         data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
@@ -95,6 +97,7 @@ where
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(L, (X, tags::String))>>::Type,
         data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
@@ -121,6 +124,7 @@ where
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(L, (X, tags::Bytes))>>::Type,
         data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
@@ -141,20 +145,47 @@ where
 impl<X, M, _1, _2> DeserFieldFromBytesIter<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>))>
     for SimpleImpl
 where
-    M: Message + DeserFromBytesIter,
+    M: Message + DeserFromBytesIter + Default,
     Self: FieldTypeGen<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>)), Type = Option<Box<M>>>,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>))>>::Type,
         data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
     {
         use ::std::ops::DerefMut;
         match data {
+            FieldData::LengthDelimited(iter) => deser_from_scoped_iter(
+                field
+                    .get_or_insert_with(|| Box::new(Default::default()))
+                    .deref_mut(),
+                iter,
+            ),
+            _ => Err(ErrorKind::UnexpectedWireType)?,
+        }
+    }
+}
+
+impl<X, M> DeserFieldFromBytesIter<(tags::Repeated, (X, tags::Message<M>))> for SimpleImpl
+where
+    M: Message + DeserFromBytesIter + Default,
+    Self: FieldTypeGen<(tags::Repeated, (X, tags::Message<M>)), Type = Vec<M>>,
+{
+    fn deser_from_scoped_bytes_iter<I>(
+        field: &mut <Self as FieldTypeGen<(tags::Repeated, (X, tags::Message<M>))>>::Type,
+        data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+    {
+        match data {
             FieldData::LengthDelimited(iter) => {
-                deser_from_scoped_iter(field.get_or_insert_with(|| todo!()).deref_mut(), iter)
+                field.push(Default::default());
+                deser_from_scoped_iter(field.last_mut().unwrap(), iter)
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
         }
