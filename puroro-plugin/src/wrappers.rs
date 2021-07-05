@@ -461,6 +461,12 @@ impl Enum {
             ident = self.rust_ident
         )
     }
+
+    pub fn first_value(&self) -> Result<&EnumValue> {
+        Ok(self.values.first().ok_or(ErrorKind::EmptyEnum {
+            name: self.proto_name.clone(),
+        })?)
+    }
 }
 
 impl Field {

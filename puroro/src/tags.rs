@@ -1,5 +1,4 @@
 use std::convert::TryFrom;
-use std::marker::PhantomData;
 
 /// A tag trait for types corresponding to the field's type.
 /// e.g. Int32, Float, String, Message<M>
@@ -55,10 +54,12 @@ pub mod value {
 
 pub mod wire {
     use ::std::marker::PhantomData;
-    pub struct Variant<V>(PhantomData<V>);
-    pub struct LengthDelimited<V>(PhantomData<V>);
-    pub struct Bits32<V>(PhantomData<V>);
-    pub struct Bits64<V>(PhantomData<V>);
+    pub type Variant<V> = (PhantomData<V>, bool, (), (), ());
+    pub type LengthDelimited<V> = (PhantomData<V>, (), bool, (), ());
+    pub type Bits32<V> = (PhantomData<V>, (), (), bool, ());
+    pub type Bits64<V> = (PhantomData<V>, (), (), (), bool);
+
+    pub type NonLD<V, _1, _2, _3> = (PhantomData<V>, _1, (), _2, _3);
 }
 
 pub type Int32 = wire::Variant<value::Int32>;
@@ -80,14 +81,25 @@ pub type Enum<T> = wire::Variant<value::Enum<T>>;
 pub type Message<T> = wire::LengthDelimited<value::Message<T>>;
 
 /// A repeated field, which is available in both proto2 and proto3.
-pub struct Repeated;
+pub type Repeated = (bool, (), (), ());
 /// Proto2 optional field || Proto3 explicitly optional marked field.
-pub struct Optional;
-
+pub type Optional = ((), bool, (), ());
 /// Proto3 unlabeled field.
-pub struct Unlabeled;
+pub type Unlabeled = ((), (), bool, ());
 /// Only available in proto2.
-pub struct Required;
+pub type Required = ((), (), (), bool);
+
+pub type NonRepeated<_1, _2, _3> = ((), _1, _2, _3);
+
+trait WrappedType<Label> {
+    type Type;
+}
+impl<T, _1, _2, _3> WrappedType<NonRepeated<_1, _2, _3>> for T {
+    type Type = Option<T>;
+}
+impl<T> WrappedType<Repeated> for T {
+    type Type = Vec<T>;
+}
 
 pub struct Proto2;
 pub struct Proto3;

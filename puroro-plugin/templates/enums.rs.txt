@@ -25,4 +25,10 @@ impl ::std::convert::From<{{ enume.rust_ident() }}> for i32 {
     }
 }
 
+impl ::std::default::Default for {{ enume.rust_ident() }} {
+    fn default() -> Self {
+        {{ enume.rust_ident() }}::{{ enume.first_value().unwrap().rust_ident() }}
+    }
+}
+
 {% endfor %}

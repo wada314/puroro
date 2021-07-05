@@ -83,7 +83,7 @@ where
 }
 impl<T> LabelWrappedLDType<tags::Required, tags::Proto2> for T
 where
-    T: ToOwned + 'static,
+    T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
 {
     type Type = Option<Cow<'static, T>>;
@@ -95,7 +95,7 @@ where
 }
 impl<T> LabelWrappedLDType<tags::Optional, tags::Proto2> for T
 where
-    T: ToOwned + 'static,
+    T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
 {
     type Type = Option<Cow<'static, T>>;
@@ -107,7 +107,7 @@ where
 }
 impl<T> LabelWrappedLDType<tags::Unlabeled, tags::Proto3> for T
 where
-    T: ToOwned + 'static,
+    T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
 {
     type Type = <T as ToOwned>::Owned;
@@ -117,7 +117,7 @@ where
 }
 impl<T> LabelWrappedLDType<tags::Optional, tags::Proto3> for T
 where
-    T: ToOwned + 'static,
+    T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
 {
     type Type = Option<<T as ToOwned>::Owned>;
@@ -127,7 +127,7 @@ where
 }
 impl<T, X> LabelWrappedLDType<tags::Repeated, X> for T
 where
-    T: ToOwned + 'static,
+    T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
 {
     type Type = Vec<<T as ToOwned>::Owned>;

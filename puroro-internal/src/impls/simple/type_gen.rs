@@ -1,36 +1,14 @@
 use super::{LabelWrappedType, LabelWrappedLDType, SimpleImpl};
 use puroro::{tags, FieldTypeGen};
 
-// For variant types
-impl<L, X, V> FieldTypeGen<(L, (X, tags::wire::Variant<V>))> for SimpleImpl
+// For numerical types
+impl<L, X, V, _1, _2, _3> FieldTypeGen<(L, (X, tags::wire::NonLD<V, _1, _2, _3>))> for SimpleImpl
 where
-    (X, tags::wire::Variant<V>): tags::NumericalFieldTypeTag,
-    <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
+    (X, tags::wire::NonLD<V, _1, _2, _3>): tags::NumericalFieldTypeTag,
+    <(X, tags::wire::NonLD<V, _1, _2, _3>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
 {
     type Type = <
-        <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType 
-            as LabelWrappedType<L>
-    >::Type;
-}
-// For bits32 types
-impl<L, X, V> FieldTypeGen<(L, (X, tags::wire::Bits32<V>))> for SimpleImpl
-where
-    (X, tags::wire::Bits32<V>): tags::NumericalFieldTypeTag,
-    <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
-{
-    type Type = <
-        <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType 
-            as LabelWrappedType<L>
-    >::Type;
-}
-// For bits64 types
-impl<L, X, V> FieldTypeGen<(L, (X, tags::wire::Bits64<V>))> for SimpleImpl
-where
-    (X, tags::wire::Bits64<V>): tags::NumericalFieldTypeTag,
-    <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
-{
-    type Type = <
-        <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType 
+        <(X, tags::wire::NonLD<V, _1, _2, _3>) as tags::NumericalFieldTypeTag>::NativeType 
             as LabelWrappedType<L>
     >::Type;
 }
