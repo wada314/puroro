@@ -15,7 +15,7 @@ where
     deser_from_scoped_iter(message, &mut scoped_iter)
 }
 
-fn deser_from_scoped_iter<Msg, I>(message: &mut Msg, iter: &mut ScopedIter<I>) -> Result<()>
+pub fn deser_from_scoped_iter<Msg, I>(message: &mut Msg, iter: &mut ScopedIter<I>) -> Result<()>
 where
     Msg: Message + DeserFromBytesIter,
     I: Iterator<Item = IoResult<u8>>,

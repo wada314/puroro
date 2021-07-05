@@ -1,9 +1,11 @@
 use super::{LabelWrappedLDType, LabelWrappedType, SimpleImpl};
+use puroro::de::from_iter::deser_from_scoped_iter;
 use puroro::de::from_iter::Variants;
 use puroro::variant;
-use puroro::DeserFromBytesIter;
-use puroro::{tags, DeserFieldFromBytesIter, Result};
-use puroro::{ErrorKind, FieldData, FieldTypeGen};
+use puroro::{
+    tags, DeserFieldFromBytesIter, DeserFromBytesIter, ErrorKind, FieldData, FieldTypeGen, Message,
+    Result,
+};
 
 // deser from iterator
 
@@ -139,7 +141,8 @@ where
 impl<X, M, _1, _2> DeserFieldFromBytesIter<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>))>
     for SimpleImpl
 where
-    M: DeserFromBytesIter,
+    M: Message + DeserFromBytesIter,
+    Self: FieldTypeGen<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>)), Type = Option<Box<M>>>,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>))>>::Type,
@@ -148,9 +151,10 @@ where
     where
         I: Iterator<Item = std::io::Result<u8>>,
     {
+        use ::std::ops::DerefMut;
         match data {
             FieldData::LengthDelimited(iter) => {
-                todo!()
+                deser_from_scoped_iter(field.get_or_insert_with(|| todo!()).deref_mut(), iter)
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
         }

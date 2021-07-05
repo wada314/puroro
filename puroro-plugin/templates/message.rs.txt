@@ -43,7 +43,7 @@ where ImplTag:
             {%- for field in self.message.fields() %}
             {{ field.number() }} => <ImplTag as ::puroro::DeserFieldFromBytesIter<
                 {{ field.label_and_type_tag().unwrap() }}>
-            >::deser_from_bytes_iter(&mut self.{{ field.rust_ident() }}, data),
+            >::deser_from_scoped_bytes_iter(&mut self.{{ field.rust_ident() }}, data),
             {%- endfor %}
 
             _ => ::std::result::Result::Err(::puroro::ErrorKind::UnknownFieldNumber)?,

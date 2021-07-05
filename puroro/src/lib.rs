@@ -46,16 +46,6 @@ pub trait FieldTypeGen<LabelAndType>: tags::ImplTypeTag
 }
 
 pub trait DeserFieldFromBytesIter<LabelAndType>: FieldTypeGen<LabelAndType> {
-    fn deser_from_bytes_iter<I>(
-        field: &mut <Self as FieldTypeGen<LabelAndType>>::Type,
-        data: FieldData<I>,
-    ) -> Result<()>
-    where
-        I: Iterator<Item = ::std::io::Result<u8>>,
-    {
-        Self::deser_from_scoped_bytes_iter(field, data.map(|iter| ScopedIter::new(iter)).as_mut())
-    }
-
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<LabelAndType>>::Type,
         data: FieldData<&mut de::from_iter::ScopedIter<I>>,
@@ -80,9 +70,9 @@ where
         data: FieldData<&[u8]>,
     ) -> Result<()> {
         use std::io::Read as _;
-        <Self as DeserFieldFromBytesIter<LabelAndType>>::deser_from_bytes_iter(
+        <Self as DeserFieldFromBytesIter<LabelAndType>>::deser_from_scoped_bytes_iter(
             field,
-            data.map(|slice| slice.bytes()),
+            data.map(|slice| ScopedIter::new(slice.bytes())).as_mut(),
         )
     }
 }
