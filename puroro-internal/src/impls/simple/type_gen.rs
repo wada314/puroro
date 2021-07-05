@@ -1,15 +1,12 @@
-
-use ::std::borrow::Cow;
-use ::puroro::{tags, FieldTypeGen};
-use super::{SimpleImpl, LabelWrappedType};
+use super::{LabelWrappedType, SimpleImpl};
+use puroro::{tags, FieldTypeGen};
+use std::borrow::Cow;
 
 // For variant types
 impl<L, S, V> FieldTypeGen<(L, (S, tags::wire::Variant<V>))> for SimpleImpl
 where
     (S, tags::wire::Variant<V>): tags::NumericalFieldTypeTag,
-    <
-        (S, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag
-    >::NativeType: LabelWrappedType<L>,
+    <(S, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
 {
     type Type = <
         <(S, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType 
@@ -20,9 +17,7 @@ where
 impl<L, S, V> FieldTypeGen<(L, (S, tags::wire::Bits32<V>))> for SimpleImpl
 where
     (S, tags::wire::Bits32<V>): tags::NumericalFieldTypeTag,
-    <
-        (S, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag
-    >::NativeType: LabelWrappedType<L>,
+    <(S, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
 {
     type Type = <
         <(S, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType 
@@ -33,9 +28,7 @@ where
 impl<L, S, V> FieldTypeGen<(L, (S, tags::wire::Bits64<V>))> for SimpleImpl
 where
     (S, tags::wire::Bits64<V>): tags::NumericalFieldTypeTag,
-    <
-        (S, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag
-    >::NativeType: LabelWrappedType<L>,
+    <(S, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType: LabelWrappedType<L>,
 {
     type Type = <
         <(S, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType 

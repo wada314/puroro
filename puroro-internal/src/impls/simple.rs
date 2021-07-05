@@ -1,7 +1,7 @@
 mod type_gen;
 
-use ::puroro::{tags, DeserFieldFromBytesIter, Result, StructInternalTypeGen};
 use puroro::variant;
+use puroro::{tags, DeserFieldFromBytesIter, Result, StructInternalTypeGen};
 
 pub struct SimpleImpl;
 impl tags::ImplTypeTag for SimpleImpl {}
