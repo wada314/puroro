@@ -5,10 +5,18 @@ where ImplTag:
     super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
     ::puroro::StructInternalTypeGen,
 {
-    {%- for field in self.message.fields() %}
-    {{ self.visibility }}{{ field.rust_ident() }}: <ImplTag as ::puroro::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type,
-    {%- endfor %}
+    {% if self.is_public -%}
+
+    {% for field in self.message.fields() -%}
+    pub {{ field.rust_ident() }}: <ImplTag as ::puroro::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type,
+    {% endfor -%}
     puroro_internal: <ImplTag as ::puroro::StructInternalTypeGen>::Type,
+
+    {%- else -%}
+
+    body: super::public::{{ self.message.rust_ident() }}<ImplTag>,
+
+    {%- endif %}
 }
 
 impl<ImplTag> ::puroro::Message for {{ self.message.rust_ident() }}<ImplTag>
@@ -21,10 +29,18 @@ where ImplTag:
         internal_data: <Self::ImplTypeTag as ::puroro::StructInternalTypeGen>::Type,
     ) -> Self {
         Self {
+            {% if self.is_public -%}
+
             {%- for field in self.message.fields() %}
             {{ field.rust_ident() }}: <ImplTag as ::puroro::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::default(&internal_data),
             {%- endfor %}
             puroro_internal: internal_data,
+
+            {%- else -%}
+
+            body: ::puroro::Message::new_with_internal_data(internal_data),
+            
+            {%- endif %}
         }
     }
 }
@@ -38,7 +54,11 @@ where ImplTag:
     where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
     {
+        {% if self.is_public -%}
         ::puroro::de::from_iter::deser_from_iter(self, iter)
+        {%- else -%}
+        ::puroro::DeserFromBytesIter::deser(&mut self.body, iter)
+        {%- endif %}
     }
     
     fn deser_field<I>(
@@ -49,6 +69,8 @@ where ImplTag:
     where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>> 
     {
+        {% if self.is_public -%}
+
         match field_number {
             {%- for field in self.message.fields() %}
             {{ field.number() }} => <ImplTag as ::puroro::DeserFieldFromBytesIter<
@@ -58,6 +80,12 @@ where ImplTag:
 
             _ => ::std::result::Result::Err(::puroro::ErrorKind::UnknownFieldNumber)?,
         }
+
+        {%- else -%}
+
+        ::puroro::DeserFromBytesIter::deser_field(&mut self.body, field_number, data)
+
+        {%- endif %}
     }
 }
 

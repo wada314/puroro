@@ -1,5 +1,5 @@
 
-{#- ################# puroro::TypeGen ################# -#}
+{# ################# puroro::TypeGen ################# -#}
 #[allow(unused)]
 pub trait {{ self.message.rust_ident() }}TraitAggregatedTypeGen :
 {%- for field in self.message.unique_type_fields() %}
@@ -16,7 +16,7 @@ where T:
 {
 }
 
-{#- ################# puroro::DeserFieldFromBytesIter ################# -#}
+{# ################# puroro::DeserFieldFromBytesIter ################# -#}
 #[allow(unused)]
 pub trait {{ self.message.rust_ident() }}TraitAggregatedDeserFromIter :
 {%- for field in self.message.unique_type_fields() %}

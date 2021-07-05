@@ -83,7 +83,7 @@ pub struct Messages {
 #[template(path = "message.rs.txt")]
 pub struct Message {
     message: Rc<wrappers::Message>,
-    visibility: &'static str, // "pub " or ""
+    is_public: bool,
 }
 
 #[derive(Template)]
@@ -114,13 +114,13 @@ mod filters {
     pub fn render_public_message(message: &Rc<wrappers::Message>) -> ::askama::Result<Message> {
         Ok(Message {
             message: Clone::clone(message),
-            visibility: "pub ",
+            is_public: true,
         })
     }
     pub fn render_private_message(message: &Rc<wrappers::Message>) -> ::askama::Result<Message> {
         Ok(Message {
             message: Clone::clone(message),
-            visibility: "",
+            is_public: false,
         })
     }
     pub fn render_trait(message: &Rc<wrappers::Message>) -> ::askama::Result<Trait> {
