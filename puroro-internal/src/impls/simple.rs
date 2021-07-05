@@ -36,7 +36,7 @@ where
             puroro::FieldData::Variant(variant) => {
                 // todo: proto3 default value check
                 let native = variant.to_native::<(S, tags::wire::Variant<V>)>()?;
-                *LabelWrappedType::<L>::get_or_insert_with(field, Default::default) = native;
+                *LabelWrappedType::<L>::get_or_insert_with(field, <(S, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::default) = native;
             },
             puroro::FieldData::LengthDelimited(_) => todo!(),
             puroro::FieldData::Bits32(_) => todo!(),
