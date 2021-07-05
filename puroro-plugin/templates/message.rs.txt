@@ -33,7 +33,7 @@ where ImplTag:
     where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
     {
-        todo!()
+        ::puroro::de::from_iter::deser_from_iter(self, iter)
     }
     
     fn deser_field<I>(
