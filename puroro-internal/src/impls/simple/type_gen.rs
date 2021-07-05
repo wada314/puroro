@@ -1,6 +1,5 @@
 use super::{LabelWrappedType, LabelWrappedLDType, SimpleImpl};
 use puroro::{tags, FieldTypeGen};
-use std::borrow::Cow;
 
 // For variant types
 impl<L, X, V> FieldTypeGen<(L, (X, tags::wire::Variant<V>))> for SimpleImpl

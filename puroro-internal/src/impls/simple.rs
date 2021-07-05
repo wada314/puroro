@@ -63,47 +63,53 @@ where
 /// - `repeated` => `Vec<T>`
 pub trait LabelWrappedType<L> {
     type Type;
-    fn get_or_insert_with<F>(wrapped: &mut Self::Type, f: F) -> &mut Self
+    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self;
+    fn extend<I>(wrapped: &mut Self::Type, iter: I)
     where
-        F: FnOnce() -> Self;
+        I: Iterator<Item = Self>;
 }
 impl<T> LabelWrappedType<tags::Required> for T {
     // TODO: Revisit... T or Option<T>
     type Type = Option<T>;
-    fn get_or_insert_with<F>(wrapped: &mut Self::Type, f: F) -> &mut Self
-    where
-        F: FnOnce() -> Self,
-    {
+    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped.get_or_insert_with(f)
+    }
+    fn extend<I: Iterator<Item = Self>>(wrapped: &mut Self::Type, iter: I) {
+        if let Some(x) = iter.last() {
+            *wrapped = Some(x);
+        }
     }
 }
 impl<T> LabelWrappedType<tags::Optional> for T {
     type Type = Option<T>;
-    fn get_or_insert_with<F>(wrapped: &mut Self::Type, f: F) -> &mut Self
-    where
-        F: FnOnce() -> Self,
-    {
+    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped.get_or_insert_with(f)
+    }
+    fn extend<I: Iterator<Item = Self>>(wrapped: &mut Self::Type, iter: I) {
+        if let Some(x) = iter.last() {
+            *wrapped = Some(x);
+        }
     }
 }
 impl<T> LabelWrappedType<tags::Unlabeled> for T {
     type Type = T;
-    fn get_or_insert_with<F>(wrapped: &mut Self::Type, f: F) -> &mut Self
-    where
-        F: FnOnce() -> Self,
-    {
+    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped
+    }
+    fn extend<I: Iterator<Item = Self>>(wrapped: &mut Self::Type, iter: I) {
+        if let Some(x) = iter.last() {
+            *wrapped = x;
+        }
     }
 }
 impl<T> LabelWrappedType<tags::Repeated> for T {
     type Type = Vec<T>;
-
-    fn get_or_insert_with<F>(wrapped: &mut Self::Type, f: F) -> &mut Self
-    where
-        F: FnOnce() -> Self,
-    {
+    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped.push((f)());
         wrapped.last_mut().unwrap()
+    }
+    fn extend<I: Iterator<Item = Self>>(wrapped: &mut Self::Type, iter: I) {
+        wrapped.extend(iter)
     }
 }
 
