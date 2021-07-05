@@ -8,6 +8,7 @@ where ImplTag:
     {% if self.is_public -%}
 
     {% for field in self.message.fields() -%}
+    /// Comment something about this field!
     pub {{ field.rust_ident() }}: <ImplTag as ::puroro::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type,
     {% endfor -%}
     puroro_internal: <ImplTag as ::puroro::StructInternalTypeGen>::Type,
