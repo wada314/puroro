@@ -147,3 +147,23 @@ fn test_scoped_iter() {
     s4.pop_scope();
     assert_eq!("g", s4.by_ref().collect::<String>());
 }
+
+/// Converts `Result<u8, std::io::IoError>` into `Result<Variant, ErrorKind>`.
+pub struct Variants<I: Iterator<Item = IoResult<u8>>> {
+    iter: I,
+}
+impl<I: Iterator<Item = IoResult<u8>>> Variants<I> {
+    pub fn new(iter: I) -> Self {
+        Self { iter }
+    }
+}
+impl<I: Iterator<Item = IoResult<u8>>> Iterator for Variants<I> {
+    type Item = Result<Variant>;
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut peekable = self.iter.by_ref().peekable();
+        if let None = peekable.peek() {
+            return None;
+        }
+        Some(Variant::decode_bytes(&mut peekable))
+    }
+}

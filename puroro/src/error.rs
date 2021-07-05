@@ -44,7 +44,7 @@ pub enum ErrorKind {
     #[error("Internal error in SliceView struct.")]
     InvalidSliceViewType,
     #[error("Invalid UTF8 string is given.")]
-    InvalidUtf8,
+    InvalidUtf8(#[from] std::string::FromUtf8Error),
     #[error("Group is not supported.")]
     GroupNotSupported,
     #[error("Other error: {0}")]
