@@ -40,12 +40,16 @@ pub trait StructInternalTypeGen: tags::ImplTypeTag {
     type Type;
 }
 
-pub trait FieldTypeGen<LabelAndType>: tags::ImplTypeTag
+pub trait FieldTypeGen<LabelAndType>: tags::ImplTypeTag + StructInternalTypeGen
 // Not setting these bounds for code simplicity
 // where
 //    LT: tags::FieldLabelAndTypeTag,
 {
     type Type;
+    /// Default value of the field when the message is allocated
+    fn default(
+        internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> <Self as FieldTypeGen<LabelAndType>>::Type;
 }
 
 pub trait DeserFieldFromBytesIter<LabelAndType>:

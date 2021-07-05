@@ -12,6 +12,7 @@ pub trait LabelWrappedType<L>: Sized {
     type Type;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self;
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()>;
+    fn default_with<F: FnOnce() -> Self>(f: F) -> Self::Type;
 }
 impl<T> LabelWrappedType<tags::Required> for T {
     // TODO: Revisit... T or Option<T>
@@ -25,6 +26,9 @@ impl<T> LabelWrappedType<tags::Required> for T {
         }
         Ok(())
     }
+    fn default_with<F: FnOnce() -> Self>(_: F) -> Self::Type {
+        None
+    }
 }
 impl<T> LabelWrappedType<tags::Optional> for T {
     type Type = Option<T>;
@@ -36,6 +40,9 @@ impl<T> LabelWrappedType<tags::Optional> for T {
             *wrapped = Some(x?);
         }
         Ok(())
+    }
+    fn default_with<F: FnOnce() -> Self>(_: F) -> Self::Type {
+        None
     }
 }
 impl<T> LabelWrappedType<tags::Unlabeled> for T {
@@ -49,6 +56,9 @@ impl<T> LabelWrappedType<tags::Unlabeled> for T {
         }
         Ok(())
     }
+    fn default_with<F: FnOnce() -> Self>(f: F) -> Self::Type {
+        (f)()
+    }
 }
 impl<T> LabelWrappedType<tags::Repeated> for T {
     type Type = Vec<T>;
@@ -61,6 +71,9 @@ impl<T> LabelWrappedType<tags::Repeated> for T {
             wrapped.push(x?);
         }
         Ok(())
+    }
+    fn default_with<F: FnOnce() -> Self>(_: F) -> Self::Type {
+        Vec::new()
     }
 }
 
@@ -80,6 +93,7 @@ where
 {
     type Type;
     fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned;
+    fn default() -> Self::Type;
 }
 impl<T> LabelWrappedLDType<tags::Required, tags::Proto2> for T
 where
@@ -91,6 +105,9 @@ where
         wrapped
             .get_or_insert_with(|| Cow::Owned(Default::default()))
             .to_mut()
+    }
+    fn default() -> Self::Type {
+        None
     }
 }
 impl<T> LabelWrappedLDType<tags::Optional, tags::Proto2> for T
@@ -104,6 +121,9 @@ where
             .get_or_insert_with(|| Cow::Owned(Default::default()))
             .to_mut()
     }
+    fn default() -> Self::Type {
+        None
+    }
 }
 impl<T> LabelWrappedLDType<tags::Unlabeled, tags::Proto3> for T
 where
@@ -113,6 +133,9 @@ where
     type Type = <T as ToOwned>::Owned;
     fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
         wrapped
+    }
+    fn default() -> Self::Type {
+        Default::default()
     }
 }
 impl<T> LabelWrappedLDType<tags::Optional, tags::Proto3> for T
@@ -124,6 +147,9 @@ where
     fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
         wrapped.get_or_insert_with(Default::default)
     }
+    fn default() -> Self::Type {
+        Default::default()
+    }
 }
 impl<T, X> LabelWrappedLDType<tags::Repeated, X> for T
 where
@@ -134,5 +160,8 @@ where
     fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
         wrapped.push(Default::default());
         wrapped.last_mut().unwrap()
+    }
+    fn default() -> Self::Type {
+        Vec::new()
     }
 }

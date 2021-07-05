@@ -20,7 +20,12 @@ where ImplTag:
     fn new_with_internal_data(
         internal_data: <Self::ImplTypeTag as ::puroro::StructInternalTypeGen>::Type,
     ) -> Self {
-        todo!()
+        Self {
+            {%- for field in self.message.fields() %}
+            {{ field.rust_ident() }}: <ImplTag as ::puroro::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::default(&internal_data),
+            {%- endfor %}
+            puroro_internal: internal_data,
+        }
     }
 }
 
