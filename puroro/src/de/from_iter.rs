@@ -20,42 +20,41 @@ where
     Msg: Message + DeserFromBytesIter,
     I: Iterator<Item = IoResult<u8>>,
 {
-    match try_get_wire_type_and_field_number(iter)? {
-        None => {
-            // reached at the end of this message.
-            Ok(())
+    while let Some((wire_type, field_number)) = try_get_wire_type_and_field_number(iter)? {
+        fn byte<I: Iterator<Item = IoResult<u8>>>(iter: &mut I) -> Result<u8> {
+            Ok(iter.next().ok_or(ErrorKind::UnexpectedInputTermination)??)
         }
-        Some((wire_type, field_number)) => {
-            fn byte<I: Iterator<Item = IoResult<u8>>>(iter: &mut I) -> Result<u8> {
-                Ok(iter.next().ok_or(ErrorKind::UnexpectedInputTermination)??)
+        let field_data = match wire_type {
+            WireType::Variant => FieldData::Variant(Variant::decode_bytes(iter)?),
+            WireType::Bits32 => {
+                FieldData::Bits32([byte(iter)?, byte(iter)?, byte(iter)?, byte(iter)?])
             }
-            let field_data = match wire_type {
-                WireType::Variant => FieldData::Variant(Variant::decode_bytes(iter)?),
-                WireType::Bits32 => {
-                    FieldData::Bits32([byte(iter)?, byte(iter)?, byte(iter)?, byte(iter)?])
-                }
-                WireType::Bits64 => FieldData::Bits64([
-                    byte(iter)?,
-                    byte(iter)?,
-                    byte(iter)?,
-                    byte(iter)?,
-                    byte(iter)?,
-                    byte(iter)?,
-                    byte(iter)?,
-                    byte(iter)?,
-                ]),
-                WireType::LengthDelimited => {
-                    let length = usize::try_from(Variant::decode_bytes(iter)?.to_i32()?)
-                        .map_err(|_| ErrorKind::InvalidFieldLength)?;
-                    iter.push_scope(length);
-                    FieldData::LengthDelimited(iter)
-                }
-                WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
-            };
-            <Msg as DeserFromBytesIter>::deser_field(message, field_number, field_data)?;
-            Ok(())
+            WireType::Bits64 => FieldData::Bits64([
+                byte(iter)?,
+                byte(iter)?,
+                byte(iter)?,
+                byte(iter)?,
+                byte(iter)?,
+                byte(iter)?,
+                byte(iter)?,
+                byte(iter)?,
+            ]),
+            WireType::LengthDelimited => {
+                let length = usize::try_from(Variant::decode_bytes(iter)?.to_i32()?)
+                    .map_err(|_| ErrorKind::InvalidFieldLength)?;
+                iter.push_scope(length);
+                FieldData::LengthDelimited(&mut *iter)
+            }
+            WireType::StartGroup | WireType::EndGroup => Err(ErrorKind::GroupNotSupported)?,
+        };
+
+        <Msg as DeserFromBytesIter>::deser_field(message, field_number, field_data)?;
+
+        if let WireType::LengthDelimited = wire_type {
+            iter.pop_scope();
         }
     }
+    Ok(())
 }
 
 fn try_get_wire_type_and_field_number<I>(iter: &mut I) -> Result<Option<(WireType, i32)>>

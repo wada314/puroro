@@ -60,6 +60,7 @@ pub mod wire {
     pub type Bits64<V> = (PhantomData<V>, ((), ()), ((), bool));
 
     pub type NonLD<V, _1, _2> = (PhantomData<V>, (_1, ()), _2);
+    pub type Bits32Or64<V, _1> = (PhantomData<V>, ((), ()), _1);
 }
 
 pub type Int32 = wire::Variant<value::Int32>;
