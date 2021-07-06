@@ -1,6 +1,6 @@
 use super::DeserFromBytesIterInternal;
 use crate::{ErrorKind, Result};
-use ::puroro::de::{FieldData, WireType};
+use ::puroro::types::{FieldData, WireType};
 use ::puroro::variant::Variant;
 use ::puroro::Message;
 use ::std::convert::TryFrom as _;

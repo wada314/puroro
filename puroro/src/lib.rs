@@ -6,10 +6,10 @@ mod error;
 pub mod de;
 pub mod fixed_bits;
 pub mod tags;
+pub mod types;
 pub mod variant;
 pub use error::{ErrorKind, PuroroError};
 pub type Result<T> = std::result::Result<T, PuroroError>;
-pub use de::FieldData;
 
 // Re-exports
 #[cfg(feature = "puroro-bumpalo")]

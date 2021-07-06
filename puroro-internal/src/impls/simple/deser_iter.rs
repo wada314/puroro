@@ -1,12 +1,13 @@
 use super::{LabelWrappedLDType, LabelWrappedType, SimpleImpl};
 use crate::de::from_iter::{deser_from_scoped_iter, Variants, ScopedIter};
 use crate::de::{DeserFieldFromBytesIter, DeserFromBytesIterInternal};
-use puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
-use puroro::variant::VariantTypeTag;
-use puroro::{
-    tags, ErrorKind, FieldData, FieldTypeGen, Message,
+use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
+use ::puroro::variant::VariantTypeTag;
+use ::puroro::{
+    tags, ErrorKind, FieldTypeGen, Message,
     Result, StructInternalTypeGen,
 };
+use ::puroro::types::FieldData;
 
 // deser from iterator
 

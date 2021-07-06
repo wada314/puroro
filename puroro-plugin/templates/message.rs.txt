@@ -71,7 +71,7 @@ where ImplTag:
     fn deser_field<I>(
         &mut self,
         field_number: i32,
-        data: ::puroro::FieldData<&mut ::puroro_internal::ScopedIter<I>>,
+        data: ::puroro::types::FieldData<&mut ::puroro_internal::ScopedIter<I>>,
     ) -> ::puroro::Result<()>
     where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>> 
