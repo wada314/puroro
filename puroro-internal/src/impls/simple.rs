@@ -2,8 +2,9 @@ mod deser_iter;
 mod field_wrapper;
 mod type_gen;
 
+use crate::StructInternalTypeGen;
+use ::puroro::tags;
 pub use field_wrapper::{LabelWrappedLDType, LabelWrappedType};
-use puroro::{tags, StructInternalTypeGen};
 
 pub struct SimpleImpl;
 impl tags::ImplTypeTag for SimpleImpl {}

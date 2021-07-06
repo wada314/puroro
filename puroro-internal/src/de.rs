@@ -1,7 +1,6 @@
 use crate::de::from_iter::ScopedIter;
-use crate::Result;
+use crate::{FieldTypeGen, Result, StructInternalTypeGen};
 use ::puroro::types::FieldData;
-use ::puroro::{FieldTypeGen, StructInternalTypeGen};
 
 pub mod from_iter;
 

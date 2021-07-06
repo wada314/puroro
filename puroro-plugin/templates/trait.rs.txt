@@ -3,7 +3,7 @@
 #[allow(unused)]
 pub trait {{ self.message.rust_ident() }}TraitAggregatedTypeGen :
 {%- for field in self.message.unique_type_fields() %}
-    ::puroro::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}> +
+    ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}> +
 {%- endfor %}
 {
 }
@@ -11,7 +11,7 @@ pub trait {{ self.message.rust_ident() }}TraitAggregatedTypeGen :
 impl<T> {{ self.message.rust_ident() }}TraitAggregatedTypeGen for T
 where T:
 {%- for field in self.message.unique_type_fields() %}
-    ::puroro::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}> +
+    ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}> +
 {%- endfor %}
 {
 }

@@ -1,11 +1,12 @@
 use super::{LabelWrappedLDType, LabelWrappedType, SimpleImpl};
+use crate::{FieldTypeGen, StructInternalTypeGen};
 use crate::de::from_iter::{deser_from_scoped_iter, Variants, ScopedIter};
 use crate::de::{DeserFieldFromBytesIter, MessageFromBytesIter};
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::variant::VariantTypeTag;
 use ::puroro::{
-    tags, ErrorKind, FieldTypeGen, Message,
-    Result, StructInternalTypeGen,
+    tags, ErrorKind, Message,
+    Result,
 };
 use ::puroro::types::FieldData;
 
