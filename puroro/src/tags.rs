@@ -116,87 +116,87 @@ impl ValueTypeTag for SFixed64 {}
 impl ProtoSyntaxTag for Proto2 {}
 impl ProtoSyntaxTag for Proto3 {}
 
-impl<S, T> FieldTypeTag for (S, T)
+impl<X, T> FieldTypeTag for (X, T)
 where
 // Not setting these bounds for code simplicity
-//S: ProtoSyntaxTag,
+//X: ProtoSyntaxTag,
 //T: ValueTypeTag,
 {
 }
 
-impl<S> NumericalFieldTypeTag for (S, Int32) {
+impl<X> NumericalFieldTypeTag for (X, Int32) {
     type NativeType = i32;
     fn default() -> Self::NativeType {
         0
     }
 }
-impl<S> NumericalFieldTypeTag for (S, UInt32) {
+impl<X> NumericalFieldTypeTag for (X, UInt32) {
     type NativeType = u32;
     fn default() -> Self::NativeType {
         0
     }
 }
-impl<S> NumericalFieldTypeTag for (S, SInt32) {
+impl<X> NumericalFieldTypeTag for (X, SInt32) {
     type NativeType = i32;
     fn default() -> Self::NativeType {
         0
     }
 }
-impl<S> NumericalFieldTypeTag for (S, Fixed32) {
+impl<X> NumericalFieldTypeTag for (X, Fixed32) {
     type NativeType = u32;
     fn default() -> Self::NativeType {
         0
     }
 }
-impl<S> NumericalFieldTypeTag for (S, SFixed32) {
+impl<X> NumericalFieldTypeTag for (X, SFixed32) {
     type NativeType = i32;
     fn default() -> Self::NativeType {
         0
     }
 }
-impl<S> NumericalFieldTypeTag for (S, Float) {
+impl<X> NumericalFieldTypeTag for (X, Float) {
     type NativeType = f32;
     fn default() -> Self::NativeType {
         0.0
     }
 }
-impl<S> NumericalFieldTypeTag for (S, Int64) {
+impl<X> NumericalFieldTypeTag for (X, Int64) {
     type NativeType = i64;
     fn default() -> Self::NativeType {
         0
     }
 }
-impl<S> NumericalFieldTypeTag for (S, UInt64) {
+impl<X> NumericalFieldTypeTag for (X, UInt64) {
     type NativeType = u64;
     fn default() -> Self::NativeType {
         0
     }
 }
-impl<S> NumericalFieldTypeTag for (S, SInt64) {
+impl<X> NumericalFieldTypeTag for (X, SInt64) {
     type NativeType = i64;
     fn default() -> Self::NativeType {
         0
     }
 }
-impl<S> NumericalFieldTypeTag for (S, Fixed64) {
+impl<X> NumericalFieldTypeTag for (X, Fixed64) {
     type NativeType = u64;
     fn default() -> Self::NativeType {
         0
     }
 }
-impl<S> NumericalFieldTypeTag for (S, SFixed64) {
+impl<X> NumericalFieldTypeTag for (X, SFixed64) {
     type NativeType = i64;
     fn default() -> Self::NativeType {
         0
     }
 }
-impl<S> NumericalFieldTypeTag for (S, Double) {
+impl<X> NumericalFieldTypeTag for (X, Double) {
     type NativeType = f64;
     fn default() -> Self::NativeType {
         0.0
     }
 }
-impl<S> NumericalFieldTypeTag for (S, Bool) {
+impl<X> NumericalFieldTypeTag for (X, Bool) {
     type NativeType = bool;
     fn default() -> Self::NativeType {
         false
