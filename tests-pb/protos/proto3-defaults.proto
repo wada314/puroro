@@ -1,0 +1,11 @@
+syntax = "proto3";
+package proto3_defaults;
+
+message Msg {
+    int32 i32_scalar = 1;
+    //optional int32 i32_optional = 2;
+    repeated int32 i32_repeated = 3;
+    float f32_scalar = 4;
+    //optional float f32_optional = 5;
+    repeated float f32_repeated = 6;
+}

@@ -92,16 +92,6 @@ pub type Required = (((), ()), ((), bool));
 
 pub type NonRepeated<_1, _2> = (((), _1), _2);
 
-trait WrappedType<Label> {
-    type Type;
-}
-impl<T, _1, _2> WrappedType<NonRepeated<_1, _2>> for T {
-    type Type = Option<T>;
-}
-impl<T> WrappedType<Repeated> for T {
-    type Type = Vec<T>;
-}
-
 pub struct Proto2;
 pub struct Proto3;
 
@@ -152,6 +142,18 @@ impl<S> NumericalFieldTypeTag for (S, SInt32) {
         0
     }
 }
+impl<S> NumericalFieldTypeTag for (S, Fixed32) {
+    type NativeType = u32;
+    fn default() -> Self::NativeType {
+        0
+    }
+}
+impl<S> NumericalFieldTypeTag for (S, SFixed32) {
+    type NativeType = i32;
+    fn default() -> Self::NativeType {
+        0
+    }
+}
 impl<S> NumericalFieldTypeTag for (S, Float) {
     type NativeType = f32;
     fn default() -> Self::NativeType {
@@ -171,6 +173,18 @@ impl<S> NumericalFieldTypeTag for (S, UInt64) {
     }
 }
 impl<S> NumericalFieldTypeTag for (S, SInt64) {
+    type NativeType = i64;
+    fn default() -> Self::NativeType {
+        0
+    }
+}
+impl<S> NumericalFieldTypeTag for (S, Fixed64) {
+    type NativeType = u64;
+    fn default() -> Self::NativeType {
+        0
+    }
+}
+impl<S> NumericalFieldTypeTag for (S, SFixed64) {
     type NativeType = i64;
     fn default() -> Self::NativeType {
         0

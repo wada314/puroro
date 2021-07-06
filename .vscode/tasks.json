@@ -44,7 +44,7 @@
             "command": "build",
             "args": [
                 "-p",
-                "sample-pb"
+                "tests-pb"
             ],
             "problemMatcher": [
                 "$rustc"
@@ -58,7 +58,7 @@
                 "clear": true
             },
             "group": "build",
-            "label": "rust: cargo build -p sample-pb"
+            "label": "rust: cargo build -p tests-pb"
         },
         {
             "type": "cargo",
