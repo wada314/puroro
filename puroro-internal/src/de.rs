@@ -5,7 +5,7 @@ use ::puroro::{FieldTypeGen, StructInternalTypeGen};
 
 pub mod from_iter;
 
-pub trait DeserFromBytesIterInternal: ::puroro::DeserFromBytesIter {
+pub trait MessageFromBytesIter: ::puroro::DeserFromBytesIter {
     fn deser_field<I>(
         &mut self,
         field_number: i32,

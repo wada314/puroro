@@ -1,6 +1,6 @@
 use super::{LabelWrappedLDType, LabelWrappedType, SimpleImpl};
 use crate::de::from_iter::{deser_from_scoped_iter, Variants, ScopedIter};
-use crate::de::{DeserFieldFromBytesIter, DeserFromBytesIterInternal};
+use crate::de::{DeserFieldFromBytesIter, MessageFromBytesIter};
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::variant::VariantTypeTag;
 use ::puroro::{
@@ -183,7 +183,7 @@ where
 impl<X, M, _1, _2> DeserFieldFromBytesIter<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>))>
     for SimpleImpl
 where
-    M: Message + DeserFromBytesIterInternal + Default,
+    M: Message + MessageFromBytesIter + Default,
     Self: FieldTypeGen<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>)), Type = Option<Box<M>>>,
 {
     fn deser_from_scoped_bytes_iter<I>(
@@ -209,7 +209,7 @@ where
 
 impl<X, M> DeserFieldFromBytesIter<(tags::Repeated, (X, tags::Message<M>))> for SimpleImpl
 where
-    M: Message + DeserFromBytesIterInternal + Default,
+    M: Message + MessageFromBytesIter + Default,
     Self: FieldTypeGen<(tags::Repeated, (X, tags::Message<M>)), Type = Vec<M>>,
 {
     fn deser_from_scoped_bytes_iter<I>(

@@ -70,7 +70,7 @@ where ImplTag:
     }
 }
 
-impl<ImplTag> ::puroro_internal::de::DeserFromBytesIterInternal for {{ self.message.rust_ident() }}<ImplTag>
+impl<ImplTag> ::puroro_internal::de::MessageFromBytesIter for {{ self.message.rust_ident() }}<ImplTag>
 where ImplTag:
     super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedDeserFromIter +
     ::puroro::StructInternalTypeGen,
@@ -97,7 +97,7 @@ where ImplTag:
 
         {%- else -%}
 
-        ::puroro_internal::de::DeserFromBytesIterInternal::deser_field(&mut self.body, field_number, data)
+        ::puroro_internal::de::MessageFromBytesIter::deser_field(&mut self.body, field_number, data)
 
         {%- endif %}
     }
