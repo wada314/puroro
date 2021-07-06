@@ -1,7 +1,7 @@
 use super::{LabelWrappedLDType, LabelWrappedType, SimpleImpl};
 use crate::{FieldTypeGen, StructInternalTypeGen};
 use crate::de::from_iter::{deser_from_scoped_iter, Variants, ScopedIter};
-use crate::de::{DeserFieldFromBytesIter, MessageFromBytesIter};
+use crate::de::{DeserFieldFromBytesIter, MessageFromBytesIter, DoDefaultCheck};
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::variant::VariantTypeTag;
 use ::puroro::{
@@ -15,6 +15,7 @@ use ::puroro::types::FieldData;
 // deser from iterator, into variant type fields
 impl<L, V, X> DeserFieldFromBytesIter<(L, (X, tags::wire::Variant<V>))> for SimpleImpl
 where
+    (L, (X, tags::wire::Variant<V>)): DoDefaultCheck,
     // The type tag has corresponding Rust numerical type,
     (X, tags::wire::Variant<V>): tags::NumericalFieldTypeTag + VariantTypeTag,
     // ..and the type above can be wrapped by Option<> or Vec<> according to
@@ -32,14 +33,17 @@ where
     where
         I: Iterator<Item = std::io::Result<u8>>,
     {
+        let do_default_check = <(L, (X, tags::wire::Variant<V>)) as DoDefaultCheck>::VALUE;
         match data {
             FieldData::Variant(variant) => {
                 // todo: proto3 default value check
                 let native = variant.to_native::<(X, tags::wire::Variant<V>)>()?;
-                *LabelWrappedType::<L>::get_or_insert_with(
-                    field,
-                    <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::default
-                ) = native;
+                if !do_default_check || native != <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::default() {
+                    *LabelWrappedType::<L>::get_or_insert_with(
+                        field,
+                        <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::default
+                    ) = native;   
+                }
             },
             FieldData::LengthDelimited(iter) => {
                 // todo: proto3 default value check
@@ -59,6 +63,7 @@ where
 // Bits32
 impl<L, V, X> DeserFieldFromBytesIter<(L, (X, tags::wire::Bits32<V>))> for SimpleImpl
 where
+    (L, (X, tags::wire::Bits32<V>)): DoDefaultCheck,
     // The type tag has corresponding Rust numerical type,
     (X, tags::wire::Bits32<V>): tags::NumericalFieldTypeTag + Bits32TypeTag,
     // ..and the type above can be wrapped by Option<> or Vec<> according to
@@ -76,14 +81,17 @@ where
     where
         I: Iterator<Item = std::io::Result<u8>>,
     {
+        let do_default_check = <(L, (X, tags::wire::Bits32<V>)) as DoDefaultCheck>::VALUE;
         match data {
             FieldData::Bits32(bytes) => {
                 // todo: proto3 default value check
                 let native = <(X, tags::wire::Bits32<V>) as Bits32TypeTag>::from_array(bytes);
-                *LabelWrappedType::<L>::get_or_insert_with(
-                    field,
-                    <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::default
-                ) = native;
+                if !do_default_check || native != <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::default() {
+                    *LabelWrappedType::<L>::get_or_insert_with(
+                        field,
+                        <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::default
+                    ) = native;
+                }
             }  
             _ => Err(ErrorKind::UnexpectedWireType)?,
         };
@@ -94,6 +102,7 @@ where
 // Bits64
 impl<L, V, X> DeserFieldFromBytesIter<(L, (X, tags::wire::Bits64<V>))> for SimpleImpl
 where
+    (L, (X, tags::wire::Bits64<V>)): DoDefaultCheck,
     // The type tag has corresponding Rust numerical type,
     (X, tags::wire::Bits64<V>): tags::NumericalFieldTypeTag + Bits64TypeTag,
     // ..and the type above can be wrapped by Option<> or Vec<> according to
@@ -111,14 +120,17 @@ where
     where
         I: Iterator<Item = std::io::Result<u8>>,
     {
+        let do_default_check = <(L, (X, tags::wire::Bits64<V>)) as DoDefaultCheck>::VALUE;
         match data {
             FieldData::Bits64(bytes) => {
                 // todo: proto3 default value check
                 let native = <(X, tags::wire::Bits64<V>) as Bits64TypeTag>::from_array(bytes);
-                *LabelWrappedType::<L>::get_or_insert_with(
-                    field,
-                    <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::default
-                ) = native;
+                if !do_default_check || native != <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::default() {
+                    *LabelWrappedType::<L>::get_or_insert_with(
+                        field,
+                        <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::default
+                    ) = native;
+                }
             }  
             _ => Err(ErrorKind::UnexpectedWireType)?,
         };
@@ -129,6 +141,7 @@ where
 // String
 impl<L, X> DeserFieldFromBytesIter<(L, (X, tags::String))> for SimpleImpl
 where
+    (L, (X, tags::String)): DoDefaultCheck,
     str: LabelWrappedLDType<L, X>,
     Self: FieldTypeGen<(L, (X, tags::String)), Type = <str as LabelWrappedLDType<L, X>>::Type>,
 {
@@ -140,12 +153,14 @@ where
     where
         I: Iterator<Item = std::io::Result<u8>>,
     {
+        let do_default_check = <(L, (X, tags::String)) as DoDefaultCheck>::VALUE;
         match data {
             FieldData::LengthDelimited(iter) => {
-                // TODO: do proto3 default value check
                 let string = String::from_utf8(iter.collect::<::std::io::Result<Vec<_>>>()?)
                     .map_err(|e| ErrorKind::InvalidUtf8(e))?;
-                *<str as LabelWrappedLDType<L, X>>::get_or_insert_default(field) = string;
+                if !do_default_check || !string.is_empty() {
+                    *<str as LabelWrappedLDType<L, X>>::get_or_insert_default(field) = string;
+                }
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
         }
@@ -156,6 +171,7 @@ where
 // Bytes
 impl<L, X> DeserFieldFromBytesIter<(L, (X, tags::Bytes))> for SimpleImpl
 where
+    (L, (X, tags::Bytes)): DoDefaultCheck,
     [u8]: LabelWrappedLDType<L, X>,
     Self: FieldTypeGen<(L, (X, tags::Bytes)), Type = <[u8] as LabelWrappedLDType<L, X>>::Type>,
 {
@@ -167,11 +183,13 @@ where
     where
         I: Iterator<Item = std::io::Result<u8>>,
     {
+        let do_default_check = <(L, (X, tags::Bytes)) as DoDefaultCheck>::VALUE;
         match data {
             FieldData::LengthDelimited(iter) => {
-                // TODO: do proto3 default value check
                 let bytes = iter.collect::<::std::io::Result<Vec<_>>>()?;
-                *<[u8] as LabelWrappedLDType<L, X>>::get_or_insert_default(field) = bytes;
+                if !do_default_check || !bytes.is_empty() {
+                    *<[u8] as LabelWrappedLDType<L, X>>::get_or_insert_default(field) = bytes;
+                }
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
         }

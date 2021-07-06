@@ -1,8 +1,18 @@
 use crate::de::from_iter::ScopedIter;
 use crate::{FieldTypeGen, Result, StructInternalTypeGen};
 use ::puroro::types::FieldData;
+use puroro::tags;
 
 pub mod from_iter;
+
+pub trait DoDefaultCheck: tags::FieldLabelAndTypeTag {
+    const VALUE: bool = false;
+}
+impl<V> DoDefaultCheck for (tags::Unlabeled, (tags::Proto3, V)) {
+    const VALUE: bool = true;
+}
+impl<V, _1, _2> DoDefaultCheck for (tags::NonUnlabeled<_1, _2>, (tags::Proto3, V)) {}
+impl<L, V> DoDefaultCheck for (L, (tags::Proto2, V)) {}
 
 pub trait MessageFromBytesIter: ::puroro::DeserFromBytesIter {
     fn deser_field<I>(
