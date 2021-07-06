@@ -163,7 +163,7 @@ impl<S> VariantTypeTag for (S, tags::Bool) {
 }
 impl<T> VariantTypeTag for (tags::Proto2, tags::Enum<T>)
 where
-    T: TryFrom<i32, Error = i32> + Into<i32> + Clone + Default,
+    T: TryFrom<i32, Error = i32> + Into<i32> + Clone + Default + PartialEq,
 {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(T::try_from(i32::try_from(i64::from_le_bytes(var.0))?)
@@ -176,7 +176,7 @@ where
 }
 impl<T> VariantTypeTag for (tags::Proto3, tags::Enum<T>)
 where
-    T: TryFrom<i32, Error = i32> + Into<i32> + Clone,
+    T: TryFrom<i32, Error = i32> + Into<i32> + Clone + PartialEq,
 {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(T::try_from(i32::try_from(i64::from_le_bytes(var.0))?))

@@ -15,7 +15,7 @@ pub trait FieldTypeTag {}
 
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
 pub trait NumericalFieldTypeTag: FieldTypeTag {
-    type NativeType: Clone;
+    type NativeType: Clone + PartialEq;
     fn default() -> Self::NativeType;
 }
 
@@ -202,13 +202,19 @@ impl<X> NumericalFieldTypeTag for (X, Bool) {
         false
     }
 }
-impl<T: Clone + Default> NumericalFieldTypeTag for (Proto2, Enum<T>) {
+impl<T> NumericalFieldTypeTag for (Proto2, Enum<T>)
+where
+    T: Clone + Default + PartialEq,
+{
     type NativeType = T;
     fn default() -> Self::NativeType {
         Default::default()
     }
 }
-impl<T: Clone + TryFrom<i32, Error = i32>> NumericalFieldTypeTag for (Proto3, Enum<T>) {
+impl<T> NumericalFieldTypeTag for (Proto3, Enum<T>)
+where
+    T: Clone + TryFrom<i32, Error = i32> + PartialEq,
+{
     type NativeType = ::std::result::Result<T, i32>;
     fn default() -> Self::NativeType {
         <T as TryFrom<i32>>::try_from(0)
