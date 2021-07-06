@@ -11,7 +11,7 @@ impl Variant {
     fn new(bytes: [u8; 8]) -> Self {
         Variant(bytes)
     }
-    pub(crate) fn decode_bytes<I>(bytes: &mut I) -> Result<Self>
+    pub fn decode_bytes<I>(bytes: &mut I) -> Result<Self>
     where
         I: Iterator<Item = IoResult<u8>>,
     {
@@ -42,7 +42,7 @@ impl Variant {
             None => Err(ErrorKind::UnexpectedInputTermination)?,
         }
     }
-    pub(crate) fn encode_bytes<W>(&self, write: &mut W) -> Result<()>
+    pub fn encode_bytes<W>(&self, write: &mut W) -> Result<()>
     where
         W: Write,
     {

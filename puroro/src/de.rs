@@ -1,4 +1,3 @@
-pub mod from_iter;
 use std::convert::TryFrom;
 
 use crate::variant::Variant;
@@ -13,7 +12,6 @@ pub enum FieldData<T> {
     Bits64([u8; 8]),
 }
 
-#[non_exhaustive]
 #[derive(Debug, Clone)]
 pub enum WireType {
     Variant = 0,

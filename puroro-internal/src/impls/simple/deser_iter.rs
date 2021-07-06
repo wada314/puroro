@@ -1,10 +1,10 @@
 use super::{LabelWrappedLDType, LabelWrappedType, SimpleImpl};
-use puroro::de::from_iter::deser_from_scoped_iter;
-use puroro::de::from_iter::Variants;
+use crate::de::from_iter::{deser_from_scoped_iter, Variants, ScopedIter};
+use crate::de::{DeserFieldFromBytesIter, DeserFromBytesIterInternal};
 use puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use puroro::variant::VariantTypeTag;
 use puroro::{
-    tags, DeserFieldFromBytesIter, DeserFromBytesIter, ErrorKind, FieldData, FieldTypeGen, Message,
+    tags, ErrorKind, FieldData, FieldTypeGen, Message,
     Result, StructInternalTypeGen,
 };
 
@@ -24,7 +24,7 @@ where
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(L, (X, tags::wire::Variant<V>))>>::Type,
-        data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        data: FieldData<&mut ScopedIter<I>>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
@@ -68,7 +68,7 @@ where
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(L, (X, tags::wire::Bits32<V>))>>::Type,
-        data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        data: FieldData<&mut ScopedIter<I>>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
@@ -103,7 +103,7 @@ where
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(L, (X, tags::wire::Bits64<V>))>>::Type,
-        data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        data: FieldData<&mut ScopedIter<I>>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
@@ -132,7 +132,7 @@ where
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(L, (X, tags::String))>>::Type,
-        data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        data: FieldData<&mut ScopedIter<I>>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
@@ -159,7 +159,7 @@ where
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(L, (X, tags::Bytes))>>::Type,
-        data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        data: FieldData<&mut ScopedIter<I>>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
@@ -182,12 +182,12 @@ where
 impl<X, M, _1, _2> DeserFieldFromBytesIter<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>))>
     for SimpleImpl
 where
-    M: Message + DeserFromBytesIter + Default,
+    M: Message + DeserFromBytesIterInternal + Default,
     Self: FieldTypeGen<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>)), Type = Option<Box<M>>>,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>))>>::Type,
-        data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        data: FieldData<&mut ScopedIter<I>>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
@@ -208,12 +208,12 @@ where
 
 impl<X, M> DeserFieldFromBytesIter<(tags::Repeated, (X, tags::Message<M>))> for SimpleImpl
 where
-    M: Message + DeserFromBytesIter + Default,
+    M: Message + DeserFromBytesIterInternal + Default,
     Self: FieldTypeGen<(tags::Repeated, (X, tags::Message<M>)), Type = Vec<M>>,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(tags::Repeated, (X, tags::Message<M>))>>::Type,
-        data: FieldData<&mut puroro::de::from_iter::ScopedIter<I>>,
+        data: FieldData<&mut ScopedIter<I>>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where

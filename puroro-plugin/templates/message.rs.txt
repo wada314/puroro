@@ -56,16 +56,22 @@ where ImplTag:
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
     {
         {% if self.is_public -%}
-        ::puroro::de::from_iter::deser_from_iter(self, iter)
+        ::puroro_internal::de::from_iter::deser_from_iter(self, iter)
         {%- else -%}
         ::puroro::DeserFromBytesIter::deser(&mut self.body, iter)
         {%- endif %}
     }
-    
+}
+
+impl<ImplTag> ::puroro_internal::de::DeserFromBytesIterInternal for {{ self.message.rust_ident() }}<ImplTag>
+where ImplTag:
+    super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedDeserFromIter +
+    ::puroro::StructInternalTypeGen,
+{    
     fn deser_field<I>(
         &mut self,
         field_number: i32,
-        data: ::puroro::FieldData<&mut ::puroro::de::from_iter::ScopedIter<I>>,
+        data: ::puroro::FieldData<&mut ::puroro_internal::ScopedIter<I>>,
     ) -> ::puroro::Result<()>
     where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>> 
@@ -74,7 +80,7 @@ where ImplTag:
 
         match field_number {
             {%- for field in self.message.fields() %}
-            {{ field.number() }} => <ImplTag as ::puroro::DeserFieldFromBytesIter<
+            {{ field.number() }} => <ImplTag as ::puroro_internal::de::DeserFieldFromBytesIter<
                 {{ field.label_and_type_tag().unwrap() }}>
             >::deser_from_scoped_bytes_iter(&mut self.{{ field.rust_ident() }}, data, &self.puroro_internal),
             {%- endfor %}
@@ -84,7 +90,7 @@ where ImplTag:
 
         {%- else -%}
 
-        ::puroro::DeserFromBytesIter::deser_field(&mut self.body, field_number, data)
+        ::puroro_internal::de::DeserFromBytesIterInternal::deser_field(&mut self.body, field_number, data)
 
         {%- endif %}
     }
