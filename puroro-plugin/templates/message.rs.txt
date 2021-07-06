@@ -26,6 +26,13 @@ where ImplTag:
     ::puroro::StructInternalTypeGen,
 {
     type ImplTypeTag = ImplTag;
+}
+
+impl<ImplTag> ::puroro_internal::MessageInternal for {{ self.message.rust_ident() }}<ImplTag>
+where ImplTag:
+    super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
+    ::puroro::StructInternalTypeGen,
+{
     fn new_with_internal_data(
         internal_data: <Self::ImplTypeTag as ::puroro::StructInternalTypeGen>::Type,
     ) -> Self {
@@ -39,7 +46,7 @@ where ImplTag:
 
             {%- else -%}
 
-            body: ::puroro::Message::new_with_internal_data(internal_data),
+            body: ::puroro_internal::MessageInternal::new_with_internal_data(internal_data),
             
             {%- endif %}
         }
@@ -103,7 +110,7 @@ where
     <ImplTag as ::puroro::StructInternalTypeGen>::Type: ::std::default::Default,
 {
     fn default() -> Self {
-        <Self as ::puroro::Message>::new_with_internal_data(::std::default::Default::default())
+        <Self as ::puroro_internal::MessageInternal>::new_with_internal_data(::std::default::Default::default())
     }
 }
 

@@ -18,9 +18,6 @@ pub use ::hashbrown;
 
 pub trait Message {
     type ImplTypeTag: StructInternalTypeGen;
-    fn new_with_internal_data(
-        internal_data: <Self::ImplTypeTag as StructInternalTypeGen>::Type,
-    ) -> Self;
 }
 pub trait DeserFromBytesIter: Message {
     fn deser<I>(&mut self, iter: I) -> Result<()>
