@@ -3,7 +3,6 @@
 
 mod error;
 
-pub mod de;
 pub mod fixed_bits;
 pub mod tags;
 pub mod types;
