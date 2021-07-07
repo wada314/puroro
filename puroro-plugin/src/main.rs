@@ -143,6 +143,8 @@ fn main() -> Result<()> {
     let wrapped_cgreq = wrappers::Context::try_from_proto(cgreq.clone())?;
 
     let mut cgres = CodeGeneratorResponse::default();
+    cgres.supported_features = Some(1); // TODO: Use Feature enum
+
     let mut mod_rs = File::default();
     mod_rs.name = Some("mod.rs".to_string());
     let package_to_subpackage_map = make_package_to_subpackages_map(&cgreq.proto_file);

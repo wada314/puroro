@@ -43,6 +43,7 @@ fn main() {
         ))
         .arg(format!("--rust_out={}", output_rust_path.to_str().unwrap()))
         .arg(format!("--proto_path={}", "./protos/"))
+        .arg("--experimental_allow_proto3_optional")
         .status()
         .unwrap();
     if !protoc_status.success() {
