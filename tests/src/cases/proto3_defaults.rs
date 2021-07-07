@@ -1,3 +1,5 @@
+/// About the proto3's default values, check the following official document:
+/// https://github.com/protocolbuffers/protobuf/blob/master/docs/field_presence.md
 use crate::tests_pb::proto3_defaults::Msg;
 use ::puroro::DeserFromBytesIter;
 
