@@ -21,3 +21,9 @@ pub trait DeserFromBytesIter: Message {
     where
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
+
+pub trait SerToIoWrite: Message {
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: ::std::io::Write;
+}

@@ -1,7 +1,6 @@
-#![allow(unstable_name_collisions)] // For ResultHelper::flatten.
-
 pub mod de;
 pub mod impls;
+pub mod se;
 
 // Re-exporting library modules
 pub use ::puroro::{bumpalo, hashbrown};
