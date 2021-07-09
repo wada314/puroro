@@ -19,6 +19,10 @@ pub trait MessageInternal: ::puroro::Message {
     ) -> Self;
 }
 
+pub trait ChooseStructVisibility<Public, Private> {
+    type Type;
+}
+
 pub trait StructInternalTypeGen: tags::ImplTypeTag {
     type Type;
 }

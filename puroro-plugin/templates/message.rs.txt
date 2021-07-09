@@ -128,6 +128,25 @@ where ImplTag:
     }
 }
 
+impl<ImplTag, NewImplTag> ::puroro::GetImpl<NewImplTag> for {{ self.message.rust_ident() }}<ImplTag> 
+where
+    NewImplTag:
+        ::puroro_internal::ChooseStructVisibility<
+            super::public::{{ self.message.rust_ident() }}<NewImplTag>,
+            super::private::{{ self.message.rust_ident() }}<NewImplTag>,
+        > + 
+        super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
+        ::puroro_internal::StructInternalTypeGen,
+    ImplTag:
+        super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
+        ::puroro_internal::StructInternalTypeGen,
+{
+    type Type = <NewImplTag as ::puroro_internal::ChooseStructVisibility<
+        super::public::{{ self.message.rust_ident() }}<NewImplTag>,
+        super::private::{{ self.message.rust_ident() }}<NewImplTag>,
+    >>::Type;
+}
+
 impl<ImplTag> ::std::default::Default for {{ self.message.rust_ident() }}<ImplTag>
 where 
     ImplTag: super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedDeserFromIter +

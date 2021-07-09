@@ -16,6 +16,11 @@ pub use ::bumpalo;
 pub use ::hashbrown;
 
 pub trait Message {}
+
+pub trait GetImpl<NewImplTypeTag> {
+    type Type;
+}
+
 pub trait DeserFromBytesIter: Message {
     fn deser<I>(&mut self, iter: I) -> Result<()>
     where
