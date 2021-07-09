@@ -199,6 +199,69 @@ where
     }
 }
 
+// Strings
+impl<L, X> SerFieldToIoWrite<(L, (X, tags::String))> for SimpleImpl
+where
+    (L, (X, tags::String)): DoDefaultCheck,
+    str: LabelWrappedLdType<L, X>,
+    Self: FieldTypeGen<(L, (X, tags::String)), Type = <str as LabelWrappedLdType<L, X>>::Type>,
+{
+    fn ser_to_io_write<W>(
+        field: &<Self as FieldTypeGen<(L, (X, tags::String))>>::Type,
+        field_number: i32,
+        out: &mut W,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> Result<()>
+    where
+        W: std::io::Write,
+    {
+        let do_default_check = <(L, (X, tags::String)) as DoDefaultCheck>::VALUE;
+        for item in <str as LabelWrappedLdType<L, X>>::iter(field) {
+            if do_default_check && item.is_empty() {
+                continue;
+            }
+            write_field_number_and_wire_type(out, field_number, WireType::LengthDelimited)?;
+            let length: i32 = item
+                .len()
+                .try_into()
+                .map_err(|_| ErrorKind::TooLongToSerialize)?;
+            Variant::from_i32(length)?.encode_bytes(out)?;
+            out.write_all(item.as_bytes())?;
+        }
+        Ok(())
+    }
+}
+
+// Non-repeated message
+type NonRepeatedMessage<X, M, _1, _2> = (tags::NonRepeated<_1, _2>, (X, tags::Message<M>));
+impl<X, M, _1, _2> SerFieldToIoWrite<NonRepeatedMessage<X, M, _1, _2>> for SimpleImpl
+where
+    Self: FieldTypeGen<NonRepeatedMessage<X, M, _1, _2>, Type = Option<Box<M>>>,
+{
+    fn ser_to_io_write<W>(
+        field: &<Self as FieldTypeGen<NonRepeatedMessage<X, M, _1, _2>>>::Type,
+        field_number: i32,
+        out: &mut W,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> Result<()>
+    where
+        W: std::io::Write,
+    {
+        if let Some(boxed) = field {
+            write_field_number_and_wire_type(out, field_number, WireType::LengthDelimited)?;
+            let mut buffer: Vec<u8> = Vec::new();
+            todo!();
+            let length: i32 = buffer
+                .len()
+                .try_into()
+                .map_err(|_| ErrorKind::TooLongToSerialize)?;
+            Variant::from_i32(length)?.encode_bytes(out)?;
+            out.write_all(&buffer)?;
+        }
+        Ok(())
+    }
+}
+
 impl SerInternalDataToIoWrite for SimpleImpl {
     fn ser_to_io_write<W>(
         _out: &mut W,
