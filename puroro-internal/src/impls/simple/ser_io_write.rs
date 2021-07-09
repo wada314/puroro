@@ -1,17 +1,20 @@
 use std::convert::TryInto;
+use std::io::Write;
 
 use crate::de::DoDefaultCheck;
 use crate::se::to_io_write::write_field_number_and_wire_type;
 use crate::se::{SerFieldToIoWrite, SerInternalDataToIoWrite};
 use crate::{ErrorKind, FieldTypeGen, Result, SimpleImpl, StructInternalTypeGen};
+use ::puroro::fixed_bits::Bits32TypeTag;
 use ::puroro::tags;
 use ::puroro::types::WireType;
 use ::puroro::variant::{Variant, VariantTypeTag};
+use puroro::fixed_bits::Bits64TypeTag;
 
 use super::LabelWrappedType;
 
+// Non-repeated, variant
 type NonRepeatedVariant<X, V, _1, _2> = (tags::NonRepeated<_1, _2>, (X, tags::wire::Variant<V>));
-
 impl<X, V, _1, _2> SerFieldToIoWrite<NonRepeatedVariant<X, V, _1, _2>> for SimpleImpl
 where
     NonRepeatedVariant<X, V, _1, _2>: DoDefaultCheck,
@@ -52,11 +55,10 @@ where
     }
 }
 
+// Repeated, variant
 type RepeatedVariant<X, V> = (tags::Repeated, (X, tags::wire::Variant<V>));
-
 impl<X, V> SerFieldToIoWrite<RepeatedVariant<X, V>> for SimpleImpl
 where
-    X: DoDefaultCheck,
     (X, tags::wire::Variant<V>): tags::NumericalFieldTypeTag + VariantTypeTag,
     <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType:
         LabelWrappedType<tags::Repeated> + Clone,
@@ -88,6 +90,78 @@ where
             write_field_number_and_wire_type(out, field_number, WireType::LengthDelimited)?;
             Variant::from_i32(total_len)?.encode_bytes(out)?;
             out.write_all(&buffer)?;
+        }
+        Ok(())
+    }
+}
+
+// Bits32
+impl<L, X, V> SerFieldToIoWrite<(L, (X, tags::wire::Bits32<V>))> for SimpleImpl
+where
+    (L, (X, tags::wire::Bits32<V>)): DoDefaultCheck,
+    (X, tags::wire::Bits32<V>): tags::NumericalFieldTypeTag + Bits32TypeTag,
+    <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType:
+        LabelWrappedType<L> + Clone,
+    Self: FieldTypeGen<
+        (L, (X, tags::wire::Bits32<V>)),
+        Type = <<(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType as LabelWrappedType<
+            L,
+        >>::Type,
+    >,
+{
+    fn ser_to_io_write<W>(
+        field: &<Self as FieldTypeGen<(L, (X, tags::wire::Bits32<V>))>>::Type,
+        field_number: i32,
+        out: &mut W,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> Result<()>
+    where
+        W: std::io::Write,
+    {
+        let do_default_check = <(L, (X, tags::wire::Bits32<V>)) as DoDefaultCheck>::VALUE;
+        for item in <<(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType as LabelWrappedType<L>>::iter(field) {
+            if do_default_check && item.clone() == <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::default() {
+                continue;
+            }
+            write_field_number_and_wire_type(out, field_number, WireType::Bits32)?;
+            let bytes = <(X, tags::wire::Bits32<V>) as Bits32TypeTag>::into_array(item.clone());
+            out.write_all(&bytes)?;
+        }
+        Ok(())
+    }
+}
+
+// Bits64
+impl<L, X, V> SerFieldToIoWrite<(L, (X, tags::wire::Bits64<V>))> for SimpleImpl
+where
+    (L, (X, tags::wire::Bits64<V>)): DoDefaultCheck,
+    (X, tags::wire::Bits64<V>): tags::NumericalFieldTypeTag + Bits64TypeTag,
+    <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType:
+        LabelWrappedType<L> + Clone,
+    Self: FieldTypeGen<
+        (L, (X, tags::wire::Bits64<V>)),
+        Type = <<(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType as LabelWrappedType<
+            L,
+        >>::Type,
+    >,
+{
+    fn ser_to_io_write<W>(
+        field: &<Self as FieldTypeGen<(L, (X, tags::wire::Bits64<V>))>>::Type,
+        field_number: i32,
+        out: &mut W,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> Result<()>
+    where
+        W: std::io::Write,
+    {
+        let do_default_check = <(L, (X, tags::wire::Bits64<V>)) as DoDefaultCheck>::VALUE;
+        for item in <<(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType as LabelWrappedType<L>>::iter(field) {
+            if do_default_check && item.clone() == <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::default() {
+                continue;
+            }
+            write_field_number_and_wire_type(out, field_number, WireType::Bits64)?;
+            let bytes = <(X, tags::wire::Bits64<V>) as Bits64TypeTag>::into_array(item.clone());
+            out.write_all(&bytes)?;
         }
         Ok(())
     }
