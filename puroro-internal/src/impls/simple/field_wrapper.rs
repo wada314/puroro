@@ -8,23 +8,35 @@ use puroro::{tags, Result};
 /// - `required` => `Option<T>` // Needs revisit!!
 /// - (unlabeled) => `T`
 /// - `repeated` => `Vec<T>`
-pub trait LabelWrappedType<L>: Sized + Clone {
+pub trait LabelWrappedType<L>: Sized {
     type Type;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self;
-    fn get_opt(wrapped: &Self::Type) -> Option<&Self>;
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()>;
     fn default_with<F: FnOnce() -> Self>(f: F) -> Self::Type;
+    fn iter(wrapped: &Self::Type) -> Iter<'_, Self>;
+}
+pub enum Iter<'a, T> {
+    Once(::std::iter::Once<&'a T>),
+    Option(::std::option::Iter<'a, T>),
+    Slice(::std::slice::Iter<'a, T>),
+}
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        match self {
+            Iter::Once(iter) => iter.next(),
+            Iter::Option(iter) => iter.next(),
+            Iter::Slice(iter) => iter.next(),
+        }
+    }
 }
 
-impl<T: Clone> LabelWrappedType<tags::Required> for T {
+impl<T> LabelWrappedType<tags::Required> for T {
     // TODO: Revisit... T or Option<T>
     type Type = Option<T>;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped.get_or_insert_with(f)
     }
-    fn get_opt(wrapped: &Self::Type) -> Option<&Self> {
-        wrapped.as_ref()
-    }
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
         if let Some(x) = iter.last() {
             *wrapped = Some(x?);
@@ -34,15 +46,15 @@ impl<T: Clone> LabelWrappedType<tags::Required> for T {
     fn default_with<F: FnOnce() -> Self>(_: F) -> Self::Type {
         None
     }
+    fn iter(wrapped: &Self::Type) -> Iter<'_, Self> {
+        Iter::Option(wrapped.iter())
+    }
 }
-impl<T: Clone> LabelWrappedType<tags::Optional> for T {
+impl<T> LabelWrappedType<tags::Optional> for T {
     type Type = Option<T>;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped.get_or_insert_with(f)
     }
-    fn get_opt(wrapped: &Self::Type) -> Option<&Self> {
-        wrapped.as_ref()
-    }
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
         if let Some(x) = iter.last() {
             *wrapped = Some(x?);
@@ -52,14 +64,14 @@ impl<T: Clone> LabelWrappedType<tags::Optional> for T {
     fn default_with<F: FnOnce() -> Self>(_: F) -> Self::Type {
         None
     }
+    fn iter(wrapped: &Self::Type) -> Iter<'_, Self> {
+        Iter::Option(wrapped.iter())
+    }
 }
-impl<T: Clone> LabelWrappedType<tags::Unlabeled> for T {
+impl<T> LabelWrappedType<tags::Unlabeled> for T {
     type Type = T;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, _: F) -> &mut Self {
         wrapped
-    }
-    fn get_opt(wrapped: &Self::Type) -> Option<&Self> {
-        Some(wrapped)
     }
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
         if let Some(x) = iter.last() {
@@ -70,15 +82,15 @@ impl<T: Clone> LabelWrappedType<tags::Unlabeled> for T {
     fn default_with<F: FnOnce() -> Self>(f: F) -> Self::Type {
         (f)()
     }
+    fn iter(wrapped: &Self::Type) -> Iter<'_, Self> {
+        Iter::Once(::std::iter::once(wrapped))
+    }
 }
-impl<T: Clone> LabelWrappedType<tags::Repeated> for T {
+impl<T> LabelWrappedType<tags::Repeated> for T {
     type Type = Vec<T>;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped.push((f)());
         wrapped.last_mut().unwrap()
-    }
-    fn get_opt(_wrapped: &Self::Type) -> Option<&Self> {
-        None
     }
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
         for x in iter {
@@ -88,6 +100,9 @@ impl<T: Clone> LabelWrappedType<tags::Repeated> for T {
     }
     fn default_with<F: FnOnce() -> Self>(_: F) -> Self::Type {
         Vec::new()
+    }
+    fn iter(wrapped: &Self::Type) -> Iter<'_, Self> {
+        Iter::Slice(wrapped.iter())
     }
 }
 

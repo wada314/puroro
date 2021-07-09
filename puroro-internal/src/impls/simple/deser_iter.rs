@@ -36,7 +36,6 @@ where
         let do_default_check = <(L, (X, tags::wire::Variant<V>)) as DoDefaultCheck>::VALUE;
         match data {
             FieldData::Variant(variant) => {
-                // todo: proto3 default value check
                 let native = variant.to_native::<(X, tags::wire::Variant<V>)>()?;
                 if !do_default_check || native != <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::default() {
                     *LabelWrappedType::<L>::get_or_insert_with(
@@ -84,7 +83,6 @@ where
         let do_default_check = <(L, (X, tags::wire::Bits32<V>)) as DoDefaultCheck>::VALUE;
         match data {
             FieldData::Bits32(bytes) => {
-                // todo: proto3 default value check
                 let native = <(X, tags::wire::Bits32<V>) as Bits32TypeTag>::from_array(bytes);
                 if !do_default_check || native != <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::default() {
                     *LabelWrappedType::<L>::get_or_insert_with(
@@ -123,7 +121,6 @@ where
         let do_default_check = <(L, (X, tags::wire::Bits64<V>)) as DoDefaultCheck>::VALUE;
         match data {
             FieldData::Bits64(bytes) => {
-                // todo: proto3 default value check
                 let native = <(X, tags::wire::Bits64<V>) as Bits64TypeTag>::from_array(bytes);
                 if !do_default_check || native != <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::default() {
                     *LabelWrappedType::<L>::get_or_insert_with(
