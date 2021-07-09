@@ -6,6 +6,7 @@ pub trait SerFieldToIoWrite<LabelAndType>:
 {
     fn ser_to_io_write<W>(
         field: &<Self as FieldTypeGen<LabelAndType>>::Type,
+        field_number: i32,
         out: &mut W,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>

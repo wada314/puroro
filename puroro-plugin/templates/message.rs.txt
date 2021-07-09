@@ -117,7 +117,7 @@ where ImplTag:
         {% if self.is_public -%}
         
         {%- for field in self.message.fields() %}
-        <ImplTag as ::puroro_internal::se::SerFieldToIoWrite<{{ field.label_and_type_tag().unwrap() }}>>::ser_to_io_write(&self.{{ field.rust_ident() }}, out, &self.puroro_internal)?;
+        <ImplTag as ::puroro_internal::se::SerFieldToIoWrite<{{ field.label_and_type_tag().unwrap() }}>>::ser_to_io_write(&self.{{ field.rust_ident() }}, {{ field.number() }}, out, &self.puroro_internal)?;
         {%- endfor %}
         <ImplTag as ::puroro_internal::se::SerInternalDataToIoWrite>::ser_to_io_write(out, &self.puroro_internal)?;
         Ok(())

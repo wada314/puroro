@@ -11,18 +11,19 @@ use puroro::{tags, Result};
 pub trait LabelWrappedType<L>: Sized + Clone {
     type Type;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self;
+    fn get_opt(wrapped: &Self::Type) -> Option<&Self>;
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()>;
     fn default_with<F: FnOnce() -> Self>(f: F) -> Self::Type;
-    // Using a by-value iterator because I don't want to require GAT here.
-    // Fortunately, the types used here are all small enough and clone-able.
-    type Iter: Iterator<Item = Self>;
-    fn iter(wrapped: &Self::Type) -> Self::Iter;
 }
+
 impl<T: Clone> LabelWrappedType<tags::Required> for T {
     // TODO: Revisit... T or Option<T>
     type Type = Option<T>;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped.get_or_insert_with(f)
+    }
+    fn get_opt(wrapped: &Self::Type) -> Option<&Self> {
+        wrapped.as_ref()
     }
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
         if let Some(x) = iter.last() {
@@ -33,15 +34,14 @@ impl<T: Clone> LabelWrappedType<tags::Required> for T {
     fn default_with<F: FnOnce() -> Self>(_: F) -> Self::Type {
         None
     }
-    type Iter = std::option::IntoIter<T>;
-    fn iter(wrapped: &Self::Type) -> Self::Iter {
-        wrapped.clone().into_iter()
-    }
 }
 impl<T: Clone> LabelWrappedType<tags::Optional> for T {
     type Type = Option<T>;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped.get_or_insert_with(f)
+    }
+    fn get_opt(wrapped: &Self::Type) -> Option<&Self> {
+        wrapped.as_ref()
     }
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
         if let Some(x) = iter.last() {
@@ -58,6 +58,9 @@ impl<T: Clone> LabelWrappedType<tags::Unlabeled> for T {
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, _: F) -> &mut Self {
         wrapped
     }
+    fn get_opt(wrapped: &Self::Type) -> Option<&Self> {
+        Some(wrapped)
+    }
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
         if let Some(x) = iter.last() {
             *wrapped = x?;
@@ -73,6 +76,9 @@ impl<T: Clone> LabelWrappedType<tags::Repeated> for T {
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped.push((f)());
         wrapped.last_mut().unwrap()
+    }
+    fn get_opt(_wrapped: &Self::Type) -> Option<&Self> {
+        None
     }
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
         for x in iter {
