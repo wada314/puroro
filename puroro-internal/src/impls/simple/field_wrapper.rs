@@ -8,13 +8,17 @@ use puroro::{tags, Result};
 /// - `required` => `Option<T>` // Needs revisit!!
 /// - (unlabeled) => `T`
 /// - `repeated` => `Vec<T>`
-pub trait LabelWrappedType<L>: Sized {
+pub trait LabelWrappedType<L>: Sized + Clone {
     type Type;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self;
     fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()>;
     fn default_with<F: FnOnce() -> Self>(f: F) -> Self::Type;
+    // Using a by-value iterator because I don't want to require GAT here.
+    // Fortunately, the types used here are all small enough and clone-able.
+    type Iter: Iterator<Item = Self>;
+    fn iter(wrapped: &Self::Type) -> Self::Iter;
 }
-impl<T> LabelWrappedType<tags::Required> for T {
+impl<T: Clone> LabelWrappedType<tags::Required> for T {
     // TODO: Revisit... T or Option<T>
     type Type = Option<T>;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
@@ -29,8 +33,12 @@ impl<T> LabelWrappedType<tags::Required> for T {
     fn default_with<F: FnOnce() -> Self>(_: F) -> Self::Type {
         None
     }
+    type Iter = std::option::IntoIter<T>;
+    fn iter(wrapped: &Self::Type) -> Self::Iter {
+        wrapped.clone().into_iter()
+    }
 }
-impl<T> LabelWrappedType<tags::Optional> for T {
+impl<T: Clone> LabelWrappedType<tags::Optional> for T {
     type Type = Option<T>;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped.get_or_insert_with(f)
@@ -45,7 +53,7 @@ impl<T> LabelWrappedType<tags::Optional> for T {
         None
     }
 }
-impl<T> LabelWrappedType<tags::Unlabeled> for T {
+impl<T: Clone> LabelWrappedType<tags::Unlabeled> for T {
     type Type = T;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, _: F) -> &mut Self {
         wrapped
@@ -60,7 +68,7 @@ impl<T> LabelWrappedType<tags::Unlabeled> for T {
         (f)()
     }
 }
-impl<T> LabelWrappedType<tags::Repeated> for T {
+impl<T: Clone> LabelWrappedType<tags::Repeated> for T {
     type Type = Vec<T>;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped.push((f)());

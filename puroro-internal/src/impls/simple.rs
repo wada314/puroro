@@ -1,5 +1,6 @@
 mod deser_iter;
 mod field_wrapper;
+mod ser_io_write;
 mod type_gen;
 
 use crate::StructInternalTypeGen;
