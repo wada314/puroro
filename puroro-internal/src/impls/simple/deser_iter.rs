@@ -195,7 +195,6 @@ where
 }
 
 // Message
-// TODO: tags::Message<M>'s M is not the actual message type
 impl<X, M, _1, _2> DeserFieldFromBytesIter<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>))>
     for SimpleImpl
 where
