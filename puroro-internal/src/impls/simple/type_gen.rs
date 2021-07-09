@@ -1,4 +1,4 @@
-use super::{LabelWrappedType, LabelWrappedLDType, SimpleImpl};
+use super::{LabelWrappedType, LabelWrappedLdType, SimpleImpl};
 use ::puroro::{tags};
 use crate::{FieldTypeGen, StructInternalTypeGen};
 
@@ -25,26 +25,26 @@ where
 // For length delimited types
 
 impl<L, X> FieldTypeGen<(L, (X, tags::Bytes))> for SimpleImpl 
-where [u8]: LabelWrappedLDType<L, X>
+where [u8]: LabelWrappedLdType<L, X>
 {
-    type Type = <[u8] as LabelWrappedLDType<L, X>>::Type;
+    type Type = <[u8] as LabelWrappedLdType<L, X>>::Type;
 
     fn default(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as FieldTypeGen<(L, (X, tags::Bytes))>>::Type {
-        <[u8] as LabelWrappedLDType<L, X>>::default()
+        <[u8] as LabelWrappedLdType<L, X>>::default()
     }
     
 }
 impl<L, X> FieldTypeGen<(L, (X, tags::String))> for SimpleImpl 
-where str: LabelWrappedLDType<L, X>
+where str: LabelWrappedLdType<L, X>
 {
-    type Type = <str as LabelWrappedLDType<L, X>>::Type;
+    type Type = <str as LabelWrappedLdType<L, X>>::Type;
     
     fn default(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as FieldTypeGen<(L, (X, tags::String))>>::Type {
-        <str as LabelWrappedLDType<L, X>>::default()
+        <str as LabelWrappedLdType<L, X>>::default()
     }
 }
 

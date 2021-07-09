@@ -108,23 +108,45 @@ impl<T> LabelWrappedType<tags::Repeated> for T {
 
 /// A custom version of `LabelWrappedType` for String and Bytes.
 ///
+/// Let `B` as a Borrowed type and `T` as an owned type:
 /// - proto2:
-///   - `optional` => `Option<Cow<'static, T>>`
-///   - `required` => `Option<Cow<'static, T>>` // Needs revisit!!
+///   - `optional` => `Option<Cow<'static, B>>`
+///   - `required` => `Option<Cow<'static, B>>` // Need revisit!!
 ///   - `repeated` => `Vec<T>`
 /// - proto3:
 ///   - (unlabeled) => `T`
 ///   - `optional` => `Option<T>`
 ///   - `repeated` => `Vec<T>`
-pub trait LabelWrappedLDType<L, X>: ToOwned
+pub trait LabelWrappedLdType<L, X>: ToOwned
 where
     <Self as ToOwned>::Owned: Default,
 {
     type Type;
     fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned;
     fn default() -> Self::Type;
+    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self>;
 }
-impl<T> LabelWrappedLDType<tags::Required, tags::Proto2> for T
+pub enum LdIter<'a, B: 'static + ?Sized + ToOwned> {
+    OnceOwned(::std::iter::Once<&'a B::Owned>),
+    OptionOwned(::std::option::Iter<'a, B::Owned>),
+    OptionCow(::std::option::Iter<'a, Cow<'static, B>>),
+    SliceOwned(::std::slice::Iter<'a, B::Owned>),
+}
+impl<'a, B: ?Sized + ToOwned> Iterator for LdIter<'a, B> {
+    type Item = &'a B;
+    fn next(&mut self) -> Option<Self::Item> {
+        use ::std::borrow::Borrow as _;
+        use ::std::ops::Deref as _;
+        match self {
+            LdIter::OnceOwned(iter) => iter.next().map(|x| x.borrow()),
+            LdIter::OptionOwned(iter) => iter.next().map(|x| x.borrow()),
+            LdIter::OptionCow(iter) => iter.next().map(|c| c.deref()),
+            LdIter::SliceOwned(iter) => iter.next().map(|x| x.borrow()),
+        }
+    }
+}
+
+impl<T> LabelWrappedLdType<tags::Required, tags::Proto2> for T
 where
     T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
@@ -138,8 +160,11 @@ where
     fn default() -> Self::Type {
         None
     }
+    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
+        LdIter::OptionCow(wrapped.iter())
+    }
 }
-impl<T> LabelWrappedLDType<tags::Optional, tags::Proto2> for T
+impl<T> LabelWrappedLdType<tags::Optional, tags::Proto2> for T
 where
     T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
@@ -153,8 +178,11 @@ where
     fn default() -> Self::Type {
         None
     }
+    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
+        LdIter::OptionCow(wrapped.iter())
+    }
 }
-impl<T> LabelWrappedLDType<tags::Unlabeled, tags::Proto3> for T
+impl<T> LabelWrappedLdType<tags::Unlabeled, tags::Proto3> for T
 where
     T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
@@ -166,8 +194,11 @@ where
     fn default() -> Self::Type {
         Default::default()
     }
+    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
+        LdIter::OnceOwned(::std::iter::once(wrapped))
+    }
 }
-impl<T> LabelWrappedLDType<tags::Optional, tags::Proto3> for T
+impl<T> LabelWrappedLdType<tags::Optional, tags::Proto3> for T
 where
     T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
@@ -179,8 +210,11 @@ where
     fn default() -> Self::Type {
         Default::default()
     }
+    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
+        LdIter::OptionOwned(wrapped.iter())
+    }
 }
-impl<T, X> LabelWrappedLDType<tags::Repeated, X> for T
+impl<T, X> LabelWrappedLdType<tags::Repeated, X> for T
 where
     T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
@@ -192,5 +226,8 @@ where
     }
     fn default() -> Self::Type {
         Vec::new()
+    }
+    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
+        LdIter::SliceOwned(wrapped.iter())
     }
 }

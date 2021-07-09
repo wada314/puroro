@@ -5,13 +5,12 @@ use crate::de::DoDefaultCheck;
 use crate::se::to_io_write::write_field_number_and_wire_type;
 use crate::se::{SerFieldToIoWrite, SerInternalDataToIoWrite};
 use crate::{ErrorKind, FieldTypeGen, Result, SimpleImpl, StructInternalTypeGen};
-use ::puroro::fixed_bits::Bits32TypeTag;
+use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::tags;
 use ::puroro::types::WireType;
 use ::puroro::variant::{Variant, VariantTypeTag};
-use puroro::fixed_bits::Bits64TypeTag;
 
-use super::LabelWrappedType;
+use super::{LabelWrappedLdType, LabelWrappedType};
 
 // Non-repeated, variant
 type NonRepeatedVariant<X, V, _1, _2> = (tags::NonRepeated<_1, _2>, (X, tags::wire::Variant<V>));
@@ -162,6 +161,39 @@ where
             write_field_number_and_wire_type(out, field_number, WireType::Bits64)?;
             let bytes = <(X, tags::wire::Bits64<V>) as Bits64TypeTag>::into_array(item.clone());
             out.write_all(&bytes)?;
+        }
+        Ok(())
+    }
+}
+
+// Bytes
+impl<L, X> SerFieldToIoWrite<(L, (X, tags::Bytes))> for SimpleImpl
+where
+    (L, (X, tags::Bytes)): DoDefaultCheck,
+    [u8]: LabelWrappedLdType<L, X>,
+    Self: FieldTypeGen<(L, (X, tags::Bytes)), Type = <[u8] as LabelWrappedLdType<L, X>>::Type>,
+{
+    fn ser_to_io_write<W>(
+        field: &<Self as FieldTypeGen<(L, (X, tags::Bytes))>>::Type,
+        field_number: i32,
+        out: &mut W,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> Result<()>
+    where
+        W: std::io::Write,
+    {
+        let do_default_check = <(L, (X, tags::Bytes)) as DoDefaultCheck>::VALUE;
+        for item in <[u8] as LabelWrappedLdType<L, X>>::iter(field) {
+            if do_default_check && item.is_empty() {
+                continue;
+            }
+            write_field_number_and_wire_type(out, field_number, WireType::LengthDelimited)?;
+            let length: i32 = item
+                .len()
+                .try_into()
+                .map_err(|_| ErrorKind::TooLongToSerialize)?;
+            Variant::from_i32(length)?.encode_bytes(out)?;
+            out.write_all(item)?;
         }
         Ok(())
     }

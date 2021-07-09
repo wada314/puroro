@@ -1,4 +1,4 @@
-use super::{LabelWrappedLDType, LabelWrappedType, SimpleImpl};
+use super::{LabelWrappedLdType, LabelWrappedType, SimpleImpl};
 use crate::{FieldTypeGen, StructInternalTypeGen};
 use crate::de::from_iter::{deser_from_scoped_iter, Variants, ScopedIter};
 use crate::de::{DeserFieldFromBytesIter, MessageFromBytesIter, DoDefaultCheck};
@@ -139,8 +139,8 @@ where
 impl<L, X> DeserFieldFromBytesIter<(L, (X, tags::String))> for SimpleImpl
 where
     (L, (X, tags::String)): DoDefaultCheck,
-    str: LabelWrappedLDType<L, X>,
-    Self: FieldTypeGen<(L, (X, tags::String)), Type = <str as LabelWrappedLDType<L, X>>::Type>,
+    str: LabelWrappedLdType<L, X>,
+    Self: FieldTypeGen<(L, (X, tags::String)), Type = <str as LabelWrappedLdType<L, X>>::Type>,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(L, (X, tags::String))>>::Type,
@@ -156,7 +156,7 @@ where
                 let string = String::from_utf8(iter.collect::<::std::io::Result<Vec<_>>>()?)
                     .map_err(|e| ErrorKind::InvalidUtf8(e))?;
                 if !do_default_check || !string.is_empty() {
-                    *<str as LabelWrappedLDType<L, X>>::get_or_insert_default(field) = string;
+                    *<str as LabelWrappedLdType<L, X>>::get_or_insert_default(field) = string;
                 }
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
@@ -169,8 +169,8 @@ where
 impl<L, X> DeserFieldFromBytesIter<(L, (X, tags::Bytes))> for SimpleImpl
 where
     (L, (X, tags::Bytes)): DoDefaultCheck,
-    [u8]: LabelWrappedLDType<L, X>,
-    Self: FieldTypeGen<(L, (X, tags::Bytes)), Type = <[u8] as LabelWrappedLDType<L, X>>::Type>,
+    [u8]: LabelWrappedLdType<L, X>,
+    Self: FieldTypeGen<(L, (X, tags::Bytes)), Type = <[u8] as LabelWrappedLdType<L, X>>::Type>,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(L, (X, tags::Bytes))>>::Type,
@@ -185,7 +185,7 @@ where
             FieldData::LengthDelimited(iter) => {
                 let bytes = iter.collect::<::std::io::Result<Vec<_>>>()?;
                 if !do_default_check || !bytes.is_empty() {
-                    *<[u8] as LabelWrappedLDType<L, X>>::get_or_insert_default(field) = bytes;
+                    *<[u8] as LabelWrappedLdType<L, X>>::get_or_insert_default(field) = bytes;
                 }
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
