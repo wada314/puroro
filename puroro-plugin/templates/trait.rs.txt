@@ -33,4 +33,21 @@ where T:
 {
 }
 
+{# ################# puroro::SerFieldToIoWrite ################# -#}
+#[allow(unused)]
+pub trait {{ self.message.rust_ident() }}TraitAggregatedSerToIoWrite :
+{%- for field in self.message.unique_type_fields() %}
+    ::puroro_internal::se::SerFieldToIoWrite<{{ field.label_and_type_tag().unwrap() }}> +
+{%- endfor %}
+    ::puroro_internal::se::SerInternalDataToIoWrite
+{
+}
 
+impl<T> {{ self.message.rust_ident() }}TraitAggregatedSerToIoWrite for T
+where T:
+{%- for field in self.message.unique_type_fields() %}
+    ::puroro_internal::se::SerFieldToIoWrite<{{ field.label_and_type_tag().unwrap() }}> +
+{%- endfor %}
+    ::puroro_internal::se::SerInternalDataToIoWrite
+{
+}
