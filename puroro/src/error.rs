@@ -17,6 +17,8 @@ pub enum ErrorKind {
     InvalidBooleanValue,
     #[error("Unknown field label [optional, repeated, required]")]
     InvalidFieldLabel,
+    #[error("Too large field number. The max value is 2^29 - 1.")]
+    InvalidFieldNumber,
     #[error("A variant integer type is longer than 10 bytes.")]
     TooLargeVariant,
     #[error("Invalid wire type value: {0}.")]
