@@ -5,7 +5,7 @@ mod type_gen;
 
 use crate::{ChooseStructVisibility, StructInternalTypeGen};
 use ::puroro::tags;
-pub use field_wrapper::{LabelWrappedLdType, LabelWrappedType};
+pub use field_wrapper::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType};
 
 pub struct SimpleImpl;
 impl tags::ImplTypeTag for SimpleImpl {}

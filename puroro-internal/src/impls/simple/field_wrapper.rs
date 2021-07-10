@@ -231,3 +231,41 @@ where
         LdIter::SliceOwned(wrapped.iter())
     }
 }
+
+/// A custom version of `LabelWrappedType` for String and Bytes.
+///
+///  - (unlabeled) => `Option<Box<T>>`
+///  - `required` => `Option<Box<T>>`
+///  - `optional` => `Option<Box<T>>`
+///  - `repeated` => `Vec<T>`
+pub trait LabelWrappedMessageType<L>: Sized {
+    type Type;
+    fn iter(wrapped: &Self::Type) -> MsgIter<'_, Self>;
+}
+pub enum MsgIter<'a, T> {
+    OptionBox(::std::option::Iter<'a, Box<T>>),
+    Slice(::std::slice::Iter<'a, T>),
+}
+impl<'a, T> Iterator for MsgIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        use ::std::ops::Deref as _;
+        match self {
+            MsgIter::OptionBox(iter) => iter.next().map(|b| b.deref()),
+            MsgIter::Slice(iter) => iter.next(),
+        }
+    }
+}
+
+impl<T, _1, _2> LabelWrappedMessageType<tags::NonRepeated<_1, _2>> for T {
+    type Type = Option<Box<T>>;
+    fn iter(wrapped: &Self::Type) -> MsgIter<'_, Self> {
+        MsgIter::OptionBox(wrapped.iter())
+    }
+}
+impl<T> LabelWrappedMessageType<tags::Repeated> for T {
+    type Type = Vec<T>;
+    fn iter(wrapped: &Self::Type) -> MsgIter<'_, Self> {
+        MsgIter::Slice(wrapped.iter())
+    }
+}

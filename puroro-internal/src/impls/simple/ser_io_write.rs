@@ -1,5 +1,4 @@
 use std::convert::TryInto;
-use std::io::Write;
 
 use crate::de::DoDefaultCheck;
 use crate::se::to_io_write::write_field_number_and_wire_type;
@@ -9,9 +8,9 @@ use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::tags;
 use ::puroro::types::WireType;
 use ::puroro::variant::{Variant, VariantTypeTag};
-use ::puroro::GetImpl;
+use ::puroro::{GetImpl, SerToIoWrite};
 
-use super::{LabelWrappedLdType, LabelWrappedType};
+use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType};
 
 // Non-repeated, variant
 type NonRepeatedVariant<X, V, _1, _2> = (tags::NonRepeated<_1, _2>, (X, tags::wire::Variant<V>));
@@ -240,16 +239,20 @@ where
     }
 }
 
-// Non-repeated message
-type NonRepeatedMessage<X, M, _1, _2> = (tags::NonRepeated<_1, _2>, (X, tags::Message<M>));
+// Message
+type MessageFieldTag<L, X, M> = (L, (X, tags::Message<M>));
 type ActualMessage<M> = <M as ::puroro::GetImpl<SimpleImpl>>::Type;
-impl<X, M, _1, _2> SerFieldToIoWrite<NonRepeatedMessage<X, M, _1, _2>> for SimpleImpl
+impl<L, X, M> SerFieldToIoWrite<MessageFieldTag<L, X, M>> for SimpleImpl
 where
-    // TODO: M to actual type
-    Self: FieldTypeGen<NonRepeatedMessage<X, M, _1, _2>, Type = Option<Box<M>>>,
+    M: GetImpl<SimpleImpl>,
+    ActualMessage<M>: SerToIoWrite + LabelWrappedMessageType<L>,
+    Self: FieldTypeGen<
+        MessageFieldTag<L, X, M>,
+        Type = <ActualMessage<M> as LabelWrappedMessageType<L>>::Type,
+    >,
 {
     fn ser_to_io_write<W>(
-        field: &<Self as FieldTypeGen<NonRepeatedMessage<X, M, _1, _2>>>::Type,
+        field: &<Self as FieldTypeGen<MessageFieldTag<L, X, M>>>::Type,
         field_number: i32,
         out: &mut W,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
@@ -257,10 +260,11 @@ where
     where
         W: std::io::Write,
     {
-        if let Some(boxed) = field {
+        use std::ops::Deref as _;
+        for boxed in <ActualMessage<M> as LabelWrappedMessageType<L>>::iter(field) {
             write_field_number_and_wire_type(out, field_number, WireType::LengthDelimited)?;
             let mut buffer: Vec<u8> = Vec::new();
-            todo!();
+            <ActualMessage<M> as SerToIoWrite>::ser(boxed.deref(), &mut buffer)?;
             let length: i32 = buffer
                 .len()
                 .try_into()

@@ -1,5 +1,5 @@
 use super::{LabelWrappedLdType, LabelWrappedType, SimpleImpl};
-use crate::{FieldTypeGen, StructInternalTypeGen, ChooseStructVisibility};
+use crate::{FieldTypeGen, StructInternalTypeGen};
 use crate::de::from_iter::{deser_from_scoped_iter, Variants, ScopedIter};
 use crate::de::{DeserFieldFromBytesIter, MessageFromBytesIter, DoDefaultCheck};
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
