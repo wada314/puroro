@@ -236,6 +236,7 @@ where
 type NonRepeatedMessage<X, M, _1, _2> = (tags::NonRepeated<_1, _2>, (X, tags::Message<M>));
 impl<X, M, _1, _2> SerFieldToIoWrite<NonRepeatedMessage<X, M, _1, _2>> for SimpleImpl
 where
+    // TODO: M to actual type
     Self: FieldTypeGen<NonRepeatedMessage<X, M, _1, _2>, Type = Option<Box<M>>>,
 {
     fn ser_to_io_write<W>(
