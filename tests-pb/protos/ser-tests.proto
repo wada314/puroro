@@ -1,0 +1,20 @@
+syntax = "proto3";
+package ser_tests;
+
+message Msg {
+    int32 i32_unlabeled = 1;
+    repeated int32 i32_repeated = 2;
+    float float_unlabeled = 3;
+    repeated float float_repeated = 4;
+    string string_unlabeled = 5;
+    repeated string string_repeated = 6;
+
+    message Submsg {
+        int32 i32_unlabeled = 1;
+    }
+    Submsg submsg_unlabeled = 7;
+    repeated Submsg submsg_repeated = 8;
+
+    int32 very_large_field_number = 536870911; // 2^29 - 1
+}
+
