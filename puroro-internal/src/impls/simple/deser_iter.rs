@@ -7,6 +7,7 @@ use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::types::FieldData;
 use ::puroro::variant::VariantTypeTag;
 use ::puroro::{tags, ErrorKind, GetImpl, Message, Result};
+use ::std::collections::HashMap;
 
 // deser from iterator
 
@@ -255,5 +256,28 @@ where
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
         }
+    }
+}
+
+// Map
+
+use super::type_gen::{GetVecItemType, VecItemType};
+impl<X, K, V> DeserFieldFromBytesIter<tags::Map<X, K, V>> for SimpleImpl
+where
+    Self: FieldTypeGen<tags::Map<X, K, V>, Type = HashMap<VecItemType<X, K>, VecItemType<X, V>>>,
+    Self: FieldTypeGen<(tags::Repeated, (X, K))>,
+    Self: FieldTypeGen<(tags::Repeated, (X, V))>,
+    <Self as FieldTypeGen<(tags::Repeated, (X, K))>>::Type: GetVecItemType,
+    <Self as FieldTypeGen<(tags::Repeated, (X, V))>>::Type: GetVecItemType,
+{
+    fn deser_from_scoped_bytes_iter<I>(
+        field: &mut <Self as FieldTypeGen<tags::Map<X, K, V>>>::Type,
+        data: FieldData<&mut ScopedIter<I>>,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+    {
+        todo!()
     }
 }

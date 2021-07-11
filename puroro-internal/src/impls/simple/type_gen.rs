@@ -72,13 +72,15 @@ impl<X, M> FieldTypeGen<(tags::Repeated, (X, tags::Message<M>))> for SimpleImpl
     }
 }
 
+// Map
+
 pub trait GetVecItemType {
     type Type;
 }
 impl<T> GetVecItemType for Vec<T> {
     type Type = T;
 }
-type VecItemType<X, KorV> = <<SimpleImpl as FieldTypeGen<(tags::Repeated, (X, KorV))>>::Type as GetVecItemType>::Type;
+pub type VecItemType<X, KorV> = <<SimpleImpl as FieldTypeGen<(tags::Repeated, (X, KorV))>>::Type as GetVecItemType>::Type;
 impl<X, K, V> FieldTypeGen<tags::Map<X, K, V>> for SimpleImpl 
 where 
     Self: FieldTypeGen<(tags::Repeated, (X, K))>,
