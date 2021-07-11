@@ -6,7 +6,7 @@ use puroro::{tags, Result};
 /// Can be applied for every types except length delimited types (String, Bytes, Message).
 /// - `optional` => `Option<T>`
 /// - `required` => `Option<T>` // Needs revisit!!
-/// - (unlabeled) => `T`
+/// - (unlabeled), (oneof), (mapentry) => `T`
 /// - `repeated` => `Vec<T>`
 pub trait LabelWrappedType<L>: Sized {
     type Type;
@@ -95,7 +95,7 @@ impl<T> LabelWrappedType<tags::Repeated> for T {
 ///   - `required` => `Option<Cow<'static, B>>` // Need revisit!!
 ///   - `repeated` => `Vec<T>`
 /// - proto3:
-///   - (unlabeled) => `T`
+///   - (unlabeled, oneof, mapentry) => `T`
 ///   - `optional` => `Option<T>`
 ///   - `repeated` => `Vec<T>`
 pub trait LabelWrappedLdType<L, X>: ToOwned
@@ -145,22 +145,6 @@ where
         LdIter::OptionCow(wrapped.iter())
     }
 }
-impl<T> LabelWrappedLdType<tags::Unlabeled, tags::Proto3> for T
-where
-    T: ?Sized + ToOwned + 'static,
-    <T as ToOwned>::Owned: Default,
-{
-    type Type = <T as ToOwned>::Owned;
-    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
-        wrapped
-    }
-    fn default() -> Self::Type {
-        Default::default()
-    }
-    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
-        LdIter::OnceOwned(::std::iter::once(wrapped))
-    }
-}
 impl<T> LabelWrappedLdType<tags::Optional, tags::Proto3> for T
 where
     T: ?Sized + ToOwned + 'static,
@@ -175,6 +159,22 @@ where
     }
     fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
         LdIter::OptionOwned(wrapped.iter())
+    }
+}
+impl<T, X, _1, _2, _3> LabelWrappedLdType<tags::UnlabeledOrOneofOrMapEntry<_1, _2, _3>, X> for T
+where
+    T: ?Sized + ToOwned + 'static,
+    <T as ToOwned>::Owned: Default,
+{
+    type Type = <T as ToOwned>::Owned;
+    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
+        wrapped
+    }
+    fn default() -> Self::Type {
+        Default::default()
+    }
+    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
+        LdIter::OnceOwned(::std::iter::once(wrapped))
     }
 }
 impl<T, X> LabelWrappedLdType<tags::Repeated, X> for T
@@ -195,7 +195,7 @@ where
     }
 }
 
-/// A custom version of `LabelWrappedType` for String and Bytes.
+/// A custom version of `LabelWrappedType` for Message types.
 ///
 ///  - (unlabeled) => `Option<Box<T>>`
 ///  - `required` => `Option<Box<T>>`
