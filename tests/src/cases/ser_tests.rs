@@ -63,9 +63,6 @@ fn test_ser_and_then_deser() {
     use ::std::io::Read as _;
     let mut new_msg = Msg::default();
     new_msg.deser(buf.bytes()).unwrap();
-    // todo: compare by msg
-    //assert_eq!(msg, new_msg);
-    let mut new_buf: Vec<u8> = Vec::new();
-    new_msg.ser(&mut new_buf).unwrap();
-    assert_eq!(buf, new_buf);
+
+    assert_eq!(msg, new_msg);
 }

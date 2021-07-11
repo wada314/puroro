@@ -202,10 +202,21 @@ where
 {%- for field in self.message.unique_type_fields() %}
     <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type: ::std::fmt::Debug,
 {%- endfor %}
-    <ImplTag as ::puroro_internal::StructInternalTypeGen>::Type: ::std::fmt::Debug,
 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        todo!()
+        {% if self.is_public -%}
+
+        f.debug_struct("{{ self.message.rust_ident() }}")
+            {% for field in self.message.fields() -%}
+            .field("{{ field.rust_ident() }}", &self.{{ field.rust_ident() }})
+            {% endfor -%}
+            .finish()
+        
+        {%- else -%}
+        <super::public::{{ self.message.rust_ident() }}<ImplTag> as ::std::fmt::Debug>::fmt(
+            &self.body, f
+        )
+        {%- endif %}
     }
 }
     
