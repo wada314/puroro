@@ -61,6 +61,7 @@ pub struct Field {
     message: Weak<Message>,
     rust_ident: String,
     lazy_proto_type: OnceCell<FieldType>,
+    proto_name: String,
     proto_type_name: String,
     proto_type_enum: FieldTypeProto,
     proto_label: FieldLabelProto,
@@ -486,6 +487,7 @@ impl Field {
         Ok(Self {
             message: Clone::clone(&message),
             rust_ident: utils::get_keyword_safe_ident(&utils::to_lower_snake_case(&proto_name)),
+            proto_name,
             proto_type_name,
             proto_type_enum,
             lazy_proto_type: OnceCell::new(),
@@ -552,6 +554,21 @@ impl Field {
                     vtype = self.field_type()?.tag_ident()?
                 ))
             })?)
+    }
+
+    pub fn rust_one_line_comment(&self) -> Result<String> {
+        Ok(format!(
+            "{label_then_space}{field_type} {name} = {number};",
+            label_then_space = match self.field_label()? {
+                FieldLabel::Unlabeled => "",
+                FieldLabel::Required => "required ",
+                FieldLabel::Optional => "optional ",
+                FieldLabel::Repeated => "repeated ",
+            },
+            field_type = self.field_type()?.proto_name()?,
+            name = &self.proto_name,
+            number = self.number(),
+        ))
     }
 }
 
@@ -652,6 +669,39 @@ impl FieldType {
                     })?
                     .rust_absolute_path()
             ),
+        })
+    }
+
+    pub fn proto_name(&self) -> Result<String> {
+        Ok(match self {
+            FieldType::Double => "double".to_string(),
+            FieldType::Float => "float".to_string(),
+            FieldType::Int32 => "int32".to_string(),
+            FieldType::Int64 => "int64".to_string(),
+            FieldType::UInt32 => "uint32".to_string(),
+            FieldType::UInt64 => "uint64".to_string(),
+            FieldType::SInt32 => "sint32".to_string(),
+            FieldType::SInt64 => "sint64".to_string(),
+            FieldType::Fixed32 => "fixed32".to_string(),
+            FieldType::Fixed64 => "fixed64".to_string(),
+            FieldType::SFixed32 => "sfixed32".to_string(),
+            FieldType::SFixed64 => "sfixed64".to_string(),
+            FieldType::Bool => "bool".to_string(),
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => "string".to_string(),
+            FieldType::Bytes => "bytes".to_string(),
+            FieldType::Enum(e) => Weak::upgrade(e)
+                .ok_or(ErrorKind::InternalError {
+                    detail: "Failed to upgrade a Weak<> pointer.".to_string(),
+                })?
+                .proto_name()
+                .to_string(),
+            FieldType::Message(m) => Weak::upgrade(m)
+                .ok_or(ErrorKind::InternalError {
+                    detail: "Failed to upgrade a Weak<> pointer.".to_string(),
+                })?
+                .proto_name()
+                .to_string(),
         })
     }
 }

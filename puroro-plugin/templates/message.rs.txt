@@ -10,7 +10,7 @@ where ImplTag:
     {% if self.is_public -%}
 
     {% for field in self.message.fields() -%}
-    /// Comment something about this field!
+    /// {{ field.rust_one_line_comment().unwrap() }}
     pub {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type,
     {% endfor -%}
     puroro_internal: <ImplTag as ::puroro_internal::StructInternalTypeGen>::Type,
