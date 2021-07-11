@@ -5,17 +5,14 @@ use ::std::marker::PhantomData;
 /// e.g. Int32, Float, String, Message<M>
 /// This type actually consist of two tags for generics specialization:
 /// `wire::wire_tag<value::value_tag>`.
-pub trait ValueTypeTag {}
+pub trait FieldTypeTag {}
 
 /// A tag trait for types corresponding to the proto syntax.
 /// Proto2 or Proto3.
 pub trait ProtoSyntaxTag {}
 
-/// A tuple of (`ProtoSyntaxTag`, `ValueTypeTag`).
-pub trait FieldTypeTag {}
-
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
-pub trait NumericalFieldTypeTag: FieldTypeTag {
+pub trait NumericalFieldTypeTag {
     type NativeType: Clone + PartialEq;
     fn default() -> Self::NativeType;
 }
@@ -24,7 +21,7 @@ pub trait NumericalFieldTypeTag: FieldTypeTag {
 /// e.g. Optional, Repeated, Required
 pub trait FieldLabelTag {}
 
-/// A tuple of (`FieldLabelTag`, `FieldTypeTag`).
+/// A tuple of (`ProtoSyntaxTag`, `FieldLabelTag`, `FieldTypeTag`).
 /// TODO: Maybe map type should have its own tag type.
 pub trait FieldLabelAndTypeTag {}
 
@@ -100,34 +97,26 @@ pub type UnlabeledOrOneofOrMapEntry<_1, _2, _3> = ((), (), (_1, _2, _3));
 pub struct Proto2;
 pub struct Proto3;
 
-impl ValueTypeTag for Int32 {}
-impl ValueTypeTag for Int64 {}
-impl ValueTypeTag for UInt32 {}
-impl ValueTypeTag for UInt64 {}
-impl ValueTypeTag for SInt32 {}
-impl ValueTypeTag for SInt64 {}
-impl ValueTypeTag for Bool {}
-impl ValueTypeTag for Bytes {}
-impl ValueTypeTag for String {}
-impl<T> ValueTypeTag for Enum<T> {}
-impl<T> ValueTypeTag for Message<T> {}
-impl ValueTypeTag for Float {}
-impl ValueTypeTag for Double {}
-impl ValueTypeTag for Fixed32 {}
-impl ValueTypeTag for Fixed64 {}
-impl ValueTypeTag for SFixed32 {}
-impl ValueTypeTag for SFixed64 {}
+impl FieldTypeTag for Int32 {}
+impl FieldTypeTag for Int64 {}
+impl FieldTypeTag for UInt32 {}
+impl FieldTypeTag for UInt64 {}
+impl FieldTypeTag for SInt32 {}
+impl FieldTypeTag for SInt64 {}
+impl FieldTypeTag for Bool {}
+impl FieldTypeTag for Bytes {}
+impl FieldTypeTag for String {}
+impl<T> FieldTypeTag for Enum<T> {}
+impl<T> FieldTypeTag for Message<T> {}
+impl FieldTypeTag for Float {}
+impl FieldTypeTag for Double {}
+impl FieldTypeTag for Fixed32 {}
+impl FieldTypeTag for Fixed64 {}
+impl FieldTypeTag for SFixed32 {}
+impl FieldTypeTag for SFixed64 {}
 
 impl ProtoSyntaxTag for Proto2 {}
 impl ProtoSyntaxTag for Proto3 {}
-
-impl<X, T> FieldTypeTag for (X, T)
-where
-// Not setting these bounds for code simplicity
-//X: ProtoSyntaxTag,
-//T: ValueTypeTag,
-{
-}
 
 impl<X> NumericalFieldTypeTag for (X, Int32) {
     type NativeType = i32;
@@ -232,19 +221,3 @@ impl FieldLabelTag for Unlabeled {}
 impl FieldLabelTag for Required {}
 
 pub struct Map<X, K, V>(PhantomData<(X, K, V)>);
-
-impl<L, V> FieldLabelAndTypeTag for (L, V)
-where
-// Not setting these bounds for code simplicity
-//    L: FieldLabelTag,
-//    V: FieldTypeTag,
-{
-}
-impl<X, K, V> FieldLabelAndTypeTag for Map<X, K, V>
-where
-// Not setting these bounds for code simplicity
-//X: ProtoSyntaxTag,
-//K: ValueTypeTag,
-//V: ValueTypeTag,
-{
-}

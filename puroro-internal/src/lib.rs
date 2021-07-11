@@ -29,14 +29,24 @@ pub trait StructInternalTypeGen: tags::ImplTypeTag {
     type Type;
 }
 
-pub trait FieldTypeGen<LabelAndType>: tags::ImplTypeTag + StructInternalTypeGen
-// Not setting these bounds for code simplicity
-// where
-//    LT: tags::FieldLabelAndTypeTag,
-{
+pub trait FieldTypeGen<X, L, V>: StructInternalTypeGen {
     type Type;
     /// Default value of the field when the message is allocated
     fn default(
         internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as FieldTypeGen<LabelAndType>>::Type;
+    ) -> <Self as FieldTypeGen<X, L, V>>::Type;
+}
+pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
+    type EnumType<E>;
+    /// Default value of the field when the message is allocated
+    fn default<E: Default>(
+        internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> <Self as EnumTypeGen<X, L>>::EnumType<E>;
+}
+pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
+    type MsgType<M>;
+    /// Default value of the field when the message is allocated
+    fn default<M>(
+        internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> <Self as MsgTypeGen<X, L>>::MsgType<M>;
 }

@@ -1,23 +1,23 @@
 use crate::de::from_iter::ScopedIter;
-use crate::{FieldTypeGen, Result, StructInternalTypeGen};
+use crate::{EnumTypeGen, FieldTypeGen, MsgTypeGen, Result, StructInternalTypeGen};
 use ::puroro::types::FieldData;
 use puroro::tags;
 
 pub mod from_iter;
 
-pub trait DoDefaultCheck: tags::FieldLabelAndTypeTag {
+pub trait DoDefaultCheck {
     const VALUE: bool = false;
 }
-impl<V> DoDefaultCheck for (tags::Unlabeled, (tags::Proto3, V)) {
+impl DoDefaultCheck for (tags::Proto3, tags::Unlabeled) {
     const VALUE: bool = true;
 }
-impl<V> DoDefaultCheck for (tags::MapEntry, (tags::Proto3, V)) {
+impl DoDefaultCheck for (tags::Proto3, tags::MapEntry) {
     const VALUE: bool = true;
 }
-impl<V> DoDefaultCheck for (tags::Repeated, (tags::Proto3, V)) {}
-impl<V, _1, _2> DoDefaultCheck for (tags::OptionalOrRequired<_1, _2>, (tags::Proto3, V)) {}
-impl<V> DoDefaultCheck for (tags::Oneof, (tags::Proto3, V)) {}
-impl<L, V> DoDefaultCheck for (L, (tags::Proto2, V)) {}
+impl DoDefaultCheck for (tags::Proto3, tags::Repeated) {}
+impl<_1, _2> DoDefaultCheck for (tags::Proto3, tags::OptionalOrRequired<_1, _2>) {}
+impl DoDefaultCheck for (tags::Proto3, tags::Oneof) {}
+impl<L> DoDefaultCheck for (tags::Proto2, L) {}
 
 pub trait MessageFromBytesIter: ::puroro::DeserFromBytesIter {
     fn deser_field<I>(
@@ -29,11 +29,9 @@ pub trait MessageFromBytesIter: ::puroro::DeserFromBytesIter {
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
 
-pub trait DeserFieldFromBytesIter<LabelAndType>:
-    FieldTypeGen<LabelAndType> + StructInternalTypeGen
-{
+pub trait DeserFieldFromBytesIter<X, L, V>: FieldTypeGen<X, L, V> + StructInternalTypeGen {
     fn deser_from_scoped_bytes_iter<I>(
-        field: &mut <Self as FieldTypeGen<LabelAndType>>::Type,
+        field: &mut <Self as FieldTypeGen<X, L, V>>::Type,
         data: FieldData<&mut ScopedIter<I>>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
@@ -41,30 +39,21 @@ pub trait DeserFieldFromBytesIter<LabelAndType>:
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
 
-pub trait DeserFieldFromBytesSlice<LabelAndType>:
-    FieldTypeGen<LabelAndType> + StructInternalTypeGen
-{
-    fn deser_from_bytes_slice(
-        field: &mut <Self as FieldTypeGen<LabelAndType>>::Type,
-        data: FieldData<&[u8]>,
+pub trait DeserEnumFromBytesIter<X, L>: EnumTypeGen<X, L> + StructInternalTypeGen {
+    fn deser_from_scoped_bytes_iter<I, E>(
+        field: &mut <Self as EnumTypeGen<X, L>>::EnumType<E>,
+        data: FieldData<&mut ScopedIter<I>>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> Result<()>;
+    ) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>;
 }
-
-impl<T, LabelAndType> DeserFieldFromBytesSlice<LabelAndType> for T
-where
-    T: DeserFieldFromBytesIter<LabelAndType>,
-{
-    fn deser_from_bytes_slice(
-        field: &mut <Self as FieldTypeGen<LabelAndType>>::Type,
-        data: FieldData<&[u8]>,
+pub trait DeserMsgFromBytesIter<X, L>: MsgTypeGen<X, L> + StructInternalTypeGen {
+    fn deser_from_scoped_bytes_iter<I, M>(
+        field: &mut <Self as MsgTypeGen<X, L>>::MsgType<M>,
+        data: FieldData<&mut ScopedIter<I>>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> Result<()> {
-        use std::io::Read as _;
-        <Self as DeserFieldFromBytesIter<LabelAndType>>::deser_from_scoped_bytes_iter(
-            field,
-            data.map(|slice| ScopedIter::new(slice.bytes())).as_mut(),
-            internal_data,
-        )
-    }
+    ) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>;
 }
