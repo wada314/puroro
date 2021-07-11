@@ -6,7 +6,7 @@ use ::itertools::Itertools;
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::types::FieldData;
 use ::puroro::variant::VariantTypeTag;
-use ::puroro::{tags, ErrorKind, GetImpl, Message, Result};
+use ::puroro::{tags, ErrorKind, Message, Result};
 use ::std::collections::HashMap;
 
 // deser from iterator
@@ -204,12 +204,8 @@ where
 impl<X, M, _1, _2> DeserFieldFromBytesIter<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>))>
     for SimpleImpl
 where
-    M: GetImpl<SimpleImpl>,
-    <M as GetImpl<SimpleImpl>>::Type: Message + MessageFromBytesIter + Default,
-    Self: FieldTypeGen<
-        (tags::NonRepeated<_1, _2>, (X, tags::Message<M>)),
-        Type = Option<Box<<M as GetImpl<SimpleImpl>>::Type>>,
-    >,
+    M: Message + MessageFromBytesIter + Default,
+    Self: FieldTypeGen<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>)), Type = Option<Box<M>>>,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>))>>::Type,
@@ -234,12 +230,8 @@ where
 
 impl<X, M> DeserFieldFromBytesIter<(tags::Repeated, (X, tags::Message<M>))> for SimpleImpl
 where
-    M: GetImpl<SimpleImpl>,
-    <M as GetImpl<SimpleImpl>>::Type: Message + MessageFromBytesIter + Default,
-    Self: FieldTypeGen<
-        (tags::Repeated, (X, tags::Message<M>)),
-        Type = Vec<<M as GetImpl<SimpleImpl>>::Type>,
-    >,
+    M: Message + MessageFromBytesIter + Default,
+    Self: FieldTypeGen<(tags::Repeated, (X, tags::Message<M>)), Type = Vec<M>>,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as FieldTypeGen<(tags::Repeated, (X, tags::Message<M>))>>::Type,

@@ -1,5 +1,5 @@
 use super::{LabelWrappedType, LabelWrappedLdType, SimpleImpl};
-use ::puroro::{tags, GetImpl};
+use ::puroro::{tags};
 use crate::{FieldTypeGen, StructInternalTypeGen};
 use ::std::collections::HashMap;
 
@@ -50,9 +50,8 @@ where str: LabelWrappedLdType<L, X>
 }
 
 impl<X, M, _1, _2> FieldTypeGen<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>))> for SimpleImpl
-    where M: GetImpl<SimpleImpl>
 {
-    type Type = Option<Box<<M as GetImpl<SimpleImpl>>::Type>>;
+    type Type = Option<Box<M>>;
 
     fn default(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
@@ -60,10 +59,9 @@ impl<X, M, _1, _2> FieldTypeGen<(tags::NonRepeated<_1, _2>, (X, tags::Message<M>
         None
     }
 }
-impl<X, M> FieldTypeGen<(tags::Repeated, (X, tags::Message<M>))> for SimpleImpl 
-    where M: GetImpl<SimpleImpl>
+impl<X, M> FieldTypeGen<(tags::Repeated, (X, tags::Message<M>))> for SimpleImpl
 {
-    type Type = Vec<<M as GetImpl<SimpleImpl>>::Type>;
+    type Type = Vec<M>;
 
     fn default(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
