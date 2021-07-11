@@ -11,7 +11,7 @@ where ImplTag:
 
     {% for field in self.message.fields() -%}
     /// {{ field.rust_one_line_comment().unwrap() }}
-    pub {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type,
+    pub {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag("ImplTag").unwrap() }}>>::Type,
     {% endfor -%}
     puroro_internal: <ImplTag as ::puroro_internal::StructInternalTypeGen>::Type,
 
@@ -45,7 +45,7 @@ where ImplTag:
             {% if self.is_public -%}
 
             {%- for field in self.message.fields() %}
-            {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::default(&internal_data),
+            {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag("ImplTag").unwrap() }}>>::default(&internal_data),
             {%- endfor %}
             puroro_internal: internal_data,
 
@@ -93,7 +93,7 @@ where ImplTag:
         match field_number {
             {%- for field in self.message.fields() %}
             {{ field.number() }} => <ImplTag as ::puroro_internal::de::DeserFieldFromBytesIter<
-                {{ field.label_and_type_tag().unwrap() }}>
+                {{ field.label_and_type_tag("ImplTag").unwrap() }}>
             >::deser_from_scoped_bytes_iter(&mut self.{{ field.rust_ident() }}, data, &self.puroro_internal),
             {%- endfor %}
 
@@ -121,7 +121,7 @@ where ImplTag:
         {% if self.is_public -%}
         
         {%- for field in self.message.fields() %}
-        <ImplTag as ::puroro_internal::se::SerFieldToIoWrite<{{ field.label_and_type_tag().unwrap() }}>>::ser_to_io_write(&self.{{ field.rust_ident() }}, {{ field.number() }}, out, &self.puroro_internal)?;
+        <ImplTag as ::puroro_internal::se::SerFieldToIoWrite<{{ field.label_and_type_tag("ImplTag").unwrap() }}>>::ser_to_io_write(&self.{{ field.rust_ident() }}, {{ field.number() }}, out, &self.puroro_internal)?;
         {%- endfor %}
         <ImplTag as ::puroro_internal::se::SerInternalDataToIoWrite>::ser_to_io_write(out, &self.puroro_internal)?;
         Ok(())
@@ -169,7 +169,7 @@ where
     ImplTag: super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
         ::puroro_internal::StructInternalTypeGen,
 {%- for field in self.message.unique_type_fields() %}
-    <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type: ::std::cmp::PartialEq,
+    <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag("ImplTag").unwrap() }}>>::Type: ::std::cmp::PartialEq,
 {%- endfor %}
     <ImplTag as ::puroro_internal::StructInternalTypeGen>::Type: ::std::cmp::PartialEq,
 {
@@ -177,7 +177,7 @@ where
         {% if self.is_public -%}
 
         {% for field in self.message.fields() -%}
-        <<ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type as ::std::cmp::PartialEq>::eq(
+        <<ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag("ImplTag").unwrap() }}>>::Type as ::std::cmp::PartialEq>::eq(
             &self.{{ field.rust_ident() }},
             &other.{{ field.rust_ident() }}
         ) &&
@@ -200,7 +200,7 @@ where
     ImplTag: super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
         ::puroro_internal::StructInternalTypeGen,
 {%- for field in self.message.unique_type_fields() %}
-    <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type: ::std::fmt::Debug,
+    <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag("ImplTag").unwrap() }}>>::Type: ::std::fmt::Debug,
 {%- endfor %}
 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {

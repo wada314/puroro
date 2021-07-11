@@ -68,7 +68,6 @@ pub struct Field {
     proto_is_optional3: bool,
     lazy_label: OnceCell<FieldLabel>,
     number: i32,
-    lazy_label_and_type_tag: OnceCell<String>,
 }
 
 #[derive(Debug)]
@@ -395,7 +394,7 @@ impl Message {
                 (
                     field
                         .field_type()
-                        .and_then(|ft| ft.tag_ident())
+                        .and_then(|ft| ft.tag_ident(""))
                         .unwrap_or("".to_string()),
                     field
                         .field_label()
@@ -495,7 +494,6 @@ impl Field {
             proto_is_optional3,
             lazy_label: OnceCell::new(),
             number: proto_number,
-            lazy_label_and_type_tag: OnceCell::new(),
         })
     }
 
@@ -542,18 +540,14 @@ impl Field {
         self.number
     }
 
-    pub fn label_and_type_tag(&self) -> Result<&str> {
-        Ok(&self
-            .lazy_label_and_type_tag
-            .get_or_try_init(|| -> Result<_> {
-                Ok(format!(
-                    "(::puroro::tags::{label}, \
+    pub fn label_and_type_tag(&self, impl_tag: &str) -> Result<String> {
+        Ok(format!(
+            "(::puroro::tags::{label}, \
                         (::puroro::tags::{syntax}, ::puroro::tags::{vtype}))",
-                    label = self.field_label()?.tag_ident(),
-                    syntax = self.message()?.input_file()?.syntax().tag_ident(),
-                    vtype = self.field_type()?.tag_ident()?
-                ))
-            })?)
+            label = self.field_label()?.tag_ident(),
+            syntax = self.message()?.input_file()?.syntax().tag_ident(),
+            vtype = self.field_type()?.tag_ident(impl_tag)?
+        ))
     }
 
     pub fn rust_one_line_comment(&self) -> Result<String> {
@@ -635,7 +629,7 @@ impl FieldType {
         })
     }
 
-    pub fn tag_ident(&self) -> Result<String> {
+    pub fn tag_ident(&self, impl_tag: &str) -> Result<String> {
         Ok(match *self {
             FieldType::Double => "Double".into(),
             FieldType::Float => "Float".into(),
@@ -662,12 +656,13 @@ impl FieldType {
                     .rust_absolute_path()
             ),
             FieldType::Message(ref m) => format!(
-                "Message::<{}>",
-                Weak::upgrade(m)
+                "Message::<{path}<{impl_tag}>>",
+                path = Weak::upgrade(m)
                     .ok_or(ErrorKind::InternalError {
                         detail: "Failed to upgrade a Weak<> pointer.".to_string(),
                     })?
-                    .rust_absolute_path()
+                    .rust_absolute_path(),
+                impl_tag = impl_tag,
             ),
         })
     }
