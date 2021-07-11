@@ -45,7 +45,7 @@ where
                 .next()
         {
             let variant = Variant::from_native::<(X, tags::wire::Variant<V>)>(value.clone())?;
-            if !do_default_check && !variant.is_zero() {
+            if !do_default_check || !variant.is_zero() {
                 write_field_number_and_wire_type(out, field_number, WireType::Variant)?;
                 variant.encode_bytes(out)?;
             }
