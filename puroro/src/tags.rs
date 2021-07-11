@@ -82,16 +82,20 @@ pub type Enum<T> = wire::Variant<value::Enum<T>>;
 pub type Message<T> = wire::LengthDelimited<value::Message<T>>;
 
 /// A repeated field, which is available in both proto2 and proto3.
-pub type Repeated = ((bool, ()), ((), ()));
+pub type Repeated = (bool, (), ());
 /// Proto2 optional field || Proto3 explicitly optional marked field.
-pub type Optional = (((), bool), ((), ()));
-/// Proto3 unlabeled field.
-pub type Unlabeled = (((), ()), (bool, ()));
+pub type Optional = ((), (bool, ()), ());
 /// Only available in proto2.
-pub type Required = (((), ()), ((), bool));
+pub type Required = ((), ((), bool), ());
+/// Proto3 unlabeled field.
+pub type Unlabeled = ((), (), (bool, (), ()));
+pub type Oneof = ((), (), ((), bool, ()));
+pub type MapEntry = ((), (), ((), (), bool));
 
-pub type NonRepeated<_1, _2> = (((), _1), _2);
-pub type NonUnlabeled<_1, _2> = (_1, ((), _2));
+// call for good idea instead of this :)
+pub type NonRepeated<_1, _2> = ((), _1, _2);
+pub type OptionalOrRequired<_1, _2> = ((), (_1, _2), ());
+pub type UnlabeledOrOneofOrMapEntry<_1, _2, _3> = ((), (), (_1, _2, _3));
 
 pub struct Proto2;
 pub struct Proto3;

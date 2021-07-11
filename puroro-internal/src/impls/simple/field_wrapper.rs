@@ -31,8 +31,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
-impl<T> LabelWrappedType<tags::Required> for T {
-    // TODO: Revisit... T or Option<T>
+impl<T, _1, _2> LabelWrappedType<tags::OptionalOrRequired<_1, _2>> for T {
     type Type = Option<T>;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
         wrapped.get_or_insert_with(f)
@@ -50,25 +49,7 @@ impl<T> LabelWrappedType<tags::Required> for T {
         Iter::Option(wrapped.iter())
     }
 }
-impl<T> LabelWrappedType<tags::Optional> for T {
-    type Type = Option<T>;
-    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
-        wrapped.get_or_insert_with(f)
-    }
-    fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
-        if let Some(x) = iter.last() {
-            *wrapped = Some(x?);
-        }
-        Ok(())
-    }
-    fn default_with<F: FnOnce() -> Self>(_: F) -> Self::Type {
-        None
-    }
-    fn iter(wrapped: &Self::Type) -> Iter<'_, Self> {
-        Iter::Option(wrapped.iter())
-    }
-}
-impl<T> LabelWrappedType<tags::Unlabeled> for T {
+impl<T, _1, _2, _3> LabelWrappedType<tags::UnlabeledOrOneofOrMapEntry<_1, _2, _3>> for T {
     type Type = T;
     fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, _: F) -> &mut Self {
         wrapped
@@ -146,25 +127,7 @@ impl<'a, B: ?Sized + ToOwned> Iterator for LdIter<'a, B> {
     }
 }
 
-impl<T> LabelWrappedLdType<tags::Required, tags::Proto2> for T
-where
-    T: ?Sized + ToOwned + 'static,
-    <T as ToOwned>::Owned: Default,
-{
-    type Type = Option<Cow<'static, T>>;
-    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
-        wrapped
-            .get_or_insert_with(|| Cow::Owned(Default::default()))
-            .to_mut()
-    }
-    fn default() -> Self::Type {
-        None
-    }
-    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
-        LdIter::OptionCow(wrapped.iter())
-    }
-}
-impl<T> LabelWrappedLdType<tags::Optional, tags::Proto2> for T
+impl<T, _1, _2> LabelWrappedLdType<tags::OptionalOrRequired<_1, _2>, tags::Proto2> for T
 where
     T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,

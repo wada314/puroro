@@ -11,7 +11,12 @@ pub trait DoDefaultCheck: tags::FieldLabelAndTypeTag {
 impl<V> DoDefaultCheck for (tags::Unlabeled, (tags::Proto3, V)) {
     const VALUE: bool = true;
 }
-impl<V, _1, _2> DoDefaultCheck for (tags::NonUnlabeled<_1, _2>, (tags::Proto3, V)) {}
+impl<V> DoDefaultCheck for (tags::MapEntry, (tags::Proto3, V)) {
+    const VALUE: bool = true;
+}
+impl<V> DoDefaultCheck for (tags::Repeated, (tags::Proto3, V)) {}
+impl<V, _1, _2> DoDefaultCheck for (tags::OptionalOrRequired<_1, _2>, (tags::Proto3, V)) {}
+impl<V> DoDefaultCheck for (tags::Oneof, (tags::Proto3, V)) {}
 impl<L, V> DoDefaultCheck for (L, (tags::Proto2, V)) {}
 
 pub trait MessageFromBytesIter: ::puroro::DeserFromBytesIter {
