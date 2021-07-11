@@ -1,6 +1,7 @@
 use super::{LabelWrappedType, LabelWrappedLdType, SimpleImpl};
 use ::puroro::{tags, GetImpl};
 use crate::{FieldTypeGen, StructInternalTypeGen};
+use ::std::collections::HashMap;
 
 // For numerical types
 impl<L, X, V, _1, _2> FieldTypeGen<(L, (X, tags::wire::NonLD<V, _1, _2>))> for SimpleImpl
@@ -68,5 +69,27 @@ impl<X, M> FieldTypeGen<(tags::Repeated, (X, tags::Message<M>))> for SimpleImpl
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as FieldTypeGen<(tags::Repeated, (X, tags::Message<M>))>>::Type {
         Vec::new()
+    }
+}
+
+pub trait GetVecItemType {
+    type Type;
+}
+impl<T> GetVecItemType for Vec<T> {
+    type Type = T;
+}
+type VecItemType<X, KorV> = <<SimpleImpl as FieldTypeGen<(tags::Repeated, (X, KorV))>>::Type as GetVecItemType>::Type;
+impl<X, K, V> FieldTypeGen<tags::Map<X, K, V>> for SimpleImpl 
+where 
+    Self: FieldTypeGen<(tags::Repeated, (X, K))>,
+    Self: FieldTypeGen<(tags::Repeated, (X, V))>,
+    <Self as FieldTypeGen<(tags::Repeated, (X, K))>>::Type: GetVecItemType,
+    <Self as FieldTypeGen<(tags::Repeated, (X, V))>>::Type: GetVecItemType,
+{
+    type Type = HashMap<VecItemType<X, K>, VecItemType<X, V>>;
+    fn default(
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> <Self as FieldTypeGen<tags::Map<X, K, V>>>::Type {
+        HashMap::new()
     }
 }

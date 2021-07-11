@@ -1,4 +1,5 @@
-use std::convert::TryFrom;
+use ::std::convert::TryFrom;
+use ::std::marker::PhantomData;
 
 /// A tag trait for types corresponding to the field's type.
 /// e.g. Int32, Float, String, Message<M>
@@ -226,10 +227,20 @@ impl FieldLabelTag for Optional {}
 impl FieldLabelTag for Unlabeled {}
 impl FieldLabelTag for Required {}
 
+pub struct Map<X, K, V>(PhantomData<(X, K, V)>);
+
 impl<L, V> FieldLabelAndTypeTag for (L, V)
 where
 // Not setting these bounds for code simplicity
 //    L: FieldLabelTag,
 //    V: FieldTypeTag,
+{
+}
+impl<X, K, V> FieldLabelAndTypeTag for Map<X, K, V>
+where
+// Not setting these bounds for code simplicity
+//X: ProtoSyntaxTag,
+//K: ValueTypeTag,
+//V: ValueTypeTag,
 {
 }
