@@ -80,6 +80,14 @@ impl Variant {
     pub fn from_i32(val: i32) -> Result<Variant> {
         Self::from_native::<(tags::Proto2, tags::Int32)>(val)
     }
+    /// A shortcut of `to_native::<(tags::Proto2, tags::UInt32)>()`.
+    pub fn to_u32(&self) -> Result<u32> {
+        self.to_native::<(tags::Proto2, tags::UInt32)>()
+    }
+    /// A shortcut of `from_native::<(tags::Proto2, tags::UInt32)>()`.
+    pub fn from_u32(val: u32) -> Result<Variant> {
+        Self::from_native::<(tags::Proto2, tags::UInt32)>(val)
+    }
 
     fn to_sint(&self) -> Result<i64> {
         // decode zigzag encoding for sint32 and sint64.

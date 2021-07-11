@@ -3,7 +3,7 @@ use crate::{ErrorKind, Result};
 use ::puroro::types::{FieldData, WireType};
 use ::puroro::variant::Variant;
 use ::puroro::Message;
-use ::std::convert::TryFrom as _;
+use ::std::convert::TryFrom;
 use ::std::io::Result as IoResult;
 
 pub fn deser_from_iter<Msg, I>(message: &mut Msg, input_iter: I) -> Result<()>
@@ -66,8 +66,11 @@ where
         // Found EOF at first byte. Successfull failure.
         return Ok(None);
     }
-    let key = Variant::decode_bytes(&mut peekable)?.to_i32()?;
-    Ok(Some((WireType::try_from(key & 0x07)?, (key >> 3))))
+    let key = Variant::decode_bytes(&mut peekable)?.to_u32()?;
+    Ok(Some((
+        WireType::try_from((key & 0x07) as i32)?,
+        <i32 as TryFrom<u32>>::try_from(key >> 3).map_err(|_| ErrorKind::InvalidFieldNumber)?,
+    )))
 }
 
 pub struct ScopedIter<I> {
