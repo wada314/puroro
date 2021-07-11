@@ -1,4 +1,6 @@
 
+{# ################# Struct body ################# -#}
+
 #[allow(unused)]
 pub struct {{ self.message.rust_ident() }}<ImplTag> 
 where ImplTag:
@@ -19,6 +21,8 @@ where ImplTag:
 
     {%- endif %}
 }
+
+{# ################# Puroro provided trait impls ################# -#}
 
 impl<ImplTag> ::puroro::Message for {{ self.message.rust_ident() }}<ImplTag>
 where ImplTag:
@@ -147,6 +151,8 @@ where
     >>::Type;
 }
 
+{# ################# std trait impls ################# -#}
+
 impl<ImplTag> ::std::default::Default for {{ self.message.rust_ident() }}<ImplTag>
 where 
     ImplTag: super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedDeserFromIter +
@@ -158,3 +164,26 @@ where
     }
 }
 
+impl<ImplTag> ::std::cmp::PartialEq<Self> for {{ self.message.rust_ident() }}<ImplTag>
+where
+    ImplTag: super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
+        ::puroro_internal::StructInternalTypeGen,
+{%- for field in self.message.unique_type_fields() %}
+    <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type: PartialEq,
+{%- endfor %}
+    <ImplTag as ::puroro_internal::StructInternalTypeGen>::Type: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        {% if self.is_public -%}
+
+        {% for field in self.message.fields() -%}
+        self.{{ field.rust_ident() }}.eq(&other.{{ field.rust_ident() }}) &&
+        {% endfor -%}
+        self.puroro_internal.eq(&other.puroro_internal)
+
+        {%- else -%}
+        self.body.eq(&other.body)
+        {%- endif %}
+    }
+}
+    
