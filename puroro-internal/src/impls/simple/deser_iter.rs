@@ -263,8 +263,8 @@ where
     <Self as FieldTypeGen<(tags::Repeated, (X, V))>>::Type: GetVecItemType,
 {
     fn deser_from_scoped_bytes_iter<I>(
-        field: &mut <Self as FieldTypeGen<tags::Map<X, K, V>>>::Type,
-        data: FieldData<&mut ScopedIter<I>>,
+        _field: &mut <Self as FieldTypeGen<tags::Map<X, K, V>>>::Type,
+        _data: FieldData<&mut ScopedIter<I>>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where

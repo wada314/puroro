@@ -3,8 +3,6 @@ use std::collections::HashSet;
 
 enum WordCase {
     CamelCase,
-    #[allow(unused)]
-    UpperCase,
     LowerCase,
 }
 fn convert_cases(input: &str, generate_snake_case: bool, out_word_case: WordCase) -> String {
@@ -30,11 +28,7 @@ fn convert_cases(input: &str, generate_snake_case: bool, out_word_case: WordCase
                     out.push(c.to_ascii_uppercase());
                 }
             } else {
-                if let WordCase::UpperCase = out_word_case {
-                    out.push(c.to_ascii_uppercase());
-                } else {
-                    out.push(c.to_ascii_lowercase());
-                }
+                out.push(c.to_ascii_lowercase());
             }
         }
     }
@@ -42,9 +36,6 @@ fn convert_cases(input: &str, generate_snake_case: bool, out_word_case: WordCase
 }
 pub fn to_lower_snake_case(input: &str) -> String {
     convert_cases(input, true, WordCase::LowerCase)
-}
-pub fn to_upper_snake_case(input: &str) -> String {
-    convert_cases(input, true, WordCase::UpperCase)
 }
 pub fn to_camel_case(input: &str) -> String {
     convert_cases(input, false, WordCase::CamelCase)
