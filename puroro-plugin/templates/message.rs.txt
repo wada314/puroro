@@ -169,21 +169,44 @@ where
     ImplTag: super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
         ::puroro_internal::StructInternalTypeGen,
 {%- for field in self.message.unique_type_fields() %}
-    <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type: PartialEq,
+    <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type: ::std::cmp::PartialEq,
 {%- endfor %}
-    <ImplTag as ::puroro_internal::StructInternalTypeGen>::Type: PartialEq,
+    <ImplTag as ::puroro_internal::StructInternalTypeGen>::Type: ::std::cmp::PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         {% if self.is_public -%}
 
         {% for field in self.message.fields() -%}
-        self.{{ field.rust_ident() }}.eq(&other.{{ field.rust_ident() }}) &&
+        <<ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type as ::std::cmp::PartialEq>::eq(
+            &self.{{ field.rust_ident() }},
+            &other.{{ field.rust_ident() }}
+        ) &&
         {% endfor -%}
-        self.puroro_internal.eq(&other.puroro_internal)
+        <<ImplTag as ::puroro_internal::StructInternalTypeGen>::Type as ::std::cmp::PartialEq>::eq(
+            &self.puroro_internal,
+            &other.puroro_internal,
+        )
 
         {%- else -%}
-        self.body.eq(&other.body)
+        <super::public::{{ self.message.rust_ident() }}<ImplTag> as ::std::cmp::PartialEq>::eq(
+            &self.body, &other.body
+        )
         {%- endif %}
     }
 }
+
+impl<ImplTag> ::std::fmt::Debug for {{ self.message.rust_ident() }}<ImplTag>
+where
+    ImplTag: super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
+        ::puroro_internal::StructInternalTypeGen,
+{%- for field in self.message.unique_type_fields() %}
+    <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag().unwrap() }}>>::Type: ::std::fmt::Debug,
+{%- endfor %}
+    <ImplTag as ::puroro_internal::StructInternalTypeGen>::Type: ::std::fmt::Debug,
+{
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        todo!()
+    }
+}
     
+
