@@ -219,5 +219,16 @@ where
         {%- endif %}
     }
 }
+
+impl<ImplTag> ::std::fmt::Display for {{ self.message.rust_ident() }}<ImplTag>
+where
+    ImplTag: super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
+        ::puroro_internal::StructInternalTypeGen,
+    Self: ::std::fmt::Debug
+{
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        <Self as ::std::fmt::Debug>::fmt(self, f)
+    }
+}
     
 
