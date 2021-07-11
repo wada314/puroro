@@ -1,3 +1,5 @@
+#![allow(incomplete_features)]
+#![feature(generic_associated_types)]
 pub mod de;
 pub mod impls;
 pub mod se;
