@@ -24,7 +24,7 @@ where
     (X, tags::NonRepeated<_1, _2>): DoDefaultCheck,
     (X, tags::wire::Variant<V>): tags::NumericalFieldTypeTag + VariantTypeTag,
     VariantNativeType<X, V>: Clone,
-    tags::NonRepeated<_1, _2>: LabelWrappedType<VariantNativeType<X, V>>,
+    tags::NonRepeated<_1, _2>: LabelWrappedType,
     Self: FieldTypeGen<X, tags::NonRepeated<_1, _2>, tags::wire::Variant<V>>,
 {
     fn ser_to_io_write<W>(
@@ -38,7 +38,7 @@ where
     {
         let do_default_check = <(X, tags::NonRepeated<_1, _2>) as DoDefaultCheck>::VALUE;
         if let Some(value) =
-            <tags::NonRepeated<_1, _2> as LabelWrappedType<VariantNativeType<X, V>>>::iter(field)
+            <tags::NonRepeated<_1, _2> as LabelWrappedType>::iter::<VariantNativeType<X, V>>(field)
                 .next()
         {
             let variant = Variant::from_native::<(X, tags::wire::Variant<V>)>(value.clone())?;
@@ -57,7 +57,6 @@ impl<X, V> SerFieldToIoWrite<X, tags::Repeated, tags::wire::Variant<V>> for Simp
 where
     (X, tags::wire::Variant<V>): tags::NumericalFieldTypeTag + VariantTypeTag,
     VariantNativeType<X, V>: Clone,
-    tags::Repeated: LabelWrappedType<VariantNativeType<X, V>>,
     Self: FieldTypeGen<X, tags::Repeated, tags::wire::Variant<V>>,
 {
     fn ser_to_io_write<W>(
@@ -70,7 +69,7 @@ where
         W: std::io::Write,
     {
         let mut iter =
-            <tags::Repeated as LabelWrappedType<VariantNativeType<X, V>>>::iter(field).peekable();
+            <tags::Repeated as LabelWrappedType>::iter::<VariantNativeType<X, V>>(field).peekable();
         if iter.peek().is_some() {
             let mut buffer: Vec<u8> = Vec::new();
             for val in iter {
@@ -99,12 +98,12 @@ where
     (X, L): DoDefaultCheck,
     (X, tags::wire::Bits32<V>): tags::NumericalFieldTypeTag + Bits32TypeTag,
     Bits32NativeType<X, V>: Clone,
-    L: LabelWrappedType<Bits32NativeType<X, V>>,
+    L: LabelWrappedType,
     Self: FieldTypeGen<
         X,
         L,
         tags::wire::Bits32<V>,
-        Type = <L as LabelWrappedType<Bits32NativeType<X, V>>>::Type,
+        Type = <L as LabelWrappedType>::Type<Bits32NativeType<X, V>>,
     >,
 {
     fn ser_to_io_write<W>(
@@ -141,12 +140,12 @@ where
     (X, L): DoDefaultCheck,
     (X, tags::wire::Bits64<V>): tags::NumericalFieldTypeTag + Bits64TypeTag,
     Bits64NativeType<X, V>: Clone,
-    L: LabelWrappedType<Bits64NativeType<X, V>> + Clone,
+    L: LabelWrappedType,
     Self: FieldTypeGen<
         X,
         L,
         tags::wire::Bits64<V>,
-        Type = <L as LabelWrappedType<Bits64NativeType<X, V>>>::Type,
+        Type = <L as LabelWrappedType>::Type<Bits64NativeType<X, V>>,
     >,
 {
     fn ser_to_io_write<W>(
@@ -177,7 +176,7 @@ where
 // Bytes
 impl<L, X> SerFieldToIoWrite<X, L, tags::Bytes> for SimpleImpl
 where
-    (X, L): DoDefaultCheck + LabelWrappedLdType<[u8]>,
+    (X, L): DoDefaultCheck + LabelWrappedLdType,
     Self: FieldTypeGen<X, L, tags::Bytes>,
 {
     fn ser_to_io_write<W>(
@@ -190,7 +189,7 @@ where
         W: std::io::Write,
     {
         let do_default_check = <(X, L) as DoDefaultCheck>::VALUE;
-        for item in <(X, L) as LabelWrappedLdType<[u8]>>::iter(field) {
+        for item in <(X, L) as LabelWrappedLdType>::iter::<[u8]>(field) {
             if do_default_check && item.is_empty() {
                 continue;
             }
@@ -209,8 +208,8 @@ where
 // Strings
 impl<L, X> SerFieldToIoWrite<X, L, tags::String> for SimpleImpl
 where
-    (X, L): DoDefaultCheck + LabelWrappedLdType<str>,
-    Self: FieldTypeGen<X, L, tags::String, Type = <(X, L) as LabelWrappedLdType<str>>::Type>,
+    (X, L): DoDefaultCheck + LabelWrappedLdType,
+    Self: FieldTypeGen<X, L, tags::String, Type = <(X, L) as LabelWrappedLdType>::Type<str>>,
 {
     fn ser_to_io_write<W>(
         field: &<Self as FieldTypeGen<X, L, tags::String>>::Type,
@@ -222,7 +221,7 @@ where
         W: std::io::Write,
     {
         let do_default_check = <(X, L) as DoDefaultCheck>::VALUE;
-        for item in <(L, X) as LabelWrappedLdType<str>>::iter(field) {
+        for item in <(L, X) as LabelWrappedLdType>::iter::<str>(field) {
             if do_default_check && item.is_empty() {
                 continue;
             }

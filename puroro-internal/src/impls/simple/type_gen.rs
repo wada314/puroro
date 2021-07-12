@@ -6,13 +6,11 @@ use ::puroro::tags;
 impl<L, X, V, _1, _2> FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>> for SimpleImpl
 where
     (X, tags::wire::NonLD<V, _1, _2>): tags::NumericalFieldTypeTag,
-    L: LabelWrappedType<
-        <(X, tags::wire::NonLD<V, _1, _2>) as tags::NumericalFieldTypeTag>::NativeType,
-    >,
+    L: LabelWrappedType,
 {
-    type Type = <L as LabelWrappedType<
+    type Type = <L as LabelWrappedType>::Type<
         <(X, tags::wire::NonLD<V, _1, _2>) as tags::NumericalFieldTypeTag>::NativeType,
-    >>::Type;
+    >;
 
     fn default(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
@@ -27,26 +25,26 @@ where
 
 impl<L, X> FieldTypeGen<X, L, tags::Bytes> for SimpleImpl
 where
-    (X, L): LabelWrappedLdType<[u8]>,
+    (X, L): LabelWrappedLdType,
 {
-    type Type = <(X, L) as LabelWrappedLdType<[u8]>>::Type;
+    type Type = <(X, L) as LabelWrappedLdType>::Type<[u8]>;
 
     fn default(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as FieldTypeGen<X, L, tags::Bytes>>::Type {
-        <[u8] as LabelWrappedLdType<L, X>>::default()
+        <(X, L) as LabelWrappedLdType>::default::<[u8]>()
     }
 }
 impl<L, X> FieldTypeGen<X, L, tags::String> for SimpleImpl
 where
-    (X, L): LabelWrappedLdType<str>,
+    (X, L): LabelWrappedLdType,
 {
-    type Type = <(X, L) as LabelWrappedLdType<str>>::Type;
+    type Type = <(X, L) as LabelWrappedLdType>::Type<str>;
 
     fn default(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as FieldTypeGen<X, L, tags::String>>::Type {
-        <str as LabelWrappedLdType<L, X>>::default()
+        <(L, X) as LabelWrappedLdType>::default::<str>()
     }
 }
 
@@ -54,11 +52,11 @@ impl<L> EnumTypeGen<tags::Proto2, L> for SimpleImpl
 where
     Self: StructInternalTypeGen,
 {
-    type EnumType<E> = <L as LabelWrappedType<E>>::Type;
+    type EnumType<E> = <L as LabelWrappedType>::Type<E>;
     fn default<E: Default>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<tags::Proto2, L>>::EnumType<E> {
-        <L as LabelWrappedType<E>>::default_with(Default::default)
+        <L as LabelWrappedType>::default_with::<E>(Default::default)
     }
 }
 
@@ -66,11 +64,11 @@ impl<L> EnumTypeGen<tags::Proto3, L> for SimpleImpl
 where
     Self: StructInternalTypeGen,
 {
-    type EnumType<E> = <L as LabelWrappedType<::std::result::Result<E, i32>>>::Type;
+    type EnumType<E> = <L as LabelWrappedType>::Type<::std::result::Result<E, i32>>;
     fn default<E: Default>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<tags::Proto3, L>>::EnumType<E> {
-        <L as LabelWrappedType<::std::result::Result<E, i32>>>::default_with(Default::default)
+        <L as LabelWrappedType>::default_with::<::std::result::Result<E, i32>>(Default::default)
     }
 }
 
