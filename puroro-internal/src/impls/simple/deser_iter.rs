@@ -44,7 +44,7 @@ where
             FieldData::Variant(variant) => {
                 let native = variant.to_native::<(X, tags::wire::Variant<V>)>()?;
                 if !do_default_check || native != default() {
-                    *LabelWrappedType::<L>::get_or_insert_with(field, default) = native;
+                    *<L as LabelWrappedType>::get_or_insert_with(field, default) = native;
                 }
             }
             FieldData::LengthDelimited(iter) => {
@@ -52,7 +52,7 @@ where
                 let values_iter = variants_iter
                     .map(|rv| rv.and_then(|v| v.to_native::<(X, tags::wire::Variant<V>)>()))
                     .filter_ok(|val| !do_default_check || val.clone() != default());
-                LabelWrappedType::<L>::extend(field, values_iter)?;
+                <L as LabelWrappedType>::extend(field, values_iter)?;
             }
             FieldData::Bits32(_) | FieldData::Bits64(_) => Err(ErrorKind::UnexpectedWireType)?,
         };
@@ -93,7 +93,7 @@ where
             FieldData::Bits32(bytes) => {
                 let native = <(X, tags::wire::Bits32<V>) as Bits32TypeTag>::from_array(bytes);
                 if !do_default_check || native != default() {
-                    *LabelWrappedType::<L>::get_or_insert_with(field, default) = native;
+                    *<L as LabelWrappedType>::get_or_insert_with(field, default) = native;
                 }
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
@@ -135,7 +135,7 @@ where
             FieldData::Bits64(bytes) => {
                 let native = <(X, tags::wire::Bits64<V>) as Bits64TypeTag>::from_array(bytes);
                 if !do_default_check || native != default() {
-                    *LabelWrappedType::<L>::get_or_insert_with(field, default) = native;
+                    *<L as LabelWrappedType>::get_or_insert_with(field, default) = native;
                 }
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
@@ -164,7 +164,7 @@ where
                 let string = String::from_utf8(iter.collect::<::std::io::Result<Vec<_>>>()?)
                     .map_err(|e| ErrorKind::InvalidUtf8(e))?;
                 if !do_default_check || !string.is_empty() {
-                    *<str as LabelWrappedLdType<L, X>>::get_or_insert_default(field) = string;
+                    *<(X, L) as LabelWrappedLdType>::get_or_insert_default(field) = string;
                 }
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
@@ -192,7 +192,7 @@ where
             FieldData::LengthDelimited(iter) => {
                 let bytes = iter.collect::<::std::io::Result<Vec<_>>>()?;
                 if !do_default_check || !bytes.is_empty() {
-                    *<[u8] as LabelWrappedLdType<L, X>>::get_or_insert_default(field) = bytes;
+                    *<(X, L) as LabelWrappedLdType>::get_or_insert_default(field) = bytes;
                 }
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
@@ -205,6 +205,8 @@ where
 impl<X, L> DeserEnumFromBytesIter<X, L> for SimpleImpl
 where
     Self: EnumTypeGen<X, L>,
+    (X, L): DoDefaultCheck,
+    L: LabelWrappedType,
 {
     fn deser_from_scoped_bytes_iter<I, E>(
         field: &mut <Self as EnumTypeGen<X, L>>::EnumType<E>,
@@ -220,7 +222,7 @@ where
             FieldData::Variant(variant) => {
                 let native = variant.to_native::<(X, tags::Enum<E>)>()?;
                 if !do_default_check || native != default() {
-                    *LabelWrappedType::<L>::get_or_insert_with(field, default) = native;
+                    *<L as LabelWrappedType>::get_or_insert_with(field, default) = native;
                 }
             }
             FieldData::LengthDelimited(iter) => {
@@ -228,7 +230,7 @@ where
                 let values_iter = variants_iter
                     .map(|rv| rv.and_then(|v| v.to_native::<(X, tags::Enum<E>)>()))
                     .filter_ok(|val| !do_default_check || val.clone() != default());
-                LabelWrappedType::<L>::extend(field, values_iter)?;
+                <L as LabelWrappedType>::extend(field, values_iter)?;
             }
             FieldData::Bits32(_) | FieldData::Bits64(_) => Err(ErrorKind::UnexpectedWireType)?,
         };

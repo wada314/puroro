@@ -1,5 +1,6 @@
 #![cfg_attr(feature = "puroro-nightly", feature(backtrace))]
 #![allow(incomplete_features)]
+#![feature(generic_associated_types)]
 
 mod error;
 

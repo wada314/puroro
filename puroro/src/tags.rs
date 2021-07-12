@@ -16,6 +16,10 @@ pub trait NumericalFieldTypeTag {
     type NativeType: Clone + PartialEq;
     fn default() -> Self::NativeType;
 }
+pub trait EnumFieldTypeGen {
+    type NativeType<E: Default + TryFrom<i32>>;
+    fn default<E: Default + TryFrom<i32>>() -> Self::NativeType<E>;
+}
 
 /// A tag trait for types corresponding to the field label.
 /// e.g. Optional, Repeated, Required

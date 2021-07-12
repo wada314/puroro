@@ -110,10 +110,14 @@ impl LabelWrappedType for tags::Repeated {
 ///   - `repeated` => `Vec<T>`
 pub trait LabelWrappedLdType {
     type Type<T: ?Sized + 'static + ToOwned>;
-    fn get_or_insert_default<T: ?Sized + 'static + ToOwned>(
-        wrapped: &mut Self::Type<T>,
-    ) -> &mut <T as ToOwned>::Owned;
-    fn default<T: ?Sized + 'static + ToOwned>() -> Self::Type<T>;
+    fn get_or_insert_default<T>(wrapped: &mut Self::Type<T>) -> &mut <T as ToOwned>::Owned
+    where
+        T: ?Sized + 'static + ToOwned,
+        <T as ToOwned>::Owned: Default;
+    fn default<T>() -> Self::Type<T>
+    where
+        T: ?Sized + 'static + ToOwned,
+        <T as ToOwned>::Owned: Default;
     fn iter<T: 'static + ?Sized + ToOwned>(wrapped: &Self::Type<T>) -> LdIter<'_, T>;
 }
 pub enum LdIter<'a, B: 'static + ?Sized + ToOwned> {
@@ -138,9 +142,11 @@ impl<'a, B: ?Sized + ToOwned> Iterator for LdIter<'a, B> {
 
 impl<_1, _2> LabelWrappedLdType for (tags::Proto2, tags::OptionalOrRequired<_1, _2>) {
     type Type<T: ?Sized + 'static + ToOwned> = Option<Cow<'static, T>>;
-    fn get_or_insert_default<T: ?Sized + 'static + ToOwned>(
-        wrapped: &mut Self::Type<T>,
-    ) -> &mut <T as ToOwned>::Owned {
+    fn get_or_insert_default<T>(wrapped: &mut Self::Type<T>) -> &mut <T as ToOwned>::Owned
+    where
+        T: ?Sized + 'static + ToOwned,
+        <T as ToOwned>::Owned: Default,
+    {
         wrapped
             .get_or_insert_with(|| Cow::Owned(Default::default()))
             .to_mut()
@@ -154,9 +160,11 @@ impl<_1, _2> LabelWrappedLdType for (tags::Proto2, tags::OptionalOrRequired<_1, 
 }
 impl LabelWrappedLdType for (tags::Proto3, tags::Optional) {
     type Type<T: ?Sized + 'static + ToOwned> = Option<<T as ToOwned>::Owned>;
-    fn get_or_insert_default<T: ?Sized + 'static + ToOwned>(
-        wrapped: &mut Self::Type<T>,
-    ) -> &mut <T as ToOwned>::Owned {
+    fn get_or_insert_default<T>(wrapped: &mut Self::Type<T>) -> &mut <T as ToOwned>::Owned
+    where
+        T: ?Sized + 'static + ToOwned,
+        <T as ToOwned>::Owned: Default,
+    {
         wrapped.get_or_insert_with(Default::default)
     }
     fn default<T: ?Sized + 'static + ToOwned>() -> Self::Type<T> {
@@ -168,12 +176,18 @@ impl LabelWrappedLdType for (tags::Proto3, tags::Optional) {
 }
 impl<X, _1, _2, _3> LabelWrappedLdType for (X, tags::UnlabeledOrOneofOrMapEntry<_1, _2, _3>) {
     type Type<T: ?Sized + 'static + ToOwned> = <T as ToOwned>::Owned;
-    fn get_or_insert_default<T: ?Sized + 'static + ToOwned>(
-        wrapped: &mut Self::Type<T>,
-    ) -> &mut <T as ToOwned>::Owned {
+    fn get_or_insert_default<T>(wrapped: &mut Self::Type<T>) -> &mut <T as ToOwned>::Owned
+    where
+        T: ?Sized + 'static + ToOwned,
+        <T as ToOwned>::Owned: Default,
+    {
         wrapped
     }
-    fn default<T: ?Sized + 'static + ToOwned>() -> Self::Type<T> {
+    fn default<T>() -> Self::Type<T>
+    where
+        T: ?Sized + 'static + ToOwned,
+        <T as ToOwned>::Owned: Default,
+    {
         Default::default()
     }
     fn iter<T: 'static + ?Sized + ToOwned>(wrapped: &Self::Type<T>) -> LdIter<'_, T> {
@@ -182,9 +196,11 @@ impl<X, _1, _2, _3> LabelWrappedLdType for (X, tags::UnlabeledOrOneofOrMapEntry<
 }
 impl<X> LabelWrappedLdType for (X, tags::Repeated) {
     type Type<T: ?Sized + 'static + ToOwned> = Vec<<T as ToOwned>::Owned>;
-    fn get_or_insert_default<T: ?Sized + 'static + ToOwned>(
-        wrapped: &mut Self::Type<T>,
-    ) -> &mut <T as ToOwned>::Owned {
+    fn get_or_insert_default<T>(wrapped: &mut Self::Type<T>) -> &mut <T as ToOwned>::Owned
+    where
+        T: ?Sized + 'static + ToOwned,
+        <T as ToOwned>::Owned: Default,
+    {
         wrapped.push(Default::default());
         wrapped.last_mut().unwrap()
     }

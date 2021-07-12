@@ -4,6 +4,8 @@ pub mod de;
 pub mod impls;
 pub mod se;
 
+use ::std::convert::TryFrom;
+
 // Re-exporting library modules
 pub use ::puroro::{bumpalo, hashbrown};
 
@@ -39,7 +41,7 @@ pub trait FieldTypeGen<X, L, V>: StructInternalTypeGen {
 pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
     type EnumType<E>;
     /// Default value of the field when the message is allocated
-    fn default<E: Default>(
+    fn default<E: Default + TryFrom<i32>>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<X, L>>::EnumType<E>;
 }
