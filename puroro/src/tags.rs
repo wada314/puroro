@@ -13,10 +13,9 @@ pub trait ProtoSyntaxTag {}
 
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
 pub trait NumericalFieldTypeTag {
-    type NativeType: Clone + PartialEq;
-    fn default() -> Self::NativeType;
+    type NativeType: Default;
 }
-pub trait EnumFieldTypeGen {
+pub trait EnumFieldTypeForSyntax {
     type NativeType<E: Default + TryFrom<i32>>;
     fn default<E: Default + TryFrom<i32>>() -> Self::NativeType<E>;
 }
@@ -122,100 +121,56 @@ impl FieldTypeTag for SFixed64 {}
 impl ProtoSyntaxTag for Proto2 {}
 impl ProtoSyntaxTag for Proto3 {}
 
-impl<X> NumericalFieldTypeTag for (X, Int32) {
+impl NumericalFieldTypeTag for Int32 {
     type NativeType = i32;
-    fn default() -> Self::NativeType {
-        0
-    }
 }
-impl<X> NumericalFieldTypeTag for (X, UInt32) {
+impl NumericalFieldTypeTag for UInt32 {
     type NativeType = u32;
-    fn default() -> Self::NativeType {
-        0
-    }
 }
-impl<X> NumericalFieldTypeTag for (X, SInt32) {
+impl NumericalFieldTypeTag for SInt32 {
     type NativeType = i32;
-    fn default() -> Self::NativeType {
-        0
-    }
 }
-impl<X> NumericalFieldTypeTag for (X, Fixed32) {
+impl NumericalFieldTypeTag for Fixed32 {
     type NativeType = u32;
-    fn default() -> Self::NativeType {
-        0
-    }
 }
-impl<X> NumericalFieldTypeTag for (X, SFixed32) {
+impl NumericalFieldTypeTag for SFixed32 {
     type NativeType = i32;
-    fn default() -> Self::NativeType {
-        0
-    }
 }
-impl<X> NumericalFieldTypeTag for (X, Float) {
+impl NumericalFieldTypeTag for Float {
     type NativeType = f32;
-    fn default() -> Self::NativeType {
-        0.0
-    }
 }
-impl<X> NumericalFieldTypeTag for (X, Int64) {
+impl NumericalFieldTypeTag for Int64 {
     type NativeType = i64;
-    fn default() -> Self::NativeType {
-        0
-    }
 }
-impl<X> NumericalFieldTypeTag for (X, UInt64) {
+impl NumericalFieldTypeTag for UInt64 {
     type NativeType = u64;
-    fn default() -> Self::NativeType {
-        0
-    }
 }
-impl<X> NumericalFieldTypeTag for (X, SInt64) {
+impl NumericalFieldTypeTag for SInt64 {
     type NativeType = i64;
-    fn default() -> Self::NativeType {
-        0
-    }
 }
-impl<X> NumericalFieldTypeTag for (X, Fixed64) {
+impl NumericalFieldTypeTag for Fixed64 {
     type NativeType = u64;
-    fn default() -> Self::NativeType {
-        0
-    }
 }
-impl<X> NumericalFieldTypeTag for (X, SFixed64) {
+impl NumericalFieldTypeTag for SFixed64 {
     type NativeType = i64;
-    fn default() -> Self::NativeType {
-        0
-    }
 }
-impl<X> NumericalFieldTypeTag for (X, Double) {
+impl NumericalFieldTypeTag for Double {
     type NativeType = f64;
-    fn default() -> Self::NativeType {
-        0.0
-    }
 }
-impl<X> NumericalFieldTypeTag for (X, Bool) {
+impl NumericalFieldTypeTag for Bool {
     type NativeType = bool;
-    fn default() -> Self::NativeType {
-        false
-    }
 }
-impl<T> NumericalFieldTypeTag for (Proto2, Enum<T>)
-where
-    T: Clone + Default + PartialEq,
-{
-    type NativeType = T;
-    fn default() -> Self::NativeType {
+
+impl EnumFieldTypeForSyntax for Proto2 {
+    type NativeType<E: Default + TryFrom<i32>> = E;
+    fn default<E: Default + TryFrom<i32>>() -> Self::NativeType<E> {
         Default::default()
     }
 }
-impl<T> NumericalFieldTypeTag for (Proto3, Enum<T>)
-where
-    T: Clone + TryFrom<i32, Error = i32> + PartialEq,
-{
-    type NativeType = ::std::result::Result<T, i32>;
-    fn default() -> Self::NativeType {
-        <T as TryFrom<i32>>::try_from(0)
+impl EnumFieldTypeForSyntax for Proto3 {
+    type NativeType<E: Default + TryFrom<i32>> = ::std::result::Result<E, i32>;
+    fn default<E: Default + TryFrom<i32>>() -> Self::NativeType<E> {
+        <E as TryFrom<i32>>::try_from(0).map_err(|_| 0)
     }
 }
 

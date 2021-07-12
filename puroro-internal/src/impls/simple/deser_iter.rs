@@ -206,6 +206,7 @@ impl<X, L> DeserEnumFromBytesIter<X, L> for SimpleImpl
 where
     Self: EnumTypeGen<X, L>,
     (X, L): DoDefaultCheck,
+    X: tags::EnumFieldTypeForSyntax,
     L: LabelWrappedType,
 {
     fn deser_from_scoped_bytes_iter<I, E>(
@@ -217,7 +218,7 @@ where
         I: Iterator<Item = std::io::Result<u8>>,
     {
         let do_default_check = <(X, L) as DoDefaultCheck>::VALUE;
-        let default = <(X, tags::Enum<E>) as tags::NumericalFieldTypeTag>::default;
+        let default = <X as tags::NumericalFieldTypeTag>::default;
         match data {
             FieldData::Variant(variant) => {
                 let native = variant.to_native::<(X, tags::Enum<E>)>()?;

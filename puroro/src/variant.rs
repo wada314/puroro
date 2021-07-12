@@ -72,26 +72,26 @@ impl Variant {
     pub fn from_native<T: VariantTypeTag>(val: T::NativeType) -> Result<Variant> {
         T::to_variant(val)
     }
-    /// A shortcut of `to_native::<(tags::Proto2, tags::Int32)>()`.
+    /// A shortcut of `to_native::<tags::Int32>()`.
     pub fn to_i32(&self) -> Result<i32> {
-        self.to_native::<(tags::Proto2, tags::Int32)>()
+        self.to_native::<tags::Int32>()
     }
-    /// A shortcut of `from_native::<(tags::Proto2, tags::Int32)>()`.
+    /// A shortcut of `from_native::<tags::Int32>()`.
     pub fn from_i32(val: i32) -> Result<Variant> {
-        Self::from_native::<(tags::Proto2, tags::Int32)>(val)
+        Self::from_native::<tags::Int32>(val)
     }
-    /// A shortcut of `to_native::<(tags::Proto2, tags::UInt32)>()`.
+    /// A shortcut of `to_native::<tags::UInt32>()`.
     pub fn to_u32(&self) -> Result<u32> {
-        self.to_native::<(tags::Proto2, tags::UInt32)>()
+        self.to_native::<tags::UInt32>()
     }
-    /// A shortcut of `from_native::<(tags::Proto2, tags::UInt32)>()`.
+    /// A shortcut of `from_native::<tags::UInt32>()`.
     pub fn from_u32(val: u32) -> Result<Variant> {
-        Self::from_native::<(tags::Proto2, tags::UInt32)>(val)
+        Self::from_native::<tags::UInt32>(val)
     }
 
     fn to_sint(&self) -> Result<i64> {
         // decode zigzag encoding for sint32 and sint64.
-        let x = self.to_native::<(tags::Proto2, tags::Int64)>()?;
+        let x = self.to_native::<tags::Int64>()?;
         Ok((x ^ (0 - (x & 1))) >> 1)
     }
     fn from_sint(x: i64) -> Self {
@@ -111,8 +111,16 @@ pub trait VariantTypeTag: tags::NumericalFieldTypeTag {
     fn from_variant(var: &Variant) -> Result<Self::NativeType>;
     fn to_variant(val: Self::NativeType) -> Result<Variant>;
 }
+pub trait EnumVariantTypeForSyntax: tags::EnumFieldTypeForSyntax {
+    fn from_variant<E: Default + TryFrom<i32>>(
+        var: &Variant,
+    ) -> Result<<Self as tags::EnumFieldTypeForSyntax>::NativeType<E>>;
+    fn to_variant<E: Default + TryFrom<i32> + Into<i32>>(
+        val: <Self as tags::EnumFieldTypeForSyntax>::NativeType<E>,
+    ) -> Result<Variant>;
+}
 
-impl<S> VariantTypeTag for (S, tags::Int32) {
+impl VariantTypeTag for tags::Int32 {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i32::try_from(i64::from_le_bytes(var.0))?)
     }
@@ -120,7 +128,7 @@ impl<S> VariantTypeTag for (S, tags::Int32) {
         Ok(Variant::new(i64::to_le_bytes(i64::from(val))))
     }
 }
-impl<S> VariantTypeTag for (S, tags::UInt32) {
+impl VariantTypeTag for tags::UInt32 {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(u32::try_from(u64::from_le_bytes(var.0))?)
     }
@@ -128,7 +136,7 @@ impl<S> VariantTypeTag for (S, tags::UInt32) {
         Ok(Variant::new(u64::to_le_bytes(u64::from(val))))
     }
 }
-impl<S> VariantTypeTag for (S, tags::SInt32) {
+impl VariantTypeTag for tags::SInt32 {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i32::try_from(var.to_sint()?)?)
     }
@@ -137,7 +145,7 @@ impl<S> VariantTypeTag for (S, tags::SInt32) {
     }
 }
 
-impl<S> VariantTypeTag for (S, tags::Int64) {
+impl VariantTypeTag for tags::Int64 {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(i64::from_le_bytes(var.0))
     }
@@ -145,7 +153,7 @@ impl<S> VariantTypeTag for (S, tags::Int64) {
         Ok(Variant::new(i64::to_le_bytes(val)))
     }
 }
-impl<S> VariantTypeTag for (S, tags::UInt64) {
+impl VariantTypeTag for tags::UInt64 {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(u64::from_le_bytes(var.0))
     }
@@ -153,7 +161,7 @@ impl<S> VariantTypeTag for (S, tags::UInt64) {
         Ok(Variant::new(u64::to_le_bytes(val)))
     }
 }
-impl<S> VariantTypeTag for (S, tags::SInt64) {
+impl VariantTypeTag for tags::SInt64 {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         Ok(var.to_sint()?)
     }
@@ -161,7 +169,7 @@ impl<S> VariantTypeTag for (S, tags::SInt64) {
         Ok(Variant::from_sint(val))
     }
 }
-impl<S> VariantTypeTag for (S, tags::Bool) {
+impl VariantTypeTag for tags::Bool {
     fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         match u64::from_le_bytes(var.0) {
             0 => Ok(false),
@@ -173,29 +181,33 @@ impl<S> VariantTypeTag for (S, tags::Bool) {
         Ok(Variant::new(u64::to_le_bytes(if val { 1 } else { 0 })))
     }
 }
-impl<T> VariantTypeTag for (tags::Proto2, tags::Enum<T>)
-where
-    T: TryFrom<i32, Error = i32> + Into<i32> + Clone + Default + PartialEq,
-{
-    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
-        Ok(T::try_from(i32::try_from(i64::from_le_bytes(var.0))?)
-            .map_err(|i| ErrorKind::UnknownEnumVariant(i))?)
+
+impl EnumVariantTypeForSyntax for tags::Proto2 {
+    fn from_variant<E: Default + TryFrom<i32>>(
+        var: &Variant,
+    ) -> Result<<Self as tags::EnumFieldTypeForSyntax>::NativeType<E>> {
+        let i: i32 = i32::try_from(i64::from_le_bytes(var.0))?;
+        Ok(E::try_from(i).map_err(|_| ErrorKind::UnknownEnumVariant(i))?)
     }
-    fn to_variant(val: Self::NativeType) -> Result<Variant> {
-        let int_val = T::into(val);
+    fn to_variant<E: Default + TryFrom<i32> + Into<i32>>(
+        val: <Self as tags::EnumFieldTypeForSyntax>::NativeType<E>,
+    ) -> Result<Variant> {
+        let int_val: i32 = E::into(val);
         Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))
     }
 }
-impl<T> VariantTypeTag for (tags::Proto3, tags::Enum<T>)
-where
-    T: TryFrom<i32, Error = i32> + Into<i32> + Clone + PartialEq,
-{
-    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
-        Ok(T::try_from(i32::try_from(i64::from_le_bytes(var.0))?))
+impl EnumVariantTypeForSyntax for tags::Proto3 {
+    fn from_variant<E: Default + TryFrom<i32>>(
+        var: &Variant,
+    ) -> Result<<Self as tags::EnumFieldTypeForSyntax>::NativeType<E>> {
+        let i = i32::try_from(i64::from_le_bytes(var.0))?;
+        Ok(E::try_from(i).map_err(|_| i))
     }
-    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+    fn to_variant<E: Default + TryFrom<i32> + Into<i32>>(
+        val: <Self as tags::EnumFieldTypeForSyntax>::NativeType<E>,
+    ) -> Result<Variant> {
         let int_val = match val {
-            Ok(v) => T::into(v),
+            Ok(v) => E::into(v),
             Err(i) => i,
         };
         Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))
@@ -254,7 +266,7 @@ mod tests {
             let mut iter = input.bytes();
             let v = Variant::decode_bytes(&mut iter)?;
             assert_eq!(collect_iter(iter), Vec::<u8>::new());
-            v.to_native::<(tags::Proto2, tags::UInt32)>()
+            v.to_native::<tags::UInt32>()
         }
         assert_eq!(get_u32(&[0x00]).unwrap(), 0);
         assert_eq!(get_u32(&[0x01]).unwrap(), 1);
@@ -282,7 +294,7 @@ mod tests {
             let mut iter = input.bytes();
             let v = Variant::decode_bytes(&mut iter)?;
             assert_eq!(collect_iter(iter), Vec::<u8>::new());
-            v.to_native::<(tags::Proto2, tags::SInt32)>()
+            v.to_native::<tags::SInt32>()
         }
         assert_eq!(get_si32(&[0x00]).unwrap(), 0);
         assert_eq!(get_si32(&[0x01]).unwrap(), -1);
