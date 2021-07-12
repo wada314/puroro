@@ -58,7 +58,7 @@ where
     fn default<E: Default>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<tags::Proto2, L>>::EnumType<E> {
-        <E as LabelWrappedType<L, tags::Proto2>>::default_with(Default::default)
+        <L as LabelWrappedType<E>>::default_with(Default::default)
     }
 }
 
@@ -70,7 +70,7 @@ where
     fn default<E: Default>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<tags::Proto3, L>>::EnumType<E> {
-        <E as LabelWrappedType<L, tags::Proto3>>::default_with(Default::default)
+        <L as LabelWrappedType<::std::result::Result<E, i32>>>::default_with(Default::default)
     }
 }
 
