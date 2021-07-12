@@ -8,12 +8,12 @@ use puroro::{tags, Result};
 /// - `required` => `Option<T>` // Needs revisit!!
 /// - (unlabeled), (oneof), (mapentry) => `T`
 /// - `repeated` => `Vec<T>`
-pub trait LabelWrappedType<L>: Sized {
+pub trait LabelWrappedType<T>: Sized {
     type Type;
-    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self;
-    fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()>;
-    fn default_with<F: FnOnce() -> Self>(f: F) -> Self::Type;
-    fn iter(wrapped: &Self::Type) -> Iter<'_, Self>;
+    fn get_or_insert_with<F: FnOnce() -> T>(wrapped: &mut Self::Type, f: F) -> &mut T;
+    fn extend<I: Iterator<Item = Result<T>>>(wrapped: &mut Self::Type, iter: I) -> Result<()>;
+    fn default_with<F: FnOnce() -> T>(f: F) -> Self::Type;
+    fn iter(wrapped: &Self::Type) -> Iter<'_, T>;
 }
 pub enum Iter<'a, T> {
     Once(::std::iter::Once<&'a T>),
@@ -31,58 +31,58 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
-impl<T, _1, _2> LabelWrappedType<tags::OptionalOrRequired<_1, _2>> for T {
+impl<T, _1, _2> LabelWrappedType<T> for tags::OptionalOrRequired<_1, _2> {
     type Type = Option<T>;
-    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
+    fn get_or_insert_with<F: FnOnce() -> T>(wrapped: &mut Self::Type, f: F) -> &mut T {
         wrapped.get_or_insert_with(f)
     }
-    fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
+    fn extend<I: Iterator<Item = Result<T>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
         if let Some(x) = iter.last() {
             *wrapped = Some(x?);
         }
         Ok(())
     }
-    fn default_with<F: FnOnce() -> Self>(_: F) -> Self::Type {
+    fn default_with<F: FnOnce() -> T>(_: F) -> Self::Type {
         None
     }
-    fn iter(wrapped: &Self::Type) -> Iter<'_, Self> {
+    fn iter(wrapped: &Self::Type) -> Iter<'_, T> {
         Iter::Option(wrapped.iter())
     }
 }
-impl<T, _1, _2, _3> LabelWrappedType<tags::UnlabeledOrOneofOrMapEntry<_1, _2, _3>> for T {
+impl<T, _1, _2, _3> LabelWrappedType<T> for tags::UnlabeledOrOneofOrMapEntry<_1, _2, _3> {
     type Type = T;
-    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, _: F) -> &mut Self {
+    fn get_or_insert_with<F: FnOnce() -> T>(wrapped: &mut Self::Type, _: F) -> &mut T {
         wrapped
     }
-    fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
+    fn extend<I: Iterator<Item = Result<T>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
         if let Some(x) = iter.last() {
             *wrapped = x?;
         }
         Ok(())
     }
-    fn default_with<F: FnOnce() -> Self>(f: F) -> Self::Type {
+    fn default_with<F: FnOnce() -> T>(f: F) -> Self::Type {
         (f)()
     }
-    fn iter(wrapped: &Self::Type) -> Iter<'_, Self> {
+    fn iter(wrapped: &Self::Type) -> Iter<'_, T> {
         Iter::Once(::std::iter::once(wrapped))
     }
 }
-impl<T> LabelWrappedType<tags::Repeated> for T {
+impl<T> LabelWrappedType<T> for tags::Repeated {
     type Type = Vec<T>;
-    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut Self {
+    fn get_or_insert_with<F: FnOnce() -> Self>(wrapped: &mut Self::Type, f: F) -> &mut T {
         wrapped.push((f)());
         wrapped.last_mut().unwrap()
     }
-    fn extend<I: Iterator<Item = Result<Self>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
+    fn extend<I: Iterator<Item = Result<T>>>(wrapped: &mut Self::Type, iter: I) -> Result<()> {
         for x in iter {
             wrapped.push(x?);
         }
         Ok(())
     }
-    fn default_with<F: FnOnce() -> Self>(_: F) -> Self::Type {
+    fn default_with<F: FnOnce() -> T>(_: F) -> Self::Type {
         Vec::new()
     }
-    fn iter(wrapped: &Self::Type) -> Iter<'_, Self> {
+    fn iter(wrapped: &Self::Type) -> Iter<'_, T> {
         Iter::Slice(wrapped.iter())
     }
 }
@@ -98,14 +98,15 @@ impl<T> LabelWrappedType<tags::Repeated> for T {
 ///   - (unlabeled, oneof, mapentry) => `T`
 ///   - `optional` => `Option<T>`
 ///   - `repeated` => `Vec<T>`
-pub trait LabelWrappedLdType<L, X>: ToOwned
+pub trait LabelWrappedLdType<T>
 where
-    <Self as ToOwned>::Owned: Default,
+    T: ?Sized + ToOwned,
+    <T as ToOwned>::Owned: Default,
 {
     type Type;
-    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned;
+    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <T as ToOwned>::Owned;
     fn default() -> Self::Type;
-    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self>;
+    fn iter(wrapped: &Self::Type) -> LdIter<'_, T>;
 }
 pub enum LdIter<'a, B: 'static + ?Sized + ToOwned> {
     OnceOwned(::std::iter::Once<&'a B::Owned>),
@@ -127,13 +128,13 @@ impl<'a, B: ?Sized + ToOwned> Iterator for LdIter<'a, B> {
     }
 }
 
-impl<T, _1, _2> LabelWrappedLdType<tags::OptionalOrRequired<_1, _2>, tags::Proto2> for T
+impl<T, _1, _2> LabelWrappedLdType<T> for (tags::Proto2, tags::OptionalOrRequired<_1, _2>)
 where
     T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
 {
     type Type = Option<Cow<'static, T>>;
-    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
+    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <T as ToOwned>::Owned {
         wrapped
             .get_or_insert_with(|| Cow::Owned(Default::default()))
             .to_mut()
@@ -141,56 +142,56 @@ where
     fn default() -> Self::Type {
         None
     }
-    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
+    fn iter(wrapped: &Self::Type) -> LdIter<'_, T> {
         LdIter::OptionCow(wrapped.iter())
     }
 }
-impl<T> LabelWrappedLdType<tags::Optional, tags::Proto3> for T
+impl<T> LabelWrappedLdType<T> for (tags::Proto3, tags::Optional)
 where
     T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
 {
     type Type = Option<<T as ToOwned>::Owned>;
-    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
+    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <T as ToOwned>::Owned {
         wrapped.get_or_insert_with(Default::default)
     }
     fn default() -> Self::Type {
         Default::default()
     }
-    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
+    fn iter(wrapped: &Self::Type) -> LdIter<'_, T> {
         LdIter::OptionOwned(wrapped.iter())
     }
 }
-impl<T, X, _1, _2, _3> LabelWrappedLdType<tags::UnlabeledOrOneofOrMapEntry<_1, _2, _3>, X> for T
+impl<T, X, _1, _2, _3> LabelWrappedLdType<T> for (X, tags::UnlabeledOrOneofOrMapEntry<_1, _2, _3>)
 where
     T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
 {
     type Type = <T as ToOwned>::Owned;
-    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
+    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <T as ToOwned>::Owned {
         wrapped
     }
     fn default() -> Self::Type {
         Default::default()
     }
-    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
+    fn iter(wrapped: &Self::Type) -> LdIter<'_, T> {
         LdIter::OnceOwned(::std::iter::once(wrapped))
     }
 }
-impl<T, X> LabelWrappedLdType<tags::Repeated, X> for T
+impl<T, X> LabelWrappedLdType<T> for (X, tags::Repeated)
 where
     T: ?Sized + ToOwned + 'static,
     <T as ToOwned>::Owned: Default,
 {
     type Type = Vec<<T as ToOwned>::Owned>;
-    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <Self as ToOwned>::Owned {
+    fn get_or_insert_default(wrapped: &mut Self::Type) -> &mut <T as ToOwned>::Owned {
         wrapped.push(Default::default());
         wrapped.last_mut().unwrap()
     }
     fn default() -> Self::Type {
         Vec::new()
     }
-    fn iter(wrapped: &Self::Type) -> LdIter<'_, Self> {
+    fn iter(wrapped: &Self::Type) -> LdIter<'_, T> {
         LdIter::SliceOwned(wrapped.iter())
     }
 }
@@ -201,7 +202,7 @@ where
 ///  - `required` => `Option<Box<T>>`
 ///  - `optional` => `Option<Box<T>>`
 ///  - `repeated` => `Vec<T>`
-pub trait LabelWrappedMessageType<L>: Sized {
+pub trait LabelWrappedMessageType<T>: Sized {
     type Type;
     fn iter(wrapped: &Self::Type) -> MsgIter<'_, Self>;
 }
@@ -220,13 +221,13 @@ impl<'a, T> Iterator for MsgIter<'a, T> {
     }
 }
 
-impl<T, _1, _2> LabelWrappedMessageType<tags::NonRepeated<_1, _2>> for T {
+impl<T, _1, _2> LabelWrappedMessageType<T> for tags::NonRepeated<_1, _2> {
     type Type = Option<Box<T>>;
     fn iter(wrapped: &Self::Type) -> MsgIter<'_, Self> {
         MsgIter::OptionBox(wrapped.iter())
     }
 }
-impl<T> LabelWrappedMessageType<tags::Repeated> for T {
+impl<T> LabelWrappedMessageType<T> for tags::Repeated {
     type Type = Vec<T>;
     fn iter(wrapped: &Self::Type) -> MsgIter<'_, Self> {
         MsgIter::Slice(wrapped.iter())
