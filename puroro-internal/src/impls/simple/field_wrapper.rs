@@ -109,11 +109,12 @@ impl LabelWrappedType for tags::Repeated {
 ///   - `optional` => `Option<T>`
 ///   - `repeated` => `Vec<T>`
 pub trait LabelWrappedLdType {
-    type Type<T>;
-    fn get_or_insert_default<T: ToOwned>(wrapped: &mut Self::Type<T>)
-        -> &mut <T as ToOwned>::Owned;
-    fn default<T>() -> Self::Type<T>;
-    fn iter<T>(wrapped: &Self::Type<T>) -> LdIter<'_, T>;
+    type Type<T: ?Sized + 'static + ToOwned>;
+    fn get_or_insert_default<T: ?Sized + 'static + ToOwned>(
+        wrapped: &mut Self::Type<T>,
+    ) -> &mut <T as ToOwned>::Owned;
+    fn default<T: ?Sized + 'static + ToOwned>() -> Self::Type<T>;
+    fn iter<T: 'static + ?Sized + ToOwned>(wrapped: &Self::Type<T>) -> LdIter<'_, T>;
 }
 pub enum LdIter<'a, B: 'static + ?Sized + ToOwned> {
     OnceOwned(::std::iter::Once<&'a B::Owned>),
@@ -136,53 +137,61 @@ impl<'a, B: ?Sized + ToOwned> Iterator for LdIter<'a, B> {
 }
 
 impl<_1, _2> LabelWrappedLdType for (tags::Proto2, tags::OptionalOrRequired<_1, _2>) {
-    type Type<T: 'static> = Option<Cow<'static, T>>;
-    fn get_or_insert_default<T>(wrapped: &mut Self::Type<T>) -> &mut <T as ToOwned>::Owned {
+    type Type<T: ?Sized + 'static + ToOwned> = Option<Cow<'static, T>>;
+    fn get_or_insert_default<T: ?Sized + 'static + ToOwned>(
+        wrapped: &mut Self::Type<T>,
+    ) -> &mut <T as ToOwned>::Owned {
         wrapped
             .get_or_insert_with(|| Cow::Owned(Default::default()))
             .to_mut()
     }
-    fn default<T>() -> Self::Type<T> {
+    fn default<T: ?Sized + 'static + ToOwned>() -> Self::Type<T> {
         None
     }
-    fn iter<T>(wrapped: &Self::Type<T>) -> LdIter<'_, T> {
+    fn iter<T: 'static + ?Sized + ToOwned>(wrapped: &Self::Type<T>) -> LdIter<'_, T> {
         LdIter::OptionCow(wrapped.iter())
     }
 }
 impl LabelWrappedLdType for (tags::Proto3, tags::Optional) {
-    type Type<T: ToOwned> = Option<<T as ToOwned>::Owned>;
-    fn get_or_insert_default<T>(wrapped: &mut Self::Type<T>) -> &mut <T as ToOwned>::Owned {
+    type Type<T: ?Sized + 'static + ToOwned> = Option<<T as ToOwned>::Owned>;
+    fn get_or_insert_default<T: ?Sized + 'static + ToOwned>(
+        wrapped: &mut Self::Type<T>,
+    ) -> &mut <T as ToOwned>::Owned {
         wrapped.get_or_insert_with(Default::default)
     }
-    fn default<T>() -> Self::Type<T> {
+    fn default<T: ?Sized + 'static + ToOwned>() -> Self::Type<T> {
         Default::default()
     }
-    fn iter<T>(wrapped: &Self::Type<T>) -> LdIter<'_, T> {
+    fn iter<T: 'static + ?Sized + ToOwned>(wrapped: &Self::Type<T>) -> LdIter<'_, T> {
         LdIter::OptionOwned(wrapped.iter())
     }
 }
 impl<X, _1, _2, _3> LabelWrappedLdType for (X, tags::UnlabeledOrOneofOrMapEntry<_1, _2, _3>) {
-    type Type<T: ToOwned> = <T as ToOwned>::Owned;
-    fn get_or_insert_default<T>(wrapped: &mut Self::Type<T>) -> &mut <T as ToOwned>::Owned {
+    type Type<T: ?Sized + 'static + ToOwned> = <T as ToOwned>::Owned;
+    fn get_or_insert_default<T: ?Sized + 'static + ToOwned>(
+        wrapped: &mut Self::Type<T>,
+    ) -> &mut <T as ToOwned>::Owned {
         wrapped
     }
-    fn default<T>() -> Self::Type<T> {
+    fn default<T: ?Sized + 'static + ToOwned>() -> Self::Type<T> {
         Default::default()
     }
-    fn iter<T>(wrapped: &Self::Type<T>) -> LdIter<'_, T> {
+    fn iter<T: 'static + ?Sized + ToOwned>(wrapped: &Self::Type<T>) -> LdIter<'_, T> {
         LdIter::OnceOwned(::std::iter::once(wrapped))
     }
 }
 impl<X> LabelWrappedLdType for (X, tags::Repeated) {
-    type Type<T: ToOwned> = Vec<<T as ToOwned>::Owned>;
-    fn get_or_insert_default<T>(wrapped: &mut Self::Type<T>) -> &mut <T as ToOwned>::Owned {
+    type Type<T: ?Sized + 'static + ToOwned> = Vec<<T as ToOwned>::Owned>;
+    fn get_or_insert_default<T: ?Sized + 'static + ToOwned>(
+        wrapped: &mut Self::Type<T>,
+    ) -> &mut <T as ToOwned>::Owned {
         wrapped.push(Default::default());
         wrapped.last_mut().unwrap()
     }
-    fn default<T>() -> Self::Type<T> {
+    fn default<T: ?Sized + 'static + ToOwned>() -> Self::Type<T> {
         Vec::new()
     }
-    fn iter<T>(wrapped: &Self::Type<T>) -> LdIter<'_, T> {
+    fn iter<T: 'static + ?Sized + ToOwned>(wrapped: &Self::Type<T>) -> LdIter<'_, T> {
         LdIter::SliceOwned(wrapped.iter())
     }
 }

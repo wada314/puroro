@@ -51,6 +51,7 @@ where
 impl<L> EnumTypeGen<tags::Proto2, L> for SimpleImpl
 where
     Self: StructInternalTypeGen,
+    L: LabelWrappedType,
 {
     type EnumType<E> = <L as LabelWrappedType>::Type<E>;
     fn default<E: Default>(
@@ -63,6 +64,7 @@ where
 impl<L> EnumTypeGen<tags::Proto3, L> for SimpleImpl
 where
     Self: StructInternalTypeGen,
+    L: LabelWrappedType,
 {
     type EnumType<E> = <L as LabelWrappedType>::Type<::std::result::Result<E, i32>>;
     fn default<E: Default>(
