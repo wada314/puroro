@@ -25,7 +25,12 @@ where
     (X, tags::wire::Variant<V>): tags::NumericalFieldTypeTag + VariantTypeTag,
     VariantNativeType<X, V>: Clone,
     tags::NonRepeated<_1, _2>: LabelWrappedType,
-    Self: FieldTypeGen<X, tags::NonRepeated<_1, _2>, tags::wire::Variant<V>>,
+    Self: FieldTypeGen<
+        X,
+        tags::NonRepeated<_1, _2>,
+        tags::wire::Variant<V>,
+        Type = <tags::NonRepeated<_1, _2> as LabelWrappedType>::Type<VariantNativeType<X, V>>,
+    >,
 {
     fn ser_to_io_write<W>(
         field: &<Self as FieldTypeGen<X, tags::NonRepeated<_1, _2>, tags::wire::Variant<V>>>::Type,
@@ -57,7 +62,12 @@ impl<X, V> SerFieldToIoWrite<X, tags::Repeated, tags::wire::Variant<V>> for Simp
 where
     (X, tags::wire::Variant<V>): tags::NumericalFieldTypeTag + VariantTypeTag,
     VariantNativeType<X, V>: Clone,
-    Self: FieldTypeGen<X, tags::Repeated, tags::wire::Variant<V>>,
+    Self: FieldTypeGen<
+        X,
+        tags::Repeated,
+        tags::wire::Variant<V>,
+        Type = <tags::Repeated as LabelWrappedType>::Type<VariantNativeType<X, V>>,
+    >,
 {
     fn ser_to_io_write<W>(
         field: &<Self as FieldTypeGen<X, tags::Repeated, tags::wire::Variant<V>>>::Type,
@@ -116,11 +126,8 @@ where
         W: std::io::Write,
     {
         let do_default_check = <(X, L) as DoDefaultCheck>::VALUE;
-        for item in <Bits32NativeType<X, V> as LabelWrappedType<L>>::iter(field) {
-            if do_default_check
-                && item.clone()
-                    == <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::default()
-            {
+        for item in <L as LabelWrappedType>::iter(field) {
+            if do_default_check && item.clone() == Default::default() {
                 continue;
             }
             write_field_number_and_wire_type(out, field_number, WireType::Bits32)?;
@@ -250,6 +257,7 @@ where
     ) -> Result<()>
     where
         W: std::io::Write,
+        E: PartialEq,
     {
         let do_default_check = <(X, tags::NonRepeated<_1, _2>) as DoDefaultCheck>::VALUE;
         if let Some(value) = <VariantNativeType<X, tags::value::Enum<E>> as LabelWrappedType<
@@ -278,6 +286,7 @@ where
     ) -> Result<()>
     where
         W: std::io::Write,
+        E: PartialEq,
     {
         let mut iter = <VariantNativeType<X, tags::value::Enum<E>> as LabelWrappedType<
             tags::Repeated,

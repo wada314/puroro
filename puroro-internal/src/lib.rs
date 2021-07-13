@@ -39,9 +39,9 @@ pub trait FieldTypeGen<X, L, V>: StructInternalTypeGen {
     ) -> <Self as FieldTypeGen<X, L, V>>::Type;
 }
 pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
-    type EnumType<E>;
+    type EnumType<E: PartialEq>;
     /// Default value of the field when the message is allocated
-    fn default<E: Default + TryFrom<i32>>(
+    fn default<E: Default + TryFrom<i32> + PartialEq>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<X, L>>::EnumType<E>;
 }

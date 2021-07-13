@@ -19,7 +19,8 @@ pub trait SerEnumToIoWrite<X, L>: EnumTypeGen<X, L> + StructInternalTypeGen {
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
-        W: ::std::io::Write;
+        W: ::std::io::Write,
+        E: PartialEq;
 }
 pub trait SerMsgToIoWrite<X, L>: MsgTypeGen<X, L> + StructInternalTypeGen {
     fn ser_to_io_write<W, M>(

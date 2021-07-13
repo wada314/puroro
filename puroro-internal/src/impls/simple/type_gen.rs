@@ -47,29 +47,18 @@ where
     }
 }
 
-impl<L> EnumTypeGen<tags::Proto2, L> for SimpleImpl
+impl<X, L> EnumTypeGen<X, L> for SimpleImpl
 where
     Self: StructInternalTypeGen,
     L: LabelWrappedType,
+    X: tags::EnumFieldTypeForSyntax,
 {
-    type EnumType<E> = <L as LabelWrappedType>::Type<E>;
-    fn default<E: Default>(
+    type EnumType<E: PartialEq> =
+        <L as LabelWrappedType>::Type<<X as tags::EnumFieldTypeForSyntax>::NativeType<E>>;
+    fn default<E: Default + TryFrom<i32> + PartialEq>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as EnumTypeGen<tags::Proto2, L>>::EnumType<E> {
-        <L as LabelWrappedType>::default_with(Default::default)
-    }
-}
-
-impl<L> EnumTypeGen<tags::Proto3, L> for SimpleImpl
-where
-    Self: StructInternalTypeGen,
-    L: LabelWrappedType,
-{
-    type EnumType<E> = <L as LabelWrappedType>::Type<::std::result::Result<E, i32>>;
-    fn default<E: TryFrom<i32>>(
-        internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as EnumTypeGen<tags::Proto3, L>>::EnumType<E> {
-        <L as LabelWrappedType>::default_with(|| TryFrom::try_from(0i32).map_err(|_| 0i32))
+    ) -> <Self as EnumTypeGen<X, L>>::EnumType<E> {
+        <L as LabelWrappedType>::default_with(<X as tags::EnumFieldTypeForSyntax>::default)
     }
 }
 

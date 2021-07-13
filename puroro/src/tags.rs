@@ -13,7 +13,7 @@ pub trait ProtoSyntaxTag {}
 
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
 pub trait NumericalFieldTypeTag {
-    type NativeType: Default;
+    type NativeType: Default + PartialEq;
 }
 pub trait EnumFieldTypeForSyntax {
     type NativeType<E: PartialEq>: PartialEq;

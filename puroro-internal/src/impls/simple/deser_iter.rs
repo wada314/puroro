@@ -198,6 +198,7 @@ where
 }
 
 // Enum
+type EnumNativeType<X, E> = <X as tags::EnumFieldTypeForSyntax>::NativeType<E>;
 impl<X, L> DeserEnumFromBytesIter<X, L> for SimpleImpl
 where
     Self: EnumTypeGen<X, L>,
@@ -220,7 +221,9 @@ where
             FieldData::Variant(variant) => {
                 let native = variant.to_enum::<X, E>()?;
                 if !do_default_check || native != default() {
-                    *<L as LabelWrappedType>::get_or_insert_with(field, default) = native;
+                    *<L as LabelWrappedType>::get_or_insert_with::<_, EnumNativeType<X, E>>(
+                        field, default,
+                    ) = native;
                 }
             }
             FieldData::LengthDelimited(iter) => {
