@@ -16,8 +16,8 @@ pub trait NumericalFieldTypeTag {
     type NativeType: Default;
 }
 pub trait EnumFieldTypeForSyntax {
-    type NativeType<E: Default + TryFrom<i32>>;
-    fn default<E: Default + TryFrom<i32>>() -> Self::NativeType<E>;
+    type NativeType<E: PartialEq>: PartialEq;
+    fn default<E: Default + TryFrom<i32> + PartialEq>() -> Self::NativeType<E>;
 }
 
 /// A tag trait for types corresponding to the field label.
@@ -162,14 +162,14 @@ impl NumericalFieldTypeTag for Bool {
 }
 
 impl EnumFieldTypeForSyntax for Proto2 {
-    type NativeType<E: Default + TryFrom<i32>> = E;
-    fn default<E: Default + TryFrom<i32>>() -> Self::NativeType<E> {
+    type NativeType<E: PartialEq> = E;
+    fn default<E: Default + TryFrom<i32> + PartialEq>() -> Self::NativeType<E> {
         Default::default()
     }
 }
 impl EnumFieldTypeForSyntax for Proto3 {
-    type NativeType<E: Default + TryFrom<i32>> = ::std::result::Result<E, i32>;
-    fn default<E: Default + TryFrom<i32>>() -> Self::NativeType<E> {
+    type NativeType<E: PartialEq> = ::std::result::Result<E, i32>;
+    fn default<E: Default + TryFrom<i32> + PartialEq>() -> Self::NativeType<E> {
         <E as TryFrom<i32>>::try_from(0).map_err(|_| 0)
     }
 }

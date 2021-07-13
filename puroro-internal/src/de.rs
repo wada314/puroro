@@ -1,7 +1,8 @@
 use crate::de::from_iter::ScopedIter;
 use crate::{EnumTypeGen, FieldTypeGen, MsgTypeGen, Result, StructInternalTypeGen};
+use ::puroro::tags;
 use ::puroro::types::FieldData;
-use puroro::tags;
+use ::std::convert::TryFrom;
 
 pub mod from_iter;
 
@@ -46,7 +47,8 @@ pub trait DeserEnumFromBytesIter<X, L>: EnumTypeGen<X, L> + StructInternalTypeGe
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
-        I: Iterator<Item = ::std::io::Result<u8>>;
+        I: Iterator<Item = ::std::io::Result<u8>>,
+        E: Default + TryFrom<i32> + PartialEq;
 }
 pub trait DeserMsgFromBytesIter<X, L>: MsgTypeGen<X, L> + StructInternalTypeGen {
     fn deser_from_scoped_bytes_iter<I, M>(

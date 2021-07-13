@@ -72,6 +72,21 @@ impl Variant {
     pub fn from_native<T: VariantTypeTag>(val: T::NativeType) -> Result<Variant> {
         T::to_variant(val)
     }
+    pub fn to_enum<X, E>(&self) -> Result<X::NativeType<E>>
+    where
+        X: EnumVariantTypeForSyntax,
+        E: TryFrom<i32> + PartialEq,
+    {
+        X::from_variant(self)
+    }
+    pub fn from_enum<X, E>(val: X::NativeType<E>) -> Result<Variant>
+    where
+        X: EnumVariantTypeForSyntax,
+        E: PartialEq,
+        i32: From<E>,
+    {
+        X::to_variant(val)
+    }
     /// A shortcut of `to_native::<tags::Int32>()`.
     pub fn to_i32(&self) -> Result<i32> {
         self.to_native::<tags::Int32>()
@@ -112,10 +127,10 @@ pub trait VariantTypeTag: tags::NumericalFieldTypeTag {
     fn to_variant(val: Self::NativeType) -> Result<Variant>;
 }
 pub trait EnumVariantTypeForSyntax: tags::EnumFieldTypeForSyntax {
-    fn from_variant<E: Default + TryFrom<i32>>(
+    fn from_variant<E: TryFrom<i32> + PartialEq>(
         var: &Variant,
     ) -> Result<<Self as tags::EnumFieldTypeForSyntax>::NativeType<E>>;
-    fn to_variant<E: Default + TryFrom<i32> + Into<i32>>(
+    fn to_variant<E: Into<i32> + PartialEq>(
         val: <Self as tags::EnumFieldTypeForSyntax>::NativeType<E>,
     ) -> Result<Variant>;
 }
@@ -183,13 +198,13 @@ impl VariantTypeTag for tags::Bool {
 }
 
 impl EnumVariantTypeForSyntax for tags::Proto2 {
-    fn from_variant<E: Default + TryFrom<i32>>(
+    fn from_variant<E: TryFrom<i32> + PartialEq>(
         var: &Variant,
     ) -> Result<<Self as tags::EnumFieldTypeForSyntax>::NativeType<E>> {
         let i: i32 = i32::try_from(i64::from_le_bytes(var.0))?;
         Ok(E::try_from(i).map_err(|_| ErrorKind::UnknownEnumVariant(i))?)
     }
-    fn to_variant<E: Default + TryFrom<i32> + Into<i32>>(
+    fn to_variant<E: Into<i32> + PartialEq>(
         val: <Self as tags::EnumFieldTypeForSyntax>::NativeType<E>,
     ) -> Result<Variant> {
         let int_val: i32 = E::into(val);
@@ -197,13 +212,13 @@ impl EnumVariantTypeForSyntax for tags::Proto2 {
     }
 }
 impl EnumVariantTypeForSyntax for tags::Proto3 {
-    fn from_variant<E: Default + TryFrom<i32>>(
+    fn from_variant<E: TryFrom<i32> + PartialEq>(
         var: &Variant,
     ) -> Result<<Self as tags::EnumFieldTypeForSyntax>::NativeType<E>> {
         let i = i32::try_from(i64::from_le_bytes(var.0))?;
         Ok(E::try_from(i).map_err(|_| i))
     }
-    fn to_variant<E: Default + TryFrom<i32> + Into<i32>>(
+    fn to_variant<E: Into<i32> + PartialEq>(
         val: <Self as tags::EnumFieldTypeForSyntax>::NativeType<E>,
     ) -> Result<Variant> {
         let int_val = match val {

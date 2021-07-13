@@ -16,9 +16,7 @@ where
     fn default(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>>>::Type {
-        <L as LabelWrappedType>::default_with(
-            <(X, tags::wire::NonLD<V, _1, _2>) as tags::NumericalFieldTypeTag>::default,
-        )
+        <L as LabelWrappedType>::default_with(Default::default)
     }
 }
 
