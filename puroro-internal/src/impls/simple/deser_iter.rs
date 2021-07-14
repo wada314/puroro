@@ -1,18 +1,17 @@
 use super::{LabelWrappedLdType, LabelWrappedType, SimpleImpl};
 use crate::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variants};
 use crate::de::{
-    DeserEnumFromBytesIter, DeserFieldFromBytesIter, DeserMsgFromBytesIter, DoDefaultCheck,
-    MessageFromBytesIter,
+    DeserEnumFromBytesIter, DeserEnumFromBytesIterProxy, DeserFieldFromBytesIter,
+    DeserMsgFromBytesIter, DeserMsgFromBytesIterProxy, DoDefaultCheck, MessageFromBytesIter,
 };
-use crate::{EnumTypeGen, FieldTypeGen, MsgTypeGen, StructInternalTypeGen};
+use crate::{EnumTypeGen, FieldTypeGen, MessageInternal, MsgTypeGen, StructInternalTypeGen};
 use ::itertools::Itertools;
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::types::FieldData;
-use ::puroro::variant::VariantTypeTag;
+use ::puroro::variant::{EnumVariantTypeForSyntax, VariantTypeTag};
 use ::puroro::{tags, ErrorKind, Message, Result};
 use ::std::collections::HashMap;
 use ::std::convert::TryFrom;
-use puroro::variant::EnumVariantTypeForSyntax;
 
 // deser from iterator
 
@@ -199,21 +198,39 @@ where
 
 // Enum
 type EnumNativeType<X, E> = <X as tags::EnumFieldTypeForSyntax>::NativeType<E>;
-impl<X, L> DeserEnumFromBytesIter<X, L> for SimpleImpl
+impl<X, L> DeserEnumFromBytesIterProxy<X, L> for SimpleImpl
 where
-    Self: EnumTypeGen<X, L>,
+    Self: StructInternalTypeGen,
+    L: LabelWrappedType,
+    X: tags::EnumFieldTypeForSyntax + EnumVariantTypeForSyntax,
+    (X, L): DoDefaultCheck,
+{
+    type DeserEnum<E>
+    where
+        E: Default + TryFrom<i32> + PartialEq,
+    = Self;
+}
+
+#[rustfmt::skip] // Self: EnumTypeGen<..., EnumType<E> = ...> 's <E> is removed by rustfmt 
+impl<X, L, E> DeserEnumFromBytesIter<X, L, E> for SimpleImpl
+where
+    Self: EnumTypeGen<
+        X,
+        L,
+        EnumType<E> = <L as LabelWrappedType>::Type<<X as tags::EnumFieldTypeForSyntax>::NativeType<E>>
+    >,
     (X, L): DoDefaultCheck,
     X: tags::EnumFieldTypeForSyntax + EnumVariantTypeForSyntax,
     L: LabelWrappedType,
+    E: Default + TryFrom<i32> + PartialEq,
 {
-    fn deser_from_scoped_bytes_iter<I, E>(
+    fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as EnumTypeGen<X, L>>::EnumType<E>,
         data: FieldData<&mut ScopedIter<I>>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
-        E: Default + TryFrom<i32> + PartialEq,
     {
         let do_default_check = <(X, L) as DoDefaultCheck>::VALUE;
         let default = <X as tags::EnumFieldTypeForSyntax>::default;
@@ -230,7 +247,7 @@ where
                 let variants_iter = Variants::new(iter);
                 let values_iter = variants_iter
                     .map(|rv| rv.and_then(|v| v.to_enum::<X, E>()))
-                    .filter_ok(|val| !do_default_check || val.clone() != default());
+                    .filter_ok(|val| !do_default_check || *val != default());
                 <L as LabelWrappedType>::extend(field, values_iter)?;
             }
             FieldData::Bits32(_) | FieldData::Bits64(_) => Err(ErrorKind::UnexpectedWireType)?,
@@ -240,14 +257,26 @@ where
 }
 
 // Message
-impl<X, _1, _2> DeserMsgFromBytesIter<X, tags::NonRepeated<_1, _2>> for SimpleImpl
+impl<X, _1, _2> DeserMsgFromBytesIterProxy<X, tags::NonRepeated<_1, _2>> for SimpleImpl
 where
     Self: MsgTypeGen<X, tags::NonRepeated<_1, _2>>,
 {
-    fn deser_from_scoped_bytes_iter<I, M>(
+    type DeserMessage<M>
+    where
+        M: MessageFromBytesIter + MessageInternal,
+    = Self;
+}
+
+#[rustfmt::skip] // Self: MsgTypeGen<..., MsgType<M> = ...> 's <M> is removed by rustfmt 
+impl<X, M, _1, _2> DeserMsgFromBytesIter<X, tags::NonRepeated<_1, _2>, M> for SimpleImpl
+where
+    Self: MsgTypeGen<X, tags::NonRepeated<_1, _2>, MsgType<M> = Option<Box<M>>>,
+    M: MessageFromBytesIter +  MessageInternal<ImplTypeTag = SimpleImpl>,
+{
+    fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as MsgTypeGen<X, tags::NonRepeated<_1, _2>>>::MsgType<M>,
         data: FieldData<&mut ScopedIter<I>>,
-        _internal_data: &<Self as StructInternalTypeGen>::Type,
+        internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
@@ -256,7 +285,9 @@ where
         match data {
             FieldData::LengthDelimited(iter) => deser_from_scoped_iter(
                 field
-                    .get_or_insert_with(|| Box::new(Default::default()))
+                    .get_or_insert_with(|| Box::new(
+                        MessageInternal::new_with_parents_internal_data(internal_data)
+                    ))
                     .deref_mut(),
                 iter,
             ),
@@ -265,21 +296,23 @@ where
     }
 }
 
-impl<X> DeserMsgFromBytesIter<X, tags::Repeated> for SimpleImpl
+#[rustfmt::skip] // Self: MsgTypeGen<..., MsgType<M> = ...> 's <M> is removed by rustfmt 
+impl<X, M> DeserMsgFromBytesIter<X, tags::Repeated, M> for SimpleImpl
 where
-    Self: MsgTypeGen<X, tags::Repeated>,
+    Self: MsgTypeGen<X, tags::Repeated, MsgType<M> = Vec<M>>,
+    M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl>,
 {
-    fn deser_from_scoped_bytes_iter<I, M>(
+    fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as MsgTypeGen<X, tags::Repeated>>::MsgType<M>,
         data: FieldData<&mut ScopedIter<I>>,
-        _internal_data: &<Self as StructInternalTypeGen>::Type,
+        internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
     {
         match data {
             FieldData::LengthDelimited(iter) => {
-                field.push(Default::default());
+                field.push(MessageInternal::new_with_parents_internal_data(internal_data));
                 deser_from_scoped_iter(field.last_mut().unwrap(), iter)
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,

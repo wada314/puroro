@@ -1,5 +1,7 @@
 use crate::de::from_iter::ScopedIter;
-use crate::{EnumTypeGen, FieldTypeGen, MsgTypeGen, Result, StructInternalTypeGen};
+use crate::{
+    EnumTypeGen, FieldTypeGen, MessageInternal, MsgTypeGen, Result, StructInternalTypeGen,
+};
 use ::puroro::tags;
 use ::puroro::types::FieldData;
 use ::std::convert::TryFrom;
@@ -40,18 +42,38 @@ pub trait DeserFieldFromBytesIter<X, L, V>: FieldTypeGen<X, L, V> + StructIntern
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
 
-pub trait DeserEnumFromBytesIter<X, L>: EnumTypeGen<X, L> + StructInternalTypeGen {
-    fn deser_from_scoped_bytes_iter<I, E>(
+pub trait DeserEnumFromBytesIterProxy<X, L>: EnumTypeGen<X, L> + StructInternalTypeGen {
+    // We need to proxy this associated type once before calling the method
+    // because in *trait method* implementation we cannot add extra
+    // constraints to trait bounds:
+    // i.e. Cannot add `Self: EnumTypeGen<..., EnumType<E> = Something>`
+    type DeserEnum<E>: DeserEnumFromBytesIter<X, L, E>
+    where
+        E: Default + TryFrom<i32> + PartialEq;
+}
+pub trait DeserEnumFromBytesIter<X, L, E>: EnumTypeGen<X, L> + StructInternalTypeGen
+where
+    E: PartialEq,
+{
+    fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as EnumTypeGen<X, L>>::EnumType<E>,
         data: FieldData<&mut ScopedIter<I>>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
-        I: Iterator<Item = ::std::io::Result<u8>>,
-        E: Default + TryFrom<i32> + PartialEq;
+        I: Iterator<Item = ::std::io::Result<u8>>;
 }
-pub trait DeserMsgFromBytesIter<X, L>: MsgTypeGen<X, L> + StructInternalTypeGen {
-    fn deser_from_scoped_bytes_iter<I, M>(
+pub trait DeserMsgFromBytesIterProxy<X, L>: MsgTypeGen<X, L> + StructInternalTypeGen {
+    // We need to proxy this associated type once before calling the method
+    // because in *trait method* implementation we cannot add extra
+    // constraints to trait bounds:
+    // i.e. Cannot add `Self: EnumTypeGen<..., EnumType<E> = Something>`
+    type DeserMessage<M>: DeserMsgFromBytesIter<X, L, M>
+    where
+        M: MessageFromBytesIter + MessageInternal;
+}
+pub trait DeserMsgFromBytesIter<X, L, M>: MsgTypeGen<X, L> + StructInternalTypeGen {
+    fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as MsgTypeGen<X, L>>::MsgType<M>,
         data: FieldData<&mut ScopedIter<I>>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
