@@ -9,8 +9,7 @@ use ::itertools::Itertools;
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::types::FieldData;
 use ::puroro::variant::{EnumVariantTypeForSyntax, VariantTypeTag};
-use ::puroro::{tags, ErrorKind, Message, Result};
-use ::std::collections::HashMap;
+use ::puroro::{tags, ErrorKind, Result};
 use ::std::convert::TryFrom;
 
 // deser from iterator

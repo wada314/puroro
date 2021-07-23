@@ -9,8 +9,8 @@ use crate::{
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::tags;
 use ::puroro::types::WireType;
-use ::puroro::variant::{Variant, VariantTypeTag};
-use ::puroro::{GetImpl, SerToIoWrite};
+use ::puroro::variant::{EnumVariantTypeForSyntax, Variant, VariantTypeTag};
+use ::puroro::SerToIoWrite;
 
 use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType};
 
@@ -165,11 +165,8 @@ where
         W: std::io::Write,
     {
         let do_default_check = <(X, L) as DoDefaultCheck>::VALUE;
-        for item in <Bits64NativeType<X, V> as LabelWrappedType<L>>::iter(field) {
-            if do_default_check
-                && item.clone()
-                    == <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::default()
-            {
+        for item in <L as LabelWrappedType>::iter(field) {
+            if do_default_check && item.clone() == Default::default() {
                 continue;
             }
             write_field_number_and_wire_type(out, field_number, WireType::Bits64)?;
@@ -184,7 +181,7 @@ where
 impl<L, X> SerFieldToIoWrite<X, L, tags::Bytes> for SimpleImpl
 where
     (X, L): DoDefaultCheck + LabelWrappedLdType,
-    Self: FieldTypeGen<X, L, tags::Bytes>,
+    Self: FieldTypeGen<X, L, tags::Bytes, Type = <(X, L) as LabelWrappedLdType>::Type<[u8]>>,
 {
     fn ser_to_io_write<W>(
         field: &<Self as FieldTypeGen<X, L, tags::Bytes>>::Type,
@@ -228,7 +225,7 @@ where
         W: std::io::Write,
     {
         let do_default_check = <(X, L) as DoDefaultCheck>::VALUE;
-        for item in <(L, X) as LabelWrappedLdType>::iter::<str>(field) {
+        for item in <(X, L) as LabelWrappedLdType>::iter::<str>(field) {
             if do_default_check && item.is_empty() {
                 continue;
             }
@@ -247,7 +244,14 @@ where
 // Enum
 impl<X, _1, _2> SerEnumToIoWrite<X, tags::NonRepeated<_1, _2>> for SimpleImpl
 where
-    Self: EnumTypeGen<X, tags::NonRepeated<_1, _2>>,
+    Self: EnumTypeGen<
+        X,
+        tags::NonRepeated<_1, _2>,
+        EnumType = <tags::NonRepeated<_1, _2> as LabelWrappedType>::Type,
+    >,
+    tags::NonRepeated<_1, _2>: LabelWrappedType,
+    X: EnumVariantTypeForSyntax,
+    (X, tags::NonRepeated<_1, _2>): DoDefaultCheck,
 {
     fn ser_to_io_write<W, E>(
         field: &<Self as EnumTypeGen<X, tags::NonRepeated<_1, _2>>>::EnumType<E>,
@@ -260,12 +264,8 @@ where
         E: PartialEq,
     {
         let do_default_check = <(X, tags::NonRepeated<_1, _2>) as DoDefaultCheck>::VALUE;
-        if let Some(value) = <VariantNativeType<X, tags::value::Enum<E>> as LabelWrappedType<
-            tags::NonRepeated<_1, _2>,
-        >>::iter(field)
-        .next()
-        {
-            let variant = Variant::from_native::<(X, tags::wire::Variant<E>)>(value.clone())?;
+        if let Some(value) = <tags::NonRepeated<_1, _2> as LabelWrappedType>::iter(field).next() {
+            let variant = Variant::from_enum::<X, E>(value.clone())?;
             if !do_default_check || !variant.is_zero() {
                 write_field_number_and_wire_type(out, field_number, WireType::Variant)?;
                 variant.encode_bytes(out)?;
