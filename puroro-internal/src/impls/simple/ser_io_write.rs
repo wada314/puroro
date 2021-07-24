@@ -247,7 +247,7 @@ where
 // Enum
 impl<X, _1, _2> SerEnumToIoWriteProxy<X, tags::NonRepeated<_1, _2>> for SimpleImpl
 where
-    Self: EnumTypeGen<X, tags::NonRepeated<_1, _2>> + StructInternalTypeGen,
+    Self: StructInternalTypeGen,
     tags::NonRepeated<_1, _2>: LabelWrappedType,
     X: EnumVariantTypeForSyntax,
     (X, tags::NonRepeated<_1, _2>): DoDefaultCheck,
@@ -255,6 +255,7 @@ where
     type SerEnum<E>
     where
         E: PartialEq,
+        i32: From<E>,
     = Self;
 }
 #[rustfmt::skip]
@@ -271,6 +272,7 @@ where
     i32: From<E>,
     tags::NonRepeated<_1, _2>: LabelWrappedType,
     X: EnumVariantTypeForSyntax,
+    <X as tags::EnumFieldTypeForSyntax>::NativeType<E>: Clone,
     (X, tags::NonRepeated<_1, _2>): DoDefaultCheck,
 {
     fn ser_to_io_write<W>(
@@ -284,7 +286,7 @@ where
     {
         let do_default_check = <(X, tags::NonRepeated<_1, _2>) as DoDefaultCheck>::VALUE;
         if let Some(value) = <tags::NonRepeated<_1, _2> as LabelWrappedType>::iter(field).next() {
-            let variant = Variant::from_enum::<X, E>(value.clone())?;
+            let variant = Variant::from_enum::<X, E>(<<X as tags::EnumFieldTypeForSyntax>::NativeType<E> as Clone>::clone(value))?;
             if !do_default_check || !variant.is_zero() {
                 write_field_number_and_wire_type(out, field_number, WireType::Variant)?;
                 variant.encode_bytes(out)?;

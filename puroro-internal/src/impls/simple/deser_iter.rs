@@ -258,11 +258,11 @@ where
 // Message
 impl<X, _1, _2> DeserMsgFromBytesIterProxy<X, tags::NonRepeated<_1, _2>> for SimpleImpl
 where
-    Self: MsgTypeGen<X, tags::NonRepeated<_1, _2>>,
+    Self: StructInternalTypeGen,
 {
     type DeserMessage<M>
     where
-        M: MessageFromBytesIter + MessageInternal,
+        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self>,
     = Self;
 }
 

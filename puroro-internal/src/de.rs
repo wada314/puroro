@@ -70,7 +70,7 @@ pub trait DeserMsgFromBytesIterProxy<X, L>: MsgTypeGen<X, L> + StructInternalTyp
     // i.e. Cannot add `Self: EnumTypeGen<..., EnumType<E> = Something>`
     type DeserMessage<M>: DeserMsgFromBytesIter<X, L, M>
     where
-        M: MessageFromBytesIter + MessageInternal;
+        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self>;
 }
 pub trait DeserMsgFromBytesIter<X, L, M>: MsgTypeGen<X, L> + StructInternalTypeGen {
     fn deser_from_scoped_bytes_iter<I>(

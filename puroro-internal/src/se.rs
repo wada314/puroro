@@ -16,7 +16,8 @@ pub trait SerFieldToIoWrite<X, L, V>: FieldTypeGen<X, L, V> + StructInternalType
 pub trait SerEnumToIoWriteProxy<X, L>: EnumTypeGen<X, L> + StructInternalTypeGen {
     type SerEnum<E>: SerEnumToIoWrite<X, L, E>
     where
-        E: PartialEq;
+        E: PartialEq,
+        i32: From<E>;
 }
 pub trait SerEnumToIoWrite<X, L, E>: EnumTypeGen<X, L> + StructInternalTypeGen
 where
