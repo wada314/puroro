@@ -249,7 +249,7 @@ impl<X, _1, _2> SerEnumToIoWriteProxy<X, tags::NonRepeated<_1, _2>> for SimpleIm
 where
     Self: StructInternalTypeGen,
     tags::NonRepeated<_1, _2>: LabelWrappedType,
-    X: tags::EnumFieldTypeForSyntax,
+    X: EnumVariantTypeForSyntax,
     (X, tags::NonRepeated<_1, _2>): DoDefaultCheck,
 {
     type SerEnum<E>
@@ -258,6 +258,20 @@ where
         i32: From<E>,
     = Self;
 }
+impl<X> SerEnumToIoWriteProxy<X, tags::Repeated> for SimpleImpl
+where
+    Self: StructInternalTypeGen,
+    tags::Repeated: LabelWrappedType,
+    X: EnumVariantTypeForSyntax,
+    (X, tags::Repeated): DoDefaultCheck,
+{
+    type SerEnum<E>
+    where
+        E: PartialEq,
+        i32: From<E>,
+    = Self;
+}
+
 #[rustfmt::skip]
 impl<X, _1, _2, E> SerEnumToIoWrite<X, tags::NonRepeated<_1, _2>, E> for SimpleImpl
 where
