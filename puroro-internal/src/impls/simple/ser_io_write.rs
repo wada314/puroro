@@ -256,6 +256,7 @@ where
     where
         E: PartialEq,
         i32: From<E>,
+        <X as tags::EnumFieldTypeForSyntax>::NativeType<E>: Clone,
     = Self;
 }
 impl<X> SerEnumToIoWriteProxy<X, tags::Repeated> for SimpleImpl
@@ -269,6 +270,7 @@ where
     where
         E: PartialEq,
         i32: From<E>,
+        <X as tags::EnumFieldTypeForSyntax>::NativeType<E>: Clone,
     = Self;
 }
 
