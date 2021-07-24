@@ -249,7 +249,7 @@ impl<X, _1, _2> SerEnumToIoWriteProxy<X, tags::NonRepeated<_1, _2>> for SimpleIm
 where
     Self: StructInternalTypeGen,
     tags::NonRepeated<_1, _2>: LabelWrappedType,
-    X: EnumVariantTypeForSyntax,
+    X: tags::EnumFieldTypeForSyntax,
     (X, tags::NonRepeated<_1, _2>): DoDefaultCheck,
 {
     type SerEnum<E>
@@ -295,13 +295,21 @@ where
         Ok(())
     }
 }
+#[rustfmt::skip]
 impl<X, E> SerEnumToIoWrite<X, tags::Repeated, E> for SimpleImpl
 where
-    Self: EnumTypeGen<X, tags::Repeated> + StructInternalTypeGen,
+    Self: EnumTypeGen<
+            X,
+            tags::Repeated,
+            EnumType<E> = <tags::Repeated as LabelWrappedType>::Type<
+                <X as tags::EnumFieldTypeForSyntax>::NativeType<E>,
+            >,
+        > + StructInternalTypeGen,
     E: PartialEq,
     i32: From<E>,
     tags::Repeated: LabelWrappedType,
     X: EnumVariantTypeForSyntax,
+    <X as tags::EnumFieldTypeForSyntax>::NativeType<E>: Clone,
     (X, tags::Repeated): DoDefaultCheck,
 {
     fn ser_to_io_write<W>(
@@ -314,18 +322,18 @@ where
         W: std::io::Write,
         E: PartialEq,
     {
-        let mut iter = <tags::Repeated as LabelWrappedType>::iter(field).peekable();
-        if iter.peek().is_some() {
-            let mut buffer: Vec<u8> = Vec::new();
-            for val in iter {
-                let variant = Variant::from_enum::<X, E>(val.clone())?;
-                variant.encode_bytes(&mut buffer)?;
-            }
-            let total_len: i32 = buffer
-                .len()
-                .try_into()
-                .map_err(|_| ErrorKind::TooLongToSerialize)?;
+        let mut iter = <tags::Repeated as LabelWrappedType>::iter(field);
+        let mut buffer: Vec<u8> = Vec::new();
+        for val in iter {
+            let variant = Variant::from_enum::<X, E>(val.clone())?;
+            variant.encode_bytes(&mut buffer)?;
+        }
+        let total_len: i32 = buffer
+            .len()
+            .try_into()
+            .map_err(|_| ErrorKind::TooLongToSerialize)?;
 
+        if total_len != 0 {
             write_field_number_and_wire_type(out, field_number, WireType::LengthDelimited)?;
             Variant::from_i32(total_len)?.encode_bytes(out)?;
             out.write_all(&buffer)?;
