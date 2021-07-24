@@ -1,4 +1,4 @@
-use super::{LabelWrappedLdType, LabelWrappedType, SimpleImpl};
+use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType, SimpleImpl};
 use crate::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variants};
 use crate::de::{
     DeserEnumFromBytesIter, DeserEnumFromBytesIterProxy, DeserFieldFromBytesIter,
@@ -266,11 +266,16 @@ where
     = Self;
 }
 
-#[rustfmt::skip] // Self: MsgTypeGen<..., MsgType<M> = ...> 's <M> is removed by rustfmt 
+#[rustfmt::skip] // Self: MsgTypeGen<..., MsgType<M> = ...> 's <M> is removed by rustfmt
 impl<X, M, _1, _2> DeserMsgFromBytesIter<X, tags::NonRepeated<_1, _2>, M> for SimpleImpl
 where
-    Self: MsgTypeGen<X, tags::NonRepeated<_1, _2>, MsgType<M> = Option<Box<M>>>,
-    M: MessageFromBytesIter +  MessageInternal<ImplTypeTag = SimpleImpl>,
+    Self: MsgTypeGen<
+        X,
+        tags::NonRepeated<_1, _2>,
+        MsgType<M> = <tags::NonRepeated<_1, _2> as LabelWrappedMessageType>::Type<M>,
+    >,
+    M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl>,
+    tags::NonRepeated<_1, _2>: LabelWrappedMessageType,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as MsgTypeGen<X, tags::NonRepeated<_1, _2>>>::MsgType<M>,
@@ -283,11 +288,11 @@ where
         use ::std::ops::DerefMut;
         match data {
             FieldData::LengthDelimited(iter) => deser_from_scoped_iter(
-                field
-                    .get_or_insert_with(|| Box::new(
-                        MessageInternal::new_with_parents_internal_data(internal_data)
-                    ))
-                    .deref_mut(),
+                <tags::NonRepeated<_1, _2> as LabelWrappedMessageType>::get_or_insert_with(
+                    field,
+                    || MessageInternal::new_with_parents_internal_data(internal_data),
+                )
+                .deref_mut(),
                 iter,
             ),
             _ => Err(ErrorKind::UnexpectedWireType)?,

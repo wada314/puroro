@@ -1,5 +1,6 @@
 use ::std::borrow::Cow;
 use puroro::{tags, Result};
+use std::ops::DerefMut;
 
 /// A utility type-function which returns a type wrapped by `Option` or `Vec` according
 /// to the label (e.g. `optional` => `Option`).
@@ -221,6 +222,7 @@ impl<X> LabelWrappedLdType for (X, tags::Repeated) {
 pub trait LabelWrappedMessageType: Sized {
     type Type<T>;
     fn iter<T>(wrapped: &Self::Type<T>) -> MsgIter<'_, T>;
+    fn get_or_insert_with<F: FnOnce() -> T, T>(wrapped: &mut Self::Type<T>, f: F) -> &mut T;
 }
 pub enum MsgIter<'a, T> {
     OptionBox(::std::option::Iter<'a, Box<T>>),
@@ -242,10 +244,17 @@ impl<_1, _2> LabelWrappedMessageType for tags::NonRepeated<_1, _2> {
     fn iter<T>(wrapped: &Self::Type<T>) -> MsgIter<'_, T> {
         MsgIter::OptionBox(wrapped.iter())
     }
+    fn get_or_insert_with<F: FnOnce() -> T, T>(wrapped: &mut Self::Type<T>, f: F) -> &mut T {
+        <Option<Box<T>>>::get_or_insert_with(wrapped, || Box::new((f)())).deref_mut()
+    }
 }
 impl LabelWrappedMessageType for tags::Repeated {
     type Type<T> = Vec<T>;
     fn iter<T>(wrapped: &Self::Type<T>) -> MsgIter<'_, T> {
         MsgIter::Slice(wrapped.iter())
+    }
+    fn get_or_insert_with<F: FnOnce() -> T, T>(wrapped: &mut Self::Type<T>, f: F) -> &mut T {
+        <Vec<T>>::push(wrapped, (f)());
+        wrapped.last_mut().unwrap()
     }
 }

@@ -2,7 +2,10 @@ use std::convert::TryInto;
 
 use crate::de::DoDefaultCheck;
 use crate::se::to_io_write::write_field_number_and_wire_type;
-use crate::se::{SerEnumToIoWrite, SerFieldToIoWrite, SerInternalDataToIoWrite, SerMsgToIoWrite};
+use crate::se::{
+    SerEnumToIoWrite, SerEnumToIoWriteProxy, SerFieldToIoWrite, SerInternalDataToIoWrite,
+    SerMsgToIoWrite, SerMsgToIoWriteProxy,
+};
 use crate::{
     EnumTypeGen, ErrorKind, FieldTypeGen, MsgTypeGen, Result, SimpleImpl, StructInternalTypeGen,
 };
@@ -242,18 +245,35 @@ where
 }
 
 // Enum
-impl<X, _1, _2> SerEnumToIoWrite<X, tags::NonRepeated<_1, _2>> for SimpleImpl
+impl<X, _1, _2> SerEnumToIoWriteProxy<X, tags::NonRepeated<_1, _2>> for SimpleImpl
 where
-    Self: EnumTypeGen<
-        X,
-        tags::NonRepeated<_1, _2>,
-        EnumType = <tags::NonRepeated<_1, _2> as LabelWrappedType>::Type,
-    >,
+    Self: EnumTypeGen<X, tags::NonRepeated<_1, _2>> + StructInternalTypeGen,
     tags::NonRepeated<_1, _2>: LabelWrappedType,
     X: EnumVariantTypeForSyntax,
     (X, tags::NonRepeated<_1, _2>): DoDefaultCheck,
 {
-    fn ser_to_io_write<W, E>(
+    type SerEnum<E>
+    where
+        E: PartialEq,
+    = Self;
+}
+#[rustfmt::skip]
+impl<X, _1, _2, E> SerEnumToIoWrite<X, tags::NonRepeated<_1, _2>, E> for SimpleImpl
+where
+    Self: EnumTypeGen<
+        X,
+        tags::NonRepeated<_1, _2>,
+        EnumType<E> = <tags::NonRepeated<_1, _2> as LabelWrappedType>::Type<
+            <X as tags::EnumFieldTypeForSyntax>::NativeType<E>
+        >,
+    > + StructInternalTypeGen,
+    E: PartialEq,
+    i32: From<E>,
+    tags::NonRepeated<_1, _2>: LabelWrappedType,
+    X: EnumVariantTypeForSyntax,
+    (X, tags::NonRepeated<_1, _2>): DoDefaultCheck,
+{
+    fn ser_to_io_write<W>(
         field: &<Self as EnumTypeGen<X, tags::NonRepeated<_1, _2>>>::EnumType<E>,
         field_number: i32,
         out: &mut W,
@@ -261,7 +281,6 @@ where
     ) -> Result<()>
     where
         W: std::io::Write,
-        E: PartialEq,
     {
         let do_default_check = <(X, tags::NonRepeated<_1, _2>) as DoDefaultCheck>::VALUE;
         if let Some(value) = <tags::NonRepeated<_1, _2> as LabelWrappedType>::iter(field).next() {
@@ -274,11 +293,16 @@ where
         Ok(())
     }
 }
-impl<X> SerEnumToIoWrite<X, tags::Repeated> for SimpleImpl
+impl<X, E> SerEnumToIoWrite<X, tags::Repeated, E> for SimpleImpl
 where
-    Self: EnumTypeGen<X, tags::Repeated>,
+    Self: EnumTypeGen<X, tags::Repeated> + StructInternalTypeGen,
+    E: PartialEq,
+    i32: From<E>,
+    tags::Repeated: LabelWrappedType,
+    X: EnumVariantTypeForSyntax,
+    (X, tags::Repeated): DoDefaultCheck,
 {
-    fn ser_to_io_write<W, E>(
+    fn ser_to_io_write<W>(
         field: &<Self as EnumTypeGen<X, tags::Repeated>>::EnumType<E>,
         field_number: i32,
         out: &mut W,
@@ -288,14 +312,11 @@ where
         W: std::io::Write,
         E: PartialEq,
     {
-        let mut iter = <VariantNativeType<X, tags::value::Enum<E>> as LabelWrappedType<
-            tags::Repeated,
-        >>::iter(field)
-        .peekable();
+        let mut iter = <tags::Repeated as LabelWrappedType>::iter(field).peekable();
         if iter.peek().is_some() {
             let mut buffer: Vec<u8> = Vec::new();
             for val in iter {
-                let variant = Variant::from_native::<(X, tags::Enum<E>)>(val.clone())?;
+                let variant = Variant::from_enum::<X, E>(val.clone())?;
                 variant.encode_bytes(&mut buffer)?;
             }
             let total_len: i32 = buffer
@@ -312,11 +333,24 @@ where
 }
 
 // Message
-impl<L, X> SerMsgToIoWrite<X, L> for SimpleImpl
+impl<X, L> SerMsgToIoWriteProxy<X, L> for SimpleImpl
 where
     Self: MsgTypeGen<X, L>,
+    L: LabelWrappedMessageType,
 {
-    fn ser_to_io_write<W, M>(
+    type SerMsg<M>
+    where
+        M: SerToIoWrite,
+    = Self;
+}
+#[rustfmt::skip]
+impl<X, L, M> SerMsgToIoWrite<X, L, M> for SimpleImpl
+where
+    Self: MsgTypeGen<X, L, MsgType<M> = <L as LabelWrappedMessageType>::Type<M>>,
+    L: LabelWrappedMessageType,
+    M: SerToIoWrite,
+{
+    fn ser_to_io_write<W>(
         field: &<Self as MsgTypeGen<X, L>>::MsgType<M>,
         field_number: i32,
         out: &mut W,
@@ -326,7 +360,7 @@ where
         W: std::io::Write,
     {
         use std::ops::Deref as _;
-        for boxed in <M as LabelWrappedMessageType<L>>::iter(field) {
+        for boxed in <L as LabelWrappedMessageType>::iter(field) {
             write_field_number_and_wire_type(out, field_number, WireType::LengthDelimited)?;
             let mut buffer: Vec<u8> = Vec::new();
             <M as SerToIoWrite>::ser(boxed.deref(), &mut buffer)?;
