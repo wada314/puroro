@@ -5,7 +5,7 @@ use crate::de::{
     DeserFieldFromBytesIter, DeserInternalDataFromBytesIter, DeserMsgFromBytesIter,
     DeserMsgFromBytesIterProxy, DoDefaultCheck, MessageFromBytesIter,
 };
-use crate::{EnumTypeGen, FieldTypeGen, MessageInternal, MsgTypeGen, StructInternalTypeGen};
+use crate::{FieldTypeGen, MessageInternal, StructInternalTypeGen};
 use ::itertools::Itertools;
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::types::FieldData;
@@ -208,23 +208,19 @@ where
     = Self;
 }
 
-#[rustfmt::skip] // Self: EnumTypeGen<..., EnumType<E> = ...> 's <E> is removed by rustfmt 
-impl<X, L, E> DeserEnumFromBytesIter<X, L, E> for SimpleImpl
+#[rustfmt::skip]
+impl<X, L, E, EnumFieldType, InternalDataType>
+    DeserEnumFromBytesIter<X, L, E, EnumFieldType, InternalDataType> for SimpleImpl
 where
-    Self: EnumTypeGen<
-        X,
-        L,
-        EnumType<E> = <L as LabelWrappedType>::Type<<X as tags::EnumTypeForSyntax>::NativeType<E>>
-    >,
     (X, L): DoDefaultCheck,
     X: tags::EnumTypeForSyntax + EnumVariantTypeForSyntax,
-    L: LabelWrappedType,
+    L: LabelWrappedType<Type<EnumNativeType<X, E>> = EnumFieldType>,
     E: Default + TryFrom<i32> + PartialEq,
 {
     fn deser_from_scoped_bytes_iter<I>(
-        field: &mut <Self as EnumTypeGen<X, L>>::EnumType<E>,
+        field: &mut EnumFieldType,
         data: FieldData<&mut ScopedIter<I>>,
-        _internal_data: &<Self as StructInternalTypeGen>::Type,
+        _internal_data: &InternalDataType,
     ) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
@@ -265,21 +261,17 @@ where
     = Self;
 }
 
-#[rustfmt::skip] // Self: MsgTypeGen<..., MsgType<M> = ...> 's <M> is removed by rustfmt
-impl<X, L, M> DeserMsgFromBytesIter<X, L, M> for SimpleImpl
+#[rustfmt::skip]
+impl<X, L, M, MsgFieldType, InternalDataType>
+    DeserMsgFromBytesIter<X, L, M, MsgFieldType, InternalDataType> for SimpleImpl
 where
-    Self: MsgTypeGen<
-        X,
-        L,
-        MsgType<M> = <L as LabelWrappedMessageType>::Type<M>,
-    > + StructInternalTypeGen<Type = ()>,
     M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl>,
-    L: LabelWrappedMessageType,
+    L: LabelWrappedMessageType<Type<M> = MsgFieldType>,
 {
     fn deser_from_scoped_bytes_iter<I>(
-        field: &mut <Self as MsgTypeGen<X, L>>::MsgType<M>,
+        field: &mut MsgFieldType,
         data: FieldData<&mut ScopedIter<I>>,
-        _internal_data: &<Self as StructInternalTypeGen>::Type,
+        _internal_data: &InternalDataType,
     ) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
@@ -287,10 +279,9 @@ where
         use ::std::ops::DerefMut;
         match data {
             FieldData::LengthDelimited(iter) => deser_from_scoped_iter(
-                <L as LabelWrappedMessageType>::get_or_insert_with(
-                    field,
-                    || MessageInternal::new_with_internal_data(()),
-                )
+                <L as LabelWrappedMessageType>::get_or_insert_with(field, || {
+                    MessageInternal::new_with_internal_data(())
+                })
                 .deref_mut(),
                 iter,
             ),
