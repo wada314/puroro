@@ -1,8 +1,9 @@
 use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType, SimpleImpl};
 use crate::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variants};
 use crate::de::{
-    DeserEnumFromBytesIter, DeserEnumFromBytesIterProxy, DeserFieldFromBytesIter,
-    DeserMsgFromBytesIter, DeserMsgFromBytesIterProxy, DoDefaultCheck, MessageFromBytesIter,
+    DeserAnyFieldFromBytesIter, DeserEnumFromBytesIter, DeserEnumFromBytesIterProxy,
+    DeserFieldFromBytesIter, DeserMsgFromBytesIter, DeserMsgFromBytesIterProxy, DoDefaultCheck,
+    MessageFromBytesIter,
 };
 use crate::{EnumTypeGen, FieldTypeGen, MessageInternal, MsgTypeGen, StructInternalTypeGen};
 use ::itertools::Itertools;
@@ -13,21 +14,21 @@ use ::puroro::{tags, ErrorKind, Result};
 use ::std::convert::TryFrom;
 
 // deser from iterator
+impl DeserAnyFieldFromBytesIter for SimpleImpl {}
 
 // deser from iterator, into variant type fields
-type VariantNativeType<X, V> =
-    <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType;
+type VariantNativeType<V> = <tags::wire::Variant<V> as tags::NumericalFieldTypeTag>::NativeType;
 impl<L, V, X> DeserFieldFromBytesIter<X, L, tags::wire::Variant<V>> for SimpleImpl
 where
     (X, L): DoDefaultCheck,
-    (X, tags::wire::Variant<V>): tags::NumericalFieldTypeTag + VariantTypeTag,
-    VariantNativeType<X, V>: PartialEq,
+    tags::wire::Variant<V>: tags::NumericalFieldTypeTag + VariantTypeTag,
+    VariantNativeType<V>: PartialEq,
     L: LabelWrappedType,
     Self: FieldTypeGen<
         X,
         L,
         tags::wire::Variant<V>,
-        Type = <L as LabelWrappedType>::Type<VariantNativeType<X, V>>,
+        Type = <L as LabelWrappedType>::Type<VariantNativeType<V>>,
     >,
 {
     fn deser_from_scoped_bytes_iter<I>(
@@ -41,7 +42,7 @@ where
         let do_default_check = <(X, L) as DoDefaultCheck>::VALUE;
         match data {
             FieldData::Variant(variant) => {
-                let native = variant.to_native::<(X, tags::wire::Variant<V>)>()?;
+                let native = variant.to_native::<tags::wire::Variant<V>>()?;
                 if !do_default_check || native != Default::default() {
                     *<L as LabelWrappedType>::get_or_insert_with(field, Default::default) = native;
                 }
@@ -49,9 +50,9 @@ where
             FieldData::LengthDelimited(iter) => {
                 let variants_iter = Variants::new(iter);
                 let values_iter = variants_iter
-                    .map(|rv| rv.and_then(|v| v.to_native::<(X, tags::wire::Variant<V>)>()))
+                    .map(|rv| rv.and_then(|v| v.to_native::<tags::wire::Variant<V>>()))
                     .filter_ok(|val| {
-                        !do_default_check || *val != <VariantNativeType<X, V> as Default>::default()
+                        !do_default_check || *val != <VariantNativeType<V> as Default>::default()
                     });
                 <L as LabelWrappedType>::extend(field, values_iter)?;
             }
@@ -62,19 +63,18 @@ where
 }
 
 // Bits32
-type Bits32NativeType<X, V> =
-    <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType;
+type Bits32NativeType<V> = <tags::wire::Bits32<V> as tags::NumericalFieldTypeTag>::NativeType;
 impl<L, V, X> DeserFieldFromBytesIter<X, L, tags::wire::Bits32<V>> for SimpleImpl
 where
     (X, L): DoDefaultCheck,
-    (X, tags::wire::Bits32<V>): tags::NumericalFieldTypeTag + Bits32TypeTag,
-    Bits32NativeType<X, V>: PartialEq,
+    tags::wire::Bits32<V>: tags::NumericalFieldTypeTag + Bits32TypeTag,
+    Bits32NativeType<V>: PartialEq,
     L: LabelWrappedType,
     Self: FieldTypeGen<
         X,
         L,
         tags::wire::Bits32<V>,
-        Type = <L as LabelWrappedType>::Type<Bits32NativeType<X, V>>,
+        Type = <L as LabelWrappedType>::Type<Bits32NativeType<V>>,
     >,
 {
     fn deser_from_scoped_bytes_iter<I>(
@@ -88,7 +88,7 @@ where
         let do_default_check = <(X, L) as DoDefaultCheck>::VALUE;
         match data {
             FieldData::Bits32(bytes) => {
-                let native = <(X, tags::wire::Bits32<V>) as Bits32TypeTag>::from_array(bytes);
+                let native = <tags::wire::Bits32<V> as Bits32TypeTag>::from_array(bytes);
                 if !do_default_check || native != Default::default() {
                     *<L as LabelWrappedType>::get_or_insert_with(field, Default::default) = native;
                 }
@@ -100,19 +100,18 @@ where
 }
 
 // Bits64
-type Bits64NativeType<X, V> =
-    <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType;
+type Bits64NativeType<V> = <tags::wire::Bits64<V> as tags::NumericalFieldTypeTag>::NativeType;
 impl<L, V, X> DeserFieldFromBytesIter<X, L, tags::wire::Bits64<V>> for SimpleImpl
 where
     (X, L): DoDefaultCheck,
-    (X, tags::wire::Bits64<V>): tags::NumericalFieldTypeTag + Bits64TypeTag,
-    Bits64NativeType<X, V>: PartialEq,
+    tags::wire::Bits64<V>: tags::NumericalFieldTypeTag + Bits64TypeTag,
+    Bits64NativeType<V>: PartialEq,
     L: LabelWrappedType,
     Self: FieldTypeGen<
         X,
         L,
         tags::wire::Bits64<V>,
-        Type = <L as LabelWrappedType>::Type<Bits64NativeType<X, V>>,
+        Type = <L as LabelWrappedType>::Type<Bits64NativeType<V>>,
     >,
 {
     fn deser_from_scoped_bytes_iter<I>(
@@ -126,7 +125,7 @@ where
         let do_default_check = <(X, L) as DoDefaultCheck>::VALUE;
         match data {
             FieldData::Bits64(bytes) => {
-                let native = <(X, tags::wire::Bits64<V>) as Bits64TypeTag>::from_array(bytes);
+                let native = <tags::wire::Bits64<V> as Bits64TypeTag>::from_array(bytes);
                 if !do_default_check || native != Default::default() {
                     *<L as LabelWrappedType>::get_or_insert_with(field, Default::default) = native;
                 }
@@ -255,9 +254,10 @@ where
 }
 
 // Message
-impl<X, _1, _2> DeserMsgFromBytesIterProxy<X, tags::NonRepeated<_1, _2>> for SimpleImpl
+impl<X, L> DeserMsgFromBytesIterProxy<X, L> for SimpleImpl
 where
     Self: StructInternalTypeGen,
+    L: LabelWrappedMessageType,
 {
     type DeserMessage<M>
     where
@@ -266,18 +266,18 @@ where
 }
 
 #[rustfmt::skip] // Self: MsgTypeGen<..., MsgType<M> = ...> 's <M> is removed by rustfmt
-impl<X, M, _1, _2> DeserMsgFromBytesIter<X, tags::NonRepeated<_1, _2>, M> for SimpleImpl
+impl<X, L, M> DeserMsgFromBytesIter<X, L, M> for SimpleImpl
 where
     Self: MsgTypeGen<
         X,
-        tags::NonRepeated<_1, _2>,
-        MsgType<M> = <tags::NonRepeated<_1, _2> as LabelWrappedMessageType>::Type<M>,
+        L,
+        MsgType<M> = <L as LabelWrappedMessageType>::Type<M>,
     >,
     M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl>,
-    tags::NonRepeated<_1, _2>: LabelWrappedMessageType,
+    L: LabelWrappedMessageType,
 {
     fn deser_from_scoped_bytes_iter<I>(
-        field: &mut <Self as MsgTypeGen<X, tags::NonRepeated<_1, _2>>>::MsgType<M>,
+        field: &mut <Self as MsgTypeGen<X, L>>::MsgType<M>,
         data: FieldData<&mut ScopedIter<I>>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
@@ -287,37 +287,13 @@ where
         use ::std::ops::DerefMut;
         match data {
             FieldData::LengthDelimited(iter) => deser_from_scoped_iter(
-                <tags::NonRepeated<_1, _2> as LabelWrappedMessageType>::get_or_insert_with(
+                <L as LabelWrappedMessageType>::get_or_insert_with(
                     field,
                     || MessageInternal::new_with_parents_internal_data(internal_data),
                 )
                 .deref_mut(),
                 iter,
             ),
-            _ => Err(ErrorKind::UnexpectedWireType)?,
-        }
-    }
-}
-
-#[rustfmt::skip] // Self: MsgTypeGen<..., MsgType<M> = ...> 's <M> is removed by rustfmt 
-impl<X, M> DeserMsgFromBytesIter<X, tags::Repeated, M> for SimpleImpl
-where
-    Self: MsgTypeGen<X, tags::Repeated, MsgType<M> = Vec<M>>,
-    M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl>,
-{
-    fn deser_from_scoped_bytes_iter<I>(
-        field: &mut <Self as MsgTypeGen<X, tags::Repeated>>::MsgType<M>,
-        data: FieldData<&mut ScopedIter<I>>,
-        internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> Result<()>
-    where
-        I: Iterator<Item = std::io::Result<u8>>,
-    {
-        match data {
-            FieldData::LengthDelimited(iter) => {
-                field.push(MessageInternal::new_with_parents_internal_data(internal_data));
-                deser_from_scoped_iter(field.last_mut().unwrap(), iter)
-            }
             _ => Err(ErrorKind::UnexpectedWireType)?,
         }
     }

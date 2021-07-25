@@ -8,6 +8,112 @@ use ::std::convert::TryFrom;
 
 pub mod from_iter;
 
+pub trait DeserAnyFieldFromBytesIter:
+    DeserEnumFromBytesIterProxy<tags::Proto2, tags::Required>
+    + DeserEnumFromBytesIterProxy<tags::Proto2, tags::Optional>
+    + DeserEnumFromBytesIterProxy<tags::Proto2, tags::Repeated>
+    + DeserEnumFromBytesIterProxy<tags::Proto3, tags::Unlabeled>
+    + DeserEnumFromBytesIterProxy<tags::Proto3, tags::Optional>
+    + DeserEnumFromBytesIterProxy<tags::Proto3, tags::Repeated>
+    + DeserMsgFromBytesIterProxy<tags::Proto2, tags::Required>
+    + DeserMsgFromBytesIterProxy<tags::Proto2, tags::Optional>
+    + DeserMsgFromBytesIterProxy<tags::Proto2, tags::Repeated>
+    + DeserMsgFromBytesIterProxy<tags::Proto3, tags::Unlabeled>
+    + DeserMsgFromBytesIterProxy<tags::Proto3, tags::Optional>
+    + DeserMsgFromBytesIterProxy<tags::Proto3, tags::Repeated>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::Int32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::UInt32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::SInt32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::Int64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::UInt64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::SInt64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::Bool>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::Bytes>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::String>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::Float>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::Double>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::SFixed32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::Fixed32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::SFixed64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Required, tags::Fixed64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::Int32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::UInt32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::SInt32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::Int64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::UInt64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::SInt64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::Bool>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::Bytes>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::String>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::Float>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::Double>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::SFixed32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::Fixed32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::SFixed64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Optional, tags::Fixed64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::Int32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::UInt32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::SInt32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::Int64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::UInt64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::SInt64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::Bool>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::Bytes>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::String>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::Float>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::Double>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::SFixed32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::Fixed32>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::SFixed64>
+    + DeserFieldFromBytesIter<tags::Proto2, tags::Repeated, tags::Fixed64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::Int32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::UInt32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::SInt32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::Int64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::UInt64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::SInt64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::Bool>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::Bytes>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::String>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::Float>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::Double>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::SFixed32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::Fixed32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::SFixed64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Unlabeled, tags::Fixed64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::Int32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::UInt32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::SInt32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::Int64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::UInt64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::SInt64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::Bool>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::Bytes>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::String>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::Float>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::Double>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::SFixed32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::Fixed32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::SFixed64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Optional, tags::Fixed64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::Int32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::UInt32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::SInt32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::Int64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::UInt64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::SInt64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::Bool>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::Bytes>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::String>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::Float>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::Double>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::SFixed32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::Fixed32>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::SFixed64>
+    + DeserFieldFromBytesIter<tags::Proto3, tags::Repeated, tags::Fixed64>
+{
+}
+
 pub trait DoDefaultCheck {
     const VALUE: bool = false;
 }

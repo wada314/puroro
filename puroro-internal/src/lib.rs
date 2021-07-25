@@ -4,17 +4,16 @@ pub mod de;
 pub mod impls;
 pub mod se;
 
+use ::puroro::{tags, ErrorKind, Result};
 use ::std::convert::TryFrom;
 
 // Re-exporting library modules
 pub use ::puroro::{bumpalo, hashbrown};
 
 // Impl symbols
-pub use impls::simple::SimpleImpl;
-
-use ::puroro::{tags, ErrorKind, Result};
-
 pub use de::from_iter::ScopedIter;
+pub use de::DeserAnyFieldFromBytesIter;
+pub use impls::simple::SimpleImpl;
 
 pub trait MessageInternal: ::puroro::Message {
     type ImplTypeTag: StructInternalTypeGen;
