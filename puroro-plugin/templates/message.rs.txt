@@ -146,8 +146,9 @@ where ImplTag:
 
 impl<ImplTag> ::puroro::SerToIoWrite for {{ self.message.rust_ident() }}<ImplTag>
 where ImplTag:
-    super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedSerToIoWrite +
-    ::puroro_internal::StructInternalTypeGen,
+    ::puroro_internal::AnyFieldTypeGen
+    + ::puroro_internal::SerAnyFieldToIoWrite
+    + ::puroro_internal::StructInternalTypeGen
 {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
@@ -156,7 +157,24 @@ where ImplTag:
         {% if self.is_public -%}
         
         {%- for field in self.message.fields() %}
-        {# TODO <ImplTag as ::puroro_internal::se::SerFieldToIoWrite<{{ field.label_and_type_tag("ImplTag").unwrap() }}>>::ser_to_io_write(&self.{{ field.rust_ident() }}, {{ field.number() }}, out, &self.puroro_internal)?; #}
+        {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
+        {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
+        <ImplTag as ::puroro_internal::se::SerEnumToIoWrite<
+            {{ field.syntax_and_label_tags().unwrap() }}
+        >>::SerEnum<
+            {{ e.rust_absolute_path() }}
+        >::ser_to_io_write(&self.{{ field.rust_ident() }}, {{ field.number() }}, out, &self.puroro_internal)?;
+        {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+        <ImplTag as ::puroro_internal::se::SerMsgToIoWrite<
+            {{ field.syntax_and_label_tags().unwrap() }}
+        >>::SerMsg<
+            {{ m.rust_absolute_path() }}
+        >::ser_to_io_write(&self.{{ field.rust_ident() }}, {{ field.number() }}, out, &self.puroro_internal)?;
+        {%- else %}
+        <ImplTag as ::puroro_internal::se::SerFieldToIoWrite<
+            {{ field.syntax_and_label_and_type_tags().unwrap() }}
+        >>::ser_to_io_write(&self.{{ field.rust_ident() }}, {{ field.number() }}, out, &self.puroro_internal)?;
+        {%- endmatch %}
         {%- endfor %}
         <ImplTag as ::puroro_internal::se::SerInternalDataToIoWrite>::ser_to_io_write(out, &self.puroro_internal)?;
         Ok(())

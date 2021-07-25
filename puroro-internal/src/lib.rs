@@ -14,6 +14,7 @@ pub use ::puroro::{bumpalo, hashbrown};
 pub use de::from_iter::ScopedIter;
 pub use de::DeserAnyFieldFromBytesIter;
 pub use impls::simple::SimpleImpl;
+pub use se::SerAnyFieldToIoWrite;
 
 pub trait MessageInternal: ::puroro::Message {
     type ImplTypeTag: StructInternalTypeGen;
