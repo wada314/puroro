@@ -103,6 +103,13 @@ pub enum FieldType {
     Enum(Weak<Enum>),
     Message(Weak<Message>),
 }
+// Do not cache this type! This type contains a strong `Rc` ponter
+// to other `Message` type, causes cycle-reference if it is not handled properly.
+#[derive(Debug, Clone)]
+pub enum NontrivialFieldType {
+    Enum(Rc<Enum>),
+    Message(Rc<Message>),
+}
 
 #[derive(Debug, Clone)]
 pub enum FieldLabel {
@@ -394,12 +401,12 @@ impl Message {
                 (
                     field
                         .field_type()
-                        .and_then(|ft| ft.tag_ident(""))
-                        .unwrap_or("".to_string()),
+                        .and_then(|ft| ft.tag_ident())
+                        .unwrap_or_default(),
                     field
                         .field_label()
                         .map(|fl| fl.tag_ident().to_string())
-                        .unwrap_or("".to_string()),
+                        .unwrap_or_default(),
                 )
             })
             .collect_vec()
@@ -540,13 +547,20 @@ impl Field {
         self.number
     }
 
-    pub fn label_and_type_tag(&self, impl_tag: &str) -> Result<String> {
+    pub fn syntax_and_label_and_type_tags(&self) -> Result<String> {
         Ok(format!(
-            "(::puroro::tags::{label}, \
-                        (::puroro::tags::{syntax}, ::puroro::tags::{vtype}))",
-            label = self.field_label()?.tag_ident(),
+            "::puroro::tags::{syntax}, ::puroro::tags::{label}, \
+                ::puroro::tags::{vtype}",
             syntax = self.message()?.input_file()?.syntax().tag_ident(),
-            vtype = self.field_type()?.tag_ident(impl_tag)?
+            label = self.field_label()?.tag_ident(),
+            vtype = self.field_type()?.tag_ident()?
+        ))
+    }
+    pub fn syntax_and_label_tags(&self) -> Result<String> {
+        Ok(format!(
+            "::puroro::tags::{syntax}, ::puroro::tags::{label}",
+            syntax = self.message()?.input_file()?.syntax().tag_ident(),
+            label = self.field_label()?.tag_ident(),
         ))
     }
 
@@ -629,41 +643,42 @@ impl FieldType {
         })
     }
 
-    pub fn tag_ident(&self, impl_tag: &str) -> Result<String> {
+    pub fn as_nontrivial_field_type(&self) -> Result<Option<NontrivialFieldType>> {
+        Ok(match self {
+            FieldType::Enum(e) => Some(NontrivialFieldType::Enum(Weak::upgrade(e).ok_or(
+                ErrorKind::InternalError {
+                    detail: "Failed to upgrade Weak pointer.".to_string(),
+                },
+            )?)),
+            FieldType::Message(m) => Some(NontrivialFieldType::Message(Weak::upgrade(m).ok_or(
+                ErrorKind::InternalError {
+                    detail: "Failed to upgrade Weak pointer.".to_string(),
+                },
+            )?)),
+            _ => None,
+        })
+    }
+
+    pub fn tag_ident(&self) -> Result<&str> {
         Ok(match *self {
-            FieldType::Double => "Double".into(),
-            FieldType::Float => "Float".into(),
-            FieldType::Int32 => "Int32".into(),
-            FieldType::Int64 => "Int64".into(),
-            FieldType::UInt32 => "UInt32".into(),
-            FieldType::UInt64 => "UInt64".into(),
-            FieldType::SInt32 => "SInt32".into(),
-            FieldType::SInt64 => "SInt64".into(),
-            FieldType::Fixed32 => "Fixed32".into(),
-            FieldType::Fixed64 => "Fixed64".into(),
-            FieldType::SFixed32 => "SFixed32".into(),
-            FieldType::SFixed64 => "SFixed64".into(),
-            FieldType::Bool => "Bool".into(),
+            FieldType::Double => "Double",
+            FieldType::Float => "Float",
+            FieldType::Int32 => "Int32",
+            FieldType::Int64 => "Int64",
+            FieldType::UInt32 => "UInt32",
+            FieldType::UInt64 => "UInt64",
+            FieldType::SInt32 => "SInt32",
+            FieldType::SInt64 => "SInt64",
+            FieldType::Fixed32 => "Fixed32",
+            FieldType::Fixed64 => "Fixed64",
+            FieldType::SFixed32 => "SFixed32",
+            FieldType::SFixed64 => "SFixed64",
+            FieldType::Bool => "Bool",
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => "String".into(),
-            FieldType::Bytes => "Bytes".into(),
-            FieldType::Enum(ref e) => format!(
-                "Enum::<{}>",
-                Weak::upgrade(e)
-                    .ok_or(ErrorKind::InternalError {
-                        detail: "Failed to upgrade a Weak<> pointer.".to_string(),
-                    })?
-                    .rust_absolute_path()
-            ),
-            FieldType::Message(ref m) => format!(
-                "Message::<{path}<{impl_tag}>>",
-                path = Weak::upgrade(m)
-                    .ok_or(ErrorKind::InternalError {
-                        detail: "Failed to upgrade a Weak<> pointer.".to_string(),
-                    })?
-                    .rust_absolute_path(),
-                impl_tag = impl_tag,
-            ),
+            FieldType::String => "String",
+            FieldType::Bytes => "Bytes",
+            FieldType::Enum(_) => "Enum",
+            FieldType::Message(_) => "Message",
         })
     }
 

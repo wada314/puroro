@@ -11,7 +11,22 @@ where ImplTag:
 
     {% for field in self.message.fields() -%}
     /// {{ field.rust_one_line_comment().unwrap() }}
-    pub {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag("ImplTag").unwrap() }}>>::Type,
+    
+    {%- match field.field_type().unwrap().as_nontrivial_field_type().unwrap() %}
+    {%- when Some with (field_type) %}
+    {%- match field_type %}
+    {%- when Enum with (e) %}
+    pub {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::EnumTypeGen<{{ field.syntax_and_label_tags().unwrap() }}>>::EnumType<
+        {{ e.rust_absolute_path() }}
+    >,
+    {%- when Message with (m) %}
+    pub {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::MsgTypeGen<{{ field.syntax_and_label_tags().unwrap() }}>>::EnumType<
+        {{ m.rust_absolute_path() }}<ImplTag>
+    >,
+    {%- endmatch %}
+    {%- else %}
+    pub {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.syntax_and_label_and_type_tags().unwrap() }}>>::Type,
+    {%- endmatch %}
     {% endfor -%}
     puroro_internal: <ImplTag as ::puroro_internal::StructInternalTypeGen>::Type,
 
@@ -45,7 +60,12 @@ where ImplTag:
             {% if self.is_public -%}
 
             {%- for field in self.message.fields() %}
-            {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.label_and_type_tag("ImplTag").unwrap() }}>>::default(&internal_data),
+            {%- if field.is_enum() %}
+            {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::EnumTypeGen<{{ field.syntax_and_label_tag("ImplTag").unwrap() }}>>::default(&internal_data),
+            {%- else if field.is_message() %}
+            {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::MsgTypeGen<{{ field.syntax_and_label_tag("ImplTag").unwrap() }}>>::default(&internal_data),
+            {%- else %}
+            {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.syntax_and_label_and_type_tags("ImplTag").unwrap() }}>>::default(&internal_data),
             {%- endfor %}
             puroro_internal: internal_data,
 
