@@ -2,8 +2,8 @@ use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType, Simpl
 use crate::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variants};
 use crate::de::{
     DeserAnyFieldFromBytesIter, DeserEnumFromBytesIter, DeserEnumFromBytesIterProxy,
-    DeserFieldFromBytesIter, DeserMsgFromBytesIter, DeserMsgFromBytesIterProxy, DoDefaultCheck,
-    MessageFromBytesIter,
+    DeserFieldFromBytesIter, DeserInternalDataFromBytesIter, DeserMsgFromBytesIter,
+    DeserMsgFromBytesIterProxy, DoDefaultCheck, MessageFromBytesIter,
 };
 use crate::{EnumTypeGen, FieldTypeGen, MessageInternal, MsgTypeGen, StructInternalTypeGen};
 use ::itertools::Itertools;
@@ -259,7 +259,7 @@ where
     Self: StructInternalTypeGen,
     L: LabelWrappedMessageType,
 {
-    type DeserMessage<M>
+    type DeserMsg<M>
     where
         M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self>,
     = Self;
@@ -272,14 +272,14 @@ where
         X,
         L,
         MsgType<M> = <L as LabelWrappedMessageType>::Type<M>,
-    >,
+    > + StructInternalTypeGen<Type = ()>,
     M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl>,
     L: LabelWrappedMessageType,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as MsgTypeGen<X, L>>::MsgType<M>,
         data: FieldData<&mut ScopedIter<I>>,
-        internal_data: &<Self as StructInternalTypeGen>::Type,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,
@@ -289,12 +289,25 @@ where
             FieldData::LengthDelimited(iter) => deser_from_scoped_iter(
                 <L as LabelWrappedMessageType>::get_or_insert_with(
                     field,
-                    || MessageInternal::new_with_parents_internal_data(internal_data),
+                    || MessageInternal::new_with_internal_data(()),
                 )
                 .deref_mut(),
                 iter,
             ),
             _ => Err(ErrorKind::UnexpectedWireType)?,
         }
+    }
+}
+
+// Internal data
+impl DeserInternalDataFromBytesIter for SimpleImpl {
+    fn deser_from_scoped_bytes_iter<I>(
+        _internal_data: &mut <Self as StructInternalTypeGen>::Type,
+        _data: FieldData<&mut ScopedIter<I>>,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = std::io::Result<u8>>,
+    {
+        Ok(())
     }
 }

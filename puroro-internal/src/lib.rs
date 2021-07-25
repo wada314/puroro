@@ -21,9 +21,6 @@ pub trait MessageInternal: ::puroro::Message {
     fn new_with_internal_data(
         internal_data: <Self::ImplTypeTag as StructInternalTypeGen>::Type,
     ) -> Self;
-    fn new_with_parents_internal_data(
-        parents_internal_data: &<Self::ImplTypeTag as StructInternalTypeGen>::Type,
-    ) -> Self;
 }
 
 pub trait ChooseStructVisibility<Public, Private> {

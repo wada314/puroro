@@ -9,7 +9,8 @@ use ::std::convert::TryFrom;
 pub mod from_iter;
 
 pub trait DeserAnyFieldFromBytesIter:
-    DeserEnumFromBytesIterProxy<tags::Proto2, tags::Required>
+    DeserInternalDataFromBytesIter
+    + DeserEnumFromBytesIterProxy<tags::Proto2, tags::Required>
     + DeserEnumFromBytesIterProxy<tags::Proto2, tags::Optional>
     + DeserEnumFromBytesIterProxy<tags::Proto2, tags::Repeated>
     + DeserEnumFromBytesIterProxy<tags::Proto3, tags::Unlabeled>
@@ -174,7 +175,7 @@ pub trait DeserMsgFromBytesIterProxy<X, L>: MsgTypeGen<X, L> + StructInternalTyp
     // because in *trait method* implementation we cannot add extra
     // constraints to trait bounds:
     // i.e. Cannot add `Self: EnumTypeGen<..., EnumType<E> = Something>`
-    type DeserMessage<M>: DeserMsgFromBytesIter<X, L, M>
+    type DeserMsg<M>: DeserMsgFromBytesIter<X, L, M>
     where
         M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self>;
 }
@@ -183,6 +184,15 @@ pub trait DeserMsgFromBytesIter<X, L, M>: MsgTypeGen<X, L> + StructInternalTypeG
         field: &mut <Self as MsgTypeGen<X, L>>::MsgType<M>,
         data: FieldData<&mut ScopedIter<I>>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>;
+}
+
+pub trait DeserInternalDataFromBytesIter: StructInternalTypeGen {
+    fn deser_from_scoped_bytes_iter<I>(
+        internal_data: &mut <Self as StructInternalTypeGen>::Type,
+        data: FieldData<&mut ScopedIter<I>>,
     ) -> Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>;

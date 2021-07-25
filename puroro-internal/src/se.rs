@@ -4,7 +4,8 @@ use ::puroro::SerToIoWrite;
 
 use crate::{EnumTypeGen, FieldTypeGen, MsgTypeGen, Result, StructInternalTypeGen};
 pub trait SerAnyFieldToIoWrite:
-    SerEnumToIoWriteProxy<tags::Proto2, tags::Required>
+    SerInternalDataToIoWrite
+    + SerEnumToIoWriteProxy<tags::Proto2, tags::Required>
     + SerEnumToIoWriteProxy<tags::Proto2, tags::Optional>
     + SerEnumToIoWriteProxy<tags::Proto2, tags::Repeated>
     + SerEnumToIoWriteProxy<tags::Proto3, tags::Unlabeled>
