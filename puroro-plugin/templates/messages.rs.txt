@@ -24,11 +24,6 @@ pub mod puroro_structs {
         mod puroro_root {
             pub use super::super::super::puroro_root::*;
         }
-        
-        use ::puroro_internal::de::DeserEnumFromBytesIter as _;
-        use ::puroro_internal::de::DeserMsgFromBytesIter as _;
-        use ::puroro_internal::se::SerEnumToIoWrite as _;
-        use ::puroro_internal::se::SerMsgToIoWrite as _;
 
         {%- for message in self.messages %}
         {{ message|render_private_message|indent(8) }}
