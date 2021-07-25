@@ -89,6 +89,7 @@ pub struct Message {
 #[derive(Template)]
 #[template(path = "trait.rs.txt")]
 pub struct Trait {
+    #[allow(unused)] // for now...
     message: Rc<wrappers::Message>,
 }
 
