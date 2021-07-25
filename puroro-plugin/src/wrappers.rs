@@ -106,9 +106,10 @@ pub enum FieldType {
 // Do not cache this type! This type contains a strong `Rc` ponter
 // to other `Message` type, causes cycle-reference if it is not handled properly.
 #[derive(Debug, Clone)]
-pub enum NontrivialFieldType {
+pub enum MaybeEnumOrMessage {
     Enum(Rc<Enum>),
     Message(Rc<Message>),
+    Others,
 }
 
 #[derive(Debug, Clone)]
@@ -643,19 +644,19 @@ impl FieldType {
         })
     }
 
-    pub fn as_nontrivial_field_type(&self) -> Result<Option<NontrivialFieldType>> {
+    pub fn maybe_enum_or_message(&self) -> Result<MaybeEnumOrMessage> {
         Ok(match self {
-            FieldType::Enum(e) => Some(NontrivialFieldType::Enum(Weak::upgrade(e).ok_or(
-                ErrorKind::InternalError {
+            FieldType::Enum(e) => {
+                MaybeEnumOrMessage::Enum(Weak::upgrade(e).ok_or(ErrorKind::InternalError {
                     detail: "Failed to upgrade Weak pointer.".to_string(),
-                },
-            )?)),
-            FieldType::Message(m) => Some(NontrivialFieldType::Message(Weak::upgrade(m).ok_or(
-                ErrorKind::InternalError {
+                })?)
+            }
+            FieldType::Message(m) => {
+                MaybeEnumOrMessage::Message(Weak::upgrade(m).ok_or(ErrorKind::InternalError {
                     detail: "Failed to upgrade Weak pointer.".to_string(),
-                },
-            )?)),
-            _ => None,
+                })?)
+            }
+            _ => MaybeEnumOrMessage::Others,
         })
     }
 
