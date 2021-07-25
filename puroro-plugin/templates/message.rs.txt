@@ -128,9 +128,9 @@ where ImplTag:
             {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
             {{ field.number() }} => <ImplTag as ::puroro_internal::de::DeserMsgFromBytesIterProxy<
                 {{ field.syntax_and_label_tags().unwrap() }}
-            >::DeserMsg::<
+            >>::DeserMsg::<
                 {{ m.rust_absolute_path() }}<ImplTag>
-            >>::deser_from_scoped_bytes_iter(&mut self.{{ field.rust_ident() }}, data, &self.puroro_internal),
+            >::deser_from_scoped_bytes_iter(&mut self.{{ field.rust_ident() }}, data, &self.puroro_internal),
             {%- else %}
             {{ field.number() }} => <ImplTag as ::puroro_internal::de::DeserFieldFromBytesIter<
                 {{ field.syntax_and_label_and_type_tags().unwrap() }}
