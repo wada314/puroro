@@ -4,7 +4,7 @@
 #[allow(unused)]
 pub struct {{ self.message.rust_ident() }}<ImplTag> 
 where ImplTag:
-    super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
+    ::puroro_internal::AnyFieldTypeGen +
     ::puroro_internal::StructInternalTypeGen,
 {
     {% if self.is_public -%}
@@ -41,14 +41,14 @@ where ImplTag:
 
 impl<ImplTag> ::puroro::Message for {{ self.message.rust_ident() }}<ImplTag>
 where ImplTag:
-    super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
+    ::puroro_internal::AnyFieldTypeGen +
     ::puroro_internal::StructInternalTypeGen,
 {
 }
 
 impl<ImplTag> ::puroro_internal::MessageInternal for {{ self.message.rust_ident() }}<ImplTag>
 where ImplTag:
-    super::super::puroro_traits::{{ self.message.rust_ident() }}TraitAggregatedTypeGen +
+    ::puroro_internal::AnyFieldTypeGen +
     ::puroro_internal::StructInternalTypeGen,
 {
     type ImplTypeTag = ImplTag;

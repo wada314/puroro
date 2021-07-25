@@ -1,16 +1,19 @@
 use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType, SimpleImpl};
-use crate::{EnumTypeGen, FieldTypeGen, MsgTypeGen, StructInternalTypeGen};
+use crate::{AnyFieldTypeGen, EnumTypeGen, FieldTypeGen, MsgTypeGen, StructInternalTypeGen};
 use ::puroro::tags;
 use ::std::convert::TryFrom;
+
+// All-in-one typegen trait
+impl AnyFieldTypeGen for SimpleImpl {}
 
 // For numerical types
 impl<L, X, V, _1, _2> FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>> for SimpleImpl
 where
-    (X, tags::wire::NonLD<V, _1, _2>): tags::NumericalFieldTypeTag,
+    tags::wire::NonLD<V, _1, _2>: tags::NumericalFieldTypeTag,
     L: LabelWrappedType,
 {
     type Type = <L as LabelWrappedType>::Type<
-        <(X, tags::wire::NonLD<V, _1, _2>) as tags::NumericalFieldTypeTag>::NativeType,
+        <tags::wire::NonLD<V, _1, _2> as tags::NumericalFieldTypeTag>::NativeType,
     >;
 
     fn default(
