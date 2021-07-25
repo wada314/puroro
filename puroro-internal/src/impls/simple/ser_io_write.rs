@@ -6,9 +6,7 @@ use crate::se::{
     SerEnumToIoWrite, SerEnumToIoWriteProxy, SerFieldToIoWrite, SerInternalDataToIoWrite,
     SerMsgToIoWrite, SerMsgToIoWriteProxy,
 };
-use crate::{
-    EnumTypeGen, ErrorKind, FieldTypeGen, MsgTypeGen, Result, SimpleImpl, StructInternalTypeGen,
-};
+use crate::{ErrorKind, FieldTypeGen, Result, SimpleImpl, StructInternalTypeGen};
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::tags;
 use ::puroro::types::WireType;
@@ -18,20 +16,19 @@ use ::puroro::SerToIoWrite;
 use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType};
 
 // Non-repeated, variant
-type VariantNativeType<X, V> =
-    <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType;
+type VariantNativeType<V> = <tags::wire::Variant<V> as tags::NumericalFieldTypeTag>::NativeType;
 impl<X, V, _1, _2> SerFieldToIoWrite<X, tags::NonRepeated<_1, _2>, tags::wire::Variant<V>>
     for SimpleImpl
 where
     (X, tags::NonRepeated<_1, _2>): DoDefaultCheck,
-    (X, tags::wire::Variant<V>): tags::NumericalFieldTypeTag + VariantTypeTag,
-    VariantNativeType<X, V>: Clone,
+    tags::wire::Variant<V>: tags::NumericalFieldTypeTag + VariantTypeTag,
+    VariantNativeType<V>: Clone,
     tags::NonRepeated<_1, _2>: LabelWrappedType,
     Self: FieldTypeGen<
         X,
         tags::NonRepeated<_1, _2>,
         tags::wire::Variant<V>,
-        Type = <tags::NonRepeated<_1, _2> as LabelWrappedType>::Type<VariantNativeType<X, V>>,
+        Type = <tags::NonRepeated<_1, _2> as LabelWrappedType>::Type<VariantNativeType<V>>,
     >,
 {
     fn ser_to_io_write<W>(
@@ -45,10 +42,10 @@ where
     {
         let do_default_check = <(X, tags::NonRepeated<_1, _2>) as DoDefaultCheck>::VALUE;
         if let Some(value) =
-            <tags::NonRepeated<_1, _2> as LabelWrappedType>::iter::<VariantNativeType<X, V>>(field)
+            <tags::NonRepeated<_1, _2> as LabelWrappedType>::iter::<VariantNativeType<V>>(field)
                 .next()
         {
-            let variant = Variant::from_native::<(X, tags::wire::Variant<V>)>(value.clone())?;
+            let variant = Variant::from_native::<tags::wire::Variant<V>>(value.clone())?;
             if !do_default_check || !variant.is_zero() {
                 write_field_number_and_wire_type(out, field_number, WireType::Variant)?;
                 variant.encode_bytes(out)?;
@@ -61,13 +58,13 @@ where
 // Repeated, variant
 impl<X, V> SerFieldToIoWrite<X, tags::Repeated, tags::wire::Variant<V>> for SimpleImpl
 where
-    (X, tags::wire::Variant<V>): tags::NumericalFieldTypeTag + VariantTypeTag,
-    VariantNativeType<X, V>: Clone,
+    tags::wire::Variant<V>: tags::NumericalFieldTypeTag + VariantTypeTag,
+    VariantNativeType<V>: Clone,
     Self: FieldTypeGen<
         X,
         tags::Repeated,
         tags::wire::Variant<V>,
-        Type = <tags::Repeated as LabelWrappedType>::Type<VariantNativeType<X, V>>,
+        Type = <tags::Repeated as LabelWrappedType>::Type<VariantNativeType<V>>,
     >,
 {
     fn ser_to_io_write<W>(
@@ -80,11 +77,11 @@ where
         W: std::io::Write,
     {
         let mut iter =
-            <tags::Repeated as LabelWrappedType>::iter::<VariantNativeType<X, V>>(field).peekable();
+            <tags::Repeated as LabelWrappedType>::iter::<VariantNativeType<V>>(field).peekable();
         if iter.peek().is_some() {
             let mut buffer: Vec<u8> = Vec::new();
             for val in iter {
-                let variant = Variant::from_native::<(X, tags::wire::Variant<V>)>(val.clone())?;
+                let variant = Variant::from_native::<tags::wire::Variant<V>>(val.clone())?;
                 variant.encode_bytes(&mut buffer)?;
             }
             let total_len: i32 = buffer
@@ -101,19 +98,18 @@ where
 }
 
 // Bits32
-type Bits32NativeType<X, V> =
-    <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType;
+type Bits32NativeType<V> = <tags::wire::Bits32<V> as tags::NumericalFieldTypeTag>::NativeType;
 impl<L, X, V> SerFieldToIoWrite<X, L, tags::wire::Bits32<V>> for SimpleImpl
 where
     (X, L): DoDefaultCheck,
-    (X, tags::wire::Bits32<V>): tags::NumericalFieldTypeTag + Bits32TypeTag,
-    Bits32NativeType<X, V>: Clone,
+    tags::wire::Bits32<V>: tags::NumericalFieldTypeTag + Bits32TypeTag,
+    Bits32NativeType<V>: Clone,
     L: LabelWrappedType,
     Self: FieldTypeGen<
         X,
         L,
         tags::wire::Bits32<V>,
-        Type = <L as LabelWrappedType>::Type<Bits32NativeType<X, V>>,
+        Type = <L as LabelWrappedType>::Type<Bits32NativeType<V>>,
     >,
 {
     fn ser_to_io_write<W>(
@@ -131,7 +127,7 @@ where
                 continue;
             }
             write_field_number_and_wire_type(out, field_number, WireType::Bits32)?;
-            let bytes = <(X, tags::wire::Bits32<V>) as Bits32TypeTag>::into_array(item.clone());
+            let bytes = <tags::wire::Bits32<V> as Bits32TypeTag>::into_array(item.clone());
             out.write_all(&bytes)?;
         }
         Ok(())
@@ -139,19 +135,18 @@ where
 }
 
 // Bits64
-type Bits64NativeType<X, V> =
-    <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType;
+type Bits64NativeType<V> = <tags::wire::Bits64<V> as tags::NumericalFieldTypeTag>::NativeType;
 impl<L, X, V> SerFieldToIoWrite<X, L, tags::wire::Bits64<V>> for SimpleImpl
 where
     (X, L): DoDefaultCheck,
-    (X, tags::wire::Bits64<V>): tags::NumericalFieldTypeTag + Bits64TypeTag,
-    Bits64NativeType<X, V>: Clone,
+    tags::wire::Bits64<V>: tags::NumericalFieldTypeTag + Bits64TypeTag,
+    Bits64NativeType<V>: Clone,
     L: LabelWrappedType,
     Self: FieldTypeGen<
         X,
         L,
         tags::wire::Bits64<V>,
-        Type = <L as LabelWrappedType>::Type<Bits64NativeType<X, V>>,
+        Type = <L as LabelWrappedType>::Type<Bits64NativeType<V>>,
     >,
 {
     fn ser_to_io_write<W>(
@@ -169,7 +164,7 @@ where
                 continue;
             }
             write_field_number_and_wire_type(out, field_number, WireType::Bits64)?;
-            let bytes = <(X, tags::wire::Bits64<V>) as Bits64TypeTag>::into_array(item.clone());
+            let bytes = <tags::wire::Bits64<V> as Bits64TypeTag>::into_array(item.clone());
             out.write_all(&bytes)?;
         }
         Ok(())
@@ -241,6 +236,7 @@ where
 }
 
 // Enum
+type EnumNativeType<X, E> = <X as tags::EnumFieldTypeForSyntax>::NativeType<E>;
 impl<X, _1, _2> SerEnumToIoWriteProxy<X, tags::NonRepeated<_1, _2>> for SimpleImpl
 where
     Self: StructInternalTypeGen,
@@ -252,7 +248,7 @@ where
     where
         E: PartialEq,
         i32: From<E>,
-        <X as tags::EnumFieldTypeForSyntax>::NativeType<E>: Clone,
+        EnumNativeType<X, E>: Clone,
     = Self;
 }
 impl<X> SerEnumToIoWriteProxy<X, tags::Repeated> for SimpleImpl
@@ -266,32 +262,25 @@ where
     where
         E: PartialEq,
         i32: From<E>,
-        <X as tags::EnumFieldTypeForSyntax>::NativeType<E>: Clone,
+        EnumNativeType<X, E>: Clone,
     = Self;
 }
 
 #[rustfmt::skip]
-impl<X, _1, _2, E> SerEnumToIoWrite<X, tags::NonRepeated<_1, _2>, E> for SimpleImpl
+impl<X, _1, _2, E, EnumFieldType, InternalDataType> SerEnumToIoWrite<X, tags::NonRepeated<_1, _2>, E, EnumFieldType, InternalDataType> for SimpleImpl
 where
-    Self: EnumTypeGen<
-        X,
-        tags::NonRepeated<_1, _2>,
-        EnumType<E> = <tags::NonRepeated<_1, _2> as LabelWrappedType>::Type<
-            <X as tags::EnumFieldTypeForSyntax>::NativeType<E>
-        >,
-    > + StructInternalTypeGen,
     E: PartialEq,
     i32: From<E>,
-    tags::NonRepeated<_1, _2>: LabelWrappedType,
+    tags::NonRepeated<_1, _2>: LabelWrappedType<Type<EnumNativeType<X, E>> = EnumFieldType>,
     X: EnumVariantTypeForSyntax,
     <X as tags::EnumFieldTypeForSyntax>::NativeType<E>: Clone,
     (X, tags::NonRepeated<_1, _2>): DoDefaultCheck,
 {
     fn ser_to_io_write<W>(
-        field: &<Self as EnumTypeGen<X, tags::NonRepeated<_1, _2>>>::EnumType<E>,
+        field: &EnumFieldType,
         field_number: i32,
         out: &mut W,
-        _internal_data: &<Self as StructInternalTypeGen>::Type,
+        _internal_data: &InternalDataType,
     ) -> Result<()>
     where
         W: std::io::Write,
@@ -308,27 +297,20 @@ where
     }
 }
 #[rustfmt::skip]
-impl<X, E> SerEnumToIoWrite<X, tags::Repeated, E> for SimpleImpl
+impl<X, E, EnumFieldType, InternalDataType> SerEnumToIoWrite<X, tags::Repeated, E, EnumFieldType, InternalDataType> for SimpleImpl
 where
-    Self: EnumTypeGen<
-            X,
-            tags::Repeated,
-            EnumType<E> = <tags::Repeated as LabelWrappedType>::Type<
-                <X as tags::EnumFieldTypeForSyntax>::NativeType<E>,
-            >,
-        > + StructInternalTypeGen,
     E: PartialEq,
     i32: From<E>,
-    tags::Repeated: LabelWrappedType,
+    tags::Repeated: LabelWrappedType<Type<EnumNativeType<X, E>> = EnumFieldType>,
     X: EnumVariantTypeForSyntax,
     <X as tags::EnumFieldTypeForSyntax>::NativeType<E>: Clone,
     (X, tags::Repeated): DoDefaultCheck,
 {
     fn ser_to_io_write<W>(
-        field: &<Self as EnumTypeGen<X, tags::Repeated>>::EnumType<E>,
+        field: &EnumFieldType,
         field_number: i32,
         out: &mut W,
-        _internal_data: &<Self as StructInternalTypeGen>::Type,
+        _internal_data: &InternalDataType,
     ) -> Result<()>
     where
         W: std::io::Write,
@@ -366,17 +348,16 @@ where
     = Self;
 }
 #[rustfmt::skip]
-impl<X, L, M> SerMsgToIoWrite<X, L, M> for SimpleImpl
+impl<X, L, M, MsgFieldType, InternalDataType> SerMsgToIoWrite<X, L, M, MsgFieldType, InternalDataType> for SimpleImpl
 where
-    Self: MsgTypeGen<X, L, MsgType<M> = <L as LabelWrappedMessageType>::Type<M>>,
-    L: LabelWrappedMessageType,
+    L: LabelWrappedMessageType<Type<M> = MsgFieldType>,
     M: SerToIoWrite,
 {
     fn ser_to_io_write<W>(
-        field: &<Self as MsgTypeGen<X, L>>::MsgType<M>,
+        field: &MsgFieldType,
         field_number: i32,
         out: &mut W,
-        _internal_data: &<Self as StructInternalTypeGen>::Type,
+        _internal_data: &InternalDataType,
     ) -> Result<()>
     where
         W: std::io::Write,
