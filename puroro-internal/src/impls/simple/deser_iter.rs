@@ -17,7 +17,6 @@ use ::std::convert::TryFrom;
 // deser from iterator, into variant type fields
 type VariantNativeType<X, V> =
     <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType;
-type VariantFieldTag<L, X, V> = (X, L, tags::wire::Variant<V>);
 impl<L, V, X> DeserFieldFromBytesIter<X, L, tags::wire::Variant<V>> for SimpleImpl
 where
     (X, L): DoDefaultCheck,
@@ -226,7 +225,7 @@ where
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut <Self as EnumTypeGen<X, L>>::EnumType<E>,
         data: FieldData<&mut ScopedIter<I>>,
-        internal_data: &<Self as StructInternalTypeGen>::Type,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> Result<()>
     where
         I: Iterator<Item = std::io::Result<u8>>,

@@ -18,7 +18,6 @@ use ::puroro::SerToIoWrite;
 use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType};
 
 // Non-repeated, variant
-type NonRepeatedVariant<X, V, _1, _2> = (tags::NonRepeated<_1, _2>, (X, tags::wire::Variant<V>));
 type VariantNativeType<X, V> =
     <(X, tags::wire::Variant<V>) as tags::NumericalFieldTypeTag>::NativeType;
 impl<X, V, _1, _2> SerFieldToIoWrite<X, tags::NonRepeated<_1, _2>, tags::wire::Variant<V>>
@@ -60,7 +59,6 @@ where
 }
 
 // Repeated, variant
-type RepeatedVariant<X, V> = (tags::Repeated, (X, tags::wire::Variant<V>));
 impl<X, V> SerFieldToIoWrite<X, tags::Repeated, tags::wire::Variant<V>> for SimpleImpl
 where
     (X, tags::wire::Variant<V>): tags::NumericalFieldTypeTag + VariantTypeTag,
@@ -105,7 +103,6 @@ where
 // Bits32
 type Bits32NativeType<X, V> =
     <(X, tags::wire::Bits32<V>) as tags::NumericalFieldTypeTag>::NativeType;
-type Bits32FieldTag<L, X, V> = (L, (X, tags::wire::Bits32<V>));
 impl<L, X, V> SerFieldToIoWrite<X, L, tags::wire::Bits32<V>> for SimpleImpl
 where
     (X, L): DoDefaultCheck,
@@ -144,7 +141,6 @@ where
 // Bits64
 type Bits64NativeType<X, V> =
     <(X, tags::wire::Bits64<V>) as tags::NumericalFieldTypeTag>::NativeType;
-type Bits64FieldTag<L, X, V> = (L, (X, tags::wire::Bits64<V>));
 impl<L, X, V> SerFieldToIoWrite<X, L, tags::wire::Bits64<V>> for SimpleImpl
 where
     (X, L): DoDefaultCheck,
@@ -338,7 +334,7 @@ where
         W: std::io::Write,
         E: PartialEq,
     {
-        let mut iter = <tags::Repeated as LabelWrappedType>::iter(field);
+        let iter = <tags::Repeated as LabelWrappedType>::iter(field);
         let mut buffer: Vec<u8> = Vec::new();
         for val in iter {
             let variant = Variant::from_enum::<X, E>(val.clone())?;
