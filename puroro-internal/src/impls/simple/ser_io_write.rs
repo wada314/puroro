@@ -6,7 +6,9 @@ use crate::se::{
     SerEnumToIoWrite, SerEnumToIoWriteProxy, SerFieldToIoWrite, SerInternalDataToIoWrite,
     SerMsgToIoWrite, SerMsgToIoWriteProxy,
 };
-use crate::{ErrorKind, FieldTypeGen, Result, SimpleImpl, StructInternalTypeGen};
+use crate::{
+    ErrorKind, FieldTypeGen, Result, SerAnyFieldToIoWrite, SimpleImpl, StructInternalTypeGen,
+};
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::tags;
 use ::puroro::types::WireType;
@@ -14,6 +16,9 @@ use ::puroro::variant::{EnumVariantTypeForSyntax, Variant, VariantTypeTag};
 use ::puroro::SerToIoWrite;
 
 use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType};
+
+// All types
+impl SerAnyFieldToIoWrite for SimpleImpl {}
 
 // Non-repeated, variant
 type VariantNativeType<V> = <tags::wire::Variant<V> as tags::NumericalTypeTag>::NativeType;

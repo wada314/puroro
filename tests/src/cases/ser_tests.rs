@@ -1,10 +1,12 @@
 use crate::tests_pb::ser_tests::{msg::Submsg, Msg};
+use ::puroro::DeserFromBytesIter;
 use ::puroro::SerToIoWrite;
-use puroro::DeserFromBytesIter;
+use ::puroro_internal::SimpleImpl;
 
 #[test]
 fn test_empty() {
-    let msg = Msg::default();
+    // Why do we need to set <SimpleImpl> parameter explicitly???
+    let msg = Msg::<SimpleImpl>::default();
     let mut buf: Vec<u8> = Vec::new();
     msg.ser(&mut buf).unwrap();
     assert!(buf.is_empty());
@@ -12,7 +14,7 @@ fn test_empty() {
 
 #[test]
 fn test_i32_unlabeled() {
-    let mut msg = Msg::default();
+    let mut msg = Msg::<SimpleImpl>::default();
     let mut buf: Vec<u8> = Vec::new();
     msg.i32_unlabeled = 10;
     msg.ser(&mut buf).unwrap();
@@ -21,7 +23,7 @@ fn test_i32_unlabeled() {
 
 #[test]
 fn test_submsg_unlabeled_empty() {
-    let mut msg = Msg::default();
+    let mut msg = Msg::<SimpleImpl>::default();
     let mut buf: Vec<u8> = Vec::new();
     msg.submsg_unlabeled = Some(Box::new(Submsg::default()));
     msg.ser(&mut buf).unwrap();
@@ -30,7 +32,7 @@ fn test_submsg_unlabeled_empty() {
 
 #[test]
 fn test_submsg_unlabeled_filled() {
-    let mut msg = Msg::default();
+    let mut msg = Msg::<SimpleImpl>::default();
     let mut buf: Vec<u8> = Vec::new();
     msg.submsg_unlabeled = Some(Box::new(Submsg::default()));
     msg.submsg_unlabeled.as_mut().unwrap().i32_unlabeled = 10;
@@ -40,7 +42,7 @@ fn test_submsg_unlabeled_filled() {
 
 #[test]
 fn test_ser_and_then_deser() {
-    let mut msg = Msg::default();
+    let mut msg = Msg::<SimpleImpl>::default();
     let mut buf: Vec<u8> = Vec::new();
     msg.i32_unlabeled = 10;
     msg.i32_repeated.extend(vec![10, 20].into_iter());
