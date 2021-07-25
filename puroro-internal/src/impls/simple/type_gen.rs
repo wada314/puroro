@@ -9,11 +9,11 @@ impl AnyFieldTypeGen for SimpleImpl {}
 // For numerical types
 impl<L, X, V, _1, _2> FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>> for SimpleImpl
 where
-    tags::wire::NonLD<V, _1, _2>: tags::NumericalFieldTypeTag,
+    tags::wire::NonLD<V, _1, _2>: tags::NumericalTypeTag,
     L: LabelWrappedType,
 {
     type Type = <L as LabelWrappedType>::Type<
-        <tags::wire::NonLD<V, _1, _2> as tags::NumericalFieldTypeTag>::NativeType,
+        <tags::wire::NonLD<V, _1, _2> as tags::NumericalTypeTag>::NativeType,
     >;
 
     fn default(
@@ -54,14 +54,14 @@ impl<X, L> EnumTypeGen<X, L> for SimpleImpl
 where
     Self: StructInternalTypeGen,
     L: LabelWrappedType,
-    X: tags::EnumFieldTypeForSyntax,
+    X: tags::EnumTypeForSyntax,
 {
     type EnumType<E: PartialEq> =
-        <L as LabelWrappedType>::Type<<X as tags::EnumFieldTypeForSyntax>::NativeType<E>>;
+        <L as LabelWrappedType>::Type<<X as tags::EnumTypeForSyntax>::NativeType<E>>;
     fn default<E: Default + TryFrom<i32> + PartialEq>(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<X, L>>::EnumType<E> {
-        <L as LabelWrappedType>::default_with(<X as tags::EnumFieldTypeForSyntax>::default)
+        <L as LabelWrappedType>::default_with(<X as tags::EnumTypeForSyntax>::default)
     }
 }
 

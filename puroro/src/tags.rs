@@ -12,10 +12,10 @@ pub trait FieldTypeTag {}
 pub trait ProtoSyntaxTag {}
 
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
-pub trait NumericalFieldTypeTag {
+pub trait NumericalTypeTag {
     type NativeType: Default + PartialEq;
 }
-pub trait EnumFieldTypeForSyntax {
+pub trait EnumTypeForSyntax {
     type NativeType<E: PartialEq>: PartialEq;
     fn default<E: Default + TryFrom<i32> + PartialEq>() -> Self::NativeType<E>;
 }
@@ -121,53 +121,53 @@ impl FieldTypeTag for SFixed64 {}
 impl ProtoSyntaxTag for Proto2 {}
 impl ProtoSyntaxTag for Proto3 {}
 
-impl NumericalFieldTypeTag for Int32 {
+impl NumericalTypeTag for Int32 {
     type NativeType = i32;
 }
-impl NumericalFieldTypeTag for UInt32 {
+impl NumericalTypeTag for UInt32 {
     type NativeType = u32;
 }
-impl NumericalFieldTypeTag for SInt32 {
+impl NumericalTypeTag for SInt32 {
     type NativeType = i32;
 }
-impl NumericalFieldTypeTag for Fixed32 {
+impl NumericalTypeTag for Fixed32 {
     type NativeType = u32;
 }
-impl NumericalFieldTypeTag for SFixed32 {
+impl NumericalTypeTag for SFixed32 {
     type NativeType = i32;
 }
-impl NumericalFieldTypeTag for Float {
+impl NumericalTypeTag for Float {
     type NativeType = f32;
 }
-impl NumericalFieldTypeTag for Int64 {
+impl NumericalTypeTag for Int64 {
     type NativeType = i64;
 }
-impl NumericalFieldTypeTag for UInt64 {
+impl NumericalTypeTag for UInt64 {
     type NativeType = u64;
 }
-impl NumericalFieldTypeTag for SInt64 {
+impl NumericalTypeTag for SInt64 {
     type NativeType = i64;
 }
-impl NumericalFieldTypeTag for Fixed64 {
+impl NumericalTypeTag for Fixed64 {
     type NativeType = u64;
 }
-impl NumericalFieldTypeTag for SFixed64 {
+impl NumericalTypeTag for SFixed64 {
     type NativeType = i64;
 }
-impl NumericalFieldTypeTag for Double {
+impl NumericalTypeTag for Double {
     type NativeType = f64;
 }
-impl NumericalFieldTypeTag for Bool {
+impl NumericalTypeTag for Bool {
     type NativeType = bool;
 }
 
-impl EnumFieldTypeForSyntax for Proto2 {
+impl EnumTypeForSyntax for Proto2 {
     type NativeType<E: PartialEq> = E;
     fn default<E: Default + TryFrom<i32> + PartialEq>() -> Self::NativeType<E> {
         Default::default()
     }
 }
-impl EnumFieldTypeForSyntax for Proto3 {
+impl EnumTypeForSyntax for Proto3 {
     type NativeType<E: PartialEq> = ::std::result::Result<E, i32>;
     fn default<E: Default + TryFrom<i32> + PartialEq>() -> Self::NativeType<E> {
         <E as TryFrom<i32>>::try_from(0).map_err(|_| 0)

@@ -122,7 +122,7 @@ pub trait SerFieldToIoWrite<X, L, V>: FieldTypeGen<X, L, V> + StructInternalType
 }
 pub trait SerEnumToIoWriteProxy<X, L>: EnumTypeGen<X, L> + StructInternalTypeGen
 where
-    X: tags::EnumFieldTypeForSyntax,
+    X: tags::EnumTypeForSyntax,
 {
     type SerEnum<E>: SerEnumToIoWrite<
         X,
@@ -134,12 +134,12 @@ where
     where
         E: PartialEq,
         i32: From<E>,
-        <X as tags::EnumFieldTypeForSyntax>::NativeType<E>: Clone;
+        <X as tags::EnumTypeForSyntax>::NativeType<E>: Clone;
 }
 pub trait SerEnumToIoWrite<X, L, E, EnumFieldType, InternalDataType>
 where
-    X: tags::EnumFieldTypeForSyntax,
-    <X as tags::EnumFieldTypeForSyntax>::NativeType<E>: Clone,
+    X: tags::EnumTypeForSyntax,
+    <X as tags::EnumTypeForSyntax>::NativeType<E>: Clone,
     E: PartialEq,
 {
     fn ser_to_io_write<W>(

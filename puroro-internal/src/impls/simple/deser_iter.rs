@@ -17,11 +17,11 @@ use ::std::convert::TryFrom;
 impl DeserAnyFieldFromBytesIter for SimpleImpl {}
 
 // deser from iterator, into variant type fields
-type VariantNativeType<V> = <tags::wire::Variant<V> as tags::NumericalFieldTypeTag>::NativeType;
+type VariantNativeType<V> = <tags::wire::Variant<V> as tags::NumericalTypeTag>::NativeType;
 impl<L, V, X> DeserFieldFromBytesIter<X, L, tags::wire::Variant<V>> for SimpleImpl
 where
     (X, L): DoDefaultCheck,
-    tags::wire::Variant<V>: tags::NumericalFieldTypeTag + VariantTypeTag,
+    tags::wire::Variant<V>: tags::NumericalTypeTag + VariantTypeTag,
     VariantNativeType<V>: PartialEq,
     L: LabelWrappedType,
     Self: FieldTypeGen<
@@ -63,11 +63,11 @@ where
 }
 
 // Bits32
-type Bits32NativeType<V> = <tags::wire::Bits32<V> as tags::NumericalFieldTypeTag>::NativeType;
+type Bits32NativeType<V> = <tags::wire::Bits32<V> as tags::NumericalTypeTag>::NativeType;
 impl<L, V, X> DeserFieldFromBytesIter<X, L, tags::wire::Bits32<V>> for SimpleImpl
 where
     (X, L): DoDefaultCheck,
-    tags::wire::Bits32<V>: tags::NumericalFieldTypeTag + Bits32TypeTag,
+    tags::wire::Bits32<V>: tags::NumericalTypeTag + Bits32TypeTag,
     Bits32NativeType<V>: PartialEq,
     L: LabelWrappedType,
     Self: FieldTypeGen<
@@ -100,11 +100,11 @@ where
 }
 
 // Bits64
-type Bits64NativeType<V> = <tags::wire::Bits64<V> as tags::NumericalFieldTypeTag>::NativeType;
+type Bits64NativeType<V> = <tags::wire::Bits64<V> as tags::NumericalTypeTag>::NativeType;
 impl<L, V, X> DeserFieldFromBytesIter<X, L, tags::wire::Bits64<V>> for SimpleImpl
 where
     (X, L): DoDefaultCheck,
-    tags::wire::Bits64<V>: tags::NumericalFieldTypeTag + Bits64TypeTag,
+    tags::wire::Bits64<V>: tags::NumericalTypeTag + Bits64TypeTag,
     Bits64NativeType<V>: PartialEq,
     L: LabelWrappedType,
     Self: FieldTypeGen<
@@ -194,12 +194,12 @@ where
 }
 
 // Enum
-type EnumNativeType<X, E> = <X as tags::EnumFieldTypeForSyntax>::NativeType<E>;
+type EnumNativeType<X, E> = <X as tags::EnumTypeForSyntax>::NativeType<E>;
 impl<X, L> DeserEnumFromBytesIterProxy<X, L> for SimpleImpl
 where
     Self: StructInternalTypeGen,
     L: LabelWrappedType,
-    X: tags::EnumFieldTypeForSyntax + EnumVariantTypeForSyntax,
+    X: tags::EnumTypeForSyntax + EnumVariantTypeForSyntax,
     (X, L): DoDefaultCheck,
 {
     type DeserEnum<E>
@@ -214,10 +214,10 @@ where
     Self: EnumTypeGen<
         X,
         L,
-        EnumType<E> = <L as LabelWrappedType>::Type<<X as tags::EnumFieldTypeForSyntax>::NativeType<E>>
+        EnumType<E> = <L as LabelWrappedType>::Type<<X as tags::EnumTypeForSyntax>::NativeType<E>>
     >,
     (X, L): DoDefaultCheck,
-    X: tags::EnumFieldTypeForSyntax + EnumVariantTypeForSyntax,
+    X: tags::EnumTypeForSyntax + EnumVariantTypeForSyntax,
     L: LabelWrappedType,
     E: Default + TryFrom<i32> + PartialEq,
 {
@@ -230,7 +230,7 @@ where
         I: Iterator<Item = std::io::Result<u8>>,
     {
         let do_default_check = <(X, L) as DoDefaultCheck>::VALUE;
-        let default = <X as tags::EnumFieldTypeForSyntax>::default;
+        let default = <X as tags::EnumTypeForSyntax>::default;
         match data {
             FieldData::Variant(variant) => {
                 let native = variant.to_enum::<X, E>()?;

@@ -1,6 +1,6 @@
 use crate::tags;
 
-pub trait Bits32TypeTag: tags::NumericalFieldTypeTag {
+pub trait Bits32TypeTag: tags::NumericalTypeTag {
     fn from_array(array: [u8; 4]) -> Self::NativeType;
     fn into_array(val: Self::NativeType) -> [u8; 4];
 }
@@ -29,7 +29,7 @@ impl Bits32TypeTag for tags::SFixed32 {
     }
 }
 
-pub trait Bits64TypeTag: tags::NumericalFieldTypeTag {
+pub trait Bits64TypeTag: tags::NumericalTypeTag {
     fn from_array(array: [u8; 8]) -> Self::NativeType;
     fn into_array(val: Self::NativeType) -> [u8; 8];
 }
