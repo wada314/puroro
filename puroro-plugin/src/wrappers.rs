@@ -659,7 +659,7 @@ impl FieldType {
         })
     }
 
-    pub fn tag_ident(&self) -> Result<&str> {
+    pub fn tag_ident(&self) -> Result<&'static str> {
         Ok(match *self {
             FieldType::Double => "Double",
             FieldType::Float => "Float",
