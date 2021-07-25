@@ -1,7 +1,6 @@
 pub mod to_io_write;
+use ::puroro::tags;
 use ::puroro::SerToIoWrite;
-use puroro::tags;
-use puroro::variant::EnumVariantTypeForSyntax;
 
 use crate::{EnumTypeGen, FieldTypeGen, MsgTypeGen, Result, StructInternalTypeGen};
 

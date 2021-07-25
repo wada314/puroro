@@ -221,6 +221,7 @@ impl<X> LabelWrappedLdType for (X, tags::Repeated) {
 ///  - `repeated` => `Vec<T>`
 pub trait LabelWrappedMessageType: Sized {
     type Type<T>;
+    fn default<T>() -> Self::Type<T>;
     fn iter<T>(wrapped: &Self::Type<T>) -> MsgIter<'_, T>;
     fn get_or_insert_with<F: FnOnce() -> T, T>(wrapped: &mut Self::Type<T>, f: F) -> &mut T;
 }
@@ -241,6 +242,9 @@ impl<'a, T> Iterator for MsgIter<'a, T> {
 
 impl<_1, _2> LabelWrappedMessageType for tags::NonRepeated<_1, _2> {
     type Type<T> = Option<Box<T>>;
+    fn default<T>() -> Self::Type<T> {
+        None
+    }
     fn iter<T>(wrapped: &Self::Type<T>) -> MsgIter<'_, T> {
         MsgIter::OptionBox(wrapped.iter())
     }
@@ -250,6 +254,9 @@ impl<_1, _2> LabelWrappedMessageType for tags::NonRepeated<_1, _2> {
 }
 impl LabelWrappedMessageType for tags::Repeated {
     type Type<T> = Vec<T>;
+    fn default<T>() -> Self::Type<T> {
+        Vec::new()
+    }
     fn iter<T>(wrapped: &Self::Type<T>) -> MsgIter<'_, T> {
         MsgIter::Slice(wrapped.iter())
     }

@@ -361,7 +361,7 @@ where
 // Message
 impl<X, L> SerMsgToIoWriteProxy<X, L> for SimpleImpl
 where
-    Self: MsgTypeGen<X, L>,
+    Self: StructInternalTypeGen,
     L: LabelWrappedMessageType,
 {
     type SerMsg<M>

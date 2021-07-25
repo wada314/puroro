@@ -1,4 +1,4 @@
-use super::{LabelWrappedLdType, LabelWrappedType, SimpleImpl};
+use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType, SimpleImpl};
 use crate::{EnumTypeGen, FieldTypeGen, MsgTypeGen, StructInternalTypeGen};
 use ::puroro::tags;
 use ::std::convert::TryFrom;
@@ -56,28 +56,21 @@ where
     type EnumType<E: PartialEq> =
         <L as LabelWrappedType>::Type<<X as tags::EnumFieldTypeForSyntax>::NativeType<E>>;
     fn default<E: Default + TryFrom<i32> + PartialEq>(
-        internal_data: &<Self as StructInternalTypeGen>::Type,
+        _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<X, L>>::EnumType<E> {
         <L as LabelWrappedType>::default_with(<X as tags::EnumFieldTypeForSyntax>::default)
     }
 }
 
-impl<X, _1, _2> MsgTypeGen<X, tags::NonRepeated<_1, _2>> for SimpleImpl
+impl<X, L> MsgTypeGen<X, L> for SimpleImpl
 where
     Self: StructInternalTypeGen,
+    L: LabelWrappedMessageType,
 {
-    type MsgType<M> = Option<Box<M>>;
+    type MsgType<M> = <L as LabelWrappedMessageType>::Type<M>;
     fn default<M>(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as MsgTypeGen<X, tags::NonRepeated<_1, _2>>>::MsgType<M> {
-        None
-    }
-}
-impl<X> MsgTypeGen<X, tags::Repeated> for SimpleImpl {
-    type MsgType<M> = Vec<M>;
-    fn default<M>(
-        _internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as MsgTypeGen<X, tags::Repeated>>::MsgType<M> {
-        Vec::new()
+    ) -> <Self as MsgTypeGen<X, L>>::MsgType<M> {
+        <L as LabelWrappedMessageType>::default()
     }
 }
