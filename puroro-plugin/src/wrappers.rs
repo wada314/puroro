@@ -364,6 +364,16 @@ impl Message {
             ident = self.rust_ident
         )
     }
+    pub fn rust_absolute_trait_path(&self) -> String {
+        format!(
+            "{path}::puroro_traits::{ident}Trait",
+            path = make_module_path(
+                self.package.iter().map(|s| s.borrow()),
+                self.outer_messages.iter().map(|s| s.borrow())
+            ),
+            ident = self.rust_ident
+        )
+    }
 
     pub fn input_file(&self) -> Result<Rc<InputFile>> {
         Ok(self.input_file.upgrade().ok_or(ErrorKind::InternalError {

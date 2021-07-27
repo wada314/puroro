@@ -1,16 +1,54 @@
+{#- Macro for method return type #}
 
-pub mod {{ message.rust_nested_module_ident() }} {
+{%- macro scalar_getter_return_type(field_type) %}
+{%- match field_type.maybe_enum_or_message().unwrap() %}
+{%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
+                <() as ::puroro_internal::TraitEnumTypeGen<
+                    {{ field.syntax_and_label_tags().unwrap() }}
+                >>::ScalarGetterReturnType::<'_, {{ e.rust_absolute_path() }}>
+{%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+                <() as ::puroro_internal::TraitMsgTypeGen<
+                    {{ field.syntax_and_label_tags().unwrap() }}
+                >>::ScalarGetterReturnType::<'_, Self::MessageType>
+{%- else %}
+                <() as ::puroro_internal::TraitFieldTypeGen<
+                    {{ field.syntax_and_label_and_type_tags().unwrap() }}
+                >>::ScalarGetterReturnType<'_>
+{%- endmatch %}
+{%- endmacro %}
+
+{#- Main definitions of the traits #}
+
+pub mod {{ message.rust_nested_module_ident() }}_fields {
+    mod puroro_root {
+        pub use super::super::super::puroro_root::*;
+    }
+
     // Field getters
     {%- for field in message.fields() %}
     pub trait Field{{ field.number() }} {
-        fn {{ field.rust_ident() }}(&self) -> i32;
+
+        {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
+        {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+        type MessageType: ::puroro::Message + {{ m.rust_absolute_trait_path() }};
+        {% else %}
+        {%- endmatch %}
+
+        {%- match field.field_label().unwrap() %}
+        {%- when wrappers::FieldLabel::Repeated %}
+        // Do something for repeated field...
+        {%- when wrappers::FieldLabel::Unlabeled %}
+        fn {{ field.rust_ident() }}(&self) -> {% call scalar_getter_return_type(field.field_type().unwrap())%};
+        {%- else -%}
+        fn {{ field.rust_ident() }}(&self) -> {% call scalar_getter_return_type(field.field_type().unwrap())%};
+        {%- endmatch %}
     }
     {%- endfor %}
 }
 
 pub trait {{ message.rust_ident() }}Trait:
     {%- for field in message.fields() %}
-    self::{{ message.rust_nested_module_ident() }}::Field{{ field.number() }} +
+    self::{{ message.rust_nested_module_ident() }}_fields::Field{{ field.number() }} +
     {%- endfor %}
 {
 }
