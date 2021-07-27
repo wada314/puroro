@@ -224,6 +224,45 @@ where
     }
 }
 
+impl<ImplTag> ::std::clone::Clone for {{ self.message.rust_ident() }}<ImplTag>
+where 
+    ImplTag: 
+        ::puroro_internal::AnyFieldTypeGen
+        + ::puroro_internal::StructInternalTypeGen,
+    <ImplTag as ::puroro_internal::StructInternalTypeGen>::Type: ::std::clone::Clone,
+{
+    fn clone(&self) -> Self {
+        {%- if self.is_public -%}
+        let internal_data = ::std::clone::Clone::clone(&self.puroro_internal);
+        Self {
+            {%- for field in self.message.fields() %}
+            
+            {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
+            {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
+            {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::EnumTypeGen<
+                {{ field.syntax_and_label_tags().unwrap() }}
+            >>::clone(&self.{{ field.rust_ident() }}, &internal_data),
+            {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+            {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::MsgTypeGen<
+                {{ field.syntax_and_label_tags().unwrap() }}
+            >>::clone(&self.{{ field.rust_ident() }}, &internal_data),
+            {%- else %}
+            {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::FieldTypeGen<
+                {{ field.syntax_and_label_and_type_tags().unwrap() }}
+            >>::clone(&self.{{ field.rust_ident() }}, &internal_data),
+            {%- endmatch %}
+
+            {%- endfor %}
+            puroro_internal: internal_data,
+        }
+        {%- else %}
+        Self {
+            body: ::std::clone::Clone::clone(&self.body),
+        }
+        {%- endif %}
+    }
+}
+
 impl<ImplTag> ::std::fmt::Debug for {{ self.message.rust_ident() }}<ImplTag>
 where
     ImplTag: ::puroro_internal::AnyFieldTypeGen
@@ -247,7 +286,7 @@ where
         {{ field.syntax_and_label_and_type_tags().unwrap() }}
     >>::Type: ::std::fmt::Debug,
     {%- endmatch %}
-{%- endfor %}
+    {%- endfor %}
 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         {% if self.is_public -%}

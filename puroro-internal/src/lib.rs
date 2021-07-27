@@ -28,7 +28,7 @@ pub trait ChooseStructVisibility<Public, Private> {
 }
 
 pub trait StructInternalTypeGen: tags::ImplTypeTag {
-    type Type;
+    type Type: Clone;
 }
 
 pub trait FieldTypeGen<X, L, V>: StructInternalTypeGen {
