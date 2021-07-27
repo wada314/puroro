@@ -251,7 +251,7 @@ where
 {
     type SerEnum<E>
     where
-        E: PartialEq,
+        E: PartialEq + Clone,
         i32: From<E>,
         EnumNativeType<X, E>: Clone,
     = Self;
@@ -265,7 +265,7 @@ where
 {
     type SerEnum<E>
     where
-        E: PartialEq,
+        E: PartialEq + Clone,
         i32: From<E>,
         EnumNativeType<X, E>: Clone,
     = Self;
@@ -274,7 +274,7 @@ where
 #[rustfmt::skip]
 impl<X, _1, _2, E, EnumFieldType, InternalDataType> SerEnumToIoWrite<X, tags::NonRepeated<_1, _2>, E, EnumFieldType, InternalDataType> for SimpleImpl
 where
-    E: PartialEq,
+    E: PartialEq + Clone,
     i32: From<E>,
     tags::NonRepeated<_1, _2>: LabelWrappedType<Type<EnumNativeType<X, E>> = EnumFieldType>,
     X: EnumVariantTypeForSyntax,
@@ -304,7 +304,7 @@ where
 #[rustfmt::skip]
 impl<X, E, EnumFieldType, InternalDataType> SerEnumToIoWrite<X, tags::Repeated, E, EnumFieldType, InternalDataType> for SimpleImpl
 where
-    E: PartialEq,
+    E: PartialEq + Clone,
     i32: From<E>,
     tags::Repeated: LabelWrappedType<Type<EnumNativeType<X, E>> = EnumFieldType>,
     X: EnumVariantTypeForSyntax,
@@ -349,14 +349,14 @@ where
 {
     type SerMsg<M>
     where
-        M: SerToIoWrite,
+        M: SerToIoWrite + Clone,
     = Self;
 }
 #[rustfmt::skip]
 impl<X, L, M, MsgFieldType, InternalDataType> SerMsgToIoWrite<X, L, M, MsgFieldType, InternalDataType> for SimpleImpl
 where
     L: LabelWrappedMessageType<Type<M> = MsgFieldType>,
-    M: SerToIoWrite,
+    M: SerToIoWrite + Clone,
 {
     fn ser_to_io_write<W>(
         field: &MsgFieldType,

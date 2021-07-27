@@ -13,11 +13,13 @@ pub trait ProtoSyntaxTag {}
 
 /// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
 pub trait NumericalTypeTag {
-    type NativeType: Default + PartialEq;
+    type NativeType: Default + PartialEq + Clone;
 }
 pub trait EnumTypeForSyntax {
-    type NativeType<E: PartialEq>: PartialEq;
-    fn default<E: Default + TryFrom<i32> + PartialEq>() -> Self::NativeType<E>;
+    type NativeType<E: PartialEq + Clone>: PartialEq + Clone;
+    fn default<E>() -> Self::NativeType<E>
+    where
+        E: Default + TryFrom<i32> + PartialEq + Clone;
 }
 
 /// A tag trait for types corresponding to the field label.
@@ -162,14 +164,20 @@ impl NumericalTypeTag for Bool {
 }
 
 impl EnumTypeForSyntax for Proto2 {
-    type NativeType<E: PartialEq> = E;
-    fn default<E: Default + TryFrom<i32> + PartialEq>() -> Self::NativeType<E> {
+    type NativeType<E: PartialEq + Clone> = E;
+    fn default<E>() -> Self::NativeType<E>
+    where
+        E: Default + TryFrom<i32> + PartialEq + Clone,
+    {
         Default::default()
     }
 }
 impl EnumTypeForSyntax for Proto3 {
-    type NativeType<E: PartialEq> = ::std::result::Result<E, i32>;
-    fn default<E: Default + TryFrom<i32> + PartialEq>() -> Self::NativeType<E> {
+    type NativeType<E: PartialEq + Clone> = ::std::result::Result<E, i32>;
+    fn default<E>() -> Self::NativeType<E>
+    where
+        E: Default + TryFrom<i32> + PartialEq + Clone,
+    {
         <E as TryFrom<i32>>::try_from(0).map_err(|_| 0)
     }
 }

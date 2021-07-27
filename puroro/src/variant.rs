@@ -75,14 +75,14 @@ impl Variant {
     pub fn to_enum<X, E>(&self) -> Result<X::NativeType<E>>
     where
         X: EnumVariantTypeForSyntax,
-        E: TryFrom<i32> + PartialEq,
+        E: TryFrom<i32> + PartialEq + Clone,
     {
         X::from_variant(self)
     }
     pub fn from_enum<X, E>(val: X::NativeType<E>) -> Result<Variant>
     where
         X: EnumVariantTypeForSyntax,
-        E: PartialEq,
+        E: PartialEq + Clone,
         i32: From<E>,
     {
         X::to_variant(val)
@@ -127,10 +127,10 @@ pub trait VariantTypeTag: tags::NumericalTypeTag {
     fn to_variant(val: Self::NativeType) -> Result<Variant>;
 }
 pub trait EnumVariantTypeForSyntax: tags::EnumTypeForSyntax {
-    fn from_variant<E: TryFrom<i32> + PartialEq>(
+    fn from_variant<E: TryFrom<i32> + PartialEq + Clone>(
         var: &Variant,
     ) -> Result<<Self as tags::EnumTypeForSyntax>::NativeType<E>>;
-    fn to_variant<E: Into<i32> + PartialEq>(
+    fn to_variant<E: Into<i32> + PartialEq + Clone>(
         val: <Self as tags::EnumTypeForSyntax>::NativeType<E>,
     ) -> Result<Variant>;
 }
@@ -198,13 +198,13 @@ impl VariantTypeTag for tags::Bool {
 }
 
 impl EnumVariantTypeForSyntax for tags::Proto2 {
-    fn from_variant<E: TryFrom<i32> + PartialEq>(
+    fn from_variant<E: TryFrom<i32> + PartialEq + Clone>(
         var: &Variant,
     ) -> Result<<Self as tags::EnumTypeForSyntax>::NativeType<E>> {
         let i: i32 = i32::try_from(i64::from_le_bytes(var.0))?;
         Ok(E::try_from(i).map_err(|_| ErrorKind::UnknownEnumVariant(i))?)
     }
-    fn to_variant<E: Into<i32> + PartialEq>(
+    fn to_variant<E: Into<i32> + PartialEq + Clone>(
         val: <Self as tags::EnumTypeForSyntax>::NativeType<E>,
     ) -> Result<Variant> {
         let int_val: i32 = E::into(val);
@@ -212,13 +212,13 @@ impl EnumVariantTypeForSyntax for tags::Proto2 {
     }
 }
 impl EnumVariantTypeForSyntax for tags::Proto3 {
-    fn from_variant<E: TryFrom<i32> + PartialEq>(
+    fn from_variant<E: TryFrom<i32> + PartialEq + Clone>(
         var: &Variant,
     ) -> Result<<Self as tags::EnumTypeForSyntax>::NativeType<E>> {
         let i = i32::try_from(i64::from_le_bytes(var.0))?;
         Ok(E::try_from(i).map_err(|_| i))
     }
-    fn to_variant<E: Into<i32> + PartialEq>(
+    fn to_variant<E: Into<i32> + PartialEq + Clone>(
         val: <Self as tags::EnumTypeForSyntax>::NativeType<E>,
     ) -> Result<Variant> {
         let int_val = match val {

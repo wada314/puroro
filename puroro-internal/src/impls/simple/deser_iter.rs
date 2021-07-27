@@ -204,7 +204,7 @@ where
 {
     type DeserEnum<E>
     where
-        E: Default + TryFrom<i32> + PartialEq,
+        E: Default + TryFrom<i32> + PartialEq + Clone,
     = Self;
 }
 
@@ -215,7 +215,7 @@ where
     (X, L): DoDefaultCheck,
     X: tags::EnumTypeForSyntax + EnumVariantTypeForSyntax,
     L: LabelWrappedType<Type<EnumNativeType<X, E>> = EnumFieldType>,
-    E: Default + TryFrom<i32> + PartialEq,
+    E: Default + TryFrom<i32> + PartialEq + Clone,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut EnumFieldType,
@@ -257,7 +257,7 @@ where
 {
     type DeserMsg<M>
     where
-        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self>,
+        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self> + Clone,
     = Self;
 }
 
@@ -265,7 +265,7 @@ where
 impl<X, L, M, MsgFieldType, InternalDataType>
     DeserMsgFromBytesIter<X, L, M, MsgFieldType, InternalDataType> for SimpleImpl
 where
-    M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl>,
+    M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl> + Clone,
     L: LabelWrappedMessageType<Type<M> = MsgFieldType>,
 {
     fn deser_from_scoped_bytes_iter<I>(

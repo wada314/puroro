@@ -161,7 +161,7 @@ pub trait DeserEnumFromBytesIterProxy<X, L>: EnumTypeGen<X, L> + StructInternalT
         <Self as StructInternalTypeGen>::Type,
     >
     where
-        E: Default + TryFrom<i32> + PartialEq;
+        E: Default + TryFrom<i32> + PartialEq + Clone;
 }
 pub trait DeserEnumFromBytesIter<X, L, E, EnumFieldType, InternalDataType>:
     EnumTypeGen<X, L> + StructInternalTypeGen
@@ -188,7 +188,7 @@ pub trait DeserMsgFromBytesIterProxy<X, L>: MsgTypeGen<X, L> + StructInternalTyp
         <Self as StructInternalTypeGen>::Type,
     >
     where
-        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self>;
+        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self> + Clone;
 }
 pub trait DeserMsgFromBytesIter<X, L, M, MsgFieldType, InternalDataType> {
     fn deser_from_scoped_bytes_iter<I>(

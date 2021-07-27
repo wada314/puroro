@@ -37,18 +37,33 @@ pub trait FieldTypeGen<X, L, V>: StructInternalTypeGen {
     fn default(
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as FieldTypeGen<X, L, V>>::Type;
+    /// Clone the field type
+    fn clone(
+        from: &<Self as FieldTypeGen<X, L, V>>::Type,
+        internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> <Self as FieldTypeGen<X, L, V>>::Type;
 }
 pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
-    type EnumType<E: PartialEq>;
+    type EnumType<E: PartialEq + Clone>;
     /// Default value of the field when the message is allocated
-    fn default<E: Default + TryFrom<i32> + PartialEq>(
+    fn default<E: Default + TryFrom<i32> + PartialEq + Clone>(
+        internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> <Self as EnumTypeGen<X, L>>::EnumType<E>;
+    /// Clone the field type
+    fn clone<E: Clone + PartialEq>(
+        from: &<Self as EnumTypeGen<X, L>>::EnumType<E>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<X, L>>::EnumType<E>;
 }
 pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
-    type MsgType<M>;
+    type MsgType<M: Clone>;
     /// Default value of the field when the message is allocated
-    fn default<M>(
+    fn default<M: Clone>(
+        internal_data: &<Self as StructInternalTypeGen>::Type,
+    ) -> <Self as MsgTypeGen<X, L>>::MsgType<M>;
+    /// Clone the field type
+    fn clone<M: Clone>(
+        from: &<Self as MsgTypeGen<X, L>>::MsgType<M>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgType<M>;
 }
