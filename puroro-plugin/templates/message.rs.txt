@@ -263,6 +263,7 @@ where
     }
 }
 
+// Incorrect! Not work properly with recursive types
 impl<ImplTag> ::std::fmt::Debug for {{ self.message.rust_ident() }}<ImplTag>
 where
     ImplTag: ::puroro_internal::AnyFieldTypeGen
