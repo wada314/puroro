@@ -1,2 +1,16 @@
 
-{#- Empty -#}
+pub mod {{ message.rust_nested_module_ident() }} {
+    // Field getters
+    {%- for field in message.fields() %}
+    pub trait Field{{ field.number() }} {
+        fn {{ field.rust_ident() }}(&self) -> i32;
+    }
+    {%- endfor %}
+}
+
+pub trait {{ message.rust_ident() }}Trait:
+    {%- for field in message.fields() %}
+    self::{{ message.rust_nested_module_ident() }}::Field{{ field.number() }} +
+    {%- endfor %}
+{
+}
