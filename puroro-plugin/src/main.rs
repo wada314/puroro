@@ -5,6 +5,7 @@
 #![allow(incomplete_features)]
 
 mod error;
+#[allow(unused)]
 mod protos;
 mod utils;
 mod wrappers;

@@ -14,11 +14,15 @@ pub mod puroro_root {
 
 {#- Message structs #}
 
+{%- if !file.messages().is_empty() %}
 {{ file.messages()|render_messages }}
+{%- endif %}
 
 {#- Enums #}
 
+{%- if !file.enums().is_empty() %}
 {{ file.enums()|render_enums }}
+{%- endif %}
 
 {%- else %}     {#- match file #}
 {%- endmatch %} {#- match file #}
