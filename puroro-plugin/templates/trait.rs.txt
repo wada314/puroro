@@ -44,7 +44,7 @@ pub mod {{ message.rust_nested_module_ident() }}_fields {
         {%- endmatch %}
     }
     {%- endfor %}
-}
+} // mod {{ message.rust_nested_module_ident() }}_fields
 
 pub trait {{ message.rust_ident() }}Trait:
     {%- for field in message.fields() %}
