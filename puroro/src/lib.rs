@@ -3,11 +3,13 @@
 #![feature(generic_associated_types)]
 
 mod error;
-
 pub mod fixed_bits;
 pub mod tags;
 pub mod types;
 pub mod variant;
+
+use ::std::convert::TryFrom;
+
 pub use error::{ErrorKind, PuroroError};
 pub type Result<T> = std::result::Result<T, PuroroError>;
 
@@ -16,7 +18,9 @@ pub type Result<T> = std::result::Result<T, PuroroError>;
 pub use ::bumpalo;
 pub use ::hashbrown;
 
-pub trait Message {}
+pub trait Message: Clone {}
+
+pub trait Enum: PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32> {}
 
 pub trait GetImpl<NewImplTypeTag> {
     type Type;

@@ -16,10 +16,10 @@ pub trait NumericalTypeTag {
     type NativeType: Default + PartialEq + Clone;
 }
 pub trait EnumTypeForSyntax {
-    type NativeType<E: PartialEq + Clone>: PartialEq + Clone;
+    type NativeType<E: crate::Enum>: PartialEq + Clone;
     fn default<E>() -> Self::NativeType<E>
     where
-        E: Default + TryFrom<i32> + PartialEq + Clone;
+        E: crate::Enum;
 }
 
 /// A tag trait for types corresponding to the field label.
@@ -164,19 +164,19 @@ impl NumericalTypeTag for Bool {
 }
 
 impl EnumTypeForSyntax for Proto2 {
-    type NativeType<E: PartialEq + Clone> = E;
+    type NativeType<E: crate::Enum> = E;
     fn default<E>() -> Self::NativeType<E>
     where
-        E: Default + TryFrom<i32> + PartialEq + Clone,
+        E: crate::Enum,
     {
         Default::default()
     }
 }
 impl EnumTypeForSyntax for Proto3 {
-    type NativeType<E: PartialEq + Clone> = ::std::result::Result<E, i32>;
+    type NativeType<E: crate::Enum> = ::std::result::Result<E, i32>;
     fn default<E>() -> Self::NativeType<E>
     where
-        E: Default + TryFrom<i32> + PartialEq + Clone,
+        E: crate::Enum,
     {
         <E as TryFrom<i32>>::try_from(0).map_err(|_| 0)
     }

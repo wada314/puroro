@@ -10,8 +10,7 @@ use ::itertools::Itertools;
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::types::FieldData;
 use ::puroro::variant::{EnumVariantTypeForSyntax, VariantTypeTag};
-use ::puroro::{tags, ErrorKind, Result};
-use ::std::convert::TryFrom;
+use ::puroro::{tags, Enum, ErrorKind, Message, Result};
 
 // deser from iterator
 impl DeserAnyFieldFromBytesIter for SimpleImpl {}
@@ -204,7 +203,7 @@ where
 {
     type DeserEnum<E>
     where
-        E: Default + TryFrom<i32> + PartialEq + Clone,
+        E: Enum,
     = Self;
 }
 
@@ -215,7 +214,7 @@ where
     (X, L): DoDefaultCheck,
     X: tags::EnumTypeForSyntax + EnumVariantTypeForSyntax,
     L: LabelWrappedType<Type<EnumNativeType<X, E>> = EnumFieldType>,
-    E: Default + TryFrom<i32> + PartialEq + Clone,
+    E: Enum,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut EnumFieldType,
@@ -257,7 +256,7 @@ where
 {
     type DeserMsg<M>
     where
-        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self> + Clone,
+        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self> + Message,
     = Self;
 }
 
@@ -265,7 +264,7 @@ where
 impl<X, L, M, MsgFieldType, InternalDataType>
     DeserMsgFromBytesIter<X, L, M, MsgFieldType, InternalDataType> for SimpleImpl
 where
-    M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl> + Clone,
+    M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl> + Message,
     L: LabelWrappedMessageType<Type<M> = MsgFieldType>,
 {
     fn deser_from_scoped_bytes_iter<I>(

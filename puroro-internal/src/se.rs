@@ -1,6 +1,5 @@
 pub mod to_io_write;
-use ::puroro::tags;
-use ::puroro::SerToIoWrite;
+use ::puroro::{tags, Enum, Message, SerToIoWrite};
 
 use crate::{EnumTypeGen, FieldTypeGen, MsgTypeGen, Result, StructInternalTypeGen};
 pub trait SerAnyFieldToIoWrite:
@@ -132,15 +131,14 @@ where
         <Self as StructInternalTypeGen>::Type,
     >
     where
-        E: PartialEq + Clone,
-        i32: From<E>,
+        E: Enum,
         <X as tags::EnumTypeForSyntax>::NativeType<E>: Clone;
 }
 pub trait SerEnumToIoWrite<X, L, E, EnumFieldType, InternalDataType>
 where
     X: tags::EnumTypeForSyntax,
     <X as tags::EnumTypeForSyntax>::NativeType<E>: Clone,
-    E: PartialEq + Clone,
+    E: Enum,
 {
     fn ser_to_io_write<W>(
         field: &EnumFieldType,
@@ -160,9 +158,12 @@ pub trait SerMsgToIoWriteProxy<X, L>: MsgTypeGen<X, L> + StructInternalTypeGen {
         <Self as StructInternalTypeGen>::Type,
     >
     where
-        M: SerToIoWrite + Clone;
+        M: SerToIoWrite + Message;
 }
-pub trait SerMsgToIoWrite<X, L, M, MsgFieldType, InternalDataType> {
+pub trait SerMsgToIoWrite<X, L, M, MsgFieldType, InternalDataType>
+where
+    M: Message,
+{
     fn ser_to_io_write<W>(
         field: &MsgFieldType,
         field_number: i32,

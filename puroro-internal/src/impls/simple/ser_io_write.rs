@@ -13,7 +13,7 @@ use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::tags;
 use ::puroro::types::WireType;
 use ::puroro::variant::{EnumVariantTypeForSyntax, Variant, VariantTypeTag};
-use ::puroro::SerToIoWrite;
+use ::puroro::{Enum, Message, SerToIoWrite};
 
 use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType};
 
@@ -251,8 +251,7 @@ where
 {
     type SerEnum<E>
     where
-        E: PartialEq + Clone,
-        i32: From<E>,
+        E: Enum,
         EnumNativeType<X, E>: Clone,
     = Self;
 }
@@ -265,8 +264,7 @@ where
 {
     type SerEnum<E>
     where
-        E: PartialEq + Clone,
-        i32: From<E>,
+        E: Enum,
         EnumNativeType<X, E>: Clone,
     = Self;
 }
@@ -274,8 +272,7 @@ where
 #[rustfmt::skip]
 impl<X, _1, _2, E, EnumFieldType, InternalDataType> SerEnumToIoWrite<X, tags::NonRepeated<_1, _2>, E, EnumFieldType, InternalDataType> for SimpleImpl
 where
-    E: PartialEq + Clone,
-    i32: From<E>,
+    E: Enum,
     tags::NonRepeated<_1, _2>: LabelWrappedType<Type<EnumNativeType<X, E>> = EnumFieldType>,
     X: EnumVariantTypeForSyntax,
     <X as tags::EnumTypeForSyntax>::NativeType<E>: Clone,
@@ -304,8 +301,7 @@ where
 #[rustfmt::skip]
 impl<X, E, EnumFieldType, InternalDataType> SerEnumToIoWrite<X, tags::Repeated, E, EnumFieldType, InternalDataType> for SimpleImpl
 where
-    E: PartialEq + Clone,
-    i32: From<E>,
+    E: Enum,
     tags::Repeated: LabelWrappedType<Type<EnumNativeType<X, E>> = EnumFieldType>,
     X: EnumVariantTypeForSyntax,
     <X as tags::EnumTypeForSyntax>::NativeType<E>: Clone,
@@ -349,14 +345,14 @@ where
 {
     type SerMsg<M>
     where
-        M: SerToIoWrite + Clone,
+        M: SerToIoWrite + Message,
     = Self;
 }
 #[rustfmt::skip]
 impl<X, L, M, MsgFieldType, InternalDataType> SerMsgToIoWrite<X, L, M, MsgFieldType, InternalDataType> for SimpleImpl
 where
     L: LabelWrappedMessageType<Type<M> = MsgFieldType>,
-    M: SerToIoWrite + Clone,
+    M: SerToIoWrite + Message,
 {
     fn ser_to_io_write<W>(
         field: &MsgFieldType,

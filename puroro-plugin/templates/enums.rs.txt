@@ -7,6 +7,9 @@ pub enum {{ enume.rust_ident() }} {
     {%- endfor %}
 }
 
+impl ::puroro::Enum for {{ enume.rust_ident() }} {
+}
+
 impl ::std::convert::TryFrom<i32> for {{ enume.rust_ident() }} {
     type Error = i32;
     fn try_from(value: i32) -> ::std::result::Result<Self, i32> {

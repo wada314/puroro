@@ -4,8 +4,7 @@ pub mod de;
 pub mod impls;
 pub mod se;
 
-use ::puroro::{tags, ErrorKind, Result};
-use ::std::convert::TryFrom;
+use ::puroro::{tags, Enum, ErrorKind, Message, Result};
 
 // Re-exporting library modules
 pub use ::puroro::{bumpalo, hashbrown};
@@ -44,25 +43,25 @@ pub trait FieldTypeGen<X, L, V>: StructInternalTypeGen {
     ) -> <Self as FieldTypeGen<X, L, V>>::Type;
 }
 pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
-    type EnumType<E: PartialEq + Clone>;
+    type EnumType<E: Enum>;
     /// Default value of the field when the message is allocated
-    fn default<E: Default + TryFrom<i32> + PartialEq + Clone>(
+    fn default<E: Enum>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<X, L>>::EnumType<E>;
     /// Clone the field type
-    fn clone<E: Clone + PartialEq>(
+    fn clone<E: Enum>(
         from: &<Self as EnumTypeGen<X, L>>::EnumType<E>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<X, L>>::EnumType<E>;
 }
 pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
-    type MsgType<M: Clone>;
+    type MsgType<M: Message>;
     /// Default value of the field when the message is allocated
-    fn default<M: Clone>(
+    fn default<M: Message>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgType<M>;
     /// Clone the field type
-    fn clone<M: Clone>(
+    fn clone<M: Message>(
         from: &<Self as MsgTypeGen<X, L>>::MsgType<M>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgType<M>;

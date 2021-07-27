@@ -1,7 +1,6 @@
 use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType, SimpleImpl};
 use crate::{AnyFieldTypeGen, EnumTypeGen, FieldTypeGen, MsgTypeGen, StructInternalTypeGen};
-use ::puroro::tags;
-use ::std::convert::TryFrom;
+use ::puroro::{tags, Enum, Message};
 
 // All-in-one typegen trait
 impl AnyFieldTypeGen for SimpleImpl {}
@@ -77,15 +76,15 @@ where
     L: LabelWrappedType,
     X: tags::EnumTypeForSyntax,
 {
-    type EnumType<E: PartialEq + Clone> =
+    type EnumType<E: Enum> =
         <L as LabelWrappedType>::Type<<X as tags::EnumTypeForSyntax>::NativeType<E>>;
-    fn default<E: Default + TryFrom<i32> + PartialEq + Clone>(
+    fn default<E: Enum>(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<X, L>>::EnumType<E> {
         <L as LabelWrappedType>::default_with(<X as tags::EnumTypeForSyntax>::default)
     }
 
-    fn clone<E: Clone + PartialEq>(
+    fn clone<E: Enum>(
         from: &<Self as EnumTypeGen<X, L>>::EnumType<E>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as EnumTypeGen<X, L>>::EnumType<E> {
@@ -98,14 +97,14 @@ where
     Self: StructInternalTypeGen,
     L: LabelWrappedMessageType,
 {
-    type MsgType<M: Clone> = <L as LabelWrappedMessageType>::Type<M>;
-    fn default<M: Clone>(
+    type MsgType<M: Message> = <L as LabelWrappedMessageType>::Type<M>;
+    fn default<M: Message>(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgType<M> {
         <L as LabelWrappedMessageType>::default()
     }
 
-    fn clone<M: Clone>(
+    fn clone<M: Message>(
         from: &<Self as MsgTypeGen<X, L>>::MsgType<M>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgType<M> {
