@@ -1,9 +1,9 @@
 #![allow(unused)]
 
-use crate::protos::enums::google::protobuf::field_descriptor_proto::{
+use crate::protos::google::protobuf;
+use crate::protos::google::protobuf::field_descriptor_proto::{
     Label as FieldLabelProto, Type as FieldTypeProto,
 };
-use crate::protos::simple::google::protobuf;
 use crate::utils;
 use crate::{ErrorKind, Result};
 use ::askama::Template;
@@ -298,9 +298,12 @@ impl Message {
         package: Rc<Vec<String>>,
         outer_messages: Rc<Vec<String>>,
     ) -> Result<Rc<Self>> {
-        let proto_name = proto.name.ok_or(ErrorKind::EmptyInputField {
-            name: "DescriptorProto.name".to_string(),
-        })?;
+        let proto_name = proto
+            .name
+            .ok_or(ErrorKind::EmptyInputField {
+                name: "DescriptorProto.name".into(),
+            })?
+            .to_string();
         let new_outer_messages = Rc::new({
             let mut v = outer_messages.deref().clone();
             v.push(proto_name.clone());
@@ -421,9 +424,12 @@ impl Enum {
         package: Rc<Vec<String>>,
         outer_messages: Rc<Vec<String>>,
     ) -> Result<Rc<Self>> {
-        let proto_name = proto.name.ok_or(ErrorKind::EmptyInputField {
-            name: "EnumDescriptorProto.name".to_string(),
-        })?;
+        let proto_name = proto
+            .name
+            .ok_or(ErrorKind::EmptyInputField {
+                name: "EnumDescriptorProto.name".into(),
+            })?
+            .to_string();
         let proto_value = proto.value;
         Ok(Rc::new(Self {
             input_file: input_file,
@@ -479,10 +485,13 @@ impl Enum {
 
 impl Field {
     pub fn try_from_proto(message: Weak<Message>, proto: FieldDescriptorProto) -> Result<Self> {
-        let proto_name = proto.name.ok_or(ErrorKind::EmptyInputField {
-            name: "FieldDescriptorProto.name".to_string(),
-        })?;
-        let proto_type_name = proto.type_name.unwrap_or_default();
+        let proto_name = proto
+            .name
+            .ok_or(ErrorKind::EmptyInputField {
+                name: "FieldDescriptorProto.name".into(),
+            })?
+            .to_string();
+        let proto_type_name = proto.type_name.unwrap_or_default().to_string();
         let proto_type_enum = proto.type_.ok_or(ErrorKind::InternalError {
             detail: "currently we are assuming the field type enum is always set.".to_string(),
         })?;

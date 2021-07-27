@@ -9,8 +9,7 @@ mod protos;
 mod utils;
 mod wrappers;
 
-use ::puroro::Serializable;
-use ::puroro_internal::deser::MergeableMessageFromIter;
+use ::puroro::{DeserFromBytesIter, SerToIoWrite};
 use itertools::Itertools;
 
 use error::{ErrorKind, GeneratorError};
@@ -21,9 +20,9 @@ use std::io::Read;
 use std::io::{stdin, stdout};
 use std::rc::Rc;
 
-use google::protobuf::compiler::code_generator_response::File;
-use google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
-pub use protos::simple::google;
+pub use protos::google;
+use protos::google::protobuf::compiler::code_generator_response::File;
+use protos::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 
 use askama::Template;
 
@@ -137,17 +136,17 @@ mod filters {
 }
 
 fn main() -> Result<()> {
-    let mut cgreq = CodeGeneratorRequest::default();
-    cgreq.merge_from_iter(&mut stdin().bytes()).unwrap();
+    let mut cgreq: CodeGeneratorRequest = CodeGeneratorRequest::default();
+    cgreq.deser(&mut stdin().bytes()).unwrap();
 
     #[allow(unused)]
     let wrapped_cgreq = wrappers::Context::try_from_proto(cgreq.clone())?;
 
-    let mut cgres = CodeGeneratorResponse::default();
+    let mut cgres: CodeGeneratorResponse = CodeGeneratorResponse::default();
     cgres.supported_features = Some(1); // TODO: Use Feature enum
 
-    let mut mod_rs = File::default();
-    mod_rs.name = Some("mod.rs".to_string());
+    let mut mod_rs: File = File::default();
+    mod_rs.name = Some("mod.rs".into());
     let package_to_subpackage_map = make_package_to_subpackages_map(&cgreq.proto_file);
     let package_to_file_descriptor_map = wrapped_cgreq
         .input_files()
@@ -174,11 +173,11 @@ fn main() -> Result<()> {
         let contents = variables.render().unwrap();
 
         let mut output_file = <File as Default>::default();
-        output_file.name = Some(filename);
-        output_file.content = Some(contents);
+        output_file.name = Some(filename.into());
+        output_file.content = Some(contents.into());
         cgres.file.push(output_file);
     }
 
-    cgres.serialize(&mut stdout())?;
+    cgres.ser(&mut stdout())?;
     Ok(())
 }
