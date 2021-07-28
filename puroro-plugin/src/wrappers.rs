@@ -598,6 +598,19 @@ impl Field {
             number = self.number(),
         ))
     }
+
+    pub fn rust_absolute_field_trait_path(&self) -> Result<String> {
+        let m = self.message()?;
+        Ok(format!(
+            "{path}::puroro_traits::{submodule}_fields::Field{number}",
+            path = make_module_path(
+                m.package.iter().map(|s| s.borrow()),
+                m.outer_messages.iter().map(|s| s.borrow())
+            ),
+            submodule = m.rust_nested_module_ident(),
+            number = self.number(),
+        ))
+    }
 }
 
 impl EnumValue {

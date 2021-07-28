@@ -1,3 +1,22 @@
+{#- ################ Macro for trait method return type ################ #}
+
+{%- macro scalar_getter_return_type(field_type) %}
+{%- match field_type.maybe_enum_or_message().unwrap() %}
+{%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
+            <() as ::puroro_internal::TraitEnumTypeGen<
+                {{ field.syntax_and_label_tags().unwrap() }}
+            >>::ScalarGetterReturnType::<'_, {{ e.rust_absolute_path() }}>
+{%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+            <() as ::puroro_internal::TraitMsgTypeGen<
+                {{ field.syntax_and_label_tags().unwrap() }}
+            >>::ScalarGetterReturnType::<'_, Self::MessageType>
+{%- else %}
+            <() as ::puroro_internal::TraitFieldTypeGen<
+                {{ field.syntax_and_label_and_type_tags().unwrap() }}
+            >>::ScalarGetterReturnType<'_>
+{%- endmatch %}
+{%- endmacro %}
+
 
 {# ################# Struct body ################# -#}
 
@@ -209,6 +228,25 @@ where
         super::private::{{ self.message.rust_ident() }}<NewImplTag>,
     >>::Type;
 }
+
+{%- for field in self.message.fields() %}
+impl<ImplTag> {{ field.rust_absolute_field_trait_path().unwrap() }} {
+    {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
+    {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+    //type MessageType: ::puroro::Message + {{ m.rust_absolute_trait_path() }};
+    {%- else %}
+    {%- endmatch %}
+
+    {%- match field.field_label().unwrap() %}
+    {%- when wrappers::FieldLabel::Repeated %}
+    // Do something for repeated field...
+    {%- when wrappers::FieldLabel::Unlabeled %}
+    /*fn {{ field.rust_ident() }}(&self) -> {% call scalar_getter_return_type(field.field_type().unwrap())%};*/
+    {%- else -%}
+    /*fn {{ field.rust_ident() }}(&self) -> {% call scalar_getter_return_type(field.field_type().unwrap())%};*/
+    {%- endmatch %}
+}
+{%- endfor %}
 
 {# ################# std trait impls ################# -#}
 
