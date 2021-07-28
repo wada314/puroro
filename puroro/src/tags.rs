@@ -35,7 +35,6 @@ pub trait FieldLabelAndTypeTag {}
 pub trait ImplTypeTag {}
 
 pub mod value {
-    use std::marker::PhantomData;
     pub struct Int32;
     pub struct UInt32;
     pub struct SInt32;
@@ -45,8 +44,8 @@ pub mod value {
     pub struct Bool;
     pub struct Bytes;
     pub struct String;
-    pub struct Enum<T>(PhantomData<T>);
-    pub struct Message<T>(PhantomData<T>);
+    pub struct Enum;
+    pub struct Message;
     pub struct Float;
     pub struct Double;
     pub struct SFixed32;
@@ -80,8 +79,8 @@ pub type SFixed32 = wire::Bits32<value::SFixed32>;
 pub type Double = wire::Bits64<value::Double>;
 pub type Fixed64 = wire::Bits64<value::Fixed64>;
 pub type SFixed64 = wire::Bits64<value::SFixed64>;
-pub type Enum<T> = wire::Variant<value::Enum<T>>;
-pub type Message<T> = wire::LengthDelimited<value::Message<T>>;
+pub type Enum = wire::Variant<value::Enum>;
+pub type Message = wire::LengthDelimited<value::Message>;
 
 /// A repeated field, which is available in both proto2 and proto3.
 pub type Repeated = (bool, (), ());
@@ -111,8 +110,8 @@ impl FieldTypeTag for SInt64 {}
 impl FieldTypeTag for Bool {}
 impl FieldTypeTag for Bytes {}
 impl FieldTypeTag for String {}
-impl<T> FieldTypeTag for Enum<T> {}
-impl<T> FieldTypeTag for Message<T> {}
+impl FieldTypeTag for Enum {}
+impl FieldTypeTag for Message {}
 impl FieldTypeTag for Float {}
 impl FieldTypeTag for Double {}
 impl FieldTypeTag for Fixed32 {}
