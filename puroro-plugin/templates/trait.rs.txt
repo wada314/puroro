@@ -40,7 +40,7 @@ pub mod {{ message.rust_nested_module_ident() }}_fields {
         {%- when wrappers::FieldLabel::Unlabeled %}
         fn {{ field.rust_ident() }}(&self) -> {% call scalar_getter_return_type(field.field_type().unwrap())%};
         {%- else -%}
-        fn {{ field.rust_ident() }}(&self) -> {% call scalar_getter_return_type(field.field_type().unwrap())%};
+        fn {{ field.rust_ident() }}(&self) -> ::std::option::Option<{% call scalar_getter_return_type(field.field_type().unwrap())%}>;
         {%- endmatch %}
     }
     {%- endfor %}
