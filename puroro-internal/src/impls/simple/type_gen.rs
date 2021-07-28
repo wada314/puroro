@@ -98,6 +98,8 @@ where
     L: LabelWrappedMessageType,
 {
     type MsgFieldType<M: Message> = <L as LabelWrappedMessageType>::Type<M>;
+    type MsgTypeInTrait<M: Message> = M;
+
     fn default<M: Message>(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgFieldType<M> {

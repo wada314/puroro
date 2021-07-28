@@ -57,6 +57,7 @@ pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
 }
 pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
     type MsgFieldType<M: Message>;
+    type MsgTypeInTrait<M: Message>: Message;
     /// Default value of the field when the message is allocated
     fn default<M: Message>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
