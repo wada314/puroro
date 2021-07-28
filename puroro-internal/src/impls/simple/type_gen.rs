@@ -76,18 +76,18 @@ where
     L: LabelWrappedType,
     X: tags::EnumTypeForSyntax,
 {
-    type EnumType<E: Enum> =
+    type EnumFieldType<E: Enum> =
         <L as LabelWrappedType>::Type<<X as tags::EnumTypeForSyntax>::NativeType<E>>;
     fn default<E: Enum>(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as EnumTypeGen<X, L>>::EnumType<E> {
+    ) -> <Self as EnumTypeGen<X, L>>::EnumFieldType<E> {
         <L as LabelWrappedType>::default_with(<X as tags::EnumTypeForSyntax>::default)
     }
 
     fn clone<E: Enum>(
-        from: &<Self as EnumTypeGen<X, L>>::EnumType<E>,
+        from: &<Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as EnumTypeGen<X, L>>::EnumType<E> {
+    ) -> <Self as EnumTypeGen<X, L>>::EnumFieldType<E> {
         Clone::clone(from)
     }
 }
@@ -97,17 +97,17 @@ where
     Self: StructInternalTypeGen,
     L: LabelWrappedMessageType,
 {
-    type MsgType<M: Message> = <L as LabelWrappedMessageType>::Type<M>;
+    type MsgFieldType<M: Message> = <L as LabelWrappedMessageType>::Type<M>;
     fn default<M: Message>(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as MsgTypeGen<X, L>>::MsgType<M> {
+    ) -> <Self as MsgTypeGen<X, L>>::MsgFieldType<M> {
         <L as LabelWrappedMessageType>::default()
     }
 
     fn clone<M: Message>(
-        from: &<Self as MsgTypeGen<X, L>>::MsgType<M>,
+        from: &<Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as MsgTypeGen<X, L>>::MsgType<M> {
+    ) -> <Self as MsgTypeGen<X, L>>::MsgFieldType<M> {
         Clone::clone(from)
     }
 }

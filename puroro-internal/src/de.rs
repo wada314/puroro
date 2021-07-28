@@ -156,7 +156,7 @@ pub trait DeserEnumFromBytesIterProxy<X, L>: EnumTypeGen<X, L> + StructInternalT
         X,
         L,
         E,
-        <Self as EnumTypeGen<X, L>>::EnumType<E>,
+        <Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
         <Self as StructInternalTypeGen>::Type,
     >
     where
@@ -183,7 +183,7 @@ pub trait DeserMsgFromBytesIterProxy<X, L>: MsgTypeGen<X, L> + StructInternalTyp
         X,
         L,
         M,
-        <Self as MsgTypeGen<X, L>>::MsgType<M>,
+        <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         <Self as StructInternalTypeGen>::Type,
     >
     where
