@@ -3,7 +3,6 @@
 pub mod de;
 pub mod impls;
 pub mod se;
-mod traits;
 
 use ::puroro::{tags, Enum, ErrorKind, Message, Result};
 
@@ -67,16 +66,6 @@ pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
         from: &<Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgFieldType<M>;
-}
-
-pub trait TraitFieldTypeGen<X, L, V> {
-    type ScalarGetterReturnType<'this>;
-}
-pub trait TraitEnumTypeGen<X, L> {
-    type ScalarGetterReturnType<'this, E: Enum>;
-}
-pub trait TraitMsgTypeGen<X, L> {
-    type ScalarGetterReturnType<'this, M: 'this + Message>;
 }
 
 pub trait AnyFieldTypeGen:

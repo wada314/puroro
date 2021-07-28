@@ -1,3 +1,4 @@
+use ::std::borrow::Cow;
 use ::std::convert::TryFrom;
 use ::std::marker::PhantomData;
 
@@ -11,7 +12,7 @@ pub trait FieldTypeTag {}
 /// Proto2 or Proto3.
 pub trait ProtoSyntaxTag {}
 
-/// A `FieldTypeTag` which has wire type one of Variant, Bits32 or Bits64.
+/// A `FieldTypeTag` which has wire type one of Variant (except enum), Bits32 or Bits64.
 pub trait NumericalTypeTag {
     type NativeType: Default + PartialEq + Clone;
 }

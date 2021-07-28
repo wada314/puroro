@@ -715,6 +715,27 @@ impl FieldType {
         })
     }
 
+    pub fn numerical_rust_type(&self) -> Result<&'static str> {
+        Ok(match *self {
+            FieldType::Double => "f64",
+            FieldType::Float => "f32",
+            FieldType::Int32 => "i32",
+            FieldType::Int64 => "i64",
+            FieldType::UInt32 => "u32",
+            FieldType::UInt64 => "u64",
+            FieldType::SInt32 => "i32",
+            FieldType::SInt64 => "i64",
+            FieldType::Fixed32 => "u32",
+            FieldType::Fixed64 => "u64",
+            FieldType::SFixed32 => "i32",
+            FieldType::SFixed64 => "i64",
+            FieldType::Bool => "bool",
+            _ => Err(ErrorKind::InternalError {
+                detail: "numerical_rust_type() is invoked for non-numerical type".to_string(),
+            })?,
+        })
+    }
+
     pub fn proto_name(&self) -> Result<String> {
         Ok(match self {
             FieldType::Double => "double".to_string(),
