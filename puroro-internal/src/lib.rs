@@ -68,16 +68,6 @@ pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
     ) -> <Self as MsgTypeGen<X, L>>::MsgType<M>;
 }
 
-pub trait TraitFieldTypeGen<X, L, V> {
-    type ScalarGetterReturnType<'this>;
-}
-pub trait TraitEnumTypeGen<X, L> {
-    type ScalarGetterReturnType<'this, E: Enum>;
-}
-pub trait TraitMsgTypeGen<X, L> {
-    type ScalarGetterReturnType<'this, M: 'this + Message>;
-}
-
 pub trait AnyFieldTypeGen:
     EnumTypeGen<tags::Proto2, tags::Required>
     + EnumTypeGen<tags::Proto2, tags::Optional>
