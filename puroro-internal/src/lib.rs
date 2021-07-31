@@ -3,7 +3,6 @@
 pub mod de;
 pub mod impls;
 pub mod se;
-mod traits;
 
 use ::puroro::{tags, Enum, ErrorKind, Message, Result};
 
