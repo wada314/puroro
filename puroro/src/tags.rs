@@ -1,4 +1,5 @@
 use crate::bool::{BoolTypes, False, True};
+use ::std::borrow::Cow;
 use ::std::convert::TryFrom;
 use ::std::marker::PhantomData;
 
@@ -16,6 +17,13 @@ pub trait ProtoSyntaxTag {}
 pub trait NumericalTypeTag {
     type NativeType: Default + PartialEq + Clone;
 }
+
+/// A type tag except `Enum` and `Message`, which needs extra information to
+/// get the corresponding Rust type.
+pub trait SelfContainedTypeTag {
+    type TraitScalarGetterType<'this>;
+}
+
 pub trait EnumTypeForSyntax {
     type NativeType<E: crate::Enum>: PartialEq + Clone;
     fn default<E>() -> Self::NativeType<E>
@@ -165,6 +173,19 @@ impl NumericalTypeTag for Double {
 }
 impl NumericalTypeTag for Bool {
     type NativeType = bool;
+}
+
+impl<T> SelfContainedTypeTag for T
+where
+    T: NumericalTypeTag,
+{
+    type TraitScalarGetterType<'this> = <T as NumericalTypeTag>::NativeType;
+}
+impl SelfContainedTypeTag for Bytes {
+    type TraitScalarGetterType<'this> = Cow<'this, [u8]>;
+}
+impl SelfContainedTypeTag for String {
+    type TraitScalarGetterType<'this> = Cow<'this, str>;
 }
 
 impl EnumTypeForSyntax for Proto2 {

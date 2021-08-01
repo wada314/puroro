@@ -31,12 +31,10 @@ where
         Clone::clone(from)
     }
 
-    type ScalarGetterType<'this> =
-        <tags::wire::NonLD<V, _1, _2> as tags::NumericalTypeTag>::NativeType;
     fn get_scalar<'this>(
         from: &'this <Self as FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Self::ScalarGetterType<'this>
+    ) -> <tags::wire::NonLD<V, _1, _2> as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>
     where
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>,
     {
@@ -45,7 +43,9 @@ where
     fn get_scalar_optional<'this>(
         from: &'this <Self as FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Option<Self::ScalarGetterType<'this>>
+    ) -> Option<
+        <tags::wire::NonLD<V, _1, _2> as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>,
+    >
     where
         L: tags::FieldLabelTag<IsOptionalScalar = True>,
     {
@@ -74,11 +74,10 @@ where
         Clone::clone(from)
     }
 
-    type ScalarGetterType<'this> = Cow<'this, [u8]>;
     fn get_scalar<'this>(
         from: &'this <Self as FieldTypeGen<X, L, tags::Bytes>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Self::ScalarGetterType<'this>
+    ) -> <tags::Bytes as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>
     where
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>,
     {
@@ -87,7 +86,7 @@ where
     fn get_scalar_optional<'this>(
         from: &'this <Self as FieldTypeGen<X, L, tags::Bytes>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Option<Self::ScalarGetterType<'this>>
+    ) -> Option<<tags::Bytes as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>>
     where
         L: tags::FieldLabelTag<IsOptionalScalar = True>,
     {
@@ -113,11 +112,10 @@ where
         Clone::clone(from)
     }
 
-    type ScalarGetterType<'this> = Cow<'this, str>;
     fn get_scalar<'this>(
         from: &'this <Self as FieldTypeGen<X, L, tags::String>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Self::ScalarGetterType<'this>
+    ) -> <tags::String as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>
     where
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>,
     {
@@ -126,7 +124,7 @@ where
     fn get_scalar_optional<'this>(
         from: &'this <Self as FieldTypeGen<X, L, tags::String>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Option<Self::ScalarGetterType<'this>>
+    ) -> Option<<tags::String as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>>
     where
         L: tags::FieldLabelTag<IsOptionalScalar = True>,
     {
@@ -155,11 +153,10 @@ where
         Clone::clone(from)
     }
 
-    type ScalarGetterType<'this, E: Enum> = <X as tags::EnumTypeForSyntax>::NativeType<E>;
     fn get_scalar<'this, E: Enum>(
         from: &'this <Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Self::ScalarGetterType<'this, E>
+    ) -> <X as tags::EnumTypeForSyntax>::NativeType<E>
     where
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>,
     {

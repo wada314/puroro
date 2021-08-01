@@ -46,21 +46,21 @@ pub trait FieldTypeGen<X, L, V>: StructInternalTypeGen {
 
     // Trait method implementations
 
-    /// The scalar type for the trait getter method.
-    type ScalarGetterType<'this>;
     /// Get the scalar type for the trait getter method.
     fn get_scalar<'this>(
         from: &'this <Self as FieldTypeGen<X, L, V>>::Type,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Self::ScalarGetterType<'this>
+    ) -> <V as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>
     where
+        V: tags::SelfContainedTypeTag,
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>;
     /// Get `Option` wrapped scalar type for the trait getter method.
     fn get_scalar_optional<'this>(
         from: &'this <Self as FieldTypeGen<X, L, V>>::Type,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Option<Self::ScalarGetterType<'this>>
+    ) -> Option<<V as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>>
     where
+        V: tags::SelfContainedTypeTag,
         L: tags::FieldLabelTag<IsOptionalScalar = True>;
 }
 pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
@@ -77,14 +77,13 @@ pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
 
     // Trait method implementations
 
-    /// The scalar type for the trait getter method.
-    type ScalarGetterType<'this, E: Enum>;
     /// Get the scalar type for the trait getter method.
     fn get_scalar<'this, E: Enum>(
         from: &'this <Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Self::ScalarGetterType<'this, E>
+    ) -> <X as tags::EnumTypeForSyntax>::NativeType<E>
     where
+        X: tags::EnumTypeForSyntax,
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>;
 }
 pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
