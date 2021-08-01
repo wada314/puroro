@@ -11,7 +11,7 @@ pub mod {{ message.rust_nested_module_ident() }}_fields {
 
         {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
         {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-        type MessageType: ::puroro::Message + {{ m.rust_absolute_trait_path() }};
+        type Field{{ field.number() }}MessageType: ::puroro::Message + {{ m.rust_absolute_trait_path() }};
         {%- else %}
         {%- endmatch %}
 

@@ -56,16 +56,16 @@ pub trait FieldTypeGen<X, L, V>: StructInternalTypeGen {
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>;
 }
 pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
-    type EnumType<E: Enum>;
+    type EnumFieldType<E: Enum>;
     /// Default value of the field when the message is allocated
     fn default<E: Enum>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as EnumTypeGen<X, L>>::EnumType<E>;
+    ) -> <Self as EnumTypeGen<X, L>>::EnumFieldType<E>;
     /// Clone the field type
     fn clone<E: Enum>(
-        from: &<Self as EnumTypeGen<X, L>>::EnumType<E>,
+        from: &<Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as EnumTypeGen<X, L>>::EnumType<E>;
+    ) -> <Self as EnumTypeGen<X, L>>::EnumFieldType<E>;
 
     // Trait method implementations
 
@@ -73,23 +73,24 @@ pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
     type ScalarGetterType<'this, E>;
     /// Get the scalar type for the trait getter method.
     fn get_scalar<'this, E: Enum>(
-        from: &'this <Self as EnumTypeGen<X, L>>::EnumType<E>,
+        from: &'this <Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
     ) -> Self::ScalarGetterType<'this, E>
     where
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>;
 }
 pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
-    type MsgType<M: Message>;
+    type MsgFieldType<M: Message>;
+    type MsgTypeInTrait<M: Message>: Message;
     /// Default value of the field when the message is allocated
     fn default<M: Message>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as MsgTypeGen<X, L>>::MsgType<M>;
+    ) -> <Self as MsgTypeGen<X, L>>::MsgFieldType<M>;
     /// Clone the field type
     fn clone<M: Message>(
-        from: &<Self as MsgTypeGen<X, L>>::MsgType<M>,
+        from: &<Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
-    ) -> <Self as MsgTypeGen<X, L>>::MsgType<M>;
+    ) -> <Self as MsgTypeGen<X, L>>::MsgFieldType<M>;
 }
 
 pub trait AnyFieldTypeGen:

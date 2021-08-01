@@ -127,7 +127,7 @@ where
         X,
         L,
         E,
-        <Self as EnumTypeGen<X, L>>::EnumType<E>,
+        <Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
         <Self as StructInternalTypeGen>::Type,
     >
     where
@@ -154,7 +154,7 @@ pub trait SerMsgToIoWriteProxy<X, L>: MsgTypeGen<X, L> + StructInternalTypeGen {
         X,
         L,
         M,
-        <Self as MsgTypeGen<X, L>>::MsgType<M>,
+        <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         <Self as StructInternalTypeGen>::Type,
     >
     where
