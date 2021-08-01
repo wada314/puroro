@@ -94,6 +94,17 @@ where
     ) -> <Self as FieldTypeGen<X, L, tags::String>>::Type {
         Clone::clone(from)
     }
+
+    type ScalarGetterType<'this> = Cow<'this, str>;
+    fn get_scalar<'this>(
+        from: &'this <Self as FieldTypeGen<X, L, tags::String>>::Type,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::ScalarGetterType<'this>
+    where
+        L: tags::FieldLabelTag<IsNonOptionalScalar = True>,
+    {
+        <(X, L) as LabelWrappedLdType>::get_scalar(from)
+    }
 }
 
 impl<X, L> EnumTypeGen<X, L> for SimpleImpl
