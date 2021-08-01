@@ -5,7 +5,7 @@ pub mod impls;
 pub mod se;
 
 use ::puroro::bool::{False, True};
-use ::puroro::{tags, Enum, ErrorKind, Message, Result};
+use ::puroro::{tags, Enum, ErrorKind, Message, RepeatedField, Result};
 use ::std::borrow::Cow;
 
 // Re-exporting library modules
@@ -32,6 +32,7 @@ pub trait StructInternalTypeGen: tags::ImplTypeTag {
     type Type: Clone;
 }
 
+type ScalarTypeForTrait<'this, V> = <V as tags::SelfContainedTypeTag>::ScalarTypeForTrait<'this>;
 pub trait FieldTypeGen<X, L, V>: StructInternalTypeGen {
     type Type;
     /// Default value of the field when the message is allocated
@@ -50,7 +51,7 @@ pub trait FieldTypeGen<X, L, V>: StructInternalTypeGen {
     fn get_scalar<'this>(
         from: &'this <Self as FieldTypeGen<X, L, V>>::Type,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> <V as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>
+    ) -> ScalarTypeForTrait<'this, V>
     where
         V: tags::SelfContainedTypeTag,
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>;
@@ -58,10 +59,23 @@ pub trait FieldTypeGen<X, L, V>: StructInternalTypeGen {
     fn get_scalar_optional<'this>(
         from: &'this <Self as FieldTypeGen<X, L, V>>::Type,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Option<<V as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>>
+    ) -> Option<ScalarTypeForTrait<'this, V>>
     where
         V: tags::SelfContainedTypeTag,
         L: tags::FieldLabelTag<IsOptionalScalar = True>;
+    /// Repeated field type for the trait.
+    type TraitRepeatedFieldType<'this>: RepeatedField<'this, ScalarTypeForTrait<'this, V>>
+    where
+        V: tags::SelfContainedTypeTag,
+        L: tags::FieldLabelTag<IsRepeated = True>;
+    /// Get repeated field for the trait getter method.
+    fn get_repeated<'this>(
+        from: &'this <Self as FieldTypeGen<X, L, V>>::Type,
+        internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::TraitRepeatedFieldType<'this>
+    where
+        V: tags::SelfContainedTypeTag,
+        L: tags::FieldLabelTag<IsRepeated = True>;
 }
 pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
     type EnumFieldType<E: Enum>;

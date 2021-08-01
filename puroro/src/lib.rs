@@ -23,6 +23,8 @@ pub trait Message: Clone {}
 
 pub trait Enum: PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32> {}
 
+pub trait RepeatedField<'msg, T>: IntoIterator<Item = T> {}
+
 pub trait GetImpl<NewImplTypeTag> {
     type Type;
 }

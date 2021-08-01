@@ -21,7 +21,7 @@ pub trait NumericalTypeTag {
 /// A type tag except `Enum` and `Message`, which needs extra information to
 /// get the corresponding Rust type.
 pub trait SelfContainedTypeTag {
-    type TraitScalarGetterType<'this>;
+    type ScalarTypeForTrait<'this>;
 }
 
 pub trait EnumTypeForSyntax {
@@ -179,13 +179,13 @@ impl<T> SelfContainedTypeTag for T
 where
     T: NumericalTypeTag,
 {
-    type TraitScalarGetterType<'this> = <T as NumericalTypeTag>::NativeType;
+    type ScalarTypeForTrait<'this> = <T as NumericalTypeTag>::NativeType;
 }
 impl SelfContainedTypeTag for Bytes {
-    type TraitScalarGetterType<'this> = Cow<'this, [u8]>;
+    type ScalarTypeForTrait<'this> = Cow<'this, [u8]>;
 }
 impl SelfContainedTypeTag for String {
-    type TraitScalarGetterType<'this> = Cow<'this, str>;
+    type ScalarTypeForTrait<'this> = Cow<'this, str>;
 }
 
 impl EnumTypeForSyntax for Proto2 {

@@ -24,14 +24,14 @@ This library is under development and it is very possible to make breaking chang
         - [ ] Repeated field interface
         - [ ] Map interface
     - [ ] Keep unknown fields
-    - [x] Deserializer from a slice
+    - [ ] Deserializer from a slice
     - [ ] Custom deserializer
     - [ ] Required field checker
     - [ ] Other implementations
-        - [x] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
-        - [x] SliceView -- A viewer over a `&[u8]` slice
+        - [ ] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
+        - [ ] SliceView -- A viewer over a `&[u8]` slice
+        - [ ] Default -- A 0 byte size immutable implementation that only returns default value
         - [ ] Append (name TBD) -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
-    - [ ] Naming of the other implementations. Consider using a type generator class
     - [ ] Support the `allocator_api`. Waiting for the `String` support
     - [ ] RPCs / services
     - [ ] Deserializer vulnerbility: Need to limit the recursion depth

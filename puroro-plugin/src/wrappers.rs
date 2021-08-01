@@ -646,6 +646,9 @@ impl Field {
             _ => false,
         }
     }
+    pub fn has_repeated_getter(&self) -> bool {
+        matches!(self.field_label(), Ok(FieldLabel::Repeated))
+    }
 }
 
 impl EnumValue {

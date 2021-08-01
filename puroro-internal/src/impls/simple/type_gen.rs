@@ -34,7 +34,7 @@ where
     fn get_scalar<'this>(
         from: &'this <Self as FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> <tags::wire::NonLD<V, _1, _2> as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>
+    ) -> <tags::wire::NonLD<V, _1, _2> as tags::SelfContainedTypeTag>::ScalarTypeForTrait<'this>
     where
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>,
     {
@@ -44,12 +44,27 @@ where
         from: &'this <Self as FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
     ) -> Option<
-        <tags::wire::NonLD<V, _1, _2> as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>,
+        <tags::wire::NonLD<V, _1, _2> as tags::SelfContainedTypeTag>::ScalarTypeForTrait<'this>,
     >
     where
         L: tags::FieldLabelTag<IsOptionalScalar = True>,
     {
         <L as LabelWrappedType>::get_scalar_optional(from)
+    }
+    type TraitRepeatedFieldType<'this>
+    where
+        tags::wire::NonLD<V, _1, _2>: tags::SelfContainedTypeTag,
+        L: tags::FieldLabelTag<IsRepeated = True>;
+
+    fn get_repeated<'this>(
+        from: &'this FieldTypeGen::Type,
+        internal_data: &'this StructInternalTypeGen::Type,
+    ) -> Self::TraitRepeatedFieldType<'this>
+    where
+        tags::wire::NonLD<V, _1, _2>: tags::SelfContainedTypeTag,
+        L: tags::FieldLabelTag<IsRepeated = True>,
+    {
+        todo!()
     }
 }
 
@@ -77,7 +92,7 @@ where
     fn get_scalar<'this>(
         from: &'this <Self as FieldTypeGen<X, L, tags::Bytes>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> <tags::Bytes as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>
+    ) -> <tags::Bytes as tags::SelfContainedTypeTag>::ScalarTypeForTrait<'this>
     where
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>,
     {
@@ -86,7 +101,7 @@ where
     fn get_scalar_optional<'this>(
         from: &'this <Self as FieldTypeGen<X, L, tags::Bytes>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Option<<tags::Bytes as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>>
+    ) -> Option<<tags::Bytes as tags::SelfContainedTypeTag>::ScalarTypeForTrait<'this>>
     where
         L: tags::FieldLabelTag<IsOptionalScalar = True>,
     {
@@ -115,7 +130,7 @@ where
     fn get_scalar<'this>(
         from: &'this <Self as FieldTypeGen<X, L, tags::String>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> <tags::String as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>
+    ) -> <tags::String as tags::SelfContainedTypeTag>::ScalarTypeForTrait<'this>
     where
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>,
     {
@@ -124,7 +139,7 @@ where
     fn get_scalar_optional<'this>(
         from: &'this <Self as FieldTypeGen<X, L, tags::String>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Option<<tags::String as tags::SelfContainedTypeTag>::TraitScalarGetterType<'this>>
+    ) -> Option<<tags::String as tags::SelfContainedTypeTag>::ScalarTypeForTrait<'this>>
     where
         L: tags::FieldLabelTag<IsOptionalScalar = True>,
     {

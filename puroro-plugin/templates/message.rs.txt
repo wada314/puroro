@@ -1,5 +1,27 @@
-{#- ################ Macro for trait method return type ################ #}
+{#- ################ Macros (file local functions) ################ #}
 
+{%- macro field_type_gen(field) -%}
+    {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() -%}
+    {%- when wrappers::MaybeEnumOrMessage::Enum with (e) -%}
+        <ImplTag as ::puroro_internal::EnumTypeGen<{{ field.syntax_and_label_tags().unwrap() }}>>
+    {%- when wrappers::MaybeEnumOrMessage::Message with (m) -%}
+        <ImplTag as ::puroro_internal::MsgTypeGen<{{ field.syntax_and_label_tags().unwrap() }}>>
+    {%- else -%}
+        <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.syntax_and_label_and_type_tags().unwrap() }}>>
+    {%- endmatch -%}
+{%- endmacro -%}
+
+{%- macro field_type(field, impl_tag) -%}
+    {%- call field_type_gen(field) -%}::
+    {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() -%}
+    {%- when wrappers::MaybeEnumOrMessage::Enum with (e) -%}
+        EnumFieldType::<{{ e.rust_absolute_path() }}>
+    {%- when wrappers::MaybeEnumOrMessage::Message with (m) -%}
+        MsgFieldType::<{{ m.rust_absolute_path() }}<{{ impl_tag }}>>
+    {%- else -%}
+        Type
+    {%- endmatch -%}
+{%- endmacro -%}
 
 {# ################# Struct body ################# -#}
 
@@ -299,6 +321,36 @@ where
 
         {%- endif %} {# if self.is_public #}
     }
+    {%- endif %}
+
+    {%- if field.has_repeated_getter() %}
+
+    {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
+    {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
+    {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+    {%- else %}
+    type Field{{ field.number() }}RepeatedType<'this> = <ImplTag as ::puroro_internal::FieldTypeGen<
+        {{ field.syntax_and_label_and_type_tags().unwrap() }}
+    >>::TraitRepeatedFieldType::<'this>;
+    {%- endmatch %}
+
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this> {
+        {%- if self.is_public %}
+
+        {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
+        {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
+        {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+        {%- else %}
+        //fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this>;
+        {%- endmatch %}
+
+        {%- else %} {# if self.is_public #}
+
+        {{ field.rust_absolute_field_trait_path().unwrap() }}::{{ field.rust_ident() }}(&self.body)
+
+        {%- endif %} {# if self.is_public #}
+    }
+
     {%- endif %}
 }
 {%- endfor %}

@@ -21,6 +21,10 @@ pub mod {{ message.rust_nested_module_ident() }}_fields {
         {%- if field.has_scalar_optional_getter() %}
         fn {{ field.rust_ident() }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}>;
         {%- endif %}
+        {%- if field.has_repeated_getter() %}
+        type Field{{ field.number() }}RepeatedType<'this>: ::puroro::RepeatedField<'this, {{ field.trait_scalar_getter_type().unwrap() }}>;
+        fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this>;
+        {%- endif %}
     }
     {%- endfor %}
 } // mod {{ message.rust_nested_module_ident() }}_fields
