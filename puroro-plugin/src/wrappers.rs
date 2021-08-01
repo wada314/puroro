@@ -618,8 +618,8 @@ impl Field {
             FieldType::SFixed64 => "i64".to_string(),
             FieldType::Bool => "bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => "::std::borrow::Cow<'_, str>".to_string(),
-            FieldType::Bytes => "::std::borrow::Cow<'_, [u8]>".to_string(),
+            FieldType::String => "::std::borrow::Cow<'this, str>".to_string(),
+            FieldType::Bytes => "::std::borrow::Cow<'this, [u8]>".to_string(),
             FieldType::Enum(e) => match self.message()?.input_file()?.syntax() {
                 ProtoSyntax::Proto2 => upgrade(&e)?.rust_absolute_path(),
                 ProtoSyntax::Proto3 => format!(
@@ -628,10 +628,23 @@ impl Field {
                 ),
             },
             FieldType::Message(_) => format!(
-                "::std::borrow::Cow<'_, <Self as {field_trait}>::MessageType>",
+                "::std::borrow::Cow<'this, <Self as {field_trait}>::Field{number}MessageType>",
                 field_trait = self.rust_absolute_field_trait_path()?,
+                number = self.number(),
             ),
         })
+    }
+
+    pub fn has_scalar_getter(&self) -> bool {
+        matches!(self.field_label(), Ok(FieldLabel::Unlabeled))
+            && !matches!(self.field_type(), Ok(FieldType::Message(_)))
+    }
+    pub fn has_scalar_optional_getter(&self) -> bool {
+        match self.field_label() {
+            Ok(FieldLabel::Optional | FieldLabel::Required) => true,
+            Ok(FieldLabel::Unlabeled) => matches!(self.field_type(), Ok(FieldType::Message(_))),
+            _ => false,
+        }
     }
 }
 
@@ -698,6 +711,9 @@ impl FieldType {
             FieldType::Message(m) => MaybeEnumOrMessage::Message(upgrade(m)?),
             _ => MaybeEnumOrMessage::Others,
         })
+    }
+    pub fn is_message(&self) -> bool {
+        matches!(self, FieldType::Message(_))
     }
 
     pub fn tag_ident(&self) -> Result<&'static str> {

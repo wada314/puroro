@@ -96,12 +96,12 @@ pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
     /// The concrete message type for the `MessageType` type in `FieldN` traits.
     type MsgTypeInTrait<M: Message>: Message;
     /// The scalar type for the trait getter method.
-    type ScalarOptionalGetterType<'this, M: 'this + Message>;
+    type ScalarGetterType<'this, M: 'this + Message>;
     /// Get the scalar type for the trait getter method.
     fn get_scalar_optional<'this, M: Message>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Self::ScalarOptionalGetterType<'this, M>
+    ) -> Option<Self::ScalarGetterType<'this, M>>
     where
         L: tags::FieldLabelTag<IsRepeated = False>;
 }

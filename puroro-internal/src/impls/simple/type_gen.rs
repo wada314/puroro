@@ -161,11 +161,11 @@ where
     }
 
     type MsgTypeInTrait<M: Message> = M;
-    type ScalarOptionalGetterType<'this, M: 'this + Message> = Option<Cow<'this, M>>;
+    type ScalarGetterType<'this, M: 'this + Message> = Cow<'this, M>;
     fn get_scalar_optional<'this, M: Message>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Self::ScalarOptionalGetterType<'this, M>
+    ) -> Option<Self::ScalarGetterType<'this, M>>
     where
         L: tags::FieldLabelTag<IsRepeated = False>,
     {
