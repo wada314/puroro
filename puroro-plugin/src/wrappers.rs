@@ -593,15 +593,6 @@ impl Field {
         ))
     }
 
-    pub fn rust_absolute_field_trait_path(&self) -> Result<String> {
-        Ok(format!(
-            "{path}::puroro_traits::{submsg_module}_fields::Field{field_number}",
-            path = self.message()?.rust_absolute_module_path(),
-            submsg_module = self.message()?.rust_nested_module_ident(),
-            field_number = self.number()
-        ))
-    }
-
     pub fn trait_scalar_getter_type(&self) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Double => "f64".to_string(),

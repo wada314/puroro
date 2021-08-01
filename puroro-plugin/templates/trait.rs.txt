@@ -1,62 +1,41 @@
 {#- Main definitions of the traits #}
 
-pub mod {{ message.rust_nested_module_ident() }}_fields {
-    mod puroro_root {
-        pub use super::super::super::puroro_root::*;
-    }
-
-    // Field getters
+pub trait {{ message.rust_ident() }}Trait {
     {%- for field in message.fields() %}
-    pub trait Field{{ field.number() }} {
+    {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
+    {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+    type Field{{ field.number() }}MessageType<'this>: ::puroro::Message + {{ m.rust_absolute_trait_path() }};
+    {%- else %}
+    {%- endmatch %}
 
+    {%- if field.has_scalar_getter() %}
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type().unwrap() }};
+    {%- endif %}
+    {%- if field.has_scalar_optional_getter() %}
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}>
         {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
         {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-        type Field{{ field.number() }}MessageType<'this>: ::puroro::Message + {{ m.rust_absolute_trait_path() }};
-        {%- else %}
+        where Self::Field{{ field.number() }}MessageType<'this>: 'this;
+        {%- else -%}
+        ;
         {%- endmatch %}
+    {%- endif %}
+    {%- if field.has_repeated_getter() %}
+    type Field{{ field.number() }}RepeatedType<'this>: ::puroro::RepeatedField<'this, {{ field.trait_scalar_getter_type().unwrap() }}>
+        {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
+        {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+        where Self::Field{{ field.number() }}MessageType<'this>: 'this;
+        {%- else -%}
+        ;
+        {%- endmatch %}
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this>
+        {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
+        {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+        where Self::Field{{ field.number() }}MessageType<'this>: 'this;
+        {%- else -%}
+        ;
+        {%- endmatch %}
+    {%- endif %}
+    {%- endfor %}
 
-        {%- if field.has_scalar_getter() %}
-        fn {{ field.rust_ident() }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type().unwrap() }};
-        {%- endif %}
-        {%- if field.has_scalar_optional_getter() %}
-        fn {{ field.rust_ident() }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}>
-            {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
-            {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-            where Self::Field{{ field.number() }}MessageType<'this>: 'this;
-            {%- else -%}
-            ;
-            {%- endmatch %}
-        {%- endif %}
-        {%- if field.has_repeated_getter() %}
-        type Field{{ field.number() }}RepeatedType<'this>: ::puroro::RepeatedField<'this, {{ field.trait_scalar_getter_type().unwrap() }}>
-            {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
-            {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-            where Self::Field{{ field.number() }}MessageType<'this>: 'this;
-            {%- else -%}
-            ;
-            {%- endmatch %}
-        fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this>
-            {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
-            {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-            where Self::Field{{ field.number() }}MessageType<'this>: 'this;
-            {%- else -%}
-            ;
-            {%- endmatch %}
-        {%- endif %}
-    }
-    {%- endfor %}
-} // mod {{ message.rust_nested_module_ident() }}_fields
-
-pub trait {{ message.rust_ident() }}Trait:
-    {%- for field in message.fields() %}
-    {{ field.rust_absolute_field_trait_path().unwrap() }} +
-    {%- endfor %}
-{
-}
-impl<T> {{ message.rust_ident() }}Trait for T
-where T:
-    {%- for field in message.fields() %}
-    {{ field.rust_absolute_field_trait_path().unwrap() }} +
-    {%- endfor %}
-{
 }

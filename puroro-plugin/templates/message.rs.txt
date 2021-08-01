@@ -217,12 +217,12 @@ where
     >>::Type;
 }
 
-{%- for field in self.message.fields() %}
-impl<ImplTag> {{ field.rust_absolute_field_trait_path().unwrap() }} for {{ self.message.rust_ident() }}<ImplTag> 
+impl<ImplTag> {{ self.message.rust_absolute_trait_path() }} for {{ self.message.rust_ident() }}<ImplTag>
 where
     ImplTag:
         ::puroro_internal::AnyFieldTypeGen
         + ::puroro_internal::StructInternalTypeGen,
+    {%- for field in self.message.fields() %}
     {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
     {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
     for<'a> <ImplTag as ::puroro_internal::MsgTypeGen<
@@ -232,7 +232,10 @@ where
     >: {{ m.rust_absolute_trait_path() }},
     {%- else %}
     {%- endmatch %}
+    {%- endfor %}
 {
+    {%- for field in self.message.fields() %}
+
     {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
     {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
     type Field{{ field.number() }}MessageType<'this> = <ImplTag as ::puroro_internal::MsgTypeGen<
@@ -245,10 +248,10 @@ where
 
     {%- if field.has_scalar_getter() %}
     fn {{ field.rust_ident() }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type().unwrap() }} {
-        {%- if self.is_public %}
+        {% if self.is_public %}
         {%- call field_type_gen(field) %}::get_scalar(&self.{{ field.rust_ident() }}, &self.puroro_internal)
         {%- else %} {# if self.is_public #}
-        {{ field.rust_absolute_field_trait_path().unwrap() }}::{{ field.rust_ident() }}(&self.body)
+        {{ self.message.rust_absolute_trait_path() }}::{{ field.rust_ident() }}(&self.body)
         {%- endif %} {# if self.is_public #}
     }
     {%- endif %}
@@ -261,10 +264,10 @@ where
         {%- else -%}
         {%- endmatch %}
     {
-        {%- if self.is_public %}        
+        {% if self.is_public %}        
         {%- call field_type_gen(field) -%}::get_scalar_optional(&self.{{ field.rust_ident() }}, &self.puroro_internal)
         {%- else %}
-        {{ field.rust_absolute_field_trait_path().unwrap() }}::{{ field.rust_ident() }}(&self.body)
+        {{ self.message.rust_absolute_trait_path() }}::{{ field.rust_ident() }}(&self.body)
         {%- endif %}
     }
     {%- endif %}
@@ -286,16 +289,17 @@ where
         {%- else -%}
         {%- endmatch %}
     {
-        {%- if self.is_public %}
+        {% if self.is_public %}
         {%- call field_type_gen(field) %}::get_repeated(&self.{{ field.rust_ident() }}, &self.puroro_internal)
         {%- else %}
-        {{ field.rust_absolute_field_trait_path().unwrap() }}::{{ field.rust_ident() }}(&self.body)
+        {{ self.message.rust_absolute_trait_path() }}::{{ field.rust_ident() }}(&self.body)
         {%- endif %}
     }
 
     {%- endif %}
+
+    {%- endfor %}
 }
-{%- endfor %}
 
 {# ################# std trait impls ################# -#}
 
