@@ -134,7 +134,7 @@ where
         tags::Bytes: tags::SelfContainedTypeTag,
         L: tags::FieldLabelTag<IsRepeated = True>,
     {
-        RepeatedFieldImplForLdTypes(todo!())
+        RepeatedFieldImplForLdTypes(<(X, L) as LabelWrappedLdType>::get_repeated(from))
     }
 }
 impl<L, X> FieldTypeGen<X, L, tags::String> for SimpleImpl
@@ -189,7 +189,7 @@ where
         tags::Bytes: tags::SelfContainedTypeTag,
         L: tags::FieldLabelTag<IsRepeated = True>,
     {
-        RepeatedFieldImplForLdTypes(todo!())
+        RepeatedFieldImplForLdTypes(<(X, L) as LabelWrappedLdType>::get_repeated(from))
     }
 }
 
@@ -245,11 +245,11 @@ where
         Clone::clone(from)
     }
 
-    type MsgTypeInTrait<M: Message> = M;
+    type MsgTypeInTrait<'this, M: Message> = M;
     fn get_scalar_optional<'this, M: Message>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Option<Cow<'this, Self::MsgTypeInTrait<M>>>
+    ) -> Option<Cow<'this, Self::MsgTypeInTrait<'this, M>>>
     where
         L: tags::FieldLabelTag<IsRepeated = False>,
     {

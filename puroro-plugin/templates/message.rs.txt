@@ -242,31 +242,21 @@ where
         + ::puroro_internal::StructInternalTypeGen,
     {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
     {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
-    for <'this> ImplTag:
-        ::puroro_internal::EnumTypeGen<
-            {{ field.syntax_and_label_tags().unwrap() }},
-            ScalarGetterType<'this, {{ e.rust_absolute_path() }}> = {{ field.trait_scalar_getter_type().unwrap() }}
-        >,
     {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-    <ImplTag as ::puroro_internal::MsgTypeGen<
+    for<'a> <ImplTag as ::puroro_internal::MsgTypeGen<
         {{ field.syntax_and_label_tags().unwrap() }}
     >>::MsgTypeInTrait::<
-        {{ m.rust_absolute_path() }}<ImplTag>
+        'a, {{ m.rust_absolute_path() }}<ImplTag>
     >: {{ m.rust_absolute_trait_path() }},
     {%- else %}
-    for <'this> ImplTag:
-        ::puroro_internal::FieldTypeGen<
-            {{ field.syntax_and_label_and_type_tags().unwrap() }},
-            ScalarGetterType<'this> = {{ field.trait_scalar_getter_type().unwrap() }}
-        >,
     {%- endmatch %}
 {
     {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
     {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-    type Field{{ field.number() }}MessageType = <ImplTag as ::puroro_internal::MsgTypeGen<
+    type Field{{ field.number() }}MessageType<'this> = <ImplTag as ::puroro_internal::MsgTypeGen<
         {{ field.syntax_and_label_tags().unwrap() }}
     >>::MsgTypeInTrait::<
-        {{ m.rust_absolute_path() }}<ImplTag>
+        'this, {{ m.rust_absolute_path() }}<ImplTag>
     >;
     {%- else %}
     {%- endmatch %}
@@ -297,7 +287,13 @@ where
     {%- endif %}
 
     {%- if field.has_scalar_optional_getter() %}
-    fn {{ field.rust_ident() }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}> {
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}> 
+        {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
+        {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+        where Self::Field{{ field.number() }}MessageType<'this>: 'this
+        {%- else -%}
+        {%- endmatch %}
+    {
         {%- if self.is_public %}
         
         {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
@@ -325,23 +321,28 @@ where
 
     {%- if field.has_repeated_getter() %}
 
+    type Field{{ field.number() }}RepeatedType<'this>
     {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
-    {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
     {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-    {%- else %}
-    type Field{{ field.number() }}RepeatedType<'this> = <ImplTag as ::puroro_internal::FieldTypeGen<
-        {{ field.syntax_and_label_and_type_tags().unwrap() }}
-    >>::TraitRepeatedFieldType::<'this>;
+    where Self::Field{{ field.number() }}MessageType<'this>: 'this
+    {%- else -%}
     {%- endmatch %}
+        = {% call field_type_gen(field) %}::TraitRepeatedFieldType::<'this>;
 
-    fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this> {
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this> 
+        {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
+        {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+        where Self::Field{{ field.number() }}MessageType<'this>: 'this
+        {%- else -%}
+        {%- endmatch %}
+    {
         {%- if self.is_public %}
 
         {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
         {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
         {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
         {%- else %}
-        //fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this>;
+        {% call field_type_gen(field) %}::get_repeated(&self.{{ field.rust_ident() }}, &self.puroro_internal)
         {%- endmatch %}
 
         {%- else %} {# if self.is_public #}

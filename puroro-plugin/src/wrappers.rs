@@ -628,8 +628,7 @@ impl Field {
                 ),
             },
             FieldType::Message(_) => format!(
-                "::std::borrow::Cow<'this, <Self as {field_trait}>::Field{number}MessageType>",
-                field_trait = self.rust_absolute_field_trait_path()?,
+                "::std::borrow::Cow<'this, Self::Field{number}MessageType<'this>>",
                 number = self.number(),
             ),
         })
