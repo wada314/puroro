@@ -22,12 +22,24 @@ pub trait LabelWrappedType: Sized {
     fn iter<T: Clone>(wrapped: &Self::Type<T>) -> Iter<'_, T>;
 
     // for trait methods
-    fn get_scalar<T: Clone>(from: &Self::Type<T>) -> T
+    fn get_scalar<T: Clone>(_from: &Self::Type<T>) -> T
     where
-        Self: tags::FieldLabelTag<IsNonOptionalScalar = True>;
-    fn get_scalar_optional<T: Clone>(from: &Self::Type<T>) -> Option<T>
+        Self: tags::FieldLabelTag<IsNonOptionalScalar = True>,
+    {
+        unreachable!() // Never be called
+    }
+    fn get_scalar_optional<T: Clone>(_from: &Self::Type<T>) -> Option<T>
     where
-        Self: tags::FieldLabelTag<IsOptionalScalar = True>;
+        Self: tags::FieldLabelTag<IsOptionalScalar = True>,
+    {
+        unreachable!() // Never be called
+    }
+    fn get_repeated<T: Clone>(_from: &Self::Type<T>) -> &Vec<T>
+    where
+        Self: tags::FieldLabelTag<IsRepeated = True>,
+    {
+        unreachable!() // Never be called
+    }
 }
 pub enum Iter<'a, T> {
     Once(::std::iter::Once<&'a T>),
@@ -65,9 +77,6 @@ impl<_1, _2> LabelWrappedType for tags::OptionalOrRequired<_1, _2> {
     fn iter<T: Clone>(wrapped: &Self::Type<T>) -> Iter<'_, T> {
         Iter::Option(wrapped.iter())
     }
-    fn get_scalar<T: Clone>(_from: &Self::Type<T>) -> T {
-        unreachable!() // Never be called
-    }
     fn get_scalar_optional<T: Clone>(from: &Self::Type<T>) -> Option<T> {
         from.clone()
     }
@@ -95,9 +104,6 @@ impl<_1, _2, _3> LabelWrappedType for tags::UnlabeledOrOneofOrMapEntry<_1, _2, _
     fn get_scalar<T: Clone>(from: &Self::Type<T>) -> T {
         Clone::clone(from)
     }
-    fn get_scalar_optional<T: Clone>(_from: &Self::Type<T>) -> Option<T> {
-        unreachable!() // Never be called
-    }
 }
 impl LabelWrappedType for tags::Repeated {
     type Type<T: Clone> = Vec<T>;
@@ -120,11 +126,8 @@ impl LabelWrappedType for tags::Repeated {
     fn iter<T: Clone>(wrapped: &Self::Type<T>) -> Iter<'_, T> {
         Iter::Slice(wrapped.iter())
     }
-    fn get_scalar<T: Clone>(_from: &Self::Type<T>) -> T {
-        unreachable!() // never be called
-    }
-    fn get_scalar_optional<T: Clone>(_from: &Self::Type<T>) -> Option<T> {
-        unreachable!() // Never be called
+    fn get_repeated<T: Clone>(from: &Self::Type<T>) -> &Vec<T> {
+        from
     }
 }
 
@@ -157,14 +160,27 @@ pub trait LabelWrappedLdType {
         B: ?Sized + 'static + ToOwned,
         <B as ToOwned>::Owned: Clone;
     // for trait methods
-    fn get_scalar<'this, B>(from: &'this Self::Type<B>) -> Cow<'this, B>
+    fn get_scalar<'this, B>(_from: &'this Self::Type<B>) -> Cow<'this, B>
     where
         B: ?Sized + 'static + ToOwned,
-        <B as ToOwned>::Owned: Clone;
-    fn get_scalar_optional<'this, B>(from: &'this Self::Type<B>) -> Option<Cow<'this, B>>
+        <B as ToOwned>::Owned: Clone,
+    {
+        unimplemented!()
+    }
+    fn get_scalar_optional<'this, B>(_from: &'this Self::Type<B>) -> Option<Cow<'this, B>>
     where
         B: ?Sized + 'static + ToOwned,
-        <B as ToOwned>::Owned: Clone;
+        <B as ToOwned>::Owned: Clone,
+    {
+        unimplemented!()
+    }
+    fn get_repeated<'this, B>(_from: &'this Self::Type<B>) -> &'this Vec<<B as ToOwned>::Owned>
+    where
+        B: ?Sized + 'static + ToOwned,
+        <B as ToOwned>::Owned: Clone,
+    {
+        unimplemented!()
+    }
 }
 pub enum LdIter<'a, B: 'static + ?Sized + ToOwned> {
     OnceOwned(::std::iter::Once<&'a B::Owned>),
@@ -215,13 +231,6 @@ impl<_1, _2> LabelWrappedLdType for (tags::Proto2, tags::OptionalOrRequired<_1, 
     {
         LdIter::OptionCow(wrapped.iter())
     }
-    fn get_scalar<'this, B>(_from: &'this Self::Type<B>) -> Cow<'this, B>
-    where
-        B: ?Sized + 'static + ToOwned,
-        <B as ToOwned>::Owned: Clone,
-    {
-        unreachable!() // Never be called
-    }
     fn get_scalar_optional<'this, B>(from: &'this Self::Type<B>) -> Option<Cow<'this, B>>
     where
         B: ?Sized + 'static + ToOwned,
@@ -257,14 +266,6 @@ impl LabelWrappedLdType for (tags::Proto3, tags::Optional) {
     {
         LdIter::OptionOwned(wrapped.iter())
     }
-    fn get_scalar<'this, B>(_from: &'this Self::Type<B>) -> Cow<'this, B>
-    where
-        B: ?Sized + 'static + ToOwned,
-        <B as ToOwned>::Owned: Clone,
-    {
-        unreachable!() // Never be called
-    }
-
     fn get_scalar_optional<'this, B>(from: &'this Self::Type<B>) -> Option<Cow<'this, B>>
     where
         B: ?Sized + 'static + ToOwned,
@@ -307,13 +308,6 @@ impl<X, _1, _2, _3> LabelWrappedLdType for (X, tags::UnlabeledOrOneofOrMapEntry<
     {
         Cow::Borrowed(Borrow::<B>::borrow(from))
     }
-    fn get_scalar_optional<'this, B>(_from: &'this Self::Type<B>) -> Option<Cow<'this, B>>
-    where
-        B: ?Sized + 'static + ToOwned,
-        <B as ToOwned>::Owned: Clone,
-    {
-        unreachable!() // Never be called
-    }
 }
 impl<X> LabelWrappedLdType for (X, tags::Repeated) {
     type Type<T>
@@ -343,19 +337,12 @@ impl<X> LabelWrappedLdType for (X, tags::Repeated) {
     {
         LdIter::SliceOwned(wrapped.iter())
     }
-    fn get_scalar<'this, B>(_from: &'this Self::Type<B>) -> Cow<'this, B>
+    fn get_repeated<'this, B>(from: &'this Self::Type<B>) -> &'this Vec<<B as ToOwned>::Owned>
     where
         B: ?Sized + 'static + ToOwned,
         <B as ToOwned>::Owned: Clone,
     {
-        unreachable!() // Never be called
-    }
-    fn get_scalar_optional<'this, B>(_from: &'this Self::Type<B>) -> Option<Cow<'this, B>>
-    where
-        B: ?Sized + 'static + ToOwned,
-        <B as ToOwned>::Owned: Clone,
-    {
-        unreachable!() // Never be called
+        from
     }
 }
 
@@ -374,9 +361,18 @@ pub trait LabelWrappedMessageType: Sized {
         f: F,
     ) -> &mut M;
     // for trait methods
-    fn get_scalar_optional<'this, M: Message>(from: &'this Self::Type<M>) -> Option<Cow<'this, M>>
+    fn get_scalar_optional<'this, M: Message>(_from: &'this Self::Type<M>) -> Option<Cow<'this, M>>
     where
-        Self: tags::FieldLabelTag<IsRepeated = False>;
+        Self: tags::FieldLabelTag<IsRepeated = False>,
+    {
+        unreachable!() // Never be called
+    }
+    fn get_repeated<'this, M: Message>(_from: &'this Self::Type<M>) -> &'this Vec<M>
+    where
+        Self: tags::FieldLabelTag<IsRepeated = True>,
+    {
+        unreachable!() // Never be called
+    }
 }
 pub enum MsgIter<'a, M> {
     OptionBox(::std::option::Iter<'a, Box<M>>),
@@ -427,9 +423,10 @@ impl LabelWrappedMessageType for tags::Repeated {
         <Vec<M>>::push(wrapped, (f)());
         wrapped.last_mut().unwrap()
     }
-    fn get_scalar_optional<'this, M: Message>(
-        _from: &'this Self::Type<M>,
-    ) -> Option<Cow<'this, M>> {
-        unreachable!() // Never be called
+    fn get_repeated<'this, M: Message>(from: &'this Self::Type<M>) -> &'this Vec<M>
+    where
+        Self: tags::FieldLabelTag<IsRepeated = True>,
+    {
+        from
     }
 }

@@ -1,6 +1,9 @@
 use std::borrow::Cow;
 
-use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType, SimpleImpl};
+use super::{
+    LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType, RepeatedFieldImplForLdTypes,
+    RepeatedFieldImplForNonLdTypes, SimpleImpl,
+};
 use crate::{AnyFieldTypeGen, EnumTypeGen, FieldTypeGen, MsgTypeGen, StructInternalTypeGen};
 use ::puroro::bool::{False, True};
 use ::puroro::{tags, Enum, Message};
@@ -9,9 +12,13 @@ use ::puroro::{tags, Enum, Message};
 impl AnyFieldTypeGen for SimpleImpl {}
 
 // For numerical types
+#[rustfmt::skip]
 impl<L, X, V, _1, _2> FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>> for SimpleImpl
 where
     tags::wire::NonLD<V, _1, _2>: tags::NumericalTypeTag,
+    for<'a> tags::wire::NonLD<V, _1, _2>: tags::SelfContainedTypeTag<
+        ScalarTypeForTrait<'a> = <tags::wire::NonLD<V, _1, _2> as tags::NumericalTypeTag>::NativeType,
+    >,
     L: LabelWrappedType,
 {
     type Type = <L as LabelWrappedType>::Type<
@@ -40,6 +47,7 @@ where
     {
         <L as LabelWrappedType>::get_scalar(from)
     }
+
     fn get_scalar_optional<'this>(
         from: &'this <Self as FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>>>::Type,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
@@ -51,20 +59,24 @@ where
     {
         <L as LabelWrappedType>::get_scalar_optional(from)
     }
+
     type TraitRepeatedFieldType<'this>
     where
         tags::wire::NonLD<V, _1, _2>: tags::SelfContainedTypeTag,
-        L: tags::FieldLabelTag<IsRepeated = True>;
-
+        L: tags::FieldLabelTag<IsRepeated = True>,
+    = RepeatedFieldImplForNonLdTypes<
+        'this,
+        <tags::wire::NonLD<V, _1, _2> as tags::SelfContainedTypeTag>::ScalarTypeForTrait<'this>,
+    >;
     fn get_repeated<'this>(
-        from: &'this FieldTypeGen::Type,
-        internal_data: &'this StructInternalTypeGen::Type,
+        from: &'this <Self as FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>>>::Type,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
     ) -> Self::TraitRepeatedFieldType<'this>
     where
         tags::wire::NonLD<V, _1, _2>: tags::SelfContainedTypeTag,
         L: tags::FieldLabelTag<IsRepeated = True>,
     {
-        todo!()
+        RepeatedFieldImplForNonLdTypes(<L as LabelWrappedType>::get_repeated(from))
     }
 }
 
@@ -107,6 +119,23 @@ where
     {
         <(X, L) as LabelWrappedLdType>::get_scalar_optional(from)
     }
+
+    type TraitRepeatedFieldType<'this>
+    where
+        tags::Bytes: tags::SelfContainedTypeTag,
+        L: tags::FieldLabelTag<IsRepeated = True>,
+    = RepeatedFieldImplForLdTypes<'this, [u8]>;
+
+    fn get_repeated<'this>(
+        from: &'this <Self as FieldTypeGen<X, L, tags::Bytes>>::Type,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::TraitRepeatedFieldType<'this>
+    where
+        tags::Bytes: tags::SelfContainedTypeTag,
+        L: tags::FieldLabelTag<IsRepeated = True>,
+    {
+        RepeatedFieldImplForLdTypes(todo!())
+    }
 }
 impl<L, X> FieldTypeGen<X, L, tags::String> for SimpleImpl
 where
@@ -144,6 +173,23 @@ where
         L: tags::FieldLabelTag<IsOptionalScalar = True>,
     {
         <(X, L) as LabelWrappedLdType>::get_scalar_optional(from)
+    }
+
+    type TraitRepeatedFieldType<'this>
+    where
+        tags::Bytes: tags::SelfContainedTypeTag,
+        L: tags::FieldLabelTag<IsRepeated = True>,
+    = RepeatedFieldImplForLdTypes<'this, str>;
+
+    fn get_repeated<'this>(
+        from: &'this <Self as FieldTypeGen<X, L, tags::String>>::Type,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::TraitRepeatedFieldType<'this>
+    where
+        tags::Bytes: tags::SelfContainedTypeTag,
+        L: tags::FieldLabelTag<IsRepeated = True>,
+    {
+        RepeatedFieldImplForLdTypes(todo!())
     }
 }
 

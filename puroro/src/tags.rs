@@ -15,13 +15,13 @@ pub trait ProtoSyntaxTag {}
 
 /// A `FieldTypeTag` which has wire type one of Variant (except enum), Bits32 or Bits64.
 pub trait NumericalTypeTag {
-    type NativeType: Default + PartialEq + Clone;
+    type NativeType: 'static + Default + PartialEq + Clone;
 }
 
 /// A type tag except `Enum` and `Message`, which needs extra information to
 /// get the corresponding Rust type.
 pub trait SelfContainedTypeTag {
-    type ScalarTypeForTrait<'this>;
+    type ScalarTypeForTrait<'msg>: 'msg + Clone;
 }
 
 pub trait EnumTypeForSyntax {
