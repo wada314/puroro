@@ -23,6 +23,16 @@
     {%- endmatch -%}
 {%- endmacro -%}
 
+{%- macro maybe_concrete_type_of_enum_and_message(field, impl_tag) -%}
+    {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() -%}
+    {%- when wrappers::MaybeEnumOrMessage::Enum with (e) -%}
+        {{ e.rust_absolute_path() }}
+    {%- when wrappers::MaybeEnumOrMessage::Message with (m) -%}
+        {{ m.rust_absolute_path() }}<{{ impl_tag }}>
+    {%- else -%}
+    {%- endmatch -%}
+{%- endmacro -%}
+
 {# ################# Struct body ################# -#}
 
 #[allow(unused)]
@@ -327,7 +337,7 @@ where
     where Self::Field{{ field.number() }}MessageType<'this>: 'this
     {%- else -%}
     {%- endmatch %}
-        = {% call field_type_gen(field) %}::TraitRepeatedFieldType::<'this>;
+        = {% call field_type_gen(field) %}::TraitRepeatedFieldType::<'this, {% call maybe_concrete_type_of_enum_and_message(field, "ImplTag") %}>;
 
     fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this> 
         {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
@@ -338,12 +348,7 @@ where
     {
         {%- if self.is_public %}
 
-        {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
-        {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
-        {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-        {%- else %}
         {% call field_type_gen(field) %}::get_repeated(&self.{{ field.rust_ident() }}, &self.puroro_internal)
-        {%- endmatch %}
 
         {%- else %} {# if self.is_public #}
 

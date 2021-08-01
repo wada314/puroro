@@ -107,6 +107,24 @@ pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
     where
         X: tags::EnumTypeForSyntax,
         L: tags::FieldLabelTag<IsOptionalScalar = True>;
+    /// Repeated field type for the trait.
+    type TraitRepeatedFieldType<'this, E: Enum>: RepeatedField<
+        'this,
+        <X as tags::EnumTypeForSyntax>::NativeType<E>,
+    >
+    where
+        X: tags::EnumTypeForSyntax,
+        <X as tags::EnumTypeForSyntax>::NativeType<E>: 'this,
+        L: tags::FieldLabelTag<IsRepeated = True>;
+    /// Get repeated field for the trait getter method.
+    fn get_repeated<'this, E: Enum>(
+        from: &'this <Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
+        internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::TraitRepeatedFieldType<'this, E>
+    where
+        X: tags::EnumTypeForSyntax,
+        <X as tags::EnumTypeForSyntax>::NativeType<E>: 'this,
+        L: tags::FieldLabelTag<IsRepeated = True>;
 }
 pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
     type MsgFieldType<M: Message>;
@@ -131,6 +149,22 @@ pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
     ) -> Option<Cow<'this, Self::MsgTypeInTrait<'this, M>>>
     where
         L: tags::FieldLabelTag<IsRepeated = False>;
+
+    /// Repeated field type for the trait.
+    type TraitRepeatedFieldType<'this, M: Message>: RepeatedField<
+        'this,
+        Cow<'this, Self::MsgTypeInTrait<'this, M>>,
+    >
+    where
+        Self::MsgTypeInTrait<'this, M>: 'this;
+
+    /// Get repeated field for the trait getter method.
+    fn get_repeated<'this, M: Message>(
+        from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
+        internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::TraitRepeatedFieldType<'this, M>
+    where
+        L: tags::FieldLabelTag<IsRepeated = True>;
 }
 
 pub trait AnyFieldTypeGen:

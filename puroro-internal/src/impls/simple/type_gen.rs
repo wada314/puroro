@@ -233,6 +233,25 @@ where
     {
         <L as LabelWrappedType>::get_scalar_optional(from)
     }
+
+    type TraitRepeatedFieldType<'this, E: Enum>
+    where
+        X: tags::EnumTypeForSyntax,
+        <X as tags::EnumTypeForSyntax>::NativeType<E>: 'this,
+        L: tags::FieldLabelTag<IsRepeated = True>,
+    = RepeatedFieldImplForNonLdTypes<'this, <X as tags::EnumTypeForSyntax>::NativeType<E>>;
+
+    fn get_repeated<'this, E: Enum>(
+        from: &'this <Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::TraitRepeatedFieldType<'this, E>
+    where
+        X: tags::EnumTypeForSyntax,
+        <X as tags::EnumTypeForSyntax>::NativeType<E>: 'this,
+        L: tags::FieldLabelTag<IsRepeated = True>,
+    {
+        RepeatedFieldImplForNonLdTypes(<L as LabelWrappedType>::get_repeated(from))
+    }
 }
 
 impl<X, L> MsgTypeGen<X, L> for SimpleImpl
@@ -264,5 +283,21 @@ where
         L: tags::FieldLabelTag<IsRepeated = False>,
     {
         <L as LabelWrappedMessageType>::get_scalar_optional(from)
+    }
+
+    type TraitRepeatedFieldType<'this, M: Message>
+    where
+        Self::MsgTypeInTrait<'this, M>: 'this,
+    = RepeatedFieldImplForLdTypes<'this, Self::MsgTypeInTrait<'this, M>>;
+
+    /// Get repeated field for the trait getter method.
+    fn get_repeated<'this, M: Message>(
+        from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::TraitRepeatedFieldType<'this, M>
+    where
+        L: tags::FieldLabelTag<IsRepeated = True>,
+    {
+        RepeatedFieldImplForLdTypes(<L as LabelWrappedMessageType>::get_repeated(from))
     }
 }
