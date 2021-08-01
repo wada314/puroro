@@ -230,6 +230,7 @@ where
     >>::MsgTypeInTrait::<
         'a, {{ m.rust_absolute_path() }}<ImplTag>
     >: {{ m.rust_absolute_trait_path() }},
+    {{ m.rust_absolute_path() }}<ImplTag>: {{ m.rust_absolute_trait_path() }},
     {%- else %}
     {%- endmatch %}
     {%- endfor %}
@@ -251,7 +252,7 @@ where
         {% if self.is_public %}
         {%- call field_type_gen(field) %}::get_scalar(&self.{{ field.rust_ident() }}, &self.puroro_internal)
         {%- else %} {# if self.is_public #}
-        {{ self.message.rust_absolute_trait_path() }}::{{ field.rust_ident() }}(&self.body)
+        {{- self.message.rust_absolute_trait_path() }}::{{ field.rust_ident() }}(&self.body)
         {%- endif %} {# if self.is_public #}
     }
     {%- endif %}
@@ -266,8 +267,8 @@ where
     {
         {% if self.is_public %}        
         {%- call field_type_gen(field) -%}::get_scalar_optional(&self.{{ field.rust_ident() }}, &self.puroro_internal)
-        {%- else %}
-        {{ self.message.rust_absolute_trait_path() }}::{{ field.rust_ident() }}(&self.body)
+        {%- else -%}
+        <super::public::{{ self.message.rust_ident() }}<ImplTag> as {{ self.message.rust_absolute_trait_path() }}>::{{ field.rust_ident() }}(&self.body)
         {%- endif %}
     }
     {%- endif %}
@@ -292,7 +293,7 @@ where
         {% if self.is_public %}
         {%- call field_type_gen(field) %}::get_repeated(&self.{{ field.rust_ident() }}, &self.puroro_internal)
         {%- else %}
-        {{ self.message.rust_absolute_trait_path() }}::{{ field.rust_ident() }}(&self.body)
+        {{- self.message.rust_absolute_trait_path() }}::{{ field.rust_ident() }}(&self.body)
         {%- endif %}
     }
 
