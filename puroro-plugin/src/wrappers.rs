@@ -618,8 +618,14 @@ impl Field {
                     upgrade(&e)?.rust_absolute_path()
                 ),
             },
-            FieldType::Message(_) => format!(
-                "::std::borrow::Cow<'this, Self::Field{number}MessageType<'this>>",
+            FieldType::Message(m) => format!(
+                "::std::borrow::Cow<\
+                    'this, \
+                    {msg_path}<\
+                        Self::Field{number}MessageImplTag<'this>\
+                    >\
+                >",
+                msg_path = upgrade(&m)?.rust_absolute_path(),
                 number = self.number(),
             ),
         })

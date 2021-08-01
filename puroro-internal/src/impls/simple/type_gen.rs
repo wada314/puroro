@@ -274,21 +274,18 @@ where
         Clone::clone(from)
     }
 
-    type MsgTypeInTrait<'this, M: Message> = M;
-    fn get_scalar_optional<'this, M: Message>(
+    type ImplTagForChildMessage<'this> = SimpleImpl;
+    fn get_scalar_optional<'this, M: 'this + Message>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Option<Cow<'this, Self::MsgTypeInTrait<'this, M>>>
+    ) -> Option<Cow<'this, M>>
     where
         L: tags::FieldLabelTag<IsRepeated = False>,
     {
         <L as LabelWrappedMessageType>::get_scalar_optional(from)
     }
 
-    type TraitRepeatedFieldType<'this, M: Message>
-    where
-        Self::MsgTypeInTrait<'this, M>: 'this,
-    = RepeatedFieldImplForLdTypes<'this, Self::MsgTypeInTrait<'this, M>>;
+    type TraitRepeatedFieldType<'this, M: 'this + Message> = RepeatedFieldImplForLdTypes<'this, M>;
 
     /// Get repeated field for the trait getter method.
     fn get_repeated<'this, M: Message>(
