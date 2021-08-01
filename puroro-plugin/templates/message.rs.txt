@@ -11,24 +11,24 @@
     {%- endmatch -%}
 {%- endmacro -%}
 
-{%- macro field_type(field, impl_tag) -%}
+{%- macro field_type(field) -%}
     {%- call field_type_gen(field) -%}::
     {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() -%}
     {%- when wrappers::MaybeEnumOrMessage::Enum with (e) -%}
         EnumFieldType::<{{ e.rust_absolute_path() }}>
     {%- when wrappers::MaybeEnumOrMessage::Message with (m) -%}
-        MsgFieldType::<{{ m.rust_absolute_path() }}<{{ impl_tag }}>>
+        MsgFieldType::<{{ m.rust_absolute_path() }}<ImplTag>>
     {%- else -%}
         Type
     {%- endmatch -%}
 {%- endmacro -%}
 
-{%- macro maybe_concrete_type_of_enum_and_message(field, impl_tag) -%}
+{%- macro maybe_concrete_type_of_enum_and_message(field) -%}
     {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() -%}
     {%- when wrappers::MaybeEnumOrMessage::Enum with (e) -%}
         {{ e.rust_absolute_path() }}
     {%- when wrappers::MaybeEnumOrMessage::Message with (m) -%}
-        {{ m.rust_absolute_path() }}<{{ impl_tag }}>
+        {{ m.rust_absolute_path() }}<ImplTag>
     {%- else -%}
     {%- endmatch -%}
 {%- endmacro -%}
@@ -44,25 +44,7 @@ where ImplTag:
 
     {% for field in self.message.fields() -%}
     /// {{ field.rust_one_line_comment().unwrap() }}
-    
-    {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
-    {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
-    pub {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::EnumTypeGen<
-        {{ field.syntax_and_label_tags().unwrap() }}
-    >>::EnumFieldType::<
-        {{ e.rust_absolute_path() }}
-    >,
-    {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-    pub {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::MsgTypeGen<
-        {{ field.syntax_and_label_tags().unwrap() }}
-    >>::MsgFieldType::<
-        {{ m.rust_absolute_path() }}<ImplTag>
-    >,
-    {%- else %}
-    pub {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::FieldTypeGen<
-        {{ field.syntax_and_label_and_type_tags().unwrap() }}
-    >>::Type,
-    {%- endmatch %}
+    pub {{ field.rust_ident() }}: {% call field_type(field) %},
     {% endfor -%}
     puroro_internal: <ImplTag as ::puroro_internal::StructInternalTypeGen>::Type,
 
@@ -94,16 +76,7 @@ where ImplTag:
             {%- if self.is_public %}
 
             {%- for field in self.message.fields() %}
-            
-            {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
-            {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
-            {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::EnumTypeGen<{{ field.syntax_and_label_tags().unwrap() }}>>::default(&internal_data),
-            {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-            {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::MsgTypeGen<{{ field.syntax_and_label_tags().unwrap() }}>>::default(&internal_data),
-            {%- else %}
-            {{ field.rust_ident() }}: <ImplTag as ::puroro_internal::FieldTypeGen<{{ field.syntax_and_label_and_type_tags().unwrap() }}>>::default(&internal_data),
-            {%- endmatch %}
-
+            {{ field.rust_ident() }}: {% call field_type_gen(field) %}::default(&internal_data),
             {%- endfor %}
             puroro_internal: internal_data,
 
@@ -251,7 +224,6 @@ where
         ::puroro_internal::AnyFieldTypeGen
         + ::puroro_internal::StructInternalTypeGen,
     {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
-    {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
     {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
     for<'a> <ImplTag as ::puroro_internal::MsgTypeGen<
         {{ field.syntax_and_label_tags().unwrap() }}
@@ -274,24 +246,9 @@ where
     {%- if field.has_scalar_getter() %}
     fn {{ field.rust_ident() }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type().unwrap() }} {
         {%- if self.is_public %}
-
-        {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
-        {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
-        <ImplTag as ::puroro_internal::EnumTypeGen<
-            {{ field.syntax_and_label_tags().unwrap() }}
-        >>::get_scalar(&self.{{ field.rust_ident() }}, &self.puroro_internal)
-        {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-        {# unreachable #}
-        {%- else %}
-        <ImplTag as ::puroro_internal::FieldTypeGen<
-            {{ field.syntax_and_label_and_type_tags().unwrap() }}
-        >>::get_scalar(&self.{{ field.rust_ident() }}, &self.puroro_internal)
-        {%- endmatch %}
-
+        {%- call field_type_gen(field) %}::get_scalar(&self.{{ field.rust_ident() }}, &self.puroro_internal)
         {%- else %} {# if self.is_public #}
-
         {{ field.rust_absolute_field_trait_path().unwrap() }}::{{ field.rust_ident() }}(&self.body)
-
         {%- endif %} {# if self.is_public #}
     }
     {%- endif %}
@@ -304,28 +261,11 @@ where
         {%- else -%}
         {%- endmatch %}
     {
-        {%- if self.is_public %}
-        
-        {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
-        {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
-        <ImplTag as ::puroro_internal::EnumTypeGen<
-            {{ field.syntax_and_label_tags().unwrap() }}
-        >>::get_scalar_optional(&self.{{ field.rust_ident() }}, &self.puroro_internal)
-        {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-        <ImplTag as ::puroro_internal::MsgTypeGen<
-            {{ field.syntax_and_label_tags().unwrap() }}
-        >>::get_scalar_optional(&self.{{ field.rust_ident() }}, &self.puroro_internal)
+        {%- if self.is_public %}        
+        {%- call field_type_gen(field) -%}::get_scalar_optional(&self.{{ field.rust_ident() }}, &self.puroro_internal)
         {%- else %}
-        <ImplTag as ::puroro_internal::FieldTypeGen<
-            {{ field.syntax_and_label_and_type_tags().unwrap() }}
-        >>::get_scalar_optional(&self.{{ field.rust_ident() }}, &self.puroro_internal)
-        {%- endmatch %}
-        
-        {%- else %} {# if self.is_public #}
-
         {{ field.rust_absolute_field_trait_path().unwrap() }}::{{ field.rust_ident() }}(&self.body)
-
-        {%- endif %} {# if self.is_public #}
+        {%- endif %}
     }
     {%- endif %}
 
@@ -347,14 +287,10 @@ where
         {%- endmatch %}
     {
         {%- if self.is_public %}
-
-        {% call field_type_gen(field) %}::get_repeated(&self.{{ field.rust_ident() }}, &self.puroro_internal)
-
-        {%- else %} {# if self.is_public #}
-
+        {%- call field_type_gen(field) %}::get_repeated(&self.{{ field.rust_ident() }}, &self.puroro_internal)
+        {%- else %}
         {{ field.rust_absolute_field_trait_path().unwrap() }}::{{ field.rust_ident() }}(&self.body)
-
-        {%- endif %} {# if self.is_public #}
+        {%- endif %}
     }
 
     {%- endif %}
