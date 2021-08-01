@@ -99,6 +99,14 @@ pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
     where
         X: tags::EnumTypeForSyntax,
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>;
+    /// Get `Option` wrapped scalar type for the trait getter method.
+    fn get_scalar_optional<'this, E: Enum>(
+        from: &'this <Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
+        internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Option<<X as tags::EnumTypeForSyntax>::NativeType<E>>
+    where
+        X: tags::EnumTypeForSyntax,
+        L: tags::FieldLabelTag<IsOptionalScalar = True>;
 }
 pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
     type MsgFieldType<M: Message>;

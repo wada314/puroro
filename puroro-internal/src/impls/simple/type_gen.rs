@@ -223,6 +223,16 @@ where
     {
         <L as LabelWrappedType>::get_scalar(from)
     }
+
+    fn get_scalar_optional<'this, E: Enum>(
+        from: &'this <Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Option<<X as tags::EnumTypeForSyntax>::NativeType<E>>
+    where
+        L: tags::FieldLabelTag<IsOptionalScalar = True>,
+    {
+        <L as LabelWrappedType>::get_scalar_optional(from)
+    }
 }
 
 impl<X, L> MsgTypeGen<X, L> for SimpleImpl
