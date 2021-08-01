@@ -4,6 +4,7 @@ pub mod de;
 pub mod impls;
 pub mod se;
 
+use ::puroro::bool::True;
 use ::puroro::{tags, Enum, ErrorKind, Message, Result};
 
 // Re-exporting library modules
@@ -41,6 +42,18 @@ pub trait FieldTypeGen<X, L, V>: StructInternalTypeGen {
         from: &<Self as FieldTypeGen<X, L, V>>::Type,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as FieldTypeGen<X, L, V>>::Type;
+
+    // Trait method implementations
+
+    /// The scalar type for the trait getter method.
+    type ScalarGetterType<'this>;
+    /// Get the scalar type for the trait getter method.
+    fn get_scalar<'this>(
+        from: &'this <Self as FieldTypeGen<X, L, V>>::Type,
+        internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::ScalarGetterType<'this>
+    where
+        L: tags::FieldLabelTag<IsNonOptionalScalar = True>;
 }
 pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
     type EnumFieldType<E: Enum>;

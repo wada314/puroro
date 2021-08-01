@@ -1,4 +1,5 @@
 use ::std::borrow::Cow;
+use crate::bool::{BoolTypes, False, True};
 use ::std::convert::TryFrom;
 use ::std::marker::PhantomData;
 
@@ -25,7 +26,10 @@ pub trait EnumTypeForSyntax {
 
 /// A tag trait for types corresponding to the field label.
 /// e.g. Optional, Repeated, Required
-pub trait FieldLabelTag {}
+pub trait FieldLabelTag {
+    type IsRepeated: BoolTypes;
+    type IsNonOptionalScalar: BoolTypes;
+}
 
 /// A tuple of (`ProtoSyntaxTag`, `FieldLabelTag`, `FieldTypeTag`).
 /// TODO: Maybe map type should have its own tag type.
@@ -182,9 +186,21 @@ impl EnumTypeForSyntax for Proto3 {
     }
 }
 
-impl FieldLabelTag for Repeated {}
-impl FieldLabelTag for Optional {}
-impl FieldLabelTag for Unlabeled {}
-impl FieldLabelTag for Required {}
+impl FieldLabelTag for Repeated {
+    type IsRepeated = True;
+    type IsNonOptionalScalar = False;
+}
+impl FieldLabelTag for Optional {
+    type IsRepeated = False;
+    type IsNonOptionalScalar = False;
+}
+impl FieldLabelTag for Unlabeled {
+    type IsRepeated = False;
+    type IsNonOptionalScalar = True;
+}
+impl FieldLabelTag for Required {
+    type IsRepeated = False;
+    type IsNonOptionalScalar = False;
+}
 
 pub struct Map<X, K, V>(PhantomData<(X, K, V)>);

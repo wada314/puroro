@@ -1,6 +1,8 @@
+use ::puroro::bool::True;
+use ::puroro::{tags, Message, Result};
 use ::std::borrow::Cow;
-use puroro::{tags, Message, Result};
-use std::ops::DerefMut;
+use ::std::ops::DerefMut;
+use std::borrow::Borrow;
 
 /// A utility type-function which returns a type wrapped by `Option` or `Vec` according
 /// to the label (e.g. `optional` => `Option`).
@@ -18,6 +20,11 @@ pub trait LabelWrappedType: Sized {
     ) -> Result<()>;
     fn default_with<F: FnOnce() -> T, T: Clone>(f: F) -> Self::Type<T>;
     fn iter<T: Clone>(wrapped: &Self::Type<T>) -> Iter<'_, T>;
+
+    // for trait methods
+    fn get_scalar<T: Clone>(from: &Self::Type<T>) -> T
+    where
+        Self: tags::FieldLabelTag<IsNonOptionalScalar = True>;
 }
 pub enum Iter<'a, T> {
     Once(::std::iter::Once<&'a T>),
@@ -55,6 +62,9 @@ impl<_1, _2> LabelWrappedType for tags::OptionalOrRequired<_1, _2> {
     fn iter<T: Clone>(wrapped: &Self::Type<T>) -> Iter<'_, T> {
         Iter::Option(wrapped.iter())
     }
+    fn get_scalar<T: Clone>(from: &Self::Type<T>) -> T {
+        unimplemented!() // Never be called
+    }
 }
 impl<_1, _2, _3> LabelWrappedType for tags::UnlabeledOrOneofOrMapEntry<_1, _2, _3> {
     type Type<T: Clone> = T;
@@ -75,6 +85,9 @@ impl<_1, _2, _3> LabelWrappedType for tags::UnlabeledOrOneofOrMapEntry<_1, _2, _
     }
     fn iter<T: Clone>(wrapped: &Self::Type<T>) -> Iter<'_, T> {
         Iter::Once(::std::iter::once(wrapped))
+    }
+    fn get_scalar<T: Clone>(from: &Self::Type<T>) -> T {
+        Clone::clone(from)
     }
 }
 impl LabelWrappedType for tags::Repeated {
@@ -98,6 +111,9 @@ impl LabelWrappedType for tags::Repeated {
     fn iter<T: Clone>(wrapped: &Self::Type<T>) -> Iter<'_, T> {
         Iter::Slice(wrapped.iter())
     }
+    fn get_scalar<T: Clone>(from: &Self::Type<T>) -> T {
+        unimplemented!() // never be called
+    }
 }
 
 /// A custom version of `LabelWrappedType` for String and Bytes.
@@ -112,22 +128,27 @@ impl LabelWrappedType for tags::Repeated {
 ///   - `optional` => `Option<T>`
 ///   - `repeated` => `Vec<T>`
 pub trait LabelWrappedLdType {
-    type Type<T>: Clone
+    type Type<B>: Clone
     where
-        T: ?Sized + 'static + ToOwned,
-        <T as ToOwned>::Owned: Clone;
-    fn get_or_insert_default<T>(wrapped: &mut Self::Type<T>) -> &mut <T as ToOwned>::Owned
+        B: ?Sized + 'static + ToOwned,
+        <B as ToOwned>::Owned: Clone;
+    fn get_or_insert_default<B>(wrapped: &mut Self::Type<B>) -> &mut <B as ToOwned>::Owned
     where
-        T: ?Sized + 'static + ToOwned,
-        <T as ToOwned>::Owned: Default + Clone;
-    fn default<T>() -> Self::Type<T>
+        B: ?Sized + 'static + ToOwned,
+        <B as ToOwned>::Owned: Default + Clone;
+    fn default<B>() -> Self::Type<B>
     where
-        T: ?Sized + 'static + ToOwned,
-        <T as ToOwned>::Owned: Default + Clone;
-    fn iter<T>(wrapped: &Self::Type<T>) -> LdIter<'_, T>
+        B: ?Sized + 'static + ToOwned,
+        <B as ToOwned>::Owned: Default + Clone;
+    fn iter<B>(wrapped: &Self::Type<B>) -> LdIter<'_, B>
     where
-        T: 'static + ?Sized + ToOwned,
-        <T as ToOwned>::Owned: Clone;
+        B: ?Sized + 'static + ToOwned,
+        <B as ToOwned>::Owned: Clone;
+    // for trait methods
+    fn get_scalar<'this, B>(from: &'this Self::Type<B>) -> Cow<'this, B>
+    where
+        B: ?Sized + 'static + ToOwned,
+        <B as ToOwned>::Owned: Clone;
 }
 pub enum LdIter<'a, B: 'static + ?Sized + ToOwned> {
     OnceOwned(::std::iter::Once<&'a B::Owned>),
@@ -178,6 +199,13 @@ impl<_1, _2> LabelWrappedLdType for (tags::Proto2, tags::OptionalOrRequired<_1, 
     {
         LdIter::OptionCow(wrapped.iter())
     }
+    fn get_scalar<'this, B>(from: &'this Self::Type<B>) -> Cow<'this, B>
+    where
+        B: ?Sized + 'static + ToOwned,
+        <B as ToOwned>::Owned: Clone,
+    {
+        unimplemented!() // Never be called
+    }
 }
 impl LabelWrappedLdType for (tags::Proto3, tags::Optional) {
     type Type<T>
@@ -205,6 +233,13 @@ impl LabelWrappedLdType for (tags::Proto3, tags::Optional) {
         <T as ToOwned>::Owned: Clone,
     {
         LdIter::OptionOwned(wrapped.iter())
+    }
+    fn get_scalar<'this, B>(from: &'this Self::Type<B>) -> Cow<'this, B>
+    where
+        B: ?Sized + 'static + ToOwned,
+        <B as ToOwned>::Owned: Clone,
+    {
+        unimplemented!() // Never be called
     }
 }
 impl<X, _1, _2, _3> LabelWrappedLdType for (X, tags::UnlabeledOrOneofOrMapEntry<_1, _2, _3>) {
@@ -234,6 +269,13 @@ impl<X, _1, _2, _3> LabelWrappedLdType for (X, tags::UnlabeledOrOneofOrMapEntry<
     {
         LdIter::OnceOwned(::std::iter::once(wrapped))
     }
+    fn get_scalar<'this, B>(from: &'this Self::Type<B>) -> Cow<'this, B>
+    where
+        B: ?Sized + 'static + ToOwned,
+        <B as ToOwned>::Owned: Clone,
+    {
+        Cow::Borrowed(Borrow::<B>::borrow(from))
+    }
 }
 impl<X> LabelWrappedLdType for (X, tags::Repeated) {
     type Type<T>
@@ -262,6 +304,13 @@ impl<X> LabelWrappedLdType for (X, tags::Repeated) {
         <T as ToOwned>::Owned: Clone,
     {
         LdIter::SliceOwned(wrapped.iter())
+    }
+    fn get_scalar<'this, B>(from: &'this Self::Type<B>) -> Cow<'this, B>
+    where
+        B: ?Sized + 'static + ToOwned,
+        <B as ToOwned>::Owned: Clone,
+    {
+        unimplemented!() // Never be called
     }
 }
 

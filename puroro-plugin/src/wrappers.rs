@@ -269,9 +269,7 @@ impl InputFile {
     }
 
     pub fn context(&self) -> Result<Rc<Context>> {
-        Ok(self.context.upgrade().ok_or(ErrorKind::InternalError {
-            detail: "Failed to upgrade a Weak<> pointer.".to_string(),
-        })?)
+        Ok(upgrade(&self.context)?)
     }
 
     pub fn package(&self) -> &[String] {
@@ -357,28 +355,26 @@ impl Message {
     pub fn rust_absolute_path(&self) -> String {
         format!(
             "{path}::{ident}",
-            path = make_module_path(
-                self.package.iter().map(|s| s.borrow()),
-                self.outer_messages.iter().map(|s| s.borrow())
-            ),
+            path = self.rust_absolute_module_path(),
             ident = self.rust_ident
         )
     }
     pub fn rust_absolute_trait_path(&self) -> String {
         format!(
             "{path}::puroro_traits::{ident}Trait",
-            path = make_module_path(
-                self.package.iter().map(|s| s.borrow()),
-                self.outer_messages.iter().map(|s| s.borrow())
-            ),
+            path = self.rust_absolute_module_path(),
             ident = self.rust_ident
+        )
+    }
+    pub fn rust_absolute_module_path(&self) -> String {
+        make_module_path(
+            self.package.iter().map(|s| s.borrow()),
+            self.outer_messages.iter().map(|s| s.borrow()),
         )
     }
 
     pub fn input_file(&self) -> Result<Rc<InputFile>> {
-        Ok(self.input_file.upgrade().ok_or(ErrorKind::InternalError {
-            detail: "Failed to upgrade a Weak<> pointer.".to_string(),
-        })?)
+        Ok(upgrade(&self.input_file)?)
     }
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
@@ -528,9 +524,7 @@ impl Field {
         &self.rust_ident
     }
     pub fn message(&self) -> Result<Rc<Message>> {
-        Ok(self.message.upgrade().ok_or(ErrorKind::InternalError {
-            detail: "Failed to upgrade a Weak<> pointer.".to_string(),
-        })?)
+        Ok(upgrade(&self.message)?)
     }
     pub fn field_type(&self) -> Result<FieldType> {
         self.lazy_proto_type
@@ -599,17 +593,43 @@ impl Field {
         ))
     }
 
-    pub fn rust_absolute_field_trait_path(&self) -> Result<String> {
-        let m = self.message()?;
-        Ok(format!(
-            "{path}::puroro_traits::{submodule}_fields::Field{number}",
-            path = make_module_path(
-                m.package.iter().map(|s| s.borrow()),
-                m.outer_messages.iter().map(|s| s.borrow())
+    pub fn trait_scalar_getter_type(&self) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Double => "f64".to_string(),
+            FieldType::Float => "f32".to_string(),
+            FieldType::Int32 => "i32".to_string(),
+            FieldType::Int64 => "i64".to_string(),
+            FieldType::UInt32 => "u32".to_string(),
+            FieldType::UInt64 => "u64".to_string(),
+            FieldType::SInt32 => "i32".to_string(),
+            FieldType::SInt64 => "i64".to_string(),
+            FieldType::Fixed32 => "u32".to_string(),
+            FieldType::Fixed64 => "u64".to_string(),
+            FieldType::SFixed32 => "i32".to_string(),
+            FieldType::SFixed64 => "i64".to_string(),
+            FieldType::Bool => "bool".to_string(),
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => "::std::borrow::Cow<'_, str>".to_string(),
+            FieldType::Bytes => "::std::borrow::Cow<'_, [u8]>".to_string(),
+            FieldType::Enum(e) => match self.message()?.input_file()?.syntax() {
+                ProtoSyntax::Proto2 => upgrade(&e)?.rust_absolute_path(),
+                ProtoSyntax::Proto3 => format!(
+                    "::std::result::Result<{}, i32>",
+                    upgrade(&e)?.rust_absolute_path()
+                ),
+            },
+            FieldType::Message(_) => format!(
+                "::std::borrow::Cow<'_, \
+                    <Self as {path}::puroro_traits\
+                        ::{submsg_module}_fields\
+                        ::Field{field_number}\
+                    >::MessageType\
+                >",
+                path = self.message()?.rust_absolute_module_path(),
+                submsg_module = self.message()?.rust_nested_module_ident(),
+                field_number = self.number()
             ),
-            submodule = m.rust_nested_module_ident(),
-            number = self.number(),
-        ))
+        })
     }
 }
 
@@ -637,13 +657,7 @@ impl FieldType {
         proto_type_enum: &FieldTypeProto,
         proto_type_name: &str,
     ) -> Result<Self> {
-        let context = message
-            .upgrade()
-            .ok_or(ErrorKind::InternalError {
-                detail: "Failed to upgrade a Weak<> pointer.".to_string(),
-            })?
-            .input_file()?
-            .context()?;
+        let context = upgrade(&message)?.input_file()?.context()?;
         Ok(match proto_type_enum {
             FieldTypeProto::TypeDouble => FieldType::Double,
             FieldTypeProto::TypeFloat => FieldType::Float,
@@ -678,16 +692,8 @@ impl FieldType {
 
     pub fn maybe_enum_or_message(&self) -> Result<MaybeEnumOrMessage> {
         Ok(match self {
-            FieldType::Enum(e) => {
-                MaybeEnumOrMessage::Enum(Weak::upgrade(e).ok_or(ErrorKind::InternalError {
-                    detail: "Failed to upgrade Weak pointer.".to_string(),
-                })?)
-            }
-            FieldType::Message(m) => {
-                MaybeEnumOrMessage::Message(Weak::upgrade(m).ok_or(ErrorKind::InternalError {
-                    detail: "Failed to upgrade Weak pointer.".to_string(),
-                })?)
-            }
+            FieldType::Enum(e) => MaybeEnumOrMessage::Enum(upgrade(e)?),
+            FieldType::Message(m) => MaybeEnumOrMessage::Message(upgrade(m)?),
             _ => MaybeEnumOrMessage::Others,
         })
     }
@@ -754,18 +760,8 @@ impl FieldType {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "string".to_string(),
             FieldType::Bytes => "bytes".to_string(),
-            FieldType::Enum(e) => Weak::upgrade(e)
-                .ok_or(ErrorKind::InternalError {
-                    detail: "Failed to upgrade a Weak<> pointer.".to_string(),
-                })?
-                .proto_name()
-                .to_string(),
-            FieldType::Message(m) => Weak::upgrade(m)
-                .ok_or(ErrorKind::InternalError {
-                    detail: "Failed to upgrade a Weak<> pointer.".to_string(),
-                })?
-                .proto_name()
-                .to_string(),
+            FieldType::Enum(e) => upgrade(e)?.proto_name().to_string(),
+            FieldType::Message(m) => upgrade(m)?.proto_name().to_string(),
         })
     }
 }
@@ -837,4 +833,10 @@ where
         .chain(package)
         .chain(outer_messages);
     modules_iter.join("::")
+}
+
+fn upgrade<T>(weak: &Weak<T>) -> Result<Rc<T>> {
+    Ok(Weak::upgrade(weak).ok_or(ErrorKind::InternalError {
+        detail: "Failed to upgrade a Weak<> pointer.".to_string(),
+    })?)
 }

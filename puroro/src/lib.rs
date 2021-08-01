@@ -2,6 +2,7 @@
 #![allow(incomplete_features)]
 #![feature(generic_associated_types)]
 
+pub mod bool;
 mod error;
 pub mod fixed_bits;
 pub mod tags;

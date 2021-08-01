@@ -1,29 +1,3 @@
-{#- Macro for method return type #}
-
-{%- macro scalar_getter_return_type(field) -%}
-{%- let field_type = field.field_type().unwrap() -%}
-{%- match field_type.maybe_enum_or_message().unwrap() -%}
-    {%- when wrappers::MaybeEnumOrMessage::Enum with (e) -%}
-    {%- match field.message().unwrap().input_file().unwrap().syntax() -%}
-        {%- when wrappers::ProtoSyntax::Proto2 -%}
-            {{ e.rust_absolute_path() }}
-        {%- when wrappers::ProtoSyntax::Proto3 -%}
-            ::std::result::Result<{{ e.rust_absolute_path() }}, i32>
-    {%- endmatch -%}
-    {%- when wrappers::MaybeEnumOrMessage::Message with (m) -%}
-        ::std::borrow::Cow<'_, Self::Field{{ field.number() }}MessageType>
-    {%- else %}
-    {%- match field_type %}
-        {%- when wrappers::FieldType::Bytes -%}
-            ::std::borrow::Cow<'_, [u8]>
-        {%- when wrappers::FieldType::String -%}
-            ::std::borrow::Cow<'_, str>
-        {%- else -%}
-            {{ field_type.numerical_rust_type().unwrap() }}
-    {%- endmatch -%}
-{%- endmatch -%}
-{%- endmacro %}
-
 {#- Main definitions of the traits #}
 
 pub mod {{ message.rust_nested_module_ident() }}_fields {
@@ -45,9 +19,9 @@ pub mod {{ message.rust_nested_module_ident() }}_fields {
         {%- when wrappers::FieldLabel::Repeated %}
         // Do something for repeated field...
         {%- when wrappers::FieldLabel::Unlabeled %}
-        fn {{ field.rust_ident() }}(&self) -> {% call scalar_getter_return_type(field)%};
+        fn {{ field.rust_ident() }}(&self) -> {{ field.trait_scalar_getter_type().unwrap() }};
         {%- else -%}
-        fn {{ field.rust_ident() }}(&self) -> ::std::option::Option<{% call scalar_getter_return_type(field)%}>;
+        fn {{ field.rust_ident() }}(&self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}>;
         {%- endmatch %}
     }
     {%- endfor %}

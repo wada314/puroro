@@ -1,5 +1,8 @@
+use std::borrow::Cow;
+
 use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType, SimpleImpl};
 use crate::{AnyFieldTypeGen, EnumTypeGen, FieldTypeGen, MsgTypeGen, StructInternalTypeGen};
+use ::puroro::bool::True;
 use ::puroro::{tags, Enum, Message};
 
 // All-in-one typegen trait
@@ -27,6 +30,18 @@ where
     ) -> <Self as FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>>>::Type {
         Clone::clone(from)
     }
+
+    type ScalarGetterType<'this> =
+        <tags::wire::NonLD<V, _1, _2> as tags::NumericalTypeTag>::NativeType;
+    fn get_scalar<'this>(
+        from: &'this <Self as FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>>>::Type,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::ScalarGetterType<'this>
+    where
+        L: tags::FieldLabelTag<IsNonOptionalScalar = True>,
+    {
+        <L as LabelWrappedType>::get_scalar(from)
+    }
 }
 
 // For length delimited types
@@ -48,6 +63,17 @@ where
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as FieldTypeGen<X, L, tags::Bytes>>::Type {
         Clone::clone(from)
+    }
+
+    type ScalarGetterType<'this> = Cow<'this, [u8]>;
+    fn get_scalar<'this>(
+        from: &'this <Self as FieldTypeGen<X, L, tags::Bytes>>::Type,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::ScalarGetterType<'this>
+    where
+        L: tags::FieldLabelTag<IsNonOptionalScalar = True>,
+    {
+        <(X, L) as LabelWrappedLdType>::get_scalar(from)
     }
 }
 impl<L, X> FieldTypeGen<X, L, tags::String> for SimpleImpl
