@@ -1,0 +1,30 @@
+syntax = "proto3";
+package full_coverage3;
+
+message Msg {
+    int32 i32_unlabeled = 1;
+    optional int32 i32_optional = 2;
+    repeated int32 i32_repeated = 3;
+    float float_unlabeled = 11;
+    optional float float_optional = 12;
+    repeated float float_repeated = 13;
+    string string_unlabeled = 21;
+    optional string string_optional = 22;
+    repeated string string_repeated = 23;
+    Enum enum_unlabeled = 31;
+    optional Enum enum_optional = 32;
+    repeated Enum enum_repeated = 33;
+
+    message Submsg {
+        int32 i32_unlabeled = 1;
+    }
+    Submsg submsg_unlabeled = 41;
+    optional Submsg submsg_optional = 42;
+    repeated Submsg submsg_repeated = 43;
+}
+
+enum Enum {
+    ZEROTH = 0;
+    FIRST = 1;
+    TENTH = 10;
+}
