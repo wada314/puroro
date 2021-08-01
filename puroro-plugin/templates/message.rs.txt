@@ -226,6 +226,11 @@ where
             ScalarGetterType<'this, {{ e.rust_absolute_path() }}> = {{ field.trait_scalar_getter_type().unwrap() }}
         >,
     {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
+    <ImplTag as ::puroro_internal::MsgTypeGen<
+        {{ field.syntax_and_label_tags().unwrap() }}
+    >>::MsgTypeInTrait::<
+        {{ m.rust_absolute_path() }}<ImplTag>
+    >: {{ m.rust_absolute_trait_path() }},
     {%- else %}
     for <'this> ImplTag:
         ::puroro_internal::FieldTypeGen<
@@ -246,6 +251,8 @@ where
 
     {%- if field.has_scalar_getter() %}
     fn {{ field.rust_ident() }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type().unwrap() }} {
+        {%- if self.is_public %}
+
         {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
         {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
         <ImplTag as ::puroro_internal::EnumTypeGen<
@@ -258,11 +265,19 @@ where
             {{ field.syntax_and_label_and_type_tags().unwrap() }}
         >>::get_scalar(&self.{{ field.rust_ident() }}, &self.puroro_internal)
         {%- endmatch %}
+
+        {%- else %} {# if self.is_public #}
+
+        {{ field.rust_absolute_field_trait_path().unwrap() }}::{{ field.rust_ident() }}(&self.body)
+
+        {%- endif %} {# if self.is_public #}
     }
     {%- endif %}
 
     {%- if field.has_scalar_optional_getter() %}
     fn {{ field.rust_ident() }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}> {
+        {%- if self.is_public %}
+        
         {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
         {%- when wrappers::MaybeEnumOrMessage::Enum with (e) %}
         <ImplTag as ::puroro_internal::EnumTypeGen<
@@ -277,6 +292,12 @@ where
             {{ field.syntax_and_label_and_type_tags().unwrap() }}
         >>::get_scalar_optional(&self.{{ field.rust_ident() }}, &self.puroro_internal)
         {%- endmatch %}
+        
+        {%- else %} {# if self.is_public #}
+
+        {{ field.rust_absolute_field_trait_path().unwrap() }}::{{ field.rust_ident() }}(&self.body)
+
+        {%- endif %} {# if self.is_public #}
     }
     {%- endif %}
 }

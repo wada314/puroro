@@ -27,15 +27,14 @@ pub mod {{ message.rust_nested_module_ident() }}_fields {
 
 pub trait {{ message.rust_ident() }}Trait:
     {%- for field in message.fields() %}
-    self::{{ message.rust_nested_module_ident() }}_fields::Field{{ field.number() }} +
+    {{ field.rust_absolute_field_trait_path().unwrap() }} +
     {%- endfor %}
 {
 }
 impl<T> {{ message.rust_ident() }}Trait for T
-where T: 
-    ::puroro::Message
+where T:
     {%- for field in message.fields() %}
-    + self::{{ message.rust_nested_module_ident() }}_fields::Field{{ field.number() }}
+    {{ field.rust_absolute_field_trait_path().unwrap() }} +
     {%- endfor %}
 {
 }

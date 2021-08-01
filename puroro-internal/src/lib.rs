@@ -6,6 +6,7 @@ pub mod se;
 
 use ::puroro::bool::{False, True};
 use ::puroro::{tags, Enum, ErrorKind, Message, Result};
+use ::std::borrow::Cow;
 
 // Re-exporting library modules
 pub use ::puroro::{bumpalo, hashbrown};
@@ -102,13 +103,11 @@ pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
 
     /// The concrete message type for the `MessageType` type in `FieldN` traits.
     type MsgTypeInTrait<M: Message>: Message;
-    /// The scalar type for the trait getter method.
-    type ScalarGetterType<'this, M: 'this + Message>;
     /// Get the scalar type for the trait getter method.
     fn get_scalar_optional<'this, M: Message>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Option<Self::ScalarGetterType<'this, M>>
+    ) -> Option<Cow<'this, Self::MsgTypeInTrait<M>>>
     where
         L: tags::FieldLabelTag<IsRepeated = False>;
 }
