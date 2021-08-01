@@ -4,7 +4,7 @@ pub mod de;
 pub mod impls;
 pub mod se;
 
-use ::puroro::bool::True;
+use ::puroro::bool::{False, True};
 use ::puroro::{tags, Enum, ErrorKind, Message, Result};
 
 // Re-exporting library modules
@@ -70,7 +70,7 @@ pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
     // Trait method implementations
 
     /// The scalar type for the trait getter method.
-    type ScalarGetterType<'this, E>;
+    type ScalarGetterType<'this, E: Enum>;
     /// Get the scalar type for the trait getter method.
     fn get_scalar<'this, E: Enum>(
         from: &'this <Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
@@ -81,7 +81,6 @@ pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
 }
 pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
     type MsgFieldType<M: Message>;
-    type MsgTypeInTrait<M: Message>: Message;
     /// Default value of the field when the message is allocated
     fn default<M: Message>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
@@ -91,6 +90,20 @@ pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
         from: &<Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgFieldType<M>;
+
+    // Trait method implementations
+
+    /// The concrete message type for the `MessageType` type in `FieldN` traits.
+    type MsgTypeInTrait<M: Message>: Message;
+    /// The scalar type for the trait getter method.
+    type ScalarOptionalGetterType<'this, M: 'this + Message>;
+    /// Get the scalar type for the trait getter method.
+    fn get_scalar_optional<'this, M: Message>(
+        from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
+        internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::ScalarOptionalGetterType<'this, M>
+    where
+        L: tags::FieldLabelTag<IsRepeated = False>;
 }
 
 pub trait AnyFieldTypeGen:

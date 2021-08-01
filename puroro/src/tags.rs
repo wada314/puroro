@@ -1,4 +1,3 @@
-use ::std::borrow::Cow;
 use crate::bool::{BoolTypes, False, True};
 use ::std::convert::TryFrom;
 use ::std::marker::PhantomData;

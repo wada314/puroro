@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType, SimpleImpl};
 use crate::{AnyFieldTypeGen, EnumTypeGen, FieldTypeGen, MsgTypeGen, StructInternalTypeGen};
-use ::puroro::bool::True;
+use ::puroro::bool::{False, True};
 use ::puroro::{tags, Enum, Message};
 
 // All-in-one typegen trait
@@ -127,6 +127,17 @@ where
     ) -> <Self as EnumTypeGen<X, L>>::EnumFieldType<E> {
         Clone::clone(from)
     }
+
+    type ScalarGetterType<'this, E: Enum> = <X as tags::EnumTypeForSyntax>::NativeType<E>;
+    fn get_scalar<'this, E: Enum>(
+        from: &'this <Self as EnumTypeGen<X, L>>::EnumFieldType<E>,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::ScalarGetterType<'this, E>
+    where
+        L: tags::FieldLabelTag<IsNonOptionalScalar = True>,
+    {
+        <L as LabelWrappedType>::get_scalar(from)
+    }
 }
 
 impl<X, L> MsgTypeGen<X, L> for SimpleImpl
@@ -135,7 +146,6 @@ where
     L: LabelWrappedMessageType,
 {
     type MsgFieldType<M: Message> = <L as LabelWrappedMessageType>::Type<M>;
-    type MsgTypeInTrait<M: Message> = M;
 
     fn default<M: Message>(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
@@ -148,5 +158,17 @@ where
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgFieldType<M> {
         Clone::clone(from)
+    }
+
+    type MsgTypeInTrait<M: Message> = M;
+    type ScalarOptionalGetterType<'this, M: 'this + Message> = Option<Cow<'this, M>>;
+    fn get_scalar_optional<'this, M: Message>(
+        from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Self::ScalarOptionalGetterType<'this, M>
+    where
+        L: tags::FieldLabelTag<IsRepeated = False>,
+    {
+        <L as LabelWrappedMessageType>::get_scalar_optional(from)
     }
 }
