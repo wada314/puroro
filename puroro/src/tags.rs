@@ -27,6 +27,7 @@ pub trait EnumTypeForSyntax {
 /// e.g. Optional, Repeated, Required
 pub trait FieldLabelTag {
     type IsRepeated: BoolTypes;
+    type IsOptionalScalar: BoolTypes;
     type IsNonOptionalScalar: BoolTypes;
 }
 
@@ -187,18 +188,22 @@ impl EnumTypeForSyntax for Proto3 {
 
 impl FieldLabelTag for Repeated {
     type IsRepeated = True;
+    type IsOptionalScalar = False;
     type IsNonOptionalScalar = False;
 }
 impl FieldLabelTag for Optional {
     type IsRepeated = False;
+    type IsOptionalScalar = True;
     type IsNonOptionalScalar = False;
 }
 impl FieldLabelTag for Unlabeled {
     type IsRepeated = False;
+    type IsOptionalScalar = False;
     type IsNonOptionalScalar = True;
 }
 impl FieldLabelTag for Required {
     type IsRepeated = False;
+    type IsOptionalScalar = True;
     type IsNonOptionalScalar = False;
 }
 

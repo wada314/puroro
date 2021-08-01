@@ -31,3 +31,11 @@ pub trait {{ message.rust_ident() }}Trait:
     {%- endfor %}
 {
 }
+impl<T> {{ message.rust_ident() }}Trait for T
+where T: 
+    ::puroro::Message
+    {%- for field in message.fields() %}
+    + self::{{ message.rust_nested_module_ident() }}_fields::Field{{ field.number() }}
+    {%- endfor %}
+{
+}

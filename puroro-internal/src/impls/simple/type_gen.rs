@@ -42,6 +42,15 @@ where
     {
         <L as LabelWrappedType>::get_scalar(from)
     }
+    fn get_scalar_optional<'this>(
+        from: &'this <Self as FieldTypeGen<X, L, tags::wire::NonLD<V, _1, _2>>>::Type,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Option<Self::ScalarGetterType<'this>>
+    where
+        L: tags::FieldLabelTag<IsOptionalScalar = True>,
+    {
+        <L as LabelWrappedType>::get_scalar_optional(from)
+    }
 }
 
 // For length delimited types
@@ -75,6 +84,15 @@ where
     {
         <(X, L) as LabelWrappedLdType>::get_scalar(from)
     }
+    fn get_scalar_optional<'this>(
+        from: &'this <Self as FieldTypeGen<X, L, tags::Bytes>>::Type,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Option<Self::ScalarGetterType<'this>>
+    where
+        L: tags::FieldLabelTag<IsOptionalScalar = True>,
+    {
+        <(X, L) as LabelWrappedLdType>::get_scalar_optional(from)
+    }
 }
 impl<L, X> FieldTypeGen<X, L, tags::String> for SimpleImpl
 where
@@ -104,6 +122,15 @@ where
         L: tags::FieldLabelTag<IsNonOptionalScalar = True>,
     {
         <(X, L) as LabelWrappedLdType>::get_scalar(from)
+    }
+    fn get_scalar_optional<'this>(
+        from: &'this <Self as FieldTypeGen<X, L, tags::String>>::Type,
+        _internal_data: &'this <Self as StructInternalTypeGen>::Type,
+    ) -> Option<Self::ScalarGetterType<'this>>
+    where
+        L: tags::FieldLabelTag<IsOptionalScalar = True>,
+    {
+        <(X, L) as LabelWrappedLdType>::get_scalar_optional(from)
     }
 }
 
