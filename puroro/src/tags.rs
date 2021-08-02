@@ -68,13 +68,14 @@ pub mod value {
 }
 
 pub mod wire {
+    use crate::bool::{False, True};
     use ::std::marker::PhantomData;
-    pub type Variant<V> = (PhantomData<V>, (bool, ()), ((), ()));
-    pub type LengthDelimited<V> = (PhantomData<V>, ((), bool), ((), ()));
-    pub type Bits32<V> = (PhantomData<V>, ((), ()), (bool, ()));
-    pub type Bits64<V> = (PhantomData<V>, ((), ()), ((), bool));
+    pub type Variant<V> = (PhantomData<V>, (True, False), (False, False));
+    pub type LengthDelimited<V> = (PhantomData<V>, (False, True), (False, False));
+    pub type Bits32<V> = (PhantomData<V>, (False, False), (True, False));
+    pub type Bits64<V> = (PhantomData<V>, (False, False), (False, True));
 
-    pub type NonLD<V, _1, _2> = (PhantomData<V>, (_1, ()), _2);
+    pub type NonLD<V, _1, _2> = (PhantomData<V>, (_1, False), _2);
 }
 
 pub type Int32 = wire::Variant<value::Int32>;
@@ -96,20 +97,20 @@ pub type Enum = wire::Variant<value::Enum>;
 pub type Message = wire::LengthDelimited<value::Message>;
 
 /// A repeated field, which is available in both proto2 and proto3.
-pub type Repeated = (bool, (), ());
+pub type Repeated = (True, False, False);
 /// Proto2 optional field || Proto3 explicitly optional marked field.
-pub type Optional = ((), (bool, ()), ());
+pub type Optional = (False, (True, False), False);
 /// Only available in proto2.
-pub type Required = ((), ((), bool), ());
+pub type Required = (False, (False, True), False);
 /// Proto3 unlabeled field.
-pub type Unlabeled = ((), (), (bool, (), ()));
-pub type Oneof = ((), (), ((), bool, ()));
-pub type MapEntry = ((), (), ((), (), bool));
+pub type Unlabeled = (False, False, (True, False, False));
+pub type Oneof = (False, False, (False, True, False));
+pub type MapEntry = (False, False, (False, False, True));
 
 // call for good idea instead of this :)
-pub type NonRepeated<_1, _2> = ((), _1, _2);
-pub type OptionalOrRequired<_1, _2> = ((), (_1, _2), ());
-pub type UnlabeledOrOneofOrMapEntry<_1, _2, _3> = ((), (), (_1, _2, _3));
+pub type NonRepeated<_1, _2> = (False, _1, _2);
+pub type OptionalOrRequired<_1, _2> = (False, (_1, _2), False);
+pub type UnlabeledOrOneofOrMapEntry<_1, _2, _3> = (False, False, (_1, _2, _3));
 
 pub struct Proto2;
 pub struct Proto3;
