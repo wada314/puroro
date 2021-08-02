@@ -25,7 +25,7 @@ pub trait Enum: PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i
 
 pub trait RepeatedField<'msg, T>: IntoIterator<Item = T> {}
 
-pub trait GetImpl<NewImplTypeTag> {
+pub trait SwitchImpl<NewImplTypeTag> {
     type Type;
 }
 

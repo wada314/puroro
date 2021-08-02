@@ -5,7 +5,7 @@ pub mod impls;
 pub mod se;
 
 use ::puroro::bool::{False, True};
-use ::puroro::{tags, Enum, ErrorKind, Message, RepeatedField, Result};
+use ::puroro::{tags, Enum, ErrorKind, RepeatedField, Result};
 use ::std::borrow::Cow;
 
 // Re-exporting library modules
@@ -18,7 +18,7 @@ pub use impls::simple::SimpleImpl;
 pub use se::SerAnyFieldToIoWrite;
 
 pub trait MessageInternal: ::puroro::Message {
-    type ImplTypeTag: StructInternalTypeGen;
+    type ImplTypeTag: AnyFieldTypeGen + StructInternalTypeGen;
     fn new_with_internal_data(
         internal_data: <Self::ImplTypeTag as StructInternalTypeGen>::Type,
     ) -> Self;
@@ -127,38 +127,46 @@ pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
         L: tags::FieldLabelTag<IsRepeated = True>;
 }
 pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
-    type MsgFieldType<M: Message>;
+    /// The type for struct field. e.g. `Vec<MyMessage>`
+    type MsgFieldType<M: MessageInternal<ImplTypeTag = Self>>;
+
+    /// The `ImplTag` type for the child message type.
+    /// Some impl may want to have different `ImplTag` for the child message...
+    type ImplTagForChildMessage<'this>: 'this + AnyFieldTypeGen + StructInternalTypeGen;
+
     /// Default value of the field when the message is allocated
-    fn default<M: Message>(
+    fn default<M: MessageInternal<ImplTypeTag = Self>>(
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgFieldType<M>;
     /// Clone the field type
-    fn clone<M: Message>(
+    fn clone<M: MessageInternal<ImplTypeTag = Self>>(
         from: &<Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgFieldType<M>;
 
     // Trait method implementations
 
-    /// The `ImplTag` type for the child message type.
-    type ImplTagForChildMessage<'this>: 'this + AnyFieldTypeGen + StructInternalTypeGen;
     /// Get the scalar type for the trait getter method.
-    fn get_scalar_optional<'this, M: 'this + Message>(
+    fn get_scalar_optional<'this, M>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
     ) -> Option<Cow<'this, M>>
     where
+        M: 'this + MessageInternal<ImplTypeTag = Self>,
         L: tags::FieldLabelTag<IsRepeated = False>;
 
     /// Repeated field type for the trait.
-    type TraitRepeatedFieldType<'this, M: 'this + Message>: RepeatedField<'this, Cow<'this, M>>;
+    type TraitRepeatedFieldType<'this, M>: RepeatedField<'this, Cow<'this, M>>
+    where
+        M: 'this + MessageInternal<ImplTypeTag = Self>;
 
     /// Get repeated field for the trait getter method.
-    fn get_repeated<'this, M: Message>(
+    fn get_repeated<'this, M>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
     ) -> Self::TraitRepeatedFieldType<'this, M>
     where
+        M: MessageInternal<ImplTypeTag = Self>,
         L: tags::FieldLabelTag<IsRepeated = True>;
 }
 

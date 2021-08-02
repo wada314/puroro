@@ -7,7 +7,8 @@ use crate::se::{
     SerMsgToIoWrite, SerMsgToIoWriteProxy,
 };
 use crate::{
-    ErrorKind, FieldTypeGen, Result, SerAnyFieldToIoWrite, SimpleImpl, StructInternalTypeGen,
+    ErrorKind, FieldTypeGen, MessageInternal, Result, SerAnyFieldToIoWrite, SimpleImpl,
+    StructInternalTypeGen,
 };
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::tags;
@@ -345,7 +346,7 @@ where
 {
     type SerMsg<M>
     where
-        M: SerToIoWrite + Message,
+        M: SerToIoWrite + MessageInternal<ImplTypeTag = Self>,
     = Self;
 }
 #[rustfmt::skip]

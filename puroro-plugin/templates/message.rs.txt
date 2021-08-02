@@ -198,7 +198,7 @@ where ImplTag:
     }
 }
 
-impl<ImplTag, NewImplTag> ::puroro::GetImpl<NewImplTag> for {{ self.message.rust_ident() }}<ImplTag> 
+impl<ImplTag, NewImplTag> ::puroro::SwitchImpl<NewImplTag> for {{ self.message.rust_ident() }}<ImplTag> 
 where
     NewImplTag:
         ::puroro_internal::AnyFieldTypeGen
