@@ -25,10 +25,6 @@ pub trait Enum: PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i
 
 pub trait RepeatedField<'msg, T>: IntoIterator<Item = T> {}
 
-pub trait SwitchImpl<NewImplTypeTag> {
-    type Type;
-}
-
 pub trait DeserFromBytesIter: Message {
     fn deser<I>(&mut self, iter: I) -> Result<()>
     where

@@ -198,23 +198,22 @@ where ImplTag:
     }
 }
 
-impl<ImplTag, NewImplTag> ::puroro::SwitchImpl<NewImplTag> for {{ self.message.rust_ident() }}<ImplTag> 
+impl<ImplTag> ::puroro_internal::SwitchImpl for {{ self.message.rust_ident() }}<ImplTag> 
 where
-    NewImplTag:
-        ::puroro_internal::AnyFieldTypeGen
-        + ::puroro_internal::StructInternalTypeGen
-        + ::puroro_internal::ChooseStructVisibility<
-            super::public::{{ self.message.rust_ident() }}<NewImplTag>,
-            super::private::{{ self.message.rust_ident() }}<NewImplTag>,
-        >,
     ImplTag:
         ::puroro_internal::AnyFieldTypeGen
         + ::puroro_internal::StructInternalTypeGen,
 {
-    type Type = <NewImplTag as ::puroro_internal::ChooseStructVisibility<
-        super::public::{{ self.message.rust_ident() }}<NewImplTag>,
-        super::private::{{ self.message.rust_ident() }}<NewImplTag>,
-    >>::Type;
+    type Type<NewImplTag> 
+    where
+        NewImplTag:
+            ::puroro_internal::AnyFieldTypeGen
+            + ::puroro_internal::StructInternalTypeGen
+            + ::puroro_internal::ChooseStructVisibility
+        = <NewImplTag as ::puroro_internal::ChooseStructVisibility>::Type<
+            super::public::{{ self.message.rust_ident() }}<NewImplTag>,
+            super::private::{{ self.message.rust_ident() }}<NewImplTag>,
+        >;
 }
 
 impl<ImplTag> {{ self.message.rust_absolute_trait_path() }} for {{ self.message.rust_ident() }}<ImplTag>

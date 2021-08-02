@@ -13,8 +13,8 @@ pub use field_wrapper::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappe
 pub struct SimpleImpl;
 impl tags::ImplTypeTag for SimpleImpl {}
 
-impl<Public, Private> ChooseStructVisibility<Public, Private> for SimpleImpl {
-    type Type = Public;
+impl ChooseStructVisibility for SimpleImpl {
+    type Type<Public, Private> = Public;
 }
 
 // Struct's internal type generator
