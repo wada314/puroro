@@ -5,7 +5,7 @@ use crate::de::{
     DeserFieldFromBytesIter, DeserInternalDataFromBytesIter, DeserMsgFromBytesIter,
     DeserMsgFromBytesIterProxy, DoDefaultCheck, MessageFromBytesIter,
 };
-use crate::{FieldTypeGen, MessageInternal, StructInternalTypeGen};
+use crate::{FieldTypeGen, MessageInternal, StructInternalTypeGen, SwitchImpl};
 use ::itertools::Itertools;
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::types::FieldData;
@@ -256,7 +256,7 @@ where
 {
     type DeserMsg<M>
     where
-        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self> + Message,
+        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self> + Message + SwitchImpl,
     = Self;
 }
 

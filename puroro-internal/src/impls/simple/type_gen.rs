@@ -6,6 +6,7 @@ use super::{
 };
 use crate::{
     AnyFieldTypeGen, EnumTypeGen, FieldTypeGen, MessageInternal, MsgTypeGen, StructInternalTypeGen,
+    SwitchImpl,
 };
 use ::puroro::bool::{False, True};
 use ::puroro::{tags, Enum};
@@ -261,16 +262,16 @@ where
     Self: StructInternalTypeGen,
     L: LabelWrappedMessageType,
 {
-    type MsgFieldType<M: MessageInternal<ImplTypeTag = Self>> =
-        <L as LabelWrappedMessageType>::Type<M>;
+    type MsgFieldType<M: MessageInternal<ImplTypeTag = Self> + SwitchImpl> =
+        <L as LabelWrappedMessageType>::Type<<M as SwitchImpl>::Type<SimpleImpl>>;
 
-    fn default<M: MessageInternal<ImplTypeTag = Self>>(
+    fn default<M: MessageInternal<ImplTypeTag = Self> + SwitchImpl>(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgFieldType<M> {
         <L as LabelWrappedMessageType>::default()
     }
 
-    fn clone<M: MessageInternal<ImplTypeTag = Self>>(
+    fn clone<M: MessageInternal<ImplTypeTag = Self> + SwitchImpl>(
         from: &<Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         _internal_data: &<Self as StructInternalTypeGen>::Type,
     ) -> <Self as MsgTypeGen<X, L>>::MsgFieldType<M> {
@@ -278,7 +279,7 @@ where
     }
 
     type ImplTagForChildMessage<'this> = SimpleImpl;
-    fn get_scalar_optional<'this, M: 'this + MessageInternal<ImplTypeTag = Self>>(
+    fn get_scalar_optional<'this, M: 'this + MessageInternal<ImplTypeTag = Self> + SwitchImpl>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
     ) -> Option<Cow<'this, M>>
@@ -288,11 +289,13 @@ where
         <L as LabelWrappedMessageType>::get_scalar_optional(from)
     }
 
-    type TraitRepeatedFieldType<'this, M: 'this + MessageInternal<ImplTypeTag = Self>> =
-        RepeatedFieldImplForLdTypes<'this, M>;
+    type TraitRepeatedFieldType<
+        'this,
+        M: 'this + MessageInternal<ImplTypeTag = Self> + SwitchImpl,
+    > = RepeatedFieldImplForLdTypes<'this, M>;
 
     /// Get repeated field for the trait getter method.
-    fn get_repeated<'this, M: MessageInternal<ImplTypeTag = Self>>(
+    fn get_repeated<'this, M: MessageInternal<ImplTypeTag = Self> + SwitchImpl>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
     ) -> Self::TraitRepeatedFieldType<'this, M>

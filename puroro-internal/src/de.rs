@@ -1,6 +1,7 @@
 use crate::de::from_iter::ScopedIter;
 use crate::{
     EnumTypeGen, FieldTypeGen, MessageInternal, MsgTypeGen, Result, StructInternalTypeGen,
+    SwitchImpl,
 };
 use ::puroro::types::FieldData;
 use ::puroro::{tags, Enum, Message};
@@ -187,7 +188,7 @@ pub trait DeserMsgFromBytesIterProxy<X, L>: MsgTypeGen<X, L> + StructInternalTyp
         <Self as StructInternalTypeGen>::Type,
     >
     where
-        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self> + Message;
+        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self> + Message + SwitchImpl;
 }
 pub trait DeserMsgFromBytesIter<X, L, M, MsgFieldType, InternalDataType>
 where

@@ -3,6 +3,7 @@ use ::puroro::{tags, Enum, Message, SerToIoWrite};
 
 use crate::{
     EnumTypeGen, FieldTypeGen, MessageInternal, MsgTypeGen, Result, StructInternalTypeGen,
+    SwitchImpl,
 };
 pub trait SerAnyFieldToIoWrite:
     SerInternalDataToIoWrite
@@ -160,7 +161,7 @@ pub trait SerMsgToIoWriteProxy<X, L>: MsgTypeGen<X, L> + StructInternalTypeGen {
         <Self as StructInternalTypeGen>::Type,
     >
     where
-        M: SerToIoWrite + MessageInternal<ImplTypeTag = Self>;
+        M: SerToIoWrite + MessageInternal<ImplTypeTag = Self> + SwitchImpl;
 }
 pub trait SerMsgToIoWrite<X, L, M, MsgFieldType, InternalDataType>
 where
