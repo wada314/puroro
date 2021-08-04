@@ -170,7 +170,10 @@ pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
     fn get_repeated<'this, M>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Self::TraitRepeatedFieldType<'this, M>
+    ) -> Self::TraitRepeatedFieldType<
+        'this,
+        <M as SwitchImpl>::Type<Self::ImplTagForChildMessage<'this>>,
+    >
     where
         M: MessageInternal<ImplTypeTag = Self> + SwitchImpl,
         L: tags::FieldLabelTag<IsRepeated = True>;

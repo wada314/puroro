@@ -264,8 +264,8 @@ where
 impl<X, L, M, MsgFieldType, InternalDataType>
     DeserMsgFromBytesIter<X, L, M, MsgFieldType, InternalDataType> for SimpleImpl
 where
-    M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl> + Message,
-    L: LabelWrappedMessageType<Type<M> = MsgFieldType>,
+    M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl> + Message + SwitchImpl,
+    L: LabelWrappedMessageType<Type<<M as SwitchImpl>::Type<SimpleImpl>> = MsgFieldType>,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut MsgFieldType,

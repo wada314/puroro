@@ -298,7 +298,10 @@ where
     fn get_repeated<'this, M: MessageInternal<ImplTypeTag = Self> + SwitchImpl>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Self::TraitRepeatedFieldType<'this, M>
+    ) -> Self::TraitRepeatedFieldType<
+        'this,
+        <M as SwitchImpl>::Type<Self::ImplTagForChildMessage<'this>>,
+    >
     where
         L: tags::FieldLabelTag<IsRepeated = True>,
     {
