@@ -161,17 +161,18 @@ pub trait SerMsgToIoWriteProxy<X, L>: MsgTypeGen<X, L> + StructInternalTypeGen {
         <Self as StructInternalTypeGen>::Type,
     >
     where
-        M: SerToIoWrite + MessageInternal<ImplTypeTag = Self> + SwitchImpl;
+        M: SerToIoWrite + MessageInternal<ImplTypeTag = Self> + SwitchImpl,
+        ;
 }
 pub trait SerMsgToIoWrite<X, L, M, MsgFieldType, InternalDataType>
 where
     M: Message,
 {
-    fn ser_to_io_write<W>(
-        field: &MsgFieldType,
+    fn ser_to_io_write<'msg, W>(
+        field: &'msg MsgFieldType,
         field_number: i32,
         out: &mut W,
-        internal_data: &InternalDataType,
+        internal_data: &'msg InternalDataType,
     ) -> Result<()>
     where
         W: ::std::io::Write;

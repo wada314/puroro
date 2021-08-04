@@ -7,7 +7,7 @@ use crate::se::{
     SerMsgToIoWrite, SerMsgToIoWriteProxy,
 };
 use crate::{
-    ErrorKind, FieldTypeGen, MessageInternal, Result, SerAnyFieldToIoWrite, SimpleImpl,
+    ErrorKind, FieldTypeGen, MessageInternal, MsgTypeGen, Result, SerAnyFieldToIoWrite, SimpleImpl,
     StructInternalTypeGen, SwitchImpl,
 };
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
@@ -352,14 +352,15 @@ where
 #[rustfmt::skip]
 impl<X, L, M, MsgFieldType, InternalDataType> SerMsgToIoWrite<X, L, M, MsgFieldType, InternalDataType> for SimpleImpl
 where
-    L: LabelWrappedMessageType<Type<M> = MsgFieldType>,
-    M: SerToIoWrite + Message,
+    Self: MsgTypeGen<X, L>,
+    for <'msg> L: LabelWrappedMessageType<Type<<M as SwitchImpl>::Type<<Self as MsgTypeGen<X, L>>::ImplTagForChildMessage<'msg>>> = MsgFieldType>,
+    M: SerToIoWrite + Message + SwitchImpl,
 {
-    fn ser_to_io_write<W>(
-        field: &MsgFieldType,
+    fn ser_to_io_write<'msg, W>(
+        field: &'msg MsgFieldType,
         field_number: i32,
         out: &mut W,
-        _internal_data: &InternalDataType,
+        _internal_data: &'msg InternalDataType,
     ) -> Result<()>
     where
         W: std::io::Write,
@@ -368,7 +369,7 @@ where
         for boxed in <L as LabelWrappedMessageType>::iter(field) {
             write_field_number_and_wire_type(out, field_number, WireType::LengthDelimited)?;
             let mut buffer: Vec<u8> = Vec::new();
-            <M as SerToIoWrite>::ser(boxed.deref(), &mut buffer)?;
+            <<M as SwitchImpl>::Type<<Self as MsgTypeGen<X, L>>::ImplTagForChildMessage<'msg>> as SerToIoWrite>::ser(boxed.deref(), &mut buffer)?;
             let length: i32 = buffer
                 .len()
                 .try_into()

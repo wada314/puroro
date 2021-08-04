@@ -132,6 +132,7 @@ pub trait EnumTypeGen<X, L>: StructInternalTypeGen {
         <X as tags::EnumTypeForSyntax>::NativeType<E>: 'this,
         L: tags::FieldLabelTag<IsRepeated = True>;
 }
+
 pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
     /// The type for struct field. e.g. `Vec<MyMessage>`
     type MsgFieldType<M: MessageInternal<ImplTypeTag = Self> + SwitchImpl>;
