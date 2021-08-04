@@ -29,7 +29,7 @@ pub trait ChooseStructVisibility {
 }
 
 pub trait SwitchImpl {
-    type Type<NewImplTypeTag>: MessageInternal
+    type Type<NewImplTypeTag>: MessageInternal + SwitchImpl
     where
         NewImplTypeTag: AnyFieldTypeGen + StructInternalTypeGen + ChooseStructVisibility;
 }
@@ -138,7 +138,10 @@ pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
 
     /// The `ImplTag` type for the child message type.
     /// Some impl may want to have different `ImplTag` for the child message...
-    type ImplTagForChildMessage<'this>: 'this + AnyFieldTypeGen + StructInternalTypeGen;
+    type ImplTagForChildMessage<'this>: 'this
+        + AnyFieldTypeGen
+        + StructInternalTypeGen
+        + ChooseStructVisibility;
 
     /// Default value of the field when the message is allocated
     fn default<M: MessageInternal<ImplTypeTag = Self> + SwitchImpl>(
@@ -156,24 +159,25 @@ pub trait MsgTypeGen<X, L>: StructInternalTypeGen {
     fn get_scalar_optional<'this, M>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Option<Cow<'this, M>>
+    ) -> Option<Cow<'this, <M as SwitchImpl>::Type<Self::ImplTagForChildMessage<'this>>>>
     where
         M: 'this + MessageInternal<ImplTypeTag = Self> + SwitchImpl,
         L: tags::FieldLabelTag<IsRepeated = False>;
 
     /// Repeated field type for the trait.
-    type TraitRepeatedFieldType<'this, M>: RepeatedField<'this, Cow<'this, M>>
+    type TraitRepeatedFieldType<'this, M>: RepeatedField<
+        'this,
+        Cow<'this, <M as SwitchImpl>::Type<Self::ImplTagForChildMessage<'this>>>,
+    >
     where
-        M: 'this + MessageInternal<ImplTypeTag = Self> + SwitchImpl;
+        M: MessageInternal<ImplTypeTag = Self> + SwitchImpl,
+        <M as SwitchImpl>::Type<Self::ImplTagForChildMessage<'this>>: 'this;
 
     /// Get repeated field for the trait getter method.
     fn get_repeated<'this, M>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Self::TraitRepeatedFieldType<
-        'this,
-        <M as SwitchImpl>::Type<Self::ImplTagForChildMessage<'this>>,
-    >
+    ) -> Self::TraitRepeatedFieldType<'this, M>
     where
         M: MessageInternal<ImplTypeTag = Self> + SwitchImpl,
         L: tags::FieldLabelTag<IsRepeated = True>;

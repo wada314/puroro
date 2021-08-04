@@ -282,27 +282,26 @@ where
     fn get_scalar_optional<'this, M: 'this + MessageInternal<ImplTypeTag = Self> + SwitchImpl>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Option<Cow<'this, M>>
+    ) -> Option<Cow<'this, <M as SwitchImpl>::Type<Self::ImplTagForChildMessage<'this>>>>
     where
         L: tags::FieldLabelTag<IsRepeated = False>,
     {
         <L as LabelWrappedMessageType>::get_scalar_optional(from)
     }
 
-    type TraitRepeatedFieldType<
-        'this,
-        M: 'this + MessageInternal<ImplTypeTag = Self> + SwitchImpl,
-    > = RepeatedFieldImplForLdTypes<'this, M>;
+    type TraitRepeatedFieldType<'this, M>
+    where
+        M: MessageInternal<ImplTypeTag = Self> + SwitchImpl,
+        <M as SwitchImpl>::Type<Self::ImplTagForChildMessage<'this>>: 'this,
+    = RepeatedFieldImplForLdTypes<'this, <M as SwitchImpl>::Type<SimpleImpl>>;
 
     /// Get repeated field for the trait getter method.
     fn get_repeated<'this, M: MessageInternal<ImplTypeTag = Self> + SwitchImpl>(
         from: &'this <Self as MsgTypeGen<X, L>>::MsgFieldType<M>,
         _internal_data: &'this <Self as StructInternalTypeGen>::Type,
-    ) -> Self::TraitRepeatedFieldType<
-        'this,
-        <M as SwitchImpl>::Type<Self::ImplTagForChildMessage<'this>>,
-    >
+    ) -> Self::TraitRepeatedFieldType<'this, M>
     where
+        M: MessageInternal<ImplTypeTag = Self> + SwitchImpl,
         L: tags::FieldLabelTag<IsRepeated = True>,
     {
         RepeatedFieldImplForLdTypes(<L as LabelWrappedMessageType>::get_repeated(from))
