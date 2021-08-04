@@ -14,7 +14,7 @@ use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::tags;
 use ::puroro::types::WireType;
 use ::puroro::variant::{EnumVariantTypeForSyntax, Variant, VariantTypeTag};
-use ::puroro::{Enum, Message, SerToIoWrite};
+use ::puroro::{Enum, SerToIoWrite};
 
 use super::{LabelWrappedLdType, LabelWrappedMessageType, LabelWrappedType};
 
@@ -341,20 +341,23 @@ where
 // Message
 impl<X, L> SerMsgToIoWriteProxy<X, L> for SimpleImpl
 where
-    Self: StructInternalTypeGen,
+    Self: StructInternalTypeGen + MsgTypeGen<X, L>,
     L: LabelWrappedMessageType,
 {
     type SerMsg<M>
     where
-        M: SerToIoWrite + MessageInternal<ImplTypeTag = Self> + SwitchImpl,
+        M: MessageInternal<ImplTypeTag = Self> + SwitchImpl,
+        for<'msg> <M as SwitchImpl>::Type<<Self as MsgTypeGen<X, L>>::ImplTagForChildMessage<'msg>>:
+            SerToIoWrite,
     = Self;
 }
 #[rustfmt::skip]
 impl<X, L, M, MsgFieldType, InternalDataType> SerMsgToIoWrite<X, L, M, MsgFieldType, InternalDataType> for SimpleImpl
 where
-    Self: MsgTypeGen<X, L>,
+    Self: MsgTypeGen<X, L, MsgFieldType<M> = MsgFieldType>,
     for <'msg> L: LabelWrappedMessageType<Type<<M as SwitchImpl>::Type<<Self as MsgTypeGen<X, L>>::ImplTagForChildMessage<'msg>>> = MsgFieldType>,
-    M: SerToIoWrite + Message + SwitchImpl,
+    M: MessageInternal<ImplTypeTag = SimpleImpl> + SwitchImpl,
+    for <'msg> <M as SwitchImpl>::Type<<Self as MsgTypeGen<X, L>>::ImplTagForChildMessage<'msg>>: SerToIoWrite
 {
     fn ser_to_io_write<'msg, W>(
         field: &'msg MsgFieldType,
