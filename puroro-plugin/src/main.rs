@@ -82,7 +82,6 @@ pub struct Messages {
 #[template(path = "message.rs.txt")]
 pub struct Message {
     message: Rc<wrappers::Message>,
-    is_public: bool,
 }
 
 #[derive(Template)]
@@ -110,16 +109,9 @@ mod filters {
             messages: messages.to_vec(),
         })
     }
-    pub fn render_public_message(message: &Rc<wrappers::Message>) -> ::askama::Result<Message> {
+    pub fn render_message(message: &Rc<wrappers::Message>) -> ::askama::Result<Message> {
         Ok(Message {
             message: Clone::clone(message),
-            is_public: true,
-        })
-    }
-    pub fn render_private_message(message: &Rc<wrappers::Message>) -> ::askama::Result<Message> {
-        Ok(Message {
-            message: Clone::clone(message),
-            is_public: false,
         })
     }
     pub fn render_trait(message: &Rc<wrappers::Message>) -> ::askama::Result<Trait> {

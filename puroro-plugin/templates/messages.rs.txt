@@ -3,37 +3,18 @@
 
 pub mod puroro_structs {
 
-    pub mod public {
-
-        pub mod puroro_root {
-            pub use super::super::super::puroro_root::*;
-        }
-
-        use ::puroro_internal::de::DeserEnumFromBytesIter as _;
-        use ::puroro_internal::de::DeserMsgFromBytesIter as _;
-        use ::puroro_internal::se::SerEnumToIoWrite as _;
-        use ::puroro_internal::se::SerMsgToIoWrite as _;
-
-        {%- for message in self.messages %}
-        {{ message|render_public_message|indent(8) }}
-        {%- endfor %}
+    pub mod puroro_root {
+        pub use super::super::puroro_root::*;
     }
 
-    pub mod private {
-    
-        mod puroro_root {
-            pub use super::super::super::puroro_root::*;
-        }
-
-        {%- for message in self.messages %}
-        {{ message|render_private_message|indent(8) }}
-        {%- endfor %}
-    }
+    {%- for message in self.messages %}
+    {{ message|render_message|indent(8) }}
+    {%- endfor %}
 
 } // mod puroro_structs
 
 {%- for message in self.messages %}
-pub type {{ message.rust_ident() }}<ImplTag = ::puroro_internal::SimpleImpl> = self::puroro_structs::public::{{ message.rust_ident() }}<ImplTag>;
+pub type {{ message.rust_ident() }} = self::puroro_structs::{{ message.rust_ident() }};
 {%- endfor %}
 
 {#- ################ Traits ################ #}

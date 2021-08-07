@@ -19,7 +19,7 @@ pub type Result<T> = std::result::Result<T, PuroroError>;
 pub use ::bumpalo;
 pub use ::hashbrown;
 
-pub trait Message: Clone {}
+pub trait Message {}
 
 pub trait Enum: PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32> {}
 

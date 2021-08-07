@@ -1,26 +1,4 @@
 {#- Main definitions of the traits #}
 
 pub trait {{ message.rust_ident() }}Trait {
-    {%- for field in message.fields() %}
-    {%- match field.field_type().unwrap().maybe_enum_or_message().unwrap() %}
-    {%- when wrappers::MaybeEnumOrMessage::Message with (m) %}
-    type Field{{ field.number() }}MessageImplTag<'this>: 
-        'this 
-        + ::puroro_internal::AnyFieldTypeGen
-        + ::puroro_internal::StructInternalTypeGen;
-    {%- else %}
-    {%- endmatch %}
-
-    {%- if field.has_scalar_getter() %}
-    fn {{ field.rust_ident() }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type().unwrap() }};
-    {%- endif %}
-    {%- if field.has_scalar_optional_getter() %}
-    fn {{ field.rust_ident() }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}>;
-    {%- endif %}
-    {%- if field.has_repeated_getter() %}
-    type Field{{ field.number() }}RepeatedType<'this>: ::puroro::RepeatedField<'this, {{ field.trait_scalar_getter_type().unwrap() }}>;
-    fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this>;
-    {%- endif %}
-    {%- endfor %}
-
 }
