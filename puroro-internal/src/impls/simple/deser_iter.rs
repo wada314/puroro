@@ -5,7 +5,7 @@ use crate::de::{
     DeserFieldFromBytesIter, DeserInternalDataFromBytesIter, DeserMsgFromBytesIter,
     DeserMsgFromBytesIterProxy, DoDefaultCheck, MessageFromBytesIter,
 };
-use crate::{FieldTypeGen, MessageInternal, StructInternalTypeGen, SwitchImpl};
+use crate::{FieldTypeGen, MessageInternal, MsgTypeGen, StructInternalTypeGen, SwitchImpl};
 use ::itertools::Itertools;
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::types::FieldData;
@@ -256,7 +256,9 @@ where
 {
     type DeserMsg<M>
     where
-        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self> + Message + SwitchImpl,
+        M: MessageInternal<ImplTypeTag = Self> + Message + SwitchImpl,
+        for<'a> <M as SwitchImpl>::Type<<Self as MsgTypeGen<X, L>>::ImplTagForChildMessage<'a>>:
+            MessageFromBytesIter,
     = Self;
 }
 
@@ -264,8 +266,11 @@ where
 impl<X, L, M, MsgFieldType, InternalDataType>
     DeserMsgFromBytesIter<X, L, M, MsgFieldType, InternalDataType> for SimpleImpl
 where
-    M: MessageFromBytesIter + MessageInternal<ImplTypeTag = SimpleImpl> + Message + SwitchImpl,
+    M: MessageInternal<ImplTypeTag = SimpleImpl> + Message + SwitchImpl,
     L: LabelWrappedMessageType<Type<<M as SwitchImpl>::Type<SimpleImpl>> = MsgFieldType>,
+    for<'a> <M as SwitchImpl>::Type<<Self as MsgTypeGen<X, L>>::ImplTagForChildMessage<'a>>: 
+        MessageFromBytesIter + MessageInternal,
+    for<'a> <<M as SwitchImpl>::Type<<Self as MsgTypeGen<X, L>>::ImplTagForChildMessage<'a>> as MessageInternal>::ImplTypeTag: StructInternalTypeGen<Type = ()>,
 {
     fn deser_from_scoped_bytes_iter<I>(
         field: &mut MsgFieldType,

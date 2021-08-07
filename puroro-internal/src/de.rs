@@ -188,7 +188,9 @@ pub trait DeserMsgFromBytesIterProxy<X, L>: MsgTypeGen<X, L> + StructInternalTyp
         <Self as StructInternalTypeGen>::Type,
     >
     where
-        M: MessageFromBytesIter + MessageInternal<ImplTypeTag = Self> + Message + SwitchImpl;
+        M: MessageInternal<ImplTypeTag = Self> + Message + SwitchImpl,
+        for<'a> <M as SwitchImpl>::Type<<Self as MsgTypeGen<X, L>>::ImplTagForChildMessage<'a>>:
+            MessageFromBytesIter;
 }
 pub trait DeserMsgFromBytesIter<X, L, M, MsgFieldType, InternalDataType>
 where
