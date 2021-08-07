@@ -599,12 +599,8 @@ impl Field {
             },
             FieldType::Message(m) => format!(
                 "::std::borrow::Cow<\
-                    'this, \
-                    {msg_path}<\
-                        Self::Field{number}MessageImplTag<'this>\
-                    >\
+                    'this, Self::Field{number}MessageType<'this>\
                 >",
-                msg_path = upgrade(&m)?.rust_absolute_path(),
                 number = self.number(),
             ),
         })
@@ -688,6 +684,13 @@ impl FieldType {
             FieldType::Enum(e) => MaybeEnumOrMessage::Enum(upgrade(e)?),
             FieldType::Message(m) => MaybeEnumOrMessage::Message(upgrade(m)?),
             _ => MaybeEnumOrMessage::Others,
+        })
+    }
+    pub fn maybe_message(&self) -> Result<Option<Rc<Message>>> {
+        Ok(if let FieldType::Message(m) = self {
+            Some(upgrade(m)?)
+        } else {
+            None
         })
     }
     pub fn is_message(&self) -> bool {

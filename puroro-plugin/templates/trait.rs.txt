@@ -1,4 +1,21 @@
 {#- Main definitions of the traits #}
 
-pub trait {{ message.rust_ident() }}Trait {
+pub trait {{ message.rust_ident() }}Trait: ::std::clone::Clone {
+    {%- for field in message.fields() %}
+
+    {%- match field.field_type().unwrap().maybe_message().unwrap() %}
+    {%- when Some with (m) %}
+    type Field{{ field.number() }}MessageType<'this>: {{ m.rust_absolute_trait_path() }};
+    {%- else %}
+    {%- endmatch %}
+
+    {%- if field.has_scalar_getter() %}
+    /// {{ field.rust_one_line_comment().unwrap() }}
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type().unwrap() }};
+    {%- endif %}
+    {%- if field.has_scalar_optional_getter() %}
+    /// {{ field.rust_one_line_comment().unwrap() }}
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}>;
+    {%- endif %}
+    {%- endfor %}
 }
