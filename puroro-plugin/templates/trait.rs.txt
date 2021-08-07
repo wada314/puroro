@@ -5,7 +5,7 @@ pub trait {{ message.rust_ident() }}Trait: ::std::clone::Clone {
 
     {%- match field.field_type().unwrap().maybe_message().unwrap() %}
     {%- when Some with (m) %}
-    type Field{{ field.number() }}MessageType<'this>: {{ m.rust_absolute_trait_path() }};
+    type Field{{ field.number() }}MessageType<'this>: 'this + {{ m.rust_absolute_trait_path() }};
     {%- else %}
     {%- endmatch %}
 
@@ -16,6 +16,12 @@ pub trait {{ message.rust_ident() }}Trait: ::std::clone::Clone {
     {%- if field.has_scalar_optional_getter() %}
     /// {{ field.rust_one_line_comment().unwrap() }}
     fn {{ field.rust_ident() }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}>;
+    {%- endif %}
+    {%- if field.has_repeated_getter() %}
+    type Field{{ field.number() }}RepeatedType<'this>: ::puroro::RepeatedField<'this, {{ field.trait_scalar_getter_type().unwrap() }}>;
+
+    /// {{ field.rust_one_line_comment().unwrap() }}
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this>;
     {%- endif %}
     {%- endfor %}
 }

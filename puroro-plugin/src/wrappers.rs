@@ -605,6 +605,21 @@ impl Field {
             ),
         })
     }
+    pub fn maybe_trait_scalar_getter_type_borrowed(
+        &self,
+        impl_tag: &str,
+    ) -> Result<Option<String>> {
+        Ok(match self.field_type() {
+            Ok(FieldType::String) => Some("str".to_string()),
+            Ok(FieldType::Bytes) => Some("[u8]".to_string()),
+            Ok(FieldType::Message(m)) => Some(format!(
+                "{path}<{tag}>",
+                path = upgrade(&m)?.rust_absolute_path(),
+                tag = impl_tag,
+            )),
+            _ => None,
+        })
+    }
 
     pub fn has_scalar_getter(&self) -> bool {
         matches!(self.field_label(), Ok(FieldLabel::Unlabeled))

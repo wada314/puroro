@@ -41,6 +41,20 @@ where
         >::{{ field.rust_ident() }}(&self.0)
     }
     {%- endif %}
+    {%- if field.has_repeated_getter() %}
+    type Field{{ field.number() }}RepeatedType<'this> = <
+        <Self as ::puroro_internal::GetImplStruct>::Type
+        as {{ self.message.rust_absolute_trait_path() }}
+    >::Field{{ field.number() }}RepeatedType::<'this>;
+
+    /// {{ field.rust_one_line_comment().unwrap() }}
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this> {
+        <
+            <Self as ::puroro_internal::GetImplStruct>::Type
+            as {{ self.message.rust_absolute_trait_path() }}
+        >::{{ field.rust_ident() }}(&self.0)
+    }
+    {%- endif %}
     {%- endfor %}
 }
 

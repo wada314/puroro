@@ -13,7 +13,7 @@ impl ::puroro_internal::GetImplStruct for {{ self.message.rust_ident() }}::<::pu
 }
 
 impl {{ self.message.rust_absolute_trait_path() }} for {{ self.rust_ident() }} {
-    {%- for field in self.message.fields() %}
+    {%- for field in self.fields() %}
 
     {%- match field.field_type().unwrap().maybe_message().unwrap() %}
     {%- when Some with (m) %}
@@ -24,13 +24,36 @@ impl {{ self.message.rust_absolute_trait_path() }} for {{ self.rust_ident() }} {
     {%- if field.has_scalar_getter() %}
     /// {{ field.rust_one_line_comment().unwrap() }}
     fn {{ field.rust_ident() }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type().unwrap() }} {
-        todo!()
+        {%- match field.maybe_trait_scalar_getter_type_borrowed("::puroro::tags::SimpleImpl").unwrap() %}
+        {%- when Some with (_) %}
+        ::std::borrow::Cow::Borrowed(&self.{{ field.rust_ident() }})
+        {%- else %}
+        ::std::clone::Clone::clone(&self.{{ field.rust_ident() }})
+        {%- endmatch %}
     }
     {%- endif %}
     {%- if field.has_scalar_optional_getter() %}
     /// {{ field.rust_one_line_comment().unwrap() }}
     fn {{ field.rust_ident() }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}> {
         todo!()
+    }
+    {%- endif %}
+    {%- if field.has_repeated_getter() %}
+    {%- match field.maybe_trait_scalar_getter_type_borrowed("::puroro::tags::SimpleImpl").unwrap() %}
+    {%- when Some with (borrowed) %}
+    type Field{{ field.number() }}RepeatedType<'this> = ::puroro_internal::impls::simple::VecCowWrapper<'this, {{ borrowed }}>;
+    {%- else %}
+    type Field{{ field.number() }}RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, {{ field.trait_scalar_getter_type().unwrap() }}>;
+    {%- endmatch %}
+
+    /// {{ field.rust_one_line_comment().unwrap() }}
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> Self::Field{{ field.number() }}RepeatedType<'this> {
+        {%- match field.maybe_trait_scalar_getter_type_borrowed("::puroro::tags::SimpleImpl").unwrap() %}
+        {%- when Some with (borrowed) %}
+        ::puroro_internal::impls::simple::VecCowWrapper::new(&self.{{ field.rust_ident() }})
+        {%- else %}
+        ::puroro_internal::impls::simple::VecWrapper::new(&self.{{ field.rust_ident() }})
+        {%- endmatch %}
     }
     {%- endif %}
     {%- endfor %}
