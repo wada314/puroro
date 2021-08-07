@@ -1,5 +1,5 @@
 pub mod to_io_write;
-use ::puroro::{tags, Enum, Message, SerToIoWrite};
+use ::puroro::{tags, Enum, SerToIoWrite};
 
 use crate::{
     EnumTypeGen, FieldTypeGen, MessageInternal, MsgTypeGen, Result, StructInternalTypeGen,

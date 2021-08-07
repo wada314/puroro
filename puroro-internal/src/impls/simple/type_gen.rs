@@ -263,7 +263,9 @@ where
     L: LabelWrappedMessageType,
 {
     type MsgFieldType<M: MessageInternal<ImplTypeTag = Self> + SwitchImpl> =
-        <L as LabelWrappedMessageType>::Type<<M as SwitchImpl>::Type<SimpleImpl>>;
+        <L as LabelWrappedMessageType>::Type<
+            <M as SwitchImpl>::Type<Self::ImplTagForChildMessage<'static>>,
+        >;
 
     fn default<M: MessageInternal<ImplTypeTag = Self> + SwitchImpl>(
         _internal_data: &<Self as StructInternalTypeGen>::Type,
