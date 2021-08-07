@@ -41,7 +41,7 @@ pub struct Message {
     proto_name: String,
     package: Rc<Vec<String>>,
     outer_messages: Rc<Vec<String>>,
-    fields: Vec<Field>,
+    fields: Vec<Rc<Field>>,
     nested_messages: Vec<Rc<Message>>,
     nested_enums: Vec<Rc<Enum>>,
 }
@@ -321,7 +321,7 @@ impl Message {
             outer_messages: outer_messages.clone(),
             fields: proto_field
                 .into_iter()
-                .map(|f| Field::try_from_proto(Clone::clone(message), f))
+                .map(|f| Field::try_from_proto(Clone::clone(message), f).map(|x| Rc::new(x)))
                 .collect::<Result<Vec<_>>>()
                 .expect("I need try_new_cyclic..."),
             nested_messages: proto_nested_type
@@ -391,7 +391,7 @@ impl Message {
     pub fn outer_messages(&self) -> &[String] {
         &self.outer_messages
     }
-    pub fn fields(&self) -> &[Field] {
+    pub fn fields(&self) -> &[Rc<Field>] {
         &self.fields
     }
     pub fn nested_messages(&self) -> &[Rc<Message>] {
@@ -403,23 +403,6 @@ impl Message {
 
     pub fn has_nested_items(&self) -> bool {
         self.nested_messages().len() + self.nested_enums().len() > 0
-    }
-    pub fn unique_type_fields(&self) -> Vec<&Field> {
-        self.fields()
-            .iter()
-            .unique_by(|field| {
-                (
-                    field
-                        .field_type()
-                        .and_then(|ft| ft.tag_ident())
-                        .unwrap_or_default(),
-                    field
-                        .field_label()
-                        .map(|fl| fl.tag_ident().to_string())
-                        .unwrap_or_default(),
-                )
-            })
-            .collect_vec()
     }
 }
 
