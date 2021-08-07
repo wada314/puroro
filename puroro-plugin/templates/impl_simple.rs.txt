@@ -1,6 +1,7 @@
 
 #[allow(unused)]
 #[allow(non_camel_case_types)]
+#[derive(Clone)]
 pub struct {{ self.rust_ident() }} {
     {%- for field in self.fields()  %}
     pub {{ field.rust_ident() }}: {{ field.rust_field_type("::puroro::tags::SimpleImpl").unwrap() }},
@@ -9,5 +10,29 @@ pub struct {{ self.rust_ident() }} {
 
 impl ::puroro_internal::GetImplStruct for {{ self.message.rust_ident() }}::<::puroro::tags::SimpleImpl> {
     type Type = {{ self.rust_ident() }};
+}
+
+impl {{ self.message.rust_absolute_trait_path() }} for {{ self.rust_ident() }} {
+    {%- for field in self.message.fields() %}
+
+    {%- match field.field_type().unwrap().maybe_message().unwrap() %}
+    {%- when Some with (m) %}
+    type Field{{ field.number() }}MessageType<'this> = {{ m.rust_absolute_path() }}<::puroro::tags::SimpleImpl>;
+    {%- else %}
+    {%- endmatch %}
+
+    {%- if field.has_scalar_getter() %}
+    /// {{ field.rust_one_line_comment().unwrap() }}
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type().unwrap() }} {
+        todo!()
+    }
+    {%- endif %}
+    {%- if field.has_scalar_optional_getter() %}
+    /// {{ field.rust_one_line_comment().unwrap() }}
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}> {
+        todo!()
+    }
+    {%- endif %}
+    {%- endfor %}
 }
 

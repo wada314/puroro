@@ -7,6 +7,43 @@ where Self: ::puroro_internal::GetImplStruct;
 
 {# ################# Trait impls (delegate) ################# -#}
 
+impl<ImplTag> {{ self.message.rust_absolute_trait_path() }} for {{ self.message.rust_ident() }}<ImplTag>
+where
+    Self: ::puroro_internal::GetImplStruct,
+    <Self as ::puroro_internal::GetImplStruct>::Type: {{ self.message.rust_absolute_trait_path() }}
+{
+    {%- for field in message.fields() %}
+
+    {%- match field.field_type().unwrap().maybe_message().unwrap() %}
+    {%- when Some with (m) %}
+    type Field{{ field.number() }}MessageType<'this> = <
+        <Self as ::puroro_internal::GetImplStruct>::Type
+        as {{ self.message.rust_absolute_trait_path() }}
+    >::Field{{ field.number() }}MessageType::<'this>;
+    {%- else %}
+    {%- endmatch %}
+
+    {%- if field.has_scalar_getter() %}
+    /// {{ field.rust_one_line_comment().unwrap() }}
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type().unwrap() }} {
+        <
+            <Self as ::puroro_internal::GetImplStruct>::Type
+            as {{ self.message.rust_absolute_trait_path() }}
+        >::{{ field.rust_ident() }}(&self.0)
+    }
+    {%- endif %}
+    {%- if field.has_scalar_optional_getter() %}
+    /// {{ field.rust_one_line_comment().unwrap() }}
+    fn {{ field.rust_ident() }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type().unwrap() }}> {
+        <
+            <Self as ::puroro_internal::GetImplStruct>::Type
+            as {{ self.message.rust_absolute_trait_path() }}
+        >::{{ field.rust_ident() }}(&self.0)
+    }
+    {%- endif %}
+    {%- endfor %}
+}
+
 impl<ImplTag> ::std::ops::Deref for {{ self.message.rust_ident() }}<ImplTag>
 where Self: ::puroro_internal::GetImplStruct
 {
