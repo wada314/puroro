@@ -2,7 +2,10 @@
 {# ################# Struct body ################# -#}
 
 #[allow(unused)]
-pub struct {{ self.message.rust_ident() }}
-{
-    
-}
+pub struct {{ self.message.rust_ident() }}<ImplTag>(<Self as ::puroro_internal::GetImplStruct>::Type)
+where Self: ::puroro_internal::GetImplStruct;
+
+{# ################# impls ################# -#}
+
+{{ self.message|render_impl_simple }}
+

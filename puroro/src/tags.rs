@@ -230,3 +230,6 @@ impl FieldLabelTag for Required {
 }
 
 pub struct Map<X, K, V>(PhantomData<(X, K, V)>);
+
+pub struct SimpleImpl;
+impl ImplTypeTag for SimpleImpl {}

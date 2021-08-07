@@ -4,6 +4,7 @@
 #![allow(incomplete_features)]
 
 mod error;
+mod impls;
 #[allow(unused)]
 mod protos;
 mod utils;
@@ -24,7 +25,7 @@ pub use protos::google;
 use protos::google::protobuf::compiler::code_generator_response::File;
 use protos::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 
-use askama::Template;
+use ::askama::Template;
 
 fn make_package_to_subpackages_map(
     files: &Vec<google::protobuf::FileDescriptorProto>,
@@ -111,6 +112,13 @@ mod filters {
     }
     pub fn render_message(message: &Rc<wrappers::Message>) -> ::askama::Result<Message> {
         Ok(Message {
+            message: Clone::clone(message),
+        })
+    }
+    pub fn render_impl_simple(
+        message: &Rc<wrappers::Message>,
+    ) -> ::askama::Result<impls::SimpleImpl> {
+        Ok(impls::SimpleImpl {
             message: Clone::clone(message),
         })
     }

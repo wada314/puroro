@@ -8,13 +8,13 @@ pub mod puroro_structs {
     }
 
     {%- for message in self.messages %}
-    {{ message|render_message|indent(8) }}
+    {{ message|render_message|indent(4) }}
     {%- endfor %}
 
 } // mod puroro_structs
 
 {%- for message in self.messages %}
-pub type {{ message.rust_ident() }} = self::puroro_structs::{{ message.rust_ident() }};
+pub type {{ message.rust_ident() }}<ImplTag> = self::puroro_structs::{{ message.rust_ident() }}<ImplTag>;
 {%- endfor %}
 
 {#- ################ Traits ################ #}
