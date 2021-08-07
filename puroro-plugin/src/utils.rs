@@ -1,5 +1,9 @@
+use crate::{ErrorKind, Result};
+use ::itertools::Itertools;
 use ::lazy_static::lazy_static;
-use std::collections::HashSet;
+use ::std::collections::HashSet;
+use ::std::iter;
+use ::std::rc::{Rc, Weak};
 
 enum WordCase {
     CamelCase,
@@ -61,4 +65,30 @@ pub fn get_keyword_safe_ident(input: &str) -> String {
         s.push('_');
     }
     s
+}
+
+pub fn make_module_path<'a, I, J>(package: I, outer_messages: J) -> String
+where
+    I: Iterator<Item = &'a str>,
+    J: Iterator<Item = &'a str> + Clone,
+{
+    let package = package.map(|s| get_keyword_safe_ident(s));
+
+    let outer_messages = outer_messages.map(|s| {
+        format!(
+            "puroro_nested::{}",
+            get_keyword_safe_ident(&to_lower_snake_case(s))
+        )
+    });
+    let mut modules_iter = iter::once("self".to_string())
+        .chain(iter::once("puroro_root".to_string()))
+        .chain(package)
+        .chain(outer_messages);
+    modules_iter.join("::")
+}
+
+pub fn upgrade<T>(weak: &Weak<T>) -> Result<Rc<T>> {
+    Ok(Weak::upgrade(weak).ok_or(ErrorKind::InternalError {
+        detail: "Failed to upgrade a Weak<> pointer.".to_string(),
+    })?)
 }

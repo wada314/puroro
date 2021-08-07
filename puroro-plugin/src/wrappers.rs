@@ -4,7 +4,7 @@ use crate::protos::google::protobuf;
 use crate::protos::google::protobuf::field_descriptor_proto::{
     Label as FieldLabelProto, Type as FieldTypeProto,
 };
-use crate::utils;
+use crate::utils::*;
 use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
@@ -312,10 +312,8 @@ impl Message {
         let proto_enum_type = proto.enum_type;
         let message = Rc::new_cyclic(|message| Self {
             input_file: Clone::clone(&input_file),
-            rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
-            rust_nested_module_ident: utils::get_keyword_safe_ident(&utils::to_lower_snake_case(
-                &proto_name,
-            )),
+            rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)),
+            rust_nested_module_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name)),
             proto_name,
             package: package.clone(),
             outer_messages: outer_messages.clone(),
@@ -422,16 +420,14 @@ impl Enum {
         let proto_value = proto.value;
         Ok(Rc::new(Self {
             input_file: input_file,
-            rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(&proto_name)),
+            rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)),
             proto_name,
             package: package,
             outer_messages: outer_messages,
             values: proto_value
                 .into_iter()
                 .map(|v| EnumValue {
-                    rust_ident: utils::get_keyword_safe_ident(&utils::to_camel_case(
-                        &v.name.unwrap_or_default(),
-                    )),
+                    rust_ident: get_keyword_safe_ident(&to_camel_case(&v.name.unwrap_or_default())),
                     number: v.number.unwrap_or_default(),
                 })
                 .collect_vec(),
@@ -491,7 +487,7 @@ impl Field {
         let proto_number = proto.number.unwrap_or_default();
         Ok(Self {
             message: Clone::clone(&message),
-            rust_ident: utils::get_keyword_safe_ident(&utils::to_lower_snake_case(&proto_name)),
+            rust_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name)),
             proto_name,
             proto_type_name,
             proto_type_enum,
@@ -813,30 +809,4 @@ fn test_make_module_path() {
         "self::puroro_root::google::protobuf::compiler::puroro_nested::code_generator_response",
         make_module_path(package.clone(), outer_messages.clone())
     );
-}
-
-fn make_module_path<'a, I, J>(package: I, outer_messages: J) -> String
-where
-    I: Iterator<Item = &'a str>,
-    J: Iterator<Item = &'a str> + Clone,
-{
-    let package = package.map(|s| utils::get_keyword_safe_ident(s));
-
-    let outer_messages = outer_messages.map(|s| {
-        format!(
-            "puroro_nested::{}",
-            utils::get_keyword_safe_ident(&utils::to_lower_snake_case(s))
-        )
-    });
-    let mut modules_iter = iter::once("self".to_string())
-        .chain(iter::once("puroro_root".to_string()))
-        .chain(package)
-        .chain(outer_messages);
-    modules_iter.join("::")
-}
-
-fn upgrade<T>(weak: &Weak<T>) -> Result<Rc<T>> {
-    Ok(Weak::upgrade(weak).ok_or(ErrorKind::InternalError {
-        detail: "Failed to upgrade a Weak<> pointer.".to_string(),
-    })?)
 }

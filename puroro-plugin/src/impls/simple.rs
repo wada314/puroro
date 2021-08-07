@@ -1,3 +1,5 @@
+use crate::utils::*;
+use crate::wrappers::{FieldLabel, FieldType};
 use crate::{wrappers, ErrorKind, Result};
 use ::askama::Template;
 use ::std::rc::Rc;
@@ -37,14 +39,32 @@ impl Field {
     pub fn rust_ident(&self) -> &str {
         self.field.rust_ident()
     }
-    pub fn rust_field_type(&self) -> Result<String> {
+    pub fn rust_field_type(&self, impl_tag: &'static str) -> Result<String> {
         let scalar_type = match self.field.field_type()? {
-            wrappers::FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            wrappers::FieldType::String => todo!(),
-            wrappers::FieldType::Bytes => todo!(),
-            wrappers::FieldType::Enum(_) => todo!(),
-            wrappers::FieldType::Message(_) => todo!(),
-            t => t.numerical_rust_type()?,
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => "::std::string::String".to_string(),
+            FieldType::Bytes => "::std::vec::Vec<u8>".to_string(),
+            FieldType::Enum(e) => upgrade(&e)?.rust_absolute_path(),
+            FieldType::Message(m) => {
+                let bare_msg = format!(
+                    "{path}<{tag}>",
+                    path = upgrade(&m)?.rust_absolute_path(),
+                    tag = impl_tag
+                );
+                if matches!(self.field.field_label(), Ok(FieldLabel::Repeated)) {
+                    bare_msg
+                } else {
+                    format!("::std::boxed::Box<{}>", bare_msg)
+                }
+            }
+            t => t.numerical_rust_type()?.to_string(),
         };
+        Ok(match self.field.field_label()? {
+            FieldLabel::Required | FieldLabel::Optional => {
+                format!("::std::option::Option<{}>", scalar_type)
+            }
+            FieldLabel::Unlabeled => scalar_type,
+            FieldLabel::Repeated => format!("::std::vec::Vec<{}>", scalar_type),
+        })
     }
 }

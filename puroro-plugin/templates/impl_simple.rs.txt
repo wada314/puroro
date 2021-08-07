@@ -2,6 +2,9 @@
 #[allow(unused)]
 #[allow(non_camel_case_types)]
 pub struct {{ self.rust_ident() }} {
+    {%- for field in self.fields()  %}
+    pub {{ field.rust_ident() }}: {{ field.rust_field_type("::puroro::tags::SimpleImpl").unwrap() }},
+    {%- endfor %}
 }
 
 impl ::puroro_internal::GetImplStruct for {{ self.message.rust_ident() }}::<::puroro::tags::SimpleImpl> {
