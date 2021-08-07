@@ -118,9 +118,7 @@ mod filters {
     pub fn render_impl_simple(
         message: &Rc<wrappers::Message>,
     ) -> ::askama::Result<impls::SimpleImpl> {
-        Ok(impls::SimpleImpl {
-            message: Clone::clone(message),
-        })
+        Ok(impls::SimpleImpl::new(message))
     }
     pub fn render_trait(message: &Rc<wrappers::Message>) -> ::askama::Result<Trait> {
         Ok(Trait {

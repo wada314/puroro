@@ -5,6 +5,24 @@
 pub struct {{ self.message.rust_ident() }}<ImplTag>(<Self as ::puroro_internal::GetImplStruct>::Type)
 where Self: ::puroro_internal::GetImplStruct;
 
+{# ################# Trait impls (delegate) ################# -#}
+
+impl<ImplTag> ::std::ops::Deref for {{ self.message.rust_ident() }}<ImplTag>
+where Self: ::puroro_internal::GetImplStruct
+{
+    type Target = <Self as ::puroro_internal::GetImplStruct>::Type;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+impl<ImplTag> ::std::ops::DerefMut for {{ self.message.rust_ident() }}<ImplTag>
+where Self: ::puroro_internal::GetImplStruct
+{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
 {# ################# impls ################# -#}
 
 {{ self.message|render_impl_simple }}

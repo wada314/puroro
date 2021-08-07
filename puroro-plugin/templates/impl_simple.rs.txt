@@ -1,10 +1,10 @@
 
 #[allow(unused)]
 #[allow(non_camel_case_types)]
-pub struct {{ self.message.rust_ident() }}_SimpleImpl {   
+pub struct {{ self.rust_ident() }} {
 }
 
 impl ::puroro_internal::GetImplStruct for {{ self.message.rust_ident() }}::<::puroro::tags::SimpleImpl> {
-    type Type = {{ self.message.rust_ident() }}_SimpleImpl;
+    type Type = {{ self.rust_ident() }};
 }
 
