@@ -5,7 +5,14 @@
 pub struct {{ self.message.rust_ident() }}<ImplTag>(<Self as ::puroro_internal::GetImplStruct>::Type)
 where Self: ::puroro_internal::GetImplStruct;
 
-{# ################# Trait impls (delegate) ################# -#}
+{# ################# Trait impls (puroro traits) ################# -#}
+
+impl<ImplTag> ::puroro::Message for {{ self.message.rust_ident() }}<ImplTag>
+where
+    Self: ::puroro_internal::GetImplStruct,
+    <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro::Message
+{
+}
 
 impl<ImplTag> {{ self.message.rust_absolute_trait_path() }} for {{ self.message.rust_ident() }}<ImplTag>
 where
@@ -57,6 +64,21 @@ where
     {%- endif %}
     {%- endfor %}
 }
+
+impl<ImplTag> ::puroro::DeserFromBytesIter for {{ self.message.rust_ident() }}<ImplTag>
+where
+    Self: ::puroro_internal::GetImplStruct,
+    <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro::DeserFromBytesIter,
+{
+    fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+    where
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
+    {
+        <<Self as ::puroro_internal::GetImplStruct>::Type as ::puroro::DeserFromBytesIter>::deser(self, iter)
+    }
+}
+
+{# ################# Trait impls (std traits) ################# -#}
 
 impl<ImplTag> ::std::ops::Deref for {{ self.message.rust_ident() }}<ImplTag>
 where Self: ::puroro_internal::GetImplStruct

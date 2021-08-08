@@ -12,6 +12,8 @@ impl ::puroro_internal::GetImplStruct for {{ self.message.rust_ident() }}::<::pu
     type Type = {{ self.rust_ident() }};
 }
 
+impl ::puroro::Message for {{ self.rust_ident() }} {}
+
 impl {{ self.message.rust_absolute_trait_path() }} for {{ self.rust_ident() }} {
     {%- for field in self.fields() %}
 
@@ -57,5 +59,14 @@ impl {{ self.message.rust_absolute_trait_path() }} for {{ self.rust_ident() }} {
     }
     {%- endif %}
     {%- endfor %}
+}
+
+impl ::puroro::DeserFromBytesIter for {{ self.rust_ident() }} {
+    fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+    where
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
+    {
+        todo!()
+    }
 }
 
