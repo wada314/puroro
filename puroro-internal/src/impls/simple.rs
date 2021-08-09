@@ -1,6 +1,6 @@
-use ::itertools::Itertools;
+use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::types::FieldData;
-use ::puroro::variant::{Variant, VariantTypeTag};
+use ::puroro::variant::VariantTypeTag;
 use ::puroro::{tags, RepeatedField, Result};
 use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
@@ -63,38 +63,30 @@ impl<'msg, B> RepeatedField<'msg, Cow<'msg, B>> for VecCowWrapper<'msg, B> where
 
 // deser from iter methods
 
-pub trait MaybeOptional<T> {
-    fn set(&mut self, val: T);
-}
-impl<T> MaybeOptional<T> for Option<T> {
-    fn set(&mut self, val: T) {
-        *self = Some(val);
-    }
-}
-impl<T> MaybeOptional<T> for T {
-    fn set(&mut self, val: T) {
-        *self = val;
-    }
-}
-pub trait VecOrOption<T> {
+pub trait VecOrOptionOrBare<T> {
     fn push(&mut self, val: T);
 }
-impl<T> VecOrOption<T> for Option<T> {
+impl<T> VecOrOptionOrBare<T> for Option<T> {
     fn push(&mut self, val: T) {
         *self = Some(val);
     }
 }
-impl<T> VecOrOption<T> for Vec<T> {
+impl<T> VecOrOptionOrBare<T> for Vec<T> {
     fn push(&mut self, val: T) {
         self.push(val);
+    }
+}
+impl<T> VecOrOptionOrBare<T> for T {
+    fn push(&mut self, val: T) {
+        *self = val;
     }
 }
 
 pub struct DeserFieldFromBytesIter<L, V>(PhantomData<(L, V)>);
 
-impl<V, _1, _2>
-    DeserFieldFromBytesIter<tags::RepeatedOrOptionalOrRequired<_1, _2>, tags::wire::Variant<V>>
+impl<L, V> DeserFieldFromBytesIter<L, tags::wire::Variant<V>>
 where
+    L: tags::FieldLabelTag,
     V: VariantTypeTag,
 {
     pub fn deser_field<FieldType, I>(
@@ -102,18 +94,24 @@ where
         input: FieldData<ScopedIter<I>>,
     ) -> Result<()>
     where
-        FieldType: VecOrOption<<V as tags::NumericalTypeTag>::NativeType>,
+        FieldType: VecOrOptionOrBare<<V as tags::NumericalTypeTag>::NativeType>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         match input {
             FieldData::Variant(v) => {
-                field.push(v.to_native::<V>()?);
+                let native_value = v.to_native::<V>()?;
+                if !L::DO_DEFAULT_CHECK || native_value != Default::default() {
+                    field.push(native_value);
+                }
             }
             FieldData::LengthDelimited(iter) => {
                 let variants = Variants::new(iter);
                 let values = variants.map(|rv| rv.and_then(|v| v.to_native::<V>()));
-                for value in values {
-                    field.push(value?);
+                for rvalue in values {
+                    let native_value = rvalue?;
+                    if !L::DO_DEFAULT_CHECK || native_value != Default::default() {
+                        field.push(native_value);
+                    }
                 }
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
@@ -122,35 +120,51 @@ where
     }
 }
 
-impl<V> DeserFieldFromBytesIter<tags::Unlabeled, tags::wire::Variant<V>>
+impl<L, V> DeserFieldFromBytesIter<L, tags::wire::Bits32<V>>
 where
-    V: VariantTypeTag,
+    L: tags::FieldLabelTag,
+    V: Bits32TypeTag,
 {
     pub fn deser_field<FieldType, I>(
-        field: &mut <V as tags::NumericalTypeTag>::NativeType,
+        field: &mut FieldType,
         input: FieldData<ScopedIter<I>>,
     ) -> Result<()>
     where
+        FieldType: VecOrOptionOrBare<<V as tags::NumericalTypeTag>::NativeType>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
-        match input {
-            FieldData::Variant(v) => {
-                let native_value = v.to_native::<V>()?;
-                if native_value != Default::default() {
-                    *field = native_value;
-                }
+        if let FieldData::Bits32(bytes) = input {
+            let native_value = V::from_array(bytes);
+            if !L::DO_DEFAULT_CHECK || native_value != Default::default() {
+                field.push(native_value);
             }
-            FieldData::LengthDelimited(iter) => {
-                let variants = Variants::new(iter);
-                let native_values = variants.map(|rv| rv.and_then(|v| v.to_native::<V>()));
-                for rnative_value in native_values {
-                    let native_value = rnative_value?;
-                    if native_value != Default::default() {
-                        *field = native_value;
-                    }
-                }
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?;
+        }
+        Ok(())
+    }
+}
+
+impl<L, V> DeserFieldFromBytesIter<L, tags::wire::Bits64<V>>
+where
+    L: tags::FieldLabelTag,
+    V: Bits64TypeTag,
+{
+    pub fn deser_field<FieldType, I>(
+        field: &mut FieldType,
+        input: FieldData<ScopedIter<I>>,
+    ) -> Result<()>
+    where
+        FieldType: VecOrOptionOrBare<<V as tags::NumericalTypeTag>::NativeType>,
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        if let FieldData::Bits64(bytes) = input {
+            let native_value = V::from_array(bytes);
+            if !L::DO_DEFAULT_CHECK || native_value != Default::default() {
+                field.push(native_value);
             }
-            _ => Err(ErrorKind::UnexpectedWireType)?,
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?;
         }
         Ok(())
     }

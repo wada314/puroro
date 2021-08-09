@@ -19,9 +19,7 @@ pub trait NumericalTypeTag {
 /// A tag trait for types corresponding to the field label.
 /// e.g. Optional, Repeated, Required
 pub trait FieldLabelTag {
-    type IsRepeated: BoolTypes;
-    type IsOptionalScalar: BoolTypes;
-    type IsNonOptionalScalar: BoolTypes;
+    const DO_DEFAULT_CHECK: bool;
 }
 
 /// A tuple of (`ProtoSyntaxTag`, `FieldLabelTag`, `FieldTypeTag`).
@@ -173,24 +171,16 @@ impl<E: crate::Enum3> NumericalTypeTag for Enum3<E> {
 }
 
 impl FieldLabelTag for Repeated {
-    type IsRepeated = True;
-    type IsOptionalScalar = False;
-    type IsNonOptionalScalar = False;
+    const DO_DEFAULT_CHECK: bool = false;
 }
 impl FieldLabelTag for Optional {
-    type IsRepeated = False;
-    type IsOptionalScalar = True;
-    type IsNonOptionalScalar = False;
+    const DO_DEFAULT_CHECK: bool = false;
 }
 impl FieldLabelTag for Unlabeled {
-    type IsRepeated = False;
-    type IsOptionalScalar = False;
-    type IsNonOptionalScalar = True;
+    const DO_DEFAULT_CHECK: bool = true;
 }
 impl FieldLabelTag for Required {
-    type IsRepeated = False;
-    type IsOptionalScalar = True;
-    type IsNonOptionalScalar = False;
+    const DO_DEFAULT_CHECK: bool = false;
 }
 
 pub struct Map<X, K, V>(PhantomData<(X, K, V)>);
