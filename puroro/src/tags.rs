@@ -98,6 +98,7 @@ pub type MapEntry = (False, False, (False, False, True));
 // call for good idea instead of this :)
 pub type NonRepeated<_1, _2> = (False, _1, _2);
 pub type OptionalOrRequired<_1, _2> = (False, (_1, _2), False);
+pub type RepeatedOrOptionalOrRequired<_1, _2> = (_1, _2, False);
 pub type UnlabeledOrOneofOrMapEntry<_1, _2, _3> = (False, False, (_1, _2, _3));
 
 pub struct Proto2;

@@ -61,22 +61,48 @@ impl<'msg, B> RepeatedField<'msg, Cow<'msg, B>> for VecCowWrapper<'msg, B> where
 {
 }
 
-pub struct DeserFieldFromBytesIter<L, V, FieldType>(PhantomData<(L, V, FieldType)>);
+// deser from iter methods
 
-impl<V>
-    DeserFieldFromBytesIter<
-        tags::Repeated,
-        tags::wire::Variant<V>,
-        Vec<<V as tags::NumericalTypeTag>::NativeType>,
-    >
+pub trait MaybeOptional<T> {
+    fn set(&mut self, val: T);
+}
+impl<T> MaybeOptional<T> for Option<T> {
+    fn set(&mut self, val: T) {
+        *self = Some(val);
+    }
+}
+impl<T> MaybeOptional<T> for T {
+    fn set(&mut self, val: T) {
+        *self = val;
+    }
+}
+pub trait VecOrOption<T> {
+    fn push(&mut self, val: T);
+}
+impl<T> VecOrOption<T> for Option<T> {
+    fn push(&mut self, val: T) {
+        *self = Some(val);
+    }
+}
+impl<T> VecOrOption<T> for Vec<T> {
+    fn push(&mut self, val: T) {
+        self.push(val);
+    }
+}
+
+pub struct DeserFieldFromBytesIter<L, V>(PhantomData<(L, V)>);
+
+impl<V, _1, _2>
+    DeserFieldFromBytesIter<tags::RepeatedOrOptionalOrRequired<_1, _2>, tags::wire::Variant<V>>
 where
     V: VariantTypeTag,
 {
-    fn deser_field<I>(
-        field: &mut Vec<<V as tags::NumericalTypeTag>::NativeType>,
+    pub fn deser_field<FieldType, I>(
+        field: &mut FieldType,
         input: FieldData<ScopedIter<I>>,
     ) -> Result<()>
     where
+        FieldType: VecOrOption<<V as tags::NumericalTypeTag>::NativeType>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         match input {
@@ -88,6 +114,40 @@ where
                 let values = variants.map(|rv| rv.and_then(|v| v.to_native::<V>()));
                 for value in values {
                     field.push(value?);
+                }
+            }
+            _ => Err(ErrorKind::UnexpectedWireType)?,
+        }
+        Ok(())
+    }
+}
+
+impl<V> DeserFieldFromBytesIter<tags::Unlabeled, tags::wire::Variant<V>>
+where
+    V: VariantTypeTag,
+{
+    pub fn deser_field<FieldType, I>(
+        field: &mut <V as tags::NumericalTypeTag>::NativeType,
+        input: FieldData<ScopedIter<I>>,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        match input {
+            FieldData::Variant(v) => {
+                let native_value = v.to_native::<V>()?;
+                if native_value != Default::default() {
+                    *field = native_value;
+                }
+            }
+            FieldData::LengthDelimited(iter) => {
+                let variants = Variants::new(iter);
+                let native_values = variants.map(|rv| rv.and_then(|v| v.to_native::<V>()));
+                for rnative_value in native_values {
+                    let native_value = rnative_value?;
+                    if native_value != Default::default() {
+                        *field = native_value;
+                    }
                 }
             }
             _ => Err(ErrorKind::UnexpectedWireType)?,
