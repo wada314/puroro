@@ -440,6 +440,9 @@ impl Enum {
     pub fn proto_name(&self) -> &str {
         &self.proto_name
     }
+    pub fn syntax(&self) -> Result<ProtoSyntax> {
+        Ok(upgrade(&self.input_file)?.syntax())
+    }
     pub fn package(&self) -> &[String] {
         &self.package
     }

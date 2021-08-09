@@ -3,13 +3,27 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum {{ enume.rust_ident() }} {
     {%- for value in enume.values() %}
-    {{ value.rust_ident() }} = {{ value.number() }},
+    {{ value.rust_ident() }},
     {%- endfor %}
+
+    {%- match enume.syntax().unwrap() %}
+    {%- when wrappers::ProtoSyntax::Proto3 %}
+    _Unknown(i32),
+    {%- else %}
+    {%- endmatch %}
 }
 
-impl ::puroro::Enum for {{ enume.rust_ident() }} {
+{%- match enume.syntax().unwrap() %}
+{%- when wrappers::ProtoSyntax::Proto2 %}
+impl ::puroro::Enum2 for {{ enume.rust_ident() }} {
 }
+{%- when wrappers::ProtoSyntax::Proto3 %}
+impl ::puroro::Enum3 for {{ enume.rust_ident() }} {
+}
+{%- endmatch %}
 
+{%- match enume.syntax().unwrap() %}
+{%- when wrappers::ProtoSyntax::Proto2 %}
 impl ::std::convert::TryFrom<i32> for {{ enume.rust_ident() }} {
     type Error = i32;
     fn try_from(value: i32) -> ::std::result::Result<Self, i32> {
@@ -21,10 +35,32 @@ impl ::std::convert::TryFrom<i32> for {{ enume.rust_ident() }} {
         })
     }
 }
+{%- when wrappers::ProtoSyntax::Proto3 %}
+impl ::std::convert::From<i32> for {{ enume.rust_ident() }} {
+    fn from(value: i32) -> Self {
+        match value {
+            {%- for value in enume.values() %}
+            {{ value.number() }} => {{ enume.rust_ident() }}::{{ value.rust_ident() }},
+            {%- endfor %}
+            _ => {{ enume.rust_ident() }}::_Unknown(value),
+        }
+    }
+}
+{%- endmatch %}
 
 impl ::std::convert::From<{{ enume.rust_ident() }}> for i32 {
     fn from(value: {{ enume.rust_ident() }}) -> i32 {
-        value as i32
+        match value {
+            {%- for value in enume.values() %}
+            {{ enume.rust_ident() }}::{{ value.rust_ident() }} => {{ value.number() }},
+            {%- endfor %}
+            
+            {%- match enume.syntax().unwrap() %}
+            {%- when wrappers::ProtoSyntax::Proto3 %}
+            {{ enume.rust_ident() }}::_Unknown(ivalue) => ivalue,
+            {%- else %}
+            {%- endmatch %}
+        }
     }
 }
 
