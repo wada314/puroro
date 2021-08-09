@@ -1,5 +1,5 @@
 use crate::tags;
-use crate::{Enum, ErrorKind, Result};
+use crate::{Enum2, Enum3, ErrorKind, Result};
 use std::convert::TryFrom;
 use std::io::Result as IoResult;
 use std::io::Write;
@@ -72,20 +72,6 @@ impl Variant {
     pub fn from_native<T: VariantTypeTag>(val: T::NativeType) -> Result<Variant> {
         T::to_variant(val)
     }
-    pub fn to_enum<X, E>(&self) -> Result<X::NativeType<E>>
-    where
-        X: EnumVariantTypeForSyntax,
-        E: Enum,
-    {
-        X::from_variant(self)
-    }
-    pub fn from_enum<X, E>(val: X::NativeType<E>) -> Result<Variant>
-    where
-        X: EnumVariantTypeForSyntax,
-        E: Enum,
-    {
-        X::to_variant(val)
-    }
     /// A shortcut of `to_native::<tags::Int32>()`.
     pub fn to_i32(&self) -> Result<i32> {
         self.to_native::<tags::Int32>()
@@ -124,14 +110,6 @@ impl Variant {
 pub trait VariantTypeTag: tags::NumericalTypeTag {
     fn from_variant(var: &Variant) -> Result<Self::NativeType>;
     fn to_variant(val: Self::NativeType) -> Result<Variant>;
-}
-pub trait EnumVariantTypeForSyntax: tags::EnumTypeForSyntax {
-    fn from_variant<E: Enum>(
-        var: &Variant,
-    ) -> Result<<Self as tags::EnumTypeForSyntax>::NativeType<E>>;
-    fn to_variant<E: Enum>(
-        val: <Self as tags::EnumTypeForSyntax>::NativeType<E>,
-    ) -> Result<Variant>;
 }
 
 impl VariantTypeTag for tags::Int32 {
@@ -196,34 +174,23 @@ impl VariantTypeTag for tags::Bool {
     }
 }
 
-impl EnumVariantTypeForSyntax for tags::Proto2 {
-    fn from_variant<E: Enum>(
-        var: &Variant,
-    ) -> Result<<Self as tags::EnumTypeForSyntax>::NativeType<E>> {
+impl<E: Enum2> VariantTypeTag for tags::Enum2<E> {
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         let i: i32 = i32::try_from(i64::from_le_bytes(var.0))?;
         Ok(E::try_from(i).map_err(|_| ErrorKind::UnknownEnumVariant(i))?)
     }
-    fn to_variant<E: Enum>(
-        val: <Self as tags::EnumTypeForSyntax>::NativeType<E>,
-    ) -> Result<Variant> {
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
         let int_val: i32 = E::into(val);
         Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))
     }
 }
-impl EnumVariantTypeForSyntax for tags::Proto3 {
-    fn from_variant<E: Enum>(
-        var: &Variant,
-    ) -> Result<<Self as tags::EnumTypeForSyntax>::NativeType<E>> {
+impl<E: Enum3> VariantTypeTag for tags::Enum3<E> {
+    fn from_variant(var: &Variant) -> Result<Self::NativeType> {
         let i = i32::try_from(i64::from_le_bytes(var.0))?;
-        Ok(E::try_from(i).map_err(|_| i))
+        Ok(E::from(i))
     }
-    fn to_variant<E: Enum>(
-        val: <Self as tags::EnumTypeForSyntax>::NativeType<E>,
-    ) -> Result<Variant> {
-        let int_val = match val {
-            Ok(v) => E::into(v),
-            Err(i) => i,
-        };
+    fn to_variant(val: Self::NativeType) -> Result<Variant> {
+        let int_val: i32 = E::into(val);
         Ok(Variant::new(i64::to_le_bytes(i64::from(int_val))))
     }
 }

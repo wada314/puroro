@@ -1,4 +1,5 @@
-use ::puroro::RepeatedField;
+use ::puroro::variant::{Variant, VariantTypeTag};
+use ::puroro::{tags, RepeatedField, Result};
 use ::std::borrow::Cow;
 use std::borrow::Borrow;
 use std::marker::PhantomData;
@@ -53,4 +54,24 @@ where
 impl<'msg, B> RepeatedField<'msg, Cow<'msg, B>> for VecCowWrapper<'msg, B> where
     B: 'msg + ?Sized + ToOwned
 {
+}
+
+pub struct DeserFieldFromBytesIter<X, L, V, FieldType, StructInternal>(
+    PhantomData<(X, L, V, FieldType, StructInternal)>,
+);
+
+impl<X, V, StructInternal>
+    DeserFieldFromBytesIter<
+        X,
+        tags::Repeated,
+        tags::wire::Variant<V>,
+        Vec<<V as tags::NumericalTypeTag>::NativeType>,
+        StructInternal,
+    >
+where
+    V: VariantTypeTag,
+{
+    fn deser_field(field: &mut FieldType, internal_data: &mut StructInternal) -> Result<()> {
+        todo!()
+    }
 }

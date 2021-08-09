@@ -1,6 +1,4 @@
 use crate::bool::{BoolTypes, False, True};
-use ::std::borrow::Cow;
-use ::std::convert::TryFrom;
 use ::std::marker::PhantomData;
 
 /// A tag trait for types corresponding to the field's type.
@@ -16,19 +14,6 @@ pub trait ProtoSyntaxTag {}
 /// A `FieldTypeTag` which has wire type one of Variant (except enum), Bits32 or Bits64.
 pub trait NumericalTypeTag {
     type NativeType: 'static + Default + PartialEq + Clone;
-}
-
-/// A type tag except `Enum` and `Message`, which needs extra information to
-/// get the corresponding Rust type.
-pub trait SelfContainedTypeTag {
-    type ScalarTypeForTrait<'msg>: 'msg + Clone;
-}
-
-pub trait EnumTypeForSyntax {
-    type NativeType<E: crate::Enum>: PartialEq + Clone;
-    fn default<E>() -> Self::NativeType<E>
-    where
-        E: crate::Enum;
 }
 
 /// A tag trait for types corresponding to the field label.
@@ -48,6 +33,7 @@ pub trait FieldLabelAndTypeTag {}
 pub trait ImplTypeTag {}
 
 pub mod value {
+    use ::std::marker::PhantomData;
     pub struct Int32;
     pub struct UInt32;
     pub struct SInt32;
@@ -57,8 +43,9 @@ pub mod value {
     pub struct Bool;
     pub struct Bytes;
     pub struct String;
-    pub struct Enum;
-    pub struct Message;
+    pub struct Enum2<E>(PhantomData<E>);
+    pub struct Enum3<E>(PhantomData<E>);
+    pub struct Message<M>(PhantomData<M>);
     pub struct Float;
     pub struct Double;
     pub struct SFixed32;
@@ -93,8 +80,9 @@ pub type SFixed32 = wire::Bits32<value::SFixed32>;
 pub type Double = wire::Bits64<value::Double>;
 pub type Fixed64 = wire::Bits64<value::Fixed64>;
 pub type SFixed64 = wire::Bits64<value::SFixed64>;
-pub type Enum = wire::Variant<value::Enum>;
-pub type Message = wire::LengthDelimited<value::Message>;
+pub type Enum2<E> = wire::Variant<value::Enum2<E>>;
+pub type Enum3<E> = wire::Variant<value::Enum3<E>>;
+pub type Message<M> = wire::LengthDelimited<value::Message<M>>;
 
 /// A repeated field, which is available in both proto2 and proto3.
 pub type Repeated = (True, False, False);
@@ -124,8 +112,9 @@ impl FieldTypeTag for SInt64 {}
 impl FieldTypeTag for Bool {}
 impl FieldTypeTag for Bytes {}
 impl FieldTypeTag for String {}
-impl FieldTypeTag for Enum {}
-impl FieldTypeTag for Message {}
+impl<E> FieldTypeTag for Enum2<E> {}
+impl<E> FieldTypeTag for Enum3<E> {}
+impl<M> FieldTypeTag for Message<M> {}
 impl FieldTypeTag for Float {}
 impl FieldTypeTag for Double {}
 impl FieldTypeTag for Fixed32 {}
@@ -175,37 +164,11 @@ impl NumericalTypeTag for Double {
 impl NumericalTypeTag for Bool {
     type NativeType = bool;
 }
-
-impl<T> SelfContainedTypeTag for T
-where
-    T: NumericalTypeTag,
-{
-    type ScalarTypeForTrait<'this> = <T as NumericalTypeTag>::NativeType;
+impl<E: crate::Enum2> NumericalTypeTag for Enum2<E> {
+    type NativeType = E;
 }
-impl SelfContainedTypeTag for Bytes {
-    type ScalarTypeForTrait<'this> = Cow<'this, [u8]>;
-}
-impl SelfContainedTypeTag for String {
-    type ScalarTypeForTrait<'this> = Cow<'this, str>;
-}
-
-impl EnumTypeForSyntax for Proto2 {
-    type NativeType<E: crate::Enum> = E;
-    fn default<E>() -> Self::NativeType<E>
-    where
-        E: crate::Enum,
-    {
-        Default::default()
-    }
-}
-impl EnumTypeForSyntax for Proto3 {
-    type NativeType<E: crate::Enum> = ::std::result::Result<E, i32>;
-    fn default<E>() -> Self::NativeType<E>
-    where
-        E: crate::Enum,
-    {
-        <E as TryFrom<i32>>::try_from(0).map_err(|_| 0)
-    }
+impl<E: crate::Enum3> NumericalTypeTag for Enum3<E> {
+    type NativeType = E;
 }
 
 impl FieldLabelTag for Repeated {

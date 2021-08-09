@@ -21,7 +21,11 @@ pub use ::hashbrown;
 
 pub trait Message {}
 
-pub trait Enum: PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32> {}
+pub trait Enum2:
+    'static + PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32>
+{
+}
+pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {}
 
 pub trait RepeatedField<'msg, T>: IntoIterator<Item = T> {}
 
