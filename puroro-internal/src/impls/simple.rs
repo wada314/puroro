@@ -1,13 +1,14 @@
+use crate::de::from_iter::{ScopedIter, Variants};
+use crate::de::DeserFieldsFromBytesIter;
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::types::FieldData;
 use ::puroro::variant::VariantTypeTag;
 use ::puroro::{tags, RepeatedField, Result};
+use ::puroro::{ErrorKind, Message};
 use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
 use ::std::marker::PhantomData;
-use puroro::ErrorKind;
-
-use crate::de::from_iter::{ScopedIter, Variants};
+use std::ops::DerefMut;
 
 pub struct VecWrapper<'msg, T>(&'msg Vec<T>);
 
@@ -183,7 +184,72 @@ where
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(iter) = input {
-            todo!()
+            let string = String::from_utf8(iter.collect::<::std::io::Result<Vec<_>>>()?)
+                .map_err(|e| ErrorKind::InvalidUtf8(e))?;
+            if !L::DO_DEFAULT_CHECK || !string.is_empty() {
+                field.push(string);
+            }
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?;
+        }
+        Ok(())
+    }
+}
+
+impl<L> DeserFieldFromBytesIter<L, tags::Bytes>
+where
+    L: tags::FieldLabelTag,
+{
+    pub fn deser_field<FieldType, I>(
+        field: &mut FieldType,
+        input: FieldData<ScopedIter<I>>,
+    ) -> Result<()>
+    where
+        FieldType: VecOrOptionOrBare<Vec<u8>>,
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        if let FieldData::LengthDelimited(iter) = input {
+            let bytes = iter.collect::<::std::io::Result<Vec<_>>>()?;
+            if !L::DO_DEFAULT_CHECK || !bytes.is_empty() {
+                field.push(bytes);
+            }
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?;
+        }
+        Ok(())
+    }
+}
+
+impl<M, _1, _2> DeserFieldFromBytesIter<tags::NonRepeated<_1, _2>, tags::Message<M>>
+where
+    M: Message + DeserFieldsFromBytesIter + Default,
+{
+    pub fn deser_field<I>(field: &mut Option<Box<M>>, input: FieldData<ScopedIter<I>>) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        if let FieldData::LengthDelimited(mut iter) = input {
+            let msg = field.get_or_insert_with(Default::default);
+            crate::de::from_iter::deser_from_scoped_iter(msg.deref_mut(), &mut iter)?;
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?;
+        }
+        Ok(())
+    }
+}
+
+impl<M> DeserFieldFromBytesIter<tags::Repeated, tags::Message<M>>
+where
+    M: Message + DeserFieldsFromBytesIter + Default,
+{
+    pub fn deser_field<I>(field: &mut Vec<M>, input: FieldData<ScopedIter<I>>) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        if let FieldData::LengthDelimited(mut iter) = input {
+            field.push(Default::default());
+            let msg = field.last_mut().unwrap();
+            crate::de::from_iter::deser_from_scoped_iter(msg, &mut iter)?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?;
         }
