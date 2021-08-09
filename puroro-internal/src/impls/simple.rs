@@ -169,3 +169,24 @@ where
         Ok(())
     }
 }
+
+impl<L> DeserFieldFromBytesIter<L, tags::String>
+where
+    L: tags::FieldLabelTag,
+{
+    pub fn deser_field<FieldType, I>(
+        field: &mut FieldType,
+        input: FieldData<ScopedIter<I>>,
+    ) -> Result<()>
+    where
+        FieldType: VecOrOptionOrBare<String>,
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        if let FieldData::LengthDelimited(iter) = input {
+            todo!()
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?;
+        }
+        Ok(())
+    }
+}
