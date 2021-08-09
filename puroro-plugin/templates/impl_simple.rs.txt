@@ -66,7 +66,7 @@ impl ::puroro::DeserFromBytesIter for {{ self.rust_ident() }} {
     where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
     {
-        todo!()
+        ::puroro_internal::de::deser_from_iter(self, iter)
     }
 }
 
