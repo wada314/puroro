@@ -1,8 +1,13 @@
+use ::itertools::Itertools;
+use ::puroro::types::FieldData;
 use ::puroro::variant::{Variant, VariantTypeTag};
 use ::puroro::{tags, RepeatedField, Result};
+use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
-use std::borrow::Borrow;
-use std::marker::PhantomData;
+use ::std::marker::PhantomData;
+use puroro::ErrorKind;
+
+use crate::de::from_iter::{ScopedIter, Variants};
 
 pub struct VecWrapper<'msg, T>(&'msg Vec<T>);
 
@@ -56,22 +61,37 @@ impl<'msg, B> RepeatedField<'msg, Cow<'msg, B>> for VecCowWrapper<'msg, B> where
 {
 }
 
-pub struct DeserFieldFromBytesIter<X, L, V, FieldType, StructInternal>(
-    PhantomData<(X, L, V, FieldType, StructInternal)>,
-);
+pub struct DeserFieldFromBytesIter<L, V, FieldType>(PhantomData<(L, V, FieldType)>);
 
-impl<X, V, StructInternal>
+impl<V>
     DeserFieldFromBytesIter<
-        X,
         tags::Repeated,
         tags::wire::Variant<V>,
         Vec<<V as tags::NumericalTypeTag>::NativeType>,
-        StructInternal,
     >
 where
     V: VariantTypeTag,
 {
-    fn deser_field(field: &mut FieldType, internal_data: &mut StructInternal) -> Result<()> {
-        todo!()
+    fn deser_field<I>(
+        field: &mut Vec<<V as tags::NumericalTypeTag>::NativeType>,
+        input: FieldData<ScopedIter<I>>,
+    ) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        match input {
+            FieldData::Variant(v) => {
+                field.push(v.to_native::<V>()?);
+            }
+            FieldData::LengthDelimited(iter) => {
+                let variants = Variants::new(iter);
+                let values = variants.map(|rv| rv.and_then(|v| v.to_native::<V>()));
+                for value in values {
+                    field.push(value?);
+                }
+            }
+            _ => Err(ErrorKind::UnexpectedWireType)?,
+        }
+        Ok(())
     }
 }
