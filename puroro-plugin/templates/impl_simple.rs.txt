@@ -1,7 +1,7 @@
 
 #[allow(unused)]
 #[allow(non_camel_case_types)]
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct {{ self.rust_ident() }} {
     {%- for field in self.fields()  %}
     pub {{ field.rust_ident() }}: {{ field.rust_field_type("::puroro::tags::SimpleImpl").unwrap() }},
@@ -80,8 +80,12 @@ impl ::puroro_internal::de::DeserFieldsFromBytesIter for {{ self.rust_ident() }}
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
     {
         match field_number {
+            {%- for field in self.fields() %}
+            {{ field.number() }} => ::puroro_internal::impls::simple::DeserFieldFromBytesIter::<
+                {{ field.rust_label_and_type_tags("::puroro::tags::", "SimpleImpl").unwrap() }}
+            >::deser_field(&mut self.{{ field.rust_ident() }}, data),
+            {%- endfor %}
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
-        todo!()
     }
 }

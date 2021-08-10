@@ -48,15 +48,8 @@ impl Field {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "::std::string::String".to_string(),
             FieldType::Bytes => "::std::vec::Vec<u8>".to_string(),
-            FieldType::Enum(e) => {
-                let bare_enum = upgrade(&e)?.rust_absolute_path();
-                match self.field.message()?.input_file()?.syntax() {
-                    wrappers::ProtoSyntax::Proto2 => bare_enum,
-                    wrappers::ProtoSyntax::Proto3 => {
-                        format!("::std::result::Result<{}, i32>", bare_enum)
-                    }
-                }
-            }
+            FieldType::Enum2(e) => upgrade(&e)?.rust_absolute_path(),
+            FieldType::Enum3(e) => upgrade(&e)?.rust_absolute_path(),
             FieldType::Message(m) => {
                 let bare_msg = format!(
                     "{path}<{tag}>",
@@ -75,7 +68,13 @@ impl Field {
             FieldLabel::Required | FieldLabel::Optional => {
                 format!("::std::option::Option<{}>", scalar_type)
             }
-            FieldLabel::Unlabeled => scalar_type,
+            FieldLabel::Unlabeled => {
+                if matches!(self.field.field_type(), Ok(FieldType::Message(_))) {
+                    format!("::std::option::Option<{}>", scalar_type)
+                } else {
+                    scalar_type
+                }
+            }
             FieldLabel::Repeated => format!("::std::vec::Vec<{}>", scalar_type),
         })
     }

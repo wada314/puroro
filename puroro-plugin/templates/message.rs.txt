@@ -77,6 +77,22 @@ where
         <<Self as ::puroro_internal::GetImplStruct>::Type as ::puroro::DeserFromBytesIter>::deser(self, iter)
     }
 }
+impl<ImplTag> ::puroro_internal::de::DeserFieldsFromBytesIter for {{ self.message.rust_ident() }}<ImplTag>
+where
+    Self: ::puroro_internal::GetImplStruct,
+    <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro_internal::de::DeserFieldsFromBytesIter,
+{
+    fn deser_field<I>(
+        &mut self,
+        field_number: i32,
+        data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
+    ) -> ::puroro::Result<()>
+    where
+        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
+    {
+        ::puroro_internal::de::DeserFieldsFromBytesIter::deser_field(&mut self.0, field_number, data)
+    }
+}
 
 {# ################# Trait impls (std traits) ################# -#}
 
@@ -102,6 +118,15 @@ where
 {
     fn clone(&self) -> Self {
         Self(self.0.clone())
+    }
+}
+impl<ImplTag> ::std::default::Default for {{ self.message.rust_ident() }}<ImplTag>
+where 
+    Self: ::puroro_internal::GetImplStruct,
+    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::default::Default,
+{
+    fn default() -> Self {
+        Self(::std::default::Default::default())
     }
 }
 

@@ -100,7 +100,8 @@ pub enum FieldType {
     Group,
     String,
     Bytes,
-    Enum(Weak<Enum>),
+    Enum2(Weak<Enum>),
+    Enum3(Weak<Enum>),
     Message(Weak<Message>),
 }
 // Do not cache this type! This type contains a strong `Rc` ponter
@@ -543,20 +544,17 @@ impl Field {
         self.number
     }
 
-    pub fn syntax_and_label_and_type_tags(&self) -> Result<String> {
+    pub fn rust_label_and_type_tags(&self, modules: &str, impl_tag_ident: &str) -> Result<String> {
+        let impl_tag = format!(
+            "{modules}{impl_tag_ident}",
+            modules = modules,
+            impl_tag_ident = impl_tag_ident
+        );
         Ok(format!(
-            "::puroro::tags::{syntax}, ::puroro::tags::{label}, \
-                ::puroro::tags::{vtype}",
-            syntax = self.message()?.input_file()?.syntax().tag_ident(),
-            label = self.field_label()?.tag_ident(),
-            vtype = self.field_type()?.tag_ident()?
-        ))
-    }
-    pub fn syntax_and_label_tags(&self) -> Result<String> {
-        Ok(format!(
-            "::puroro::tags::{syntax}, ::puroro::tags::{label}",
-            syntax = self.message()?.input_file()?.syntax().tag_ident(),
-            label = self.field_label()?.tag_ident(),
+            "{modules}{label_tag}, {modules}{type_tag}",
+            modules = modules,
+            label_tag = self.field_label()?.tag_ident(),
+            type_tag = self.field_type()?.tag_ident_and_gp(&impl_tag)?,
         ))
     }
 
@@ -593,13 +591,8 @@ impl Field {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "::std::borrow::Cow<'this, str>".to_string(),
             FieldType::Bytes => "::std::borrow::Cow<'this, [u8]>".to_string(),
-            FieldType::Enum(e) => match self.message()?.input_file()?.syntax() {
-                ProtoSyntax::Proto2 => upgrade(&e)?.rust_absolute_path(),
-                ProtoSyntax::Proto3 => format!(
-                    "::std::result::Result<{}, i32>",
-                    upgrade(&e)?.rust_absolute_path()
-                ),
-            },
+            FieldType::Enum2(e) => upgrade(&e)?.rust_absolute_path(),
+            FieldType::Enum3(e) => upgrade(&e)?.rust_absolute_path(),
             FieldType::Message(m) => format!(
                 "::std::borrow::Cow<\
                     'this, Self::Field{number}MessageType<'this>\
@@ -664,7 +657,8 @@ impl FieldType {
         proto_type_enum: &FieldTypeProto,
         proto_type_name: &str,
     ) -> Result<Self> {
-        let context = upgrade(&message)?.input_file()?.context()?;
+        let input_file = upgrade(&message)?.input_file()?;
+        let context = input_file.context()?;
         Ok(match proto_type_enum {
             FieldTypeProto::TypeDouble => FieldType::Double,
             FieldTypeProto::TypeFloat => FieldType::Float,
@@ -685,7 +679,10 @@ impl FieldType {
             FieldTypeProto::TypeBytes => FieldType::Bytes,
             FieldTypeProto::TypeUint32 => FieldType::UInt32,
             FieldTypeProto::TypeEnum => match context.get_type_from_fqtn(&proto_type_name) {
-                Some(MessageOrEnum::Enum(e)) => FieldType::Enum(Rc::downgrade(e)),
+                Some(MessageOrEnum::Enum(e)) => match input_file.syntax() {
+                    ProtoSyntax::Proto2 => FieldType::Enum2(Rc::downgrade(e)),
+                    ProtoSyntax::Proto3 => FieldType::Enum3(Rc::downgrade(e)),
+                },
                 _ => Err(ErrorKind::UnknownTypeName {
                     name: proto_type_name.to_string(),
                 })?,
@@ -697,13 +694,6 @@ impl FieldType {
         })
     }
 
-    pub fn maybe_enum_or_message(&self) -> Result<MaybeEnumOrMessage> {
-        Ok(match self {
-            FieldType::Enum(e) => MaybeEnumOrMessage::Enum(upgrade(e)?),
-            FieldType::Message(m) => MaybeEnumOrMessage::Message(upgrade(m)?),
-            _ => MaybeEnumOrMessage::Others,
-        })
-    }
     pub fn maybe_message(&self) -> Result<Option<Rc<Message>>> {
         Ok(if let FieldType::Message(m) = self {
             Some(upgrade(m)?)
@@ -715,26 +705,31 @@ impl FieldType {
         matches!(self, FieldType::Message(_))
     }
 
-    pub fn tag_ident(&self) -> Result<&'static str> {
-        Ok(match *self {
-            FieldType::Double => "Double",
-            FieldType::Float => "Float",
-            FieldType::Int32 => "Int32",
-            FieldType::Int64 => "Int64",
-            FieldType::UInt32 => "UInt32",
-            FieldType::UInt64 => "UInt64",
-            FieldType::SInt32 => "SInt32",
-            FieldType::SInt64 => "SInt64",
-            FieldType::Fixed32 => "Fixed32",
-            FieldType::Fixed64 => "Fixed64",
-            FieldType::SFixed32 => "SFixed32",
-            FieldType::SFixed64 => "SFixed64",
-            FieldType::Bool => "Bool",
+    pub fn tag_ident_and_gp(&self, impl_tag: &str) -> Result<String> {
+        Ok(match self {
+            FieldType::Double => "Double".to_string(),
+            FieldType::Float => "Float".to_string(),
+            FieldType::Int32 => "Int32".to_string(),
+            FieldType::Int64 => "Int64".to_string(),
+            FieldType::UInt32 => "UInt32".to_string(),
+            FieldType::UInt64 => "UInt64".to_string(),
+            FieldType::SInt32 => "SInt32".to_string(),
+            FieldType::SInt64 => "SInt64".to_string(),
+            FieldType::Fixed32 => "Fixed32".to_string(),
+            FieldType::Fixed64 => "Fixed64".to_string(),
+            FieldType::SFixed32 => "SFixed32".to_string(),
+            FieldType::SFixed64 => "SFixed64".to_string(),
+            FieldType::Bool => "Bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => "String",
-            FieldType::Bytes => "Bytes",
-            FieldType::Enum(_) => "Enum",
-            FieldType::Message(_) => "Message",
+            FieldType::String => "String".to_string(),
+            FieldType::Bytes => "Bytes".to_string().to_string(),
+            FieldType::Enum2(e) => format!("Enum2<{}>", upgrade(e)?.rust_absolute_path()),
+            FieldType::Enum3(e) => format!("Enum3<{}>", upgrade(e)?.rust_absolute_path()),
+            FieldType::Message(m) => format!(
+                "Message<{path}<{tag}>>",
+                path = upgrade(m)?.rust_absolute_path(),
+                tag = impl_tag
+            ),
         })
     }
 
@@ -777,7 +772,8 @@ impl FieldType {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "string".to_string(),
             FieldType::Bytes => "bytes".to_string(),
-            FieldType::Enum(e) => upgrade(e)?.proto_name().to_string(),
+            FieldType::Enum2(e) => upgrade(e)?.proto_name().to_string(),
+            FieldType::Enum3(e) => upgrade(e)?.proto_name().to_string(),
             FieldType::Message(m) => upgrade(m)?.proto_name().to_string(),
         })
     }

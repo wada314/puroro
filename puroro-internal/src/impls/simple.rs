@@ -88,26 +88,28 @@ pub struct DeserFieldFromBytesIter<L, V>(PhantomData<(L, V)>);
 impl<L, V> DeserFieldFromBytesIter<L, tags::wire::Variant<V>>
 where
     L: tags::FieldLabelTag,
-    V: VariantTypeTag,
+    tags::wire::Variant<V>: VariantTypeTag,
 {
     pub fn deser_field<FieldType, I>(
         field: &mut FieldType,
-        input: FieldData<ScopedIter<I>>,
+        input: FieldData<&mut ScopedIter<I>>,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<<V as tags::NumericalTypeTag>::NativeType>,
+        FieldType:
+            VecOrOptionOrBare<<tags::wire::Variant<V> as tags::NumericalTypeTag>::NativeType>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         match input {
             FieldData::Variant(v) => {
-                let native_value = v.to_native::<V>()?;
+                let native_value = v.to_native::<tags::wire::Variant<V>>()?;
                 if !L::DO_DEFAULT_CHECK || native_value != Default::default() {
                     field.push(native_value);
                 }
             }
             FieldData::LengthDelimited(iter) => {
                 let variants = Variants::new(iter);
-                let values = variants.map(|rv| rv.and_then(|v| v.to_native::<V>()));
+                let values =
+                    variants.map(|rv| rv.and_then(|v| v.to_native::<tags::wire::Variant<V>>()));
                 for rvalue in values {
                     let native_value = rvalue?;
                     if !L::DO_DEFAULT_CHECK || native_value != Default::default() {
@@ -124,18 +126,18 @@ where
 impl<L, V> DeserFieldFromBytesIter<L, tags::wire::Bits32<V>>
 where
     L: tags::FieldLabelTag,
-    V: Bits32TypeTag,
+    tags::wire::Bits32<V>: Bits32TypeTag,
 {
     pub fn deser_field<FieldType, I>(
         field: &mut FieldType,
-        input: FieldData<ScopedIter<I>>,
+        input: FieldData<&mut ScopedIter<I>>,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<<V as tags::NumericalTypeTag>::NativeType>,
+        FieldType: VecOrOptionOrBare<<tags::wire::Bits32<V> as tags::NumericalTypeTag>::NativeType>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::Bits32(bytes) = input {
-            let native_value = V::from_array(bytes);
+            let native_value = tags::wire::Bits32::<V>::from_array(bytes);
             if !L::DO_DEFAULT_CHECK || native_value != Default::default() {
                 field.push(native_value);
             }
@@ -149,18 +151,18 @@ where
 impl<L, V> DeserFieldFromBytesIter<L, tags::wire::Bits64<V>>
 where
     L: tags::FieldLabelTag,
-    V: Bits64TypeTag,
+    tags::wire::Bits64<V>: Bits64TypeTag,
 {
     pub fn deser_field<FieldType, I>(
         field: &mut FieldType,
-        input: FieldData<ScopedIter<I>>,
+        input: FieldData<&mut ScopedIter<I>>,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<<V as tags::NumericalTypeTag>::NativeType>,
+        FieldType: VecOrOptionOrBare<<tags::wire::Bits64<V> as tags::NumericalTypeTag>::NativeType>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::Bits64(bytes) = input {
-            let native_value = V::from_array(bytes);
+            let native_value = tags::wire::Bits64::<V>::from_array(bytes);
             if !L::DO_DEFAULT_CHECK || native_value != Default::default() {
                 field.push(native_value);
             }
@@ -177,7 +179,7 @@ where
 {
     pub fn deser_field<FieldType, I>(
         field: &mut FieldType,
-        input: FieldData<ScopedIter<I>>,
+        input: FieldData<&mut ScopedIter<I>>,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<String>,
@@ -202,7 +204,7 @@ where
 {
     pub fn deser_field<FieldType, I>(
         field: &mut FieldType,
-        input: FieldData<ScopedIter<I>>,
+        input: FieldData<&mut ScopedIter<I>>,
     ) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<Vec<u8>>,
@@ -224,7 +226,10 @@ impl<M, _1, _2> DeserFieldFromBytesIter<tags::NonRepeated<_1, _2>, tags::Message
 where
     M: Message + DeserFieldsFromBytesIter + Default,
 {
-    pub fn deser_field<I>(field: &mut Option<Box<M>>, input: FieldData<ScopedIter<I>>) -> Result<()>
+    pub fn deser_field<I>(
+        field: &mut Option<Box<M>>,
+        input: FieldData<&mut ScopedIter<I>>,
+    ) -> Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
@@ -242,7 +247,7 @@ impl<M> DeserFieldFromBytesIter<tags::Repeated, tags::Message<M>>
 where
     M: Message + DeserFieldsFromBytesIter + Default,
 {
-    pub fn deser_field<I>(field: &mut Vec<M>, input: FieldData<ScopedIter<I>>) -> Result<()>
+    pub fn deser_field<I>(field: &mut Vec<M>, input: FieldData<&mut ScopedIter<I>>) -> Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
