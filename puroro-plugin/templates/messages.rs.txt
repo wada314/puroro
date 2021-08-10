@@ -14,7 +14,7 @@ pub mod puroro_structs {
 } // mod puroro_structs
 
 {%- for message in self.messages %}
-pub type {{ message.rust_ident() }}<ImplTag> = self::puroro_structs::{{ message.rust_ident() }}<ImplTag>;
+pub type {{ message.rust_ident() }}<ImplTag = ::puroro::tags::SimpleImpl> = self::puroro_structs::{{ message.rust_ident() }}<ImplTag>;
 {%- endfor %}
 
 {#- ################ Traits ################ #}

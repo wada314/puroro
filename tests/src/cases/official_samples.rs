@@ -37,7 +37,7 @@ fn test3_simple() {
     let mut t3 = <tests_pb::official_samples::Test3 as Default>::default();
     t3.deser(TEST3_INPUT.bytes()).unwrap();
     assert!(t3.c.is_some());
-    assert_eq!(Some(TEST3_EXPECTED), t3.c.unwrap().a);
+    assert_eq!(Some(TEST3_EXPECTED), t3.c.as_ref().unwrap().a);
 }
 
 #[test]

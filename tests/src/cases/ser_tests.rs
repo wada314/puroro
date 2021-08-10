@@ -2,7 +2,6 @@ use crate::tests_pb::ser_tests::msg::Submsg;
 use crate::tests_pb::ser_tests::{Enum, Msg};
 use ::puroro::DeserFromBytesIter;
 use ::puroro::SerToIoWrite;
-use ::puroro_internal::SimpleImpl;
 
 #[test]
 fn test_empty() {

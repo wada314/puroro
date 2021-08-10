@@ -2,7 +2,7 @@ use crate::tests_pb::self_recursive::Msg;
 
 #[test]
 fn test_new() {
-    //let msg = Msg::default();
+    let msg = Msg::default();
     let msg: Msg;
 }
 

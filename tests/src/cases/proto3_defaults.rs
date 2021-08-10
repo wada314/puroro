@@ -120,5 +120,5 @@ fn test_message_unlabeled() {
 
     msg.deser(INPUT_FIELDS6_MSG_FIELD1_I32_ONE.bytes()).unwrap();
     assert!(msg.submsg_unlabeled.as_ref().is_some());
-    assert_eq!(1, msg.submsg_unlabeled.unwrap().i32_unlabeled);
+    assert_eq!(1, msg.submsg_unlabeled.as_ref().unwrap().i32_unlabeled);
 }
