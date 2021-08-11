@@ -94,6 +94,19 @@ where
     }
 }
 
+impl<ImplTag> ::puroro::SerToIoWrite for {{ self.message.rust_ident() }}<ImplTag>
+where
+    Self: ::puroro_internal::GetImplStruct,
+    <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro::SerToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    where
+        W: ::std::io::Write
+    {
+        ::puroro::SerToIoWrite::ser(&self.0, out)
+    }
+}
+
 {# ################# Trait impls (std traits) ################# -#}
 
 impl<ImplTag> ::std::ops::Deref for {{ self.message.rust_ident() }}<ImplTag>

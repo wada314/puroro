@@ -89,3 +89,12 @@ impl ::puroro_internal::de::DeserFieldsFromBytesIter for {{ self.rust_ident() }}
         }
     }
 }
+
+impl ::puroro::SerToIoWrite for {{ self.rust_ident() }} {
+    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+    where
+        W: ::std::io::Write
+    {
+        todo!()
+    }
+}
