@@ -1,14 +1,16 @@
 use crate::de::from_iter::{ScopedIter, Variants};
 use crate::de::DeserFieldsFromBytesIter;
+use crate::se::to_io_write::write_field_number_and_wire_type;
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::types::FieldData;
+use ::puroro::types::WireType;
 use ::puroro::variant::VariantTypeTag;
 use ::puroro::{tags, RepeatedField, Result};
 use ::puroro::{ErrorKind, Message};
 use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
 use ::std::marker::PhantomData;
-use std::ops::DerefMut;
+use ::std::ops::DerefMut;
 
 pub struct VecWrapper<'msg, T>(&'msg Vec<T>);
 
@@ -66,20 +68,45 @@ impl<'msg, B> RepeatedField<'msg, Cow<'msg, B>> for VecCowWrapper<'msg, B> where
 
 pub trait VecOrOptionOrBare<T> {
     fn push(&mut self, val: T);
+    type Iter<'a>: Iterator<Item = &'a T>
+    where
+        T: 'a;
+    fn iter(&self) -> Self::Iter<'_>;
 }
 impl<T> VecOrOptionOrBare<T> for Option<T> {
     fn push(&mut self, val: T) {
         *self = Some(val);
+    }
+    type Iter<'a>
+    where
+        T: 'a,
+    = ::std::option::Iter<'a, T>;
+    fn iter(&self) -> Self::Iter<'_> {
+        Option::iter(self)
     }
 }
 impl<T> VecOrOptionOrBare<T> for Vec<T> {
     fn push(&mut self, val: T) {
         self.push(val);
     }
+    type Iter<'a>
+    where
+        T: 'a,
+    = ::std::slice::Iter<'a, T>;
+    fn iter(&self) -> Self::Iter<'_> {
+        Vec::iter(self)
+    }
 }
 impl<T> VecOrOptionOrBare<T> for T {
     fn push(&mut self, val: T) {
         *self = val;
+    }
+    type Iter<'a>
+    where
+        T: 'a,
+    = ::std::iter::Once<&'a T>;
+    fn iter(&self) -> Self::Iter<'_> {
+        ::std::iter::once(self)
     }
 }
 
@@ -257,6 +284,67 @@ where
             crate::de::from_iter::deser_from_scoped_iter(msg, &mut iter)?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?;
+        }
+        Ok(())
+    }
+}
+
+pub struct SerFieldToIoWrite<L, V>(PhantomData<(L, V)>);
+
+impl<V, _1, _2> SerFieldToIoWrite<tags::NonRepeated<_1, _2>, tags::wire::Variant<V>>
+where
+    tags::NonRepeated<_1, _2>: tags::FieldLabelTag,
+    tags::wire::Variant<V>: VariantTypeTag,
+{
+    pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
+    where
+        FieldType:
+            VecOrOptionOrBare<<tags::wire::Variant<V> as tags::NumericalTypeTag>::NativeType>,
+        W: ::std::io::Write,
+    {
+        for item in field.iter() {
+            write_field_number_and_wire_type(out, number, WireType::Variant);
+            out.write(&tags::wire::Bits32::<V>::into_array(item.clone()))?;
+        }
+        Ok(())
+    }
+}
+
+impl<L, V> SerFieldToIoWrite<L, tags::wire::Bits32<V>>
+where
+    L: tags::FieldLabelTag,
+    tags::wire::Bits32<V>: Bits32TypeTag,
+{
+    pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
+    where
+        FieldType: VecOrOptionOrBare<<tags::wire::Bits32<V> as tags::NumericalTypeTag>::NativeType>,
+        W: ::std::io::Write,
+    {
+        for item in field.iter() {
+            if !L::DO_DEFAULT_CHECK || item.clone() != Default::default() {
+                write_field_number_and_wire_type(out, number, WireType::Bits32);
+                out.write(&tags::wire::Bits32::<V>::into_array(item.clone()))?;
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<L, V> SerFieldToIoWrite<L, tags::wire::Bits64<V>>
+where
+    L: tags::FieldLabelTag,
+    tags::wire::Bits64<V>: Bits64TypeTag,
+{
+    pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
+    where
+        FieldType: VecOrOptionOrBare<<tags::wire::Bits64<V> as tags::NumericalTypeTag>::NativeType>,
+        W: ::std::io::Write,
+    {
+        for item in field.iter() {
+            if !L::DO_DEFAULT_CHECK || item.clone() != Default::default() {
+                write_field_number_and_wire_type(out, number, WireType::Bits64);
+                out.write(&tags::wire::Bits64::<V>::into_array(item.clone()))?;
+            }
         }
         Ok(())
     }
