@@ -4,11 +4,14 @@ use crate::se::to_io_write::write_field_number_and_wire_type;
 use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
 use ::puroro::types::FieldData;
 use ::puroro::types::WireType;
+use ::puroro::variant::Variant;
 use ::puroro::variant::VariantTypeTag;
 use ::puroro::{tags, RepeatedField, Result};
 use ::puroro::{ErrorKind, Message};
 use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
+use ::std::convert::TryInto;
+use ::std::io::Write;
 use ::std::marker::PhantomData;
 use ::std::ops::DerefMut;
 
@@ -25,7 +28,7 @@ impl<'msg, T: Clone> IntoIterator for VecWrapper<'msg, T> {
     type IntoIter = std::iter::Cloned<std::slice::Iter<'msg, T>>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.0.iter().cloned()
+        <[T]>::iter(&self.0).cloned()
     }
 }
 impl<'msg, T: Clone> RepeatedField<'msg, T> for VecWrapper<'msg, T> {}
@@ -42,7 +45,7 @@ impl<'msg, B: 'msg + ?Sized + ToOwned> IntoIterator for VecCowWrapper<'msg, B> {
     type IntoIter = CowIter<'msg, B, std::slice::Iter<'msg, B::Owned>>;
 
     fn into_iter(self) -> Self::IntoIter {
-        CowIter(self.0.iter(), PhantomData)
+        CowIter(<[B::Owned]>::iter(self.0), PhantomData)
     }
 }
 pub struct CowIter<'msg, B, Iter>(Iter, PhantomData<B>)
@@ -63,8 +66,6 @@ impl<'msg, B> RepeatedField<'msg, Cow<'msg, B>> for VecCowWrapper<'msg, B> where
     B: 'msg + ?Sized + ToOwned
 {
 }
-
-// deser from iter methods
 
 pub trait VecOrOptionOrBare<T> {
     fn push(&mut self, val: T);
@@ -93,8 +94,8 @@ impl<T> VecOrOptionOrBare<T> for Vec<T> {
     where
         T: 'a,
     = ::std::slice::Iter<'a, T>;
-    fn iter(&self) -> Self::Iter<'_> {
-        Vec::iter(self)
+    fn iter(&self) -> <Self as VecOrOptionOrBare<T>>::Iter<'_> {
+        <[T]>::iter(self)
     }
 }
 impl<T> VecOrOptionOrBare<T> for T {
@@ -109,6 +110,34 @@ impl<T> VecOrOptionOrBare<T> for T {
         ::std::iter::once(self)
     }
 }
+
+struct NullWrite(usize);
+impl Write for NullWrite {
+    fn write(&mut self, buf: &[u8]) -> ::std::io::Result<usize> {
+        if let Some(new_size) = usize::checked_add(self.0, buf.len()) {
+            self.0 = new_size;
+            Ok(buf.len())
+        } else {
+            Err(::std::io::Error::new(
+                ::std::io::ErrorKind::Unsupported,
+                "Too long to serialize",
+            ))
+        }
+    }
+    fn flush(&mut self) -> ::std::io::Result<()> {
+        Ok(())
+    }
+}
+impl NullWrite {
+    fn new() -> Self {
+        Self(0usize)
+    }
+    fn len(&self) -> usize {
+        self.0
+    }
+}
+
+// deser from iter methods
 
 pub struct DeserFieldFromBytesIter<L, V>(PhantomData<(L, V)>);
 
@@ -289,6 +318,8 @@ where
     }
 }
 
+// ser to Write methods
+
 pub struct SerFieldToIoWrite<L, V>(PhantomData<(L, V)>);
 
 impl<V, _1, _2> SerFieldToIoWrite<tags::NonRepeated<_1, _2>, tags::wire::Variant<V>>
@@ -300,11 +331,41 @@ where
     where
         FieldType:
             VecOrOptionOrBare<<tags::wire::Variant<V> as tags::NumericalTypeTag>::NativeType>,
-        W: ::std::io::Write,
+        W: Write,
     {
         for item in field.iter() {
-            write_field_number_and_wire_type(out, number, WireType::Variant);
-            out.write(&tags::wire::Bits32::<V>::into_array(item.clone()))?;
+            write_field_number_and_wire_type(out, number, WireType::Variant)?;
+            Variant::from_native::<tags::wire::Variant<V>>(item.clone())?.encode_bytes(out)?;
+        }
+        Ok(())
+    }
+}
+
+impl<V> SerFieldToIoWrite<tags::Repeated, tags::wire::Variant<V>>
+where
+    tags::wire::Variant<V>: VariantTypeTag,
+{
+    pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
+    where
+        FieldType:
+            VecOrOptionOrBare<<tags::wire::Variant<V> as tags::NumericalTypeTag>::NativeType>,
+        W: Write,
+    {
+        let len = {
+            let mut null_out = NullWrite::new();
+            for item in field.iter() {
+                Variant::from_native::<tags::wire::Variant<V>>(item.clone())?
+                    .encode_bytes(&mut null_out)?;
+            }
+            null_out.len()
+        };
+        let len_i32 = len
+            .try_into()
+            .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
+        write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
+        Variant::from_i32(len_i32)?.encode_bytes(out)?;
+        for item in field.iter() {
+            Variant::from_native::<tags::wire::Variant<V>>(item.clone())?.encode_bytes(out)?;
         }
         Ok(())
     }
@@ -318,11 +379,11 @@ where
     pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<<tags::wire::Bits32<V> as tags::NumericalTypeTag>::NativeType>,
-        W: ::std::io::Write,
+        W: Write,
     {
         for item in field.iter() {
             if !L::DO_DEFAULT_CHECK || item.clone() != Default::default() {
-                write_field_number_and_wire_type(out, number, WireType::Bits32);
+                write_field_number_and_wire_type(out, number, WireType::Bits32)?;
                 out.write(&tags::wire::Bits32::<V>::into_array(item.clone()))?;
             }
         }
@@ -338,11 +399,11 @@ where
     pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
     where
         FieldType: VecOrOptionOrBare<<tags::wire::Bits64<V> as tags::NumericalTypeTag>::NativeType>,
-        W: ::std::io::Write,
+        W: Write,
     {
         for item in field.iter() {
             if !L::DO_DEFAULT_CHECK || item.clone() != Default::default() {
-                write_field_number_and_wire_type(out, number, WireType::Bits64);
+                write_field_number_and_wire_type(out, number, WireType::Bits64)?;
                 out.write(&tags::wire::Bits64::<V>::into_array(item.clone()))?;
             }
         }
