@@ -410,3 +410,68 @@ where
         Ok(())
     }
 }
+
+impl<L> SerFieldToIoWrite<L, tags::Bytes>
+where
+    L: tags::FieldLabelTag,
+{
+    pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
+    where
+        FieldType: VecOrOptionOrBare<Vec<u8>>,
+        W: Write,
+    {
+        for item in field.iter() {
+            write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
+            let len_i32: i32 = item
+                .len()
+                .try_into()
+                .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
+            Variant::from_i32(len_i32)?.encode_bytes(&mut out)?;
+            out.write(&item)?;
+        }
+        Ok(())
+    }
+}
+
+impl<L> SerFieldToIoWrite<L, tags::String>
+where
+    L: tags::FieldLabelTag,
+{
+    pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
+    where
+        FieldType: VecOrOptionOrBare<String>,
+        W: Write,
+    {
+        for item in field.iter() {
+            write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
+            let len_i32: i32 = item
+                .len()
+                .try_into()
+                .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
+            Variant::from_i32(len_i32)?.encode_bytes(&mut out)?;
+            out.write(&item)?;
+        }
+        Ok(())
+    }
+}
+
+impl<L, M> SerFieldToIoWrite<L, tags::Message<M>>
+where
+    L: tags::FieldLabelTag,
+{
+    pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
+    where
+        FieldType: VecOrOptionOrBare<M>,
+        W: Write,
+    {
+        for item in field.iter() {
+            write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
+            let len_i32: i32 = todo!()
+                .try_into()
+                .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
+            Variant::from_i32(len_i32)?.encode_bytes(&mut out)?;
+            todo!();
+        }
+        Ok(())
+    }
+}
