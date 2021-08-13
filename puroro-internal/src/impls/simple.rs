@@ -480,9 +480,6 @@ where
                 <M as SerToIoWrite>::ser(boxed.deref(), &mut null_out)?;
                 null_out.len()
             };
-            if len == 0 {
-                return Ok(());
-            }
             let len_i32: i32 = len
                 .try_into()
                 .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
