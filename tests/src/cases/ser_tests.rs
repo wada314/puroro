@@ -58,9 +58,8 @@ fn test_ser_and_then_deser() {
             submsg.i32_unlabeled = i;
             submsg
         }));
-    msg.enum_unlabeled = Ok(Enum::First);
-    msg.enum_repeated
-        .extend(vec![Ok(Enum::Zeroth), Ok(Enum::Tenth)]);
+    msg.enum_unlabeled = Enum::First;
+    msg.enum_repeated.extend(vec![Enum::Zeroth, Enum::Tenth]);
     msg.very_large_field_number = ((1i64 << 31) - 1) as i32;
 
     msg.ser(&mut buf).unwrap();

@@ -333,9 +333,13 @@ where
             VecOrOptionOrBare<<tags::wire::Variant<V> as tags::NumericalTypeTag>::NativeType>,
         W: Write,
     {
+        use tags::FieldLabelTag as _;
         for item in field.iter() {
-            write_field_number_and_wire_type(out, number, WireType::Variant)?;
-            Variant::from_native::<tags::wire::Variant<V>>(item.clone())?.encode_bytes(out)?;
+            if !tags::NonRepeated::<_1, _2>::DO_DEFAULT_CHECK || item.clone() != Default::default()
+            {
+                write_field_number_and_wire_type(out, number, WireType::Variant)?;
+                Variant::from_native::<tags::wire::Variant<V>>(item.clone())?.encode_bytes(out)?;
+            }
         }
         Ok(())
     }
@@ -359,6 +363,9 @@ where
             }
             null_out.len()
         };
+        if len == 0 {
+            return Ok(());
+        }
         let len_i32 = len
             .try_into()
             .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
@@ -421,13 +428,15 @@ where
         W: Write,
     {
         for item in field.iter() {
-            write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
-            let len_i32: i32 = item
-                .len()
-                .try_into()
-                .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
-            Variant::from_i32(len_i32)?.encode_bytes(out)?;
-            out.write(&item)?;
+            if !L::DO_DEFAULT_CHECK || !item.is_empty() {
+                write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
+                let len_i32: i32 = item
+                    .len()
+                    .try_into()
+                    .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
+                Variant::from_i32(len_i32)?.encode_bytes(out)?;
+                out.write(&item)?;
+            }
         }
         Ok(())
     }
@@ -443,13 +452,15 @@ where
         W: Write,
     {
         for item in field.iter() {
-            write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
-            let len_i32: i32 = item
-                .len()
-                .try_into()
-                .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
-            Variant::from_i32(len_i32)?.encode_bytes(out)?;
-            out.write(item.as_bytes())?;
+            if !L::DO_DEFAULT_CHECK || !item.is_empty() {
+                write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
+                let len_i32: i32 = item
+                    .len()
+                    .try_into()
+                    .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
+                Variant::from_i32(len_i32)?.encode_bytes(out)?;
+                out.write(item.as_bytes())?;
+            }
         }
         Ok(())
     }
@@ -469,6 +480,9 @@ where
                 <M as SerToIoWrite>::ser(boxed.deref(), &mut null_out)?;
                 null_out.len()
             };
+            if len == 0 {
+                return Ok(());
+            }
             let len_i32: i32 = len
                 .try_into()
                 .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
