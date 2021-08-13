@@ -14,8 +14,12 @@ use ::std::iter;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 use protobuf::compiler::CodeGeneratorRequest;
-use protobuf::{DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto};
+use protobuf::{
+    DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
+    OneofDescriptorProto,
+};
 use std::collections::{HashMap, VecDeque};
+use std::convert::TryInto;
 use std::hash::Hash;
 
 #[derive(Debug)]
@@ -44,6 +48,7 @@ pub struct Message {
     fields: Vec<Rc<Field>>,
     nested_messages: Vec<Rc<Message>>,
     nested_enums: Vec<Rc<Enum>>,
+    oneofs: Vec<Oneof>,
 }
 
 #[derive(Debug)]
@@ -68,6 +73,15 @@ pub struct Field {
     proto_is_optional3: bool,
     lazy_label: OnceCell<FieldLabel>,
     number: i32,
+}
+
+#[derive(Debug)]
+pub struct Oneof {
+    message: Weak<Message>,
+    index: i32,
+    rust_ident: String,
+    lazy_fields: OnceCell<Vec<Rc<Field>>>,
+    lazy_is_synthetic: OnceCell<bool>,
 }
 
 #[derive(Debug)]
@@ -311,6 +325,7 @@ impl Message {
         let proto_field = proto.field;
         let proto_nested_type = proto.nested_type;
         let proto_enum_type = proto.enum_type;
+        let proto_oneofs = proto.oneof_decl;
         let message = Rc::new_cyclic(|message| Self {
             input_file: Clone::clone(&input_file),
             rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)),
@@ -344,6 +359,15 @@ impl Message {
                         package.clone(),
                         new_outer_messages.clone(),
                     )?)
+                })
+                .collect::<Result<Vec<_>>>()
+                .expect("I need try_new_cyclic..."),
+            oneofs: proto_oneofs
+                .into_iter()
+                .enumerate()
+                .map(|(index, proto)| -> Result<_> {
+                    let index_i32 = index.try_into().map_err(|_| ErrorKind::TooLargeLength)?;
+                    Oneof::try_from_proto(Clone::clone(message), proto, index_i32)
                 })
                 .collect::<Result<Vec<_>>>()
                 .expect("I need try_new_cyclic..."),
@@ -630,6 +654,28 @@ impl Field {
     }
     pub fn has_repeated_getter(&self) -> bool {
         matches!(self.field_label(), Ok(FieldLabel::Repeated))
+    }
+}
+
+impl Oneof {
+    pub fn try_from_proto(
+        message: Weak<Message>,
+        proto: OneofDescriptorProto,
+        index: i32,
+    ) -> Result<Self> {
+        if let Some(name) = proto.name.as_ref() {
+            Ok(Self {
+                message,
+                index: index,
+                rust_ident: get_keyword_safe_ident(name),
+                lazy_fields: OnceCell::new(),
+                lazy_is_synthetic: OnceCell::new(),
+            })
+        } else {
+            Err(ErrorKind::EmptyInputField {
+                name: "OneofDescriptorProto.name".to_string(),
+            })?
+        }
     }
 }
 

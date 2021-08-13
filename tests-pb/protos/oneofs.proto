@@ -1,0 +1,21 @@
+syntax = "proto3";
+package oneofs;
+
+message Msg {
+    oneof group_one {
+        int32 g1_int32 = 1;
+        string g1_string = 2;
+    }
+    oneof group_two {
+        float g2_f32 = 3;
+        string g2_string = 4;
+        Submsg g2_submsg = 5;
+    }
+    oneof group_three {
+        int32 g3_int32 = 6;
+    }
+}
+
+message Submsg {
+    int32 i32_unlabeled = 1;
+}
