@@ -48,7 +48,7 @@ pub struct Message {
     fields: Vec<Rc<Field>>,
     nested_messages: Vec<Rc<Message>>,
     nested_enums: Vec<Rc<Enum>>,
-    oneofs: Vec<Oneof>,
+    oneofs: Vec<Rc<Oneof>>,
 }
 
 #[derive(Debug)]
@@ -424,9 +424,12 @@ impl Message {
     pub fn nested_enums(&self) -> &[Rc<Enum>] {
         &self.nested_enums
     }
+    pub fn oneofs(&self) -> &[Rc<Oneof>] {
+        &self.oneofs
+    }
 
     pub fn has_nested_items(&self) -> bool {
-        self.nested_messages().len() + self.nested_enums().len() > 0
+        self.nested_messages().len() + self.nested_enums().len() + self.oneofs().len() > 0
     }
 }
 
@@ -671,20 +674,23 @@ impl Oneof {
         message: Weak<Message>,
         proto: OneofDescriptorProto,
         index: i32,
-    ) -> Result<Self> {
+    ) -> Result<Rc<Self>> {
         if let Some(name) = proto.name.as_ref() {
-            Ok(Self {
+            Ok(Rc::new(Self {
                 message,
                 index: index,
-                rust_ident: get_keyword_safe_ident(name),
+                rust_ident: get_keyword_safe_ident(&to_camel_case(name)),
                 lazy_fields: OnceCell::new(),
                 lazy_is_synthetic: OnceCell::new(),
-            })
+            }))
         } else {
             Err(ErrorKind::EmptyInputField {
                 name: "OneofDescriptorProto.name".to_string(),
             })?
         }
+    }
+    pub fn rust_ident(&self) -> &str {
+        &self.rust_ident
     }
     pub fn is_synthetic(&self) -> Result<bool> {
         self.lazy_is_synthetic

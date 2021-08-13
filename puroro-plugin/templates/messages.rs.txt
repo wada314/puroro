@@ -39,7 +39,7 @@ pub use self::puroro_traits::*;
 pub mod puroro_nested {
 
 {%- for message in messages %}
-{%- if message.nested_messages().len() + message.nested_enums().len() > 0 %}
+{%- if message.has_nested_items() %}
 
 pub mod {{ message.rust_nested_module_ident() }} {
 mod puroro_root {
@@ -48,6 +48,7 @@ mod puroro_root {
 
 {{ message.nested_messages()|render_messages }}
 {{ message.nested_enums()|render_enums }}
+{{ message.oneofs()|render_oneofs }}
 
 } // mod {{ message.rust_nested_module_ident() }}
 {%- endif %}

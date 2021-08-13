@@ -10,8 +10,8 @@ mod protos;
 mod utils;
 mod wrappers;
 
+use ::itertools::Itertools;
 use ::puroro::{DeserFromBytesIter, SerToIoWrite};
-use itertools::Itertools;
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
@@ -97,6 +97,12 @@ pub struct Enums {
     enums: Vec<Rc<wrappers::Enum>>,
 }
 
+#[derive(Template)]
+#[template(path = "oneofs.rs.txt")]
+pub struct Oneofs {
+    oneofs: Vec<Rc<wrappers::Oneof>>,
+}
+
 impl Messages {
     pub fn has_nested_items(&self) -> bool {
         self.messages.iter().any(|m| m.has_nested_items())
@@ -128,6 +134,11 @@ mod filters {
     pub fn render_enums(enums: &[Rc<wrappers::Enum>]) -> ::askama::Result<Enums> {
         Ok(Enums {
             enums: enums.to_vec(),
+        })
+    }
+    pub fn render_oneofs(oneofs: &[Rc<wrappers::Oneof>]) -> ::askama::Result<Oneofs> {
+        Ok(Oneofs {
+            oneofs: oneofs.to_vec(),
         })
     }
 }

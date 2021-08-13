@@ -1,0 +1,7 @@
+
+{% for oneof in self.oneofs %}
+#[derive(Debug, Clone, PartialEq)]
+pub enum {{ oneof.rust_ident() }} {
+    
+}
+{%- endfor %}
