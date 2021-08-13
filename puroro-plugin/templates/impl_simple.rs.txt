@@ -1,7 +1,7 @@
 
 #[allow(unused)]
 #[allow(non_camel_case_types)]
-#[derive(Clone, Default)]
+#[derive(Clone, Default, PartialEq, Debug)]
 pub struct {{ self.rust_ident() }} {
     {%- for field in self.fields()  %}
     pub {{ field.rust_ident() }}: {{ field.rust_field_type("::puroro::tags::SimpleImpl").unwrap() }},

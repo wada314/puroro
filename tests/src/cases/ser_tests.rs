@@ -67,6 +67,5 @@ fn test_ser_and_then_deser() {
     let mut new_msg: Msg = Msg::default();
     new_msg.deser(buf.bytes()).unwrap();
 
-    assert_eq!(msg.i32_unlabeled, new_msg.i32_unlabeled);
-    // check all fields or implement PartialEq
+    assert_eq!(msg, new_msg);
 }

@@ -142,6 +142,24 @@ where
         Self(::std::default::Default::default())
     }
 }
+impl<ImplTag> ::std::fmt::Debug for {{ self.message.rust_ident() }}<ImplTag>
+where 
+    Self: ::puroro_internal::GetImplStruct,
+    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::fmt::Debug,
+{
+    fn fmt(&self, formatter: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
+        ::std::fmt::Debug::fmt(&self.0, formatter)
+    }
+}
+impl<ImplTag> ::std::cmp::PartialEq for {{ self.message.rust_ident() }}<ImplTag>
+where 
+    Self: ::puroro_internal::GetImplStruct,
+    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::cmp::PartialEq,
+{
+    fn eq(&self, rhs: &Self) -> bool {
+        ::std::cmp::PartialEq::eq(&self.0, &rhs.0)
+    }
+}
 
 {# ################# impls ################# -#}
 
