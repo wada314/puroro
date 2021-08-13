@@ -7,7 +7,7 @@ use ::puroro::types::WireType;
 use ::puroro::variant::Variant;
 use ::puroro::variant::VariantTypeTag;
 use ::puroro::{tags, RepeatedField, Result};
-use ::puroro::{ErrorKind, Message};
+use ::puroro::{ErrorKind, Message, SerToIoWrite};
 use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
 use ::std::convert::TryInto;
@@ -426,7 +426,7 @@ where
                 .len()
                 .try_into()
                 .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
-            Variant::from_i32(len_i32)?.encode_bytes(&mut out)?;
+            Variant::from_i32(len_i32)?.encode_bytes(out)?;
             out.write(&item)?;
         }
         Ok(())
@@ -448,8 +448,8 @@ where
                 .len()
                 .try_into()
                 .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
-            Variant::from_i32(len_i32)?.encode_bytes(&mut out)?;
-            out.write(&item)?;
+            Variant::from_i32(len_i32)?.encode_bytes(out)?;
+            out.write(item.as_bytes())?;
         }
         Ok(())
     }
@@ -458,6 +458,7 @@ where
 impl<L, M> SerFieldToIoWrite<L, tags::Message<M>>
 where
     L: tags::FieldLabelTag,
+    M: SerToIoWrite,
 {
     pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
     where
@@ -465,12 +466,17 @@ where
         W: Write,
     {
         for item in field.iter() {
-            write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
-            let len_i32: i32 = todo!()
+            let len = {
+                let mut null_out = NullWrite::new();
+                <M as SerToIoWrite>::ser(item, &mut null_out)?;
+                null_out.len()
+            };
+            let len_i32: i32 = len
                 .try_into()
                 .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
-            Variant::from_i32(len_i32)?.encode_bytes(&mut out)?;
-            todo!();
+            write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
+            Variant::from_i32(len_i32)?.encode_bytes(out)?;
+            <M as SerToIoWrite>::ser(item, out)?;
         }
         Ok(())
     }
