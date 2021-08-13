@@ -73,6 +73,7 @@ pub struct Field {
     proto_is_optional3: bool,
     lazy_label: OnceCell<FieldLabel>,
     number: i32,
+    proto_oneof_index: Option<i32>,
 }
 
 #[derive(Debug)]
@@ -513,6 +514,7 @@ impl Field {
         })?;
         let proto_is_optional3 = proto.proto3_optional.unwrap_or_default();
         let proto_number = proto.number.unwrap_or_default();
+        let proto_oneof_index = proto.oneof_index;
         Ok(Self {
             message: Clone::clone(&message),
             rust_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name)),
@@ -524,6 +526,7 @@ impl Field {
             proto_is_optional3,
             lazy_label: OnceCell::new(),
             number: proto_number,
+            proto_oneof_index,
         })
     }
 
@@ -564,8 +567,14 @@ impl Field {
             })
             .map(|l| l.clone())
     }
+    pub fn is_optional3(&self) -> bool {
+        self.proto_is_optional3
+    }
     pub fn number(&self) -> i32 {
         self.number
+    }
+    pub fn oneof_index(&self) -> Option<i32> {
+        self.proto_oneof_index.clone()
     }
 
     pub fn rust_label_and_type_tags(&self, modules: &str, impl_tag_ident: &str) -> Result<String> {
@@ -676,6 +685,37 @@ impl Oneof {
                 name: "OneofDescriptorProto.name".to_string(),
             })?
         }
+    }
+    pub fn is_synthetic(&self) -> Result<bool> {
+        self.lazy_is_synthetic
+            .get_or_try_init(|| {
+                let fields = self.fields()?;
+                Ok(if let Some(first) = fields.first() {
+                    fields.len() == 1 && first.is_optional3()
+                } else {
+                    false
+                })
+            })
+            .map(|b| *b)
+    }
+    pub fn fields(&self) -> Result<&[Rc<Field>]> {
+        self.lazy_fields
+            .get_or_try_init(|| {
+                let message = upgrade(&self.message)?;
+                Ok(message
+                    .fields()
+                    .into_iter()
+                    .cloned()
+                    .filter(|field| {
+                        if let Some(oneof_index) = field.oneof_index() {
+                            oneof_index == self.index
+                        } else {
+                            false
+                        }
+                    })
+                    .collect::<Vec<_>>())
+            })
+            .map(|v| v.as_slice())
     }
 }
 
