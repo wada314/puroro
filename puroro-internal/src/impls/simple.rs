@@ -13,7 +13,7 @@ use ::std::borrow::Cow;
 use ::std::convert::TryInto;
 use ::std::io::Write;
 use ::std::marker::PhantomData;
-use ::std::ops::DerefMut;
+use ::std::ops::{Deref, DerefMut};
 
 pub struct VecWrapper<'msg, T>(&'msg Vec<T>);
 
@@ -455,17 +455,40 @@ where
     }
 }
 
-impl<L, M> SerFieldToIoWrite<L, tags::Message<M>>
+impl<M, _1, _2> SerFieldToIoWrite<tags::NonRepeated<_1, _2>, tags::Message<M>>
 where
-    L: tags::FieldLabelTag,
     M: SerToIoWrite,
 {
-    pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
+    pub fn ser_field<W>(field: &Option<Box<M>>, number: i32, out: &mut W) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<M>,
         W: Write,
     {
-        for item in field.iter() {
+        if let Some(boxed) = field {
+            let len = {
+                let mut null_out = NullWrite::new();
+                <M as SerToIoWrite>::ser(boxed.deref(), &mut null_out)?;
+                null_out.len()
+            };
+            let len_i32: i32 = len
+                .try_into()
+                .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
+            write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
+            Variant::from_i32(len_i32)?.encode_bytes(out)?;
+            <M as SerToIoWrite>::ser(boxed.deref(), out)?;
+        }
+        Ok(())
+    }
+}
+
+impl<M> SerFieldToIoWrite<tags::Repeated, tags::Message<M>>
+where
+    M: SerToIoWrite,
+{
+    pub fn ser_field<W>(field: &Vec<M>, number: i32, out: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        for item in field {
             let len = {
                 let mut null_out = NullWrite::new();
                 <M as SerToIoWrite>::ser(item, &mut null_out)?;

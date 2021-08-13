@@ -95,6 +95,11 @@ impl ::puroro::SerToIoWrite for {{ self.rust_ident() }} {
     where
         W: ::std::io::Write
     {
-        todo!()
+        {%- for field in self.fields() %}
+        ::puroro_internal::impls::simple::SerFieldToIoWrite::<
+            {{ field.rust_label_and_type_tags("::puroro::tags::", "SimpleImpl").unwrap() }}
+        >::ser_field(&self.{{ field.rust_ident() }}, {{ field.number() }}, out)?;
+        {%- endfor %}
+        ::std::result::Result::Ok(())
     }
 }
