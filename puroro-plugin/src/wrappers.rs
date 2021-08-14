@@ -65,6 +65,7 @@ pub struct Enum {
 pub struct Field {
     message: Weak<Message>,
     rust_ident: String,
+    rust_oneof_ident: String,
     lazy_proto_type: OnceCell<FieldType>,
     proto_name: String,
     proto_type_name: String,
@@ -521,6 +522,7 @@ impl Field {
         Ok(Self {
             message: Clone::clone(&message),
             rust_ident: get_keyword_safe_ident(&to_lower_snake_case(&proto_name)),
+            rust_oneof_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)),
             proto_name,
             proto_type_name,
             proto_type_enum,
@@ -535,6 +537,9 @@ impl Field {
 
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
+    }
+    pub fn rust_oneof_ident(&self) -> &str {
+        &self.rust_oneof_ident
     }
     pub fn message(&self) -> Result<Rc<Message>> {
         Ok(upgrade(&self.message)?)

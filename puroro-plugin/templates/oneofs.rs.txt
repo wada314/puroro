@@ -1,7 +1,11 @@
 
-{% for oneof in self.oneofs %}
+{%- for oneof in self.oneofs %}
+{%- if !oneof.is_synthetic().unwrap() %}
 #[derive(Debug, Clone, PartialEq)]
-pub enum {{ oneof.rust_ident() }} {
-    
+pub enum {{ oneof.rust_ident() }}<'this> {
+    {%- for field in oneof.fields().unwrap() %}
+    {{ field.rust_oneof_ident() }}({{ field.trait_scalar_getter_type().unwrap() }}),
+    {%- endfor %}
 }
+{%- endif %}
 {%- endfor %}
