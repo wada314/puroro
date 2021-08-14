@@ -46,9 +46,15 @@ mod puroro_root {
     pub use super::super::super::puroro_root::*;
 }
 
+{%- if message.nested_messages().len() > 0 %}
 {{ message.nested_messages()|render_messages }}
+{%- endif %}
+{%- if message.nested_enums().len() > 0 %}
 {{ message.nested_enums()|render_enums }}
+{%- endif %}
+{%- if message.oneofs().len() > 0 %}
 {{ message.oneofs()|render_oneofs }}
+{%- endif %}
 
 } // mod {{ message.rust_nested_module_ident() }}
 {%- endif %}
