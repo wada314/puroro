@@ -1,6 +1,14 @@
 
 {%- for oneof in oneofs %}
 {%- if !oneof.is_synthetic().unwrap() %}
+
+enum {{ oneof.rust_ident() }}{{ oneof.maybe_generic_params("'msg").unwrap() }} {
+    {%- for field in oneof.fields().unwrap() %}
+    {{ field.rust_oneof_ident() }}({{ field.trait_scalar_getter_type_from_external("'msg", "::puroro::tags::SimpleImpl").unwrap() }}),
+    {%- endfor %}
+}
+
 {{ oneof|render_oneof_simple }}
+
 {%- endif %}
 {%- endfor %}

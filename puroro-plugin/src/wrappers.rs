@@ -636,8 +636,8 @@ impl Field {
     }
     pub fn trait_scalar_getter_type_from_external(
         &self,
-        impl_tag: &str,
         lt: &str,
+        impl_tag: &str,
     ) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Double => "f64".to_string(),
@@ -769,6 +769,25 @@ impl Oneof {
                     .collect::<Vec<_>>())
             })
             .map(|v| v.as_slice())
+    }
+    pub fn maybe_generic_params(&self, lt: &str) -> Result<String> {
+        let need_lt = self
+            .fields()?
+            .iter()
+            .map(|field| {
+                Ok(matches!(
+                    field.field_type()?,
+                    FieldType::Bytes | FieldType::String | FieldType::Message(_)
+                ))
+            })
+            .collect::<Result<Vec<_>>>()?
+            .iter()
+            .any(|b| *b);
+        if need_lt {
+            Ok(format!("<{}>", lt))
+        } else {
+            Ok(String::new())
+        }
     }
 }
 
