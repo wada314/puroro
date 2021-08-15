@@ -44,7 +44,29 @@ impl Deref for Field {
 }
 impl Field {
     pub fn rust_field_type(&self, impl_tag: &'static str) -> Result<String> {
-        let scalar_type = match self.field.field_type()? {
+        let scalar_type = self.rust_scalar_field_type(impl_tag)?;
+        Ok(match self.field.field_label()? {
+            FieldLabel::Required | FieldLabel::Optional => {
+                format!("::std::option::Option<{}>", scalar_type)
+            }
+            FieldLabel::Unlabeled => {
+                if matches!(self.field.field_type(), Ok(FieldType::Message(_))) {
+                    format!("::std::option::Option<{}>", scalar_type)
+                } else {
+                    scalar_type
+                }
+            }
+            FieldLabel::Repeated => format!("::std::vec::Vec<{}>", scalar_type),
+        })
+    }
+
+    pub fn rust_oneof_field_type(&self, impl_tag: &'static str) -> Result<String> {
+        let scalar_type = self.rust_scalar_field_type(impl_tag)?;
+        Ok(scalar_type)
+    }
+
+    fn rust_scalar_field_type(&self, impl_tag: &'static str) -> Result<String> {
+        Ok(match self.field.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "::std::string::String".to_string(),
             FieldType::Bytes => "::std::vec::Vec<u8>".to_string(),
@@ -63,19 +85,6 @@ impl Field {
                 }
             }
             t => t.numerical_rust_type()?.to_string(),
-        };
-        Ok(match self.field.field_label()? {
-            FieldLabel::Required | FieldLabel::Optional => {
-                format!("::std::option::Option<{}>", scalar_type)
-            }
-            FieldLabel::Unlabeled => {
-                if matches!(self.field.field_type(), Ok(FieldType::Message(_))) {
-                    format!("::std::option::Option<{}>", scalar_type)
-                } else {
-                    scalar_type
-                }
-            }
-            FieldLabel::Repeated => format!("::std::vec::Vec<{}>", scalar_type),
         })
     }
 }

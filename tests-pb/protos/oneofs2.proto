@@ -1,5 +1,5 @@
-syntax = "proto3";
-package oneofs;
+syntax = "proto2";
+package oneofs2;
 
 message Msg {
     oneof group_one {
@@ -17,5 +17,5 @@ message Msg {
 }
 
 message Submsg {
-    int32 i32_unlabeled = 1;
+    optional int32 i32_optional = 1;
 }

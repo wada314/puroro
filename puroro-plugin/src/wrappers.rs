@@ -736,6 +736,9 @@ impl Oneof {
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
     }
+    pub fn message(&self) -> Result<Rc<Message>> {
+        upgrade(&self.message)
+    }
     pub fn is_synthetic(&self) -> Result<bool> {
         self.lazy_is_synthetic
             .get_or_try_init(|| {
