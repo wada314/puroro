@@ -124,7 +124,7 @@ mod filters {
     pub fn render_impl_simple(
         message: &Rc<wrappers::Message>,
     ) -> ::askama::Result<impls::SimpleImpl> {
-        Ok(impls::SimpleImpl::new(message))
+        Ok(impls::SimpleImpl::try_new(message).unwrap())
     }
     pub fn render_oneof_simple(
         oneof: &Rc<wrappers::Oneof>,

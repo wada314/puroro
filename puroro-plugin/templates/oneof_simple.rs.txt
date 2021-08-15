@@ -1,6 +1,7 @@
 
 #[allow(non_camel_case_types)]
-pub enum {{ oneof.rust_ident() }}_SimpleImpl
+#[derive(Clone, PartialEq, Debug)]
+pub enum {{ oneof.rust_enum_ident() }}
 {
     {%- for field in oneof.fields() %}
     {{ field.rust_oneof_ident() }}({{ field.rust_oneof_field_type("::puroro::tags::SimpleImpl").unwrap() }}),

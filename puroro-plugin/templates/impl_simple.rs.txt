@@ -3,8 +3,13 @@
 #[allow(non_camel_case_types)]
 #[derive(Clone, Default, PartialEq, Debug)]
 pub struct {{ self.rust_ident() }} {
-    {%- for field in self.fields()  %}
+    {%- for field in self.fields() %}
     pub {{ field.rust_ident() }}: {{ field.rust_field_type("::puroro::tags::SimpleImpl").unwrap() }},
+    {%- endfor %}
+    {%- for oneof in self.oneofs() %}
+    {%- if !oneof.is_synthetic().unwrap() %}
+    pub {{ oneof.rust_field_ident() }}: ::std::option::Option<{{ oneof.rust_absolute_path().unwrap() }}>,
+    {%- endif %}
     {%- endfor %}
 }
 

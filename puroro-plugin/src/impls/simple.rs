@@ -11,6 +11,7 @@ pub struct SimpleImpl {
     message: Rc<wrappers::Message>,
     rust_ident: String,
     fields: Vec<Field>,
+    oneofs: Vec<Oneof>,
 }
 
 #[derive(Template)]
@@ -20,8 +21,8 @@ pub struct SimpleOneof {
 }
 
 impl SimpleImpl {
-    pub fn new(message: &Rc<wrappers::Message>) -> Self {
-        Self {
+    pub fn try_new(message: &Rc<wrappers::Message>) -> Result<Self> {
+        Ok(Self {
             message: message.clone(),
             rust_ident: format!("{}_SimpleImpl", message.rust_ident()),
             fields: message
@@ -29,13 +30,21 @@ impl SimpleImpl {
                 .into_iter()
                 .map(|x| Field { field: x.clone() })
                 .collect(),
-        }
+            oneofs: message
+                .oneofs()
+                .into_iter()
+                .map(|o| Oneof::try_new(o.clone()))
+                .collect::<Result<Vec<_>>>()?,
+        })
     }
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
     }
     pub fn fields(&self) -> &[Field] {
         &self.fields
+    }
+    pub fn oneofs(&self) -> &[Oneof] {
+        &self.oneofs
     }
 }
 
@@ -126,7 +135,22 @@ impl Oneof {
                 .collect(),
         })
     }
+    pub fn rust_enum_ident(&self) -> String {
+        format!("{}_SimpleImpl", self.oneof.rust_enum_ident())
+    }
+    pub fn rust_field_ident(&self) -> &str {
+        self.oneof.rust_getter_ident()
+    }
     pub fn fields(&self) -> &[Field] {
         &self.fields
+    }
+    pub fn rust_absolute_path(&self) -> Result<String> {
+        let message = self.oneof.message()?;
+        Ok(format!(
+            "{path}::puroro_nested::{submodule}::{ident}",
+            path = message.rust_absolute_module_path(),
+            submodule = message.rust_nested_module_ident(),
+            ident = self.rust_enum_ident(),
+        ))
     }
 }

@@ -81,7 +81,8 @@ pub struct Field {
 pub struct Oneof {
     message: Weak<Message>,
     index: i32,
-    rust_ident: String,
+    rust_enum_ident: String,
+    rust_getter_ident: String,
     lazy_fields: OnceCell<Vec<Rc<Field>>>,
     lazy_is_synthetic: OnceCell<bool>,
 }
@@ -723,7 +724,8 @@ impl Oneof {
             Ok(Rc::new(Self {
                 message,
                 index: index,
-                rust_ident: get_keyword_safe_ident(&to_camel_case(name)),
+                rust_enum_ident: get_keyword_safe_ident(&to_camel_case(name)),
+                rust_getter_ident: get_keyword_safe_ident(&to_lower_snake_case(name)),
                 lazy_fields: OnceCell::new(),
                 lazy_is_synthetic: OnceCell::new(),
             }))
@@ -733,8 +735,11 @@ impl Oneof {
             })?
         }
     }
-    pub fn rust_ident(&self) -> &str {
-        &self.rust_ident
+    pub fn rust_enum_ident(&self) -> &str {
+        &self.rust_enum_ident
+    }
+    pub fn rust_getter_ident(&self) -> &str {
+        &self.rust_getter_ident
     }
     pub fn message(&self) -> Result<Rc<Message>> {
         upgrade(&self.message)
