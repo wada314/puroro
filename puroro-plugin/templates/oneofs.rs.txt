@@ -2,9 +2,9 @@
 {%- for oneof in self.oneofs %}
 {%- if !oneof.is_synthetic().unwrap() %}
 #[derive(Debug, Clone, PartialEq)]
-pub enum {{ oneof.rust_ident() }}<'this> {
+pub enum {{ oneof.rust_ident() }}<ImplTag> {
     {%- for field in oneof.fields().unwrap() %}
-    {{ field.rust_oneof_ident() }}({{ field.trait_scalar_getter_type().unwrap() }}),
+    {{ field.rust_oneof_ident() }}(/*TODO*/),
     {%- endfor %}
 }
 {%- endif %}

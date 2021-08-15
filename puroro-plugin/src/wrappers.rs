@@ -10,6 +10,9 @@ use ::askama::Template;
 use ::itertools::Itertools;
 use ::once_cell::unsync::{Lazy, OnceCell};
 use ::std::borrow::Borrow;
+use ::std::collections::{HashMap, VecDeque};
+use ::std::convert::TryInto;
+use ::std::hash::Hash;
 use ::std::iter;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
@@ -18,9 +21,6 @@ use protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
     OneofDescriptorProto,
 };
-use std::collections::{HashMap, VecDeque};
-use std::convert::TryInto;
-use std::hash::Hash;
 
 #[derive(Debug)]
 pub struct Context {
@@ -119,14 +119,6 @@ pub enum FieldType {
     Enum2(Weak<Enum>),
     Enum3(Weak<Enum>),
     Message(Weak<Message>),
-}
-// Do not cache this type! This type contains a strong `Rc` ponter
-// to other `Message` type, causes cycle-reference if it is not handled properly.
-#[derive(Debug, Clone)]
-pub enum MaybeEnumOrMessage {
-    Enum(Rc<Enum>),
-    Message(Rc<Message>),
-    Others,
 }
 
 #[derive(Debug, Clone)]
@@ -642,6 +634,46 @@ impl Field {
             ),
         })
     }
+    pub fn trait_scalar_getter_type_from_external(
+        &self,
+        impl_tag: &str,
+        lt: &str,
+    ) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Double => "f64".to_string(),
+            FieldType::Float => "f32".to_string(),
+            FieldType::Int32 => "i32".to_string(),
+            FieldType::Int64 => "i64".to_string(),
+            FieldType::UInt32 => "u32".to_string(),
+            FieldType::UInt64 => "u64".to_string(),
+            FieldType::SInt32 => "i32".to_string(),
+            FieldType::SInt64 => "i64".to_string(),
+            FieldType::Fixed32 => "u32".to_string(),
+            FieldType::Fixed64 => "u64".to_string(),
+            FieldType::SFixed32 => "i32".to_string(),
+            FieldType::SFixed64 => "i64".to_string(),
+            FieldType::Bool => "bool".to_string(),
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => format!("::std::borrow::Cow<{}, str>", lt),
+            FieldType::Bytes => format!("::std::borrow::Cow<{}, [u8]>", lt),
+            FieldType::Enum2(e) => upgrade(&e)?.rust_absolute_path(),
+            FieldType::Enum3(e) => upgrade(&e)?.rust_absolute_path(),
+            FieldType::Message(m) => format!(
+                "::std::borrow::Cow<\
+                    {lt},
+                    <{struct_path}<{impl_tag}>
+                        as {trait_path}
+                    >::Field{number}MessageType<{lt}>\
+                >",
+                lt = lt,
+                struct_path = self.message()?.rust_absolute_path(),
+                impl_tag = impl_tag,
+                trait_path = self.message()?.rust_absolute_trait_path(),
+                number = self.number(),
+            ),
+        })
+    }
+
     pub fn maybe_trait_scalar_getter_type_borrowed(
         &self,
         impl_tag: &str,
