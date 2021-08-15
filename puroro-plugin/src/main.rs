@@ -126,6 +126,11 @@ mod filters {
     ) -> ::askama::Result<impls::SimpleImpl> {
         Ok(impls::SimpleImpl::new(message))
     }
+    pub fn render_oneof_simple(
+        oneof: &Rc<wrappers::Oneof>,
+    ) -> ::askama::Result<impls::SimpleOneof> {
+        Ok(impls::SimpleOneof::try_new(oneof).unwrap())
+    }
     pub fn render_trait(message: &Rc<wrappers::Message>) -> ::askama::Result<Trait> {
         Ok(Trait {
             message: Clone::clone(message),

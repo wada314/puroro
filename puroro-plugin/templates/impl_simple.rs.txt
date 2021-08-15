@@ -22,10 +22,6 @@ impl {{ self.message.rust_absolute_trait_path() }} for {{ self.rust_ident() }} {
     type Field{{ field.number() }}MessageType<'this> = {{ m.rust_absolute_path() }}<::puroro::tags::SimpleImpl>;
     {%- else %}
     {%- endmatch %}
-    
-    {%- if field.is_non_synthetic_oneof_item().unwrap() %}
-    type Field{{ field.number() }}OneofItemType<'this> = {{ field.rust_oneof_field_type("::puroro::tags::SimpleImpl").unwrap() }};
-    {%- endif %}
 
     {%- if field.has_scalar_getter() %}
     /// {{ field.rust_one_line_comment().unwrap() }}

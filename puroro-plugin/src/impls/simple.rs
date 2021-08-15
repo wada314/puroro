@@ -13,6 +13,12 @@ pub struct SimpleImpl {
     fields: Vec<Field>,
 }
 
+#[derive(Template)]
+#[template(path = "oneof_simple.rs.txt")]
+pub struct SimpleOneof {
+    oneof: Oneof,
+}
+
 impl SimpleImpl {
     pub fn new(message: &Rc<wrappers::Message>) -> Self {
         Self {
@@ -33,6 +39,14 @@ impl SimpleImpl {
     }
 }
 
+impl SimpleOneof {
+    pub fn try_new(oneof: &Rc<wrappers::Oneof>) -> Result<Self> {
+        Ok(Self {
+            oneof: Oneof::try_new(oneof.clone())?,
+        })
+    }
+}
+
 pub struct Field {
     field: Rc<wrappers::Field>,
 }
@@ -43,6 +57,9 @@ impl Deref for Field {
     }
 }
 impl Field {
+    pub fn new(field: Rc<wrappers::Field>) -> Self {
+        Self { field }
+    }
     pub fn rust_field_type(&self, impl_tag: &'static str) -> Result<String> {
         let scalar_type = self.rust_scalar_field_type(impl_tag)?;
         Ok(match self.field.field_label()? {
@@ -86,5 +103,30 @@ impl Field {
             }
             t => t.numerical_rust_type()?.to_string(),
         })
+    }
+}
+pub struct Oneof {
+    oneof: Rc<wrappers::Oneof>,
+    fields: Vec<Field>,
+}
+impl Deref for Oneof {
+    type Target = wrappers::Oneof;
+    fn deref(&self) -> &Self::Target {
+        &self.oneof
+    }
+}
+impl Oneof {
+    pub fn try_new(oneof: Rc<wrappers::Oneof>) -> Result<Self> {
+        Ok(Self {
+            oneof: oneof.clone(),
+            fields: oneof
+                .fields()?
+                .iter()
+                .map(|f| Field::new(f.clone()))
+                .collect(),
+        })
+    }
+    pub fn fields(&self) -> &[Field] {
+        &self.fields
     }
 }

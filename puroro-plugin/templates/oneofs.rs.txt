@@ -1,18 +1,6 @@
 
-{%- for oneof in self.oneofs %}
+{%- for oneof in oneofs %}
 {%- if !oneof.is_synthetic().unwrap() %}
-{%- let message = oneof.message().unwrap() %}
-pub enum {{ oneof.rust_ident() }}<'msg, ImplTag> 
-where
-    {{ message.rust_absolute_path() }}<ImplTag>: 
-        ::puroro_internal::GetImplStruct 
-        + {{ message.rust_absolute_trait_path() }}
-{
-    {%- for field in oneof.fields().unwrap() %}
-    {{ field.rust_oneof_ident() }}(<{{ message.rust_absolute_path() }}<ImplTag>
-        as {{ message.rust_absolute_trait_path() }}
-    >::Field{{ field.number() }}OneofItemType<'msg>),
-    {%- endfor %}
-}
+{{ oneof|render_oneof_simple }}
 {%- endif %}
 {%- endfor %}

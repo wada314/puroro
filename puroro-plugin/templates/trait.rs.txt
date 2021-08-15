@@ -9,10 +9,6 @@ pub trait {{ message.rust_ident() }}Trait: ::std::clone::Clone {
     {%- else %}
     {%- endmatch %}
 
-    {%- if field.is_non_synthetic_oneof_item().unwrap() %}
-    type Field{{ field.number() }}OneofItemType<'this>: 'this;
-    {%- endif %}
-
     {%- if field.has_scalar_getter() %}
     /// {{ field.rust_one_line_comment().unwrap() }}
     fn {{ field.rust_ident() }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type().unwrap() }};

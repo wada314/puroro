@@ -1,2 +1,2 @@
 mod simple;
-pub use simple::SimpleImpl;
+pub use simple::{SimpleImpl, SimpleOneof};
