@@ -690,6 +690,13 @@ impl Field {
         })
     }
 
+    pub fn is_non_synthetic_oneof_item(&self) -> Result<bool> {
+        let message = self.message()?;
+        let maybe_oneof = self
+            .oneof_index()
+            .and_then(|index| message.oneofs().get(index as usize));
+        return maybe_oneof.map_or(Ok(false), |oneof| oneof.is_synthetic().map(|b| !b));
+    }
     pub fn has_scalar_getter(&self) -> bool {
         matches!(self.field_label(), Ok(FieldLabel::Unlabeled))
             && !matches!(self.field_type(), Ok(FieldType::Message(_)))
