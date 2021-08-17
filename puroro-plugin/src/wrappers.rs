@@ -138,11 +138,6 @@ pub enum MessageOrEnum {
 
 impl Context {
     pub fn try_from_proto(proto: CodeGeneratorRequest) -> Result<Rc<Context>> {
-        // lazy fields initialization order is important.
-        //  1. Context::lazy_input_files,
-        //  2. Context::lazy_fqtn_to_type_map,
-        //  3. Message::lazy_fields
-        // because the latters refer the formers.
         let context = Rc::new_cyclic(|weak_context| Context {
             input_files: proto
                 .proto_file
