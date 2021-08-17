@@ -1,0 +1,8 @@
+
+{#-################ Enums ################}
+
+{%- if !enums.is_empty() %}
+{%- for enume in enums %}
+{{ enume }}
+{%- endfor %}
+{%- endif %}

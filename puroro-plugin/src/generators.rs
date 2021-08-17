@@ -21,6 +21,8 @@ impl OutputFile {
     }
 }
 
+#[derive(Template)]
+#[template(path = "messages_and_enums.rs.txt")]
 pub struct InputFile {
     messages: Vec<Rc<Message>>,
     enums: Vec<Rc<Enum>>,
@@ -81,6 +83,8 @@ impl Message {
     }
 }
 
+#[derive(Template)]
+#[template(path = "enum.rs.txt")]
 struct Enum {
     ident: String,
     absolute_path: String,

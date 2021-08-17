@@ -18,10 +18,7 @@ pub mod _puroro_root {
 }
 
 {%- match input_file %}
-{%- when Some with (file) %}
-
-{#- Message structs #}
-
-
-{%- else %}     {#- match file #}
-{%- endmatch %} {#- match file #}
+{%- when Some with (input_file) %}
+{{ input_file }}
+{%- else %}
+{%- endmatch %}
