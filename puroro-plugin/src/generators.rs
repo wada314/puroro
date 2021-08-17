@@ -90,6 +90,7 @@ struct Enum {
     absolute_path: String,
     values: Vec<Rc<EnumValue>>,
     first_value: Rc<EnumValue>,
+    is_proto3: bool,
 }
 
 impl Enum {
@@ -110,6 +111,7 @@ impl Enum {
             absolute_path: e.rust_absolute_path(),
             values,
             first_value,
+            is_proto3: matches!(e.syntax()?, wrappers::ProtoSyntax::Proto3),
         })
     }
 }
