@@ -6,7 +6,6 @@
 mod error;
 mod generators;
 mod impls;
-#[allow(unused)]
 mod protos;
 mod utils;
 mod wrappers;
@@ -26,7 +25,7 @@ pub use protos::google;
 use protos::google::protobuf::compiler::code_generator_response::File;
 use protos::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 
-use ::askama::Template;
+use ::askama::Template as _;
 
 fn make_package_to_subpackages_map(
     files: &Vec<google::protobuf::FileDescriptorProto>,
@@ -66,7 +65,7 @@ fn package_to_filename(package: &str) -> String {
             + ".rs"
     }
 }
-
+/*
 #[derive(Template, Default)]
 #[template(path = "file.rs.txt")]
 pub struct OutputFile {
@@ -148,12 +147,12 @@ mod filters {
         })
     }
 }
+ */
 
 fn main() -> Result<()> {
     let mut cgreq: CodeGeneratorRequest = CodeGeneratorRequest::default();
     cgreq.deser(&mut stdin().bytes()).unwrap();
 
-    #[allow(unused)]
     let wrapped_cgreq = wrappers::Context::try_from_proto(cgreq.clone())?;
 
     let mut cgres: CodeGeneratorResponse = CodeGeneratorResponse::default();
@@ -165,26 +164,34 @@ fn main() -> Result<()> {
     let package_to_file_descriptor_map = wrapped_cgreq
         .input_files()
         .iter()
-        .map(|file| (file.package().iter().join("."), Clone::clone(file)))
-        .collect::<HashMap<_, _>>();
+        .map(|file| {
+            Ok((
+                file.package().iter().join("."),
+                Rc::new(generators::InputFile::try_new(file)?),
+            ))
+        })
+        .collect::<Result<HashMap<_, _>>>()?;
     // merge 2 hashmaps
-    let mut package_to_out_file = HashMap::<String, OutputFile>::new();
+    let mut package_to_out_file = HashMap::<String, generators::OutputFile>::new();
     for (package, subpackages) in package_to_subpackage_map {
+        let mut v = subpackages.into_iter().collect_vec();
+        v.sort();
         package_to_out_file
             .entry(package)
             .or_insert_with(Default::default)
-            .subpackages = subpackages;
+            .subpackages = v;
     }
     for (package, file) in package_to_file_descriptor_map {
         package_to_out_file
             .entry(package)
             .or_insert_with(Default::default)
-            .file = Some(file);
+            .input_file = Some(file);
     }
 
-    for (package, variables) in package_to_out_file {
+    for (package, output_context) in package_to_out_file {
         let filename = package_to_filename(&package);
-        let contents = variables.render().unwrap();
+        // Do render!
+        let contents = output_context.render().unwrap();
 
         let mut output_file = <File as Default>::default();
         output_file.name = Some(filename.into());

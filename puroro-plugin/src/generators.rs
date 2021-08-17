@@ -1,14 +1,22 @@
 use crate::wrappers;
 use crate::{ErrorKind, Result};
+use ::askama::Template;
 use ::std::rc::Rc;
 
-struct InputFile {
+#[derive(Template, Default)]
+#[template(path = "file.rs.txt")]
+pub struct OutputFile {
+    pub subpackages: Vec<String>,
+    pub input_file: Option<Rc<InputFile>>,
+}
+
+pub struct InputFile {
     messages: Vec<Rc<Message>>,
     enums: Vec<Rc<Enum>>,
 }
 
 impl InputFile {
-    fn try_new(f: &wrappers::InputFile) -> Result<Self> {
+    pub fn try_new(f: &wrappers::InputFile) -> Result<Self> {
         Ok(Self {
             messages: f
                 .messages()

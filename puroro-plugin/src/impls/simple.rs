@@ -1,9 +1,11 @@
+#![cfg(any())]
+
 use crate::utils::*;
 use crate::wrappers::{FieldLabel, FieldType};
 use crate::{wrappers, ErrorKind, Result};
-use ::askama::Template;
-use ::std::ops::Deref;
-use ::std::rc::Rc;
+use askama::Template;
+use std::ops::Deref;
+use std::rc::Rc;
 
 #[derive(Template)]
 #[template(path = "impl_simple.rs.txt")]

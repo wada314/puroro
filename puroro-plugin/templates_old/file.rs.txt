@@ -1,0 +1,28 @@
+// A generated source code by puroro library
+
+{%- for subpackage in subpackages %}
+pub mod {{ subpackage }};
+{%- endfor %}
+
+{%- match file %}
+{%- when Some with (file) %}
+// package {{ file.package()|join(".") }}
+
+pub mod puroro_root {
+    pub use super::{{ file.rust_path_to_root_module() }}::*;
+}
+
+{#- Message structs #}
+
+{%- if !file.messages().is_empty() %}
+{{ file.messages()|render_messages }}
+{%- endif %}
+
+{#- Enums #}
+
+{%- if !file.enums().is_empty() %}
+{{ file.enums()|render_enums }}
+{%- endif %}
+
+{%- else %}     {#- match file #}
+{%- endmatch %} {#- match file #}
