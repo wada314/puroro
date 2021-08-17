@@ -171,27 +171,28 @@ fn main() -> Result<()> {
             ))
         })
         .collect::<Result<HashMap<_, _>>>()?;
-    // merge 2 hashmaps
-    let mut package_to_out_file = HashMap::<String, generators::OutputFile>::new();
+
+    // merge 2 hashmaps, create a HashMap of OutputFile
+    let mut output_file_contexts = HashMap::<String, generators::OutputFile>::new();
     for (package, subpackages) in package_to_subpackage_map {
         let mut v = subpackages.into_iter().collect_vec();
         v.sort();
-        package_to_out_file
-            .entry(package)
-            .or_insert_with(Default::default)
+        output_file_contexts
+            .entry(package.clone())
+            .or_insert_with(|| generators::OutputFile::new(&package))
             .subpackages = v;
     }
     for (package, file) in package_to_file_descriptor_map {
-        package_to_out_file
-            .entry(package)
-            .or_insert_with(Default::default)
+        output_file_contexts
+            .entry(package.clone())
+            .or_insert_with(|| generators::OutputFile::new(&package))
             .input_file = Some(file);
     }
 
-    for (package, output_context) in package_to_out_file {
-        let filename = package_to_filename(&package);
+    for output_contexts in output_file_contexts.values() {
+        let filename = package_to_filename(&output_contexts.package);
         // Do render!
-        let contents = output_context.render().unwrap();
+        let contents = output_contexts.render().unwrap();
 
         let mut output_file = <File as Default>::default();
         output_file.name = Some(filename.into());

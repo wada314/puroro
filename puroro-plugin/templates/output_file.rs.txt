@@ -1,0 +1,27 @@
+// A generated source code by puroro library
+{%- if package.is_empty() %}
+// package (root)
+{%- else %}
+// package {{ package }}
+{%- endif %}
+
+{%- for subpackage in subpackages %}
+pub mod {{ subpackage }};
+{%- endfor %}
+
+pub mod _puroro_root {
+    {%- if package.is_empty() %}
+    pub use super::*;
+    {%- else %}
+    pub use super::super::_puroro_root::*;
+    {%- endif %}
+}
+
+{%- match input_file %}
+{%- when Some with (file) %}
+
+{#- Message structs #}
+
+
+{%- else %}     {#- match file #}
+{%- endmatch %} {#- match file #}

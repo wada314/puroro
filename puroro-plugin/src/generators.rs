@@ -3,16 +3,28 @@ use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::std::rc::Rc;
 
-#[derive(Template, Default)]
-#[template(path = "file.rs.txt")]
+#[derive(Template)]
+#[template(path = "output_file.rs.txt")]
 pub struct OutputFile {
+    pub package: String,
     pub subpackages: Vec<String>,
     pub input_file: Option<Rc<InputFile>>,
+}
+
+impl OutputFile {
+    pub fn new(package: &str) -> Self {
+        Self {
+            package: package.to_string(),
+            subpackages: Vec::new(),
+            input_file: None,
+        }
+    }
 }
 
 pub struct InputFile {
     messages: Vec<Rc<Message>>,
     enums: Vec<Rc<Enum>>,
+    package: String,
 }
 
 impl InputFile {
@@ -28,6 +40,7 @@ impl InputFile {
                 .into_iter()
                 .map(|e| Ok(Rc::new(Enum::try_new(e)?)))
                 .collect::<Result<Vec<_>>>()?,
+            package: f.package().join("."),
         })
     }
 }
