@@ -141,6 +141,7 @@ impl Context {
         let context = Rc::new_cyclic(|weak_context| Context {
             input_files: proto
                 .proto_file
+                .clone()
                 .into_iter()
                 .map(|file| InputFile::try_from_proto(weak_context.clone(), file))
                 .collect::<Result<Vec<_>>>()
@@ -220,6 +221,7 @@ impl InputFile {
         let package = Rc::new(
             proto
                 .package
+                .clone()
                 .unwrap_or_default()
                 .split('.')
                 .filter_map(|p| {
@@ -231,9 +233,9 @@ impl InputFile {
                 })
                 .collect_vec(),
         );
-        let proto_messages = proto.message_type;
-        let proto_enums = proto.enum_type;
-        let proto_syntax = proto.syntax;
+        let proto_messages = proto.message_type.clone();
+        let proto_enums = proto.enum_type.clone();
+        let proto_syntax = proto.syntax.clone();
         let mut file = Rc::new_cyclic(|file| Self {
             context: context,
             package: Clone::clone(&package),
@@ -303,6 +305,7 @@ impl Message {
     ) -> Result<Rc<Self>> {
         let proto_name = proto
             .name
+            .clone()
             .ok_or(ErrorKind::EmptyInputField {
                 name: "DescriptorProto.name".into(),
             })?
@@ -312,10 +315,10 @@ impl Message {
             v.push(proto_name.clone());
             v
         });
-        let proto_field = proto.field;
-        let proto_nested_type = proto.nested_type;
-        let proto_enum_type = proto.enum_type;
-        let proto_oneofs = proto.oneof_decl;
+        let proto_field = proto.field.clone();
+        let proto_nested_type = proto.nested_type.clone();
+        let proto_enum_type = proto.enum_type.clone();
+        let proto_oneofs = proto.oneof_decl.clone();
         let message = Rc::new_cyclic(|message| Self {
             input_file: Clone::clone(&input_file),
             rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)),
@@ -431,11 +434,12 @@ impl Enum {
     ) -> Result<Rc<Self>> {
         let proto_name = proto
             .name
+            .clone()
             .ok_or(ErrorKind::EmptyInputField {
                 name: "EnumDescriptorProto.name".into(),
             })?
             .to_string();
-        let proto_value = proto.value;
+        let proto_value = proto.value.clone();
         Ok(Rc::new(Self {
             input_file: input_file,
             rust_ident: get_keyword_safe_ident(&to_camel_case(&proto_name)),
@@ -445,7 +449,9 @@ impl Enum {
             values: proto_value
                 .into_iter()
                 .map(|v| EnumValue {
-                    rust_ident: get_keyword_safe_ident(&to_camel_case(&v.name.unwrap_or_default())),
+                    rust_ident: get_keyword_safe_ident(&to_camel_case(
+                        &v.name.clone().unwrap_or_default(),
+                    )),
                     number: v.number.unwrap_or_default(),
                 })
                 .collect_vec(),
@@ -493,15 +499,16 @@ impl Field {
     pub fn try_from_proto(message: Weak<Message>, proto: FieldDescriptorProto) -> Result<Self> {
         let proto_name = proto
             .name
+            .clone()
             .ok_or(ErrorKind::EmptyInputField {
                 name: "FieldDescriptorProto.name".into(),
             })?
             .to_string();
-        let proto_type_name = proto.type_name.unwrap_or_default().to_string();
-        let proto_type_enum = proto.type_.ok_or(ErrorKind::InternalError {
+        let proto_type_name = proto.type_name.clone().unwrap_or_default().to_string();
+        let proto_type_enum = proto.type_.clone().ok_or(ErrorKind::InternalError {
             detail: "currently we are assuming the field type enum is always set.".to_string(),
         })?;
-        let proto_label = proto.label.ok_or(ErrorKind::InternalError {
+        let proto_label = proto.label.clone().ok_or(ErrorKind::InternalError {
             detail: "currently we are assuming the field label enum is always set.".to_string(),
         })?;
         let proto_is_optional3 = proto.proto3_optional.unwrap_or_default();
