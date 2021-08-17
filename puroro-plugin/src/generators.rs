@@ -11,15 +11,50 @@ struct Message {
     nested_messages: Vec<Rc<Message>>,
     nested_enums: Vec<Rc<Enum>>,
     fields: Vec<Rc<Field>>,
+    oneofs: Vec<Rc<Oneof>>,
 }
 
 struct Enum {
+    ident: String,
+    absolute_path: String,
     values: Vec<Rc<EnumValue>>,
+    first_value: Rc<EnumValue>,
+}
+
+impl Enum {
+    fn try_new(e: &wrappers::Enum) -> Result<Self> {
+        let values = e
+            .values()
+            .into_iter()
+            .map(|v| -> Result<_> { Rc::new(EnumValue::try_new(v)) })
+            .collect::<Result<Vec<_>>>()?;
+        let first_value = values
+            .first()
+            .ok_or(ErrorKind::EmptyEnum {
+                name: e.proto_name(),
+            })?
+            .clone();
+        Ok(Self {
+            ident: e.rust_ident(),
+            absolute_path: e.rust_absolute_path(),
+            values,
+            first_value,
+        })
+    }
 }
 
 struct EnumValue {
     ident: String,
     number: i32,
+}
+
+impl EnumValue {
+    fn try_new(v: &wrappers::EnumValue) -> Result<Self> {
+        Ok(Self {
+            ident: v.rust_ident(),
+            number: v.number(),
+        })
+    }
 }
 
 struct Field {
@@ -30,12 +65,6 @@ struct Field {
     trait_has_scalar_getter: bool,
     trait_has_optional_getter: bool,
     trait_has_repeated_getter: bool,
-}
-
-struct Oneof {
-    enum_ident: String,
-    getter_ident: String,
-    fields: Vec<Rc<Field>>,
 }
 
 impl Field {
@@ -50,6 +79,12 @@ impl Field {
             trait_has_repeated_getter: f.has_repeated_getter(),
         })
     }
+}
+
+struct Oneof {
+    enum_ident: String,
+    getter_ident: String,
+    fields: Vec<Rc<Field>>,
 }
 
 impl Oneof {
