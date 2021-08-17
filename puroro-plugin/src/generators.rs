@@ -47,11 +47,17 @@ impl InputFile {
     }
 }
 
+#[derive(Template)]
+#[template(path = "message.rs.txt")]
 struct Message {
+    ident: String,
+    submodule_ident: String,
     nested_messages: Vec<Rc<Message>>,
     nested_enums: Vec<Rc<Enum>>,
     fields: Vec<Rc<Field>>,
     oneofs: Vec<Rc<Oneof>>,
+
+    simple_ident: String,
 }
 
 impl Message {
@@ -67,6 +73,8 @@ impl Message {
             .map(|o| Ok(Rc::new(Oneof::try_new(o, &fields)?)))
             .collect::<Result<Vec<_>>>()?;
         Ok(Self {
+            ident: m.rust_ident().to_string(),
+            submodule_ident: m.rust_nested_module_ident().to_string(),
             nested_messages: m
                 .nested_messages()
                 .into_iter()
@@ -79,6 +87,7 @@ impl Message {
                 .collect::<Result<Vec<_>>>()?,
             fields,
             oneofs,
+            simple_ident: format!("{}_Simple", m.rust_ident()),
         })
     }
 }
@@ -138,6 +147,7 @@ struct Field {
     trait_has_scalar_getter: bool,
     trait_has_optional_getter: bool,
     trait_has_repeated_getter: bool,
+    simple_field_type: String,
 }
 
 impl Field {
@@ -150,13 +160,14 @@ impl Field {
             trait_has_scalar_getter: f.has_scalar_getter(),
             trait_has_optional_getter: f.has_scalar_optional_getter(),
             trait_has_repeated_getter: f.has_repeated_getter(),
+            simple_field_type: f.simple_field_type()?,
         })
     }
 }
 
 struct Oneof {
     enum_ident: String,
-    getter_ident: String,
+    field_ident: String,
     fields: Vec<Rc<Field>>,
 }
 
@@ -164,7 +175,7 @@ impl Oneof {
     fn try_new(o: &wrappers::Oneof, fields: &[Rc<Field>]) -> Result<Self> {
         Ok(Oneof {
             enum_ident: o.rust_enum_ident().to_string(),
-            getter_ident: o.rust_getter_ident().to_string(),
+            field_ident: o.rust_getter_ident().to_string(),
             fields: o
                 .field_indices()?
                 .into_iter()

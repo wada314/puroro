@@ -714,6 +714,50 @@ impl Field {
     pub fn has_repeated_getter(&self) -> bool {
         matches!(self.field_label(), Ok(FieldLabel::Repeated))
     }
+
+    pub fn simple_field_type(&self) -> Result<String> {
+        let scalar_type = self.simple_scalar_field_type()?;
+        Ok(match self.field_label()? {
+            FieldLabel::Required | FieldLabel::Optional => {
+                format!("::std::option::Option<{}>", scalar_type)
+            }
+            FieldLabel::Unlabeled => {
+                if matches!(self.field_type(), Ok(FieldType::Message(_))) {
+                    format!("::std::option::Option<{}>", scalar_type)
+                } else {
+                    scalar_type
+                }
+            }
+            FieldLabel::Repeated => format!("::std::vec::Vec<{}>", scalar_type),
+        })
+    }
+
+    pub fn simple_oneof_field_type(&self) -> Result<String> {
+        let scalar_type = self.simple_scalar_field_type()?;
+        Ok(scalar_type)
+    }
+
+    fn simple_scalar_field_type(&self) -> Result<String> {
+        Ok(match self.field_type()? {
+            FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
+            FieldType::String => "::std::string::String".to_string(),
+            FieldType::Bytes => "::std::vec::Vec<u8>".to_string(),
+            FieldType::Enum2(e) => upgrade(&e)?.rust_absolute_path(),
+            FieldType::Enum3(e) => upgrade(&e)?.rust_absolute_path(),
+            FieldType::Message(m) => {
+                let bare_msg = format!(
+                    "{path}<::puroro::tags::SimpleImpl>",
+                    path = upgrade(&m)?.rust_absolute_path(),
+                );
+                if matches!(self.field_label(), Ok(FieldLabel::Repeated)) {
+                    bare_msg
+                } else {
+                    format!("::std::boxed::Box<{}>", bare_msg)
+                }
+            }
+            t => t.numerical_rust_type()?.to_string(),
+        })
+    }
 }
 
 impl Oneof {
@@ -996,15 +1040,15 @@ fn test_make_module_path() {
     let outer_messages = iter::once("CodeGeneratorResponse");
     let empty = iter::empty();
     assert_eq!(
-        "self::puroro_root::google::protobuf::compiler",
+        "self::_puroro_root::google::protobuf::compiler",
         make_module_path(package.clone(), empty.clone())
     );
     assert_eq!(
-        "self::puroro_root::puroro_nested::code_generator_response",
+        "self::_puroro_root::puroro_nested::code_generator_response",
         make_module_path(empty.clone(), outer_messages.clone())
     );
     assert_eq!(
-        "self::puroro_root::google::protobuf::compiler::puroro_nested::code_generator_response",
+        "self::_puroro_root::google::protobuf::compiler::puroro_nested::code_generator_response",
         make_module_path(package.clone(), outer_messages.clone())
     );
 }

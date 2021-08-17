@@ -76,12 +76,12 @@ where
 
     let outer_messages = outer_messages.map(|s| {
         format!(
-            "puroro_nested::{}",
+            "_puroro_nested::{}",
             get_keyword_safe_ident(&to_lower_snake_case(s))
         )
     });
     let mut modules_iter = iter::once("self".to_string())
-        .chain(iter::once("puroro_root".to_string()))
+        .chain(iter::once("_puroro_root".to_string()))
         .chain(package)
         .chain(outer_messages);
     modules_iter.join("::")

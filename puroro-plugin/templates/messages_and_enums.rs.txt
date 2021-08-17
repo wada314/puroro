@@ -1,4 +1,12 @@
 
+{#-################ Messages ################}
+
+{%- if !messages.is_empty() %}
+{%- for message in messages %}
+{{ message }}
+{%- endfor %}
+{%- endif %}
+
 {#-################ Enums ################}
 
 {%- if !enums.is_empty() %}
