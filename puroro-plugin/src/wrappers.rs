@@ -777,6 +777,22 @@ impl Oneof {
             })
             .map(|v| v.as_slice())
     }
+    pub fn field_indices(&self) -> Result<Vec<usize>> {
+        Ok(upgrade(&self.message)?
+            .fields()
+            .into_iter()
+            .cloned()
+            .enumerate()
+            .filter_map(|(field_index, field)| {
+                if let Some(oneof_index) = field.oneof_index() {
+                    if oneof_index == self.index {
+                        return Some(field_index);
+                    }
+                }
+                None
+            })
+            .collect::<Vec<_>>())
+    }
     pub fn maybe_generic_params(&self, lt: &str) -> Result<String> {
         let need_lt = self
             .fields()?

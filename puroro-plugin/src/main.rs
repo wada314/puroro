@@ -4,6 +4,7 @@
 #![allow(incomplete_features)]
 
 mod error;
+mod generators;
 mod impls;
 #[allow(unused)]
 mod protos;
