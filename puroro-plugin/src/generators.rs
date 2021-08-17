@@ -7,11 +7,57 @@ struct InputFile {
     enums: Vec<Rc<Enum>>,
 }
 
+impl InputFile {
+    fn try_new(f: &wrappers::InputFile) -> Result<Self> {
+        Ok(Self {
+            messages: f
+                .messages()
+                .into_iter()
+                .map(|m| Ok(Rc::new(Message::try_new(m)?)))
+                .collect::<Result<Vec<_>>>()?,
+            enums: f
+                .enums()
+                .into_iter()
+                .map(|e| Ok(Rc::new(Enum::try_new(e)?)))
+                .collect::<Result<Vec<_>>>()?,
+        })
+    }
+}
+
 struct Message {
     nested_messages: Vec<Rc<Message>>,
     nested_enums: Vec<Rc<Enum>>,
     fields: Vec<Rc<Field>>,
     oneofs: Vec<Rc<Oneof>>,
+}
+
+impl Message {
+    fn try_new(m: &wrappers::Message) -> Result<Self> {
+        let fields = m
+            .fields()
+            .into_iter()
+            .map(|f| Ok(Rc::new(Field::try_new(f)?)))
+            .collect::<Result<Vec<_>>>()?;
+        let oneofs = m
+            .oneofs()
+            .into_iter()
+            .map(|o| Ok(Rc::new(Oneof::try_new(o, &fields)?)))
+            .collect::<Result<Vec<_>>>()?;
+        Ok(Self {
+            nested_messages: m
+                .nested_messages()
+                .into_iter()
+                .map(|m| -> Result<_> { Ok(Rc::new(Message::try_new(m)?)) })
+                .collect::<Result<Vec<_>>>()?,
+            nested_enums: m
+                .nested_enums()
+                .into_iter()
+                .map(|e| -> Result<_> { Ok(Rc::new(Enum::try_new(e)?)) })
+                .collect::<Result<Vec<_>>>()?,
+            fields,
+            oneofs,
+        })
+    }
 }
 
 struct Enum {
@@ -26,16 +72,16 @@ impl Enum {
         let values = e
             .values()
             .into_iter()
-            .map(|v| -> Result<_> { Rc::new(EnumValue::try_new(v)) })
+            .map(|v| -> Result<_> { Ok(Rc::new(EnumValue::try_new(v)?)) })
             .collect::<Result<Vec<_>>>()?;
         let first_value = values
             .first()
             .ok_or(ErrorKind::EmptyEnum {
-                name: e.proto_name(),
+                name: e.proto_name().to_string(),
             })?
             .clone();
         Ok(Self {
-            ident: e.rust_ident(),
+            ident: e.rust_ident().to_string(),
             absolute_path: e.rust_absolute_path(),
             values,
             first_value,
@@ -51,7 +97,7 @@ struct EnumValue {
 impl EnumValue {
     fn try_new(v: &wrappers::EnumValue) -> Result<Self> {
         Ok(Self {
-            ident: v.rust_ident(),
+            ident: v.rust_ident().to_string(),
             number: v.number(),
         })
     }
