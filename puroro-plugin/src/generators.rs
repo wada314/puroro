@@ -208,6 +208,8 @@ impl Field {
     }
 }
 
+#[derive(Template)]
+#[template(path = "oneof.rs.txt")]
 struct Oneof {
     enum_ident: String,
     field_ident: String,

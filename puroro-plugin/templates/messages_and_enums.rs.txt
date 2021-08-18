@@ -25,6 +25,7 @@ pub mod _puroro_traits {
 
 {#-################ Nested Items ################}
 
+{%- if !messages.is_empty() %}
 pub use _puroro_nested::*;
 pub mod _puroro_nested {
     {%- for m in messages %}
@@ -32,8 +33,20 @@ pub mod _puroro_nested {
         mod _puroro_root {
             pub use super::super::super::_puroro_root::*;
         }
+
+        {#-######## Nested messages & enums ########}
         {{ m.nested|indent(8) }}
+        
+        {#-######## Oneof enums ########}
+        {%- if !m.oneofs.is_empty() %}
+        pub use _puroro_oneofs::*;
+        pub mod _puroro_oneofs {
+            {%- for oneof in m.oneofs %}
+            {%- endfor %}
+        }
+        {%- endif %}
     }
     {%- endfor %}
 }
+{%- endif %}
 
