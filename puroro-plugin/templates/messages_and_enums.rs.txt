@@ -1,8 +1,7 @@
-
 {#-################ Messages ################}
 
 {%- if !messages.is_empty() %}
-{{ messages|print_structs }}
+{{- messages|print_structs }}
 {%- endif %}
 
 {#-################ Traits ################}
@@ -12,7 +11,6 @@ pub mod _puroro_traits {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    
     {{ messages|print_traits|indent(4) }}
 }
 {%- endif %}
@@ -34,7 +32,7 @@ pub mod _puroro_nested {
         mod _puroro_root {
             pub use super::super::super::_puroro_root::*;
         }
-        {{ m.nested }}
+        {{ m.nested|indent(8) }}
     }
     {%- endfor %}
 }

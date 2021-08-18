@@ -83,8 +83,7 @@ where
 
     {%- if field.trait_has_scalar_getter %}
     fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
-        <
-            <Self as ::puroro_internal::GetImplStruct>::Type
+        <<Self as ::puroro_internal::GetImplStruct>::Type
             as {{ m.trait_absolute_path }}
         >::{{ field.ident }}(&self.0)
     }
@@ -92,8 +91,7 @@ where
 
     {%- if field.trait_has_optional_getter %}
     fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
-        <
-            <Self as ::puroro_internal::GetImplStruct>::Type
+        <<Self as ::puroro_internal::GetImplStruct>::Type
             as {{ m.trait_absolute_path }}
         >::{{ field.ident }}(&self.0)
     }
@@ -106,8 +104,7 @@ where
     >::Field{{ field.number }}RepeatedType::<'this>;
 
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
-        <
-            <Self as ::puroro_internal::GetImplStruct>::Type
+        <<Self as ::puroro_internal::GetImplStruct>::Type
             as {{ m.trait_absolute_path }}
         >::{{ field.ident }}(&self.0)
     }
