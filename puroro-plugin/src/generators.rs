@@ -8,7 +8,7 @@ use ::std::rc::Rc;
 pub struct OutputFile {
     pub package: String,
     pub subpackages: Vec<String>,
-    pub input_file: Option<Rc<InputFile>>,
+    pub input_file: Option<Rc<MessagesAndEnums>>,
 }
 
 impl OutputFile {
@@ -23,37 +23,31 @@ impl OutputFile {
 
 #[derive(Template)]
 #[template(path = "messages_and_enums.rs.txt")]
-pub struct InputFile {
+pub struct MessagesAndEnums {
     messages: Vec<Rc<Message>>,
     enums: Vec<Rc<Enum>>,
-    package: String,
 }
 
-impl InputFile {
+impl MessagesAndEnums {
     pub fn try_new(f: &wrappers::InputFile) -> Result<Self> {
-        Ok(Self {
-            messages: f
-                .messages()
-                .into_iter()
-                .map(|m| Ok(Rc::new(Message::try_new(m)?)))
-                .collect::<Result<Vec<_>>>()?,
-            enums: f
-                .enums()
-                .into_iter()
-                .map(|e| Ok(Rc::new(Enum::try_new(e)?)))
-                .collect::<Result<Vec<_>>>()?,
-            package: f.package().join("."),
-        })
+        let messages = f
+            .messages()
+            .into_iter()
+            .map(|m| Ok(Rc::new(Message::try_new(m)?)))
+            .collect::<Result<Vec<_>>>()?;
+        let enums = f
+            .enums()
+            .into_iter()
+            .map(|e| Ok(Rc::new(Enum::try_new(e)?)))
+            .collect::<Result<Vec<_>>>()?;
+        Ok(Self { messages, enums })
     }
 }
 
-#[derive(Template)]
-#[template(path = "message.rs.txt")]
 struct Message {
     ident: String,
     submodule_ident: String,
-    nested_messages: Vec<Rc<Message>>,
-    nested_enums: Vec<Rc<Enum>>,
+    nested: Rc<MessagesAndEnums>,
     fields: Vec<Rc<Field>>,
     oneofs: Vec<Rc<Oneof>>,
 
@@ -72,19 +66,23 @@ impl Message {
             .into_iter()
             .map(|o| Ok(Rc::new(Oneof::try_new(o, &fields)?)))
             .collect::<Result<Vec<_>>>()?;
+        let nested_messages = m
+            .nested_messages()
+            .into_iter()
+            .map(|m| -> Result<_> { Ok(Rc::new(Message::try_new(m)?)) })
+            .collect::<Result<Vec<_>>>()?;
+        let nested_enums = m
+            .nested_enums()
+            .into_iter()
+            .map(|e| -> Result<_> { Ok(Rc::new(Enum::try_new(e)?)) })
+            .collect::<Result<Vec<_>>>()?;
         Ok(Self {
             ident: m.rust_ident().to_string(),
             submodule_ident: m.rust_nested_module_ident().to_string(),
-            nested_messages: m
-                .nested_messages()
-                .into_iter()
-                .map(|m| -> Result<_> { Ok(Rc::new(Message::try_new(m)?)) })
-                .collect::<Result<Vec<_>>>()?,
-            nested_enums: m
-                .nested_enums()
-                .into_iter()
-                .map(|e| -> Result<_> { Ok(Rc::new(Enum::try_new(e)?)) })
-                .collect::<Result<Vec<_>>>()?,
+            nested: Rc::new(MessagesAndEnums {
+                messages: nested_messages,
+                enums: nested_enums,
+            }),
             fields,
             oneofs,
             simple_ident: format!("{}_Simple", m.rust_ident()),
@@ -188,6 +186,21 @@ impl Oneof {
                         .clone())
                 })
                 .collect::<Result<Vec<_>>>()?,
+        })
+    }
+}
+
+#[derive(Template)]
+#[template(path = "structs.rs.txt")]
+struct Structs {
+    messages: Vec<Rc<Message>>,
+}
+
+mod filters {
+    use super::*;
+    pub(super) fn print_structs(messages: &[Rc<Message>]) -> ::askama::Result<Structs> {
+        Ok(Structs {
+            messages: messages.to_vec(),
         })
     }
 }

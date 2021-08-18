@@ -1,0 +1,32 @@
+{%- for m in messages %}
+
+#[allow(unused)]
+pub struct {{ m.ident }}<ImplTag = ::puroro::tags::SimpleImpl>(<Self as ::puroro_internal::GetImplStruct>::Type)
+where Self: ::puroro_internal::GetImplStruct;
+
+{%- endfor %}
+
+mod _puroro_impls {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+
+    {%- for m in messages %}
+
+    impl ::puroro_internal::GetImplStruct for super::{{ m.ident }}<::puroro::tags::SimpleImpl> {
+        type Type = {{ m.simple_ident }};
+    }
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, Default, PartialEq, Debug)]
+    struct {{ m.simple_ident }} {
+        {%- for field in m.fields %}
+        pub {{ field.ident }}: {{ field.simple_field_type }},
+        {%- endfor %}
+        {%- for oneof in m.oneofs %}
+        pub {{ oneof.field_ident }}: ::std::option::Option<i32/*TODO*/>,
+        {%- endfor %}
+    }
+
+    {%- endfor %}
+}

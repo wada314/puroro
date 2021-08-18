@@ -167,7 +167,7 @@ fn main() -> Result<()> {
         .map(|file| {
             Ok((
                 file.package().iter().join("."),
-                Rc::new(generators::InputFile::try_new(file)?),
+                Rc::new(generators::MessagesAndEnums::try_new(file)?),
             ))
         })
         .collect::<Result<HashMap<_, _>>>()?;
