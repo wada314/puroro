@@ -16,10 +16,10 @@ use ::puroro::{DeserFromBytesIter, SerToIoWrite};
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
 
-use std::collections::{HashMap, HashSet};
-use std::io::Read;
-use std::io::{stdin, stdout};
-use std::rc::Rc;
+use ::std::collections::{HashMap, HashSet};
+use ::std::io::Read;
+use ::std::io::{stdin, stdout};
+use ::std::rc::Rc;
 
 pub use protos::google;
 use protos::google::protobuf::compiler::code_generator_response::File;
@@ -65,89 +65,6 @@ fn package_to_filename(package: &str) -> String {
             + ".rs"
     }
 }
-/*
-#[derive(Template, Default)]
-#[template(path = "file.rs.txt")]
-pub struct OutputFile {
-    subpackages: HashSet<String>,
-    file: Option<Rc<wrappers::InputFile>>,
-}
-
-#[derive(Template, Default)]
-#[template(path = "messages.rs.txt")]
-pub struct Messages {
-    messages: Vec<Rc<wrappers::Message>>,
-}
-
-#[derive(Template)]
-#[template(path = "message.rs.txt")]
-pub struct Message {
-    message: Rc<wrappers::Message>,
-}
-
-#[derive(Template)]
-#[template(path = "trait.rs.txt")]
-pub struct Trait {
-    message: Rc<wrappers::Message>,
-}
-
-#[derive(Template)]
-#[template(path = "enums.rs.txt")]
-pub struct Enums {
-    enums: Vec<Rc<wrappers::Enum>>,
-}
-
-#[derive(Template)]
-#[template(path = "oneofs.rs.txt")]
-pub struct Oneofs {
-    oneofs: Vec<Rc<wrappers::Oneof>>,
-}
-
-impl Messages {
-    pub fn has_nested_items(&self) -> bool {
-        self.messages.iter().any(|m| m.has_nested_items())
-    }
-}
-
-mod filters {
-    use super::*;
-    pub fn render_messages(messages: &[Rc<wrappers::Message>]) -> ::askama::Result<Messages> {
-        Ok(Messages {
-            messages: messages.to_vec(),
-        })
-    }
-    pub fn render_message(message: &Rc<wrappers::Message>) -> ::askama::Result<Message> {
-        Ok(Message {
-            message: Clone::clone(message),
-        })
-    }
-    pub fn render_impl_simple(
-        message: &Rc<wrappers::Message>,
-    ) -> ::askama::Result<impls::SimpleImpl> {
-        Ok(impls::SimpleImpl::try_new(message).unwrap())
-    }
-    pub fn render_oneof_simple(
-        oneof: &Rc<wrappers::Oneof>,
-    ) -> ::askama::Result<impls::SimpleOneof> {
-        Ok(impls::SimpleOneof::try_new(oneof).unwrap())
-    }
-    pub fn render_trait(message: &Rc<wrappers::Message>) -> ::askama::Result<Trait> {
-        Ok(Trait {
-            message: Clone::clone(message),
-        })
-    }
-    pub fn render_enums(enums: &[Rc<wrappers::Enum>]) -> ::askama::Result<Enums> {
-        Ok(Enums {
-            enums: enums.to_vec(),
-        })
-    }
-    pub fn render_oneofs(oneofs: &[Rc<wrappers::Oneof>]) -> ::askama::Result<Oneofs> {
-        Ok(Oneofs {
-            oneofs: oneofs.to_vec(),
-        })
-    }
-}
- */
 
 fn main() -> Result<()> {
     let mut cgreq: CodeGeneratorRequest = CodeGeneratorRequest::default();
