@@ -1,5 +1,4 @@
-{%- for m in messages -%}
-
+{%- for m in messages %}
 pub trait {{ m.ident }}Trait: ::std::clone::Clone {
     {%- for field in m.fields %}
 
@@ -22,5 +21,4 @@ pub trait {{ m.ident }}Trait: ::std::clone::Clone {
     {%- endif %}
     {%- endfor %}
 }
-
 {%- endfor %}
