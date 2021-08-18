@@ -1,4 +1,4 @@
-{#-################ Messages ################}
+{#-################ Message structs ################}
 
 {%- if !messages.is_empty() %}
 {{- messages|print_structs }}
@@ -42,6 +42,7 @@ pub mod _puroro_nested {
         pub use _puroro_oneofs::*;
         pub mod _puroro_oneofs {
             {%- for oneof in m.oneofs %}
+            {{ oneof|indent(12) }}
             {%- endfor %}
         }
         {%- endif %}
