@@ -19,7 +19,6 @@ type Result<T> = std::result::Result<T, GeneratorError>;
 use ::std::collections::{HashMap, HashSet};
 use ::std::io::Read;
 use ::std::io::{stdin, stdout};
-use ::std::rc::Rc;
 
 pub use protos::google;
 use protos::google::protobuf::compiler::code_generator_response::File;
@@ -84,7 +83,7 @@ fn main() -> Result<()> {
         .map(|file| {
             Ok((
                 file.package().iter().join("."),
-                Rc::new(generators::MessagesAndEnums::try_new(file)?),
+                generators::MessagesAndEnums::try_new(file)?,
             ))
         })
         .collect::<Result<HashMap<_, _>>>()?;

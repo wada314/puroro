@@ -1,6 +1,6 @@
 enum {{ enum_ident }} {
     {%- for field in fields %}
-    {{ field.oneof_ident }}(i32/*TODO*/),
+    {{ field.ident }}(i32/*TODO*/),
     {%- endfor %}
 }
 
@@ -9,6 +9,6 @@ enum {{ enum_ident }} {
 pub enum {{ enum_ident }}
 {
     {%- for field in fields %}
-    {{ field.oneof_ident }}(i32/*TODO*/),
+    {{ field.ident }}(i32/*TODO*/),
     {%- endfor %}
 }

@@ -2,6 +2,7 @@ use crate::utils::upgrade;
 use crate::wrappers;
 use crate::{ErrorKind, Result};
 use ::askama::Template;
+use ::itertools::Itertools;
 use ::std::collections::HashMap;
 use ::std::rc::Rc;
 
@@ -45,13 +46,13 @@ impl MessagesAndEnums {
         let messages = f
             .messages()
             .into_iter()
-            .map(|m| Ok(Message::try_new(m)?))
-            .collect::<Result<Vec<_>>>()?;
+            .map(|m| Message::try_new(m))
+            .try_collect()?;
         let enums = f
             .enums()
             .into_iter()
-            .map(|e| Ok(Enum::try_new(e)?))
-            .collect::<Result<Vec<_>>>()?;
+            .map(|e| Enum::try_new(e))
+            .try_collect()?;
         Ok(Self { messages, enums })
     }
 }
@@ -72,23 +73,23 @@ impl Message {
         let fields = m
             .fields()
             .into_iter()
-            .map(|f| Ok(Field::try_new(f)?))
-            .collect::<Result<Vec<_>>>()?;
+            .map(|f| Field::try_new(f))
+            .try_collect()?;
         let oneofs = m
             .oneofs()
             .into_iter()
-            .map(|o| Ok(Oneof::try_new(o, &fields)?))
-            .collect::<Result<Vec<_>>>()?;
+            .map(|o| Oneof::try_new(o))
+            .try_collect()?;
         let nested_messages = m
             .nested_messages()
             .into_iter()
-            .map(|m| -> Result<_> { Ok(Message::try_new(m)?) })
-            .collect::<Result<Vec<_>>>()?;
+            .map(|m| Message::try_new(m))
+            .try_collect()?;
         let nested_enums = m
             .nested_enums()
             .into_iter()
-            .map(|e| -> Result<_> { Ok(Enum::try_new(e)?) })
-            .collect::<Result<Vec<_>>>()?;
+            .map(|e| Enum::try_new(e))
+            .try_collect()?;
         Ok(Self {
             ident: m.rust_ident().to_string(),
             submodule_ident: m.rust_nested_module_ident().to_string(),
@@ -120,14 +121,15 @@ impl Enum {
             .values()
             .into_iter()
             .map(|v| -> Result<_> { Ok(EnumValue::try_new(v)?) })
-            .collect::<Result<Vec<_>>>()?;
-        let first_value_ident = values
+            .try_collect()?;
+        let first_value_ident = e
+            .values()
             .first()
             .ok_or(ErrorKind::EmptyEnum {
                 name: e.proto_name().to_string(),
             })?
-            .ident
-            .clone();
+            .rust_ident()
+            .to_string();
         Ok(Self {
             ident: e.rust_ident().to_string(),
             absolute_path: e.rust_absolute_path(),
@@ -214,52 +216,53 @@ impl Field {
 struct Oneof {
     enum_ident: String,
     field_ident: String,
-    fields: Vec<Rc<Field>>,
+    fields: Vec<OneofField>,
 }
 
 impl Oneof {
-    fn try_new(o: &wrappers::Oneof, fields: &[Rc<Field>]) -> Result<Self> {
+    fn try_new(o: &wrappers::Oneof) -> Result<Self> {
         Ok(Oneof {
             enum_ident: o.rust_enum_ident().to_string(),
             field_ident: o.rust_getter_ident().to_string(),
             fields: o
-                .field_indices()?
+                .fields()?
                 .into_iter()
-                .map(|index| -> Result<_> {
-                    Ok(fields
-                        .get(index)
-                        .ok_or(ErrorKind::InternalError {
-                            detail: "index out of bounds".to_string(),
-                        })?
-                        .clone())
-                })
-                .collect::<Result<Vec<_>>>()?,
+                .map(|f| OneofField::try_new(f))
+                .try_collect()?,
+        })
+    }
+}
+
+struct OneofField {
+    ident: String,
+}
+
+impl OneofField {
+    fn try_new(f: &wrappers::Field) -> Result<Self> {
+        Ok(Self {
+            ident: f.rust_oneof_ident().to_string(),
         })
     }
 }
 
 #[derive(Template)]
 #[template(path = "structs.rs.txt")]
-struct Structs {
-    messages: Vec<Rc<Message>>,
+struct Structs<'a> {
+    messages: &'a [Message],
 }
 
 #[derive(Template)]
 #[template(path = "traits.rs.txt")]
-struct Traits {
-    messages: Vec<Rc<Message>>,
+struct Traits<'a> {
+    messages: &'a [Message],
 }
 
 mod filters {
     use super::*;
-    pub(super) fn print_structs(messages: &[Rc<Message>]) -> ::askama::Result<Structs> {
-        Ok(Structs {
-            messages: messages.to_vec(),
-        })
+    pub(super) fn print_structs(messages: &[Message]) -> ::askama::Result<Structs> {
+        Ok(Structs { messages })
     }
-    pub(super) fn print_traits(messages: &[Rc<Message>]) -> ::askama::Result<Traits> {
-        Ok(Traits {
-            messages: messages.to_vec(),
-        })
+    pub(super) fn print_traits(messages: &[Message]) -> ::askama::Result<Traits> {
+        Ok(Traits { messages })
     }
 }
