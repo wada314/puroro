@@ -20,7 +20,7 @@ impl GlobalContext {
 pub struct OutputFile {
     pub package: String,
     pub subpackages: Vec<String>,
-    pub input_file: Option<Rc<MessagesAndEnums>>,
+    pub input_file: Option<MessagesAndEnums>,
 }
 
 impl OutputFile {
@@ -36,8 +36,8 @@ impl OutputFile {
 #[derive(Template)]
 #[template(path = "messages_and_enums.rs.txt")]
 pub struct MessagesAndEnums {
-    messages: Vec<Rc<Message>>,
-    enums: Vec<Rc<Enum>>,
+    messages: Vec<Message>,
+    enums: Vec<Enum>,
 }
 
 impl MessagesAndEnums {
@@ -45,12 +45,12 @@ impl MessagesAndEnums {
         let messages = f
             .messages()
             .into_iter()
-            .map(|m| Ok(Rc::new(Message::try_new(m)?)))
+            .map(|m| Ok(Message::try_new(m)?))
             .collect::<Result<Vec<_>>>()?;
         let enums = f
             .enums()
             .into_iter()
-            .map(|e| Ok(Rc::new(Enum::try_new(e)?)))
+            .map(|e| Ok(Enum::try_new(e)?))
             .collect::<Result<Vec<_>>>()?;
         Ok(Self { messages, enums })
     }
@@ -59,9 +59,9 @@ impl MessagesAndEnums {
 struct Message {
     ident: String,
     submodule_ident: String,
-    nested: Rc<MessagesAndEnums>,
-    fields: Vec<Rc<Field>>,
-    oneofs: Vec<Rc<Oneof>>,
+    nested: MessagesAndEnums,
+    fields: Vec<Field>,
+    oneofs: Vec<Oneof>,
 
     trait_absolute_path: String,
     simple_ident: String,
@@ -72,30 +72,30 @@ impl Message {
         let fields = m
             .fields()
             .into_iter()
-            .map(|f| Ok(Rc::new(Field::try_new(f)?)))
+            .map(|f| Ok(Field::try_new(f)?))
             .collect::<Result<Vec<_>>>()?;
         let oneofs = m
             .oneofs()
             .into_iter()
-            .map(|o| Ok(Rc::new(Oneof::try_new(o, &fields)?)))
+            .map(|o| Ok(Oneof::try_new(o, &fields)?))
             .collect::<Result<Vec<_>>>()?;
         let nested_messages = m
             .nested_messages()
             .into_iter()
-            .map(|m| -> Result<_> { Ok(Rc::new(Message::try_new(m)?)) })
+            .map(|m| -> Result<_> { Ok(Message::try_new(m)?) })
             .collect::<Result<Vec<_>>>()?;
         let nested_enums = m
             .nested_enums()
             .into_iter()
-            .map(|e| -> Result<_> { Ok(Rc::new(Enum::try_new(e)?)) })
+            .map(|e| -> Result<_> { Ok(Enum::try_new(e)?) })
             .collect::<Result<Vec<_>>>()?;
         Ok(Self {
             ident: m.rust_ident().to_string(),
             submodule_ident: m.rust_nested_module_ident().to_string(),
-            nested: Rc::new(MessagesAndEnums {
+            nested: MessagesAndEnums {
                 messages: nested_messages,
                 enums: nested_enums,
-            }),
+            },
             fields,
             oneofs,
             trait_absolute_path: m.rust_absolute_trait_path(),
@@ -109,7 +109,7 @@ impl Message {
 struct Enum {
     ident: String,
     absolute_path: String,
-    values: Vec<Rc<EnumValue>>,
+    values: Vec<EnumValue>,
     first_value_ident: String,
     is_proto3: bool,
 }
@@ -119,7 +119,7 @@ impl Enum {
         let values = e
             .values()
             .into_iter()
-            .map(|v| -> Result<_> { Ok(Rc::new(EnumValue::try_new(v)?)) })
+            .map(|v| -> Result<_> { Ok(EnumValue::try_new(v)?) })
             .collect::<Result<Vec<_>>>()?;
         let first_value_ident = values
             .first()
