@@ -6,6 +6,21 @@ where Self: ::puroro_internal::GetImplStruct;
 
 {#- ################# Trait impls (std traits) ################# #}
 
+impl<ImplTag> ::std::ops::Deref for {{ m.ident }}<ImplTag>
+where Self: ::puroro_internal::GetImplStruct
+{
+    type Target = <Self as ::puroro_internal::GetImplStruct>::Type;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+impl<ImplTag> ::std::ops::DerefMut for {{ m.ident }}<ImplTag>
+where Self: ::puroro_internal::GetImplStruct
+{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
 impl<ImplTag> ::std::clone::Clone for {{ m.ident }}<ImplTag>
 where 
     Self: ::puroro_internal::GetImplStruct,
@@ -154,7 +169,7 @@ pub mod _puroro_impls {
     {%- for m in messages %}
 
     {#- ################# Simple ################# #}
-    
+
     impl ::puroro_internal::GetImplStruct for super::{{ m.ident }}<::puroro::tags::SimpleImpl> {
         type Type = {{ m.simple_ident }};
     }

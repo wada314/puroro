@@ -220,10 +220,21 @@ struct Structs {
     messages: Vec<Rc<Message>>,
 }
 
+#[derive(Template)]
+#[template(path = "traits.rs.txt")]
+struct Traits {
+    messages: Vec<Rc<Message>>,
+}
+
 mod filters {
     use super::*;
     pub(super) fn print_structs(messages: &[Rc<Message>]) -> ::askama::Result<Structs> {
         Ok(Structs {
+            messages: messages.to_vec(),
+        })
+    }
+    pub(super) fn print_traits(messages: &[Rc<Message>]) -> ::askama::Result<Traits> {
+        Ok(Traits {
             messages: messages.to_vec(),
         })
     }

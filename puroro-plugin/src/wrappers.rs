@@ -377,7 +377,7 @@ impl Message {
     }
     pub fn rust_absolute_trait_path(&self) -> String {
         format!(
-            "{path}::puroro_traits::{ident}Trait",
+            "{path}::_puroro_traits::{ident}Trait",
             path = self.rust_absolute_module_path(),
             ident = self.rust_ident
         )

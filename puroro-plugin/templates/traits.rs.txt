@@ -1,0 +1,26 @@
+{%- for m in messages %}
+
+pub trait {{ m.ident }}Trait: ::std::clone::Clone {
+    {%- for field in m.fields %}
+
+    {%- match field.trait_maybe_field_message_trait_absolute_path %}
+    {%- when Some with (field_msg_path) %}
+    type Field{{ field.number }}MessageType<'this>: 'this + {{ field_msg_path }};
+    {%- else %}
+    {%- endmatch %}
+
+    {%- if field.trait_has_scalar_getter %}
+    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }};
+    {%- endif %}
+    {%- if field.trait_has_optional_getter %}
+    fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}>;
+    {%- endif %}
+    {%- if field.trait_has_repeated_getter %}
+    type Field{{ field.number }}RepeatedType<'this>: ::puroro::RepeatedField<'this, {{ field.trait_scalar_getter_type }}>;
+
+    fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>;
+    {%- endif %}
+    {%- endfor %}
+}
+
+{%- endfor %}

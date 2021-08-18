@@ -5,6 +5,18 @@
 {{ messages|print_structs }}
 {%- endif %}
 
+{#-################ Traits ################}
+
+{%- if !messages.is_empty() %}
+pub mod _puroro_traits {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    
+    {{ messages|print_traits|indent(4) }}
+}
+{%- endif %}
+
 {#-################ Enums ################}
 
 {%- if !enums.is_empty() %}
@@ -19,7 +31,7 @@ pub use _puroro_nested::*;
 pub mod _puroro_nested {
     {%- for m in messages %}
     pub mod {{ m.submodule_ident }} {
-        pub mod _puroro_root {
+        mod _puroro_root {
             pub use super::super::super::_puroro_root::*;
         }
         {{ m.nested }}
