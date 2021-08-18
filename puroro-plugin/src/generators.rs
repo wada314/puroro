@@ -156,16 +156,26 @@ struct Field {
     oneof_ident: String,
     number: i32,
     is_message: bool,
+    is_length_delimited: bool,
     trait_has_scalar_getter: bool,
     trait_has_optional_getter: bool,
     trait_has_repeated_getter: bool,
     trait_scalar_getter_type: String,
+    trait_maybe_field_message_absolute_path: Option<String>,
     trait_maybe_field_message_trait_absolute_path: Option<String>,
     simple_field_type: String,
+    simple_maybe_borrowed_field_type: Option<String>,
+    simple_label_and_type_tags: String,
 }
 
 impl Field {
     fn try_new(f: &wrappers::Field) -> Result<Self> {
+        let trait_maybe_field_message_absolute_path =
+            if let wrappers::FieldType::Message(m) = f.field_type()? {
+                Some(upgrade(&m)?.rust_absolute_path())
+            } else {
+                None
+            };
         let trait_maybe_field_message_trait_absolute_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
                 Some(upgrade(&m)?.rust_absolute_trait_path())
@@ -177,12 +187,23 @@ impl Field {
             oneof_ident: f.rust_oneof_ident().to_string(),
             number: f.number(),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
+            is_length_delimited: matches!(
+                f.field_type()?,
+                wrappers::FieldType::Bytes
+                    | wrappers::FieldType::String
+                    | wrappers::FieldType::Message(_)
+            ),
             trait_has_scalar_getter: f.has_scalar_getter(),
             trait_has_optional_getter: f.has_scalar_optional_getter(),
             trait_has_repeated_getter: f.has_repeated_getter(),
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
+            trait_maybe_field_message_absolute_path,
             trait_maybe_field_message_trait_absolute_path,
             simple_field_type: f.simple_field_type()?,
+            simple_maybe_borrowed_field_type: f
+                .maybe_trait_scalar_getter_type_borrowed("::puroro::tags::SimpleImpl")?,
+            simple_label_and_type_tags: f
+                .rust_label_and_type_tags("::puroro::tags::", "SimpleImpl")?,
         })
     }
 }
