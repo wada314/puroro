@@ -4,9 +4,46 @@
 pub struct {{ m.ident }}<ImplTag = ::puroro::tags::SimpleImpl>(<Self as ::puroro_internal::GetImplStruct>::Type)
 where Self: ::puroro_internal::GetImplStruct;
 
+impl<ImplTag> ::std::clone::Clone for {{ m.ident }}<ImplTag>
+where 
+    Self: ::puroro_internal::GetImplStruct,
+    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::clone::Clone,
+{
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
+    }
+}
+impl<ImplTag> ::std::default::Default for {{ m.ident }}<ImplTag>
+where 
+    Self: ::puroro_internal::GetImplStruct,
+    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::default::Default,
+{
+    fn default() -> Self {
+        Self(::std::default::Default::default())
+    }
+}
+impl<ImplTag> ::std::fmt::Debug for {{ m.ident }}<ImplTag>
+where 
+    Self: ::puroro_internal::GetImplStruct,
+    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::fmt::Debug,
+{
+    fn fmt(&self, formatter: &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
+        ::std::fmt::Debug::fmt(&self.0, formatter)
+    }
+}
+impl<ImplTag> ::std::cmp::PartialEq for {{ m.ident }}<ImplTag>
+where 
+    Self: ::puroro_internal::GetImplStruct,
+    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::cmp::PartialEq,
+{
+    fn eq(&self, rhs: &Self) -> bool {
+        ::std::cmp::PartialEq::eq(&self.0, &rhs.0)
+    }
+}
+
 {%- endfor %}
 
-mod _puroro_impls {
+pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
@@ -19,7 +56,7 @@ mod _puroro_impls {
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    struct {{ m.simple_ident }} {
+    pub struct {{ m.simple_ident }} {
         {%- for field in m.fields %}
         pub {{ field.ident }}: {{ field.simple_field_type }},
         {%- endfor %}
