@@ -34,11 +34,21 @@ impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_ident }} {
         {%- endif %}
     }
     {%- endif %}
+
     {%- if field.trait_has_optional_getter %}
     fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
-        todo!()
+        {%- if field.is_length_delimited %}
+        {%- if field.is_message %}
+        self.{{ field.ident }}.as_ref().map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
+        {%- else %}
+        self.{{ field.ident }}.as_ref().map(|v| ::std::borrow::Cow::Borrowed(v.as_ref()))
+        {%- endif %}
+        {%- else %}
+        ::std::clone::Clone::clone(&self.{{ field.ident }})
+        {%- endif %}
     }
     {%- endif %}
+
     {%- if field.trait_has_repeated_getter %}
     {%- match field.simple_maybe_borrowed_field_type %}
     {%- when Some with (borrowed) %}
