@@ -56,6 +56,6 @@ impl ::std::convert::From<{{ ident }}> for i32 {
 
 impl ::std::default::Default for {{ ident }} {
     fn default() -> Self {
-        {{ ident }}::{{ first_value.ident }}
+        {{ ident }}::{{ first_value_ident }}
     }
 }

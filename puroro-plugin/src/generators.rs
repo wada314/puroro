@@ -110,7 +110,7 @@ struct Enum {
     ident: String,
     absolute_path: String,
     values: Vec<Rc<EnumValue>>,
-    first_value: Rc<EnumValue>,
+    first_value_ident: String,
     is_proto3: bool,
 }
 
@@ -121,17 +121,18 @@ impl Enum {
             .into_iter()
             .map(|v| -> Result<_> { Ok(Rc::new(EnumValue::try_new(v)?)) })
             .collect::<Result<Vec<_>>>()?;
-        let first_value = values
+        let first_value_ident = values
             .first()
             .ok_or(ErrorKind::EmptyEnum {
                 name: e.proto_name().to_string(),
             })?
+            .ident
             .clone();
         Ok(Self {
             ident: e.rust_ident().to_string(),
             absolute_path: e.rust_absolute_path(),
             values,
-            first_value,
+            first_value_ident,
             is_proto3: matches!(e.syntax()?, wrappers::ProtoSyntax::Proto3),
         })
     }
