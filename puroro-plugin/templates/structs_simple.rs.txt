@@ -16,7 +16,7 @@ pub struct {{ m.simple_ident }} {
 }
 impl ::puroro::Message for {{ m.simple_ident }} {}
 
-impl {{ m.trait_absolute_path }} for {{ m.simple_ident }} {
+impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_ident }} {
     {%- for field in m.fields %}
 
     {%- match field.trait_maybe_field_message_absolute_path %}

@@ -67,7 +67,7 @@ where
 {
 }
 
-impl<ImplTag> {{ m.trait_absolute_path }} for {{ m.ident }}<ImplTag>
+impl<ImplTag> self::_puroro_traits::{{ m.ident }}Trait for {{ m.ident }}<ImplTag>
 where
     Self: ::puroro_internal::GetImplStruct,
     <Self as ::puroro_internal::GetImplStruct>::Type: {{ m.trait_absolute_path }}

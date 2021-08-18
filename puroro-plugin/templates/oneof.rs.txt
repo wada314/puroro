@@ -6,7 +6,7 @@ enum {{ enum_ident }} {
 
 #[allow(non_camel_case_types)]
 #[derive(Clone, PartialEq, Debug)]
-pub enum {{ enum_ident }}
+pub enum {{ enum_ident }}_Simple
 {
     {%- for field in fields %}
     {{ field.ident }}(i32/*TODO*/),
