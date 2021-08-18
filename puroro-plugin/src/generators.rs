@@ -1,7 +1,19 @@
+use crate::utils::upgrade;
 use crate::wrappers;
 use crate::{ErrorKind, Result};
 use ::askama::Template;
+use ::std::collections::HashMap;
 use ::std::rc::Rc;
+
+#[derive(Default)]
+pub struct GlobalContext {
+    wrappers_message_to_generators_message: HashMap<Rc<wrappers::Message>, Rc<Message>>,
+}
+impl GlobalContext {
+    fn get_message(&mut self, wrappers_message: Rc<wrappers::Message>) -> Rc<Message> {
+        todo!()
+    }
+}
 
 #[derive(Template)]
 #[template(path = "output_file.rs.txt")]
@@ -51,6 +63,7 @@ struct Message {
     fields: Vec<Rc<Field>>,
     oneofs: Vec<Rc<Oneof>>,
 
+    trait_absolute_path: String,
     simple_ident: String,
 }
 
@@ -85,6 +98,7 @@ impl Message {
             }),
             fields,
             oneofs,
+            trait_absolute_path: m.rust_absolute_trait_path(),
             simple_ident: format!("{}_Simple", m.rust_ident()),
         })
     }
@@ -145,19 +159,29 @@ struct Field {
     trait_has_scalar_getter: bool,
     trait_has_optional_getter: bool,
     trait_has_repeated_getter: bool,
+    trait_scalar_getter_type: String,
+    trait_maybe_field_message_trait_absolute_path: Option<String>,
     simple_field_type: String,
 }
 
 impl Field {
     fn try_new(f: &wrappers::Field) -> Result<Self> {
+        let trait_maybe_field_message_trait_absolute_path =
+            if let wrappers::FieldType::Message(m) = f.field_type()? {
+                Some(upgrade(&m)?.rust_absolute_trait_path())
+            } else {
+                None
+            };
         Ok(Field {
             ident: f.rust_ident().to_string(),
             oneof_ident: f.rust_oneof_ident().to_string(),
             number: f.number(),
-            is_message: f.field_type()?.is_message(),
+            is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             trait_has_scalar_getter: f.has_scalar_getter(),
             trait_has_optional_getter: f.has_scalar_optional_getter(),
             trait_has_repeated_getter: f.has_repeated_getter(),
+            trait_scalar_getter_type: f.trait_scalar_getter_type()?,
+            trait_maybe_field_message_trait_absolute_path,
             simple_field_type: f.simple_field_type()?,
         })
     }

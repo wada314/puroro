@@ -424,6 +424,13 @@ impl Message {
         self.nested_messages().len() + self.nested_enums().len() + self.oneofs().len() > 0
     }
 }
+impl Hash for Message {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.package.hash(state);
+        self.outer_messages.hash(state);
+        self.proto_name.hash(state);
+    }
+}
 
 impl Enum {
     pub fn try_from_proto(
