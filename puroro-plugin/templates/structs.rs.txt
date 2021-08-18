@@ -158,7 +158,7 @@ where
 
 {#- ################# impls ################# #}
 
-pub mod _puroro_impls {
+mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
