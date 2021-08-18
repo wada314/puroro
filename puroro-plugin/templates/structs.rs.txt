@@ -144,6 +144,8 @@ where
 
 {%- endfor %}
 
+{#- ################# impls ################# #}
+
 pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
@@ -151,6 +153,8 @@ pub mod _puroro_impls {
 
     {%- for m in messages %}
 
+    {#- ################# Simple ################# #}
+    
     impl ::puroro_internal::GetImplStruct for super::{{ m.ident }}<::puroro::tags::SimpleImpl> {
         type Type = {{ m.simple_ident }};
     }
