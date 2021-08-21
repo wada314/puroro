@@ -238,6 +238,7 @@ impl Oneof {
 struct OneofField {
     ident: String,
     trait_field_type: String,
+    simple_field_type: String,
 }
 
 impl OneofField {
@@ -245,6 +246,7 @@ impl OneofField {
         Ok(Self {
             ident: f.rust_oneof_ident().to_string(),
             trait_field_type: f.trait_oneof_field_type("'msg", "T")?,
+            simple_field_type: f.simple_oneof_field_type()?,
         })
     }
 }
