@@ -217,6 +217,7 @@ struct Oneof {
     enum_ident: String,
     field_ident: String,
     fields: Vec<OneofField>,
+    trait_maybe_generic_params: String,
 }
 
 impl Oneof {
@@ -229,18 +230,21 @@ impl Oneof {
                 .into_iter()
                 .map(|f| OneofField::try_new(f))
                 .try_collect()?,
+            trait_maybe_generic_params: o.trait_maybe_generic_params("'msg", "T")?,
         })
     }
 }
 
 struct OneofField {
     ident: String,
+    trait_field_type: String,
 }
 
 impl OneofField {
     fn try_new(f: &wrappers::Field) -> Result<Self> {
         Ok(Self {
             ident: f.rust_oneof_ident().to_string(),
+            trait_field_type: f.trait_oneof_field_type("'msg", "T")?,
         })
     }
 }

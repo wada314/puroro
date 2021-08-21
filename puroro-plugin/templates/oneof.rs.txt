@@ -1,6 +1,6 @@
-enum {{ enum_ident }} {
+enum {{ enum_ident }}{{ trait_maybe_generic_params }} {
     {%- for field in fields %}
-    {{ field.ident }}(i32/*TODO*/),
+    {{ field.ident }}({{ field.trait_field_type }}),
     {%- endfor %}
 }
 

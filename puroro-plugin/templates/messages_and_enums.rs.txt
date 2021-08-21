@@ -41,6 +41,10 @@ pub mod _puroro_nested {
         {%- if !m.oneofs.is_empty() %}
         pub use _puroro_oneofs::*;
         pub mod _puroro_oneofs {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+
             {%- for oneof in m.oneofs %}
             {{ oneof|indent(12) }}
             {%- endfor %}

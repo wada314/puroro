@@ -644,11 +644,7 @@ impl Field {
             ),
         })
     }
-    pub fn trait_scalar_getter_type_from_external(
-        &self,
-        lt: &str,
-        impl_tag: &str,
-    ) -> Result<String> {
+    pub fn trait_oneof_field_type(&self, lt: &str, trait_impl: &str) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Double => "f64".to_string(),
             FieldType::Float => "f32".to_string(),
@@ -669,15 +665,10 @@ impl Field {
             FieldType::Enum2(e) => upgrade(&e)?.rust_absolute_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_absolute_path(),
             FieldType::Message(m) => format!(
-                "::std::borrow::Cow<\
-                    {lt},
-                    <{struct_path}<{impl_tag}>
-                        as {trait_path}
-                    >::Field{number}MessageType<{lt}>\
-                >",
+                "::std::borrow::Cow<{lt}, \
+                    <{trait_impl} as {trait_path}>::Field{number}MessageType<{lt}>>",
                 lt = lt,
-                struct_path = self.message()?.rust_absolute_path(),
-                impl_tag = impl_tag,
+                trait_impl = trait_impl,
                 trait_path = self.message()?.rust_absolute_trait_path(),
                 number = self.number(),
             ),
@@ -844,24 +835,25 @@ impl Oneof {
             })
             .collect::<Vec<_>>())
     }
-    pub fn maybe_generic_params(&self, lt: &str) -> Result<String> {
-        let need_lt = self
+    pub fn trait_maybe_generic_params(&self, lt: &str, trait_impl: &str) -> Result<String> {
+        let need_lt = self.fields()?.iter().any(|field| {
+            matches!(
+                field.field_type(),
+                Ok(FieldType::Bytes | FieldType::String | FieldType::Message(_))
+            )
+        });
+        let need_trait_impl = self
             .fields()?
             .iter()
-            .map(|field| {
-                Ok(matches!(
-                    field.field_type()?,
-                    FieldType::Bytes | FieldType::String | FieldType::Message(_)
-                ))
-            })
-            .collect::<Result<Vec<_>>>()?
-            .iter()
-            .any(|b| *b);
-        if need_lt {
-            Ok(format!("<{}>", lt))
-        } else {
-            Ok(String::new())
-        }
+            .any(|field| matches!(field.field_type(), Ok(FieldType::Message(_))));
+        Ok(match (need_lt, need_trait_impl) {
+            (true, true) => {
+                let trait_path = self.message()?.rust_absolute_trait_path();
+                format!("<{}, {}: {}>", lt, trait_impl, trait_path)
+            }
+            (true, false) => format!("<{}>", lt),
+            _ => "".to_string(),
+        })
     }
 }
 
