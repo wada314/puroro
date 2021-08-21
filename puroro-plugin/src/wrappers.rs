@@ -587,17 +587,21 @@ impl Field {
         self.proto_oneof_index.clone()
     }
 
-    pub fn rust_label_and_type_tags(&self, modules: &str, impl_tag_ident: &str) -> Result<String> {
+    pub fn rust_type_tag(&self, impl_tag_ident: &str) -> Result<String> {
         let impl_tag = format!(
-            "{modules}{impl_tag_ident}",
-            modules = modules,
+            "::puroro::tags::{impl_tag_ident}",
             impl_tag_ident = impl_tag_ident
         );
         Ok(format!(
-            "{modules}{label_tag}, {modules}{type_tag}",
-            modules = modules,
-            label_tag = self.field_label()?.tag_ident(),
+            "::puroro::tags::{type_tag}",
             type_tag = self.field_type()?.tag_ident_and_gp(&impl_tag)?,
+        ))
+    }
+    pub fn rust_label_and_type_tags(&self, impl_tag_ident: &str) -> Result<String> {
+        Ok(format!(
+            "::puroro::tags::{label_tag}, {type_tag}",
+            label_tag = self.field_label()?.tag_ident(),
+            type_tag = self.rust_type_tag(impl_tag_ident)?,
         ))
     }
 

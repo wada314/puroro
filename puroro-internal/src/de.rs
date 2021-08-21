@@ -3,7 +3,7 @@ use crate::Result;
 use ::puroro::types::FieldData;
 
 pub mod from_iter;
-pub trait DeserFieldsFromBytesIter: ::puroro::DeserFromBytesIter {
+pub trait DeserFieldsFromBytesIter {
     fn deser_field<I>(
         &mut self,
         field_number: i32,

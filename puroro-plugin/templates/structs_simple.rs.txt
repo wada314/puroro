@@ -95,10 +95,39 @@ impl ::puroro_internal::de::DeserFieldsFromBytesIter for {{ m.simple_ident }} {
     {
         match field_number {
             {%- for field in m.fields %}
+            {%- if !field.is_explicit_oneof_field %}
             {{ field.number }} => ::puroro_internal::impls::simple::DeserFieldFromBytesIter::<
                 {{ field.simple_label_and_type_tags }}
             >::deser_field(&mut self.{{ field.ident }}, data),
+            {%- endif %}
             {%- endfor %}
+
+            {%- for oneof in m.oneofs %}
+            {%- for field in oneof.fields %}
+            {{ field.number }} => {
+                use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}_Simple;
+                use ::std::option::Option::Some;
+                if !matches!(
+                    self.{{ oneof.field_ident }}, 
+                    Some({{ oneof.enum_ident }}_Simple::{{ field.ident }}(v)))
+                {
+                    self.{{ oneof.field_ident }} = Some(
+                        {{ oneof.enum_ident }}_Simple::{{ field.ident }}(
+                            ::std::default::Default::default()
+                        )
+                    );
+                }
+                let field_value_mut_ref = match &mut self.{{ oneof.field_ident }} {
+                    Some({{ oneof.enum_ident }}_Simple::{{ field.ident }}(v)) => v,
+                    _ => unreachable!(),
+                };
+                ::puroro_internal::impls::simple::DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofItem, {{ field.simple_field_type_tag }}
+                >::deser_field(field_value_mut_ref, data)
+            }
+            {%- endfor %}
+            {%- endfor %}
+
             _ => unimplemented!("TODO: This case should be handled properly..."),
         }
     }

@@ -66,6 +66,7 @@ impl Message {
         let oneofs = m
             .oneofs()
             .into_iter()
+            .filter(|o| matches!(o.is_synthetic(), Ok(false)))
             .map(|o| Oneof::try_new(o))
             .try_collect()?;
         let nested_messages = m
@@ -191,8 +192,7 @@ impl Field {
             simple_field_type: f.simple_field_type()?,
             simple_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("::puroro::tags::SimpleImpl")?,
-            simple_label_and_type_tags: f
-                .rust_label_and_type_tags("::puroro::tags::", "SimpleImpl")?,
+            simple_label_and_type_tags: f.rust_label_and_type_tags("SimpleImpl")?,
         })
     }
 }
@@ -225,16 +225,20 @@ impl Oneof {
 
 struct OneofField {
     ident: String,
+    number: i32,
     trait_field_type: String,
     simple_field_type: String,
+    simple_field_type_tag: String,
 }
 
 impl OneofField {
     fn try_new(f: &wrappers::Field) -> Result<Self> {
         Ok(Self {
             ident: f.rust_oneof_ident().to_string(),
+            number: f.number(),
             trait_field_type: f.trait_oneof_field_type("'msg", "T")?,
             simple_field_type: f.simple_oneof_field_type()?,
+            simple_field_type_tag: f.rust_type_tag("SimpleImpl")?,
         })
     }
 }
