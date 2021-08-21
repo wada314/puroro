@@ -8,10 +8,16 @@ impl ::puroro_internal::GetImplStruct for super::{{ m.ident }}<::puroro::tags::S
 #[derive(Clone, Default, PartialEq, Debug)]
 pub struct {{ m.simple_ident }} {
     {%- for field in m.fields %}
+    {#{%- if !field.is_explicit_oneof_field %}#}
     pub {{ field.ident }}: {{ field.simple_field_type }},
+    {#{%- endif %}#}
     {%- endfor %}
     {%- for oneof in m.oneofs %}
-    pub {{ oneof.field_ident }}: ::std::option::Option<i32/*TODO*/>,
+    {%- if !oneof.is_synthetic %}
+    pub {{ oneof.field_ident }}: ::std::option::Option<
+        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}_Simple
+    >,
+    {%- endif %}
     {%- endfor %}
 }
 impl ::puroro::Message for {{ m.simple_ident }} {}

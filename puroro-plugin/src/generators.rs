@@ -145,6 +145,7 @@ struct Field {
     number: i32,
     is_message: bool,
     is_length_delimited: bool,
+    is_explicit_oneof_field: bool,
     trait_has_scalar_getter: bool,
     trait_has_optional_getter: bool,
     trait_has_repeated_getter: bool,
@@ -180,6 +181,7 @@ impl Field {
                     | wrappers::FieldType::String
                     | wrappers::FieldType::Message(_)
             ),
+            is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
             trait_has_scalar_getter: f.has_scalar_getter(),
             trait_has_optional_getter: f.has_scalar_optional_getter(),
             trait_has_repeated_getter: f.has_repeated_getter(),
@@ -201,6 +203,7 @@ struct Oneof {
     enum_ident: String,
     field_ident: String,
     fields: Vec<OneofField>,
+    is_synthetic: bool,
     trait_maybe_generic_params: String,
 }
 
@@ -214,6 +217,7 @@ impl Oneof {
                 .into_iter()
                 .map(|f| OneofField::try_new(f))
                 .try_collect()?,
+            is_synthetic: o.is_synthetic()?,
             trait_maybe_generic_params: o.trait_maybe_generic_params("'msg", "T")?,
         })
     }
