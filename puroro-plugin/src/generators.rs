@@ -3,18 +3,6 @@ use crate::wrappers;
 use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
-use ::std::collections::HashMap;
-use ::std::rc::Rc;
-
-#[derive(Default)]
-pub struct GlobalContext {
-    wrappers_message_to_generators_message: HashMap<Rc<wrappers::Message>, Rc<Message>>,
-}
-impl GlobalContext {
-    fn get_message(&mut self, wrappers_message: Rc<wrappers::Message>) -> Rc<Message> {
-        todo!()
-    }
-}
 
 #[derive(Template)]
 #[template(path = "output_file.rs.txt")]
@@ -109,7 +97,6 @@ impl Message {
 #[template(path = "enum.rs.txt")]
 struct Enum {
     ident: String,
-    absolute_path: String,
     values: Vec<EnumValue>,
     first_value_ident: String,
     is_proto3: bool,
@@ -132,7 +119,6 @@ impl Enum {
             .to_string();
         Ok(Self {
             ident: e.rust_ident().to_string(),
-            absolute_path: e.rust_absolute_path(),
             values,
             first_value_ident,
             is_proto3: matches!(e.syntax()?, wrappers::ProtoSyntax::Proto3),
@@ -156,7 +142,6 @@ impl EnumValue {
 
 struct Field {
     ident: String,
-    oneof_ident: String,
     number: i32,
     is_message: bool,
     is_length_delimited: bool,
@@ -187,7 +172,6 @@ impl Field {
             };
         Ok(Field {
             ident: f.rust_ident().to_string(),
-            oneof_ident: f.rust_oneof_ident().to_string(),
             number: f.number(),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             is_length_delimited: matches!(
