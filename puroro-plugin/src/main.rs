@@ -17,8 +17,10 @@ use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
 
 use ::std::collections::{HashMap, HashSet};
+use ::std::env;
 use ::std::io::Read;
 use ::std::io::{stdin, stdout};
+use ::std::process::Command;
 
 pub use protos::google;
 use protos::google::protobuf::compiler::code_generator_response::File;
@@ -65,6 +67,25 @@ fn package_to_filename(package: &str) -> String {
     }
 }
 
+fn format_rust_file(input: &str) -> Option<String> {
+    use ::std::io::Write as _;
+
+    let rustfmt_exe = env::var("RUSTFMT").unwrap_or("rustfmt".to_string());
+    let mut rustfmt = Command::new(&rustfmt_exe).spawn().unwrap();
+
+    if let Some(stdin) = rustfmt.stdin.as_mut() {
+        stdin.write_all(input.as_bytes()).ok()?;
+    }
+
+    if let Some(ref mut stdout) = rustfmt.stdout {
+        let mut out = String::new();
+        stdout.read_to_string(&mut out).ok()?;
+        Some(out)
+    } else {
+        None
+    }
+}
+
 fn main() -> Result<()> {
     let mut cgreq: CodeGeneratorRequest = CodeGeneratorRequest::default();
     cgreq.deser(&mut stdin().bytes()).unwrap();
@@ -108,7 +129,10 @@ fn main() -> Result<()> {
     for output_contexts in output_file_contexts.values() {
         let filename = package_to_filename(&output_contexts.package);
         // Do render!
-        let contents = output_contexts.render().unwrap();
+        let mut contents = output_contexts.render().unwrap();
+        /*if let Some(new_contents) = format_rust_file(&contents) {
+            contents = dbg!(new_contents);
+        }*/
 
         let mut output_file = <File as Default>::default();
         output_file.name = Some(filename.into());
