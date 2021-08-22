@@ -278,7 +278,7 @@ where
     }
 }
 
-impl<M, _1, _2> DeserFieldFromBytesIter<tags::NonRepeated<_1, _2>, tags::Message<M>>
+impl<M, _1, _2> DeserFieldFromBytesIter<tags::LabelOptReqUnl<_1, _2>, tags::Message<M>>
 where
     M: Message + DeserFieldsFromBytesIter + Default,
 {
@@ -318,13 +318,30 @@ where
     }
 }
 
+impl<M> DeserFieldFromBytesIter<tags::OneofItem, tags::Message<M>>
+where
+    M: Message + DeserFieldsFromBytesIter + Default,
+{
+    pub fn deser_field<I>(field: &mut Box<M>, input: FieldData<&mut ScopedIter<I>>) -> Result<()>
+    where
+        I: Iterator<Item = ::std::io::Result<u8>>,
+    {
+        if let FieldData::LengthDelimited(mut iter) = input {
+            crate::de::from_iter::deser_from_scoped_iter(field.deref_mut(), &mut iter)?;
+        } else {
+            Err(ErrorKind::UnexpectedWireType)?;
+        }
+        Ok(())
+    }
+}
+
 // ser to Write methods
 
 pub struct SerFieldToIoWrite<L, V>(PhantomData<(L, V)>);
 
-impl<V, _1, _2> SerFieldToIoWrite<tags::NonRepeated<_1, _2>, tags::wire::Variant<V>>
+impl<V, _1, _2> SerFieldToIoWrite<tags::LabelOptReqUnl<_1, _2>, tags::wire::Variant<V>>
 where
-    tags::NonRepeated<_1, _2>: tags::FieldLabelTag,
+    tags::LabelOptReqUnl<_1, _2>: tags::FieldLabelTag,
     tags::wire::Variant<V>: VariantTypeTag,
 {
     pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
@@ -335,7 +352,8 @@ where
     {
         use tags::FieldLabelTag as _;
         for item in field.iter() {
-            if !tags::NonRepeated::<_1, _2>::DO_DEFAULT_CHECK || item.clone() != Default::default()
+            if !tags::LabelOptReqUnl::<_1, _2>::DO_DEFAULT_CHECK
+                || item.clone() != Default::default()
             {
                 write_field_number_and_wire_type(out, number, WireType::Variant)?;
                 Variant::from_native::<tags::wire::Variant<V>>(item.clone())?.encode_bytes(out)?;
@@ -466,7 +484,7 @@ where
     }
 }
 
-impl<M, _1, _2> SerFieldToIoWrite<tags::NonRepeated<_1, _2>, tags::Message<M>>
+impl<M, _1, _2> SerFieldToIoWrite<tags::LabelOptReqUnl<_1, _2>, tags::Message<M>>
 where
     M: SerToIoWrite,
 {

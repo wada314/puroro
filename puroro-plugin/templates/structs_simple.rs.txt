@@ -108,8 +108,8 @@ impl ::puroro_internal::de::DeserFieldsFromBytesIter for {{ m.simple_ident }} {
                 use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}_Simple;
                 use ::std::option::Option::Some;
                 if !matches!(
-                    self.{{ oneof.field_ident }}, 
-                    Some({{ oneof.enum_ident }}_Simple::{{ field.ident }}(v)))
+                    &self.{{ oneof.field_ident }},
+                    Some({{ oneof.enum_ident }}_Simple::{{ field.ident }}(_)))
                 {
                     self.{{ oneof.field_ident }} = Some(
                         {{ oneof.enum_ident }}_Simple::{{ field.ident }}(
