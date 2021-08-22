@@ -1,5 +1,5 @@
 syntax = "proto3";
-package ser_tests;
+package ser_tests3;
 
 message Msg {
     int32 i32_unlabeled = 1;
