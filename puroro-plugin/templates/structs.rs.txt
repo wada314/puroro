@@ -109,6 +109,25 @@ where
     }
     {%- endif %}
     {%- endfor %}
+
+    {%- for oneof in m.oneofs %}
+    fn {{ oneof.field_ident }}<'this>(&'this self) ->
+        ::std::option::Option<
+            self::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+            {%- if oneof.has_message_field %}
+            <'this, Self>
+            {%- else %}
+            {%- if oneof.has_reference_field %}
+            <'this>
+            {%- endif %}
+            {%- endif %}
+        >
+    {
+        <<Self as ::puroro_internal::GetImplStruct>::Type
+            as {{ m.trait_absolute_path }}
+        >::{{ oneof.field_ident }}(&self.0)
+    }
+    {%- endfor %}
 }
 
 impl<ImplTag> ::puroro::DeserFromBytesIter for {{ m.ident }}<ImplTag>

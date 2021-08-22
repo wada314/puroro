@@ -1,4 +1,4 @@
-enum {{ enum_ident }}
+pub enum {{ enum_ident }}
 {%- if has_message_field %}
 <'msg, T: {{ owner_message_trait_path }}>
 {%- else %}
@@ -20,14 +20,15 @@ pub enum {{ enum_ident }}_Simple
     {{ field.ident }}({{ field.simple_field_type }}),
     {%- endfor %}
 }
-impl<'msg> ::std::convert::From<&'msg {{ enum_ident }}_Simple> 
+
+impl<'msg, T> ::std::convert::From<&'msg {{ enum_ident }}_Simple> 
 for {{ enum_ident }}
 {%- if has_message_field %}
-<'msg, {{ owner_message_path }}<::puroro::tags::SimpleImpl>>
+    <'msg, {{ simple_owner_message_path }}>
 {%- else %}
-{%- if has_reference_field %}
-<'msg>
-{%- endif %}
+    {%- if has_reference_field %}
+        <'msg>
+    {%- endif %}
 {%- endif %}
 {
     fn from(from: &'msg {{ enum_ident }}_Simple) -> Self {

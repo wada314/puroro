@@ -85,6 +85,28 @@ where
         <Self as ::puroro_internal::GetImplStruct>::Type
         as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait
     >::Field5MessageType::<'this>;
+    fn group_one<'this>(
+        &'this self,
+    ) -> ::std::option::Option<self::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>> {
+        <<Self as ::puroro_internal::GetImplStruct>::Type
+            as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait
+        >::group_one(&self.0)
+    }
+    fn group_two<'this>(
+        &'this self,
+    ) -> ::std::option::Option<self::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+    {
+        <<Self as ::puroro_internal::GetImplStruct>::Type
+            as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait
+        >::group_two(&self.0)
+    }
+    fn group_three<'this>(
+        &'this self,
+    ) -> ::std::option::Option<self::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+        <<Self as ::puroro_internal::GetImplStruct>::Type
+            as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait
+        >::group_three(&self.0)
+    }
 }
 
 impl<ImplTag> ::puroro::DeserFromBytesIter for Msg<ImplTag>
@@ -300,6 +322,30 @@ mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for Msg_Simple {
         type Field5MessageType<'this> =
             self::_puroro_root::oneofs2::Submsg<::puroro::tags::SimpleImpl>;
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        {
+            self.group_one
+                .as_ref()
+                .map(|o| ::std::convert::From::from(o))
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<
+            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Msg_Simple>,
+        > {
+            self.group_two
+                .as_ref()
+                .map(|o| ::std::convert::From::from(o))
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            self.group_three
+                .as_ref()
+                .map(|o| ::std::convert::From::from(o))
+        }
     }
 
     impl ::puroro::DeserFromBytesIter for Msg_Simple {
@@ -535,6 +581,15 @@ pub mod _puroro_traits {
     pub trait MsgTrait: ::std::clone::Clone {
         type Field5MessageType<'this>: 'this
             + self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait;
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>;
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>;
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree>;
     }
     pub trait SubmsgTrait: ::std::clone::Clone {
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32>;
@@ -552,7 +607,7 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            enum GroupOne<'msg> {
+            pub enum GroupOne<'msg> {
                 G1Int32(i32),
                 G1String(::std::borrow::Cow<'msg, str>),
             }
@@ -563,6 +618,7 @@ pub mod _puroro_nested {
                 G1Int32(i32),
                 G1String(::std::string::String),
             }
+
             impl<'msg> ::std::convert::From<&'msg GroupOne_Simple> for GroupOne<'msg> {
                 fn from(from: &'msg GroupOne_Simple) -> Self {
                     match from {
@@ -575,7 +631,7 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            enum GroupTwo<'msg, T: self::_puroro_root::oneofs2::_puroro_traits::MsgTrait> {
+            pub enum GroupTwo<'msg, T: self::_puroro_root::oneofs2::_puroro_traits::MsgTrait> {
                 G2F32(f32),
                 G2String(::std::borrow::Cow<'msg, str>),
                 G2Submsg(::std::borrow::Cow<'msg, <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5MessageType<'msg>>),
@@ -592,8 +648,9 @@ pub mod _puroro_nested {
                     >,
                 ),
             }
+
             impl<'msg> ::std::convert::From<&'msg GroupTwo_Simple>
-                for GroupTwo<'msg, self::_puroro_root::oneofs2::Msg<::puroro::tags::SimpleImpl>>
+                for GroupTwo<'msg, self::_puroro_root::oneofs2::_puroro_impls::Msg_Simple>
             {
                 fn from(from: &'msg GroupTwo_Simple) -> Self {
                     match from {
@@ -609,7 +666,7 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            enum GroupThree {
+            pub enum GroupThree {
                 G3Int32(i32),
             }
 
@@ -618,6 +675,7 @@ pub mod _puroro_nested {
             pub enum GroupThree_Simple {
                 G3Int32(i32),
             }
+
             impl<'msg> ::std::convert::From<&'msg GroupThree_Simple> for GroupThree {
                 fn from(from: &'msg GroupThree_Simple) -> Self {
                     match from {

@@ -206,8 +206,8 @@ struct Oneof {
     is_synthetic: bool,
     has_message_field: bool,
     has_reference_field: bool,
-    owner_message_path: String,
     owner_message_trait_path: String,
+    simple_owner_message_path: String,
 }
 
 impl Oneof {
@@ -233,8 +233,8 @@ impl Oneof {
                         | wrappers::FieldType::Message(_))
                 )
             }),
-            owner_message_path: o.message()?.rust_absolute_path(),
             owner_message_trait_path: o.message()?.rust_absolute_trait_path(),
+            simple_owner_message_path: o.message()?.rust_absolute_impl_path("Simple"),
         })
     }
 }

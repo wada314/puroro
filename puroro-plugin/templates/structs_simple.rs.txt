@@ -73,6 +73,23 @@ impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_ident }} {
     }
     {%- endif %}
     {%- endfor %}
+    
+    {%- for oneof in m.oneofs %}
+    fn {{ oneof.field_ident }}<'this>(&'this self) ->
+        ::std::option::Option<
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+            {%- if oneof.has_message_field %}
+            <'this, {{ m.simple_ident }}>
+            {%- else %}
+            {%- if oneof.has_reference_field %}
+            <'this>
+            {%- endif %}
+            {%- endif %}
+        >
+    {
+        self.{{ oneof.field_ident }}.as_ref().map(|o| ::std::convert::From::from(o))
+    }
+    {%- endfor %}
 }
 
 impl ::puroro::DeserFromBytesIter for {{ m.simple_ident }} {

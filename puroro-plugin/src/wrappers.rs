@@ -388,6 +388,14 @@ impl Message {
             self.outer_messages.iter().map(|s| s.borrow()),
         )
     }
+    pub fn rust_absolute_impl_path(&self, impl_name: &str) -> String {
+        format!(
+            "{path}::_puroro_impls::{ident}_{impl_name}",
+            path = self.rust_absolute_module_path(),
+            ident = self.rust_ident,
+            impl_name = impl_name,
+        )
+    }
 
     pub fn input_file(&self) -> Result<Rc<InputFile>> {
         Ok(upgrade(&self.input_file)?)
