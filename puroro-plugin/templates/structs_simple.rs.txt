@@ -8,9 +8,9 @@ impl ::puroro_internal::GetImplStruct for super::{{ m.ident }}<::puroro::tags::S
 #[derive(Clone, Default, PartialEq, Debug)]
 pub struct {{ m.simple_ident }} {
     {%- for field in m.fields %}
-    {#{%- if !field.is_explicit_oneof_field %}#}
+    {#-{%- if !field.is_explicit_oneof_field %}-#}
     pub {{ field.ident }}: {{ field.simple_field_type }},
-    {#{%- endif %}#}
+    {#-{%- endif %}-#}
     {%- endfor %}
     {%- for oneof in m.oneofs %}
     {%- if !oneof.is_synthetic %}
