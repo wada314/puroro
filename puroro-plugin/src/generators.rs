@@ -204,7 +204,10 @@ struct Oneof {
     field_ident: String,
     fields: Vec<OneofField>,
     is_synthetic: bool,
-    trait_maybe_generic_params: String,
+    has_message_field: bool,
+    has_reference_field: bool,
+    owner_message_path: String,
+    owner_message_trait_path: String,
 }
 
 impl Oneof {
@@ -218,7 +221,20 @@ impl Oneof {
                 .map(|f| OneofField::try_new(f))
                 .try_collect()?,
             is_synthetic: o.is_synthetic()?,
-            trait_maybe_generic_params: o.trait_maybe_generic_params("'msg", "T")?,
+            has_message_field: o
+                .fields()?
+                .into_iter()
+                .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_)))),
+            has_reference_field: o.fields()?.into_iter().any(|f| {
+                matches!(
+                    f.field_type(),
+                    Ok(wrappers::FieldType::Bytes
+                        | wrappers::FieldType::String
+                        | wrappers::FieldType::Message(_))
+                )
+            }),
+            owner_message_path: o.message()?.rust_absolute_path(),
+            owner_message_trait_path: o.message()?.rust_absolute_trait_path(),
         })
     }
 }
@@ -226,6 +242,7 @@ impl Oneof {
 struct OneofField {
     ident: String,
     number: i32,
+    is_length_delimited: bool,
     trait_field_type: String,
     simple_field_type: String,
     simple_field_type_tag: String,
@@ -236,6 +253,12 @@ impl OneofField {
         Ok(Self {
             ident: f.rust_oneof_ident().to_string(),
             number: f.number(),
+            is_length_delimited: matches!(
+                f.field_type()?,
+                wrappers::FieldType::Bytes
+                    | wrappers::FieldType::String
+                    | wrappers::FieldType::Message(_)
+            ),
             trait_field_type: f.trait_oneof_field_type("'msg", "T")?,
             simple_field_type: f.simple_oneof_field_type()?,
             simple_field_type_tag: f.rust_type_tag("SimpleImpl")?,

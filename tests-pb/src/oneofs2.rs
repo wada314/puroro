@@ -563,6 +563,18 @@ pub mod _puroro_nested {
                 G1Int32(i32),
                 G1String(::std::string::String),
             }
+            impl<'msg> ::std::convert::From<&'msg GroupOne_Simple> for GroupOne<'msg> {
+                fn from(from: &'msg GroupOne_Simple) -> Self {
+                    match from {
+                        GroupOne_Simple::G1Int32(v) => {
+                            GroupOne::G1Int32(::std::clone::Clone::clone(&v))
+                        }
+                        GroupOne_Simple::G1String(v) => {
+                            GroupOne::G1String(::std::borrow::Cow::Borrowed(v.as_ref()))
+                        }
+                    }
+                }
+            }
             enum GroupTwo<'msg, T: self::_puroro_root::oneofs2::_puroro_traits::MsgTrait> {
                 G2F32(f32),
                 G2String(::std::borrow::Cow<'msg, str>),
@@ -580,6 +592,23 @@ pub mod _puroro_nested {
                     >,
                 ),
             }
+            impl<'msg> ::std::convert::From<&'msg GroupTwo_Simple>
+                for GroupTwo<'msg, self::_puroro_root::oneofs2::Msg<::puroro::tags::SimpleImpl>>
+            {
+                fn from(from: &'msg GroupTwo_Simple) -> Self {
+                    match from {
+                        GroupTwo_Simple::G2F32(v) => {
+                            GroupTwo::G2F32(::std::clone::Clone::clone(&v))
+                        }
+                        GroupTwo_Simple::G2String(v) => {
+                            GroupTwo::G2String(::std::borrow::Cow::Borrowed(v.as_ref()))
+                        }
+                        GroupTwo_Simple::G2Submsg(v) => {
+                            GroupTwo::G2Submsg(::std::borrow::Cow::Borrowed(v.as_ref()))
+                        }
+                    }
+                }
+            }
             enum GroupThree {
                 G3Int32(i32),
             }
@@ -588,6 +617,15 @@ pub mod _puroro_nested {
             #[derive(Clone, PartialEq, Debug)]
             pub enum GroupThree_Simple {
                 G3Int32(i32),
+            }
+            impl<'msg> ::std::convert::From<&'msg GroupThree_Simple> for GroupThree {
+                fn from(from: &'msg GroupThree_Simple) -> Self {
+                    match from {
+                        GroupThree_Simple::G3Int32(v) => {
+                            GroupThree::G3Int32(::std::clone::Clone::clone(&v))
+                        }
+                    }
+                }
             }
         }
     }
