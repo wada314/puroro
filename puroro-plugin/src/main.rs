@@ -58,7 +58,7 @@ fn make_package_to_subpackages_map(
 
 fn package_to_filename(package: &str) -> String {
     if package.is_empty() {
-        "mod.rs".to_string()
+        "lib.rs".to_string()
     } else {
         package
             .split('.')
@@ -102,8 +102,6 @@ fn main() -> Result<()> {
     let mut cgres: CodeGeneratorResponse = CodeGeneratorResponse::default();
     cgres.supported_features = Some(1); // TODO: Use Feature enum
 
-    let mut mod_rs: File = File::default();
-    mod_rs.name = Some("mod.rs".into());
     let package_to_subpackage_map = make_package_to_subpackages_map(&cgreq.proto_file);
     let package_to_file_descriptor_map = wrapped_cgreq
         .input_files()

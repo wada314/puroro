@@ -32,7 +32,7 @@ fn main() {
     let plugin_exe_path = [&out_dir, "debug", "puroro-plugin.exe"]
         .iter()
         .collect::<PathBuf>();
-    let output_rust_path = [&out_dir].iter().collect::<PathBuf>();
+    let output_rust_path = ["src"].iter().collect::<PathBuf>();
 
     let protoc_exe = env::var("PURORO_PROTOC_PATH").unwrap_or("protoc".to_string());
     let protoc_status = Command::new(&protoc_exe)

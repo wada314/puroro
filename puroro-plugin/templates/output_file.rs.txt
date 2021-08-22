@@ -1,5 +1,6 @@
 // A generated source code by puroro library
 {%- if package.is_empty() %}
+#![feature(generic_associated_types)]
 // package (root)
 {%- else %}
 // package {{ package }}
