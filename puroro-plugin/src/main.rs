@@ -70,6 +70,9 @@ fn package_to_filename(package: &str) -> String {
 
 fn format_rust_file(input: &str) -> Option<String> {
     use ::std::io::Write as _;
+    if input.is_empty() {
+        return None;
+    }
 
     let rustfmt_exe = env::var("RUSTFMT").unwrap_or("rustfmt".to_string());
     let mut rustfmt = Command::new(&rustfmt_exe)
@@ -87,10 +90,12 @@ fn format_rust_file(input: &str) -> Option<String> {
     if let Some(ref mut stdout) = rustfmt.stdout {
         let mut out = String::new();
         stdout.read_to_string(&mut out).ok()?;
-        Some(out)
-    } else {
-        None
+        if !out.is_empty() {
+            return Some(out);
+        }
     }
+
+    return None;
 }
 
 fn main() -> Result<()> {
