@@ -21,6 +21,7 @@ use ::std::env;
 use ::std::io::Read;
 use ::std::io::{stdin, stdout};
 use ::std::process::Command;
+use std::process::Stdio;
 
 pub use protos::google;
 use protos::google::protobuf::compiler::code_generator_response::File;
@@ -71,9 +72,15 @@ fn format_rust_file(input: &str) -> Option<String> {
     use ::std::io::Write as _;
 
     let rustfmt_exe = env::var("RUSTFMT").unwrap_or("rustfmt".to_string());
-    let mut rustfmt = Command::new(&rustfmt_exe).spawn().unwrap();
+    let mut rustfmt = Command::new(&rustfmt_exe)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
 
-    if let Some(stdin) = rustfmt.stdin.as_mut() {
+    if let Some(mut stdin) = rustfmt.stdin {
+        //let input_string = input.to_string();
+        //::std::thread::spawn(move || stdin.write_all(input_string.as_bytes()));
         stdin.write_all(input.as_bytes()).ok()?;
     }
 
@@ -130,9 +137,11 @@ fn main() -> Result<()> {
         let filename = package_to_filename(&output_contexts.package);
         // Do render!
         let mut contents = output_contexts.render().unwrap();
-        /*if let Some(new_contents) = format_rust_file(&contents) {
+        if let Some(new_contents) = format_rust_file(&contents) {
             contents = dbg!(new_contents);
-        }*/
+        } else {
+            dbg!("failed to run rustfmt");
+        }
 
         let mut output_file = <File as Default>::default();
         output_file.name = Some(filename.into());
