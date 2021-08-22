@@ -702,19 +702,21 @@ impl Field {
             .and_then(|index| message.oneofs().get(index as usize));
         return maybe_oneof.map_or(Ok(false), |oneof| oneof.is_synthetic().map(|b| !b));
     }
-    pub fn has_scalar_getter(&self) -> bool {
-        matches!(self.field_label(), Ok(FieldLabel::Unlabeled))
-            && !matches!(self.field_type(), Ok(FieldType::Message(_)))
+    pub fn has_scalar_getter(&self) -> Result<bool> {
+        Ok(!self.is_non_synthetic_oneof_item()?
+            && matches!(self.field_label(), Ok(FieldLabel::Unlabeled))
+            && !matches!(self.field_type(), Ok(FieldType::Message(_))))
     }
-    pub fn has_scalar_optional_getter(&self) -> bool {
-        match self.field_label() {
-            Ok(FieldLabel::Optional | FieldLabel::Required) => true,
-            Ok(FieldLabel::Unlabeled) => matches!(self.field_type(), Ok(FieldType::Message(_))),
-            _ => false,
-        }
+    pub fn has_scalar_optional_getter(&self) -> Result<bool> {
+        Ok(!self.is_non_synthetic_oneof_item()?
+            && match self.field_label() {
+                Ok(FieldLabel::Optional | FieldLabel::Required) => true,
+                Ok(FieldLabel::Unlabeled) => matches!(self.field_type(), Ok(FieldType::Message(_))),
+                _ => false,
+            })
     }
-    pub fn has_repeated_getter(&self) -> bool {
-        matches!(self.field_label(), Ok(FieldLabel::Repeated))
+    pub fn has_repeated_getter(&self) -> Result<bool> {
+        Ok(matches!(self.field_label(), Ok(FieldLabel::Repeated)))
     }
 
     pub fn simple_field_type(&self) -> Result<String> {

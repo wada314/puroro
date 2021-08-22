@@ -183,9 +183,9 @@ impl Field {
                     | wrappers::FieldType::Message(_)
             ),
             is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
-            trait_has_scalar_getter: f.has_scalar_getter(),
-            trait_has_optional_getter: f.has_scalar_optional_getter(),
-            trait_has_repeated_getter: f.has_repeated_getter(),
+            trait_has_scalar_getter: f.has_scalar_getter()?,
+            trait_has_optional_getter: f.has_scalar_optional_getter()?,
+            trait_has_repeated_getter: f.has_repeated_getter()?,
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
             trait_maybe_field_message_absolute_path,
             trait_maybe_field_message_trait_absolute_path,
