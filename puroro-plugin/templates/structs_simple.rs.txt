@@ -106,6 +106,7 @@ impl ::puroro_internal::de::DeserFieldsFromBytesIter for {{ m.simple_ident }} {
             {%- for field in oneof.fields %}
             {{ field.number }} => {
                 use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}_Simple;
+                #[allow(unused)]
                 use ::std::option::Option::Some;
                 if !matches!(
                     &self.{{ oneof.field_ident }},

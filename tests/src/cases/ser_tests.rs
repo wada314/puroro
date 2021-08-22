@@ -58,7 +58,17 @@ fn test_submsg_unlabeled_empty3() {
 }
 
 #[test]
-fn test_submsg_unlabeled_filled() {
+fn test_submsg_optional_filled2() {
+    let mut msg: Msg2 = Msg2::default();
+    let mut buf: Vec<u8> = Vec::new();
+    msg.submsg_optional = Some(Box::new(Submsg2::default()));
+    msg.submsg_optional.as_mut().unwrap().i32_optional = Some(10);
+    msg.ser(&mut buf).unwrap();
+    assert_eq!(&[(7 << 3) | 2, 2, (1 << 3) | 0, 10], buf.as_slice());
+}
+
+#[test]
+fn test_submsg_unlabeled_filled3() {
     let mut msg: Msg3 = Msg3::default();
     let mut buf: Vec<u8> = Vec::new();
     msg.submsg_unlabeled = Some(Box::new(Submsg3::default()));

@@ -323,6 +323,7 @@ mod _puroro_impls {
             match field_number {
                 1 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupOne_Simple;
+                    #[allow(unused)]
                     use std::option::Option::Some;
                     if !matches!(&self.group_one, Some(GroupOne_Simple::G1Int32(_))) {
                         self.group_one =
@@ -339,6 +340,7 @@ mod _puroro_impls {
                 }
                 2 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupOne_Simple;
+                    #[allow(unused)]
                     use std::option::Option::Some;
                     if !matches!(&self.group_one, Some(GroupOne_Simple::G1String(_))) {
                         self.group_one =
@@ -355,6 +357,7 @@ mod _puroro_impls {
                 }
                 3 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo_Simple;
+                    #[allow(unused)]
                     use std::option::Option::Some;
                     if !matches!(&self.group_two, Some(GroupTwo_Simple::G2F32(_))) {
                         self.group_two =
@@ -371,6 +374,7 @@ mod _puroro_impls {
                 }
                 4 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo_Simple;
+                    #[allow(unused)]
                     use std::option::Option::Some;
                     if !matches!(&self.group_two, Some(GroupTwo_Simple::G2String(_))) {
                         self.group_two =
@@ -387,6 +391,7 @@ mod _puroro_impls {
                 }
                 5 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo_Simple;
+                    #[allow(unused)]
                     use std::option::Option::Some;
                     if !matches!(&self.group_two, Some(GroupTwo_Simple::G2Submsg(_))) {
                         self.group_two =
@@ -405,6 +410,7 @@ mod _puroro_impls {
                 }
                 6 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupThree_Simple;
+                    #[allow(unused)]
                     use std::option::Option::Some;
                     if !matches!(&self.group_three, Some(GroupThree_Simple::G3Int32(_))) {
                         self.group_three = Some(GroupThree_Simple::G3Int32(
