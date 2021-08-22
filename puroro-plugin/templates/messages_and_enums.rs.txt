@@ -7,6 +7,7 @@
 {#-################ Traits ################}
 
 {%- if !messages.is_empty() %}
+pub use _puroro_traits::*;
 pub mod _puroro_traits {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
