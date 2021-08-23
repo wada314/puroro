@@ -1,0 +1,13 @@
+{#- ################# SingleFieldN ################# #}
+
+{%- for sfield in m.fields %}
+
+#[derive(Clone, PartialEq, Debug)]
+struct {{ m.single_field_ident }}{{ sfield.number }} {
+    field: {{ sfield.simple_field_type }},
+}
+
+impl ::puroro::Message for {{ m.single_field_ident }}{{ sfield.number }} {}
+
+
+{%- endfor %}
