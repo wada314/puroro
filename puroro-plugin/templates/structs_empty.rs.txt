@@ -9,7 +9,7 @@ impl ::puroro::Message for {{ m.empty_ident }} {}
 impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.empty_ident }} {
     {%- for field in m.fields %}
 
-    {%- match field.simple_maybe_field_message_path %}
+    {%- match field.empty_maybe_field_message_path %}
     {%- when Some with (struct_path) %}
     type Field{{ field.number }}MessageType<'this> = {{ struct_path }};
     {%- else %}

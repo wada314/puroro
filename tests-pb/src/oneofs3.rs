@@ -261,6 +261,30 @@ pub mod _puroro_impls {
     }
 
     #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append1 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append2 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append3 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append4 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append5 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append6 {}
+
+    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Submsg_Simple {
         pub i32_unlabeled: i32,
@@ -335,6 +359,10 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Submsg_Append1 {}
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

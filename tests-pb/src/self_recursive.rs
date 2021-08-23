@@ -104,6 +104,10 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append1 {}
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

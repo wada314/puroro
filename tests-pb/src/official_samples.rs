@@ -91,6 +91,10 @@ pub mod _puroro_impls {
     }
 
     #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Test1_Append1 {}
+
+    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Test2_Simple {
         pub b: ::std::option::Option<::std::string::String>,
@@ -167,6 +171,10 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Test2_Append2 {}
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
@@ -263,6 +271,10 @@ pub mod _puroro_impls {
     }
 
     #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Test3_Append3 {}
+
+    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Test4_Simple {
         pub d: ::std::vec::Vec<i32>,
@@ -340,6 +352,10 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Test4_Append4 {}
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

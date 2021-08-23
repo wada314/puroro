@@ -328,6 +328,66 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append1 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append2 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append3 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append11 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append12 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append13 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append21 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append22 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append23 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append31 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append32 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append33 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append41 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append42 {}
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone, PartialEq, Debug)]
+    struct Msg_Append43 {}
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -509,6 +569,10 @@ pub mod _puroro_nested {
                     ::std::result::Result::Ok(())
                 }
             }
+
+            #[allow(non_camel_case_types)]
+            #[derive(Clone, PartialEq, Debug)]
+            struct Submsg_Append1 {}
         }
         pub use _puroro_traits::*;
         pub mod _puroro_traits {
