@@ -9,5 +9,6 @@ pub mod _puroro_impls {
     {%- for m in messages %}
     {%- include "structs_simple.rs.txt" %}
     {%- include "structs_empty.rs.txt" %}
+    {%- include "structs_append.rs.txt" %}
     {%- endfor %}
 }

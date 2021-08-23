@@ -1,0 +1,11 @@
+{#- ################# Append ################# #}
+
+{%- for field in m.fields %}
+
+#[allow(non_camel_case_types)]
+#[derive(Clone, PartialEq, Debug)]
+struct {{ m.append_ident }}{{ field.number }} {
+
+}
+
+{%- endfor %}

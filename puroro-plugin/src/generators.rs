@@ -53,6 +53,7 @@ struct Message {
     oneofs: Vec<Oneof>,
     simple_ident: String,
     empty_ident: String,
+    append_ident: String,
 }
 
 impl Message {
@@ -89,6 +90,7 @@ impl Message {
             oneofs,
             simple_ident: m.rust_impl_ident("Simple"),
             empty_ident: m.rust_impl_ident("Empty"),
+            append_ident: m.rust_impl_ident("Append"),
         })
     }
 }
