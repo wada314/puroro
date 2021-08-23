@@ -52,7 +52,7 @@ struct Message {
     fields: Vec<Field>,
     oneofs: Vec<Oneof>,
 
-    trait_absolute_path: String,
+    trait_path: String,
     simple_ident: String,
 }
 
@@ -88,7 +88,7 @@ impl Message {
             },
             fields,
             oneofs,
-            trait_absolute_path: m.rust_absolute_trait_path(),
+            trait_path: m.rust_trait_path(),
             simple_ident: format!("{}_Simple", m.rust_ident()),
         })
     }
@@ -151,8 +151,8 @@ struct Field {
     trait_has_optional_getter: bool,
     trait_has_repeated_getter: bool,
     trait_scalar_getter_type: String,
-    trait_maybe_field_message_absolute_path: Option<String>,
-    trait_maybe_field_message_trait_absolute_path: Option<String>,
+    trait_maybe_field_message_path: Option<String>,
+    trait_maybe_field_message_trait_path: Option<String>,
     simple_field_type: String,
     simple_maybe_field_message_path: Option<String>,
     simple_maybe_borrowed_field_type: Option<String>,
@@ -161,21 +161,21 @@ struct Field {
 
 impl Field {
     fn try_new(f: &wrappers::Field) -> Result<Self> {
-        let trait_maybe_field_message_absolute_path =
+        let trait_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_absolute_path())
+                Some(upgrade(&m)?.rust_path())
             } else {
                 None
             };
-        let trait_maybe_field_message_trait_absolute_path =
+        let trait_maybe_field_message_trait_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_absolute_trait_path())
+                Some(upgrade(&m)?.rust_trait_path())
             } else {
                 None
             };
         let simple_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_absolute_impl_path("Simple"))
+                Some(upgrade(&m)?.rust_impl_path("Simple"))
             } else {
                 None
             };
@@ -194,8 +194,8 @@ impl Field {
             trait_has_optional_getter: f.has_scalar_optional_getter()?,
             trait_has_repeated_getter: f.has_repeated_getter()?,
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
-            trait_maybe_field_message_absolute_path,
-            trait_maybe_field_message_trait_absolute_path,
+            trait_maybe_field_message_path,
+            trait_maybe_field_message_trait_path,
             simple_field_type: f.simple_field_type()?,
             simple_maybe_field_message_path,
             simple_maybe_borrowed_field_type: f
@@ -241,8 +241,8 @@ impl Oneof {
                         | wrappers::FieldType::Message(_))
                 )
             }),
-            owner_message_trait_path: o.message()?.rust_absolute_trait_path(),
-            simple_owner_message_path: o.message()?.rust_absolute_impl_path("Simple"),
+            owner_message_trait_path: o.message()?.rust_trait_path(),
+            simple_owner_message_path: o.message()?.rust_impl_path("Simple"),
         })
     }
 }

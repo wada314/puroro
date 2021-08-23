@@ -102,11 +102,11 @@ impl Oneof {
     pub fn fields(&self) -> &[Field] {
         &self.fields
     }
-    pub fn rust_absolute_path(&self) -> Result<String> {
+    pub fn rust_path(&self) -> Result<String> {
         let message = self.oneof.message()?;
         Ok(format!(
             "{path}::puroro_nested::{submodule}::{ident}",
-            path = message.rust_absolute_module_path(),
+            path = message.rust_module_path(),
             submodule = message.rust_nested_module_ident(),
             ident = self.rust_enum_ident(),
         ))

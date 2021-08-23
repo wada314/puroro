@@ -2,7 +2,7 @@
 pub trait {{ m.ident }}Trait: ::std::clone::Clone {
     {%- for field in m.fields %}
 
-    {%- match field.trait_maybe_field_message_trait_absolute_path %}
+    {%- match field.trait_maybe_field_message_trait_path %}
     {%- when Some with (field_msg_path) %}
     type Field{{ field.number }}MessageType<'this>: 'this + {{ field_msg_path }};
     {%- else %}

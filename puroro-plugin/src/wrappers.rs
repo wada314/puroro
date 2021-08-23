@@ -368,30 +368,30 @@ impl Message {
         Ok(message)
     }
 
-    pub fn rust_absolute_path(&self) -> String {
+    pub fn rust_path(&self) -> String {
         format!(
             "{path}::{ident}",
-            path = self.rust_absolute_module_path(),
+            path = self.rust_module_path(),
             ident = self.rust_ident
         )
     }
-    pub fn rust_absolute_trait_path(&self) -> String {
+    pub fn rust_trait_path(&self) -> String {
         format!(
             "{path}::_puroro_traits::{ident}Trait",
-            path = self.rust_absolute_module_path(),
+            path = self.rust_module_path(),
             ident = self.rust_ident
         )
     }
-    pub fn rust_absolute_module_path(&self) -> String {
+    pub fn rust_module_path(&self) -> String {
         make_module_path(
             self.package.iter().map(|s| s.borrow()),
             self.outer_messages.iter().map(|s| s.borrow()),
         )
     }
-    pub fn rust_absolute_impl_path(&self, impl_name: &str) -> String {
+    pub fn rust_impl_path(&self, impl_name: &str) -> String {
         format!(
             "{path}::_puroro_impls::{ident}_{impl_name}",
-            path = self.rust_absolute_module_path(),
+            path = self.rust_module_path(),
             ident = self.rust_ident,
             impl_name = impl_name,
         )
@@ -492,7 +492,7 @@ impl Enum {
         &self.values
     }
 
-    pub fn rust_absolute_path(&self) -> String {
+    pub fn rust_path(&self) -> String {
         format!(
             "{path}::{ident}",
             path = make_module_path(
@@ -642,8 +642,8 @@ impl Field {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "::std::borrow::Cow<'this, str>".to_string(),
             FieldType::Bytes => "::std::borrow::Cow<'this, [u8]>".to_string(),
-            FieldType::Enum2(e) => upgrade(&e)?.rust_absolute_path(),
-            FieldType::Enum3(e) => upgrade(&e)?.rust_absolute_path(),
+            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
+            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::Message(m) => format!(
                 "::std::borrow::Cow<\
                     'this, Self::Field{number}MessageType<'this>\
@@ -670,14 +670,14 @@ impl Field {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => format!("::std::borrow::Cow<{}, str>", lt),
             FieldType::Bytes => format!("::std::borrow::Cow<{}, [u8]>", lt),
-            FieldType::Enum2(e) => upgrade(&e)?.rust_absolute_path(),
-            FieldType::Enum3(e) => upgrade(&e)?.rust_absolute_path(),
+            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
+            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::Message(m) => format!(
                 "::std::borrow::Cow<{lt}, \
                     <{trait_impl} as {trait_path}>::Field{number}MessageType<{lt}>>",
                 lt = lt,
                 trait_impl = trait_impl,
-                trait_path = self.message()?.rust_absolute_trait_path(),
+                trait_path = self.message()?.rust_trait_path(),
                 number = self.number(),
             ),
         })
@@ -690,7 +690,7 @@ impl Field {
         Ok(match self.field_type() {
             Ok(FieldType::String) => Some("str".to_string()),
             Ok(FieldType::Bytes) => Some("[u8]".to_string()),
-            Ok(FieldType::Message(m)) => Some(upgrade(&m)?.rust_absolute_impl_path(impl_name)),
+            Ok(FieldType::Message(m)) => Some(upgrade(&m)?.rust_impl_path(impl_name)),
             _ => None,
         })
     }
@@ -746,10 +746,10 @@ impl Field {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "::std::string::String".to_string(),
             FieldType::Bytes => "::std::vec::Vec<u8>".to_string(),
-            FieldType::Enum2(e) => upgrade(&e)?.rust_absolute_path(),
-            FieldType::Enum3(e) => upgrade(&e)?.rust_absolute_path(),
+            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
+            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::Message(m) => {
-                let bare_msg = upgrade(&m)?.rust_absolute_impl_path("Simple");
+                let bare_msg = upgrade(&m)?.rust_impl_path("Simple");
                 if matches!(self.field_label(), Ok(FieldLabel::Repeated)) {
                     bare_msg
                 } else {
@@ -851,7 +851,7 @@ impl Oneof {
             .any(|field| matches!(field.field_type(), Ok(FieldType::Message(_))));
         Ok(match (need_lt, need_trait_impl) {
             (true, true) => {
-                let trait_path = self.message()?.rust_absolute_trait_path();
+                let trait_path = self.message()?.rust_trait_path();
                 format!("<{}, {}: {}>", lt, trait_impl, trait_path)
             }
             (true, false) => format!("<{}>", lt),
@@ -950,11 +950,11 @@ impl FieldType {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "String".to_string(),
             FieldType::Bytes => "Bytes".to_string().to_string(),
-            FieldType::Enum2(e) => format!("Enum2<{}>", upgrade(e)?.rust_absolute_path()),
-            FieldType::Enum3(e) => format!("Enum3<{}>", upgrade(e)?.rust_absolute_path()),
+            FieldType::Enum2(e) => format!("Enum2<{}>", upgrade(e)?.rust_path()),
+            FieldType::Enum3(e) => format!("Enum3<{}>", upgrade(e)?.rust_path()),
             FieldType::Message(m) => format!(
                 "Message<{path}>",
-                path = upgrade(m)?.rust_absolute_impl_path(impl_name),
+                path = upgrade(m)?.rust_impl_path(impl_name),
             ),
         })
     }
