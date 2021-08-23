@@ -8,7 +8,3 @@ use ::puroro::{ErrorKind, Result};
 
 // Re-exporting library modules
 pub use ::puroro::{bumpalo, hashbrown};
-
-pub trait GetImplStruct {
-    type Type;
-}
