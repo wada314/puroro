@@ -689,16 +689,12 @@ impl Field {
 
     pub fn maybe_trait_scalar_getter_type_borrowed(
         &self,
-        impl_tag: &str,
+        impl_name: &str,
     ) -> Result<Option<String>> {
         Ok(match self.field_type() {
             Ok(FieldType::String) => Some("str".to_string()),
             Ok(FieldType::Bytes) => Some("[u8]".to_string()),
-            Ok(FieldType::Message(m)) => Some(format!(
-                "{path}<{tag}>",
-                path = upgrade(&m)?.rust_absolute_path(),
-                tag = impl_tag,
-            )),
+            Ok(FieldType::Message(m)) => Some(upgrade(&m)?.rust_absolute_impl_path(impl_name)),
             _ => None,
         })
     }
@@ -757,10 +753,7 @@ impl Field {
             FieldType::Enum2(e) => upgrade(&e)?.rust_absolute_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_absolute_path(),
             FieldType::Message(m) => {
-                let bare_msg = format!(
-                    "{path}<::puroro::tags::SimpleImpl>",
-                    path = upgrade(&m)?.rust_absolute_path(),
-                );
+                let bare_msg = upgrade(&m)?.rust_absolute_impl_path("Simple");
                 if matches!(self.field_label(), Ok(FieldLabel::Repeated)) {
                     bare_msg
                 } else {

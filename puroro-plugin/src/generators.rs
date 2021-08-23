@@ -154,6 +154,7 @@ struct Field {
     trait_maybe_field_message_absolute_path: Option<String>,
     trait_maybe_field_message_trait_absolute_path: Option<String>,
     simple_field_type: String,
+    simple_maybe_field_message_path: Option<String>,
     simple_maybe_borrowed_field_type: Option<String>,
     simple_label_and_type_tags: String,
 }
@@ -169,6 +170,12 @@ impl Field {
         let trait_maybe_field_message_trait_absolute_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
                 Some(upgrade(&m)?.rust_absolute_trait_path())
+            } else {
+                None
+            };
+        let simple_maybe_field_message_path =
+            if let wrappers::FieldType::Message(m) = f.field_type()? {
+                Some(upgrade(&m)?.rust_absolute_impl_path("Simple"))
             } else {
                 None
             };
@@ -190,8 +197,9 @@ impl Field {
             trait_maybe_field_message_absolute_path,
             trait_maybe_field_message_trait_absolute_path,
             simple_field_type: f.simple_field_type()?,
+            simple_maybe_field_message_path,
             simple_maybe_borrowed_field_type: f
-                .maybe_trait_scalar_getter_type_borrowed("::puroro::tags::SimpleImpl")?,
+                .maybe_trait_scalar_getter_type_borrowed("Simple")?,
             simple_label_and_type_tags: f.rust_label_and_type_tags("SimpleImpl")?,
         })
     }

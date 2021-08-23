@@ -5,297 +5,16 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-pub struct Msg<ImplTag = ::puroro::tags::SimpleImpl>(
-    <Self as ::puroro_internal::GetImplStruct>::Type,
-)
-where
-    Self: ::puroro_internal::GetImplStruct;
-
-impl<ImplTag> ::std::ops::Deref for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-{
-    type Target = <Self as ::puroro_internal::GetImplStruct>::Type;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-impl<ImplTag> ::std::ops::DerefMut for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-impl<ImplTag> ::std::clone::Clone for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::clone::Clone,
-{
-    fn clone(&self) -> Self {
-        Self(self.0.clone())
-    }
-}
-impl<ImplTag> ::std::default::Default for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::default::Default,
-{
-    fn default() -> Self {
-        Self(::std::default::Default::default())
-    }
-}
-impl<ImplTag> ::std::fmt::Debug for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::fmt::Debug,
-{
-    fn fmt(
-        &self,
-        formatter: &mut ::std::fmt::Formatter<'_>,
-    ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        ::std::fmt::Debug::fmt(&self.0, formatter)
-    }
-}
-impl<ImplTag> ::std::cmp::PartialEq for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::cmp::PartialEq,
-{
-    fn eq(&self, rhs: &Self) -> bool {
-        ::std::cmp::PartialEq::eq(&self.0, &rhs.0)
-    }
-}
-
-impl<ImplTag> ::puroro::Message for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro::Message,
-{
-}
-
-impl<ImplTag> self::_puroro_traits::MsgTrait for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type:
-        self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait,
-{
-    fn i32_unlabeled<'this>(&'this self) -> i32 {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::i32_unlabeled(&self.0)
-    }
-    fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::i32_optional(&self.0)
-    }
-    type Field3RepeatedType<'this> = <
-        <Self as ::puroro_internal::GetImplStruct>::Type
-        as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-    >::Field3RepeatedType::<'this>;
-
-    fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::i32_repeated(&self.0)
-    }
-    fn float_unlabeled<'this>(&'this self) -> f32 {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::float_unlabeled(&self.0)
-    }
-    fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::float_optional(&self.0)
-    }
-    type Field13RepeatedType<'this> = <
-        <Self as ::puroro_internal::GetImplStruct>::Type
-        as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-    >::Field13RepeatedType::<'this>;
-
-    fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::float_repeated(&self.0)
-    }
-    fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::string_unlabeled(&self.0)
-    }
-    fn string_optional<'this>(
-        &'this self,
-    ) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::string_optional(&self.0)
-    }
-    type Field23RepeatedType<'this> = <
-        <Self as ::puroro_internal::GetImplStruct>::Type
-        as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-    >::Field23RepeatedType::<'this>;
-
-    fn string_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::string_repeated(&self.0)
-    }
-    fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::enum_unlabeled(&self.0)
-    }
-    fn enum_optional<'this>(
-        &'this self,
-    ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::enum_optional(&self.0)
-    }
-    type Field33RepeatedType<'this> = <
-        <Self as ::puroro_internal::GetImplStruct>::Type
-        as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-    >::Field33RepeatedType::<'this>;
-
-    fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::enum_repeated(&self.0)
-    }
-    type Field41MessageType<'this> = <
-        <Self as ::puroro_internal::GetImplStruct>::Type
-        as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-    >::Field41MessageType::<'this>;
-    fn submsg_unlabeled<'this>(
-        &'this self,
-    ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field41MessageType<'this>>> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::submsg_unlabeled(&self.0)
-    }
-    type Field42MessageType<'this> = <
-        <Self as ::puroro_internal::GetImplStruct>::Type
-        as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-    >::Field42MessageType::<'this>;
-    fn submsg_optional<'this>(
-        &'this self,
-    ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field42MessageType<'this>>> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::submsg_optional(&self.0)
-    }
-    type Field43MessageType<'this> = <
-        <Self as ::puroro_internal::GetImplStruct>::Type
-        as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-    >::Field43MessageType::<'this>;
-    type Field43RepeatedType<'this> = <
-        <Self as ::puroro_internal::GetImplStruct>::Type
-        as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-    >::Field43RepeatedType::<'this>;
-
-    fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::full_coverage3::_puroro_traits::MsgTrait
-        >::submsg_repeated(&self.0)
-    }
-}
-
-impl<ImplTag> ::puroro::DeserFromBytesIter for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro::DeserFromBytesIter,
-{
-    fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-    where
-        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-    {
-        <<Self as ::puroro_internal::GetImplStruct>::Type as ::puroro::DeserFromBytesIter>::deser(
-            self, iter,
-        )
-    }
-}
-impl<ImplTag> ::puroro_internal::de::DeserFieldsFromBytesIter for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type:
-        ::puroro_internal::de::DeserFieldsFromBytesIter,
-{
-    fn deser_field<I>(
-        &mut self,
-        field_number: i32,
-        data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
-    ) -> ::puroro::Result<()>
-    where
-        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-    {
-        ::puroro_internal::de::DeserFieldsFromBytesIter::deser_field(
-            &mut self.0,
-            field_number,
-            data,
-        )
-    }
-}
-
-impl<ImplTag> ::puroro::SerToIoWrite for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro::SerToIoWrite,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-    where
-        W: ::std::io::Write,
-    {
-        ::puroro::SerToIoWrite::ser(&self.0, out)
-    }
-}
-
+pub use _puroro_impls::Msg_Simple as Msg;
 mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
 
-    impl ::puroro_internal::GetImplStruct for super::Msg<::puroro::tags::SimpleImpl> {
-        type Type = Msg_Simple;
-    }
-
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Msg_Simple {
-        pub i32_unlabeled: i32,
-        pub i32_optional: ::std::option::Option<i32>,
-        pub i32_repeated: ::std::vec::Vec<i32>,
-        pub float_unlabeled: f32,
-        pub float_optional: ::std::option::Option<f32>,
-        pub float_repeated: ::std::vec::Vec<f32>,
-        pub string_unlabeled: ::std::string::String,
-        pub string_optional: ::std::option::Option<::std::string::String>,
-        pub string_repeated: ::std::vec::Vec<::std::string::String>,
-        pub enum_unlabeled: self::_puroro_root::full_coverage3::Enum,
-        pub enum_optional: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,
-        pub enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,
-        pub submsg_unlabeled: ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                    ::puroro::tags::SimpleImpl,
-                >,
-            >,
-        >,
-        pub submsg_optional: ::std::option::Option<
-            ::std::boxed::Box<
-                self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                    ::puroro::tags::SimpleImpl,
-                >,
-            >,
-        >,
-        pub submsg_repeated: ::std::vec::Vec<
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                ::puroro::tags::SimpleImpl,
-            >,
-        >,
-    }
+    pub struct Msg_Simple {pub i32_unlabeled: i32,pub i32_optional: ::std::option::Option<i32>,pub i32_repeated: ::std::vec::Vec<i32>,pub float_unlabeled: f32,pub float_optional: ::std::option::Option<f32>,pub float_repeated: ::std::vec::Vec<f32>,pub string_unlabeled: ::std::string::String,pub string_optional: ::std::option::Option<::std::string::String>,pub string_repeated: ::std::vec::Vec<::std::string::String>,pub enum_unlabeled: self::_puroro_root::full_coverage3::Enum,pub enum_optional: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,pub enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,pub submsg_unlabeled: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple>>,pub submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple>>,pub submsg_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple>,
+}
     impl ::puroro::Message for Msg_Simple {}
 
     impl super::_puroro_traits::MsgTrait for Msg_Simple {
@@ -354,9 +73,7 @@ mod _puroro_impls {
             ::puroro_internal::impls::simple::VecWrapper::new(&self.enum_repeated)
         }
         type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                ::puroro::tags::SimpleImpl,
-            >;
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple;
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field41MessageType<'this>>>
@@ -366,9 +83,7 @@ mod _puroro_impls {
                 .map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
         }
         type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                ::puroro::tags::SimpleImpl,
-            >;
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple;
         fn submsg_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field42MessageType<'this>>>
@@ -378,14 +93,10 @@ mod _puroro_impls {
                 .map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
         }
         type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                ::puroro::tags::SimpleImpl,
-            >;
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple;
         type Field43RepeatedType<'this> = ::puroro_internal::impls::simple::VecCowWrapper<
             'this,
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                ::puroro::tags::SimpleImpl,
-            >,
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple,
         >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -668,144 +379,10 @@ pub mod _puroro_nested {
             pub use super::super::super::_puroro_root::*;
         }
 
-        pub struct Submsg<ImplTag = ::puroro::tags::SimpleImpl>(
-            <Self as ::puroro_internal::GetImplStruct>::Type,
-        )
-        where
-            Self: ::puroro_internal::GetImplStruct;
-
-        impl<ImplTag> ::std::ops::Deref for Submsg<ImplTag>
-        where
-            Self: ::puroro_internal::GetImplStruct,
-        {
-            type Target = <Self as ::puroro_internal::GetImplStruct>::Type;
-            fn deref(&self) -> &Self::Target {
-                &self.0
-            }
-        }
-        impl<ImplTag> ::std::ops::DerefMut for Submsg<ImplTag>
-        where
-            Self: ::puroro_internal::GetImplStruct,
-        {
-            fn deref_mut(&mut self) -> &mut Self::Target {
-                &mut self.0
-            }
-        }
-        impl<ImplTag> ::std::clone::Clone for Submsg<ImplTag>
-        where
-            Self: ::puroro_internal::GetImplStruct,
-            <Self as ::puroro_internal::GetImplStruct>::Type: ::std::clone::Clone,
-        {
-            fn clone(&self) -> Self {
-                Self(self.0.clone())
-            }
-        }
-        impl<ImplTag> ::std::default::Default for Submsg<ImplTag>
-        where
-            Self: ::puroro_internal::GetImplStruct,
-            <Self as ::puroro_internal::GetImplStruct>::Type: ::std::default::Default,
-        {
-            fn default() -> Self {
-                Self(::std::default::Default::default())
-            }
-        }
-        impl<ImplTag> ::std::fmt::Debug for Submsg<ImplTag>
-        where
-            Self: ::puroro_internal::GetImplStruct,
-            <Self as ::puroro_internal::GetImplStruct>::Type: ::std::fmt::Debug,
-        {
-            fn fmt(
-                &self,
-                formatter: &mut ::std::fmt::Formatter<'_>,
-            ) -> ::std::result::Result<(), ::std::fmt::Error> {
-                ::std::fmt::Debug::fmt(&self.0, formatter)
-            }
-        }
-        impl<ImplTag> ::std::cmp::PartialEq for Submsg<ImplTag>
-        where
-            Self: ::puroro_internal::GetImplStruct,
-            <Self as ::puroro_internal::GetImplStruct>::Type: ::std::cmp::PartialEq,
-        {
-            fn eq(&self, rhs: &Self) -> bool {
-                ::std::cmp::PartialEq::eq(&self.0, &rhs.0)
-            }
-        }
-
-        impl<ImplTag> ::puroro::Message for Submsg<ImplTag>
-        where
-            Self: ::puroro_internal::GetImplStruct,
-            <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro::Message,
-        {
-        }
-
-        impl<ImplTag> self::_puroro_traits::SubmsgTrait for Submsg<ImplTag>
-        where
-            Self: ::puroro_internal::GetImplStruct,
-            <Self as ::puroro_internal::GetImplStruct>::Type: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-        {
-            fn i32_unlabeled<'this>(&'this self) -> i32 {
-                <<Self as ::puroro_internal::GetImplStruct>::Type
-                    as self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait
-                >::i32_unlabeled(&self.0)
-            }
-        }
-
-        impl<ImplTag> ::puroro::DeserFromBytesIter for Submsg<ImplTag>
-        where
-            Self: ::puroro_internal::GetImplStruct,
-            <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro::DeserFromBytesIter,
-        {
-            fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-            where
-                I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-            {
-                <<Self as ::puroro_internal::GetImplStruct>::Type as ::puroro::DeserFromBytesIter>::deser(self, iter)
-            }
-        }
-        impl<ImplTag> ::puroro_internal::de::DeserFieldsFromBytesIter for Submsg<ImplTag>
-        where
-            Self: ::puroro_internal::GetImplStruct,
-            <Self as ::puroro_internal::GetImplStruct>::Type:
-                ::puroro_internal::de::DeserFieldsFromBytesIter,
-        {
-            fn deser_field<I>(
-                &mut self,
-                field_number: i32,
-                data: ::puroro::types::FieldData<
-                    &mut ::puroro_internal::de::from_iter::ScopedIter<I>,
-                >,
-            ) -> ::puroro::Result<()>
-            where
-                I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-            {
-                ::puroro_internal::de::DeserFieldsFromBytesIter::deser_field(
-                    &mut self.0,
-                    field_number,
-                    data,
-                )
-            }
-        }
-
-        impl<ImplTag> ::puroro::SerToIoWrite for Submsg<ImplTag>
-        where
-            Self: ::puroro_internal::GetImplStruct,
-            <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro::SerToIoWrite,
-        {
-            fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-            where
-                W: ::std::io::Write,
-            {
-                ::puroro::SerToIoWrite::ser(&self.0, out)
-            }
-        }
-
+        pub use _puroro_impls::Submsg_Simple as Submsg;
         mod _puroro_impls {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
-            }
-
-            impl ::puroro_internal::GetImplStruct for super::Submsg<::puroro::tags::SimpleImpl> {
-                type Type = Submsg_Simple;
             }
 
             #[allow(non_camel_case_types)]

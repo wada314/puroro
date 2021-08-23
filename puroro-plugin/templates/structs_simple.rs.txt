@@ -1,9 +1,5 @@
 {#- ################# Simple ################# #}
 
-impl ::puroro_internal::GetImplStruct for super::{{ m.ident }}<::puroro::tags::SimpleImpl> {
-    type Type = {{ m.simple_ident }};
-}
-
 #[allow(non_camel_case_types)]
 #[derive(Clone, Default, PartialEq, Debug)]
 pub struct {{ m.simple_ident }} {
@@ -25,9 +21,9 @@ impl ::puroro::Message for {{ m.simple_ident }} {}
 impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_ident }} {
     {%- for field in m.fields %}
 
-    {%- match field.trait_maybe_field_message_absolute_path %}
+    {%- match field.simple_maybe_field_message_path %}
     {%- when Some with (struct_path) %}
-    type Field{{ field.number }}MessageType<'this> = {{ struct_path }}<::puroro::tags::SimpleImpl>;
+    type Field{{ field.number }}MessageType<'this> = {{ struct_path }};
     {%- else %}
     {%- endmatch %}
 

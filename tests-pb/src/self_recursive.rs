@@ -5,165 +5,24 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-pub struct Msg<ImplTag = ::puroro::tags::SimpleImpl>(
-    <Self as ::puroro_internal::GetImplStruct>::Type,
-)
-where
-    Self: ::puroro_internal::GetImplStruct;
-
-impl<ImplTag> ::std::ops::Deref for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-{
-    type Target = <Self as ::puroro_internal::GetImplStruct>::Type;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-impl<ImplTag> ::std::ops::DerefMut for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-impl<ImplTag> ::std::clone::Clone for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::clone::Clone,
-{
-    fn clone(&self) -> Self {
-        Self(self.0.clone())
-    }
-}
-impl<ImplTag> ::std::default::Default for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::default::Default,
-{
-    fn default() -> Self {
-        Self(::std::default::Default::default())
-    }
-}
-impl<ImplTag> ::std::fmt::Debug for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::fmt::Debug,
-{
-    fn fmt(
-        &self,
-        formatter: &mut ::std::fmt::Formatter<'_>,
-    ) -> ::std::result::Result<(), ::std::fmt::Error> {
-        ::std::fmt::Debug::fmt(&self.0, formatter)
-    }
-}
-impl<ImplTag> ::std::cmp::PartialEq for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::std::cmp::PartialEq,
-{
-    fn eq(&self, rhs: &Self) -> bool {
-        ::std::cmp::PartialEq::eq(&self.0, &rhs.0)
-    }
-}
-
-impl<ImplTag> ::puroro::Message for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro::Message,
-{
-}
-
-impl<ImplTag> self::_puroro_traits::MsgTrait for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type:
-        self::_puroro_root::self_recursive::_puroro_traits::MsgTrait,
-{
-    type Field1MessageType<'this> = <
-        <Self as ::puroro_internal::GetImplStruct>::Type
-        as self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
-    >::Field1MessageType::<'this>;
-    fn recursive_unlabeled<'this>(
-        &'this self,
-    ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>> {
-        <<Self as ::puroro_internal::GetImplStruct>::Type
-            as self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
-        >::recursive_unlabeled(&self.0)
-    }
-}
-
-impl<ImplTag> ::puroro::DeserFromBytesIter for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro::DeserFromBytesIter,
-{
-    fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-    where
-        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-    {
-        <<Self as ::puroro_internal::GetImplStruct>::Type as ::puroro::DeserFromBytesIter>::deser(
-            self, iter,
-        )
-    }
-}
-impl<ImplTag> ::puroro_internal::de::DeserFieldsFromBytesIter for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type:
-        ::puroro_internal::de::DeserFieldsFromBytesIter,
-{
-    fn deser_field<I>(
-        &mut self,
-        field_number: i32,
-        data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
-    ) -> ::puroro::Result<()>
-    where
-        I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-    {
-        ::puroro_internal::de::DeserFieldsFromBytesIter::deser_field(
-            &mut self.0,
-            field_number,
-            data,
-        )
-    }
-}
-
-impl<ImplTag> ::puroro::SerToIoWrite for Msg<ImplTag>
-where
-    Self: ::puroro_internal::GetImplStruct,
-    <Self as ::puroro_internal::GetImplStruct>::Type: ::puroro::SerToIoWrite,
-{
-    fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-    where
-        W: ::std::io::Write,
-    {
-        ::puroro::SerToIoWrite::ser(&self.0, out)
-    }
-}
-
+pub use _puroro_impls::Msg_Simple as Msg;
 mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
-    }
-
-    impl ::puroro_internal::GetImplStruct for super::Msg<::puroro::tags::SimpleImpl> {
-        type Type = Msg_Simple;
     }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Msg_Simple {
         pub recursive_unlabeled: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::self_recursive::Msg<::puroro::tags::SimpleImpl>>,
+            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::Msg_Simple>,
         >,
     }
     impl ::puroro::Message for Msg_Simple {}
 
     impl super::_puroro_traits::MsgTrait for Msg_Simple {
         type Field1MessageType<'this> =
-            self::_puroro_root::self_recursive::Msg<::puroro::tags::SimpleImpl>;
+            self::_puroro_root::self_recursive::_puroro_impls::Msg_Simple;
         fn recursive_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>>
