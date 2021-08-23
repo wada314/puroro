@@ -50,7 +50,7 @@ where
         ::std::option::Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
             {%- if oneof.has_message_field %}
-            <'this, {{ m.empty_ident }}>
+            <'this, Self>
             {%- else %}
             {%- if oneof.has_reference_field %}
             <'this>
