@@ -9,7 +9,7 @@ pub use _puroro_impls::Test1_Simple as Test1;
 pub use _puroro_impls::Test2_Simple as Test2;
 pub use _puroro_impls::Test3_Simple as Test3;
 pub use _puroro_impls::Test4_Simple as Test4;
-mod _puroro_impls {
+pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
@@ -170,7 +170,7 @@ mod _puroro_impls {
                 3 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional,
                     ::puroro::tags::Message<
-                        self::_puroro_root::official_samples::Test1<::puroro::tags::SimpleImpl>,
+                        self::_puroro_root::official_samples::_puroro_impls::Test1_Simple,
                     >,
                 >::deser_field(&mut self.c, data),
 
@@ -187,7 +187,7 @@ mod _puroro_impls {
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::official_samples::Test1<::puroro::tags::SimpleImpl>,
+                    self::_puroro_root::official_samples::_puroro_impls::Test1_Simple,
                 >,
             >::ser_field(&self.c, 3, out)?;
             ::std::result::Result::Ok(())

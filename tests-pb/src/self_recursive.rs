@@ -6,7 +6,7 @@ pub mod _puroro_root {
 }
 
 pub use _puroro_impls::Msg_Simple as Msg;
-mod _puroro_impls {
+pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
@@ -55,7 +55,7 @@ mod _puroro_impls {
                 1 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled,
                     ::puroro::tags::Message<
-                        self::_puroro_root::self_recursive::Msg<::puroro::tags::SimpleImpl>,
+                        self::_puroro_root::self_recursive::_puroro_impls::Msg_Simple,
                     >,
                 >::deser_field(&mut self.recursive_unlabeled, data),
 
@@ -72,7 +72,7 @@ mod _puroro_impls {
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
-                    self::_puroro_root::self_recursive::Msg<::puroro::tags::SimpleImpl>,
+                    self::_puroro_root::self_recursive::_puroro_impls::Msg_Simple,
                 >,
             >::ser_field(&self.recursive_unlabeled, 1, out)?;
             ::std::result::Result::Ok(())

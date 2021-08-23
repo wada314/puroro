@@ -21,7 +21,7 @@ pub enum {{ enum_ident }}_Simple
     {%- endfor %}
 }
 
-impl<'msg, T> ::std::convert::From<&'msg {{ enum_ident }}_Simple> 
+impl<'msg> ::std::convert::From<&'msg {{ enum_ident }}_Simple> 
 for {{ enum_ident }}
 {%- if has_message_field %}
     <'msg, {{ simple_owner_message_path }}>

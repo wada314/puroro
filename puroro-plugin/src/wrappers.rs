@@ -595,21 +595,17 @@ impl Field {
         self.proto_oneof_index.clone()
     }
 
-    pub fn rust_type_tag(&self, impl_tag_ident: &str) -> Result<String> {
-        let impl_tag = format!(
-            "::puroro::tags::{impl_tag_ident}",
-            impl_tag_ident = impl_tag_ident
-        );
+    pub fn rust_type_tag(&self, impl_name: &str) -> Result<String> {
         Ok(format!(
             "::puroro::tags::{type_tag}",
-            type_tag = self.field_type()?.tag_ident_and_gp(&impl_tag)?,
+            type_tag = self.field_type()?.tag_ident_and_gp(&impl_name)?,
         ))
     }
-    pub fn rust_label_and_type_tags(&self, impl_tag_ident: &str) -> Result<String> {
+    pub fn rust_label_and_type_tags(&self, impl_name: &str) -> Result<String> {
         Ok(format!(
             "::puroro::tags::{label_tag}, {type_tag}",
             label_tag = self.field_label()?.tag_ident(),
-            type_tag = self.rust_type_tag(impl_tag_ident)?,
+            type_tag = self.rust_type_tag(impl_name)?,
         ))
     }
 
@@ -936,7 +932,7 @@ impl FieldType {
         matches!(self, FieldType::Message(_))
     }
 
-    pub fn tag_ident_and_gp(&self, impl_tag: &str) -> Result<String> {
+    pub fn tag_ident_and_gp(&self, impl_name: &str) -> Result<String> {
         Ok(match self {
             FieldType::Double => "Double".to_string(),
             FieldType::Float => "Float".to_string(),
@@ -957,9 +953,8 @@ impl FieldType {
             FieldType::Enum2(e) => format!("Enum2<{}>", upgrade(e)?.rust_absolute_path()),
             FieldType::Enum3(e) => format!("Enum3<{}>", upgrade(e)?.rust_absolute_path()),
             FieldType::Message(m) => format!(
-                "Message<{path}<{tag}>>",
-                path = upgrade(m)?.rust_absolute_path(),
-                tag = impl_tag
+                "Message<{path}>",
+                path = upgrade(m)?.rust_absolute_impl_path(impl_name),
             ),
         })
     }

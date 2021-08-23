@@ -200,7 +200,7 @@ impl Field {
             simple_maybe_field_message_path,
             simple_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Simple")?,
-            simple_label_and_type_tags: f.rust_label_and_type_tags("SimpleImpl")?,
+            simple_label_and_type_tags: f.rust_label_and_type_tags("Simple")?,
         })
     }
 }
@@ -269,7 +269,7 @@ impl OneofField {
             ),
             trait_field_type: f.trait_oneof_field_type("'msg", "T")?,
             simple_field_type: f.simple_oneof_field_type()?,
-            simple_field_type_tag: f.rust_type_tag("SimpleImpl")?,
+            simple_field_type_tag: f.rust_type_tag("Simple")?,
         })
     }
 }

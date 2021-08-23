@@ -7,7 +7,7 @@ pub mod _puroro_root {
 
 pub use _puroro_impls::Msg_Simple as Msg;
 pub use _puroro_impls::Submsg_Simple as Submsg;
-mod _puroro_impls {
+pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
@@ -162,7 +162,7 @@ mod _puroro_impls {
                     ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
                         ::puroro::tags::OneofItem,
                         ::puroro::tags::Message<
-                            self::_puroro_root::oneofs3::Submsg<::puroro::tags::SimpleImpl>,
+                            self::_puroro_root::oneofs3::_puroro_impls::Submsg_Simple,
                         >,
                     >::deser_field(field_value_mut_ref, data)
                 }
@@ -213,9 +213,7 @@ mod _puroro_impls {
             >::ser_field(&self.g2_string, 4, out)?;
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    self::_puroro_root::oneofs3::Submsg<::puroro::tags::SimpleImpl>,
-                >,
+                ::puroro::tags::Message<self::_puroro_root::oneofs3::_puroro_impls::Submsg_Simple>,
             >::ser_field(&self.g2_submsg, 5, out)?;
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -327,7 +325,7 @@ pub mod _puroro_nested {
                 G1String(::std::string::String),
             }
 
-            impl<'msg, T> ::std::convert::From<&'msg GroupOne_Simple> for GroupOne<'msg> {
+            impl<'msg> ::std::convert::From<&'msg GroupOne_Simple> for GroupOne<'msg> {
                 fn from(from: &'msg GroupOne_Simple) -> Self {
                     match from {
                         GroupOne_Simple::G1Int32(v) => {
@@ -355,7 +353,7 @@ pub mod _puroro_nested {
                 ),
             }
 
-            impl<'msg, T> ::std::convert::From<&'msg GroupTwo_Simple>
+            impl<'msg> ::std::convert::From<&'msg GroupTwo_Simple>
                 for GroupTwo<'msg, self::_puroro_root::oneofs3::_puroro_impls::Msg_Simple>
             {
                 fn from(from: &'msg GroupTwo_Simple) -> Self {
@@ -382,7 +380,7 @@ pub mod _puroro_nested {
                 G3Int32(i32),
             }
 
-            impl<'msg, T> ::std::convert::From<&'msg GroupThree_Simple> for GroupThree {
+            impl<'msg> ::std::convert::From<&'msg GroupThree_Simple> for GroupThree {
                 fn from(from: &'msg GroupThree_Simple) -> Self {
                     match from {
                         GroupThree_Simple::G3Int32(v) => {

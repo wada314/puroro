@@ -6,7 +6,7 @@ pub mod _puroro_root {
 }
 
 pub use _puroro_impls::Msg_Simple as Msg;
-mod _puroro_impls {
+pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
@@ -123,81 +123,54 @@ mod _puroro_impls {
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
             match field_number {
-                1 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::Int32,
-                >::deser_field(&mut self.i32_unlabeled, data),
-                2 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional,
-                    ::puroro::tags::Int32,
-                >::deser_field(&mut self.i32_optional, data),
-                3 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated,
-                    ::puroro::tags::Int32,
-                >::deser_field(&mut self.i32_repeated, data),
-                11 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::Float,
-                >::deser_field(&mut self.float_unlabeled, data),
-                12 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional,
-                    ::puroro::tags::Float,
-                >::deser_field(&mut self.float_optional, data),
-                13 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated,
-                    ::puroro::tags::Float,
-                >::deser_field(&mut self.float_repeated, data),
-                21 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::String,
-                >::deser_field(&mut self.string_unlabeled, data),
-                22 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional,
-                    ::puroro::tags::String,
-                >::deser_field(&mut self.string_optional, data),
-                23 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated,
-                    ::puroro::tags::String,
-                >::deser_field(&mut self.string_repeated, data),
-                31 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
-                >::deser_field(&mut self.enum_unlabeled, data),
-                32 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional,
-                    ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
-                >::deser_field(&mut self.enum_optional, data),
-                33 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated,
-                    ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
-                >::deser_field(&mut self.enum_repeated, data),
-                41 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::Message<
-                        self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                            ::puroro::tags::SimpleImpl,
-                        >,
-                    >,
-                >::deser_field(&mut self.submsg_unlabeled, data),
-                42 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional,
-                    ::puroro::tags::Message<
-                        self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                            ::puroro::tags::SimpleImpl,
-                        >,
-                    >,
-                >::deser_field(&mut self.submsg_optional, data),
-                43 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated,
-                    ::puroro::tags::Message<
-                        self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                            ::puroro::tags::SimpleImpl,
-                        >,
-                    >,
-                >::deser_field(&mut self.submsg_repeated, data),
+            1 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_unlabeled, data),
+            2 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_optional, data),
+            3 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_repeated, data),
+            11 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Float
+            >::deser_field(&mut self.float_unlabeled, data),
+            12 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Float
+            >::deser_field(&mut self.float_optional, data),
+            13 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Float
+            >::deser_field(&mut self.float_repeated, data),
+            21 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::String
+            >::deser_field(&mut self.string_unlabeled, data),
+            22 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::String
+            >::deser_field(&mut self.string_optional, data),
+            23 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::String
+            >::deser_field(&mut self.string_repeated, data),
+            31 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
+            >::deser_field(&mut self.enum_unlabeled, data),
+            32 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
+            >::deser_field(&mut self.enum_optional, data),
+            33 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
+            >::deser_field(&mut self.enum_repeated, data),
+            41 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple>
+            >::deser_field(&mut self.submsg_unlabeled, data),
+            42 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple>
+            >::deser_field(&mut self.submsg_optional, data),
+            43 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple>
+            >::deser_field(&mut self.submsg_repeated, data),
 
-                _ => unimplemented!("TODO: This case should be handled properly..."),
-            }
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
         }
     }
 
@@ -255,29 +228,14 @@ mod _puroro_impls {
                 ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
             >::ser_field(&self.enum_repeated, 33, out)?;
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<
-                    self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                        ::puroro::tags::SimpleImpl,
-                    >,
-                >,
-            >::ser_field(&self.submsg_unlabeled, 41, out)?;
+            ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple>
+        >::ser_field(&self.submsg_unlabeled, 41, out)?;
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Message<
-                    self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                        ::puroro::tags::SimpleImpl,
-                    >,
-                >,
-            >::ser_field(&self.submsg_optional, 42, out)?;
+            ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple>
+        >::ser_field(&self.submsg_optional, 42, out)?;
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Message<
-                    self::_puroro_root::full_coverage3::_puroro_nested::msg::Submsg<
-                        ::puroro::tags::SimpleImpl,
-                    >,
-                >,
-            >::ser_field(&self.submsg_repeated, 43, out)?;
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple>
+        >::ser_field(&self.submsg_repeated, 43, out)?;
             ::std::result::Result::Ok(())
         }
     }
@@ -380,7 +338,7 @@ pub mod _puroro_nested {
         }
 
         pub use _puroro_impls::Submsg_Simple as Submsg;
-        mod _puroro_impls {
+        pub mod _puroro_impls {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }

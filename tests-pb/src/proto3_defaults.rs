@@ -7,7 +7,7 @@ pub mod _puroro_root {
 
 pub use _puroro_impls::Msg_Simple as Msg;
 pub use _puroro_impls::Submsg_Simple as Submsg;
-mod _puroro_impls {
+pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
@@ -98,7 +98,7 @@ mod _puroro_impls {
                 6 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled,
                     ::puroro::tags::Message<
-                        self::_puroro_root::proto3_defaults::Submsg<::puroro::tags::SimpleImpl>,
+                        self::_puroro_root::proto3_defaults::_puroro_impls::Submsg_Simple,
                     >,
                 >::deser_field(&mut self.submsg_unlabeled, data),
 
@@ -135,7 +135,7 @@ mod _puroro_impls {
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
-                    self::_puroro_root::proto3_defaults::Submsg<::puroro::tags::SimpleImpl>,
+                    self::_puroro_root::proto3_defaults::_puroro_impls::Submsg_Simple,
                 >,
             >::ser_field(&self.submsg_unlabeled, 6, out)?;
             ::std::result::Result::Ok(())
