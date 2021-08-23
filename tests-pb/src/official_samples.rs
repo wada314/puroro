@@ -5,29 +5,28 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-pub use _puroro_impls::Test1_Simple as Test1;
-pub use _puroro_impls::Test2_Simple as Test2;
-pub use _puroro_impls::Test3_Simple as Test3;
-pub use _puroro_impls::Test4_Simple as Test4;
+pub use _puroro_impls::Test1Simple as Test1;
+pub use _puroro_impls::Test2Simple as Test2;
+pub use _puroro_impls::Test3Simple as Test3;
+pub use _puroro_impls::Test4Simple as Test4;
 pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Test1_Simple {
+    pub struct Test1Simple {
         pub a: ::std::option::Option<i32>,
     }
-    impl ::puroro::Message for Test1_Simple {}
+    impl ::puroro::Message for Test1Simple {}
 
-    impl super::_puroro_traits::Test1Trait for Test1_Simple {
+    impl super::_puroro_traits::Test1Trait for Test1Simple {
         fn a<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::clone::Clone::clone(&self.a)
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for Test1_Simple {
+    impl ::puroro::DeserFromBytesIter for Test1Simple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -36,7 +35,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Test1_Simple {
+    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Test1Simple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -56,7 +55,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test1_Simple {
+    impl ::puroro::SerToIoWrite for Test1Simple {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -69,19 +68,18 @@ pub mod _puroro_impls {
         }
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Test1_Empty;
+    pub struct Test1Empty;
 
-    impl ::puroro::Message for Test1_Empty {}
+    impl ::puroro::Message for Test1Empty {}
 
-    impl super::_puroro_traits::Test1Trait for Test1_Empty {
+    impl super::_puroro_traits::Test1Trait for Test1Empty {
         fn a<'this>(&'this self) -> ::std::option::Option<i32> {
             None
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test1_Empty {
+    impl ::puroro::SerToIoWrite for Test1Empty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -90,20 +88,18 @@ pub mod _puroro_impls {
         }
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Test1_Append1<Appendee: super::_puroro_traits::Test1Trait> {
+    struct Test1Append1<Appendee: super::_puroro_traits::Test1Trait> {
         appendee: Appendee,
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Test2_Simple {
+    pub struct Test2Simple {
         pub b: ::std::option::Option<::std::string::String>,
     }
-    impl ::puroro::Message for Test2_Simple {}
+    impl ::puroro::Message for Test2Simple {}
 
-    impl super::_puroro_traits::Test2Trait for Test2_Simple {
+    impl super::_puroro_traits::Test2Trait for Test2Simple {
         fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
             self.b
                 .as_ref()
@@ -111,7 +107,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for Test2_Simple {
+    impl ::puroro::DeserFromBytesIter for Test2Simple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -120,7 +116,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Test2_Simple {
+    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Test2Simple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -140,7 +136,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test2_Simple {
+    impl ::puroro::SerToIoWrite for Test2Simple {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -153,19 +149,18 @@ pub mod _puroro_impls {
         }
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Test2_Empty;
+    pub struct Test2Empty;
 
-    impl ::puroro::Message for Test2_Empty {}
+    impl ::puroro::Message for Test2Empty {}
 
-    impl super::_puroro_traits::Test2Trait for Test2_Empty {
+    impl super::_puroro_traits::Test2Trait for Test2Empty {
         fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
             None
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test2_Empty {
+    impl ::puroro::SerToIoWrite for Test2Empty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -174,24 +169,22 @@ pub mod _puroro_impls {
         }
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Test2_Append2<Appendee: super::_puroro_traits::Test2Trait> {
+    struct Test2Append2<Appendee: super::_puroro_traits::Test2Trait> {
         appendee: Appendee,
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Test3_Simple {
+    pub struct Test3Simple {
         pub c: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::official_samples::_puroro_impls::Test1_Simple>,
+            ::std::boxed::Box<self::_puroro_root::official_samples::_puroro_impls::Test1Simple>,
         >,
     }
-    impl ::puroro::Message for Test3_Simple {}
+    impl ::puroro::Message for Test3Simple {}
 
-    impl super::_puroro_traits::Test3Trait for Test3_Simple {
+    impl super::_puroro_traits::Test3Trait for Test3Simple {
         type Field3MessageType<'this> =
-            self::_puroro_root::official_samples::_puroro_impls::Test1_Simple;
+            self::_puroro_root::official_samples::_puroro_impls::Test1Simple;
         fn c<'this>(
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
@@ -202,7 +195,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for Test3_Simple {
+    impl ::puroro::DeserFromBytesIter for Test3Simple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -211,7 +204,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Test3_Simple {
+    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Test3Simple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -224,7 +217,7 @@ pub mod _puroro_impls {
                 3 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
                     ::puroro::tags::Optional,
                     ::puroro::tags::Message<
-                        self::_puroro_root::official_samples::_puroro_impls::Test1_Simple,
+                        self::_puroro_root::official_samples::_puroro_impls::Test1Simple,
                     >,
                 >::deser_field(&mut self.c, data),
 
@@ -233,7 +226,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test3_Simple {
+    impl ::puroro::SerToIoWrite for Test3Simple {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -241,22 +234,21 @@ pub mod _puroro_impls {
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Message<
-                    self::_puroro_root::official_samples::_puroro_impls::Test1_Simple,
+                    self::_puroro_root::official_samples::_puroro_impls::Test1Simple,
                 >,
             >::ser_field(&self.c, 3, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Test3_Empty;
+    pub struct Test3Empty;
 
-    impl ::puroro::Message for Test3_Empty {}
+    impl ::puroro::Message for Test3Empty {}
 
-    impl super::_puroro_traits::Test3Trait for Test3_Empty {
+    impl super::_puroro_traits::Test3Trait for Test3Empty {
         type Field3MessageType<'this> =
-            self::_puroro_root::official_samples::_puroro_impls::Test1_Empty;
+            self::_puroro_root::official_samples::_puroro_impls::Test1Empty;
         fn c<'this>(
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
@@ -265,7 +257,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test3_Empty {
+    impl ::puroro::SerToIoWrite for Test3Empty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -274,20 +266,18 @@ pub mod _puroro_impls {
         }
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Test3_Append3<Appendee: super::_puroro_traits::Test3Trait> {
+    struct Test3Append3<Appendee: super::_puroro_traits::Test3Trait> {
         appendee: Appendee,
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Test4_Simple {
+    pub struct Test4Simple {
         pub d: ::std::vec::Vec<i32>,
     }
-    impl ::puroro::Message for Test4_Simple {}
+    impl ::puroro::Message for Test4Simple {}
 
-    impl super::_puroro_traits::Test4Trait for Test4_Simple {
+    impl super::_puroro_traits::Test4Trait for Test4Simple {
         type Field4RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, i32>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
@@ -295,7 +285,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for Test4_Simple {
+    impl ::puroro::DeserFromBytesIter for Test4Simple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -304,7 +294,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Test4_Simple {
+    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Test4Simple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -324,7 +314,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test4_Simple {
+    impl ::puroro::SerToIoWrite for Test4Simple {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -337,20 +327,19 @@ pub mod _puroro_impls {
         }
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Test4_Empty;
+    pub struct Test4Empty;
 
-    impl ::puroro::Message for Test4_Empty {}
+    impl ::puroro::Message for Test4Empty {}
 
-    impl super::_puroro_traits::Test4Trait for Test4_Empty {
+    impl super::_puroro_traits::Test4Trait for Test4Empty {
         type Field4RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
-    impl ::puroro::SerToIoWrite for Test4_Empty {
+    impl ::puroro::SerToIoWrite for Test4Empty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -359,9 +348,8 @@ pub mod _puroro_impls {
         }
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Test4_Append4<Appendee: super::_puroro_traits::Test4Trait> {
+    struct Test4Append4<Appendee: super::_puroro_traits::Test4Trait> {
         appendee: Appendee,
     }
 }

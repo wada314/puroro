@@ -1,6 +1,5 @@
 {#- ################# Simple ################# #}
 
-#[allow(non_camel_case_types)]
 #[derive(Clone, Default, PartialEq, Debug)]
 pub struct {{ m.simple_ident }} {
     {%- for field in m.fields %}

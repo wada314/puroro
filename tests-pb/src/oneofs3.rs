@@ -5,22 +5,21 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-pub use _puroro_impls::Msg_Simple as Msg;
-pub use _puroro_impls::Submsg_Simple as Submsg;
+pub use _puroro_impls::MsgSimple as Msg;
+pub use _puroro_impls::SubmsgSimple as Submsg;
 pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Msg_Simple {
+    pub struct MsgSimple {
         pub g1_int32: i32,
         pub g1_string: ::std::string::String,
         pub g2_f32: f32,
         pub g2_string: ::std::string::String,
         pub g2_submsg: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::oneofs3::_puroro_impls::Submsg_Simple>,
+            ::std::boxed::Box<self::_puroro_root::oneofs3::_puroro_impls::SubmsgSimple>,
         >,
         pub g3_int32: i32,
         pub group_one:
@@ -30,10 +29,10 @@ pub mod _puroro_impls {
         pub group_three:
             ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree_Simple>,
     }
-    impl ::puroro::Message for Msg_Simple {}
+    impl ::puroro::Message for MsgSimple {}
 
-    impl super::_puroro_traits::MsgTrait for Msg_Simple {
-        type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::Submsg_Simple;
+    impl super::_puroro_traits::MsgTrait for MsgSimple {
+        type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgSimple;
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -45,7 +44,7 @@ pub mod _puroro_impls {
         fn group_two<'this>(
             &'this self,
         ) -> ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Msg_Simple>,
+            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, MsgSimple>,
         > {
             self.group_two
                 .as_ref()
@@ -60,7 +59,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for Msg_Simple {
+    impl ::puroro::DeserFromBytesIter for MsgSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -69,7 +68,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Msg_Simple {
+    impl ::puroro_internal::de::DeserFieldsFromBytesIter for MsgSimple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -162,7 +161,7 @@ pub mod _puroro_impls {
                     ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
                         ::puroro::tags::OneofItem,
                         ::puroro::tags::Message<
-                            self::_puroro_root::oneofs3::_puroro_impls::Submsg_Simple,
+                            self::_puroro_root::oneofs3::_puroro_impls::SubmsgSimple,
                         >,
                     >::deser_field(field_value_mut_ref, data)
                 }
@@ -190,7 +189,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for Msg_Simple {
+    impl ::puroro::SerToIoWrite for MsgSimple {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -213,7 +212,7 @@ pub mod _puroro_impls {
             >::ser_field(&self.g2_string, 4, out)?;
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<self::_puroro_root::oneofs3::_puroro_impls::Submsg_Simple>,
+                ::puroro::tags::Message<self::_puroro_root::oneofs3::_puroro_impls::SubmsgSimple>,
             >::ser_field(&self.g2_submsg, 5, out)?;
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
@@ -223,14 +222,13 @@ pub mod _puroro_impls {
         }
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Msg_Empty;
+    pub struct MsgEmpty;
 
-    impl ::puroro::Message for Msg_Empty {}
+    impl ::puroro::Message for MsgEmpty {}
 
-    impl super::_puroro_traits::MsgTrait for Msg_Empty {
-        type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::Submsg_Empty;
+    impl super::_puroro_traits::MsgTrait for MsgEmpty {
+        type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
@@ -240,7 +238,7 @@ pub mod _puroro_impls {
         fn group_two<'this>(
             &'this self,
         ) -> ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Msg_Empty>,
+            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, MsgEmpty>,
         > {
             None
         }
@@ -251,7 +249,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for Msg_Empty {
+    impl ::puroro::SerToIoWrite for MsgEmpty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -260,56 +258,49 @@ pub mod _puroro_impls {
         }
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append1<Appendee: super::_puroro_traits::MsgTrait> {
+    struct MsgAppend1<Appendee: super::_puroro_traits::MsgTrait> {
         appendee: Appendee,
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append2<Appendee: super::_puroro_traits::MsgTrait> {
+    struct MsgAppend2<Appendee: super::_puroro_traits::MsgTrait> {
         appendee: Appendee,
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append3<Appendee: super::_puroro_traits::MsgTrait> {
+    struct MsgAppend3<Appendee: super::_puroro_traits::MsgTrait> {
         appendee: Appendee,
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append4<Appendee: super::_puroro_traits::MsgTrait> {
+    struct MsgAppend4<Appendee: super::_puroro_traits::MsgTrait> {
         appendee: Appendee,
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append5<Appendee: super::_puroro_traits::MsgTrait> {
+    struct MsgAppend5<Appendee: super::_puroro_traits::MsgTrait> {
         appendee: Appendee,
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append6<Appendee: super::_puroro_traits::MsgTrait> {
+    struct MsgAppend6<Appendee: super::_puroro_traits::MsgTrait> {
         appendee: Appendee,
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Submsg_Simple {
+    pub struct SubmsgSimple {
         pub i32_unlabeled: i32,
     }
-    impl ::puroro::Message for Submsg_Simple {}
+    impl ::puroro::Message for SubmsgSimple {}
 
-    impl super::_puroro_traits::SubmsgTrait for Submsg_Simple {
+    impl super::_puroro_traits::SubmsgTrait for SubmsgSimple {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::clone::Clone::clone(&self.i32_unlabeled)
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for Submsg_Simple {
+    impl ::puroro::DeserFromBytesIter for SubmsgSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -318,7 +309,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Submsg_Simple {
+    impl ::puroro_internal::de::DeserFieldsFromBytesIter for SubmsgSimple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -338,7 +329,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for Submsg_Simple {
+    impl ::puroro::SerToIoWrite for SubmsgSimple {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -351,19 +342,18 @@ pub mod _puroro_impls {
         }
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
-    pub struct Submsg_Empty;
+    pub struct SubmsgEmpty;
 
-    impl ::puroro::Message for Submsg_Empty {}
+    impl ::puroro::Message for SubmsgEmpty {}
 
-    impl super::_puroro_traits::SubmsgTrait for Submsg_Empty {
+    impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
     }
 
-    impl ::puroro::SerToIoWrite for Submsg_Empty {
+    impl ::puroro::SerToIoWrite for SubmsgEmpty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -372,9 +362,8 @@ pub mod _puroro_impls {
         }
     }
 
-    #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Submsg_Append1<Appendee: super::_puroro_traits::SubmsgTrait> {
+    struct SubmsgAppend1<Appendee: super::_puroro_traits::SubmsgTrait> {
         appendee: Appendee,
     }
 }
@@ -449,12 +438,12 @@ pub mod _puroro_nested {
                 G2F32(f32),
                 G2String(::std::string::String),
                 G2Submsg(
-                    ::std::boxed::Box<self::_puroro_root::oneofs3::_puroro_impls::Submsg_Simple>,
+                    ::std::boxed::Box<self::_puroro_root::oneofs3::_puroro_impls::SubmsgSimple>,
                 ),
             }
 
             impl<'msg> ::std::convert::From<&'msg GroupTwo_Simple>
-                for GroupTwo<'msg, self::_puroro_root::oneofs3::_puroro_impls::Msg_Simple>
+                for GroupTwo<'msg, self::_puroro_root::oneofs3::_puroro_impls::MsgSimple>
             {
                 fn from(from: &'msg GroupTwo_Simple) -> Self {
                     match from {

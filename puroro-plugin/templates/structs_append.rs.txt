@@ -2,7 +2,6 @@
 
 {%- for field in m.fields %}
 
-#[allow(non_camel_case_types)]
 #[derive(Clone, PartialEq, Debug)]
 struct {{ m.append_ident }}{{ field.number }}<Appendee: super::_puroro_traits::{{ m.trait_ident }}> {
     appendee: Appendee,

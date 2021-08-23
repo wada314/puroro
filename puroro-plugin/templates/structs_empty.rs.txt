@@ -1,6 +1,5 @@
 {#- ################# Empty ################# #}
 
-#[allow(non_camel_case_types)]
 #[derive(Clone, Default, PartialEq, Debug)]
 pub struct {{ m.empty_ident }};
 

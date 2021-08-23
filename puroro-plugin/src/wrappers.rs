@@ -406,7 +406,7 @@ impl Message {
         format!("{}Trait", &self.rust_ident)
     }
     pub fn rust_impl_ident(&self, impl_name: &str) -> String {
-        format!("{}_{}", &self.rust_ident, impl_name)
+        format!("{}{}", &self.rust_ident, impl_name)
     }
     pub fn rust_nested_module_ident(&self) -> &str {
         &self.rust_nested_module_ident
