@@ -273,6 +273,15 @@ pub mod _puroro_impls {
             None
         }
     }
+
+    impl ::puroro::SerToIoWrite for Msg_Empty {
+        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::std::result::Result::Ok(())
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -435,6 +444,15 @@ pub mod _puroro_nested {
             impl super::_puroro_traits::SubmsgTrait for Submsg_Empty {
                 fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
                     None
+                }
+            }
+
+            impl ::puroro::SerToIoWrite for Submsg_Empty {
+                fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
+                where
+                    W: ::std::io::Write,
+                {
+                    ::std::result::Result::Ok(())
                 }
             }
         }

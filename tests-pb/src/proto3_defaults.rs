@@ -175,6 +175,15 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for Msg_Empty {
+        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Submsg_Simple {
@@ -239,6 +248,15 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::SubmsgTrait for Submsg_Empty {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for Submsg_Empty {
+        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::std::result::Result::Ok(())
         }
     }
 }

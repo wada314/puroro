@@ -56,3 +56,12 @@ impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.empty_ident }} {
     }
     {%- endfor %}
 }
+
+impl ::puroro::SerToIoWrite for {{ m.empty_ident }} {
+    fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
+    where
+        W: ::std::io::Write
+    {
+        ::std::result::Result::Ok(())
+    }
+}

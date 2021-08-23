@@ -81,6 +81,15 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for Test1_Empty {
+        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Test2_Simple {
@@ -147,6 +156,15 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::Test2Trait for Test2_Empty {
         fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
             None
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for Test2_Empty {
+        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -235,6 +253,15 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for Test3_Empty {
+        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Test4_Simple {
@@ -302,6 +329,15 @@ pub mod _puroro_impls {
         type Field4RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for Test4_Empty {
+        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::std::result::Result::Ok(())
         }
     }
 }

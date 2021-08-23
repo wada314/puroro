@@ -95,6 +95,15 @@ pub mod _puroro_impls {
             None
         }
     }
+
+    impl ::puroro::SerToIoWrite for Msg_Empty {
+        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            ::std::result::Result::Ok(())
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
