@@ -3,3 +3,56 @@
 #[allow(non_camel_case_types)]
 #[derive(Clone, Default, PartialEq, Debug)]
 pub struct {{ m.empty_ident }};
+
+impl ::puroro::Message for {{ m.empty_ident }} {}
+
+impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.empty_ident }} {
+    {%- for field in m.fields %}
+
+    {%- match field.simple_maybe_field_message_path %}
+    {%- when Some with (struct_path) %}
+    type Field{{ field.number }}MessageType<'this> = {{ struct_path }};
+    {%- else %}
+    {%- endmatch %}
+
+    {%- if field.trait_has_scalar_getter %}
+    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
+        {%- if field.is_length_delimited %}
+        ::std::borrow::Cow::Owned(::std::default::Default::default())
+        {%- else %}
+        ::std::default::Default::default()
+        {%- endif %}
+    }
+    {%- endif %}
+
+    {%- if field.trait_has_optional_getter %}
+    fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
+        None
+    }
+    {%- endif %}
+
+    {%- if field.trait_has_repeated_getter %}
+    type Field{{ field.number }}RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<{{ field.trait_scalar_getter_type }}>;
+    fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
+        ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+    }
+    {%- endif %}
+    {%- endfor %}
+    
+    {%- for oneof in m.oneofs %}
+    fn {{ oneof.field_ident }}<'this>(&'this self) ->
+        ::std::option::Option<
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+            {%- if oneof.has_message_field %}
+            <'this, {{ m.empty_ident }}>
+            {%- else %}
+            {%- if oneof.has_reference_field %}
+            <'this>
+            {%- endif %}
+            {%- endif %}
+        >
+    {
+        None
+    }
+    {%- endfor %}
+}

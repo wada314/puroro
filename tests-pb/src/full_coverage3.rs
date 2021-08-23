@@ -243,6 +243,82 @@ pub mod _puroro_impls {
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Msg_Empty;
+
+    impl ::puroro::Message for Msg_Empty {}
+
+    impl super::_puroro_traits::MsgTrait for Msg_Empty {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            None
+        }
+        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+        }
+        fn float_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
+            None
+        }
+        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
+            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+        }
+        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
+            ::std::borrow::Cow::Owned(::std::default::Default::default())
+        }
+        fn string_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
+            None
+        }
+        type Field23RepeatedType<'this> =
+            ::puroro_internal::impls::empty::EmptyRepeatedField<::std::borrow::Cow<'this, str>>;
+        fn string_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
+            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+        }
+        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
+            ::std::default::Default::default()
+        }
+        fn enum_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            None
+        }
+        type Field33RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+            self::_puroro_root::full_coverage3::Enum,
+        >;
+        fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
+            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+        }
+        type Field41MessageType<'this> =
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple;
+        fn submsg_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field41MessageType<'this>>>
+        {
+            None
+        }
+        type Field42MessageType<'this> =
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple;
+        fn submsg_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field42MessageType<'this>>>
+        {
+            None
+        }
+        type Field43MessageType<'this> =
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::Submsg_Simple;
+        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+            ::std::borrow::Cow<'this, Self::Field43MessageType<'this>>,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
+            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -407,6 +483,14 @@ pub mod _puroro_nested {
             #[allow(non_camel_case_types)]
             #[derive(Clone, Default, PartialEq, Debug)]
             pub struct Submsg_Empty;
+
+            impl ::puroro::Message for Submsg_Empty {}
+
+            impl super::_puroro_traits::SubmsgTrait for Submsg_Empty {
+                fn i32_unlabeled<'this>(&'this self) -> i32 {
+                    ::std::default::Default::default()
+                }
+            }
         }
         pub use _puroro_traits::*;
         pub mod _puroro_traits {

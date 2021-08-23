@@ -73,6 +73,14 @@ pub mod _puroro_impls {
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Test1_Empty;
 
+    impl ::puroro::Message for Test1_Empty {}
+
+    impl super::_puroro_traits::Test1Trait for Test1_Empty {
+        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
+            None
+        }
+    }
+
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Test2_Simple {
@@ -133,6 +141,14 @@ pub mod _puroro_impls {
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Test2_Empty;
+
+    impl ::puroro::Message for Test2_Empty {}
+
+    impl super::_puroro_traits::Test2Trait for Test2_Empty {
+        fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
+            None
+        }
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
@@ -206,6 +222,19 @@ pub mod _puroro_impls {
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Test3_Empty;
 
+    impl ::puroro::Message for Test3_Empty {}
+
+    impl super::_puroro_traits::Test3Trait for Test3_Empty {
+        type Field3MessageType<'this> =
+            self::_puroro_root::official_samples::_puroro_impls::Test1_Simple;
+        fn c<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
+        {
+            None
+        }
+    }
+
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Test4_Simple {
@@ -266,6 +295,15 @@ pub mod _puroro_impls {
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Test4_Empty;
+
+    impl ::puroro::Message for Test4_Empty {}
+
+    impl super::_puroro_traits::Test4Trait for Test4_Empty {
+        type Field4RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

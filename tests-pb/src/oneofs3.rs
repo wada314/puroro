@@ -227,6 +227,30 @@ pub mod _puroro_impls {
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Msg_Empty;
 
+    impl ::puroro::Message for Msg_Empty {}
+
+    impl super::_puroro_traits::MsgTrait for Msg_Empty {
+        type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::Submsg_Simple;
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        {
+            None
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<
+            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Msg_Empty>,
+        > {
+            None
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            None
+        }
+    }
+
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Submsg_Simple {
@@ -285,6 +309,14 @@ pub mod _puroro_impls {
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Submsg_Empty;
+
+    impl ::puroro::Message for Submsg_Empty {}
+
+    impl super::_puroro_traits::SubmsgTrait for Submsg_Empty {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

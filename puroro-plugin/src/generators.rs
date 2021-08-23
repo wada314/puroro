@@ -155,6 +155,7 @@ struct Field {
     simple_maybe_field_message_path: Option<String>,
     simple_maybe_borrowed_field_type: Option<String>,
     simple_label_and_type_tags: String,
+    empty_maybe_field_message_path: Option<String>,
 }
 
 impl Field {
@@ -168,6 +169,12 @@ impl Field {
         let simple_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
                 Some(upgrade(&m)?.rust_impl_path("Simple"))
+            } else {
+                None
+            };
+        let empty_maybe_field_message_path =
+            if let wrappers::FieldType::Message(m) = f.field_type()? {
+                Some(upgrade(&m)?.rust_impl_path("Empty"))
             } else {
                 None
             };
@@ -192,6 +199,7 @@ impl Field {
             simple_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Simple")?,
             simple_label_and_type_tags: f.rust_label_and_type_tags("Simple")?,
+            empty_maybe_field_message_path,
         })
     }
 }

@@ -146,6 +146,35 @@ pub mod _puroro_impls {
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Msg_Empty;
 
+    impl ::puroro::Message for Msg_Empty {}
+
+    impl super::_puroro_traits::MsgTrait for Msg_Empty {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            None
+        }
+        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+        }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
+            ::std::borrow::Cow::Owned(::std::default::Default::default())
+        }
+        type Field6MessageType<'this> =
+            self::_puroro_root::proto3_defaults::_puroro_impls::Submsg_Simple;
+        fn submsg_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
+        {
+            None
+        }
+    }
+
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Submsg_Simple {
@@ -204,6 +233,14 @@ pub mod _puroro_impls {
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
     pub struct Submsg_Empty;
+
+    impl ::puroro::Message for Submsg_Empty {}
+
+    impl super::_puroro_traits::SubmsgTrait for Submsg_Empty {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
