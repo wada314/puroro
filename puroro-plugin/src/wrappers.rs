@@ -390,10 +390,9 @@ impl Message {
     }
     pub fn rust_impl_path(&self, impl_name: &str) -> String {
         format!(
-            "{path}::_puroro_impls::{ident}_{impl_name}",
+            "{path}::_puroro_impls::{ident}",
             path = self.rust_module_path(),
-            ident = self.rust_ident,
-            impl_name = impl_name,
+            ident = self.rust_impl_ident(impl_name),
         )
     }
 
@@ -402,6 +401,9 @@ impl Message {
     }
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
+    }
+    pub fn rust_impl_ident(&self, impl_name: &str) -> String {
+        format!("{}_{}", &self.rust_ident, impl_name)
     }
     pub fn rust_nested_module_ident(&self) -> &str {
         &self.rust_nested_module_ident
