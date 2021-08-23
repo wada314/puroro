@@ -1,6 +1,6 @@
 {#- ################# Empty ################# #}
 
-#[derive(Clone, Default, PartialEq, Debug)]
+#[derive(::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 pub struct {{ m.empty_ident }};
 
 impl ::puroro::Message for {{ m.empty_ident }} {}
