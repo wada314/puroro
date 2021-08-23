@@ -619,7 +619,7 @@ pub mod _puroro_nested {
                 G1String(::std::string::String),
             }
 
-            impl<'msg> ::std::convert::From<&'msg GroupOne_Simple> for GroupOne<'msg> {
+            impl<'msg, T> ::std::convert::From<&'msg GroupOne_Simple> for GroupOne<'msg> {
                 fn from(from: &'msg GroupOne_Simple) -> Self {
                     match from {
                         GroupOne_Simple::G1Int32(v) => {
@@ -649,7 +649,7 @@ pub mod _puroro_nested {
                 ),
             }
 
-            impl<'msg> ::std::convert::From<&'msg GroupTwo_Simple>
+            impl<'msg, T> ::std::convert::From<&'msg GroupTwo_Simple>
                 for GroupTwo<'msg, self::_puroro_root::oneofs2::_puroro_impls::Msg_Simple>
             {
                 fn from(from: &'msg GroupTwo_Simple) -> Self {
@@ -676,7 +676,7 @@ pub mod _puroro_nested {
                 G3Int32(i32),
             }
 
-            impl<'msg> ::std::convert::From<&'msg GroupThree_Simple> for GroupThree {
+            impl<'msg, T> ::std::convert::From<&'msg GroupThree_Simple> for GroupThree {
                 fn from(from: &'msg GroupThree_Simple) -> Self {
                     match from {
                         GroupThree_Simple::G3Int32(v) => {
