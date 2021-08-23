@@ -402,6 +402,9 @@ impl Message {
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
     }
+    pub fn rust_trait_ident(&self) -> String {
+        format!("{}Trait", &self.rust_ident)
+    }
     pub fn rust_impl_ident(&self, impl_name: &str) -> String {
         format!("{}_{}", &self.rust_ident, impl_name)
     }

@@ -166,7 +166,7 @@ pub mod _puroro_impls {
             ::std::borrow::Cow::Owned(::std::default::Default::default())
         }
         type Field6MessageType<'this> =
-            self::_puroro_root::proto3_defaults::_puroro_impls::Submsg_Simple;
+            self::_puroro_root::proto3_defaults::_puroro_impls::Submsg_Empty;
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
@@ -186,27 +186,39 @@ pub mod _puroro_impls {
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append1 {}
+    struct Msg_Append1<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append2 {}
+    struct Msg_Append2<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append3 {}
+    struct Msg_Append3<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append4 {}
+    struct Msg_Append4<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append5 {}
+    struct Msg_Append5<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append6 {}
+    struct Msg_Append6<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
@@ -286,7 +298,9 @@ pub mod _puroro_impls {
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Submsg_Append1 {}
+    struct Submsg_Append1<Appendee: super::_puroro_traits::SubmsgTrait> {
+        appendee: Appendee,
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

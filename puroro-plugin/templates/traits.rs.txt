@@ -1,5 +1,5 @@
 {%- for m in messages %}
-pub trait {{ m.ident }}Trait: ::std::clone::Clone {
+pub trait {{ m.trait_ident }}: ::std::clone::Clone {
     {%- for field in m.fields %}
 
     {%- match field.trait_maybe_field_message_trait_path %}

@@ -92,7 +92,9 @@ pub mod _puroro_impls {
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Test1_Append1 {}
+    struct Test1_Append1<Appendee: super::_puroro_traits::Test1Trait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
@@ -174,7 +176,9 @@ pub mod _puroro_impls {
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Test2_Append2 {}
+    struct Test2_Append2<Appendee: super::_puroro_traits::Test2Trait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
@@ -252,7 +256,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::Test3Trait for Test3_Empty {
         type Field3MessageType<'this> =
-            self::_puroro_root::official_samples::_puroro_impls::Test1_Simple;
+            self::_puroro_root::official_samples::_puroro_impls::Test1_Empty;
         fn c<'this>(
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
@@ -272,7 +276,9 @@ pub mod _puroro_impls {
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Test3_Append3 {}
+    struct Test3_Append3<Appendee: super::_puroro_traits::Test3Trait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, Default, PartialEq, Debug)]
@@ -355,7 +361,9 @@ pub mod _puroro_impls {
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Test4_Append4 {}
+    struct Test4_Append4<Appendee: super::_puroro_traits::Test4Trait> {
+        appendee: Appendee,
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

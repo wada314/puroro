@@ -235,7 +235,7 @@ pub mod _puroro_impls {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field7MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::Submsg_Simple;
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::Submsg_Empty;
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field7MessageType<'this>>>
@@ -243,7 +243,7 @@ pub mod _puroro_impls {
             None
         }
         type Field8MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::Submsg_Simple;
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::Submsg_Empty;
         type Field8RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
             ::std::borrow::Cow<'this, Self::Field8MessageType<'this>>,
         >;
@@ -275,47 +275,69 @@ pub mod _puroro_impls {
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append1 {}
+    struct Msg_Append1<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append2 {}
+    struct Msg_Append2<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append3 {}
+    struct Msg_Append3<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append4 {}
+    struct Msg_Append4<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append5 {}
+    struct Msg_Append5<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append6 {}
+    struct Msg_Append6<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append7 {}
+    struct Msg_Append7<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append8 {}
+    struct Msg_Append8<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append9 {}
+    struct Msg_Append9<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append10 {}
+    struct Msg_Append10<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append536870911 {}
+    struct Msg_Append536870911<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -489,7 +511,9 @@ pub mod _puroro_nested {
 
             #[allow(non_camel_case_types)]
             #[derive(Clone, PartialEq, Debug)]
-            struct Submsg_Append1 {}
+            struct Submsg_Append1<Appendee: super::_puroro_traits::SubmsgTrait> {
+                appendee: Appendee,
+            }
         }
         pub use _puroro_traits::*;
         pub mod _puroro_traits {

@@ -87,7 +87,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for Msg_Empty {
         type Field1MessageType<'this> =
-            self::_puroro_root::self_recursive::_puroro_impls::Msg_Simple;
+            self::_puroro_root::self_recursive::_puroro_impls::Msg_Empty;
         fn recursive_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>>
@@ -107,7 +107,9 @@ pub mod _puroro_impls {
 
     #[allow(non_camel_case_types)]
     #[derive(Clone, PartialEq, Debug)]
-    struct Msg_Append1 {}
+    struct Msg_Append1<Appendee: super::_puroro_traits::MsgTrait> {
+        appendee: Appendee,
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

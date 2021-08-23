@@ -47,6 +47,7 @@ impl MessagesAndEnums {
 
 struct Message {
     ident: String,
+    trait_ident: String,
     submodule_ident: String,
     nested: MessagesAndEnums,
     fields: Vec<Field>,
@@ -81,6 +82,7 @@ impl Message {
             .try_collect()?;
         Ok(Self {
             ident: m.rust_ident().to_string(),
+            trait_ident: m.rust_trait_ident().to_string(),
             submodule_ident: m.rust_nested_module_ident().to_string(),
             nested: MessagesAndEnums {
                 messages: nested_messages,
