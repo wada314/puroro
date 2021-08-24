@@ -13,7 +13,22 @@ pub mod _puroro_impls {
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
-    pub struct MsgSimple {pub i32_unlabeled: i32,pub i32_optional: ::std::option::Option<i32>,pub i32_repeated: ::std::vec::Vec<i32>,pub float_unlabeled: f32,pub float_optional: ::std::option::Option<f32>,pub float_repeated: ::std::vec::Vec<f32>,pub string_unlabeled: ::std::string::String,pub string_optional: ::std::option::Option<::std::string::String>,pub string_repeated: ::std::vec::Vec<::std::string::String>,pub enum_unlabeled: self::_puroro_root::full_coverage3::Enum,pub enum_optional: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,pub enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,pub submsg_unlabeled: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,pub submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,pub submsg_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>,
+    pub struct MsgSimple {
+    pub i32_unlabeled: i32,
+    pub i32_optional: ::std::option::Option<i32>,
+    pub i32_repeated: ::std::vec::Vec<i32>,
+    pub float_unlabeled: f32,
+    pub float_optional: ::std::option::Option<f32>,
+    pub float_repeated: ::std::vec::Vec<f32>,
+    pub string_unlabeled: ::std::string::String,
+    pub string_optional: ::std::option::Option<::std::string::String>,
+    pub string_repeated: ::std::vec::Vec<::std::string::String>,
+    pub enum_unlabeled: self::_puroro_root::full_coverage3::Enum,
+    pub enum_optional: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,
+    pub enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,
+    pub submsg_unlabeled: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
+    pub submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
+    pub submsg_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>,
 }
     impl ::puroro::Message for MsgSimple {}
 
@@ -239,7 +254,6 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -331,13 +345,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField1 {
+    struct MsgSimpleField1 {
         i32_unlabeled: i32,
     }
 
-    impl ::puroro::Message for MsgSingleField1 {}
+    impl ::puroro::Message for MsgSimpleField1 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField1 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::clone::Clone::clone(&self.i32_unlabeled)
         }
@@ -412,13 +426,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField2 {
+    struct MsgSimpleField2 {
         i32_optional: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message for MsgSingleField2 {}
+    impl ::puroro::Message for MsgSimpleField2 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField2 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField2 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -493,13 +507,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField3 {
+    struct MsgSimpleField3 {
         i32_repeated: ::std::vec::Vec<i32>,
     }
 
-    impl ::puroro::Message for MsgSingleField3 {}
+    impl ::puroro::Message for MsgSimpleField3 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField3 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField3 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -575,13 +589,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField11 {
+    struct MsgSimpleField11 {
         float_unlabeled: f32,
     }
 
-    impl ::puroro::Message for MsgSingleField11 {}
+    impl ::puroro::Message for MsgSimpleField11 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField11 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField11 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -656,13 +670,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField12 {
+    struct MsgSimpleField12 {
         float_optional: ::std::option::Option<f32>,
     }
 
-    impl ::puroro::Message for MsgSingleField12 {}
+    impl ::puroro::Message for MsgSimpleField12 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField12 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField12 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -737,13 +751,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField13 {
+    struct MsgSimpleField13 {
         float_repeated: ::std::vec::Vec<f32>,
     }
 
-    impl ::puroro::Message for MsgSingleField13 {}
+    impl ::puroro::Message for MsgSimpleField13 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField13 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField13 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -819,13 +833,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField21 {
+    struct MsgSimpleField21 {
         string_unlabeled: ::std::string::String,
     }
 
-    impl ::puroro::Message for MsgSingleField21 {}
+    impl ::puroro::Message for MsgSimpleField21 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField21 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField21 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -900,13 +914,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField22 {
+    struct MsgSimpleField22 {
         string_optional: ::std::option::Option<::std::string::String>,
     }
 
-    impl ::puroro::Message for MsgSingleField22 {}
+    impl ::puroro::Message for MsgSimpleField22 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField22 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField22 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -983,13 +997,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField23 {
+    struct MsgSimpleField23 {
         string_repeated: ::std::vec::Vec<::std::string::String>,
     }
 
-    impl ::puroro::Message for MsgSingleField23 {}
+    impl ::puroro::Message for MsgSimpleField23 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField23 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField23 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -1065,13 +1079,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField31 {
+    struct MsgSimpleField31 {
         enum_unlabeled: self::_puroro_root::full_coverage3::Enum,
     }
 
-    impl ::puroro::Message for MsgSingleField31 {}
+    impl ::puroro::Message for MsgSimpleField31 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField31 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField31 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -1146,13 +1160,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField32 {
+    struct MsgSimpleField32 {
         enum_optional: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,
     }
 
-    impl ::puroro::Message for MsgSingleField32 {}
+    impl ::puroro::Message for MsgSimpleField32 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField32 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField32 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -1227,13 +1241,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField33 {
+    struct MsgSimpleField33 {
         enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,
     }
 
-    impl ::puroro::Message for MsgSingleField33 {}
+    impl ::puroro::Message for MsgSimpleField33 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField33 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField33 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -1310,13 +1324,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField41 {
+    struct MsgSimpleField41 {
     submsg_unlabeled: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
 }
 
-    impl ::puroro::Message for MsgSingleField41 {}
+    impl ::puroro::Message for MsgSimpleField41 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField41 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField41 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -1393,13 +1407,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField42 {
+    struct MsgSimpleField42 {
     submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
 }
 
-    impl ::puroro::Message for MsgSingleField42 {}
+    impl ::puroro::Message for MsgSimpleField42 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField42 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField42 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -1476,15 +1490,15 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField43 {
+    struct MsgSimpleField43 {
         submsg_repeated: ::std::vec::Vec<
             self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
         >,
     }
 
-    impl ::puroro::Message for MsgSingleField43 {}
+    impl ::puroro::Message for MsgSimpleField43 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField43 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField43 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -1722,7 +1736,6 @@ pub mod _puroro_nested {
                     ::std::result::Result::Ok(())
                 }
             }
-
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
@@ -1749,13 +1762,13 @@ pub mod _puroro_nested {
             }
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-            struct SubmsgSingleField1 {
+            struct SubmsgSimpleField1 {
                 i32_unlabeled: i32,
             }
 
-            impl ::puroro::Message for SubmsgSingleField1 {}
+            impl ::puroro::Message for SubmsgSimpleField1 {}
 
-            impl super::_puroro_traits::SubmsgTrait for SubmsgSingleField1 {
+            impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     ::std::clone::Clone::clone(&self.i32_unlabeled)
                 }

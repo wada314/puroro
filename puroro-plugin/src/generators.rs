@@ -54,7 +54,7 @@ struct Message {
     oneofs: Vec<Oneof>,
     simple_ident: String,
     empty_ident: String,
-    single_field_ident: String,
+    simple_single_field_ident: String,
 }
 
 impl Message {
@@ -92,7 +92,7 @@ impl Message {
             oneofs,
             simple_ident: m.rust_impl_ident("Simple"),
             empty_ident: m.rust_impl_ident("Empty"),
-            single_field_ident: m.rust_impl_ident("SingleField"),
+            simple_single_field_ident: m.rust_impl_ident("SimpleField"),
         })
     }
 }

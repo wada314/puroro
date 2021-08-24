@@ -1,21 +1,19 @@
-{#- ################# SingleFieldN ################# #}
-
 {%- for sfield in m.fields %}
 
 #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-struct {{ m.single_field_ident }}{{ sfield.number }} {
+struct {{ m.simple_single_field_ident }}{{ sfield.number }} {
     {{ sfield.ident }}: {{ sfield.simple_field_type }},
 }
 
-impl ::puroro::Message for {{ m.single_field_ident }}{{ sfield.number }} {}
+impl ::puroro::Message for {{ m.simple_single_field_ident }}{{ sfield.number }} {}
 
-impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.single_field_ident }}{{ sfield.number }}
+impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_single_field_ident }}{{ sfield.number }}
 {
     {%- for field in m.fields %}
     {%- if field.number == sfield.number %}
-    {%- call simple_trait_impl(field) %}
+    {%- call simple_trait_impl_field(field) %}
     {%- else %}
-    {%- call empty_trait_impl(field) %}
+    {%- call empty_trait_impl_field(field) %}
     {%- endif %}
     {%- endfor %}
     

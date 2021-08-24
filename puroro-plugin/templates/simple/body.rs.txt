@@ -1,15 +1,7 @@
-{#- ################# Subroutines ################# -#}
-
-
-
-{#- ################# Simple impl body ################# -#}
-
 #[derive(::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 pub struct {{ m.simple_ident }} {
     {%- for field in m.fields %}
-    {#-{%- if !field.is_explicit_oneof_field %}-#}
     pub {{ field.ident }}: {{ field.simple_field_type }},
-    {#-{%- endif %}-#}
     {%- endfor %}
     {%- for oneof in m.oneofs %}
     {%- if !oneof.is_synthetic %}
@@ -23,7 +15,7 @@ impl ::puroro::Message for {{ m.simple_ident }} {}
 
 impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_ident }} {
     {%- for field in m.fields %}
-    {%- call simple_trait_impl(field) %}
+    {%- call simple_trait_impl_field(field) %}
     {%- endfor %}
     
     {%- for oneof in m.oneofs %}

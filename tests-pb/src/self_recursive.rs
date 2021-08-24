@@ -78,7 +78,6 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -106,15 +105,15 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField1 {
+    struct MsgSimpleField1 {
         recursive_unlabeled: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>,
         >,
     }
 
-    impl ::puroro::Message for MsgSingleField1 {}
+    impl ::puroro::Message for MsgSimpleField1 {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSingleField1 {
+    impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
         type Field1MessageType<'this> =
             self::_puroro_root::self_recursive::_puroro_impls::MsgSimple;
         fn recursive_unlabeled<'this>(

@@ -1,5 +1,3 @@
-{#- ################# Empty impl body ################# #}
-
 #[derive(::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 pub struct {{ m.empty_ident }};
 
@@ -7,7 +5,7 @@ impl ::puroro::Message for {{ m.empty_ident }} {}
 
 impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.empty_ident }} {
     {%- for field in m.fields %}
-    {%- call empty_trait_impl(field) %}
+    {%- call empty_trait_impl_field(field) %}
     {%- endfor %}
     
     {%- for oneof in m.oneofs %}
@@ -36,4 +34,3 @@ impl ::puroro::SerToIoWrite for {{ m.empty_ident }} {
         ::std::result::Result::Ok(())
     }
 }
-
