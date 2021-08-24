@@ -1,4 +1,8 @@
-{#- ################# Simple ################# #}
+{#- ################# Subroutines ################# -#}
+
+
+
+{#- ################# Simple impl body ################# -#}
 
 #[derive(::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 pub struct {{ m.simple_ident }} {
@@ -19,54 +23,7 @@ impl ::puroro::Message for {{ m.simple_ident }} {}
 
 impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_ident }} {
     {%- for field in m.fields %}
-
-    {%- match field.simple_maybe_field_message_path %}
-    {%- when Some with (struct_path) %}
-    type Field{{ field.number }}MessageType<'this> = {{ struct_path }};
-    {%- else %}
-    {%- endmatch %}
-
-    {%- if field.trait_has_scalar_getter %}
-    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
-        {%- if field.is_length_delimited %}
-        ::std::borrow::Cow::Borrowed(&self.{{ field.ident }})
-        {%- else %}
-        ::std::clone::Clone::clone(&self.{{ field.ident }})
-        {%- endif %}
-    }
-    {%- endif %}
-
-    {%- if field.trait_has_optional_getter %}
-    fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
-        {%- if field.is_length_delimited %}
-        {%- if field.is_message %}
-        self.{{ field.ident }}.as_ref().map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
-        {%- else %}
-        self.{{ field.ident }}.as_ref().map(|v| ::std::borrow::Cow::Borrowed(v.as_ref()))
-        {%- endif %}
-        {%- else %}
-        ::std::clone::Clone::clone(&self.{{ field.ident }})
-        {%- endif %}
-    }
-    {%- endif %}
-
-    {%- if field.trait_has_repeated_getter %}
-    {%- match field.simple_maybe_borrowed_field_type %}
-    {%- when Some with (borrowed) %}
-    type Field{{ field.number }}RepeatedType<'this> = ::puroro_internal::impls::simple::VecCowWrapper<'this, {{ borrowed }}>;
-    {%- else %}
-    type Field{{ field.number }}RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, {{ field.trait_scalar_getter_type }}>;
-    {%- endmatch %}
-
-    fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
-        {%- match field.simple_maybe_borrowed_field_type %}
-        {%- when Some with (borrowed) %}
-        ::puroro_internal::impls::simple::VecCowWrapper::new(&self.{{ field.ident }})
-        {%- else %}
-        ::puroro_internal::impls::simple::VecWrapper::new(&self.{{ field.ident }})
-        {%- endmatch %}
-    }
-    {%- endif %}
+    {%- call simple_trait_impl(field) %}
     {%- endfor %}
     
     {%- for oneof in m.oneofs %}
@@ -159,3 +116,4 @@ impl ::puroro::SerToIoWrite for {{ m.simple_ident }} {
         ::std::result::Result::Ok(())
     }
 }
+

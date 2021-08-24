@@ -13,7 +13,6 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -93,21 +92,17 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct Test1SingleField1<FieldType> {
-        field: FieldType,
+    struct Test1SingleField1 {
+        a: ::std::option::Option<i32>,
     }
 
-    impl<FieldType> ::puroro::Message for Test1SingleField1<FieldType> {}
+    impl ::puroro::Message for Test1SingleField1 {}
 
-    impl<FieldType> super::_puroro_traits::Test1Trait for Test1SingleField1<FieldType>
-    where
-        FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    {
+    impl super::_puroro_traits::Test1Trait for Test1SingleField1 {
         fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-            None
+            ::std::clone::Clone::clone(&self.a)
         }
     }
-
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -189,21 +184,19 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct Test2SingleField2<FieldType> {
-        field: FieldType,
+    struct Test2SingleField2 {
+        b: ::std::option::Option<::std::string::String>,
     }
 
-    impl<FieldType> ::puroro::Message for Test2SingleField2<FieldType> {}
+    impl ::puroro::Message for Test2SingleField2 {}
 
-    impl<FieldType> super::_puroro_traits::Test2Trait for Test2SingleField2<FieldType>
-    where
-        FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    {
+    impl super::_puroro_traits::Test2Trait for Test2SingleField2 {
         fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
-            None
+            self.b
+                .as_ref()
+                .map(|v| ::std::borrow::Cow::Borrowed(v.as_ref()))
         }
     }
-
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -301,26 +294,26 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct Test3SingleField3<FieldType> {
-        field: FieldType,
+    struct Test3SingleField3 {
+        c: ::std::option::Option<
+            ::std::boxed::Box<self::_puroro_root::official_samples::_puroro_impls::Test1Simple>,
+        >,
     }
 
-    impl<FieldType> ::puroro::Message for Test3SingleField3<FieldType> {}
+    impl ::puroro::Message for Test3SingleField3 {}
 
-    impl<FieldType> super::_puroro_traits::Test3Trait for Test3SingleField3<FieldType>
-    where
-        FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    {
+    impl super::_puroro_traits::Test3Trait for Test3SingleField3 {
         type Field3MessageType<'this> =
-            self::_puroro_root::official_samples::_puroro_impls::Test1Empty;
+            self::_puroro_root::official_samples::_puroro_impls::Test1Simple;
         fn c<'this>(
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
         {
-            None
+            self.c
+                .as_ref()
+                .map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
         }
     }
-
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -403,19 +396,17 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct Test4SingleField4<FieldType> {
-        field: FieldType,
+    struct Test4SingleField4 {
+        d: ::std::vec::Vec<i32>,
     }
 
-    impl<FieldType> ::puroro::Message for Test4SingleField4<FieldType> {}
+    impl ::puroro::Message for Test4SingleField4 {}
 
-    impl<FieldType> super::_puroro_traits::Test4Trait for Test4SingleField4<FieldType>
-    where
-        FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    {
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+    impl super::_puroro_traits::Test4Trait for Test4SingleField4 {
+        type Field4RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, i32>;
+
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro_internal::impls::simple::VecWrapper::new(&self.d)
         }
     }
 }

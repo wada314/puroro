@@ -11,7 +11,6 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -187,18 +186,15 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField1<FieldType> {
-        field: FieldType,
+    struct MsgSingleField1 {
+        i32_unlabeled: i32,
     }
 
-    impl<FieldType> ::puroro::Message for MsgSingleField1<FieldType> {}
+    impl ::puroro::Message for MsgSingleField1 {}
 
-    impl<FieldType> super::_puroro_traits::MsgTrait for MsgSingleField1<FieldType>
-    where
-        FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    {
+    impl super::_puroro_traits::MsgTrait for MsgSingleField1 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
+            ::std::clone::Clone::clone(&self.i32_unlabeled)
         }
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
             None
@@ -224,21 +220,18 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField2<FieldType> {
-        field: FieldType,
+    struct MsgSingleField2 {
+        i32_optional: ::std::option::Option<i32>,
     }
 
-    impl<FieldType> ::puroro::Message for MsgSingleField2<FieldType> {}
+    impl ::puroro::Message for MsgSingleField2 {}
 
-    impl<FieldType> super::_puroro_traits::MsgTrait for MsgSingleField2<FieldType>
-    where
-        FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    {
+    impl super::_puroro_traits::MsgTrait for MsgSingleField2 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            None
+            ::std::clone::Clone::clone(&self.i32_optional)
         }
         type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
@@ -261,25 +254,23 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField3<FieldType> {
-        field: FieldType,
+    struct MsgSingleField3 {
+        i32_repeated: ::std::vec::Vec<i32>,
     }
 
-    impl<FieldType> ::puroro::Message for MsgSingleField3<FieldType> {}
+    impl ::puroro::Message for MsgSingleField3 {}
 
-    impl<FieldType> super::_puroro_traits::MsgTrait for MsgSingleField3<FieldType>
-    where
-        FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    {
+    impl super::_puroro_traits::MsgTrait for MsgSingleField3 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
             None
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, i32>;
+
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro_internal::impls::simple::VecWrapper::new(&self.i32_repeated)
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             ::std::default::Default::default()
@@ -298,16 +289,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField4<FieldType> {
-        field: FieldType,
+    struct MsgSingleField4 {
+        f32_unlabeled: f32,
     }
 
-    impl<FieldType> ::puroro::Message for MsgSingleField4<FieldType> {}
+    impl ::puroro::Message for MsgSingleField4 {}
 
-    impl<FieldType> super::_puroro_traits::MsgTrait for MsgSingleField4<FieldType>
-    where
-        FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    {
+    impl super::_puroro_traits::MsgTrait for MsgSingleField4 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -319,7 +307,7 @@ pub mod _puroro_impls {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
+            ::std::clone::Clone::clone(&self.f32_unlabeled)
         }
         fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
             ::std::borrow::Cow::Owned(::std::default::Default::default())
@@ -335,16 +323,13 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField5<FieldType> {
-        field: FieldType,
+    struct MsgSingleField5 {
+        string_unlabeled: ::std::string::String,
     }
 
-    impl<FieldType> ::puroro::Message for MsgSingleField5<FieldType> {}
+    impl ::puroro::Message for MsgSingleField5 {}
 
-    impl<FieldType> super::_puroro_traits::MsgTrait for MsgSingleField5<FieldType>
-    where
-        FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    {
+    impl super::_puroro_traits::MsgTrait for MsgSingleField5 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -359,7 +344,7 @@ pub mod _puroro_impls {
             ::std::default::Default::default()
         }
         fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
-            ::std::borrow::Cow::Owned(::std::default::Default::default())
+            ::std::borrow::Cow::Borrowed(&self.string_unlabeled)
         }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
@@ -372,16 +357,15 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField6<FieldType> {
-        field: FieldType,
+    struct MsgSingleField6 {
+        submsg_unlabeled: ::std::option::Option<
+            ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgSimple>,
+        >,
     }
 
-    impl<FieldType> ::puroro::Message for MsgSingleField6<FieldType> {}
+    impl ::puroro::Message for MsgSingleField6 {}
 
-    impl<FieldType> super::_puroro_traits::MsgTrait for MsgSingleField6<FieldType>
-    where
-        FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    {
+    impl super::_puroro_traits::MsgTrait for MsgSingleField6 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -399,15 +383,16 @@ pub mod _puroro_impls {
             ::std::borrow::Cow::Owned(::std::default::Default::default())
         }
         type Field6MessageType<'this> =
-            self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
+            self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgSimple;
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
         {
-            None
+            self.submsg_unlabeled
+                .as_ref()
+                .map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
         }
     }
-
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -487,18 +472,15 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct SubmsgSingleField1<FieldType> {
-        field: FieldType,
+    struct SubmsgSingleField1 {
+        i32_unlabeled: i32,
     }
 
-    impl<FieldType> ::puroro::Message for SubmsgSingleField1<FieldType> {}
+    impl ::puroro::Message for SubmsgSingleField1 {}
 
-    impl<FieldType> super::_puroro_traits::SubmsgTrait for SubmsgSingleField1<FieldType>
-    where
-        FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    {
+    impl super::_puroro_traits::SubmsgTrait for SubmsgSingleField1 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
+            ::std::clone::Clone::clone(&self.i32_unlabeled)
         }
     }
 }

@@ -3,45 +3,19 @@
 {%- for sfield in m.fields %}
 
 #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-struct {{ m.single_field_ident }}{{ sfield.number }}<FieldType> {
-    field: FieldType,
+struct {{ m.single_field_ident }}{{ sfield.number }} {
+    {{ sfield.ident }}: {{ sfield.simple_field_type }},
 }
 
-impl<FieldType> ::puroro::Message for {{ m.single_field_ident }}{{ sfield.number }}<FieldType> {}
+impl ::puroro::Message for {{ m.single_field_ident }}{{ sfield.number }} {}
 
-impl<FieldType> super::_puroro_traits::{{ m.ident }}Trait for {{ m.single_field_ident }}{{ sfield.number }}<FieldType>
-where
-    FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
+impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.single_field_ident }}{{ sfield.number }}
 {
     {%- for field in m.fields %}
-
-    {%- match field.empty_maybe_field_message_path %}
-    {%- when Some with (struct_path) %}
-    type Field{{ field.number }}MessageType<'this> = {{ struct_path }};
+    {%- if field.number == sfield.number %}
+    {%- call simple_trait_impl(field) %}
     {%- else %}
-    {%- endmatch %}
-
-    {%- if field.trait_has_scalar_getter %}
-    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
-        {%- if field.is_length_delimited %}
-        ::std::borrow::Cow::Owned(::std::default::Default::default())
-        {%- else %}
-        ::std::default::Default::default()
-        {%- endif %}
-    }
-    {%- endif %}
-
-    {%- if field.trait_has_optional_getter %}
-    fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
-        None
-    }
-    {%- endif %}
-
-    {%- if field.trait_has_repeated_getter %}
-    type Field{{ field.number }}RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<{{ field.trait_scalar_getter_type }}>;
-    fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
-        ::puroro_internal::impls::empty::EmptyRepeatedField::new()
-    }
+    {%- call empty_trait_impl(field) %}
     {%- endif %}
     {%- endfor %}
     
@@ -58,7 +32,7 @@ where
             {%- endif %}
         >
     {
-        None
+        todo!()
     }
     {%- endfor %}
 }

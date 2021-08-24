@@ -10,7 +10,6 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -107,22 +106,24 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSingleField1<FieldType> {
-        field: FieldType,
+    struct MsgSingleField1 {
+        recursive_unlabeled: ::std::option::Option<
+            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>,
+        >,
     }
 
-    impl<FieldType> ::puroro::Message for MsgSingleField1<FieldType> {}
+    impl ::puroro::Message for MsgSingleField1 {}
 
-    impl<FieldType> super::_puroro_traits::MsgTrait for MsgSingleField1<FieldType>
-    where
-        FieldType: ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug,
-    {
-        type Field1MessageType<'this> = self::_puroro_root::self_recursive::_puroro_impls::MsgEmpty;
+    impl super::_puroro_traits::MsgTrait for MsgSingleField1 {
+        type Field1MessageType<'this> =
+            self::_puroro_root::self_recursive::_puroro_impls::MsgSimple;
         fn recursive_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>>
         {
-            None
+            self.recursive_unlabeled
+                .as_ref()
+                .map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
         }
     }
 }
