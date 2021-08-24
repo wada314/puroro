@@ -17,9 +17,16 @@ pub type Result<T> = std::result::Result<T, PuroroError>;
 // Re-exports
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
+pub use ::either::Either;
 pub use ::hashbrown;
 
 pub trait Message {}
+impl<T, U> Message for ::either::Either<T, U>
+where
+    T: Message,
+    U: Message,
+{
+}
 
 pub trait Enum2:
     'static + PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32>
@@ -28,6 +35,12 @@ pub trait Enum2:
 pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {}
 
 pub trait RepeatedField<'msg, T>: IntoIterator<Item = T> {}
+impl<'msg, T, U, V> RepeatedField<'msg, V> for ::either::Either<T, U>
+where
+    T: RepeatedField<'msg, V>,
+    U: RepeatedField<'msg, V>,
+{
+}
 
 pub trait DeserFromBytesIter: Message {
     fn deser<I>(&mut self, iter: I) -> Result<()>

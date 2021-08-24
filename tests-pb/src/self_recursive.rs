@@ -103,6 +103,43 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+    pub struct MsgMerged<T, U> {
+        t: T,
+        u: U,
+    }
+
+    impl<T, U> MsgMerged<T, U> {
+        pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+        }
+    }
+
+    impl<T, U> ::puroro::Message for MsgMerged<T, U> {}
+
+    /*
+    impl<T, U> super::_puroro_traits::MsgTrait for MsgMerged<T, U>
+    where
+        T: super::_puroro_traits::MsgTrait,
+        U: super::_puroro_traits::MsgTrait,
+    {
+    }
+    */
+    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
+    where
+        T: super::_puroro_traits::MsgTrait,
+        U: super::_puroro_traits::MsgTrait,
+    {
+        type Field1MessageType<'this> = ::puroro::Either<
+            <T as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
+            <U as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
+        >;
+        fn recursive_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>>
+        {
+            todo!()
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField1 {

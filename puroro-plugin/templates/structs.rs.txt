@@ -9,6 +9,8 @@ pub mod _puroro_impls {
     {%- for m in messages %}
     {%- include "simple/body.rs.txt" %}
     {%- include "empty/body.rs.txt" %}
+    {%- include "merged/body.rs.txt" %}
+    {%- include "either/body.rs.txt" %}
     {%- include "simple/single_field.rs.txt" %}
     {%- endfor %}
 }

@@ -1,0 +1,74 @@
+
+impl<T, U> super::_puroro_traits::{{ m.trait_ident }} for ::puroro::Either<T, U> 
+where
+    T: super::_puroro_traits::{{ m.trait_ident }},
+    U: super::_puroro_traits::{{ m.trait_ident }},
+{
+    {%- for field in m.fields %}
+
+    {%- match field.trait_maybe_field_message_trait_path %}
+    {%- when Some with (field_msg_path) %}
+    type Field{{ field.number }}MessageType<'this> = ::puroro::Either<
+        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'this>,
+        <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'this>,
+    >;
+    {%- else %}
+    {%- endmatch %}
+
+    {%- if field.trait_has_scalar_getter %}
+    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
+        self.as_ref().either(
+            <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }},
+            <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }},
+        )
+    }
+    {%- endif %}
+
+    {%- if field.trait_has_optional_getter %}
+    fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
+        {%- if field.is_message %}
+        todo!()
+        {%- else %}
+        self.as_ref().either(
+            <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }},
+            <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }},
+        )
+        {%- endif %}
+    }
+    {%- endif %}
+
+    {%- if field.trait_has_repeated_getter %}
+    type Field{{ field.number }}RepeatedType<'this> = ::puroro::Either<
+        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'this>,
+        <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'this>,
+    >;
+
+    fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
+        self.as_ref().map_left(
+            <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }})
+        .map_right(
+            <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }},
+        )
+    }
+    {%- endif %}
+    {%- endfor %}
+
+    {%- for oneof in m.oneofs %}
+    fn {{ oneof.field_ident }}<'this>(&'this self) ->
+        ::std::option::Option<
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+            {%- if oneof.has_message_field %}
+            <'this, Self>
+            {%- else %}
+            {%- if oneof.has_reference_field %}
+            <'this>
+            {%- endif %}
+            {%- endif %}
+        >
+    {
+        todo!()
+    }
+    {%- endfor %}
+}
+
+

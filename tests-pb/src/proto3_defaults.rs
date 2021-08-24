@@ -183,6 +183,77 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+    pub struct MsgMerged<T, U> {
+        t: T,
+        u: U,
+    }
+
+    impl<T, U> MsgMerged<T, U> {
+        pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+        }
+    }
+
+    impl<T, U> ::puroro::Message for MsgMerged<T, U> {}
+
+    /*
+    impl<T, U> super::_puroro_traits::MsgTrait for MsgMerged<T, U>
+    where
+        T: super::_puroro_traits::MsgTrait,
+        U: super::_puroro_traits::MsgTrait,
+    {
+    }
+    */
+    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
+    where
+        T: super::_puroro_traits::MsgTrait,
+        U: super::_puroro_traits::MsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                <T as super::_puroro_traits::MsgTrait>::i32_unlabeled,
+                <U as super::_puroro_traits::MsgTrait>::i32_unlabeled,
+            )
+        }
+        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                <T as super::_puroro_traits::MsgTrait>::i32_optional,
+                <U as super::_puroro_traits::MsgTrait>::i32_optional,
+            )
+        }
+        type Field3RepeatedType<'this> = ::puroro::Either<
+            <T as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
+            <U as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
+        >;
+
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            self.as_ref()
+                .map_left(<T as super::_puroro_traits::MsgTrait>::i32_repeated)
+                .map_right(<U as super::_puroro_traits::MsgTrait>::i32_repeated)
+        }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            self.as_ref().either(
+                <T as super::_puroro_traits::MsgTrait>::f32_unlabeled,
+                <U as super::_puroro_traits::MsgTrait>::f32_unlabeled,
+            )
+        }
+        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
+            self.as_ref().either(
+                <T as super::_puroro_traits::MsgTrait>::string_unlabeled,
+                <U as super::_puroro_traits::MsgTrait>::string_unlabeled,
+            )
+        }
+        type Field6MessageType<'this> = ::puroro::Either<
+            <T as super::_puroro_traits::MsgTrait>::Field6MessageType<'this>,
+            <U as super::_puroro_traits::MsgTrait>::Field6MessageType<'this>,
+        >;
+        fn submsg_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
+        {
+            todo!()
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField1 {
@@ -466,6 +537,39 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             ::std::result::Result::Ok(())
+        }
+    }
+    pub struct SubmsgMerged<T, U> {
+        t: T,
+        u: U,
+    }
+
+    impl<T, U> SubmsgMerged<T, U> {
+        pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+        }
+    }
+
+    impl<T, U> ::puroro::Message for SubmsgMerged<T, U> {}
+
+    /*
+    impl<T, U> super::_puroro_traits::SubmsgTrait for SubmsgMerged<T, U>
+    where
+        T: super::_puroro_traits::SubmsgTrait,
+        U: super::_puroro_traits::SubmsgTrait,
+    {
+    }
+    */
+    impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>
+    where
+        T: super::_puroro_traits::SubmsgTrait,
+        U: super::_puroro_traits::SubmsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
+                <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
+            )
         }
     }
 

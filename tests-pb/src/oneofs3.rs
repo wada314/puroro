@@ -257,6 +257,54 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+    pub struct MsgMerged<T, U> {
+        t: T,
+        u: U,
+    }
+
+    impl<T, U> MsgMerged<T, U> {
+        pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+        }
+    }
+
+    impl<T, U> ::puroro::Message for MsgMerged<T, U> {}
+
+    /*
+    impl<T, U> super::_puroro_traits::MsgTrait for MsgMerged<T, U>
+    where
+        T: super::_puroro_traits::MsgTrait,
+        U: super::_puroro_traits::MsgTrait,
+    {
+    }
+    */
+    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
+    where
+        T: super::_puroro_traits::MsgTrait,
+        U: super::_puroro_traits::MsgTrait,
+    {
+        type Field5MessageType<'this> = ::puroro::Either<
+            <T as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
+            <U as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
+        >;
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        {
+            todo!()
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        {
+            todo!()
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            todo!()
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField1 {
@@ -501,6 +549,39 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             ::std::result::Result::Ok(())
+        }
+    }
+    pub struct SubmsgMerged<T, U> {
+        t: T,
+        u: U,
+    }
+
+    impl<T, U> SubmsgMerged<T, U> {
+        pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+        }
+    }
+
+    impl<T, U> ::puroro::Message for SubmsgMerged<T, U> {}
+
+    /*
+    impl<T, U> super::_puroro_traits::SubmsgTrait for SubmsgMerged<T, U>
+    where
+        T: super::_puroro_traits::SubmsgTrait,
+        U: super::_puroro_traits::SubmsgTrait,
+    {
+    }
+    */
+    impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>
+    where
+        T: super::_puroro_traits::SubmsgTrait,
+        U: super::_puroro_traits::SubmsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.as_ref().either(
+                <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
+                <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
+            )
         }
     }
 

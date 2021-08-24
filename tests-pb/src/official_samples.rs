@@ -89,6 +89,39 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+    pub struct Test1Merged<T, U> {
+        t: T,
+        u: U,
+    }
+
+    impl<T, U> Test1Merged<T, U> {
+        pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+        }
+    }
+
+    impl<T, U> ::puroro::Message for Test1Merged<T, U> {}
+
+    /*
+    impl<T, U> super::_puroro_traits::Test1Trait for Test1Merged<T, U>
+    where
+        T: super::_puroro_traits::Test1Trait,
+        U: super::_puroro_traits::Test1Trait,
+    {
+    }
+    */
+    impl<T, U> super::_puroro_traits::Test1Trait for ::puroro::Either<T, U>
+    where
+        T: super::_puroro_traits::Test1Trait,
+        U: super::_puroro_traits::Test1Trait,
+    {
+        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.as_ref().either(
+                <T as super::_puroro_traits::Test1Trait>::a,
+                <U as super::_puroro_traits::Test1Trait>::a,
+            )
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test1SimpleField1 {
@@ -178,6 +211,39 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             ::std::result::Result::Ok(())
+        }
+    }
+    pub struct Test2Merged<T, U> {
+        t: T,
+        u: U,
+    }
+
+    impl<T, U> Test2Merged<T, U> {
+        pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+        }
+    }
+
+    impl<T, U> ::puroro::Message for Test2Merged<T, U> {}
+
+    /*
+    impl<T, U> super::_puroro_traits::Test2Trait for Test2Merged<T, U>
+    where
+        T: super::_puroro_traits::Test2Trait,
+        U: super::_puroro_traits::Test2Trait,
+    {
+    }
+    */
+    impl<T, U> super::_puroro_traits::Test2Trait for ::puroro::Either<T, U>
+    where
+        T: super::_puroro_traits::Test2Trait,
+        U: super::_puroro_traits::Test2Trait,
+    {
+        fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
+            self.as_ref().either(
+                <T as super::_puroro_traits::Test2Trait>::b,
+                <U as super::_puroro_traits::Test2Trait>::b,
+            )
         }
     }
 
@@ -289,6 +355,43 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+    pub struct Test3Merged<T, U> {
+        t: T,
+        u: U,
+    }
+
+    impl<T, U> Test3Merged<T, U> {
+        pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+        }
+    }
+
+    impl<T, U> ::puroro::Message for Test3Merged<T, U> {}
+
+    /*
+    impl<T, U> super::_puroro_traits::Test3Trait for Test3Merged<T, U>
+    where
+        T: super::_puroro_traits::Test3Trait,
+        U: super::_puroro_traits::Test3Trait,
+    {
+    }
+    */
+    impl<T, U> super::_puroro_traits::Test3Trait for ::puroro::Either<T, U>
+    where
+        T: super::_puroro_traits::Test3Trait,
+        U: super::_puroro_traits::Test3Trait,
+    {
+        type Field3MessageType<'this> = ::puroro::Either<
+            <T as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
+            <U as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
+        >;
+        fn c<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
+        {
+            todo!()
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test3SimpleField3 {
@@ -388,6 +491,43 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             ::std::result::Result::Ok(())
+        }
+    }
+    pub struct Test4Merged<T, U> {
+        t: T,
+        u: U,
+    }
+
+    impl<T, U> Test4Merged<T, U> {
+        pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+        }
+    }
+
+    impl<T, U> ::puroro::Message for Test4Merged<T, U> {}
+
+    /*
+    impl<T, U> super::_puroro_traits::Test4Trait for Test4Merged<T, U>
+    where
+        T: super::_puroro_traits::Test4Trait,
+        U: super::_puroro_traits::Test4Trait,
+    {
+    }
+    */
+    impl<T, U> super::_puroro_traits::Test4Trait for ::puroro::Either<T, U>
+    where
+        T: super::_puroro_traits::Test4Trait,
+        U: super::_puroro_traits::Test4Trait,
+    {
+        type Field4RepeatedType<'this> = ::puroro::Either<
+            <T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
+            <U as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
+        >;
+
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            self.as_ref()
+                .map_left(<T as super::_puroro_traits::Test4Trait>::d)
+                .map_right(<U as super::_puroro_traits::Test4Trait>::d)
         }
     }
 
