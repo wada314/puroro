@@ -520,14 +520,24 @@ pub mod _puroro_impls {
         U: super::_puroro_traits::Test4Trait,
     {
         type Field4RepeatedType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
-            <U as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
-        >;
+        <<T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>
+            as ::std::iter::IntoIterator>::IntoIter,
+        <<U as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>
+            as ::std::iter::IntoIterator>::IntoIter,
+    >;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             self.as_ref()
-                .map_left(<T as super::_puroro_traits::Test4Trait>::d)
-                .map_right(<U as super::_puroro_traits::Test4Trait>::d)
+                .map_left(|t| {
+                    ::std::iter::IntoIterator::into_iter(
+                        <T as super::_puroro_traits::Test4Trait>::d(t),
+                    )
+                })
+                .map_right(|u| {
+                    ::std::iter::IntoIterator::into_iter(
+                        <U as super::_puroro_traits::Test4Trait>::d(u),
+                    )
+                })
         }
     }
 

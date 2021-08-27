@@ -37,8 +37,8 @@ pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {
 pub trait RepeatedField<'msg, T>: IntoIterator<Item = T> {}
 impl<'msg, T, U, V> RepeatedField<'msg, V> for ::either::Either<T, U>
 where
-    T: RepeatedField<'msg, V>,
-    U: RepeatedField<'msg, V>,
+    T: Iterator<Item = V>,
+    U: Iterator<Item = V>,
 {
 }
 

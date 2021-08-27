@@ -222,14 +222,24 @@ pub mod _puroro_impls {
             )
         }
         type Field3RepeatedType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
-        >;
+        <<T as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>
+            as ::std::iter::IntoIterator>::IntoIter,
+        <<U as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>
+            as ::std::iter::IntoIterator>::IntoIter,
+    >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             self.as_ref()
-                .map_left(<T as super::_puroro_traits::MsgTrait>::i32_repeated)
-                .map_right(<U as super::_puroro_traits::MsgTrait>::i32_repeated)
+                .map_left(|t| {
+                    ::std::iter::IntoIterator::into_iter(
+                        <T as super::_puroro_traits::MsgTrait>::i32_repeated(t),
+                    )
+                })
+                .map_right(|u| {
+                    ::std::iter::IntoIterator::into_iter(
+                        <U as super::_puroro_traits::MsgTrait>::i32_repeated(u),
+                    )
+                })
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             self.as_ref().either(
