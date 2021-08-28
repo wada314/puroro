@@ -1,4 +1,5 @@
-use puroro::{Either, RepeatedField};
+use ::puroro::{Either, RepeatedField};
+use ::std::borrow::Cow;
 
 pub struct EitherRepeatedField<T, U>(Either<T, U>);
 impl<T, U> EitherRepeatedField<T, U> {
@@ -30,12 +31,14 @@ impl<T, U> EitherRepeatedMessageField<T, U> {
         Self(from)
     }
 }
-impl<'msg, T, U> IntoIterator for EitherRepeatedMessageField<T, U>
+impl<'msg, T, U, TM, UM> IntoIterator for EitherRepeatedMessageField<T, U>
 where
-    T: RepeatedField<'msg>,
-    U: RepeatedField<'msg>,
+    T: RepeatedField<'msg> + IntoIterator<Item = Cow<'msg, TM>>,
+    U: RepeatedField<'msg> + IntoIterator<Item = Cow<'msg, UM>>,
+    TM: 'msg + Clone,
+    UM: 'msg + Clone,
 {
-    type Item = Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>;
+    type Item = Cow<'msg, Either<TM, UM>>;
     type IntoIter =
         IndependentEitherIter<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>;
     fn into_iter(self) -> Self::IntoIter {
@@ -46,10 +49,12 @@ where
         )
     }
 }
-impl<'msg, T, U> RepeatedField<'msg> for EitherRepeatedMessageField<T, U>
+impl<'msg, T, U, TM, UM> RepeatedField<'msg> for EitherRepeatedMessageField<T, U>
 where
-    T: RepeatedField<'msg>,
-    U: RepeatedField<'msg>,
+    T: RepeatedField<'msg> + IntoIterator<Item = Cow<'msg, TM>>,
+    U: RepeatedField<'msg> + IntoIterator<Item = Cow<'msg, UM>>,
+    TM: 'msg + Clone,
+    UM: 'msg + Clone,
 {
 }
 
@@ -60,12 +65,14 @@ where
     T: IntoIterator,
     U: IntoIterator;
 
-impl<T, U> Iterator for IndependentEitherIter<T, U>
+impl<'msg, T, U, TM, UM> Iterator for IndependentEitherIter<T, U>
 where
-    T: Iterator,
-    U: Iterator,
+    T: Iterator<Item = Cow<'msg, TM>>,
+    U: Iterator<Item = Cow<'msg, UM>>,
+    TM: 'msg + Clone,
+    UM: 'msg + Clone,
 {
-    type Item = Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>;
+    type Item = Cow<'msg, Either<TM, UM>>;
     fn next(&mut self) -> Option<Self::Item> {
         self.0.as_mut().either(
             |iter| iter.next().map(|item| Either::Left(item)),
