@@ -11,8 +11,8 @@ pub mod variant;
 
 use ::std::convert::TryFrom;
 
-pub use error::{ErrorKind, PuroroError};
-pub type Result<T> = std::result::Result<T, PuroroError>;
+pub use self::error::{ErrorKind, PuroroError};
+pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
 // Re-exports
 #[cfg(feature = "puroro-bumpalo")]

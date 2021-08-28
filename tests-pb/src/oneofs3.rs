@@ -284,8 +284,14 @@ pub mod _puroro_impls {
         U: super::_puroro_traits::MsgTrait,
     {
         type Field5MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
+            ::std::borrow::Cow<
+                'this,
+                <T as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
+            >,
+            ::std::borrow::Cow<
+                'this,
+                <U as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
+            >,
         >;
         fn group_one<'this>(
             &'this self,

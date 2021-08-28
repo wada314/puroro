@@ -353,8 +353,14 @@ pub mod _puroro_impls {
             )
         }
         type Field7MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field7MessageType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field7MessageType<'this>,
+            ::std::borrow::Cow<
+                'this,
+                <T as super::_puroro_traits::MsgTrait>::Field7MessageType<'this>,
+            >,
+            ::std::borrow::Cow<
+                'this,
+                <U as super::_puroro_traits::MsgTrait>::Field7MessageType<'this>,
+            >,
         >;
         fn submsg_unlabeled<'this>(
             &'this self,
@@ -363,8 +369,14 @@ pub mod _puroro_impls {
             todo!()
         }
         type Field8MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field8MessageType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field8MessageType<'this>,
+            ::std::borrow::Cow<
+                'this,
+                <T as super::_puroro_traits::MsgTrait>::Field8MessageType<'this>,
+            >,
+            ::std::borrow::Cow<
+                'this,
+                <U as super::_puroro_traits::MsgTrait>::Field8MessageType<'this>,
+            >,
         >;
         type Field8RepeatedType<'this> =
             ::puroro_internal::impls::either::EitherRepeatedMessageField<

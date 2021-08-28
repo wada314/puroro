@@ -470,8 +470,14 @@ pub mod _puroro_impls {
             )
         }
         type Field41MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field41MessageType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field41MessageType<'this>,
+            ::std::borrow::Cow<
+                'this,
+                <T as super::_puroro_traits::MsgTrait>::Field41MessageType<'this>,
+            >,
+            ::std::borrow::Cow<
+                'this,
+                <U as super::_puroro_traits::MsgTrait>::Field41MessageType<'this>,
+            >,
         >;
         fn submsg_unlabeled<'this>(
             &'this self,
@@ -480,8 +486,14 @@ pub mod _puroro_impls {
             todo!()
         }
         type Field42MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field42MessageType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field42MessageType<'this>,
+            ::std::borrow::Cow<
+                'this,
+                <T as super::_puroro_traits::MsgTrait>::Field42MessageType<'this>,
+            >,
+            ::std::borrow::Cow<
+                'this,
+                <U as super::_puroro_traits::MsgTrait>::Field42MessageType<'this>,
+            >,
         >;
         fn submsg_optional<'this>(
             &'this self,
@@ -490,8 +502,14 @@ pub mod _puroro_impls {
             todo!()
         }
         type Field43MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field43MessageType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field43MessageType<'this>,
+            ::std::borrow::Cow<
+                'this,
+                <T as super::_puroro_traits::MsgTrait>::Field43MessageType<'this>,
+            >,
+            ::std::borrow::Cow<
+                'this,
+                <U as super::_puroro_traits::MsgTrait>::Field43MessageType<'this>,
+            >,
         >;
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::either::EitherRepeatedMessageField<

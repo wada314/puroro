@@ -130,8 +130,14 @@ pub mod _puroro_impls {
         U: super::_puroro_traits::MsgTrait,
     {
         type Field1MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
+            ::std::borrow::Cow<
+                'this,
+                <T as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
+            >,
+            ::std::borrow::Cow<
+                'this,
+                <U as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
+            >,
         >;
         fn recursive_unlabeled<'this>(
             &'this self,

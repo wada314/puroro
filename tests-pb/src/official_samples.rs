@@ -382,8 +382,14 @@ pub mod _puroro_impls {
         U: super::_puroro_traits::Test3Trait,
     {
         type Field3MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
-            <U as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
+            ::std::borrow::Cow<
+                'this,
+                <T as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
+            >,
+            ::std::borrow::Cow<
+                'this,
+                <U as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
+            >,
         >;
         fn c<'this>(
             &'this self,

@@ -246,8 +246,14 @@ pub mod _puroro_impls {
             )
         }
         type Field6MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field6MessageType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field6MessageType<'this>,
+            ::std::borrow::Cow<
+                'this,
+                <T as super::_puroro_traits::MsgTrait>::Field6MessageType<'this>,
+            >,
+            ::std::borrow::Cow<
+                'this,
+                <U as super::_puroro_traits::MsgTrait>::Field6MessageType<'this>,
+            >,
         >;
         fn submsg_unlabeled<'this>(
             &'this self,

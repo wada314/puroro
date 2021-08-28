@@ -9,8 +9,8 @@ where
     {%- match field.trait_maybe_field_message_trait_path %}
     {%- when Some with (field_msg_path) %}
     type Field{{ field.number }}MessageType<'this> = ::puroro::Either<
-        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'this>,
-        <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'this>,
+        ::std::borrow::Cow<'this, <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'this>>,
+        ::std::borrow::Cow<'this, <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'this>>,
     >;
     {%- else %}
     {%- endmatch %}

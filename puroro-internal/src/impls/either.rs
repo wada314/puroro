@@ -38,7 +38,7 @@ where
     TM: 'msg + Clone,
     UM: 'msg + Clone,
 {
-    type Item = Cow<'msg, Either<TM, UM>>;
+    type Item = Cow<'msg, Either<Cow<'msg, TM>, Cow<'msg, UM>>>;
     type IntoIter =
         IndependentEitherIter<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>;
     fn into_iter(self) -> Self::IntoIter {
@@ -72,11 +72,11 @@ where
     TM: 'msg + Clone,
     UM: 'msg + Clone,
 {
-    type Item = Cow<'msg, Either<TM, UM>>;
+    type Item = Cow<'msg, Either<Cow<'msg, TM>, Cow<'msg, UM>>>;
     fn next(&mut self) -> Option<Self::Item> {
         self.0.as_mut().either(
-            |iter| iter.next().map(|item| Either::Left(item)),
-            |iter| iter.next().map(|item| Either::Right(item)),
+            |iter| iter.next().map(|item| Cow::Owned(Either::Left(item))),
+            |iter| iter.next().map(|item| Cow::Owned(Either::Right(item))),
         )
     }
 }
