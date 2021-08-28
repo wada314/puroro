@@ -221,25 +221,17 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::i32_optional,
             )
         }
-        type Field3RepeatedType<'this> = ::puroro::Either<
-        <<T as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-        <<U as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-    >;
+        type Field3RepeatedType<'this> = ::puroro::EitherRepeatedField<
+            <T as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
+            <U as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
+        >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            self.as_ref()
-                .map_left(|t| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <T as super::_puroro_traits::MsgTrait>::i32_repeated(t),
-                    )
-                })
-                .map_right(|u| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <U as super::_puroro_traits::MsgTrait>::i32_repeated(u),
-                    )
-                })
+            ::puroro::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(<T as super::_puroro_traits::MsgTrait>::i32_repeated)
+                    .map_right(<U as super::_puroro_traits::MsgTrait>::i32_repeated),
+            )
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             self.as_ref().either(
@@ -605,7 +597,8 @@ pub mod _puroro_traits {
     pub trait MsgTrait: ::std::clone::Clone {
         fn i32_unlabeled<'this>(&'this self) -> i32;
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32>;
-        type Field3RepeatedType<'this>: ::puroro::RepeatedField<'this, i32>;
+        type Field3RepeatedType<'this>: ::puroro::RepeatedField<'this>
+            + ::std::iter::IntoIterator<Item = i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
         fn f32_unlabeled<'this>(&'this self) -> f32;

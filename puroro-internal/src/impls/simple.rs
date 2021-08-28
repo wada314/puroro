@@ -22,7 +22,7 @@ impl<'msg, T: Clone> IntoIterator for VecWrapper<'msg, T> {
         <[T]>::iter(&self.0).cloned()
     }
 }
-impl<'msg, T: Clone> RepeatedField<'msg, T> for VecWrapper<'msg, T> {}
+impl<'msg, T: Clone> RepeatedField<'msg> for VecWrapper<'msg, T> {}
 
 pub struct VecCowWrapper<'msg, B: ?Sized + ToOwned>(&'msg Vec<B::Owned>);
 
@@ -53,10 +53,7 @@ where
         self.0.next().map(|x| Cow::Borrowed(x.borrow()))
     }
 }
-impl<'msg, B> RepeatedField<'msg, Cow<'msg, B>> for VecCowWrapper<'msg, B> where
-    B: 'msg + ?Sized + ToOwned
-{
-}
+impl<'msg, B> RepeatedField<'msg> for VecCowWrapper<'msg, B> where B: 'msg + ?Sized + ToOwned {}
 
 pub trait VecOrOptionOrBare<T> {
     fn push(&mut self, val: T);

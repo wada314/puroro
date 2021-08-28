@@ -7,7 +7,7 @@ impl<T> EmptyRepeatedField<T> {
     }
 }
 
-impl<'msg, T> ::puroro::RepeatedField<'msg, T> for EmptyRepeatedField<T> {}
+impl<'msg, T> ::puroro::RepeatedField<'msg> for EmptyRepeatedField<T> {}
 impl<T> IntoIterator for EmptyRepeatedField<T> {
     type Item = T;
     type IntoIter = ::std::iter::Empty<T>;

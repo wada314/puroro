@@ -519,25 +519,17 @@ pub mod _puroro_impls {
         T: super::_puroro_traits::Test4Trait,
         U: super::_puroro_traits::Test4Trait,
     {
-        type Field4RepeatedType<'this> = ::puroro::Either<
-        <<T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-        <<U as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-    >;
+        type Field4RepeatedType<'this> = ::puroro::EitherRepeatedField<
+            <T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
+            <U as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
+        >;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.as_ref()
-                .map_left(|t| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <T as super::_puroro_traits::Test4Trait>::d(t),
-                    )
-                })
-                .map_right(|u| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <U as super::_puroro_traits::Test4Trait>::d(u),
-                    )
-                })
+            ::puroro::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(<T as super::_puroro_traits::Test4Trait>::d)
+                    .map_right(<U as super::_puroro_traits::Test4Trait>::d),
+            )
         }
     }
 
@@ -575,7 +567,8 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>;
     }
     pub trait Test4Trait: ::std::clone::Clone {
-        type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this, i32>;
+        type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
+            + ::std::iter::IntoIterator<Item = i32>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
     }

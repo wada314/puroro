@@ -34,23 +34,28 @@ pub trait Enum2:
 }
 pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {}
 
-pub trait RepeatedField<'msg, T>: IntoIterator<Item = T> {}
-pub struct EitherRepeatedField<T, U, V>(Either<T, U>, ::std::marker::PhantomData<V>);
-impl<'msg, T, U, V> IntoIterator for EitherRepeatedField<T, U, V>
+pub trait RepeatedField<'msg>: IntoIterator {}
+pub struct EitherRepeatedField<T, U>(Either<T, U>);
+impl<T, U> EitherRepeatedField<T, U> {
+    pub fn new(from: Either<T, U>) -> Self {
+        Self(from)
+    }
+}
+impl<'msg, T, U> IntoIterator for EitherRepeatedField<T, U>
 where
-    T: RepeatedField<'msg, V>,
-    U: RepeatedField<'msg, V>,
+    T: RepeatedField<'msg> + IntoIterator<Item = <U as IntoIterator>::Item>,
+    U: RepeatedField<'msg>,
 {
-    type Item = V;
+    type Item = <T as IntoIterator>::Item;
     type IntoIter = Either<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>;
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
     }
 }
-impl<'msg, T, U, V> RepeatedField<'msg, V> for EitherRepeatedField<T, U, V>
+impl<'msg, T, U> RepeatedField<'msg> for EitherRepeatedField<T, U>
 where
-    T: RepeatedField<'msg, V>,
-    U: RepeatedField<'msg, V>,
+    T: RepeatedField<'msg> + IntoIterator<Item = <U as IntoIterator>::Item>,
+    U: RepeatedField<'msg>,
 {
 }
 

@@ -304,25 +304,17 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::i32_unlabeled,
             )
         }
-        type Field2RepeatedType<'this> = ::puroro::Either<
-        <<T as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-        <<U as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-    >;
+        type Field2RepeatedType<'this> = ::puroro::EitherRepeatedField<
+            <T as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>,
+            <U as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>,
+        >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            self.as_ref()
-                .map_left(|t| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <T as super::_puroro_traits::MsgTrait>::i32_repeated(t),
-                    )
-                })
-                .map_right(|u| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <U as super::_puroro_traits::MsgTrait>::i32_repeated(u),
-                    )
-                })
+            ::puroro::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(<T as super::_puroro_traits::MsgTrait>::i32_repeated)
+                    .map_right(<U as super::_puroro_traits::MsgTrait>::i32_repeated),
+            )
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             self.as_ref().either(
@@ -330,25 +322,17 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::float_unlabeled,
             )
         }
-        type Field4RepeatedType<'this> = ::puroro::Either<
-        <<T as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-        <<U as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-    >;
+        type Field4RepeatedType<'this> = ::puroro::EitherRepeatedField<
+            <T as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>,
+            <U as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>,
+        >;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.as_ref()
-                .map_left(|t| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <T as super::_puroro_traits::MsgTrait>::float_repeated(t),
-                    )
-                })
-                .map_right(|u| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <U as super::_puroro_traits::MsgTrait>::float_repeated(u),
-                    )
-                })
+            ::puroro::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(<T as super::_puroro_traits::MsgTrait>::float_repeated)
+                    .map_right(<U as super::_puroro_traits::MsgTrait>::float_repeated),
+            )
         }
         fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
             self.as_ref().either(
@@ -356,25 +340,17 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::string_unlabeled,
             )
         }
-        type Field6RepeatedType<'this> = ::puroro::Either<
-        <<T as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-        <<U as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-    >;
+        type Field6RepeatedType<'this> = ::puroro::EitherRepeatedField<
+            <T as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>,
+            <U as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>,
+        >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            self.as_ref()
-                .map_left(|t| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <T as super::_puroro_traits::MsgTrait>::string_repeated(t),
-                    )
-                })
-                .map_right(|u| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <U as super::_puroro_traits::MsgTrait>::string_repeated(u),
-                    )
-                })
+            ::puroro::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(<T as super::_puroro_traits::MsgTrait>::string_repeated)
+                    .map_right(<U as super::_puroro_traits::MsgTrait>::string_repeated),
+            )
         }
         type Field7MessageType<'this> = ::puroro::Either<
             <T as super::_puroro_traits::MsgTrait>::Field7MessageType<'this>,
@@ -390,25 +366,17 @@ pub mod _puroro_impls {
             <T as super::_puroro_traits::MsgTrait>::Field8MessageType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field8MessageType<'this>,
         >;
-        type Field8RepeatedType<'this> = ::puroro::Either<
-        <<T as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-        <<U as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-    >;
+        type Field8RepeatedType<'this> = ::puroro::EitherRepeatedField<
+            <T as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>,
+            <U as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>,
+        >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            self.as_ref()
-                .map_left(|t| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <T as super::_puroro_traits::MsgTrait>::submsg_repeated(t),
-                    )
-                })
-                .map_right(|u| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <U as super::_puroro_traits::MsgTrait>::submsg_repeated(u),
-                    )
-                })
+            ::puroro::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(<T as super::_puroro_traits::MsgTrait>::submsg_repeated)
+                    .map_right(<U as super::_puroro_traits::MsgTrait>::submsg_repeated),
+            )
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
             self.as_ref().either(
@@ -416,25 +384,17 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::enum_unlabeled,
             )
         }
-        type Field10RepeatedType<'this> = ::puroro::Either<
-        <<T as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-        <<U as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-    >;
+        type Field10RepeatedType<'this> = ::puroro::EitherRepeatedField<
+            <T as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>,
+            <U as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>,
+        >;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            self.as_ref()
-                .map_left(|t| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <T as super::_puroro_traits::MsgTrait>::enum_repeated(t),
-                    )
-                })
-                .map_right(|u| {
-                    ::std::iter::IntoIterator::into_iter(
-                        <U as super::_puroro_traits::MsgTrait>::enum_repeated(u),
-                    )
-                })
+            ::puroro::EitherRepeatedField::new(
+                self.as_ref()
+                    .map_left(<T as super::_puroro_traits::MsgTrait>::enum_repeated)
+                    .map_right(<U as super::_puroro_traits::MsgTrait>::enum_repeated),
+            )
         }
         fn very_large_field_number<'this>(&'this self) -> i32 {
             self.as_ref().either(
@@ -1127,18 +1087,18 @@ pub mod _puroro_traits {
 
     pub trait MsgTrait: ::std::clone::Clone {
         fn i32_unlabeled<'this>(&'this self) -> i32;
-        type Field2RepeatedType<'this>: ::puroro::RepeatedField<'this, i32>;
+        type Field2RepeatedType<'this>: ::puroro::RepeatedField<'this>
+            + ::std::iter::IntoIterator<Item = i32>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this>;
         fn float_unlabeled<'this>(&'this self) -> f32;
-        type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this, f32>;
+        type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
+            + ::std::iter::IntoIterator<Item = f32>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
         fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str>;
-        type Field6RepeatedType<'this>: ::puroro::RepeatedField<
-            'this,
-            ::std::borrow::Cow<'this, str>,
-        >;
+        type Field6RepeatedType<'this>: ::puroro::RepeatedField<'this>
+            + ::std::iter::IntoIterator<Item = ::std::borrow::Cow<'this, str>>;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
         type Field7MessageType<'this>: 'this + self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
@@ -1146,17 +1106,15 @@ pub mod _puroro_traits {
             &'this self,
         ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field7MessageType<'this>>>;
         type Field8MessageType<'this>: 'this + self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
-        type Field8RepeatedType<'this>: ::puroro::RepeatedField<
-            'this,
-            ::std::borrow::Cow<'this, Self::Field8MessageType<'this>>,
-        >;
+        type Field8RepeatedType<'this>: ::puroro::RepeatedField<'this>
+            + ::std::iter::IntoIterator<
+                Item = ::std::borrow::Cow<'this, Self::Field8MessageType<'this>>,
+            >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this>;
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum;
-        type Field10RepeatedType<'this>: ::puroro::RepeatedField<
-            'this,
-            self::_puroro_root::ser_tests3::Enum,
-        >;
+        type Field10RepeatedType<'this>: ::puroro::RepeatedField<'this>
+            + ::std::iter::IntoIterator<Item = self::_puroro_root::ser_tests3::Enum>;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this>;
         fn very_large_field_number<'this>(&'this self) -> i32;

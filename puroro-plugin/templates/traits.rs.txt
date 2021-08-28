@@ -15,7 +15,9 @@ pub trait {{ m.trait_ident }}: ::std::clone::Clone {
     fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}>;
     {%- endif %}
     {%- if field.trait_has_repeated_getter %}
-    type Field{{ field.number }}RepeatedType<'this>: ::puroro::RepeatedField<'this, {{ field.trait_scalar_getter_type }}>;
+    type Field{{ field.number }}RepeatedType<'this>: 
+        ::puroro::RepeatedField<'this> 
+        + ::std::iter::IntoIterator<Item = {{ field.trait_scalar_getter_type }}>;
 
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>;
     {%- endif %}

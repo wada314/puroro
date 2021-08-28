@@ -38,21 +38,20 @@ where
     {%- endif %}
 
     {%- if field.trait_has_repeated_getter %}
-    type Field{{ field.number }}RepeatedType<'this> = ::puroro::Either<
-        <<T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
-        <<U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'this>
-            as ::std::iter::IntoIterator>::IntoIter,
+    type Field{{ field.number }}RepeatedType<'this> = ::puroro::EitherRepeatedField<
+        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'this>,
+        <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'this>,
     >;
 
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
-        self
-        .as_ref()
-        .map_left(
-            |t| ::std::iter::IntoIterator::into_iter(<T as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}(t))
-        )
-        .map_right(
-            |u| ::std::iter::IntoIterator::into_iter(<U as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}(u))
+        ::puroro::EitherRepeatedField::new(self
+            .as_ref()
+            .map_left(
+                <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}
+            )
+            .map_right(
+                <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}
+            )
         )
     }
     {%- endif %}
