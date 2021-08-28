@@ -314,7 +314,7 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::i32_optional,
             )
         }
-        type Field2RepeatedType<'this> = ::puroro::EitherRepeatedField<
+        type Field2RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>,
         >;
@@ -332,7 +332,7 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::float_optional,
             )
         }
-        type Field4RepeatedType<'this> = ::puroro::EitherRepeatedField<
+        type Field4RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>,
         >;
@@ -352,7 +352,7 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::string_optional,
             )
         }
-        type Field6RepeatedType<'this> = ::puroro::EitherRepeatedField<
+        type Field6RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field6RepeatedType<'this>,
         >;
@@ -378,10 +378,11 @@ pub mod _puroro_impls {
             <T as super::_puroro_traits::MsgTrait>::Field8MessageType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field8MessageType<'this>,
         >;
-        type Field8RepeatedType<'this> = ::puroro::EitherRepeatedField<
-            <T as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>,
-        >;
+        type Field8RepeatedType<'this> =
+            ::puroro_internal::impls::either::EitherRepeatedMessageField<
+                <T as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>,
+                <U as super::_puroro_traits::MsgTrait>::Field8RepeatedType<'this>,
+            >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             ::puroro::EitherRepeatedField::new(
@@ -398,7 +399,7 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::enum_optional,
             )
         }
-        type Field10RepeatedType<'this> = ::puroro::EitherRepeatedField<
+        type Field10RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>,
         >;

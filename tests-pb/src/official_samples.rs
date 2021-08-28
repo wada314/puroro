@@ -519,7 +519,7 @@ pub mod _puroro_impls {
         T: super::_puroro_traits::Test4Trait,
         U: super::_puroro_traits::Test4Trait,
     {
-        type Field4RepeatedType<'this> = ::puroro::EitherRepeatedField<
+        type Field4RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
             <T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
             <U as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
         >;

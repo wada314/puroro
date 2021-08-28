@@ -221,7 +221,7 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::i32_optional,
             )
         }
-        type Field3RepeatedType<'this> = ::puroro::EitherRepeatedField<
+        type Field3RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
         >;

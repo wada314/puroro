@@ -35,29 +35,6 @@ pub trait Enum2:
 pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {}
 
 pub trait RepeatedField<'msg>: IntoIterator {}
-pub struct EitherRepeatedField<T, U>(Either<T, U>);
-impl<T, U> EitherRepeatedField<T, U> {
-    pub fn new(from: Either<T, U>) -> Self {
-        Self(from)
-    }
-}
-impl<'msg, T, U> IntoIterator for EitherRepeatedField<T, U>
-where
-    T: RepeatedField<'msg> + IntoIterator<Item = <U as IntoIterator>::Item>,
-    U: RepeatedField<'msg>,
-{
-    type Item = <T as IntoIterator>::Item;
-    type IntoIter = Either<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.into_iter()
-    }
-}
-impl<'msg, T, U> RepeatedField<'msg> for EitherRepeatedField<T, U>
-where
-    T: RepeatedField<'msg> + IntoIterator<Item = <U as IntoIterator>::Item>,
-    U: RepeatedField<'msg>,
-{
-}
 
 pub trait DeserFromBytesIter: Message {
     fn deser<I>(&mut self, iter: I) -> Result<()>

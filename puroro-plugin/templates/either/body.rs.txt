@@ -38,7 +38,13 @@ where
     {%- endif %}
 
     {%- if field.trait_has_repeated_getter %}
-    type Field{{ field.number }}RepeatedType<'this> = ::puroro::EitherRepeatedField<
+    {%- let either_repeated_field_type %}
+    {%- if field.is_message %}
+    {%- let either_repeated_field_type = "EitherRepeatedMessageField" %}
+    {%- else %}
+    {%- let either_repeated_field_type = "EitherRepeatedField" %}
+    {%- endif %}
+    type Field{{ field.number }}RepeatedType<'this> = ::puroro_internal::impls::either::{{ either_repeated_field_type }}<
         <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'this>,
         <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'this>,
     >;

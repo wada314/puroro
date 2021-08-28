@@ -381,7 +381,7 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::i32_optional,
             )
         }
-        type Field3RepeatedType<'this> = ::puroro::EitherRepeatedField<
+        type Field3RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
         >;
@@ -405,7 +405,7 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::float_optional,
             )
         }
-        type Field13RepeatedType<'this> = ::puroro::EitherRepeatedField<
+        type Field13RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field13RepeatedType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field13RepeatedType<'this>,
         >;
@@ -431,7 +431,7 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::string_optional,
             )
         }
-        type Field23RepeatedType<'this> = ::puroro::EitherRepeatedField<
+        type Field23RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field23RepeatedType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field23RepeatedType<'this>,
         >;
@@ -457,7 +457,7 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::enum_optional,
             )
         }
-        type Field33RepeatedType<'this> = ::puroro::EitherRepeatedField<
+        type Field33RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field33RepeatedType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field33RepeatedType<'this>,
         >;
@@ -493,10 +493,11 @@ pub mod _puroro_impls {
             <T as super::_puroro_traits::MsgTrait>::Field43MessageType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field43MessageType<'this>,
         >;
-        type Field43RepeatedType<'this> = ::puroro::EitherRepeatedField<
-            <T as super::_puroro_traits::MsgTrait>::Field43RepeatedType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field43RepeatedType<'this>,
-        >;
+        type Field43RepeatedType<'this> =
+            ::puroro_internal::impls::either::EitherRepeatedMessageField<
+                <T as super::_puroro_traits::MsgTrait>::Field43RepeatedType<'this>,
+                <U as super::_puroro_traits::MsgTrait>::Field43RepeatedType<'this>,
+            >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
             ::puroro::EitherRepeatedField::new(
