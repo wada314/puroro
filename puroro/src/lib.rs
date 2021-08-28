@@ -35,10 +35,22 @@ pub trait Enum2:
 pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {}
 
 pub trait RepeatedField<'msg, T>: IntoIterator<Item = T> {}
-impl<'msg, T, U, V> RepeatedField<'msg, V> for ::either::Either<T, U>
+pub struct EitherRepeatedField<T, U, V>(Either<T, U>, ::std::marker::PhantomData<V>);
+impl<'msg, T, U, V> IntoIterator for EitherRepeatedField<T, U, V>
 where
-    T: Iterator<Item = V>,
-    U: Iterator<Item = V>,
+    T: RepeatedField<'msg, V>,
+    U: RepeatedField<'msg, V>,
+{
+    type Item = V;
+    type IntoIter = Either<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+impl<'msg, T, U, V> RepeatedField<'msg, V> for EitherRepeatedField<T, U, V>
+where
+    T: RepeatedField<'msg, V>,
+    U: RepeatedField<'msg, V>,
 {
 }
 
