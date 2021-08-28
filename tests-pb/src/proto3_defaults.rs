@@ -227,7 +227,7 @@ pub mod _puroro_impls {
         >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro::EitherRepeatedField::new(
+            ::puroro_internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(<T as super::_puroro_traits::MsgTrait>::i32_repeated)
                     .map_right(<U as super::_puroro_traits::MsgTrait>::i32_repeated),

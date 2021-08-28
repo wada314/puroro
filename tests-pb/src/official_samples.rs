@@ -525,7 +525,7 @@ pub mod _puroro_impls {
         >;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::EitherRepeatedField::new(
+            ::puroro_internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(<T as super::_puroro_traits::Test4Trait>::d)
                     .map_right(<U as super::_puroro_traits::Test4Trait>::d),

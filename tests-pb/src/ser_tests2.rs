@@ -320,7 +320,7 @@ pub mod _puroro_impls {
         >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro::EitherRepeatedField::new(
+            ::puroro_internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(<T as super::_puroro_traits::MsgTrait>::i32_repeated)
                     .map_right(<U as super::_puroro_traits::MsgTrait>::i32_repeated),
@@ -338,7 +338,7 @@ pub mod _puroro_impls {
         >;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro::EitherRepeatedField::new(
+            ::puroro_internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(<T as super::_puroro_traits::MsgTrait>::float_repeated)
                     .map_right(<U as super::_puroro_traits::MsgTrait>::float_repeated),
@@ -358,7 +358,7 @@ pub mod _puroro_impls {
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro::EitherRepeatedField::new(
+            ::puroro_internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(<T as super::_puroro_traits::MsgTrait>::string_repeated)
                     .map_right(<U as super::_puroro_traits::MsgTrait>::string_repeated),
@@ -385,7 +385,7 @@ pub mod _puroro_impls {
             >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro::EitherRepeatedField::new(
+            ::puroro_internal::impls::either::EitherRepeatedMessageField::new(
                 self.as_ref()
                     .map_left(<T as super::_puroro_traits::MsgTrait>::submsg_repeated)
                     .map_right(<U as super::_puroro_traits::MsgTrait>::submsg_repeated),
@@ -405,7 +405,7 @@ pub mod _puroro_impls {
         >;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            ::puroro::EitherRepeatedField::new(
+            ::puroro_internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(<T as super::_puroro_traits::MsgTrait>::enum_repeated)
                     .map_right(<U as super::_puroro_traits::MsgTrait>::enum_repeated),

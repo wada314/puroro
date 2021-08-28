@@ -48,7 +48,7 @@ where
 }
 impl<'msg, T, U> RepeatedField<'msg> for EitherRepeatedMessageField<T, U>
 where
-    T: RepeatedField<'msg> + IntoIterator<Item = <U as IntoIterator>::Item>,
+    T: RepeatedField<'msg>,
     U: RepeatedField<'msg>,
 {
 }

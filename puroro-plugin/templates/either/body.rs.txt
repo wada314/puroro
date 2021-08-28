@@ -50,7 +50,7 @@ where
     >;
 
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
-        ::puroro::EitherRepeatedField::new(self
+        ::puroro_internal::impls::either::{{ either_repeated_field_type }}::new(self
             .as_ref()
             .map_left(
                 <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}
