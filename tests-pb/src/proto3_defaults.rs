@@ -649,21 +649,35 @@ pub mod _puroro_traits {
     }
 
     pub trait MsgTrait: ::std::clone::Clone {
-        fn i32_unlabeled<'this>(&'this self) -> i32;
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32>;
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::default::Default::default()
+        }
         type Field3RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>;
-
-        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
-        fn f32_unlabeled<'this>(&'this self) -> f32;
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            todo!()
+        }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
+            ::std::default::Default::default()
+        }
         type Field6MessageType<'this>: 'this + self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait;
         fn submsg_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>;
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
+        {
+            ::std::default::Default::default()
+        }
     }
     pub trait SubmsgTrait: ::std::clone::Clone {
-        fn i32_unlabeled<'this>(&'this self) -> i32;
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
     }
 }
 pub use _puroro_nested::*;

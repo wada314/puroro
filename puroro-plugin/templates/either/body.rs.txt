@@ -139,8 +139,7 @@ where
             {%- endif %}
         >
     {
-        use ::std::ops::Deref;
-        self.deref().{{ oneof.field_ident }}()
+        todo!()
     }
     {%- endfor %}
 }

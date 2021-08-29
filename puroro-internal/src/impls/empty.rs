@@ -1,5 +1,6 @@
 use ::std::marker::PhantomData;
 
+#[derive(Default)]
 pub struct EmptyRepeatedField<T>(PhantomData<T>);
 impl<T> EmptyRepeatedField<T> {
     pub fn new() -> Self {

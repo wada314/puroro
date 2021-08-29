@@ -609,22 +609,30 @@ pub mod _puroro_traits {
     }
 
     pub trait Test1Trait: ::std::clone::Clone {
-        fn a<'this>(&'this self) -> ::std::option::Option<i32>;
+        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::default::Default::default()
+        }
     }
     pub trait Test2Trait: ::std::clone::Clone {
-        fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>>;
+        fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
+            ::std::default::Default::default()
+        }
     }
     pub trait Test3Trait: ::std::clone::Clone {
         type Field3MessageType<'this>: 'this + self::_puroro_root::official_samples::_puroro_traits::Test1Trait;
         fn c<'this>(
             &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>;
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
+        {
+            ::std::default::Default::default()
+        }
     }
     pub trait Test4Trait: ::std::clone::Clone {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>;
-
-        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            todo!()
+        }
     }
 }
 pub use _puroro_nested::*;

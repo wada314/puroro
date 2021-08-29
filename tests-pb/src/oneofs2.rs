@@ -322,21 +322,18 @@ pub mod _puroro_impls {
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
         {
-            use std::ops::Deref;
-            self.deref().group_one()
+            todo!()
         }
         fn group_two<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
         {
-            use std::ops::Deref;
-            self.deref().group_two()
+            todo!()
         }
         fn group_three<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            use std::ops::Deref;
-            self.deref().group_three()
+            todo!()
         }
     }
 
@@ -653,16 +650,26 @@ pub mod _puroro_traits {
             + self::_puroro_root::oneofs2::_puroro_traits::SubmsgTrait;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>;
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        {
+            ::std::option::Option::None
+        }
         fn group_two<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>;
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        {
+            ::std::option::Option::None
+        }
         fn group_three<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree>;
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            ::std::option::Option::None
+        }
     }
     pub trait SubmsgTrait: ::std::clone::Clone {
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32>;
+        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            ::std::default::Default::default()
+        }
     }
 }
 pub use _puroro_nested::*;

@@ -9,17 +9,23 @@ pub trait {{ m.trait_ident }}: ::std::clone::Clone {
     {%- endmatch %}
 
     {%- if field.trait_has_scalar_getter %}
-    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }};
+    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
+        ::std::default::Default::default()
+    }
     {%- endif %}
     {%- if field.trait_has_optional_getter %}
-    fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}>;
+    fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
+        ::std::default::Default::default()
+    }
     {%- endif %}
     {%- if field.trait_has_repeated_getter %}
     type Field{{ field.number }}RepeatedType<'this>: 
         ::puroro::RepeatedField<'this> 
         + ::std::iter::IntoIterator<Item = {{ field.trait_scalar_getter_type }}>;
-
-    fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>;
+    fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>
+    {
+        todo!()
+    }
     {%- endif %}
     {%- endfor %}
 
@@ -34,7 +40,10 @@ pub trait {{ m.trait_ident }}: ::std::clone::Clone {
             <'this>
             {%- endif %}
             {%- endif %}
-        >;
+        >
+    {
+        ::std::option::Option::None
+    }
     {%- endfor %}
 }
 {%- endfor %}

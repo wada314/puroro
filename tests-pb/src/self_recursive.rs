@@ -195,7 +195,10 @@ pub mod _puroro_traits {
             + self::_puroro_root::self_recursive::_puroro_traits::MsgTrait;
         fn recursive_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>>;
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>>
+        {
+            ::std::default::Default::default()
+        }
     }
 }
 pub use _puroro_nested::*;

@@ -1171,38 +1171,56 @@ pub mod _puroro_traits {
     }
 
     pub trait MsgTrait: ::std::clone::Clone {
-        fn i32_unlabeled<'this>(&'this self) -> i32;
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         type Field2RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>;
-
-        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this>;
-        fn float_unlabeled<'this>(&'this self) -> f32;
+        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            todo!()
+        }
+        fn float_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = f32>;
-
-        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str>;
+        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            todo!()
+        }
+        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
+            ::std::default::Default::default()
+        }
         type Field6RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = ::std::borrow::Cow<'this, str>>;
-
-        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
+        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            todo!()
+        }
         type Field7MessageType<'this>: 'this + self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
         fn submsg_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field7MessageType<'this>>>;
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field7MessageType<'this>>>
+        {
+            ::std::default::Default::default()
+        }
         type Field8MessageType<'this>: 'this + self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
         type Field8RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<
                 Item = ::std::borrow::Cow<'this, Self::Field8MessageType<'this>>,
             >;
-
-        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this>;
-        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            todo!()
+        }
+        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
+            ::std::default::Default::default()
+        }
         type Field10RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = self::_puroro_root::ser_tests3::Enum>;
-
-        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this>;
-        fn very_large_field_number<'this>(&'this self) -> i32;
+        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            todo!()
+        }
+        fn very_large_field_number<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
     }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
@@ -1401,7 +1419,9 @@ pub mod _puroro_nested {
             }
 
             pub trait SubmsgTrait: ::std::clone::Clone {
-                fn i32_unlabeled<'this>(&'this self) -> i32;
+                fn i32_unlabeled<'this>(&'this self) -> i32 {
+                    ::std::default::Default::default()
+                }
             }
         }
         pub use _puroro_nested::*;
