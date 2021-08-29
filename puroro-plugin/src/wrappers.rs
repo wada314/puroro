@@ -746,7 +746,7 @@ impl Field {
         Ok(scalar_type)
     }
 
-    fn simple_scalar_field_type(&self) -> Result<String> {
+    pub fn simple_scalar_field_type(&self) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::String => "::std::string::String".to_string(),

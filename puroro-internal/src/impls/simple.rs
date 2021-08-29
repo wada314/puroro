@@ -5,33 +5,23 @@ use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
 use ::std::marker::PhantomData;
 
-pub struct VecCowWrapper<'msg, B: ?Sized + ToOwned>(&'msg Vec<B::Owned>);
-
-impl<'msg, B: ?Sized + ToOwned> VecCowWrapper<'msg, B> {
-    pub fn new(vec: &'msg Vec<B::Owned>) -> Self {
-        Self(vec)
+pub struct CowedIter<B: ?Sized, I>(I, PhantomData<B>);
+impl<B: ?Sized, I> CowedIter<B, I> {
+    pub fn new(iter: I) -> Self {
+        Self(iter, PhantomData)
     }
 }
-impl<'msg, B: 'msg + ?Sized + ToOwned> IntoIterator for VecCowWrapper<'msg, B> {
-    type Item = Cow<'msg, B>;
-    type IntoIter = CowIter<'msg, B, std::slice::Iter<'msg, B::Owned>>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        CowIter(<[B::Owned]>::iter(self.0), PhantomData)
-    }
-}
-pub struct CowIter<'msg, B, Iter>(Iter, PhantomData<B>)
+impl<'a, B, I, T> Iterator for CowedIter<B, I>
 where
-    B: 'msg + ?Sized + ToOwned,
-    Iter: Iterator<Item = &'msg B::Owned>;
-impl<'msg, B, Iter> Iterator for CowIter<'msg, B, Iter>
-where
-    B: 'msg + ?Sized + ToOwned,
-    Iter: Iterator<Item = &'msg B::Owned>,
+    I: Iterator<Item = &'a T>,
+    T: 'a + Clone + Borrow<B>,
+    B: 'a + ?Sized + ToOwned<Owned = T>,
 {
-    type Item = Cow<'msg, B>;
+    type Item = Cow<'a, B>;
     fn next(&mut self) -> Option<Self::Item> {
-        self.0.next().map(|x| Cow::Borrowed(x.borrow()))
+        self.0
+            .next()
+            .map(|r| Cow::Borrowed(<T as Borrow<B>>::borrow(r)))
     }
 }
 

@@ -158,6 +158,7 @@ struct Field {
     trait_scalar_getter_type: String,
     trait_maybe_field_message_trait_path: Option<String>,
     simple_field_type: String,
+    simple_scalar_field_type: String,
     simple_maybe_field_message_path: Option<String>,
     simple_maybe_borrowed_field_type: Option<String>,
     simple_label_and_type_tags: String,
@@ -201,6 +202,7 @@ impl Field {
             trait_scalar_getter_type: f.trait_scalar_getter_type()?,
             trait_maybe_field_message_trait_path,
             simple_field_type: f.simple_field_type()?,
+            simple_scalar_field_type: f.simple_scalar_field_type()?,
             simple_maybe_field_message_path,
             simple_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Simple")?,

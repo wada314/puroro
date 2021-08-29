@@ -54,11 +54,13 @@ pub mod _puroro_impls {
         fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
             ::std::borrow::Cow::Borrowed(&self.string_unlabeled)
         }
-        type Field6RepeatedType<'this> =
-            ::puroro_internal::impls::simple::VecCowWrapper<'this, str>;
+        type Field6RepeatedType<'this> = ::puroro_internal::impls::simple::CowedIter<
+            str,
+            ::std::slice::Iter<'this, ::std::string::String>,
+        >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecCowWrapper::new(&self.string_repeated)
+            ::puroro_internal::impls::simple::CowedIter::new(self.string_repeated.iter())
         }
         type Field7MessageType<'this> =
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
@@ -72,13 +74,16 @@ pub mod _puroro_impls {
         }
         type Field8MessageType<'this> =
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
-        type Field8RepeatedType<'this> = ::puroro_internal::impls::simple::VecCowWrapper<
-            'this,
+        type Field8RepeatedType<'this> = ::puroro_internal::impls::simple::CowedIter<
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+            >,
         >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecCowWrapper::new(&self.submsg_repeated)
+            ::puroro_internal::impls::simple::CowedIter::new(self.submsg_repeated.iter())
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
             ::std::clone::Clone::clone(&self.enum_unlabeled)
@@ -814,11 +819,13 @@ pub mod _puroro_impls {
         fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
             ::std::borrow::Cow::Owned(::std::default::Default::default())
         }
-        type Field6RepeatedType<'this> =
-            ::puroro_internal::impls::simple::VecCowWrapper<'this, str>;
+        type Field6RepeatedType<'this> = ::puroro_internal::impls::simple::CowedIter<
+            str,
+            ::std::slice::Iter<'this, ::std::string::String>,
+        >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecCowWrapper::new(&self.string_repeated)
+            ::puroro_internal::impls::simple::CowedIter::new(self.string_repeated.iter())
         }
         type Field7MessageType<'this> =
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
@@ -958,13 +965,16 @@ pub mod _puroro_impls {
         }
         type Field8MessageType<'this> =
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
-        type Field8RepeatedType<'this> = ::puroro_internal::impls::simple::VecCowWrapper<
-            'this,
+        type Field8RepeatedType<'this> = ::puroro_internal::impls::simple::CowedIter<
             self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+            ::std::slice::Iter<
+                'this,
+                self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+            >,
         >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecCowWrapper::new(&self.submsg_repeated)
+            ::puroro_internal::impls::simple::CowedIter::new(self.submsg_repeated.iter())
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
             ::std::default::Default::default()
