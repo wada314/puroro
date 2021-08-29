@@ -149,30 +149,12 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgEmpty {}
 
     impl super::_puroro_traits::MsgTrait for MsgEmpty {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            None
-        }
         type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn f32_unlabeled<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
-            ::std::borrow::Cow::Owned(::std::default::Default::default())
-        }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
-        fn submsg_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
-        {
-            None
-        }
     }
 
     impl ::puroro::SerToIoWrite for MsgEmpty {
@@ -312,27 +294,12 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::clone::Clone::clone(&self.i32_unlabeled)
         }
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            None
-        }
         type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn f32_unlabeled<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
-            ::std::borrow::Cow::Owned(::std::default::Default::default())
-        }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
-        fn submsg_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
-        {
-            None
-        }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -343,9 +310,6 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField2 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField2 {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::clone::Clone::clone(&self.i32_optional)
         }
@@ -353,20 +317,8 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn f32_unlabeled<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
-            ::std::borrow::Cow::Owned(::std::default::Default::default())
-        }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
-        fn submsg_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
-        {
-            None
-        }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -377,31 +329,13 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField3 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField3 {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            None
-        }
         type Field3RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             self.i32_repeated.iter().cloned()
         }
-        fn f32_unlabeled<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
-            ::std::borrow::Cow::Owned(::std::default::Default::default())
-        }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
-        fn submsg_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
-        {
-            None
-        }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -412,12 +346,6 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField4 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField4 {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            None
-        }
         type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
@@ -425,17 +353,8 @@ pub mod _puroro_impls {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             ::std::clone::Clone::clone(&self.f32_unlabeled)
         }
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
-            ::std::borrow::Cow::Owned(::std::default::Default::default())
-        }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
-        fn submsg_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
-        {
-            None
-        }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -446,30 +365,15 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField5 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField5 {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            None
-        }
         type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn f32_unlabeled<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
         }
         fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
             ::std::borrow::Cow::Borrowed(&self.string_unlabeled)
         }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
-        fn submsg_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
-        {
-            None
-        }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -482,21 +386,9 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField6 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField6 {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            None
-        }
         type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
-        }
-        fn f32_unlabeled<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
-            ::std::borrow::Cow::Owned(::std::default::Default::default())
         }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgSimple;
@@ -571,11 +463,7 @@ pub mod _puroro_impls {
 
     impl ::puroro::Message for SubmsgEmpty {}
 
-    impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
-    }
+    impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {}
 
     impl ::puroro::SerToIoWrite for SubmsgEmpty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>

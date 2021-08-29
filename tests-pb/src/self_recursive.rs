@@ -87,12 +87,6 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgEmpty {
         type Field1MessageType<'this> = self::_puroro_root::self_recursive::_puroro_impls::MsgEmpty;
-        fn recursive_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>>
-        {
-            None
-        }
     }
 
     impl ::puroro::SerToIoWrite for MsgEmpty {

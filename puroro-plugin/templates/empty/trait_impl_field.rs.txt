@@ -4,22 +4,6 @@ type Field{{ f.number }}MessageType<'this> = {{ struct_path }};
 {%- else %}
 {%- endmatch %}
 
-{%- if f.trait_has_scalar_getter %}
-fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
-    {%- if f.is_length_delimited %}
-    ::std::borrow::Cow::Owned(::std::default::Default::default())
-    {%- else %}
-    ::std::default::Default::default()
-    {%- endif %}
-}
-{%- endif %}
-
-{%- if f.trait_has_optional_getter %}
-fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}> {
-    None
-}
-{%- endif %}
-
 {%- if f.trait_has_repeated_getter %}
 type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<{{ f.trait_scalar_getter_type }}>;
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {

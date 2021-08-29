@@ -75,11 +75,7 @@ pub mod _puroro_impls {
 
     impl ::puroro::Message for Test1Empty {}
 
-    impl super::_puroro_traits::Test1Trait for Test1Empty {
-        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-            None
-        }
-    }
+    impl super::_puroro_traits::Test1Trait for Test1Empty {}
 
     impl ::puroro::SerToIoWrite for Test1Empty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
@@ -209,11 +205,7 @@ pub mod _puroro_impls {
 
     impl ::puroro::Message for Test2Empty {}
 
-    impl super::_puroro_traits::Test2Trait for Test2Empty {
-        fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
-            None
-        }
-    }
+    impl super::_puroro_traits::Test2Trait for Test2Empty {}
 
     impl ::puroro::SerToIoWrite for Test2Empty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
@@ -359,12 +351,6 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::Test3Trait for Test3Empty {
         type Field3MessageType<'this> =
             self::_puroro_root::official_samples::_puroro_impls::Test1Empty;
-        fn c<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
-        {
-            None
-        }
     }
 
     impl ::puroro::SerToIoWrite for Test3Empty {

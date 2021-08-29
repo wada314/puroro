@@ -568,11 +568,7 @@ pub mod _puroro_impls {
 
     impl ::puroro::Message for SubmsgEmpty {}
 
-    impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            None
-        }
-    }
+    impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {}
 
     impl ::puroro::SerToIoWrite for SubmsgEmpty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
