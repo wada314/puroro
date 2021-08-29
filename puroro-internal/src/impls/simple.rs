@@ -1,28 +1,9 @@
 pub mod de;
 pub mod se;
 
-use ::puroro::RepeatedField;
 use ::std::borrow::Borrow;
 use ::std::borrow::Cow;
 use ::std::marker::PhantomData;
-
-pub struct VecWrapper<'msg, T>(&'msg Vec<T>);
-
-impl<'msg, T> VecWrapper<'msg, T> {
-    pub fn new(vec: &'msg Vec<T>) -> Self {
-        Self(vec)
-    }
-}
-
-impl<'msg, T: Clone> IntoIterator for VecWrapper<'msg, T> {
-    type Item = T;
-    type IntoIter = std::iter::Cloned<std::slice::Iter<'msg, T>>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        <[T]>::iter(&self.0).cloned()
-    }
-}
-impl<'msg, T: Clone> RepeatedField<'msg> for VecWrapper<'msg, T> {}
 
 pub struct VecCowWrapper<'msg, B: ?Sized + ToOwned>(&'msg Vec<B::Owned>);
 
@@ -53,7 +34,6 @@ where
         self.0.next().map(|x| Cow::Borrowed(x.borrow()))
     }
 }
-impl<'msg, B> RepeatedField<'msg> for VecCowWrapper<'msg, B> where B: 'msg + ?Sized + ToOwned {}
 
 pub trait VecOrOptionOrBare<T> {
     fn push(&mut self, val: T);

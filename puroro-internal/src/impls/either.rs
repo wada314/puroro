@@ -18,12 +18,6 @@ where
         self.0.into_iter()
     }
 }
-impl<'msg, T, U> RepeatedField<'msg> for EitherRepeatedField<T, U>
-where
-    T: RepeatedField<'msg> + IntoIterator<Item = <U as IntoIterator>::Item>,
-    U: RepeatedField<'msg>,
-{
-}
 
 pub struct EitherRepeatedMessageField<T, U>(Either<T, U>);
 impl<T, U> EitherRepeatedMessageField<T, U> {
@@ -48,14 +42,6 @@ where
                 .map_right(|u| u.into_iter()),
         )
     }
-}
-impl<'msg, T, U, TM, UM> RepeatedField<'msg> for EitherRepeatedMessageField<T, U>
-where
-    T: RepeatedField<'msg> + IntoIterator<Item = Cow<'msg, TM>>,
-    U: RepeatedField<'msg> + IntoIterator<Item = Cow<'msg, UM>>,
-    TM: 'msg + Clone,
-    UM: 'msg + Clone,
-{
 }
 
 pub struct IndependentEitherIter<T, U>(

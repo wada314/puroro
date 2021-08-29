@@ -464,10 +464,10 @@ pub mod _puroro_impls {
     impl ::puroro::Message for Test4Simple {}
 
     impl super::_puroro_traits::Test4Trait for Test4Simple {
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, i32>;
+        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.d)
+            self.d.iter().cloned()
         }
     }
 
@@ -595,10 +595,10 @@ pub mod _puroro_impls {
     impl ::puroro::Message for Test4SimpleField4 {}
 
     impl super::_puroro_traits::Test4Trait for Test4SimpleField4 {
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, i32>;
+        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.d)
+            self.d.iter().cloned()
         }
     }
 }

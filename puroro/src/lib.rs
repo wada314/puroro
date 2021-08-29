@@ -35,6 +35,7 @@ pub trait Enum2:
 pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {}
 
 pub trait RepeatedField<'msg>: IntoIterator {}
+impl<'msg, T> RepeatedField<'msg> for T where T: IntoIterator {}
 
 pub trait DeserFromBytesIter: Message {
     fn deser<I>(&mut self, iter: I) -> Result<()>

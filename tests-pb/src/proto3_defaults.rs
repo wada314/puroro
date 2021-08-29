@@ -33,10 +33,10 @@ pub mod _puroro_impls {
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::clone::Clone::clone(&self.i32_optional)
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, i32>;
+        type Field3RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.i32_repeated)
+            self.i32_repeated.iter().cloned()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             ::std::clone::Clone::clone(&self.f32_unlabeled)
@@ -383,10 +383,10 @@ pub mod _puroro_impls {
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
             None
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, i32>;
+        type Field3RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.i32_repeated)
+            self.i32_repeated.iter().cloned()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             ::std::default::Default::default()

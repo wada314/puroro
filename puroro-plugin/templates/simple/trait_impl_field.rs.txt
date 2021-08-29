@@ -33,7 +33,7 @@ fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_
 {%- when Some with (borrowed) %}
 type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::simple::VecCowWrapper<'this, {{ borrowed }}>;
 {%- else %}
-type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, {{ f.trait_scalar_getter_type }}>;
+type Field{{ f.number }}RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, {{ f.trait_scalar_getter_type }}>>;
 {%- endmatch %}
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
@@ -41,7 +41,7 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
     {%- when Some with (borrowed) %}
     ::puroro_internal::impls::simple::VecCowWrapper::new(&self.{{ f.ident }})
     {%- else %}
-    ::puroro_internal::impls::simple::VecWrapper::new(&self.{{ f.ident }})
+    self.{{ f.ident }}.iter().cloned()
     {%- endmatch %}
 }
 {%- endif %}

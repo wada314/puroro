@@ -38,18 +38,18 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::clone::Clone::clone(&self.i32_unlabeled)
         }
-        type Field2RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, i32>;
+        type Field2RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.i32_repeated)
+            self.i32_repeated.iter().cloned()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             ::std::clone::Clone::clone(&self.float_unlabeled)
         }
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, f32>;
+        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.float_repeated)
+            self.float_repeated.iter().cloned()
         }
         fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
             ::std::borrow::Cow::Borrowed(&self.string_unlabeled)
@@ -83,13 +83,11 @@ pub mod _puroro_impls {
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
             ::std::clone::Clone::clone(&self.enum_unlabeled)
         }
-        type Field10RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<
-            'this,
-            self::_puroro_root::ser_tests3::Enum,
-        >;
+        type Field10RepeatedType<'this> =
+            ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests3::Enum>>;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.enum_repeated)
+            self.enum_repeated.iter().cloned()
         }
         fn very_large_field_number<'this>(&'this self) -> i32 {
             ::std::clone::Clone::clone(&self.very_large_field_number)
@@ -560,10 +558,10 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
-        type Field2RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, i32>;
+        type Field2RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.i32_repeated)
+            self.i32_repeated.iter().cloned()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             ::std::default::Default::default()
@@ -688,10 +686,10 @@ pub mod _puroro_impls {
         fn float_unlabeled<'this>(&'this self) -> f32 {
             ::std::default::Default::default()
         }
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, f32>;
+        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.float_repeated)
+            self.float_repeated.iter().cloned()
         }
         fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
             ::std::borrow::Cow::Owned(::std::default::Default::default())
@@ -1091,13 +1089,11 @@ pub mod _puroro_impls {
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
             ::std::default::Default::default()
         }
-        type Field10RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<
-            'this,
-            self::_puroro_root::ser_tests3::Enum,
-        >;
+        type Field10RepeatedType<'this> =
+            ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests3::Enum>>;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.enum_repeated)
+            self.enum_repeated.iter().cloned()
         }
         fn very_large_field_number<'this>(&'this self) -> i32 {
             ::std::default::Default::default()

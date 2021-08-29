@@ -38,18 +38,18 @@ pub mod _puroro_impls {
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::clone::Clone::clone(&self.i32_optional)
         }
-        type Field2RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, i32>;
+        type Field2RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.i32_repeated)
+            self.i32_repeated.iter().cloned()
         }
         fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
             ::std::clone::Clone::clone(&self.float_optional)
         }
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, f32>;
+        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.float_repeated)
+            self.float_repeated.iter().cloned()
         }
         fn string_optional<'this>(
             &'this self,
@@ -89,13 +89,11 @@ pub mod _puroro_impls {
         ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
             ::std::clone::Clone::clone(&self.enum_optional)
         }
-        type Field10RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<
-            'this,
-            self::_puroro_root::ser_tests2::Enum,
-        >;
+        type Field10RepeatedType<'this> =
+            ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests2::Enum>>;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.enum_repeated)
+            self.enum_repeated.iter().cloned()
         }
         fn very_large_field_number<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::clone::Clone::clone(&self.very_large_field_number)
@@ -582,10 +580,10 @@ pub mod _puroro_impls {
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
             None
         }
-        type Field2RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, i32>;
+        type Field2RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.i32_repeated)
+            self.i32_repeated.iter().cloned()
         }
         fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
             None
@@ -718,10 +716,10 @@ pub mod _puroro_impls {
         fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
             None
         }
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<'this, f32>;
+        type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, f32>>;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.float_repeated)
+            self.float_repeated.iter().cloned()
         }
         fn string_optional<'this>(
             &'this self,
@@ -1151,13 +1149,11 @@ pub mod _puroro_impls {
         ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
             None
         }
-        type Field10RepeatedType<'this> = ::puroro_internal::impls::simple::VecWrapper<
-            'this,
-            self::_puroro_root::ser_tests2::Enum,
-        >;
+        type Field10RepeatedType<'this> =
+            ::std::iter::Cloned<::std::slice::Iter<'this, self::_puroro_root::ser_tests2::Enum>>;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            ::puroro_internal::impls::simple::VecWrapper::new(&self.enum_repeated)
+            self.enum_repeated.iter().cloned()
         }
         fn very_large_field_number<'this>(&'this self) -> ::std::option::Option<i32> {
             None
