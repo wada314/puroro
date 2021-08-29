@@ -81,4 +81,66 @@ where
     {%- endfor %}
 }
 
+impl<'a, T> super::_puroro_traits::{{ m.trait_ident }} for ::std::borrow::Cow<'a, T> 
+where
+    T: 'a + ::std::clone::Clone + super::_puroro_traits::{{ m.trait_ident }},
+{
+    
+    {%- for field in m.fields %}
 
+    {%- match field.trait_maybe_field_message_trait_path %}
+    {%- when Some with (field_msg_path) %}
+    type Field{{ field.number }}MessageType<'this> =
+        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'this>;
+    {%- else %}
+    {%- endmatch %}
+
+    {%- if field.trait_has_scalar_getter %}
+    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
+        use ::std::ops::Deref;
+        self.deref().{{ field.ident }}()
+    }
+    {%- endif %}
+
+    {%- if field.trait_has_optional_getter %}
+    fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
+        use ::std::ops::Deref;
+        self.deref().{{ field.ident }}()
+    }
+    {%- endif %}
+
+    {%- if field.trait_has_repeated_getter %}
+    {%- let either_repeated_field_type %}
+    {%- if field.is_message %}
+    {%- let either_repeated_field_type = "EitherRepeatedMessageField" %}
+    {%- else %}
+    {%- let either_repeated_field_type = "EitherRepeatedField" %}
+    {%- endif %}
+    type Field{{ field.number }}RepeatedType<'this> =
+        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'this>;
+
+    fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
+        use ::std::ops::Deref;
+        self.deref().{{ field.ident }}()
+    }
+    {%- endif %}
+    {%- endfor %}
+
+    {%- for oneof in m.oneofs %}
+    fn {{ oneof.field_ident }}<'this>(&'this self) ->
+        ::std::option::Option<
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+            {%- if oneof.has_message_field %}
+            <'this, Self>
+            {%- else %}
+            {%- if oneof.has_reference_field %}
+            <'this>
+            {%- endif %}
+            {%- endif %}
+        >
+    {
+        use ::std::ops::Deref;
+        self.deref().{{ oneof.field_ident }}()
+    }
+    {%- endfor %}
+}

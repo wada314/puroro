@@ -263,6 +263,44 @@ pub mod _puroro_impls {
         }
     }
 
+    impl<'a, T> super::_puroro_traits::MsgTrait for ::std::borrow::Cow<'a, T>
+    where
+        T: 'a + ::std::clone::Clone + super::_puroro_traits::MsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            use std::ops::Deref;
+            self.deref().i32_unlabeled()
+        }
+        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            use std::ops::Deref;
+            self.deref().i32_optional()
+        }
+        type Field3RepeatedType<'this> =
+            <T as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
+
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            use std::ops::Deref;
+            self.deref().i32_repeated()
+        }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            use std::ops::Deref;
+            self.deref().f32_unlabeled()
+        }
+        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
+            use std::ops::Deref;
+            self.deref().string_unlabeled()
+        }
+        type Field6MessageType<'this> =
+            <T as super::_puroro_traits::MsgTrait>::Field6MessageType<'this>;
+        fn submsg_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
+        {
+            use std::ops::Deref;
+            self.deref().submsg_unlabeled()
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField1 {
         i32_unlabeled: i32,
@@ -578,6 +616,16 @@ pub mod _puroro_impls {
                 <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
                 <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
             )
+        }
+    }
+
+    impl<'a, T> super::_puroro_traits::SubmsgTrait for ::std::borrow::Cow<'a, T>
+    where
+        T: 'a + ::std::clone::Clone + super::_puroro_traits::SubmsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            use std::ops::Deref;
+            self.deref().i32_unlabeled()
         }
     }
 

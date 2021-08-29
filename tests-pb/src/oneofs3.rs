@@ -312,6 +312,34 @@ pub mod _puroro_impls {
         }
     }
 
+    impl<'a, T> super::_puroro_traits::MsgTrait for ::std::borrow::Cow<'a, T>
+    where
+        T: 'a + ::std::clone::Clone + super::_puroro_traits::MsgTrait,
+    {
+        type Field5MessageType<'this> =
+            <T as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>;
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        {
+            use std::ops::Deref;
+            self.deref().group_one()
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        {
+            use std::ops::Deref;
+            self.deref().group_two()
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            use std::ops::Deref;
+            self.deref().group_three()
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField1 {
         g1_int32: i32,
@@ -588,6 +616,16 @@ pub mod _puroro_impls {
                 <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
                 <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
             )
+        }
+    }
+
+    impl<'a, T> super::_puroro_traits::SubmsgTrait for ::std::borrow::Cow<'a, T>
+    where
+        T: 'a + ::std::clone::Clone + super::_puroro_traits::SubmsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            use std::ops::Deref;
+            self.deref().i32_unlabeled()
         }
     }
 

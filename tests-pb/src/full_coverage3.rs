@@ -526,6 +526,103 @@ pub mod _puroro_impls {
         }
     }
 
+    impl<'a, T> super::_puroro_traits::MsgTrait for ::std::borrow::Cow<'a, T>
+    where
+        T: 'a + ::std::clone::Clone + super::_puroro_traits::MsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            use std::ops::Deref;
+            self.deref().i32_unlabeled()
+        }
+        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            use std::ops::Deref;
+            self.deref().i32_optional()
+        }
+        type Field3RepeatedType<'this> =
+            <T as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
+
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            use std::ops::Deref;
+            self.deref().i32_repeated()
+        }
+        fn float_unlabeled<'this>(&'this self) -> f32 {
+            use std::ops::Deref;
+            self.deref().float_unlabeled()
+        }
+        fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
+            use std::ops::Deref;
+            self.deref().float_optional()
+        }
+        type Field13RepeatedType<'this> =
+            <T as super::_puroro_traits::MsgTrait>::Field13RepeatedType<'this>;
+
+        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
+            use std::ops::Deref;
+            self.deref().float_repeated()
+        }
+        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
+            use std::ops::Deref;
+            self.deref().string_unlabeled()
+        }
+        fn string_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
+            use std::ops::Deref;
+            self.deref().string_optional()
+        }
+        type Field23RepeatedType<'this> =
+            <T as super::_puroro_traits::MsgTrait>::Field23RepeatedType<'this>;
+
+        fn string_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
+            use std::ops::Deref;
+            self.deref().string_repeated()
+        }
+        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
+            use std::ops::Deref;
+            self.deref().enum_unlabeled()
+        }
+        fn enum_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            use std::ops::Deref;
+            self.deref().enum_optional()
+        }
+        type Field33RepeatedType<'this> =
+            <T as super::_puroro_traits::MsgTrait>::Field33RepeatedType<'this>;
+
+        fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
+            use std::ops::Deref;
+            self.deref().enum_repeated()
+        }
+        type Field41MessageType<'this> =
+            <T as super::_puroro_traits::MsgTrait>::Field41MessageType<'this>;
+        fn submsg_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field41MessageType<'this>>>
+        {
+            use std::ops::Deref;
+            self.deref().submsg_unlabeled()
+        }
+        type Field42MessageType<'this> =
+            <T as super::_puroro_traits::MsgTrait>::Field42MessageType<'this>;
+        fn submsg_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field42MessageType<'this>>>
+        {
+            use std::ops::Deref;
+            self.deref().submsg_optional()
+        }
+        type Field43MessageType<'this> =
+            <T as super::_puroro_traits::MsgTrait>::Field43MessageType<'this>;
+        type Field43RepeatedType<'this> =
+            <T as super::_puroro_traits::MsgTrait>::Field43RepeatedType<'this>;
+
+        fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
+            use std::ops::Deref;
+            self.deref().submsg_repeated()
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField1 {
         i32_unlabeled: i32,
@@ -1971,6 +2068,16 @@ pub mod _puroro_nested {
                         <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
                         <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
                     )
+                }
+            }
+
+            impl<'a, T> super::_puroro_traits::SubmsgTrait for ::std::borrow::Cow<'a, T>
+            where
+                T: 'a + ::std::clone::Clone + super::_puroro_traits::SubmsgTrait,
+            {
+                fn i32_unlabeled<'this>(&'this self) -> i32 {
+                    use std::ops::Deref;
+                    self.deref().i32_unlabeled()
                 }
             }
 

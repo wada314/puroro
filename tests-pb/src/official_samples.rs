@@ -123,6 +123,16 @@ pub mod _puroro_impls {
         }
     }
 
+    impl<'a, T> super::_puroro_traits::Test1Trait for ::std::borrow::Cow<'a, T>
+    where
+        T: 'a + ::std::clone::Clone + super::_puroro_traits::Test1Trait,
+    {
+        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
+            use std::ops::Deref;
+            self.deref().a()
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test1SimpleField1 {
         a: ::std::option::Option<i32>,
@@ -244,6 +254,16 @@ pub mod _puroro_impls {
                 <T as super::_puroro_traits::Test2Trait>::b,
                 <U as super::_puroro_traits::Test2Trait>::b,
             )
+        }
+    }
+
+    impl<'a, T> super::_puroro_traits::Test2Trait for ::std::borrow::Cow<'a, T>
+    where
+        T: 'a + ::std::clone::Clone + super::_puroro_traits::Test2Trait,
+    {
+        fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
+            use std::ops::Deref;
+            self.deref().b()
         }
     }
 
@@ -399,6 +419,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl<'a, T> super::_puroro_traits::Test3Trait for ::std::borrow::Cow<'a, T>
+    where
+        T: 'a + ::std::clone::Clone + super::_puroro_traits::Test3Trait,
+    {
+        type Field3MessageType<'this> =
+            <T as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>;
+        fn c<'this>(
+            &'this self,
+        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
+        {
+            use std::ops::Deref;
+            self.deref().c()
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test3SimpleField3 {
         c: ::std::option::Option<
@@ -536,6 +571,19 @@ pub mod _puroro_impls {
                     .map_left(<T as super::_puroro_traits::Test4Trait>::d)
                     .map_right(<U as super::_puroro_traits::Test4Trait>::d),
             )
+        }
+    }
+
+    impl<'a, T> super::_puroro_traits::Test4Trait for ::std::borrow::Cow<'a, T>
+    where
+        T: 'a + ::std::clone::Clone + super::_puroro_traits::Test4Trait,
+    {
+        type Field4RepeatedType<'this> =
+            <T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>;
+
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            use std::ops::Deref;
+            self.deref().d()
         }
     }
 
