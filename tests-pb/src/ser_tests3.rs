@@ -300,13 +300,13 @@ pub mod _puroro_impls {
     where
         T: super::_puroro_traits::MsgTrait,
         U: super::_puroro_traits::MsgTrait,
-        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
-        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
+        DT: ::std::ops::Deref<Target = T>,
+        DU: ::std::ops::Deref<Target = U>,
     {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             self.as_ref().either(
-                <T as super::_puroro_traits::MsgTrait>::i32_unlabeled,
-                <U as super::_puroro_traits::MsgTrait>::i32_unlabeled,
+                |t| <T as super::_puroro_traits::MsgTrait>::i32_unlabeled(t),
+                |u| <U as super::_puroro_traits::MsgTrait>::i32_unlabeled(u),
             )
         }
         type Field2RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
@@ -317,14 +317,14 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
             ::puroro_internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
-                    .map_left(<T as super::_puroro_traits::MsgTrait>::i32_repeated)
-                    .map_right(<U as super::_puroro_traits::MsgTrait>::i32_repeated),
+                    .map_left(|t| <T as super::_puroro_traits::MsgTrait>::i32_repeated(t.deref()))
+                    .map_right(|u| <U as super::_puroro_traits::MsgTrait>::i32_repeated(u.deref())),
             )
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             self.as_ref().either(
-                <T as super::_puroro_traits::MsgTrait>::float_unlabeled,
-                <U as super::_puroro_traits::MsgTrait>::float_unlabeled,
+                |t| <T as super::_puroro_traits::MsgTrait>::float_unlabeled(t),
+                |u| <U as super::_puroro_traits::MsgTrait>::float_unlabeled(u),
             )
         }
         type Field4RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
@@ -335,8 +335,10 @@ pub mod _puroro_impls {
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro_internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
-                    .map_left(<T as super::_puroro_traits::MsgTrait>::float_repeated)
-                    .map_right(<U as super::_puroro_traits::MsgTrait>::float_repeated),
+                    .map_left(|t| <T as super::_puroro_traits::MsgTrait>::float_repeated(t.deref()))
+                    .map_right(|u| {
+                        <U as super::_puroro_traits::MsgTrait>::float_repeated(u.deref())
+                    }),
             )
         }
         type Field5ScalarGetterType<'this> = ::puroro::Either<
@@ -358,8 +360,12 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro_internal::impls::either::EitherRepeatedLDField::new(
                 self.as_ref()
-                    .map_left(<T as super::_puroro_traits::MsgTrait>::string_repeated)
-                    .map_right(<U as super::_puroro_traits::MsgTrait>::string_repeated),
+                    .map_left(|t| {
+                        <T as super::_puroro_traits::MsgTrait>::string_repeated(t.deref())
+                    })
+                    .map_right(|u| {
+                        <U as super::_puroro_traits::MsgTrait>::string_repeated(u.deref())
+                    }),
             )
         }
         type Field7MessageType<'this> = ::puroro::Either<
@@ -388,14 +394,18 @@ pub mod _puroro_impls {
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
             ::puroro_internal::impls::either::EitherRepeatedMessageField::new(
                 self.as_ref()
-                    .map_left(<T as super::_puroro_traits::MsgTrait>::submsg_repeated)
-                    .map_right(<U as super::_puroro_traits::MsgTrait>::submsg_repeated),
+                    .map_left(|t| {
+                        <T as super::_puroro_traits::MsgTrait>::submsg_repeated(t.deref())
+                    })
+                    .map_right(|u| {
+                        <U as super::_puroro_traits::MsgTrait>::submsg_repeated(u.deref())
+                    }),
             )
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
             self.as_ref().either(
-                <T as super::_puroro_traits::MsgTrait>::enum_unlabeled,
-                <U as super::_puroro_traits::MsgTrait>::enum_unlabeled,
+                |t| <T as super::_puroro_traits::MsgTrait>::enum_unlabeled(t),
+                |u| <U as super::_puroro_traits::MsgTrait>::enum_unlabeled(u),
             )
         }
         type Field10RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
@@ -406,14 +416,16 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             ::puroro_internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
-                    .map_left(<T as super::_puroro_traits::MsgTrait>::enum_repeated)
-                    .map_right(<U as super::_puroro_traits::MsgTrait>::enum_repeated),
+                    .map_left(|t| <T as super::_puroro_traits::MsgTrait>::enum_repeated(t.deref()))
+                    .map_right(|u| {
+                        <U as super::_puroro_traits::MsgTrait>::enum_repeated(u.deref())
+                    }),
             )
         }
         fn very_large_field_number<'this>(&'this self) -> i32 {
             self.as_ref().either(
-                <T as super::_puroro_traits::MsgTrait>::very_large_field_number,
-                <U as super::_puroro_traits::MsgTrait>::very_large_field_number,
+                |t| <T as super::_puroro_traits::MsgTrait>::very_large_field_number(t),
+                |u| <U as super::_puroro_traits::MsgTrait>::very_large_field_number(u),
             )
         }
     }
@@ -1093,7 +1105,7 @@ pub mod _puroro_traits {
         pub use super::super::_puroro_root::*;
     }
 
-    pub trait MsgTrait: ::std::clone::Clone {
+    pub trait MsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32;
         type Field2RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>;
@@ -1288,13 +1300,13 @@ pub mod _puroro_nested {
             where
                 T: super::_puroro_traits::SubmsgTrait,
                 U: super::_puroro_traits::SubmsgTrait,
-                DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
-                DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
+                DT: ::std::ops::Deref<Target = T>,
+                DU: ::std::ops::Deref<Target = U>,
             {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     self.as_ref().either(
-                        <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
-                        <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
+                        |t| <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(t),
+                        |u| <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(u),
                     )
                 }
             }
@@ -1318,7 +1330,7 @@ pub mod _puroro_nested {
                 pub use super::super::_puroro_root::*;
             }
 
-            pub trait SubmsgTrait: ::std::clone::Clone {
+            pub trait SubmsgTrait {
                 fn i32_unlabeled<'this>(&'this self) -> i32;
             }
         }

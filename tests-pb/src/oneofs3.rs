@@ -288,8 +288,8 @@ pub mod _puroro_impls {
     where
         T: super::_puroro_traits::MsgTrait,
         U: super::_puroro_traits::MsgTrait,
-        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
-        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
+        DT: ::std::ops::Deref<Target = T>,
+        DU: ::std::ops::Deref<Target = U>,
     {
         type Field2ScalarGetterType<'this> = ::puroro::Either<
             <T as super::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'this>,
@@ -612,13 +612,13 @@ pub mod _puroro_impls {
     where
         T: super::_puroro_traits::SubmsgTrait,
         U: super::_puroro_traits::SubmsgTrait,
-        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
-        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
+        DT: ::std::ops::Deref<Target = T>,
+        DU: ::std::ops::Deref<Target = U>,
     {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             self.as_ref().either(
-                <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
-                <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
+                |t| <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(t),
+                |u| <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(u),
             )
         }
     }
@@ -642,7 +642,7 @@ pub mod _puroro_traits {
         pub use super::super::_puroro_root::*;
     }
 
-    pub trait MsgTrait: ::std::clone::Clone {
+    pub trait MsgTrait {
         type Field2ScalarGetterType<'this>: ::std::ops::Deref<Target = str>;
         type Field4ScalarGetterType<'this>: ::std::ops::Deref<Target = str>;
         type Field5MessageType<'this>: 'this
@@ -668,7 +668,7 @@ pub mod _puroro_traits {
             ::std::option::Option::None
         }
     }
-    pub trait SubmsgTrait: ::std::clone::Clone {
+    pub trait SubmsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32;
     }
 }
@@ -684,7 +684,10 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            pub enum GroupOne<'msg, T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait> {
+            pub enum GroupOne<
+                'msg,
+                T: ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+            > {
                 G1Int32(i32),
                 G1String(<T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'msg>),
             }
@@ -708,7 +711,10 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            pub enum GroupTwo<'msg, T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait> {
+            pub enum GroupTwo<
+                'msg,
+                T: ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+            > {
                 G2F32(f32),
                 G2String(<T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'msg>),
                 G2Submsg(<T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'msg>),

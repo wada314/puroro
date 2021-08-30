@@ -110,13 +110,13 @@ pub mod _puroro_impls {
     where
         T: super::_puroro_traits::Test1Trait,
         U: super::_puroro_traits::Test1Trait,
-        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
-        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
+        DT: ::std::ops::Deref<Target = T>,
+        DU: ::std::ops::Deref<Target = U>,
     {
         fn a<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
-                <T as super::_puroro_traits::Test1Trait>::a,
-                <U as super::_puroro_traits::Test1Trait>::a,
+                |t| <T as super::_puroro_traits::Test1Trait>::a(t),
+                |u| <U as super::_puroro_traits::Test1Trait>::a(u),
             )
         }
     }
@@ -233,8 +233,8 @@ pub mod _puroro_impls {
     where
         T: super::_puroro_traits::Test2Trait,
         U: super::_puroro_traits::Test2Trait,
-        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
-        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
+        DT: ::std::ops::Deref<Target = T>,
+        DU: ::std::ops::Deref<Target = U>,
     {
         type Field2ScalarGetterType<'this> = ::puroro::Either<
             <T as super::_puroro_traits::Test2Trait>::Field2ScalarGetterType<'this>,
@@ -368,8 +368,8 @@ pub mod _puroro_impls {
     where
         T: super::_puroro_traits::Test3Trait,
         U: super::_puroro_traits::Test3Trait,
-        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
-        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
+        DT: ::std::ops::Deref<Target = T>,
+        DU: ::std::ops::Deref<Target = U>,
     {
         type Field3MessageType<'this> = ::puroro::Either<
             <T as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
@@ -503,8 +503,8 @@ pub mod _puroro_impls {
     where
         T: super::_puroro_traits::Test4Trait,
         U: super::_puroro_traits::Test4Trait,
-        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
-        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
+        DT: ::std::ops::Deref<Target = T>,
+        DU: ::std::ops::Deref<Target = U>,
     {
         type Field4RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
             <T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
@@ -514,8 +514,8 @@ pub mod _puroro_impls {
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro_internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
-                    .map_left(<T as super::_puroro_traits::Test4Trait>::d)
-                    .map_right(<U as super::_puroro_traits::Test4Trait>::d),
+                    .map_left(|t| <T as super::_puroro_traits::Test4Trait>::d(t.deref()))
+                    .map_right(|u| <U as super::_puroro_traits::Test4Trait>::d(u.deref())),
             )
         }
     }
@@ -541,18 +541,18 @@ pub mod _puroro_traits {
         pub use super::super::_puroro_root::*;
     }
 
-    pub trait Test1Trait: ::std::clone::Clone {
+    pub trait Test1Trait {
         fn a<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::default::Default::default()
         }
     }
-    pub trait Test2Trait: ::std::clone::Clone {
+    pub trait Test2Trait {
         type Field2ScalarGetterType<'this>: ::std::ops::Deref<Target = str>;
         fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
             ::std::default::Default::default()
         }
     }
-    pub trait Test3Trait: ::std::clone::Clone {
+    pub trait Test3Trait {
         type Field3MessageType<'this>: 'this + self::_puroro_root::official_samples::_puroro_traits::Test1Trait;
         type Field3ScalarGetterType<'this>: ::std::ops::Deref<
             Target = Self::Field3MessageType<'this>,
@@ -561,7 +561,7 @@ pub mod _puroro_traits {
             ::std::default::Default::default()
         }
     }
-    pub trait Test4Trait: ::std::clone::Clone {
+    pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this>;

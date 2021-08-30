@@ -2,8 +2,8 @@ impl<T, U, DT, DU> super::_puroro_traits::{{ m.trait_ident }} for ::puroro::Eith
 where
     T: super::_puroro_traits::{{ m.trait_ident }},
     U: super::_puroro_traits::{{ m.trait_ident }},
-    DT: ::std::ops::Deref<Target=T> + ::std::clone::Clone,
-    DU: ::std::ops::Deref<Target=U> + ::std::clone::Clone,
+    DT: ::std::ops::Deref<Target=T>,
+    DU: ::std::ops::Deref<Target=U>,
 {
     {%- for field in m.fields %}
     {%- call either_trait_impl_field(field) %}

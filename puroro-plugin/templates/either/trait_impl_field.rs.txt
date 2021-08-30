@@ -18,26 +18,28 @@ type Field{{ f.number }}ScalarGetterType<'this> = ::puroro_internal::Derefable<S
 {%- endif %}
 
 {%- if f.trait_has_scalar_getter %}
-fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
+{
     {%- if f.is_length_delimited %}
     todo!()
     {%- else %}
     self.as_ref().either(
-        <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }},
-        <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }},
+        |t| <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t),
+        |u| <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u),
     )
     {%- endif %}
 }
 {%- endif %}
 
 {%- if f.trait_has_optional_getter %}
-fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}> {
+fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}>
+{
     {%- if f.is_length_delimited %}
     todo!()
     {%- else %}
     self.as_ref().either(
-        <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }},
-        <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }},
+        |t| <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t),
+        |u| <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u),
     )
     {%- endif %}
 }
@@ -59,14 +61,15 @@ type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::either::
     <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
 >;
 
-fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
+fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this>
+{
     ::puroro_internal::impls::either::{{ either_repeated_field_type }}::new(self
         .as_ref()
         .map_left(
-            <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}
+            |t| <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t.deref())
         )
         .map_right(
-            <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}
+            |u| <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u.deref())
         )
     )
 }

@@ -1,6 +1,6 @@
 pub enum {{ enum_ident }}
 {%- if has_reference_field %}
-<'msg, T: {{ owner_message_trait_path }}>
+<'msg, T: ?Sized + {{ owner_message_trait_path }}>
 {%- else %}
 {%- endif %}
 {

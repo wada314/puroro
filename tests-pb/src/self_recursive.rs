@@ -121,8 +121,8 @@ pub mod _puroro_impls {
     where
         T: super::_puroro_traits::MsgTrait,
         U: super::_puroro_traits::MsgTrait,
-        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
-        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
+        DT: ::std::ops::Deref<Target = T>,
+        DU: ::std::ops::Deref<Target = U>,
     {
         type Field1MessageType<'this> = ::puroro::Either<
             <T as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
@@ -163,7 +163,7 @@ pub mod _puroro_traits {
         pub use super::super::_puroro_root::*;
     }
 
-    pub trait MsgTrait: ::std::clone::Clone {
+    pub trait MsgTrait {
         type Field1MessageType<'this>: 'this
             + self::_puroro_root::self_recursive::_puroro_traits::MsgTrait;
         type Field1ScalarGetterType<'this>: ::std::ops::Deref<
