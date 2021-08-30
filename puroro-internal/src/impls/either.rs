@@ -1,3 +1,4 @@
+use crate::Derefable;
 use ::puroro::{Either, RepeatedField};
 use ::std::ops::Deref;
 
@@ -44,6 +45,32 @@ where
     }
 }
 
+pub struct EitherRepeatedMessageField<T, U>(Either<T, U>);
+impl<T, U> EitherRepeatedMessageField<T, U> {
+    pub fn new(from: Either<T, U>) -> Self {
+        Self(from)
+    }
+}
+impl<'msg, T, U> IntoIterator for EitherRepeatedMessageField<T, U>
+where
+    T: RepeatedField<'msg> + IntoIterator,
+    U: RepeatedField<'msg> + IntoIterator,
+    <T as IntoIterator>::Item: Deref,
+    <U as IntoIterator>::Item: Deref,
+{
+    type Item = Derefable<Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>>;
+    type IntoIter = DerefableIter<
+        IndependentEitherIter<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>,
+    >;
+    fn into_iter(self) -> Self::IntoIter {
+        DerefableIter(IndependentEitherIter(
+            self.0
+                .map_left(|t| t.into_iter())
+                .map_right(|u| u.into_iter()),
+        ))
+    }
+}
+
 pub struct IndependentEitherIter<T, U>(
     Either<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>,
 )
@@ -62,5 +89,13 @@ where
             |t| t.next().map(|l| Either::Left(l)),
             |u| u.next().map(|r| Either::Right(r)),
         )
+    }
+}
+
+pub struct DerefableIter<I>(I);
+impl<I: Iterator> Iterator for DerefableIter<I> {
+    type Item = Derefable<<I as Iterator>::Item>;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.next().map(|v| Derefable::new(v))
     }
 }

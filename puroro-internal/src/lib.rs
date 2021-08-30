@@ -11,6 +11,11 @@ use ::std::ops::Deref;
 pub use ::puroro::{bumpalo, hashbrown};
 
 pub struct Derefable<T>(T);
+impl<T> Derefable<T> {
+    fn new(v: T) -> Self {
+        Self(v)
+    }
+}
 impl<T> Deref for Derefable<T> {
     type Target = T;
     fn deref(&self) -> &Self::Target {

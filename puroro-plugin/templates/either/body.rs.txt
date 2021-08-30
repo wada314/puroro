@@ -3,14 +3,6 @@ impl<T, U> super::_puroro_traits::{{ m.trait_ident }} for ::puroro::Either<T, U>
 where
     T: super::_puroro_traits::{{ m.trait_ident }},
     U: super::_puroro_traits::{{ m.trait_ident }},
-    {%- for field in m.fields %}
-    {%- if field.trait_has_repeated_getter && field.is_length_delimited %}
-    for <'a> <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'a>:
-        ::std::iter::IntoIterator<
-            Item = <<U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'a> as ::std::iter::IntoIterator>::Item
-        >,
-    {%- endif %}
-    {%- endfor %}
 {
     {%- for field in m.fields %}
 
@@ -62,7 +54,11 @@ where
     {%- if field.trait_has_repeated_getter %}
     {%- let either_repeated_field_type %}
     {%- if field.is_length_delimited %}
+    {%- if field.is_message %}
+    {%- let either_repeated_field_type = "EitherRepeatedMessageField" %}
+    {%- else %}
     {%- let either_repeated_field_type = "EitherRepeatedLDField" %}
+    {%- endif %}
     {%- else %}
     {%- let either_repeated_field_type = "EitherRepeatedField" %}
     {%- endif %}
