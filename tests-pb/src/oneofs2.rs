@@ -301,7 +301,8 @@ pub mod _puroro_impls {
             <T as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
         >;
-        type Field5ScalarGetterType<'this>;
+        type Field5ScalarGetterType<'this> =
+            ::puroro_internal::Derefable<Self::Field5MessageType<'this>>;
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>

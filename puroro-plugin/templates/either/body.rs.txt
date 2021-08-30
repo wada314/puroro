@@ -3,6 +3,14 @@ impl<T, U> super::_puroro_traits::{{ m.trait_ident }} for ::puroro::Either<T, U>
 where
     T: super::_puroro_traits::{{ m.trait_ident }},
     U: super::_puroro_traits::{{ m.trait_ident }},
+    {%- for field in m.fields %}
+    {%- if field.trait_has_repeated_getter && field.is_length_delimited %}
+    for <'a> <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'a>:
+        ::std::iter::IntoIterator<
+            Item = <<U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'a> as ::std::iter::IntoIterator>::Item
+        >,
+    {%- endif %}
+    {%- endfor %}
 {
     {%- for field in m.fields %}
 
@@ -22,7 +30,7 @@ where
     >;
     {%- endif %}
     {%- if field.is_message %}
-    type Field{{ field.number }}ScalarGetterType<'this>: ::puroro_internal::Derefable<Self::Field{{ field.number }}MessageType<'this>>;
+    type Field{{ field.number }}ScalarGetterType<'this> = ::puroro_internal::Derefable<Self::Field{{ field.number }}MessageType<'this>>;
     {%- endif %}
 
     {%- if field.trait_has_scalar_getter %}
@@ -53,8 +61,8 @@ where
 
     {%- if field.trait_has_repeated_getter %}
     {%- let either_repeated_field_type %}
-    {%- if field.is_message %}
-    {%- let either_repeated_field_type = "EitherRepeatedMessageField" %}
+    {%- if field.is_length_delimited %}
+    {%- let either_repeated_field_type = "EitherRepeatedLDField" %}
     {%- else %}
     {%- let either_repeated_field_type = "EitherRepeatedField" %}
     {%- endif %}

@@ -369,7 +369,8 @@ pub mod _puroro_impls {
             <T as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
             <U as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
         >;
-        type Field3ScalarGetterType<'this>;
+        type Field3ScalarGetterType<'this> =
+            ::puroro_internal::Derefable<Self::Field3MessageType<'this>>;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
             todo!()
         }

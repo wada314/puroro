@@ -1,5 +1,4 @@
 use ::puroro::{Either, RepeatedField};
-use ::std::marker::PhantomData;
 use ::std::ops::Deref;
 
 pub struct EitherRepeatedField<T, U>(Either<T, U>);
@@ -20,18 +19,18 @@ where
     }
 }
 
-pub struct EitherRepeatedLDField<B: ?Sized, T, U>(Either<T, U>, PhantomData<B>);
-impl<B: ?Sized, T, U> EitherRepeatedLDField<B, T, U> {
+pub struct EitherRepeatedLDField<T, U>(Either<T, U>);
+impl<T, U> EitherRepeatedLDField<T, U> {
     pub fn new(from: Either<T, U>) -> Self {
-        Self(from, PhantomData)
+        Self(from)
     }
 }
-impl<'msg, B: ?Sized, T, U> IntoIterator for EitherRepeatedLDField<B, T, U>
+impl<'msg, T, U> IntoIterator for EitherRepeatedLDField<T, U>
 where
     T: RepeatedField<'msg> + IntoIterator,
     U: RepeatedField<'msg> + IntoIterator,
-    <T as IntoIterator>::Item: Deref<Target = B>,
-    <U as IntoIterator>::Item: Deref<Target = B>,
+    <T as IntoIterator>::Item: Deref<Target = <<U as IntoIterator>::Item as Deref>::Target>,
+    <U as IntoIterator>::Item: Deref,
 {
     type Item = Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>;
     type IntoIter =

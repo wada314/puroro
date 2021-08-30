@@ -242,7 +242,8 @@ pub mod _puroro_impls {
             <T as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>,
             <U as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>,
         >;
-        type Field6ScalarGetterType<'this>;
+        type Field6ScalarGetterType<'this> =
+            ::puroro_internal::Derefable<Self::Field6MessageType<'this>>;
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
