@@ -21,12 +21,8 @@ impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_single_field_iden
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
         ::std::option::Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
-            {%- if oneof.has_message_field %}
-            <'this, Self>
-            {%- else %}
             {%- if oneof.has_reference_field %}
-            <'this>
-            {%- endif %}
+            <'this, Self>
             {%- endif %}
         >
     {

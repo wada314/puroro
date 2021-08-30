@@ -33,10 +33,13 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimple {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimple {
+        type Field2ScalarGetterType<'this> = &'this str;
+        type Field4ScalarGetterType<'this> = &'this str;
         type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgSimple;
+        type Field5ScalarGetterType<'this> = &'this Self::Field5MessageType<'this>;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
         {
             self.group_one
                 .as_ref()
@@ -229,10 +232,13 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgEmpty {}
 
     impl super::_puroro_traits::MsgTrait for MsgEmpty {
+        type Field2ScalarGetterType<'this> = &'static str;
+        type Field4ScalarGetterType<'this> = &'static str;
         type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
+        type Field5ScalarGetterType<'this> = &'static Self::Field5MessageType<'this>;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
         {
             None
         }
@@ -295,32 +301,7 @@ pub mod _puroro_impls {
         >;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
-        {
-            todo!()
-        }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_three<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            todo!()
-        }
-    }
-
-    impl<'a, T> super::_puroro_traits::MsgTrait for ::std::borrow::Cow<'a, T>
-    where
-        T: 'a + ::std::clone::Clone + super::_puroro_traits::MsgTrait,
-    {
-        type Field5MessageType<'this> =
-            <T as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>;
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
         {
             todo!()
         }
@@ -345,10 +326,13 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField1 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
+        type Field2ScalarGetterType<'this> = &'static str;
+        type Field4ScalarGetterType<'this> = &'static str;
         type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
+        type Field5ScalarGetterType<'this> = &'static Self::Field5MessageType<'this>;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
         {
             todo!()
         }
@@ -373,10 +357,13 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField2 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField2 {
+        type Field2ScalarGetterType<'this> = &'this str;
+        type Field4ScalarGetterType<'this> = &'static str;
         type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
+        type Field5ScalarGetterType<'this> = &'static Self::Field5MessageType<'this>;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
         {
             todo!()
         }
@@ -401,10 +388,13 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField3 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField3 {
+        type Field2ScalarGetterType<'this> = &'static str;
+        type Field4ScalarGetterType<'this> = &'static str;
         type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
+        type Field5ScalarGetterType<'this> = &'static Self::Field5MessageType<'this>;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
         {
             todo!()
         }
@@ -429,10 +419,13 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField4 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField4 {
+        type Field2ScalarGetterType<'this> = &'static str;
+        type Field4ScalarGetterType<'this> = &'this str;
         type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
+        type Field5ScalarGetterType<'this> = &'static Self::Field5MessageType<'this>;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
         {
             todo!()
         }
@@ -459,10 +452,13 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField5 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField5 {
+        type Field2ScalarGetterType<'this> = &'static str;
+        type Field4ScalarGetterType<'this> = &'static str;
         type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgSimple;
+        type Field5ScalarGetterType<'this> = &'this Self::Field5MessageType<'this>;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
         {
             todo!()
         }
@@ -487,10 +483,13 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField6 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField6 {
+        type Field2ScalarGetterType<'this> = &'static str;
+        type Field4ScalarGetterType<'this> = &'static str;
         type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
+        type Field5ScalarGetterType<'this> = &'static Self::Field5MessageType<'this>;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
         {
             todo!()
         }
@@ -568,7 +567,11 @@ pub mod _puroro_impls {
 
     impl ::puroro::Message for SubmsgEmpty {}
 
-    impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {}
+    impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+    }
 
     impl ::puroro::SerToIoWrite for SubmsgEmpty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
@@ -612,16 +615,6 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'a, T> super::_puroro_traits::SubmsgTrait for ::std::borrow::Cow<'a, T>
-    where
-        T: 'a + ::std::clone::Clone + super::_puroro_traits::SubmsgTrait,
-    {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            use std::ops::Deref;
-            self.deref().i32_unlabeled()
-        }
-    }
-
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct SubmsgSimpleField1 {
         i32_unlabeled: i32,
@@ -642,11 +635,16 @@ pub mod _puroro_traits {
     }
 
     pub trait MsgTrait: ::std::clone::Clone {
+        type Field2ScalarGetterType<'this>: ::std::ops::Deref<Target = str>;
+        type Field4ScalarGetterType<'this>: ::std::ops::Deref<Target = str>;
         type Field5MessageType<'this>: 'this
             + self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait;
+        type Field5ScalarGetterType<'this>: ::std::ops::Deref<
+            Target = Self::Field5MessageType<'this>,
+        >;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this>>
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
         {
             ::std::option::Option::None
         }
@@ -663,9 +661,7 @@ pub mod _puroro_traits {
         }
     }
     pub trait SubmsgTrait: ::std::clone::Clone {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
+        fn i32_unlabeled<'this>(&'this self) -> i32;
     }
 }
 pub use _puroro_nested::*;
@@ -680,9 +676,9 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            pub enum GroupOne<'msg> {
+            pub enum GroupOne<'msg, T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait> {
                 G1Int32(i32),
-                G1String(::std::borrow::Cow<'msg, str>),
+                G1String(<T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'msg>),
             }
 
             #[allow(non_camel_case_types)]
@@ -692,22 +688,22 @@ pub mod _puroro_nested {
                 G1String(::std::string::String),
             }
 
-            impl<'msg> ::std::convert::From<&'msg GroupOne_Simple> for GroupOne<'msg> {
+            impl<'msg> ::std::convert::From<&'msg GroupOne_Simple>
+                for GroupOne<'msg, self::_puroro_root::oneofs3::_puroro_impls::MsgSimple>
+            {
                 fn from(from: &'msg GroupOne_Simple) -> Self {
                     match from {
                         GroupOne_Simple::G1Int32(v) => {
                             GroupOne::G1Int32(::std::clone::Clone::clone(&v))
                         }
-                        GroupOne_Simple::G1String(v) => {
-                            GroupOne::G1String(::std::borrow::Cow::Borrowed(v.as_ref()))
-                        }
+                        GroupOne_Simple::G1String(v) => GroupOne::G1String(v.as_ref()),
                     }
                 }
             }
             pub enum GroupTwo<'msg, T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait> {
                 G2F32(f32),
-                G2String(::std::borrow::Cow<'msg, str>),
-                G2Submsg(::std::borrow::Cow<'msg, <T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5MessageType<'msg>>),
+                G2String(<T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'msg>),
+                G2Submsg(<T as self::_puroro_root::oneofs3::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'msg>),
             }
 
             #[allow(non_camel_case_types)]
@@ -728,12 +724,8 @@ pub mod _puroro_nested {
                         GroupTwo_Simple::G2F32(v) => {
                             GroupTwo::G2F32(::std::clone::Clone::clone(&v))
                         }
-                        GroupTwo_Simple::G2String(v) => {
-                            GroupTwo::G2String(::std::borrow::Cow::Borrowed(v.as_ref()))
-                        }
-                        GroupTwo_Simple::G2Submsg(v) => {
-                            GroupTwo::G2Submsg(::std::borrow::Cow::Borrowed(v.as_ref()))
-                        }
+                        GroupTwo_Simple::G2String(v) => GroupTwo::G2String(v.as_ref()),
+                        GroupTwo_Simple::G2Submsg(v) => GroupTwo::G2Submsg(v.as_ref()),
                     }
                 }
             }

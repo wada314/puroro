@@ -4,10 +4,20 @@ type Field{{ f.number }}MessageType<'this> = {{ struct_path }};
 {%- else %}
 {%- endmatch %}
 
+{%- if f.is_bytes %}
+type Field{{ f.number }}ScalarGetterType<'this> = &'this [u8];
+{%- endif %}
+{%- if f.is_string %}
+type Field{{ f.number }}ScalarGetterType<'this> = &'this str;
+{%- endif %}
+{%- if f.is_message %}
+type Field{{ f.number }}ScalarGetterType<'this> = &'this Self::Field{{ f.number }}MessageType<'this>;
+{%- endif %}
+
 {%- if f.trait_has_scalar_getter %}
 fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
     {%- if f.is_length_delimited %}
-    ::std::borrow::Cow::Borrowed(&self.{{ f.ident }})
+    &self.{{ f.ident }}
     {%- else %}
     ::std::clone::Clone::clone(&self.{{ f.ident }})
     {%- endif %}
@@ -17,11 +27,7 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
 {%- if f.trait_has_optional_getter %}
 fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}> {
     {%- if f.is_length_delimited %}
-    {%- if f.is_message %}
-    self.{{ f.ident }}.as_ref().map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
-    {%- else %}
-    self.{{ f.ident }}.as_ref().map(|v| ::std::borrow::Cow::Borrowed(v.as_ref()))
-    {%- endif %}
+    self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
     {%- else %}
     ::std::clone::Clone::clone(&self.{{ f.ident }})
     {%- endif %}

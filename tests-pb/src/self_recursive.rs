@@ -23,13 +23,11 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSimple {
         type Field1MessageType<'this> =
             self::_puroro_root::self_recursive::_puroro_impls::MsgSimple;
+        type Field1ScalarGetterType<'this> = &'this Self::Field1MessageType<'this>;
         fn recursive_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>>
-        {
-            self.recursive_unlabeled
-                .as_ref()
-                .map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+            self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
 
@@ -87,6 +85,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgEmpty {
         type Field1MessageType<'this> = self::_puroro_root::self_recursive::_puroro_impls::MsgEmpty;
+        type Field1ScalarGetterType<'this> = &'static Self::Field1MessageType<'this>;
     }
 
     impl ::puroro::SerToIoWrite for MsgEmpty {
@@ -135,24 +134,8 @@ pub mod _puroro_impls {
         >;
         fn recursive_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>>
-        {
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
             todo!()
-        }
-    }
-
-    impl<'a, T> super::_puroro_traits::MsgTrait for ::std::borrow::Cow<'a, T>
-    where
-        T: 'a + ::std::clone::Clone + super::_puroro_traits::MsgTrait,
-    {
-        type Field1MessageType<'this> =
-            <T as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>;
-        fn recursive_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>>
-        {
-            use std::ops::Deref;
-            self.deref().recursive_unlabeled()
         }
     }
 
@@ -168,13 +151,11 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
         type Field1MessageType<'this> =
             self::_puroro_root::self_recursive::_puroro_impls::MsgSimple;
+        type Field1ScalarGetterType<'this> = &'this Self::Field1MessageType<'this>;
         fn recursive_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>>
-        {
-            self.recursive_unlabeled
-                .as_ref()
-                .map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+            self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
 }
@@ -187,10 +168,12 @@ pub mod _puroro_traits {
     pub trait MsgTrait: ::std::clone::Clone {
         type Field1MessageType<'this>: 'this
             + self::_puroro_root::self_recursive::_puroro_traits::MsgTrait;
+        type Field1ScalarGetterType<'this>: ::std::ops::Deref<
+            Target = Self::Field1MessageType<'this>,
+        >;
         fn recursive_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field1MessageType<'this>>>
-        {
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
             ::std::default::Default::default()
         }
     }

@@ -150,6 +150,8 @@ struct Field {
     ident: String,
     number: i32,
     is_message: bool,
+    is_string: bool,
+    is_bytes: bool,
     is_length_delimited: bool,
     is_explicit_oneof_field: bool,
     trait_has_scalar_getter: bool,
@@ -189,6 +191,8 @@ impl Field {
             ident: f.rust_ident().to_string(),
             number: f.number(),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
+            is_string: matches!(f.field_type()?, wrappers::FieldType::String),
+            is_bytes: matches!(f.field_type()?, wrappers::FieldType::Bytes),
             is_length_delimited: matches!(
                 f.field_type()?,
                 wrappers::FieldType::Bytes

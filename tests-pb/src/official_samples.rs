@@ -119,16 +119,6 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'a, T> super::_puroro_traits::Test1Trait for ::std::borrow::Cow<'a, T>
-    where
-        T: 'a + ::std::clone::Clone + super::_puroro_traits::Test1Trait,
-    {
-        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-            use std::ops::Deref;
-            self.deref().a()
-        }
-    }
-
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test1SimpleField1 {
         a: ::std::option::Option<i32>,
@@ -150,10 +140,9 @@ pub mod _puroro_impls {
     impl ::puroro::Message for Test2Simple {}
 
     impl super::_puroro_traits::Test2Trait for Test2Simple {
-        fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
-            self.b
-                .as_ref()
-                .map(|v| ::std::borrow::Cow::Borrowed(v.as_ref()))
+        type Field2ScalarGetterType<'this> = &'this str;
+        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
+            self.b.as_ref().map(|v| v.as_ref())
         }
     }
 
@@ -205,7 +194,9 @@ pub mod _puroro_impls {
 
     impl ::puroro::Message for Test2Empty {}
 
-    impl super::_puroro_traits::Test2Trait for Test2Empty {}
+    impl super::_puroro_traits::Test2Trait for Test2Empty {
+        type Field2ScalarGetterType<'this> = &'static str;
+    }
 
     impl ::puroro::SerToIoWrite for Test2Empty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
@@ -241,21 +232,11 @@ pub mod _puroro_impls {
         T: super::_puroro_traits::Test2Trait,
         U: super::_puroro_traits::Test2Trait,
     {
-        fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
+        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
             self.as_ref().either(
                 <T as super::_puroro_traits::Test2Trait>::b,
                 <U as super::_puroro_traits::Test2Trait>::b,
             )
-        }
-    }
-
-    impl<'a, T> super::_puroro_traits::Test2Trait for ::std::borrow::Cow<'a, T>
-    where
-        T: 'a + ::std::clone::Clone + super::_puroro_traits::Test2Trait,
-    {
-        fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
-            use std::ops::Deref;
-            self.deref().b()
         }
     }
 
@@ -267,10 +248,9 @@ pub mod _puroro_impls {
     impl ::puroro::Message for Test2SimpleField2 {}
 
     impl super::_puroro_traits::Test2Trait for Test2SimpleField2 {
-        fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
-            self.b
-                .as_ref()
-                .map(|v| ::std::borrow::Cow::Borrowed(v.as_ref()))
+        type Field2ScalarGetterType<'this> = &'this str;
+        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
+            self.b.as_ref().map(|v| v.as_ref())
         }
     }
     #[derive(
@@ -286,13 +266,9 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::Test3Trait for Test3Simple {
         type Field3MessageType<'this> =
             self::_puroro_root::official_samples::_puroro_impls::Test1Simple;
-        fn c<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
-        {
-            self.c
-                .as_ref()
-                .map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
+        type Field3ScalarGetterType<'this> = &'this Self::Field3MessageType<'this>;
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
+            self.c.as_ref().map(|v| v.as_ref())
         }
     }
 
@@ -351,6 +327,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::Test3Trait for Test3Empty {
         type Field3MessageType<'this> =
             self::_puroro_root::official_samples::_puroro_impls::Test1Empty;
+        type Field3ScalarGetterType<'this> = &'static Self::Field3MessageType<'this>;
     }
 
     impl ::puroro::SerToIoWrite for Test3Empty {
@@ -397,26 +374,8 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
             >,
         >;
-        fn c<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
-        {
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
             todo!()
-        }
-    }
-
-    impl<'a, T> super::_puroro_traits::Test3Trait for ::std::borrow::Cow<'a, T>
-    where
-        T: 'a + ::std::clone::Clone + super::_puroro_traits::Test3Trait,
-    {
-        type Field3MessageType<'this> =
-            <T as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>;
-        fn c<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
-        {
-            use std::ops::Deref;
-            self.deref().c()
         }
     }
 
@@ -432,13 +391,9 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::Test3Trait for Test3SimpleField3 {
         type Field3MessageType<'this> =
             self::_puroro_root::official_samples::_puroro_impls::Test1Simple;
-        fn c<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
-        {
-            self.c
-                .as_ref()
-                .map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
+        type Field3ScalarGetterType<'this> = &'this Self::Field3MessageType<'this>;
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
+            self.c.as_ref().map(|v| v.as_ref())
         }
     }
     #[derive(
@@ -560,19 +515,6 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'a, T> super::_puroro_traits::Test4Trait for ::std::borrow::Cow<'a, T>
-    where
-        T: 'a + ::std::clone::Clone + super::_puroro_traits::Test4Trait,
-    {
-        type Field4RepeatedType<'this> =
-            <T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>;
-
-        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            use std::ops::Deref;
-            self.deref().d()
-        }
-    }
-
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test4SimpleField4 {
         d: ::std::vec::Vec<i32>,
@@ -600,25 +542,24 @@ pub mod _puroro_traits {
         }
     }
     pub trait Test2Trait: ::std::clone::Clone {
-        fn b<'this>(&'this self) -> ::std::option::Option<::std::borrow::Cow<'this, str>> {
+        type Field2ScalarGetterType<'this>: ::std::ops::Deref<Target = str>;
+        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
             ::std::default::Default::default()
         }
     }
     pub trait Test3Trait: ::std::clone::Clone {
         type Field3MessageType<'this>: 'this + self::_puroro_root::official_samples::_puroro_traits::Test1Trait;
-        fn c<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field3MessageType<'this>>>
-        {
+        type Field3ScalarGetterType<'this>: ::std::ops::Deref<
+            Target = Self::Field3MessageType<'this>,
+        >;
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
             ::std::default::Default::default()
         }
     }
     pub trait Test4Trait: ::std::clone::Clone {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>;
-        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            todo!()
-        }
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
     }
 }
 pub use _puroro_nested::*;

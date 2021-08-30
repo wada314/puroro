@@ -41,18 +41,17 @@ pub mod _puroro_impls {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             ::std::clone::Clone::clone(&self.f32_unlabeled)
         }
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
-            ::std::borrow::Cow::Borrowed(&self.string_unlabeled)
+        type Field5ScalarGetterType<'this> = &'this str;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
+            &self.string_unlabeled
         }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgSimple;
+        type Field6ScalarGetterType<'this> = &'this Self::Field6MessageType<'this>;
         fn submsg_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
-        {
-            self.submsg_unlabeled
-                .as_ref()
-                .map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
+        ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
+            self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
 
@@ -149,12 +148,23 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgEmpty {}
 
     impl super::_puroro_traits::MsgTrait for MsgEmpty {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        type Field5ScalarGetterType<'this> = &'static str;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
+            ""
+        }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
+        type Field6ScalarGetterType<'this> = &'static Self::Field6MessageType<'this>;
     }
 
     impl ::puroro::SerToIoWrite for MsgEmpty {
@@ -221,7 +231,7 @@ pub mod _puroro_impls {
                 <U as super::_puroro_traits::MsgTrait>::f32_unlabeled,
             )
         }
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
             self.as_ref().either(
                 <T as super::_puroro_traits::MsgTrait>::string_unlabeled,
                 <U as super::_puroro_traits::MsgTrait>::string_unlabeled,
@@ -239,47 +249,8 @@ pub mod _puroro_impls {
         >;
         fn submsg_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
-        {
+        ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
             todo!()
-        }
-    }
-
-    impl<'a, T> super::_puroro_traits::MsgTrait for ::std::borrow::Cow<'a, T>
-    where
-        T: 'a + ::std::clone::Clone + super::_puroro_traits::MsgTrait,
-    {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            use std::ops::Deref;
-            self.deref().i32_unlabeled()
-        }
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            use std::ops::Deref;
-            self.deref().i32_optional()
-        }
-        type Field3RepeatedType<'this> =
-            <T as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>;
-
-        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            use std::ops::Deref;
-            self.deref().i32_repeated()
-        }
-        fn f32_unlabeled<'this>(&'this self) -> f32 {
-            use std::ops::Deref;
-            self.deref().f32_unlabeled()
-        }
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
-            use std::ops::Deref;
-            self.deref().string_unlabeled()
-        }
-        type Field6MessageType<'this> =
-            <T as super::_puroro_traits::MsgTrait>::Field6MessageType<'this>;
-        fn submsg_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
-        {
-            use std::ops::Deref;
-            self.deref().submsg_unlabeled()
         }
     }
 
@@ -298,8 +269,16 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        type Field5ScalarGetterType<'this> = &'static str;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
+            ""
+        }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
+        type Field6ScalarGetterType<'this> = &'static Self::Field6MessageType<'this>;
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -310,6 +289,9 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField2 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField2 {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::clone::Clone::clone(&self.i32_optional)
         }
@@ -317,8 +299,16 @@ pub mod _puroro_impls {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        type Field5ScalarGetterType<'this> = &'static str;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
+            ""
+        }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
+        type Field6ScalarGetterType<'this> = &'static Self::Field6MessageType<'this>;
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -329,13 +319,24 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField3 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField3 {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         type Field3RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             self.i32_repeated.iter().cloned()
         }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        type Field5ScalarGetterType<'this> = &'static str;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
+            ""
+        }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
+        type Field6ScalarGetterType<'this> = &'static Self::Field6MessageType<'this>;
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -346,6 +347,9 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField4 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField4 {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
@@ -353,8 +357,13 @@ pub mod _puroro_impls {
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             ::std::clone::Clone::clone(&self.f32_unlabeled)
         }
+        type Field5ScalarGetterType<'this> = &'static str;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
+            ""
+        }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
+        type Field6ScalarGetterType<'this> = &'static Self::Field6MessageType<'this>;
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -365,15 +374,23 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField5 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField5 {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
-            ::std::borrow::Cow::Borrowed(&self.string_unlabeled)
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        type Field5ScalarGetterType<'this> = &'this str;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
+            &self.string_unlabeled
         }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
+        type Field6ScalarGetterType<'this> = &'static Self::Field6MessageType<'this>;
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -386,19 +403,27 @@ pub mod _puroro_impls {
     impl ::puroro::Message for MsgSimpleField6 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField6 {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
         type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            ::std::default::Default::default()
+        }
+        type Field5ScalarGetterType<'this> = &'static str;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
+            ""
+        }
         type Field6MessageType<'this> =
             self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgSimple;
+        type Field6ScalarGetterType<'this> = &'this Self::Field6MessageType<'this>;
         fn submsg_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
-        {
-            self.submsg_unlabeled
-                .as_ref()
-                .map(|boxed| ::std::borrow::Cow::Borrowed(boxed.as_ref()))
+        ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
+            self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
     #[derive(
@@ -463,7 +488,11 @@ pub mod _puroro_impls {
 
     impl ::puroro::Message for SubmsgEmpty {}
 
-    impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {}
+    impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            ::std::default::Default::default()
+        }
+    }
 
     impl ::puroro::SerToIoWrite for SubmsgEmpty {
         fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
@@ -507,16 +536,6 @@ pub mod _puroro_impls {
         }
     }
 
-    impl<'a, T> super::_puroro_traits::SubmsgTrait for ::std::borrow::Cow<'a, T>
-    where
-        T: 'a + ::std::clone::Clone + super::_puroro_traits::SubmsgTrait,
-    {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            use std::ops::Deref;
-            self.deref().i32_unlabeled()
-        }
-    }
-
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct SubmsgSimpleField1 {
         i32_unlabeled: i32,
@@ -537,35 +556,28 @@ pub mod _puroro_traits {
     }
 
     pub trait MsgTrait: ::std::clone::Clone {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
+        fn i32_unlabeled<'this>(&'this self) -> i32;
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
             ::std::default::Default::default()
         }
         type Field3RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            todo!()
-        }
-        fn f32_unlabeled<'this>(&'this self) -> f32 {
-            ::std::default::Default::default()
-        }
-        fn string_unlabeled<'this>(&'this self) -> ::std::borrow::Cow<'this, str> {
-            ::std::default::Default::default()
-        }
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
+        fn f32_unlabeled<'this>(&'this self) -> f32;
+        type Field5ScalarGetterType<'this>: ::std::ops::Deref<Target = str>;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this>;
         type Field6MessageType<'this>: 'this + self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait;
+        type Field6ScalarGetterType<'this>: ::std::ops::Deref<
+            Target = Self::Field6MessageType<'this>,
+        >;
         fn submsg_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<::std::borrow::Cow<'this, Self::Field6MessageType<'this>>>
-        {
+        ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
             ::std::default::Default::default()
         }
     }
     pub trait SubmsgTrait: ::std::clone::Clone {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            ::std::default::Default::default()
-        }
+        fn i32_unlabeled<'this>(&'this self) -> i32;
     }
 }
 pub use _puroro_nested::*;

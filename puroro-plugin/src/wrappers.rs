@@ -645,15 +645,10 @@ impl Field {
             FieldType::SFixed64 => "i64".to_string(),
             FieldType::Bool => "bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => "::std::borrow::Cow<'this, str>".to_string(),
-            FieldType::Bytes => "::std::borrow::Cow<'this, [u8]>".to_string(),
-            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
-            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::Message(m) => format!(
-                "::std::borrow::Cow<\
-                    'this, Self::Field{number}MessageType<'this>\
-                >",
-                number = self.number(),
+            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
+            FieldType::String | FieldType::Bytes | FieldType::Message(_) => format!(
+                "Self::Field{number}ScalarGetterType<'this>",
+                number = self.number()
             ),
         })
     }
@@ -673,13 +668,9 @@ impl Field {
             FieldType::SFixed64 => "i64".to_string(),
             FieldType::Bool => "bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => format!("::std::borrow::Cow<{}, str>", lt),
-            FieldType::Bytes => format!("::std::borrow::Cow<{}, [u8]>", lt),
-            FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
-            FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::Message(m) => format!(
-                "::std::borrow::Cow<{lt}, \
-                    <{trait_impl} as {trait_path}>::Field{number}MessageType<{lt}>>",
+            FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
+            FieldType::String | FieldType::Bytes | FieldType::Message(_) => format!(
+                "<{trait_impl} as {trait_path}>::Field{number}ScalarGetterType<{lt}>",
                 lt = lt,
                 trait_impl = trait_impl,
                 trait_path = self.message()?.rust_trait_path(),

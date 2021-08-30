@@ -4,6 +4,31 @@ type Field{{ f.number }}MessageType<'this> = {{ struct_path }};
 {%- else %}
 {%- endmatch %}
 
+{%- if f.is_bytes %}
+type Field{{ f.number }}ScalarGetterType<'this> = &'static [u8];
+{%- endif %}
+{%- if f.is_string %}
+type Field{{ f.number }}ScalarGetterType<'this> = &'static str;
+{%- endif %}
+{%- if f.is_message %}
+type Field{{ f.number }}ScalarGetterType<'this> = &'static Self::Field{{ f.number }}MessageType<'this>;
+{%- endif %}
+
+{%- if f.trait_has_scalar_getter %}
+fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+    {%- if f.is_bytes %}
+    &[]
+    {%- endif %}
+    {%- if f.is_string %}
+    ""
+    {%- endif %}
+    {#- No need to consider message type case here, message is always wrapped by Optional -#}
+    {%- if !f.is_length_delimited %}
+    ::std::default::Default::default()
+    {%- endif %}
+}
+{%- endif %}
+
 {%- if f.trait_has_repeated_getter %}
 type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<{{ f.trait_scalar_getter_type }}>;
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {

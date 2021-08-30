@@ -1,10 +1,7 @@
 pub enum {{ enum_ident }}
-{%- if has_message_field %}
+{%- if has_reference_field %}
 <'msg, T: {{ owner_message_trait_path }}>
 {%- else %}
-{%- if has_reference_field %}
-<'msg>
-{%- endif %}
 {%- endif %}
 {
     {%- for field in fields %}
@@ -23,12 +20,8 @@ pub enum {{ enum_ident }}_Simple
 
 impl<'msg> ::std::convert::From<&'msg {{ enum_ident }}_Simple> 
 for {{ enum_ident }}
-{%- if has_message_field %}
-    <'msg, {{ simple_owner_message_path }}>
-{%- else %}
-    {%- if has_reference_field %}
-        <'msg>
-    {%- endif %}
+{%- if has_reference_field %}
+<'msg, {{ simple_owner_message_path }}>
 {%- endif %}
 {
     fn from(from: &'msg {{ enum_ident }}_Simple) -> Self {
@@ -36,7 +29,7 @@ for {{ enum_ident }}
             {%- for field in fields %}
             {{ enum_ident }}_Simple::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(
                 {%- if field.is_length_delimited %}
-                ::std::borrow::Cow::Borrowed(v.as_ref())
+                v.as_ref()
                 {%- else %}
                 ::std::clone::Clone::clone(&v)
                 {%- endif %}
