@@ -84,25 +84,24 @@ pub mod _puroro_impls {
         {
             ::std::result::Result::Ok(())
         }
-    }
+    } /*
     pub struct Test1Merged<T, U> {
-        t: T,
-        u: U,
+    t: T,
+    u: U,
     }
 
     impl<T, U> Test1Merged<T, U> {
-        pub fn new(t: T, u: U) -> Self {
-            Self { t, u }
-        }
+    pub fn new(t: T, u: U) -> Self {
+    Self { t, u }
+    }
     }
 
     impl<T, U> ::puroro::Message for Test1Merged<T, U> {}
 
-    /*
     impl<T, U> super::_puroro_traits::Test1Trait for Test1Merged<T, U>
     where
-        T: super::_puroro_traits::Test1Trait,
-        U: super::_puroro_traits::Test1Trait,
+    T: super::_puroro_traits::Test1Trait,
+    U: super::_puroro_traits::Test1Trait,
     {
     }
     */
@@ -207,25 +206,24 @@ pub mod _puroro_impls {
         {
             ::std::result::Result::Ok(())
         }
-    }
+    } /*
     pub struct Test2Merged<T, U> {
-        t: T,
-        u: U,
+    t: T,
+    u: U,
     }
 
     impl<T, U> Test2Merged<T, U> {
-        pub fn new(t: T, u: U) -> Self {
-            Self { t, u }
-        }
+    pub fn new(t: T, u: U) -> Self {
+    Self { t, u }
+    }
     }
 
     impl<T, U> ::puroro::Message for Test2Merged<T, U> {}
 
-    /*
     impl<T, U> super::_puroro_traits::Test2Trait for Test2Merged<T, U>
     where
-        T: super::_puroro_traits::Test2Trait,
-        U: super::_puroro_traits::Test2Trait,
+    T: super::_puroro_traits::Test2Trait,
+    U: super::_puroro_traits::Test2Trait,
     {
     }
     */
@@ -342,25 +340,24 @@ pub mod _puroro_impls {
         {
             ::std::result::Result::Ok(())
         }
-    }
+    } /*
     pub struct Test3Merged<T, U> {
-        t: T,
-        u: U,
+    t: T,
+    u: U,
     }
 
     impl<T, U> Test3Merged<T, U> {
-        pub fn new(t: T, u: U) -> Self {
-            Self { t, u }
-        }
+    pub fn new(t: T, u: U) -> Self {
+    Self { t, u }
+    }
     }
 
     impl<T, U> ::puroro::Message for Test3Merged<T, U> {}
 
-    /*
     impl<T, U> super::_puroro_traits::Test3Trait for Test3Merged<T, U>
     where
-        T: super::_puroro_traits::Test3Trait,
-        U: super::_puroro_traits::Test3Trait,
+    T: super::_puroro_traits::Test3Trait,
+    U: super::_puroro_traits::Test3Trait,
     {
     }
     */
@@ -477,25 +474,24 @@ pub mod _puroro_impls {
         {
             ::std::result::Result::Ok(())
         }
-    }
+    } /*
     pub struct Test4Merged<T, U> {
-        t: T,
-        u: U,
+    t: T,
+    u: U,
     }
 
     impl<T, U> Test4Merged<T, U> {
-        pub fn new(t: T, u: U) -> Self {
-            Self { t, u }
-        }
+    pub fn new(t: T, u: U) -> Self {
+    Self { t, u }
+    }
     }
 
     impl<T, U> ::puroro::Message for Test4Merged<T, U> {}
 
-    /*
     impl<T, U> super::_puroro_traits::Test4Trait for Test4Merged<T, U>
     where
-        T: super::_puroro_traits::Test4Trait,
-        U: super::_puroro_traits::Test4Trait,
+    T: super::_puroro_traits::Test4Trait,
+    U: super::_puroro_traits::Test4Trait,
     {
     }
     */

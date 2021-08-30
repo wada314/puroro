@@ -1,3 +1,4 @@
+/*
 pub struct {{ m.merged_ident }}<T, U> {
     t: T,
     u: U,
@@ -11,7 +12,7 @@ impl<T, U> {{ m.merged_ident }}<T, U> {
 
 impl<T, U> ::puroro::Message for {{ m.merged_ident }}<T, U> {}
 
-/*
+
 impl<T, U> super::_puroro_traits::{{ m.trait_ident }} for {{ m.merged_ident }}<T, U>
 where
     T: super::_puroro_traits::{{ m.trait_ident }},

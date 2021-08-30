@@ -263,25 +263,24 @@ pub mod _puroro_impls {
         {
             ::std::result::Result::Ok(())
         }
-    }
+    } /*
     pub struct MsgMerged<T, U> {
-        t: T,
-        u: U,
+    t: T,
+    u: U,
     }
 
     impl<T, U> MsgMerged<T, U> {
-        pub fn new(t: T, u: U) -> Self {
-            Self { t, u }
-        }
+    pub fn new(t: T, u: U) -> Self {
+    Self { t, u }
+    }
     }
 
     impl<T, U> ::puroro::Message for MsgMerged<T, U> {}
 
-    /*
     impl<T, U> super::_puroro_traits::MsgTrait for MsgMerged<T, U>
     where
-        T: super::_puroro_traits::MsgTrait,
-        U: super::_puroro_traits::MsgTrait,
+    T: super::_puroro_traits::MsgTrait,
+    U: super::_puroro_traits::MsgTrait,
     {
     }
     */
@@ -1137,28 +1136,27 @@ pub mod _puroro_nested {
                 {
                     ::std::result::Result::Ok(())
                 }
-            }
+            } /*
             pub struct SubmsgMerged<T, U> {
-                t: T,
-                u: U,
+            t: T,
+            u: U,
             }
 
             impl<T, U> SubmsgMerged<T, U> {
-                pub fn new(t: T, u: U) -> Self {
-                    Self { t, u }
-                }
+            pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+            }
             }
 
             impl<T, U> ::puroro::Message for SubmsgMerged<T, U> {}
 
-            /*
             impl<T, U> super::_puroro_traits::SubmsgTrait for SubmsgMerged<T, U>
             where
-                T: super::_puroro_traits::SubmsgTrait,
-                U: super::_puroro_traits::SubmsgTrait,
+            T: super::_puroro_traits::SubmsgTrait,
+            U: super::_puroro_traits::SubmsgTrait,
             {
             }
-            */
+             */
             impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>
             where
                 T: ::std::ops::Deref,

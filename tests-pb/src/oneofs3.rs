@@ -84,7 +84,7 @@ pub mod _puroro_impls {
                 1 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupOne_Simple;
                     #[allow(unused)]
-                    use std::option::Option::Some;
+                    use ::std::option::Option::Some;
                     if !matches!(&self.group_one, Some(GroupOne_Simple::G1Int32(_))) {
                         self.group_one =
                             Some(GroupOne_Simple::G1Int32(::std::default::Default::default()));
@@ -101,7 +101,7 @@ pub mod _puroro_impls {
                 2 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupOne_Simple;
                     #[allow(unused)]
-                    use std::option::Option::Some;
+                    use ::std::option::Option::Some;
                     if !matches!(&self.group_one, Some(GroupOne_Simple::G1String(_))) {
                         self.group_one =
                             Some(GroupOne_Simple::G1String(::std::default::Default::default()));
@@ -118,7 +118,7 @@ pub mod _puroro_impls {
                 3 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo_Simple;
                     #[allow(unused)]
-                    use std::option::Option::Some;
+                    use ::std::option::Option::Some;
                     if !matches!(&self.group_two, Some(GroupTwo_Simple::G2F32(_))) {
                         self.group_two =
                             Some(GroupTwo_Simple::G2F32(::std::default::Default::default()));
@@ -135,7 +135,7 @@ pub mod _puroro_impls {
                 4 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo_Simple;
                     #[allow(unused)]
-                    use std::option::Option::Some;
+                    use ::std::option::Option::Some;
                     if !matches!(&self.group_two, Some(GroupTwo_Simple::G2String(_))) {
                         self.group_two =
                             Some(GroupTwo_Simple::G2String(::std::default::Default::default()));
@@ -152,7 +152,7 @@ pub mod _puroro_impls {
                 5 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo_Simple;
                     #[allow(unused)]
-                    use std::option::Option::Some;
+                    use ::std::option::Option::Some;
                     if !matches!(&self.group_two, Some(GroupTwo_Simple::G2Submsg(_))) {
                         self.group_two =
                             Some(GroupTwo_Simple::G2Submsg(::std::default::Default::default()));
@@ -171,7 +171,7 @@ pub mod _puroro_impls {
                 6 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupThree_Simple;
                     #[allow(unused)]
-                    use std::option::Option::Some;
+                    use ::std::option::Option::Some;
                     if !matches!(&self.group_three, Some(GroupThree_Simple::G3Int32(_))) {
                         self.group_three = Some(GroupThree_Simple::G3Int32(
                             ::std::default::Default::default(),
@@ -262,25 +262,24 @@ pub mod _puroro_impls {
         {
             ::std::result::Result::Ok(())
         }
-    }
+    } /*
     pub struct MsgMerged<T, U> {
-        t: T,
-        u: U,
+    t: T,
+    u: U,
     }
 
     impl<T, U> MsgMerged<T, U> {
-        pub fn new(t: T, u: U) -> Self {
-            Self { t, u }
-        }
+    pub fn new(t: T, u: U) -> Self {
+    Self { t, u }
+    }
     }
 
     impl<T, U> ::puroro::Message for MsgMerged<T, U> {}
 
-    /*
     impl<T, U> super::_puroro_traits::MsgTrait for MsgMerged<T, U>
     where
-        T: super::_puroro_traits::MsgTrait,
-        U: super::_puroro_traits::MsgTrait,
+    T: super::_puroro_traits::MsgTrait,
+    U: super::_puroro_traits::MsgTrait,
     {
     }
     */
@@ -586,25 +585,24 @@ pub mod _puroro_impls {
         {
             ::std::result::Result::Ok(())
         }
-    }
+    } /*
     pub struct SubmsgMerged<T, U> {
-        t: T,
-        u: U,
+    t: T,
+    u: U,
     }
 
     impl<T, U> SubmsgMerged<T, U> {
-        pub fn new(t: T, u: U) -> Self {
-            Self { t, u }
-        }
+    pub fn new(t: T, u: U) -> Self {
+    Self { t, u }
+    }
     }
 
     impl<T, U> ::puroro::Message for SubmsgMerged<T, U> {}
 
-    /*
     impl<T, U> super::_puroro_traits::SubmsgTrait for SubmsgMerged<T, U>
     where
-        T: super::_puroro_traits::SubmsgTrait,
-        U: super::_puroro_traits::SubmsgTrait,
+    T: super::_puroro_traits::SubmsgTrait,
+    U: super::_puroro_traits::SubmsgTrait,
     {
     }
     */
