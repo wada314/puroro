@@ -106,18 +106,6 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::Test1Trait for ::puroro::Either<T, U>
-    where
-        T: super::_puroro_traits::Test1Trait,
-        U: super::_puroro_traits::Test1Trait,
-    {
-        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().either(
-                <T as super::_puroro_traits::Test1Trait>::a,
-                <U as super::_puroro_traits::Test1Trait>::a,
-            )
-        }
-    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test1SimpleField1 {
@@ -227,18 +215,6 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::Test2Trait for ::puroro::Either<T, U>
-    where
-        T: super::_puroro_traits::Test2Trait,
-        U: super::_puroro_traits::Test2Trait,
-    {
-        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
-            self.as_ref().either(
-                <T as super::_puroro_traits::Test2Trait>::b,
-                <U as super::_puroro_traits::Test2Trait>::b,
-            )
-        }
-    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test2SimpleField2 {
@@ -359,25 +335,6 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::Test3Trait for ::puroro::Either<T, U>
-    where
-        T: super::_puroro_traits::Test3Trait,
-        U: super::_puroro_traits::Test3Trait,
-    {
-        type Field3MessageType<'this> = ::puroro::Either<
-            ::std::borrow::Cow<
-                'this,
-                <T as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
-            >,
-            ::std::borrow::Cow<
-                'this,
-                <U as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
-            >,
-        >;
-        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
-            todo!()
-        }
-    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test3SimpleField3 {
@@ -496,24 +453,6 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::Test4Trait for ::puroro::Either<T, U>
-    where
-        T: super::_puroro_traits::Test4Trait,
-        U: super::_puroro_traits::Test4Trait,
-    {
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
-            <T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
-            <U as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
-        >;
-
-        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
-                self.as_ref()
-                    .map_left(<T as super::_puroro_traits::Test4Trait>::d)
-                    .map_right(<U as super::_puroro_traits::Test4Trait>::d),
-            )
-        }
-    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test4SimpleField4 {

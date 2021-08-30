@@ -196,63 +196,6 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
-    where
-        T: super::_puroro_traits::MsgTrait,
-        U: super::_puroro_traits::MsgTrait,
-    {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            self.as_ref().either(
-                <T as super::_puroro_traits::MsgTrait>::i32_unlabeled,
-                <U as super::_puroro_traits::MsgTrait>::i32_unlabeled,
-            )
-        }
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.as_ref().either(
-                <T as super::_puroro_traits::MsgTrait>::i32_optional,
-                <U as super::_puroro_traits::MsgTrait>::i32_optional,
-            )
-        }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
-            <T as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
-        >;
-
-        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
-                self.as_ref()
-                    .map_left(<T as super::_puroro_traits::MsgTrait>::i32_repeated)
-                    .map_right(<U as super::_puroro_traits::MsgTrait>::i32_repeated),
-            )
-        }
-        fn f32_unlabeled<'this>(&'this self) -> f32 {
-            self.as_ref().either(
-                <T as super::_puroro_traits::MsgTrait>::f32_unlabeled,
-                <U as super::_puroro_traits::MsgTrait>::f32_unlabeled,
-            )
-        }
-        fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this> {
-            self.as_ref().either(
-                <T as super::_puroro_traits::MsgTrait>::string_unlabeled,
-                <U as super::_puroro_traits::MsgTrait>::string_unlabeled,
-            )
-        }
-        type Field6MessageType<'this> = ::puroro::Either<
-            ::std::borrow::Cow<
-                'this,
-                <T as super::_puroro_traits::MsgTrait>::Field6MessageType<'this>,
-            >,
-            ::std::borrow::Cow<
-                'this,
-                <U as super::_puroro_traits::MsgTrait>::Field6MessageType<'this>,
-            >,
-        >;
-        fn submsg_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field6ScalarGetterType<'this>> {
-            todo!()
-        }
-    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField1 {
@@ -523,18 +466,6 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>
-    where
-        T: super::_puroro_traits::SubmsgTrait,
-        U: super::_puroro_traits::SubmsgTrait,
-    {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            self.as_ref().either(
-                <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
-                <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
-            )
-        }
-    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct SubmsgSimpleField1 {

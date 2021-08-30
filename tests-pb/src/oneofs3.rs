@@ -284,39 +284,6 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
-    where
-        T: super::_puroro_traits::MsgTrait,
-        U: super::_puroro_traits::MsgTrait,
-    {
-        type Field5MessageType<'this> = ::puroro::Either<
-            ::std::borrow::Cow<
-                'this,
-                <T as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
-            >,
-            ::std::borrow::Cow<
-                'this,
-                <U as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
-            >,
-        >;
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_three<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            todo!()
-        }
-    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField1 {
@@ -602,18 +569,6 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>
-    where
-        T: super::_puroro_traits::SubmsgTrait,
-        U: super::_puroro_traits::SubmsgTrait,
-    {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            self.as_ref().either(
-                <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
-                <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled,
-            )
-        }
-    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct SubmsgSimpleField1 {

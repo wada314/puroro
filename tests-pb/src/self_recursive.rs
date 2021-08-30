@@ -117,27 +117,6 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
-    where
-        T: super::_puroro_traits::MsgTrait,
-        U: super::_puroro_traits::MsgTrait,
-    {
-        type Field1MessageType<'this> = ::puroro::Either<
-            ::std::borrow::Cow<
-                'this,
-                <T as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
-            >,
-            ::std::borrow::Cow<
-                'this,
-                <U as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
-            >,
-        >;
-        fn recursive_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
-            todo!()
-        }
-    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField1 {
