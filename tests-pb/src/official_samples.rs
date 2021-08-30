@@ -106,10 +106,12 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::Test1Trait for ::puroro::Either<T, U>
+    impl<T, U, DT, DU> super::_puroro_traits::Test1Trait for ::puroro::Either<DT, DU>
     where
         T: super::_puroro_traits::Test1Trait,
         U: super::_puroro_traits::Test1Trait,
+        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
+        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
     {
         fn a<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
@@ -227,10 +229,12 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::Test2Trait for ::puroro::Either<T, U>
+    impl<T, U, DT, DU> super::_puroro_traits::Test2Trait for ::puroro::Either<DT, DU>
     where
         T: super::_puroro_traits::Test2Trait,
         U: super::_puroro_traits::Test2Trait,
+        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
+        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
     {
         type Field2ScalarGetterType<'this> = ::puroro::Either<
             <T as super::_puroro_traits::Test2Trait>::Field2ScalarGetterType<'this>,
@@ -360,10 +364,12 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::Test3Trait for ::puroro::Either<T, U>
+    impl<T, U, DT, DU> super::_puroro_traits::Test3Trait for ::puroro::Either<DT, DU>
     where
         T: super::_puroro_traits::Test3Trait,
         U: super::_puroro_traits::Test3Trait,
+        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
+        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
     {
         type Field3MessageType<'this> = ::puroro::Either<
             <T as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
@@ -493,10 +499,12 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::Test4Trait for ::puroro::Either<T, U>
+    impl<T, U, DT, DU> super::_puroro_traits::Test4Trait for ::puroro::Either<DT, DU>
     where
         T: super::_puroro_traits::Test4Trait,
         U: super::_puroro_traits::Test4Trait,
+        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
+        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
     {
         type Field4RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
             <T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,

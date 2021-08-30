@@ -24,3 +24,7 @@ pub mod _puroro_impls {
 {%- macro empty_trait_impl_field(f) -%}
 {%- include "empty/trait_impl_field.rs.txt" %}
 {%- endmacro -%}
+
+{%- macro either_trait_impl_field(f) -%}
+{%- include "either/trait_impl_field.rs.txt" %}
+{%- endmacro -%}

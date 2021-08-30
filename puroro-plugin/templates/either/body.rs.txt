@@ -1,84 +1,12 @@
-
-impl<T, U> super::_puroro_traits::{{ m.trait_ident }} for ::puroro::Either<T, U> 
+impl<T, U, DT, DU> super::_puroro_traits::{{ m.trait_ident }} for ::puroro::Either<DT, DU> 
 where
     T: super::_puroro_traits::{{ m.trait_ident }},
     U: super::_puroro_traits::{{ m.trait_ident }},
+    DT: ::std::ops::Deref<Target=T> + ::std::clone::Clone,
+    DU: ::std::ops::Deref<Target=U> + ::std::clone::Clone,
 {
     {%- for field in m.fields %}
-
-    {%- match field.trait_maybe_field_message_trait_path %}
-    {%- when Some with (field_msg_path) %}
-    type Field{{ field.number }}MessageType<'this> = ::puroro::Either<
-        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType<'this>,
-        <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType<'this>,
-    >;
-    {%- else %}
-    {%- endmatch %}
-
-    {%- if field.is_bytes || field.is_string %}
-    type Field{{ field.number }}ScalarGetterType<'this> = ::puroro::Either<
-        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType<'this>,
-        <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType<'this>,
-    >;
-    {%- endif %}
-    {%- if field.is_message %}
-    type Field{{ field.number }}ScalarGetterType<'this> = ::puroro_internal::Derefable<Self::Field{{ field.number }}MessageType<'this>>;
-    {%- endif %}
-
-    {%- if field.trait_has_scalar_getter %}
-    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
-        {%- if field.is_length_delimited %}
-        todo!()
-        {%- else %}
-        self.as_ref().either(
-            <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }},
-            <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }},
-        )
-        {%- endif %}
-    }
-    {%- endif %}
-
-    {%- if field.trait_has_optional_getter %}
-    fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
-        {%- if field.is_length_delimited %}
-        todo!()
-        {%- else %}
-        self.as_ref().either(
-            <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }},
-            <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }},
-        )
-        {%- endif %}
-    }
-    {%- endif %}
-
-    {%- if field.trait_has_repeated_getter %}
-    {%- let either_repeated_field_type %}
-    {%- if field.is_length_delimited %}
-    {%- if field.is_message %}
-    {%- let either_repeated_field_type = "EitherRepeatedMessageField" %}
-    {%- else %}
-    {%- let either_repeated_field_type = "EitherRepeatedLDField" %}
-    {%- endif %}
-    {%- else %}
-    {%- let either_repeated_field_type = "EitherRepeatedField" %}
-    {%- endif %}
-    type Field{{ field.number }}RepeatedType<'this> = ::puroro_internal::impls::either::{{ either_repeated_field_type }}<
-        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'this>,
-        <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}RepeatedType<'this>,
-    >;
-
-    fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
-        ::puroro_internal::impls::either::{{ either_repeated_field_type }}::new(self
-            .as_ref()
-            .map_left(
-                <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}
-            )
-            .map_right(
-                <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }}
-            )
-        )
-    }
-    {%- endif %}
+    {%- call either_trait_impl_field(field) %}
     {%- endfor %}
 
     {%- for oneof in m.oneofs %}

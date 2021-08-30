@@ -285,10 +285,12 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
+    impl<T, U, DT, DU> super::_puroro_traits::MsgTrait for ::puroro::Either<DT, DU>
     where
         T: super::_puroro_traits::MsgTrait,
         U: super::_puroro_traits::MsgTrait,
+        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
+        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
     {
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
@@ -1138,10 +1140,12 @@ pub mod _puroro_nested {
             {
             }
             */
-            impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>
+            impl<T, U, DT, DU> super::_puroro_traits::SubmsgTrait for ::puroro::Either<DT, DU>
             where
                 T: super::_puroro_traits::SubmsgTrait,
                 U: super::_puroro_traits::SubmsgTrait,
+                DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
+                DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
             {
                 fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
                     self.as_ref().either(

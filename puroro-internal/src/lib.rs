@@ -10,13 +10,14 @@ use ::std::ops::Deref;
 // Re-exporting library modules
 pub use ::puroro::{bumpalo, hashbrown};
 
-pub struct Derefable<T>(T);
-impl<T> Derefable<T> {
+#[derive(Clone)]
+pub struct Derefable<T: Clone>(T);
+impl<T: Clone> Derefable<T> {
     fn new(v: T) -> Self {
         Self(v)
     }
 }
-impl<T> Deref for Derefable<T> {
+impl<T: Clone> Deref for Derefable<T> {
     type Target = T;
     fn deref(&self) -> &Self::Target {
         &self.0

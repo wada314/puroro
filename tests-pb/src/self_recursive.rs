@@ -117,10 +117,12 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
+    impl<T, U, DT, DU> super::_puroro_traits::MsgTrait for ::puroro::Either<DT, DU>
     where
         T: super::_puroro_traits::MsgTrait,
         U: super::_puroro_traits::MsgTrait,
+        DT: ::std::ops::Deref<Target = T> + ::std::clone::Clone,
+        DU: ::std::ops::Deref<Target = U> + ::std::clone::Clone,
     {
         type Field1MessageType<'this> = ::puroro::Either<
             <T as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
