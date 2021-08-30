@@ -55,8 +55,8 @@ impl<'msg, T, U> IntoIterator for EitherRepeatedMessageField<T, U>
 where
     T: RepeatedField<'msg> + IntoIterator,
     U: RepeatedField<'msg> + IntoIterator,
-    <T as IntoIterator>::Item: Deref + Clone,
-    <U as IntoIterator>::Item: Deref + Clone,
+    <T as IntoIterator>::Item: Deref,
+    <U as IntoIterator>::Item: Deref,
 {
     type Item = Derefable<Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>>;
     type IntoIter = DerefableIter<
@@ -96,7 +96,6 @@ pub struct DerefableIter<I>(I);
 impl<I> Iterator for DerefableIter<I>
 where
     I: Iterator,
-    <I as Iterator>::Item: Clone,
 {
     type Item = Derefable<<I as Iterator>::Item>;
     fn next(&mut self) -> Option<Self::Item> {
