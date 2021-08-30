@@ -1,16 +1,16 @@
 {%- match f.trait_maybe_field_message_trait_path %}
 {%- when Some with (field_msg_path) %}
 type Field{{ f.number }}MessageType<'this> = ::puroro::Either<
-    <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
-    <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+    <<T as ::std::ops::Deref>::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+    <<U as ::std::ops::Deref>::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
 >;
 {%- else %}
 {%- endmatch %}
 
 {%- if f.is_bytes || f.is_string %}
 type Field{{ f.number }}ScalarGetterType<'this> = ::puroro::Either<
-    <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
-    <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+    <<T as ::std::ops::Deref>::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+    <<U as ::std::ops::Deref>::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
 >;
 {%- endif %}
 {%- if f.is_message %}
@@ -24,8 +24,8 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
     todo!()
     {%- else %}
     self.as_ref().either(
-        |t| <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t),
-        |u| <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u),
+        |t| <<T as ::std::ops::Deref>::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t),
+        |u| <<U as ::std::ops::Deref>::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u),
     )
     {%- endif %}
 }
@@ -38,8 +38,8 @@ fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_
     todo!()
     {%- else %}
     self.as_ref().either(
-        |t| <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t),
-        |u| <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u),
+        |t| <<T as ::std::ops::Deref>::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t),
+        |u| <<U as ::std::ops::Deref>::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u),
     )
     {%- endif %}
 }
@@ -57,8 +57,8 @@ fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_
 {%- let either_repeated_field_type = "EitherRepeatedField" %}
 {%- endif %}
 type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::either::{{ either_repeated_field_type }}<
-    <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
-    <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
+    <<T as ::std::ops::Deref>::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
+    <<U as ::std::ops::Deref>::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
 >;
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this>
@@ -66,10 +66,10 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
     ::puroro_internal::impls::either::{{ either_repeated_field_type }}::new(self
         .as_ref()
         .map_left(
-            |t| <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t.deref())
+            |t| <<T as ::std::ops::Deref>::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t)
         )
         .map_right(
-            |u| <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u.deref())
+            |u| <<U as ::std::ops::Deref>::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u)
         )
     )
 }

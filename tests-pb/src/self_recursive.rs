@@ -117,17 +117,17 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U, DT, DU> super::_puroro_traits::MsgTrait for ::puroro::Either<DT, DU>
+    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
     where
-        T: super::_puroro_traits::MsgTrait,
-        U: super::_puroro_traits::MsgTrait,
-        DT: ::std::ops::Deref<Target = T>,
-        DU: ::std::ops::Deref<Target = U>,
+        T: ::std::ops::Deref,
+        U: ::std::ops::Deref,
+        <T as ::std::ops::Deref>::Target: super::_puroro_traits::MsgTrait,
+        <U as ::std::ops::Deref>::Target: super::_puroro_traits::MsgTrait,
     {
         type Field1MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
-        >;
+    <<T as ::std::ops::Deref>::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+    <<U as ::std::ops::Deref>::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+>;
         type Field1ScalarGetterType<'this> =
             ::puroro_internal::Derefable<Self::Field1MessageType<'this>>;
         fn recursive_unlabeled<'this>(

@@ -284,25 +284,25 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U, DT, DU> super::_puroro_traits::MsgTrait for ::puroro::Either<DT, DU>
+    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
     where
-        T: super::_puroro_traits::MsgTrait,
-        U: super::_puroro_traits::MsgTrait,
-        DT: ::std::ops::Deref<Target = T>,
-        DU: ::std::ops::Deref<Target = U>,
+        T: ::std::ops::Deref,
+        U: ::std::ops::Deref,
+        <T as ::std::ops::Deref>::Target: super::_puroro_traits::MsgTrait,
+        <U as ::std::ops::Deref>::Target: super::_puroro_traits::MsgTrait,
     {
         type Field2ScalarGetterType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'this>,
-        >;
+    <<T as ::std::ops::Deref>::Target as super::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'this>,
+    <<U as ::std::ops::Deref>::Target as super::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'this>,
+>;
         type Field4ScalarGetterType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>,
-        >;
+    <<T as ::std::ops::Deref>::Target as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>,
+    <<U as ::std::ops::Deref>::Target as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>,
+>;
         type Field5MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
-        >;
+    <<T as ::std::ops::Deref>::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+    <<U as ::std::ops::Deref>::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+>;
         type Field5ScalarGetterType<'this> =
             ::puroro_internal::Derefable<Self::Field5MessageType<'this>>;
         fn group_one<'this>(
@@ -608,18 +608,18 @@ pub mod _puroro_impls {
     {
     }
     */
-    impl<T, U, DT, DU> super::_puroro_traits::SubmsgTrait for ::puroro::Either<DT, DU>
+    impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>
     where
-        T: super::_puroro_traits::SubmsgTrait,
-        U: super::_puroro_traits::SubmsgTrait,
-        DT: ::std::ops::Deref<Target = T>,
-        DU: ::std::ops::Deref<Target = U>,
+        T: ::std::ops::Deref,
+        U: ::std::ops::Deref,
+        <T as ::std::ops::Deref>::Target: super::_puroro_traits::SubmsgTrait,
+        <U as ::std::ops::Deref>::Target: super::_puroro_traits::SubmsgTrait,
     {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             self.as_ref().either(
-                |t| <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(t),
-                |u| <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(u),
-            )
+        |t| <<T as ::std::ops::Deref>::Target as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(t),
+        |u| <<U as ::std::ops::Deref>::Target as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(u),
+    )
         }
     }
 
