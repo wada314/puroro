@@ -561,7 +561,7 @@ pub mod _puroro_traits {
         }
     }
     pub trait Test3Trait {
-        type Field3MessageType<'this>: 'this + self::_puroro_root::official_samples::_puroro_traits::Test1Trait;
+        type Field3MessageType<'this>: self::_puroro_root::official_samples::_puroro_traits::Test1Trait;
         type Field3ScalarGetterType<'this>: ::std::ops::Deref<
             Target = Self::Field3MessageType<'this>,
         >;

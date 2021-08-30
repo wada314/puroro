@@ -164,8 +164,7 @@ pub mod _puroro_traits {
     }
 
     pub trait MsgTrait {
-        type Field1MessageType<'this>: 'this
-            + self::_puroro_root::self_recursive::_puroro_traits::MsgTrait;
+        type Field1MessageType<'this>: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait;
         type Field1ScalarGetterType<'this>: ::std::ops::Deref<
             Target = Self::Field1MessageType<'this>,
         >;

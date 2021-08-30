@@ -645,8 +645,7 @@ pub mod _puroro_traits {
     pub trait MsgTrait {
         type Field2ScalarGetterType<'this>: ::std::ops::Deref<Target = str>;
         type Field4ScalarGetterType<'this>: ::std::ops::Deref<Target = str>;
-        type Field5MessageType<'this>: 'this
-            + self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait;
+        type Field5MessageType<'this>: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait;
         type Field5ScalarGetterType<'this>: ::std::ops::Deref<
             Target = Self::Field5MessageType<'this>,
         >;

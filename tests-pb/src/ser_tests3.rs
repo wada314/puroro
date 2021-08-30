@@ -1127,7 +1127,7 @@ pub mod _puroro_traits {
         type Field6RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = Self::Field6ScalarGetterType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
-        type Field7MessageType<'this>: 'this + self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
+        type Field7MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
         type Field7ScalarGetterType<'this>: ::std::ops::Deref<
             Target = Self::Field7MessageType<'this>,
         >;
@@ -1136,7 +1136,7 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
             ::std::default::Default::default()
         }
-        type Field8MessageType<'this>: 'this + self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
+        type Field8MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
         type Field8ScalarGetterType<'this>: ::std::ops::Deref<
             Target = Self::Field8MessageType<'this>,
         >;

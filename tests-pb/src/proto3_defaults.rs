@@ -571,7 +571,7 @@ pub mod _puroro_traits {
         fn f32_unlabeled<'this>(&'this self) -> f32;
         type Field5ScalarGetterType<'this>: ::std::ops::Deref<Target = str>;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5ScalarGetterType<'this>;
-        type Field6MessageType<'this>: 'this + self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait;
+        type Field6MessageType<'this>: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait;
         type Field6ScalarGetterType<'this>: ::std::ops::Deref<
             Target = Self::Field6MessageType<'this>,
         >;

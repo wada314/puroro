@@ -1492,7 +1492,7 @@ pub mod _puroro_traits {
         type Field33RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = self::_puroro_root::full_coverage3::Enum>;
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this>;
-        type Field41MessageType<'this>: 'this + self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
+        type Field41MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
         type Field41ScalarGetterType<'this>: ::std::ops::Deref<
             Target = Self::Field41MessageType<'this>,
         >;
@@ -1501,7 +1501,7 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field41ScalarGetterType<'this>> {
             ::std::default::Default::default()
         }
-        type Field42MessageType<'this>: 'this + self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
+        type Field42MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
         type Field42ScalarGetterType<'this>: ::std::ops::Deref<
             Target = Self::Field42MessageType<'this>,
         >;
@@ -1510,7 +1510,7 @@ pub mod _puroro_traits {
         ) -> ::std::option::Option<Self::Field42ScalarGetterType<'this>> {
             ::std::default::Default::default()
         }
-        type Field43MessageType<'this>: 'this + self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
+        type Field43MessageType<'this>: self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
         type Field43ScalarGetterType<'this>: ::std::ops::Deref<
             Target = Self::Field43MessageType<'this>,
         >;
