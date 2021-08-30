@@ -2,26 +2,23 @@ pub mod de;
 pub mod se;
 
 use ::std::borrow::Borrow;
-use ::std::borrow::Cow;
 use ::std::marker::PhantomData;
 
-pub struct CowedIter<B: ?Sized, I>(I, PhantomData<B>);
-impl<B: ?Sized, I> CowedIter<B, I> {
+pub struct BorrowedIter<B: ?Sized, I>(I, PhantomData<B>);
+impl<B: ?Sized, I> BorrowedIter<B, I> {
     pub fn new(iter: I) -> Self {
         Self(iter, PhantomData)
     }
 }
-impl<'a, B, I, T> Iterator for CowedIter<B, I>
+impl<'a, B, I, T> Iterator for BorrowedIter<B, I>
 where
     I: Iterator<Item = &'a T>,
-    T: 'a + Clone + Borrow<B>,
-    B: 'a + ?Sized + ToOwned<Owned = T>,
+    T: 'a + Borrow<B>,
+    B: 'a + ?Sized,
 {
-    type Item = Cow<'a, B>;
+    type Item = &'a B;
     fn next(&mut self) -> Option<Self::Item> {
-        self.0
-            .next()
-            .map(|r| Cow::Borrowed(<T as Borrow<B>>::borrow(r)))
+        self.0.next().map(|owned| owned.borrow())
     }
 }
 

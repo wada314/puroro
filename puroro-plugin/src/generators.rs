@@ -223,7 +223,6 @@ struct Oneof {
     field_ident: String,
     fields: Vec<OneofField>,
     is_synthetic: bool,
-    has_message_field: bool,
     has_reference_field: bool,
     owner_message_trait_path: String,
     simple_owner_message_path: String,
@@ -240,10 +239,6 @@ impl Oneof {
                 .map(|f| OneofField::try_new(f))
                 .try_collect()?,
             is_synthetic: o.is_synthetic()?,
-            has_message_field: o
-                .fields()?
-                .into_iter()
-                .any(|f| matches!(f.field_type(), Ok(wrappers::FieldType::Message(_)))),
             has_reference_field: o.fields()?.into_iter().any(|f| {
                 matches!(
                     f.field_type(),
