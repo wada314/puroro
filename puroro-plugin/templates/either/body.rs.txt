@@ -2,8 +2,8 @@ impl<T, U> super::_puroro_traits::{{ m.trait_ident }} for ::puroro::Either<T, U>
 where
     T: ::std::ops::Deref,
     U: ::std::ops::Deref,
-    <T as ::std::ops::Deref>::Target: super::_puroro_traits::{{ m.trait_ident }},
-    <U as ::std::ops::Deref>::Target: super::_puroro_traits::{{ m.trait_ident }},
+    T::Target: super::_puroro_traits::{{ m.trait_ident }},
+    U::Target: super::_puroro_traits::{{ m.trait_ident }},
 {
     {%- for field in m.fields %}
     {%- call either_trait_impl_field(field) %}

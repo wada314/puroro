@@ -95,38 +95,18 @@ pub mod _puroro_impls {
         {
             ::std::result::Result::Ok(())
         }
-    } /*
-    pub struct MsgMerged<T, U> {
-    t: T,
-    u: U,
     }
-
-    impl<T, U> MsgMerged<T, U> {
-    pub fn new(t: T, u: U) -> Self {
-    Self { t, u }
-    }
-    }
-
-    impl<T, U> ::puroro::Message for MsgMerged<T, U> {}
-
-    impl<T, U> super::_puroro_traits::MsgTrait for MsgMerged<T, U>
-    where
-    T: super::_puroro_traits::MsgTrait,
-    U: super::_puroro_traits::MsgTrait,
-    {
-    }
-    */
     impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
-        <T as ::std::ops::Deref>::Target: super::_puroro_traits::MsgTrait,
-        <U as ::std::ops::Deref>::Target: super::_puroro_traits::MsgTrait,
+        T::Target: super::_puroro_traits::MsgTrait,
+        U::Target: super::_puroro_traits::MsgTrait,
     {
         type Field1MessageType<'this> = ::puroro::Either<
-    <<T as ::std::ops::Deref>::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
-    <<U as ::std::ops::Deref>::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
->;
+            <T::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+            <U::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+        >;
         type Field1ScalarGetterType<'this> =
             ::puroro_internal::Derefable<Self::Field1MessageType<'this>>;
         fn recursive_unlabeled<'this>(
