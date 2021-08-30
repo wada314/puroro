@@ -9,24 +9,38 @@ where
     {%- match field.trait_maybe_field_message_trait_path %}
     {%- when Some with (field_msg_path) %}
     type Field{{ field.number }}MessageType<'this> = ::puroro::Either<
-        ::std::borrow::Cow<'this, <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'this>>,
-        ::std::borrow::Cow<'this, <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}MessageType<'this>>,
+        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType<'this>,
+        <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType<'this>,
     >;
     {%- else %}
     {%- endmatch %}
 
+    {%- if field.is_bytes || field.is_string %}
+    type Field{{ field.number }}ScalarGetterType<'this> = ::puroro::Either<
+        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType<'this>,
+        <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ field.number }}ScalarGetterType<'this>,
+    >;
+    {%- endif %}
+    {%- if field.is_message %}
+    type Field{{ field.number }}ScalarGetterType<'this>: ::puroro_internal::Derefable<Self::Field{{ field.number }}MessageType<'this>>;
+    {%- endif %}
+
     {%- if field.trait_has_scalar_getter %}
     fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
+        {%- if field.is_length_delimited %}
+        todo!()
+        {%- else %}
         self.as_ref().either(
             <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }},
             <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ field.ident }},
         )
+        {%- endif %}
     }
     {%- endif %}
 
     {%- if field.trait_has_optional_getter %}
     fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
-        {%- if field.is_message %}
+        {%- if field.is_length_delimited %}
         todo!()
         {%- else %}
         self.as_ref().either(

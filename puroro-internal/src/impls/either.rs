@@ -1,5 +1,6 @@
 use ::puroro::{Either, RepeatedField};
-use ::std::borrow::Cow;
+use ::std::marker::PhantomData;
+use ::std::ops::Deref;
 
 pub struct EitherRepeatedField<T, U>(Either<T, U>);
 impl<T, U> EitherRepeatedField<T, U> {
@@ -19,20 +20,20 @@ where
     }
 }
 
-pub struct EitherRepeatedMessageField<T, U>(Either<T, U>);
-impl<T, U> EitherRepeatedMessageField<T, U> {
+pub struct EitherRepeatedLDField<B: ?Sized, T, U>(Either<T, U>, PhantomData<B>);
+impl<B: ?Sized, T, U> EitherRepeatedLDField<B, T, U> {
     pub fn new(from: Either<T, U>) -> Self {
-        Self(from)
+        Self(from, PhantomData)
     }
 }
-impl<'msg, T, U, TM, UM> IntoIterator for EitherRepeatedMessageField<T, U>
+impl<'msg, B: ?Sized, T, U> IntoIterator for EitherRepeatedLDField<B, T, U>
 where
-    T: RepeatedField<'msg> + IntoIterator<Item = Cow<'msg, TM>>,
-    U: RepeatedField<'msg> + IntoIterator<Item = Cow<'msg, UM>>,
-    TM: 'msg + Clone,
-    UM: 'msg + Clone,
+    T: RepeatedField<'msg> + IntoIterator,
+    U: RepeatedField<'msg> + IntoIterator,
+    <T as IntoIterator>::Item: Deref<Target = B>,
+    <U as IntoIterator>::Item: Deref<Target = B>,
 {
-    type Item = Cow<'msg, Either<Cow<'msg, TM>, Cow<'msg, UM>>>;
+    type Item = Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>;
     type IntoIter =
         IndependentEitherIter<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>;
     fn into_iter(self) -> Self::IntoIter {
@@ -51,18 +52,16 @@ where
     T: IntoIterator,
     U: IntoIterator;
 
-impl<'msg, T, U, TM, UM> Iterator for IndependentEitherIter<T, U>
+impl<T, U> Iterator for IndependentEitherIter<T, U>
 where
-    T: Iterator<Item = Cow<'msg, TM>>,
-    U: Iterator<Item = Cow<'msg, UM>>,
-    TM: 'msg + Clone,
-    UM: 'msg + Clone,
+    T: Iterator,
+    U: Iterator,
 {
-    type Item = Cow<'msg, Either<Cow<'msg, TM>, Cow<'msg, UM>>>;
+    type Item = Either<<T as Iterator>::Item, <U as Iterator>::Item>;
     fn next(&mut self) -> Option<Self::Item> {
         self.0.as_mut().either(
-            |iter| iter.next().map(|item| Cow::Owned(Either::Left(item))),
-            |iter| iter.next().map(|item| Cow::Owned(Either::Right(item))),
+            |t| t.next().map(|l| Either::Left(l)),
+            |u| u.next().map(|r| Either::Right(r)),
         )
     }
 }
