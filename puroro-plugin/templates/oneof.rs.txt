@@ -38,3 +38,28 @@ for {{ enum_ident }}
         }
     }
 }
+
+{%- if has_reference_field %}
+impl<'msg, T, U> ::std::convert::From<::puroro::Either<
+    {{ enum_ident }}<'msg, T::Target>,
+    {{ enum_ident }}<'msg, U::Target>,
+>> for {{ enum_ident }}<'msg, ::puroro::Either<T, U>>
+where
+    T: ::std::ops::Deref,
+    U: ::std::ops::Deref,
+    T::Target: {{ owner_message_trait_path }},
+    U::Target: {{ owner_message_trait_path }},
+{
+    fn from(value: ::puroro::Either<{{ enum_ident }}<'msg, T::Target>, {{ enum_ident }}<'msg, U::Target>>) -> Self {
+        todo!()
+    }
+}
+{%- else %}
+impl ::std::convert::From<::puroro::Either<{{ enum_ident }}, {{ enum_ident }}>> for {{ enum_ident }}
+{
+    fn from(value: ::puroro::Either<{{ enum_ident }}, {{ enum_ident }}>) -> Self {
+        todo!()
+    }
+}
+{%- endif %}
+

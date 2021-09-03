@@ -288,18 +288,33 @@ pub mod _puroro_impls {
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
         {
-            todo!()
+            self.as_ref()
+                .either(
+                    |t| t.group_one().map(|t| ::puroro::Either::Left(t)),
+                    |u| u.group_one().map(|u| ::puroro::Either::Right(u)),
+                )
+                .map(|tu| tu.into())
         }
         fn group_two<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
         {
-            todo!()
+            self.as_ref()
+                .either(
+                    |t| t.group_two().map(|t| ::puroro::Either::Left(t)),
+                    |u| u.group_two().map(|u| ::puroro::Either::Right(u)),
+                )
+                .map(|tu| tu.into())
         }
         fn group_three<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            todo!()
+            self.as_ref()
+                .either(
+                    |t| t.group_three().map(|t| ::puroro::Either::Left(t)),
+                    |u| u.group_three().map(|u| ::puroro::Either::Right(u)),
+                )
+                .map(|tu| tu.into())
         }
     }
 
@@ -666,6 +681,22 @@ pub mod _puroro_nested {
                     }
                 }
             }
+            impl<'msg, T, U>
+                ::std::convert::From<
+                    ::puroro::Either<GroupOne<'msg, T::Target>, GroupOne<'msg, U::Target>>,
+                > for GroupOne<'msg, ::puroro::Either<T, U>>
+            where
+                T: ::std::ops::Deref,
+                U: ::std::ops::Deref,
+                T::Target: self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+                U::Target: self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+            {
+                fn from(
+                    value: ::puroro::Either<GroupOne<'msg, T::Target>, GroupOne<'msg, U::Target>>,
+                ) -> Self {
+                    todo!()
+                }
+            }
             pub enum GroupTwo<
                 'msg,
                 T: ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
@@ -698,6 +729,22 @@ pub mod _puroro_nested {
                     }
                 }
             }
+            impl<'msg, T, U>
+                ::std::convert::From<
+                    ::puroro::Either<GroupTwo<'msg, T::Target>, GroupTwo<'msg, U::Target>>,
+                > for GroupTwo<'msg, ::puroro::Either<T, U>>
+            where
+                T: ::std::ops::Deref,
+                U: ::std::ops::Deref,
+                T::Target: self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+                U::Target: self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
+            {
+                fn from(
+                    value: ::puroro::Either<GroupTwo<'msg, T::Target>, GroupTwo<'msg, U::Target>>,
+                ) -> Self {
+                    todo!()
+                }
+            }
             pub enum GroupThree {
                 G3Int32(i32),
             }
@@ -715,6 +762,11 @@ pub mod _puroro_nested {
                             GroupThree::G3Int32(::std::clone::Clone::clone(&v))
                         }
                     }
+                }
+            }
+            impl ::std::convert::From<::puroro::Either<GroupThree, GroupThree>> for GroupThree {
+                fn from(value: ::puroro::Either<GroupThree, GroupThree>) -> Self {
+                    todo!()
                 }
             }
         }

@@ -18,7 +18,10 @@ where
             {%- endif %}
         >
     {
-        todo!()
+        self.as_ref().either(
+            |t| t.{{ oneof.field_ident }}().map(|t| ::puroro::Either::Left(t)), 
+            |u| u.{{ oneof.field_ident }}().map(|u| ::puroro::Either::Right(u)),
+        ).map(|tu| tu.into())
     }
     {%- endfor %}
 }
