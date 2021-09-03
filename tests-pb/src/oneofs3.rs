@@ -263,6 +263,58 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+    pub struct MsgMerged<T, U> {
+        t: T,
+        u: U,
+    }
+
+    impl<T, U> MsgMerged<T, U> {
+        pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+        }
+    }
+
+    impl<T, U> ::puroro::Message for MsgMerged<T, U> {}
+
+    impl<T, U> super::_puroro_traits::MsgTrait for MsgMerged<T, U>
+    where
+        T: ::std::ops::Deref,
+        U: ::std::ops::Deref,
+        T::Target: super::_puroro_traits::MsgTrait,
+        U::Target: super::_puroro_traits::MsgTrait,
+    {
+        type Field2ScalarGetterType<'this> = ::puroro::Either<
+            <T::Target as super::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'this>,
+            <U::Target as super::_puroro_traits::MsgTrait>::Field2ScalarGetterType<'this>,
+        >;
+        type Field4ScalarGetterType<'this> = ::puroro::Either<
+            <T::Target as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>,
+            <U::Target as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>,
+        >;
+        type Field5MessageType<'this> = ::puroro::Either<
+            <T::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+            <U::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+        >;
+        type Field5ScalarGetterType<'this> =
+            ::puroro_internal::Derefable<Self::Field5MessageType<'this>>;
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
+        {
+            todo!()
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        {
+            todo!()
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            todo!()
+        }
+    }
     impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
     where
         T: ::std::ops::Deref,
@@ -579,6 +631,35 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             ::std::result::Result::Ok(())
+        }
+    }
+    pub struct SubmsgMerged<T, U> {
+        t: T,
+        u: U,
+    }
+
+    impl<T, U> SubmsgMerged<T, U> {
+        pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+        }
+    }
+
+    impl<T, U> ::puroro::Message for SubmsgMerged<T, U> {}
+
+    impl<T, U> super::_puroro_traits::SubmsgTrait for SubmsgMerged<T, U>
+    where
+        T: ::std::ops::Deref,
+        U: ::std::ops::Deref,
+        T::Target: super::_puroro_traits::SubmsgTrait,
+        U::Target: super::_puroro_traits::SubmsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            let left = <T::Target as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(&self.t);
+            if left == ::std::default::Default::default() {
+                <U::Target as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(&self.u)
+            } else {
+                left
+            }
         }
     }
     impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>

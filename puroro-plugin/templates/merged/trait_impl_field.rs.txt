@@ -1,0 +1,68 @@
+{%- match f.trait_maybe_field_message_trait_path %}
+{%- when Some with (field_msg_path) %}
+type Field{{ f.number }}MessageType<'this> = ::puroro::Either<
+    <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+    <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+>;
+{%- else %}
+{%- endmatch %}
+
+{%- if f.is_bytes || f.is_string %}
+type Field{{ f.number }}ScalarGetterType<'this> = ::puroro::Either<
+    <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+    <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+>;
+{%- endif %}
+{%- if f.is_message %}
+type Field{{ f.number }}ScalarGetterType<'this> = ::puroro_internal::Derefable<Self::Field{{ f.number }}MessageType<'this>>;
+{%- endif %}
+
+{%- if f.trait_has_scalar_getter %}
+fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
+{
+    {%- if f.is_length_delimited %}
+    todo!()
+    {%- else %}
+    let left = <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.t);
+    if left == ::std::default::Default::default() {
+        <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.u)
+    } else {
+        left
+    }
+    {%- endif %}
+}
+{%- endif %}
+
+{%- if f.trait_has_optional_getter %}
+fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}>
+{
+    {%- if f.is_length_delimited %}
+    todo!()
+    {%- else %}
+    let left = <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.t);
+    left.or_else(|| <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.u))
+    {%- endif %}
+}
+{%- endif %}
+
+{%- if f.trait_has_repeated_getter %}
+{%- let either_repeated_field_type %}
+{%- if f.is_length_delimited %}
+{%- if f.is_message %}
+{%- let either_repeated_field_type = "EitherRepeatedMessageField" %}
+{%- else %}
+{%- let either_repeated_field_type = "EitherRepeatedLDField" %}
+{%- endif %}
+{%- else %}
+{%- let either_repeated_field_type = "EitherRepeatedField" %}
+{%- endif %}
+type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::either::{{ either_repeated_field_type }}<
+    <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
+    <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
+>;
+
+fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this>
+{
+    todo!()
+}
+{%- endif %}

@@ -96,6 +96,38 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+    pub struct MsgMerged<T, U> {
+        t: T,
+        u: U,
+    }
+
+    impl<T, U> MsgMerged<T, U> {
+        pub fn new(t: T, u: U) -> Self {
+            Self { t, u }
+        }
+    }
+
+    impl<T, U> ::puroro::Message for MsgMerged<T, U> {}
+
+    impl<T, U> super::_puroro_traits::MsgTrait for MsgMerged<T, U>
+    where
+        T: ::std::ops::Deref,
+        U: ::std::ops::Deref,
+        T::Target: super::_puroro_traits::MsgTrait,
+        U::Target: super::_puroro_traits::MsgTrait,
+    {
+        type Field1MessageType<'this> = ::puroro::Either<
+            <T::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+            <U::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+        >;
+        type Field1ScalarGetterType<'this> =
+            ::puroro_internal::Derefable<Self::Field1MessageType<'this>>;
+        fn recursive_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+            todo!()
+        }
+    }
     impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
     where
         T: ::std::ops::Deref,
