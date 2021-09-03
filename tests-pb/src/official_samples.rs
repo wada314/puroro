@@ -252,7 +252,16 @@ pub mod _puroro_impls {
             <U::Target as super::_puroro_traits::Test2Trait>::Field2ScalarGetterType<'this>,
         >;
         fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
-            todo!()
+            self.as_ref().either(
+                |t| {
+                    <T::Target as super::_puroro_traits::Test2Trait>::b(t)
+                        .map(|t| ::puroro::Either::Left(t))
+                },
+                |u| {
+                    <U::Target as super::_puroro_traits::Test2Trait>::b(u)
+                        .map(|u| ::puroro::Either::Right(u))
+                },
+            )
         }
     }
 
@@ -398,7 +407,16 @@ pub mod _puroro_impls {
         type Field3ScalarGetterType<'this> =
             ::puroro_internal::Derefable<Self::Field3MessageType<'this>>;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
-            todo!()
+            self.as_ref().either(
+                |t| {
+                    <T::Target as super::_puroro_traits::Test3Trait>::c(t)
+                        .map(|t| ::puroro_internal::Derefable::new(::puroro::Either::Left(t)))
+                },
+                |u| {
+                    <U::Target as super::_puroro_traits::Test3Trait>::c(u)
+                        .map(|u| ::puroro_internal::Derefable::new(::puroro::Either::Right(u)))
+                },
+            )
         }
     }
 

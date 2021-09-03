@@ -21,7 +21,10 @@ type Field{{ f.number }}ScalarGetterType<'this> = ::puroro_internal::Derefable<S
 fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
 {
     {%- if f.is_length_delimited %}
-    todo!()
+    self.as_ref().either(
+        |t| ::puroro::Either::Left(<T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t)),
+        |u| ::puroro::Either::Right(<U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u)),
+    )
     {%- else %}
     self.as_ref().either(
         |t| <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t),
@@ -35,7 +38,21 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
 fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}>
 {
     {%- if f.is_length_delimited %}
-    todo!()
+    {%- if f.is_message %}
+    self.as_ref().either(
+        |t| <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t).map(
+            |t| ::puroro_internal::Derefable::new(::puroro::Either::Left(t))
+        ),
+        |u| <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u).map(
+            |u| ::puroro_internal::Derefable::new(::puroro::Either::Right(u))
+        ),
+    )
+    {%- else %}
+    self.as_ref().either(
+        |t| <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t).map(|t| ::puroro::Either::Left(t)),
+        |u| <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u).map(|u| ::puroro::Either::Right(u)),
+    )
+    {%- endif %}
     {%- else %}
     self.as_ref().either(
         |t| <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t),

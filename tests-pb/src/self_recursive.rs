@@ -144,7 +144,16 @@ pub mod _puroro_impls {
         fn recursive_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
-            todo!()
+            self.as_ref().either(
+                |t| {
+                    <T::Target as super::_puroro_traits::MsgTrait>::recursive_unlabeled(t)
+                        .map(|t| ::puroro_internal::Derefable::new(::puroro::Either::Left(t)))
+                },
+                |u| {
+                    <U::Target as super::_puroro_traits::MsgTrait>::recursive_unlabeled(u)
+                        .map(|u| ::puroro_internal::Derefable::new(::puroro::Either::Right(u)))
+                },
+            )
         }
     }
 

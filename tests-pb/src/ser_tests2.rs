@@ -429,7 +429,16 @@ pub mod _puroro_impls {
         fn string_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field5ScalarGetterType<'this>> {
-            todo!()
+            self.as_ref().either(
+                |t| {
+                    <T::Target as super::_puroro_traits::MsgTrait>::string_optional(t)
+                        .map(|t| ::puroro::Either::Left(t))
+                },
+                |u| {
+                    <U::Target as super::_puroro_traits::MsgTrait>::string_optional(u)
+                        .map(|u| ::puroro::Either::Right(u))
+                },
+            )
         }
         type Field6ScalarGetterType<'this> = ::puroro::Either<
             <T::Target as super::_puroro_traits::MsgTrait>::Field6ScalarGetterType<'this>,
@@ -460,7 +469,16 @@ pub mod _puroro_impls {
         fn submsg_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
-            todo!()
+            self.as_ref().either(
+                |t| {
+                    <T::Target as super::_puroro_traits::MsgTrait>::submsg_optional(t)
+                        .map(|t| ::puroro_internal::Derefable::new(::puroro::Either::Left(t)))
+                },
+                |u| {
+                    <U::Target as super::_puroro_traits::MsgTrait>::submsg_optional(u)
+                        .map(|u| ::puroro_internal::Derefable::new(::puroro::Either::Right(u)))
+                },
+            )
         }
         type Field8MessageType<'this> = ::puroro::Either<
             <T::Target as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>,
