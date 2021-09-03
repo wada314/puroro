@@ -12,7 +12,7 @@ pub use ::puroro::{bumpalo, hashbrown};
 
 pub struct Derefable<T>(T);
 impl<T> Derefable<T> {
-    fn new(v: T) -> Self {
+    pub fn new(v: T) -> Self {
         Self(v)
     }
 }

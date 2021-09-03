@@ -51,14 +51,39 @@ where
     U::Target: {{ owner_message_trait_path }},
 {
     fn from(value: ::puroro::Either<{{ enum_ident }}<'msg, T::Target>, {{ enum_ident }}<'msg, U::Target>>) -> Self {
-        todo!()
+        match value {
+            {%- for field in fields %}
+            ::puroro::Either::Left({{ enum_ident }}::{{ field.ident }}(v)) => {
+                {%- if field.is_length_delimited %}
+                {%- if field.is_message %}
+                {{ enum_ident }}::{{ field.ident }}(::puroro_internal::Derefable::new(::puroro::Either::Left(v)))
+                {%- else %}
+                {{ enum_ident }}::{{ field.ident }}(::puroro::Either::Left(v))
+                {%- endif %}
+                {%- else %}
+                {{ enum_ident }}::{{ field.ident }}(v)
+                {%- endif %}
+            }
+            ::puroro::Either::Right({{ enum_ident }}::{{ field.ident }}(v)) => {
+                {%- if field.is_length_delimited %}
+                {%- if field.is_message %}
+                {{ enum_ident }}::{{ field.ident }}(::puroro_internal::Derefable::new(::puroro::Either::Right(v)))
+                {%- else %}
+                {{ enum_ident }}::{{ field.ident }}(::puroro::Either::Right(v))
+                {%- endif %}
+                {%- else %}
+                {{ enum_ident }}::{{ field.ident }}(v)
+                {%- endif %}
+            }
+            {%- endfor %}
+        }
     }
 }
 {%- else %}
 impl ::std::convert::From<::puroro::Either<{{ enum_ident }}, {{ enum_ident }}>> for {{ enum_ident }}
 {
     fn from(value: ::puroro::Either<{{ enum_ident }}, {{ enum_ident }}>) -> Self {
-        todo!()
+        value.into_inner()
     }
 }
 {%- endif %}

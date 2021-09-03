@@ -696,7 +696,16 @@ pub mod _puroro_nested {
                 fn from(
                     value: ::puroro::Either<GroupOne<'msg, T::Target>, GroupOne<'msg, U::Target>>,
                 ) -> Self {
-                    todo!()
+                    match value {
+                        ::puroro::Either::Left(GroupOne::G1Int32(v)) => GroupOne::G1Int32(v),
+                        ::puroro::Either::Right(GroupOne::G1Int32(v)) => GroupOne::G1Int32(v),
+                        ::puroro::Either::Left(GroupOne::G1String(v)) => {
+                            GroupOne::G1String(::puroro::Either::Left(v))
+                        }
+                        ::puroro::Either::Right(GroupOne::G1String(v)) => {
+                            GroupOne::G1String(::puroro::Either::Right(v))
+                        }
+                    }
                 }
             }
             pub enum GroupTwo<
@@ -744,7 +753,22 @@ pub mod _puroro_nested {
                 fn from(
                     value: ::puroro::Either<GroupTwo<'msg, T::Target>, GroupTwo<'msg, U::Target>>,
                 ) -> Self {
-                    todo!()
+                    match value {
+                        ::puroro::Either::Left(GroupTwo::G2F32(v)) => GroupTwo::G2F32(v),
+                        ::puroro::Either::Right(GroupTwo::G2F32(v)) => GroupTwo::G2F32(v),
+                        ::puroro::Either::Left(GroupTwo::G2String(v)) => {
+                            GroupTwo::G2String(::puroro::Either::Left(v))
+                        }
+                        ::puroro::Either::Right(GroupTwo::G2String(v)) => {
+                            GroupTwo::G2String(::puroro::Either::Right(v))
+                        }
+                        ::puroro::Either::Left(GroupTwo::G2Submsg(v)) => GroupTwo::G2Submsg(
+                            ::puroro_internal::Derefable::new(::puroro::Either::Left(v)),
+                        ),
+                        ::puroro::Either::Right(GroupTwo::G2Submsg(v)) => GroupTwo::G2Submsg(
+                            ::puroro_internal::Derefable::new(::puroro::Either::Right(v)),
+                        ),
+                    }
                 }
             }
             pub enum GroupThree {
@@ -768,7 +792,7 @@ pub mod _puroro_nested {
             }
             impl ::std::convert::From<::puroro::Either<GroupThree, GroupThree>> for GroupThree {
                 fn from(value: ::puroro::Either<GroupThree, GroupThree>) -> Self {
-                    todo!()
+                    value.into_inner()
                 }
             }
         }
