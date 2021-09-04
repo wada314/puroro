@@ -37,7 +37,11 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
 fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}>
 {
     {%- if f.is_length_delimited %}
+    {%- if f.is_message %}
     todo!()
+    {%- else %}
+    todo!()
+    {%- endif %}
     {%- else %}
     let left = <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.t);
     left.or_else(|| <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.u))
