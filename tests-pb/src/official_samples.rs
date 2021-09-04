@@ -536,13 +536,16 @@ pub mod _puroro_impls {
         T::Target: super::_puroro_traits::Test4Trait,
         U::Target: super::_puroro_traits::Test4Trait,
     {
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field4RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
             <T::Target as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
             <U::Target as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
         >;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+                <T::Target as super::_puroro_traits::Test4Trait>::d(&self.t),
+                <U::Target as super::_puroro_traits::Test4Trait>::d(&self.u),
+            )
         }
     }
     impl<T, U> super::_puroro_traits::Test4Trait for ::puroro::Either<T, U>

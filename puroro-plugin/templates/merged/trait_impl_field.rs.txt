@@ -46,23 +46,26 @@ fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_
 {%- endif %}
 
 {%- if f.trait_has_repeated_getter %}
-{%- let either_repeated_field_type %}
+{%- let merged_repeated_field_type %}
 {%- if f.is_length_delimited %}
 {%- if f.is_message %}
-{%- let either_repeated_field_type = "EitherRepeatedMessageField" %}
+{%- let merged_repeated_field_type = "MergedRepeatedMessageField" %}
 {%- else %}
-{%- let either_repeated_field_type = "EitherRepeatedLDField" %}
+{%- let merged_repeated_field_type = "MergedRepeatedLDField" %}
 {%- endif %}
 {%- else %}
-{%- let either_repeated_field_type = "EitherRepeatedField" %}
+{%- let merged_repeated_field_type = "MergedRepeatedField" %}
 {%- endif %}
-type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::either::{{ either_repeated_field_type }}<
+type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::merged::{{ merged_repeated_field_type }}<
     <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
     <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
 >;
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this>
 {
-    todo!()
+    ::puroro_internal::impls::merged::{{ merged_repeated_field_type }}::new(
+        <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.t),
+        <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.u),
+    )
 }
 {%- endif %}

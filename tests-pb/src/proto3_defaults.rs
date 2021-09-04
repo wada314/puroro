@@ -207,13 +207,16 @@ pub mod _puroro_impls {
             let left = <T::Target as super::_puroro_traits::MsgTrait>::i32_optional(&self.t);
             left.or_else(|| <U::Target as super::_puroro_traits::MsgTrait>::i32_optional(&self.u))
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field3RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
             <T::Target as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
             <U::Target as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
         >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+                <T::Target as super::_puroro_traits::MsgTrait>::i32_repeated(&self.t),
+                <U::Target as super::_puroro_traits::MsgTrait>::i32_repeated(&self.u),
+            )
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             let left = <T::Target as super::_puroro_traits::MsgTrait>::f32_unlabeled(&self.t);

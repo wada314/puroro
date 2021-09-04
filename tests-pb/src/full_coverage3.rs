@@ -352,13 +352,16 @@ pub mod _puroro_impls {
             let left = <T::Target as super::_puroro_traits::MsgTrait>::i32_optional(&self.t);
             left.or_else(|| <U::Target as super::_puroro_traits::MsgTrait>::i32_optional(&self.u))
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field3RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
             <T::Target as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
             <U::Target as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
         >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+                <T::Target as super::_puroro_traits::MsgTrait>::i32_repeated(&self.t),
+                <U::Target as super::_puroro_traits::MsgTrait>::i32_repeated(&self.u),
+            )
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             let left = <T::Target as super::_puroro_traits::MsgTrait>::float_unlabeled(&self.t);
@@ -372,13 +375,16 @@ pub mod _puroro_impls {
             let left = <T::Target as super::_puroro_traits::MsgTrait>::float_optional(&self.t);
             left.or_else(|| <U::Target as super::_puroro_traits::MsgTrait>::float_optional(&self.u))
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field13RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
             <T::Target as super::_puroro_traits::MsgTrait>::Field13RepeatedType<'this>,
             <U::Target as super::_puroro_traits::MsgTrait>::Field13RepeatedType<'this>,
         >;
 
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+                <T::Target as super::_puroro_traits::MsgTrait>::float_repeated(&self.t),
+                <U::Target as super::_puroro_traits::MsgTrait>::float_repeated(&self.u),
+            )
         }
         type Field21ScalarGetterType<'this> = ::puroro::Either<
             <T::Target as super::_puroro_traits::MsgTrait>::Field21ScalarGetterType<'this>,
@@ -400,13 +406,16 @@ pub mod _puroro_impls {
             <T::Target as super::_puroro_traits::MsgTrait>::Field23ScalarGetterType<'this>,
             <U::Target as super::_puroro_traits::MsgTrait>::Field23ScalarGetterType<'this>,
         >;
-        type Field23RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedLDField<
+        type Field23RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedLDField<
             <T::Target as super::_puroro_traits::MsgTrait>::Field23RepeatedType<'this>,
             <U::Target as super::_puroro_traits::MsgTrait>::Field23RepeatedType<'this>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedLDField::new(
+                <T::Target as super::_puroro_traits::MsgTrait>::string_repeated(&self.t),
+                <U::Target as super::_puroro_traits::MsgTrait>::string_repeated(&self.u),
+            )
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             let left = <T::Target as super::_puroro_traits::MsgTrait>::enum_unlabeled(&self.t);
@@ -422,13 +431,16 @@ pub mod _puroro_impls {
             let left = <T::Target as super::_puroro_traits::MsgTrait>::enum_optional(&self.t);
             left.or_else(|| <U::Target as super::_puroro_traits::MsgTrait>::enum_optional(&self.u))
         }
-        type Field33RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field33RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
             <T::Target as super::_puroro_traits::MsgTrait>::Field33RepeatedType<'this>,
             <U::Target as super::_puroro_traits::MsgTrait>::Field33RepeatedType<'this>,
         >;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+                <T::Target as super::_puroro_traits::MsgTrait>::enum_repeated(&self.t),
+                <U::Target as super::_puroro_traits::MsgTrait>::enum_repeated(&self.u),
+            )
         }
         type Field41MessageType<'this> = ::puroro::Either<
             <T::Target as super::_puroro_traits::MsgTrait>::Field41ScalarGetterType<'this>,
@@ -459,13 +471,16 @@ pub mod _puroro_impls {
         type Field43ScalarGetterType<'this> =
             ::puroro_internal::Derefable<Self::Field43MessageType<'this>>;
         type Field43RepeatedType<'this> =
-            ::puroro_internal::impls::either::EitherRepeatedMessageField<
+            ::puroro_internal::impls::merged::MergedRepeatedMessageField<
                 <T::Target as super::_puroro_traits::MsgTrait>::Field43RepeatedType<'this>,
                 <U::Target as super::_puroro_traits::MsgTrait>::Field43RepeatedType<'this>,
             >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedMessageField::new(
+                <T::Target as super::_puroro_traits::MsgTrait>::submsg_repeated(&self.t),
+                <U::Target as super::_puroro_traits::MsgTrait>::submsg_repeated(&self.u),
+            )
         }
     }
     impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
