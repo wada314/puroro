@@ -54,7 +54,6 @@ struct Message {
     oneofs: Vec<Oneof>,
     simple_ident: String,
     empty_ident: String,
-    merged_ident: String,
     simple_single_field_ident: String,
 }
 
@@ -93,7 +92,6 @@ impl Message {
             oneofs,
             simple_ident: m.rust_impl_ident("Simple"),
             empty_ident: m.rust_impl_ident("Empty"),
-            merged_ident: m.rust_impl_ident("Merged"),
             simple_single_field_ident: m.rust_impl_ident("SimpleField"),
         })
     }

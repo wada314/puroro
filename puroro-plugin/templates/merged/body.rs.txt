@@ -1,19 +1,4 @@
-
-pub struct {{ m.merged_ident }}<T, U> {
-    t: T,
-    u: U,
-}
-
-impl<T, U> {{ m.merged_ident }}<T, U> {
-    pub fn new(t: T, u: U) -> Self {
-        Self { t, u }
-    }
-}
-
-impl<T, U> ::puroro::Message for {{ m.merged_ident }}<T, U> {}
-
-
-impl<T, U> super::_puroro_traits::{{ m.trait_ident }} for {{ m.merged_ident }}<T, U>
+impl<T, U> super::_puroro_traits::{{ m.trait_ident }} for ::puroro::EitherOrBoth<T, U>
 where
     T: ::std::ops::Deref,
     U: ::std::ops::Deref,
@@ -36,7 +21,5 @@ where
         todo!()
     }
     {%- endfor %}
-
-
 }
 

@@ -85,20 +85,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    pub struct Test1Merged<T, U> {
-        t: T,
-        u: U,
-    }
-
-    impl<T, U> Test1Merged<T, U> {
-        pub fn new(t: T, u: U) -> Self {
-            Self { t, u }
-        }
-    }
-
-    impl<T, U> ::puroro::Message for Test1Merged<T, U> {}
-
-    impl<T, U> super::_puroro_traits::Test1Trait for Test1Merged<T, U>
+    impl<T, U> super::_puroro_traits::Test1Trait for ::puroro::EitherOrBoth<T, U>
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
@@ -106,8 +93,15 @@ pub mod _puroro_impls {
         U::Target: super::_puroro_traits::Test1Trait,
     {
         fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-            let left = <T::Target as super::_puroro_traits::Test1Trait>::a(&self.t);
-            left.or_else(|| <U::Target as super::_puroro_traits::Test1Trait>::a(&self.u))
+            let left_opt = self
+                .as_ref()
+                .left()
+                .and_then(|t| <T::Target as super::_puroro_traits::Test1Trait>::a(t));
+            left_opt.or_else(|| {
+                self.as_ref()
+                    .right()
+                    .and_then(|u| <U::Target as super::_puroro_traits::Test1Trait>::a(u))
+            })
         }
     }
     impl<T, U> super::_puroro_traits::Test1Trait for ::puroro::Either<T, U>
@@ -212,20 +206,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    pub struct Test2Merged<T, U> {
-        t: T,
-        u: U,
-    }
-
-    impl<T, U> Test2Merged<T, U> {
-        pub fn new(t: T, u: U) -> Self {
-            Self { t, u }
-        }
-    }
-
-    impl<T, U> ::puroro::Message for Test2Merged<T, U> {}
-
-    impl<T, U> super::_puroro_traits::Test2Trait for Test2Merged<T, U>
+    impl<T, U> super::_puroro_traits::Test2Trait for ::puroro::EitherOrBoth<T, U>
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
@@ -363,27 +344,14 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    pub struct Test3Merged<T, U> {
-        t: T,
-        u: U,
-    }
-
-    impl<T, U> Test3Merged<T, U> {
-        pub fn new(t: T, u: U) -> Self {
-            Self { t, u }
-        }
-    }
-
-    impl<T, U> ::puroro::Message for Test3Merged<T, U> {}
-
-    impl<T, U> super::_puroro_traits::Test3Trait for Test3Merged<T, U>
+    impl<T, U> super::_puroro_traits::Test3Trait for ::puroro::EitherOrBoth<T, U>
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
         T::Target: super::_puroro_traits::Test3Trait,
         U::Target: super::_puroro_traits::Test3Trait,
     {
-        type Field3MessageType<'this> = ::puroro::Either<
+        type Field3MessageType<'this> = ::puroro::EitherOrBoth<
             <T::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
             <U::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
         >;
@@ -516,20 +484,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    pub struct Test4Merged<T, U> {
-        t: T,
-        u: U,
-    }
-
-    impl<T, U> Test4Merged<T, U> {
-        pub fn new(t: T, u: U) -> Self {
-            Self { t, u }
-        }
-    }
-
-    impl<T, U> ::puroro::Message for Test4Merged<T, U> {}
-
-    impl<T, U> super::_puroro_traits::Test4Trait for Test4Merged<T, U>
+    impl<T, U> super::_puroro_traits::Test4Trait for ::puroro::EitherOrBoth<T, U>
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
@@ -542,10 +497,11 @@ pub mod _puroro_impls {
         >;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            /*::puroro_internal::impls::merged::MergedRepeatedField::new(
                 <T::Target as super::_puroro_traits::Test4Trait>::d(&self.t),
                 <U::Target as super::_puroro_traits::Test4Trait>::d(&self.u),
-            )
+            )*/
+            todo!()
         }
     }
     impl<T, U> super::_puroro_traits::Test4Trait for ::puroro::Either<T, U>

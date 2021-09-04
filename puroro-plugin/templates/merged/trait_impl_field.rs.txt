@@ -1,6 +1,6 @@
 {%- match f.trait_maybe_field_message_trait_path %}
 {%- when Some with (field_msg_path) %}
-type Field{{ f.number }}MessageType<'this> = ::puroro::Either<
+type Field{{ f.number }}MessageType<'this> = ::puroro::EitherOrBoth<
     <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
     <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
 >;
@@ -23,11 +23,17 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
     {%- if f.is_length_delimited %}
     todo!()
     {%- else %}
-    let left = <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.t);
-    if left == ::std::default::Default::default() {
-        <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.u)
-    } else {
-        left
+    match self {
+        ::puroro::EitherOrBoth::Left(t) => <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t),
+        ::puroro::EitherOrBoth::Right(u) => <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u),
+        ::puroro::EitherOrBoth::Both(t, u) => {
+            let left = <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t);
+            if left != ::std::default::Default::default() {
+                left
+            } else {
+                <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u)
+            }
+        }
     }
     {%- endif %}
 }
@@ -43,8 +49,8 @@ fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_
     todo!()
     {%- endif %}
     {%- else %}
-    let left = <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.t);
-    left.or_else(|| <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.u))
+    let left_opt = self.as_ref().left().and_then(|t| <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t));
+    left_opt.or_else(|| self.as_ref().right().and_then(|u| <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u)))
     {%- endif %}
 }
 {%- endif %}
@@ -67,9 +73,10 @@ type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::merged::
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this>
 {
-    ::puroro_internal::impls::merged::{{ merged_repeated_field_type }}::new(
+    /*::puroro_internal::impls::merged::{{ merged_repeated_field_type }}::new(
         <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.t),
         <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.u),
-    )
+    )*/
+    todo!()
 }
 {%- endif %}
