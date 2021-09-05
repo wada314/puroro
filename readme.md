@@ -10,7 +10,9 @@ This library is under development and it is very possible to make breaking chang
     - [ ] extensions
 - proto2 & 3
     - [ ] Maps
-    - [x] OneOfs
+    - [ ] OneOfs
+        - [x] Type definitions
+        - [ ] serialize / deserialize
     - [ ] Anys, and other well-known types
     - [ ] Enum allow-alias option
     - [ ] Unit tests
@@ -29,7 +31,7 @@ This library is under development and it is very possible to make breaking chang
     - [ ] Other implementations
         - [ ] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
         - [ ] SliceView -- A viewer over a `&[u8]` slice
-        - [x] Empty(Unit) -- A 0 byte size immutable implementation that only returns default value
+        - [x] Empty(Unit) -- `()`, which only returns default values
         - [ ] Append (name TBD) -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
         - [x] Merged -- `(T, U)`
         - [x] Either -- `::itertools::Either<T, U>`
