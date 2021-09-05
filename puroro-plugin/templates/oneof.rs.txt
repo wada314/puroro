@@ -11,27 +11,27 @@ pub enum {{ enum_ident }}
 
 #[allow(non_camel_case_types)]
 #[derive(Clone, PartialEq, Debug)]
-pub enum {{ enum_ident }}_Simple
+pub enum {{ simple_enum_ident }}
 {
     {%- for field in fields %}
     {{ field.ident }}({{ field.simple_field_type }}),
     {%- endfor %}
 }
 
-impl<'msg> ::std::convert::From<&'msg {{ enum_ident }}_Simple> 
+impl<'msg> ::std::convert::From<&'msg {{ simple_enum_ident }}> 
 for {{ enum_ident }}
 {%- if has_reference_field %}
 <'msg, {{ simple_owner_message_path }}>
 {%- endif %}
 {
-    fn from(from: &'msg {{ enum_ident }}_Simple) -> Self {
+    fn from(from: &'msg {{ simple_enum_ident }}) -> Self {
         match from {
             {%- for field in fields %}
-            {{ enum_ident }}_Simple::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(
+            {{ simple_enum_ident }}::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(
                 {%- if field.is_length_delimited %}
                 v.as_ref()
                 {%- else %}
-                ::std::clone::Clone::clone(&v)
+                Clone::clone(&v)
                 {%- endif %}
             ),
             {%- endfor %}

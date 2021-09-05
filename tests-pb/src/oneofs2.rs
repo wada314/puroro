@@ -74,8 +74,6 @@ pub mod _puroro_impls {
             match field_number {
                 1 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupOne_Simple;
-                    #[allow(unused)]
-                    use ::std::option::Option::Some;
                     if !matches!(&self.group_one, Some(GroupOne_Simple::G1Int32(_))) {
                         self.group_one =
                             Some(GroupOne_Simple::G1Int32(::std::default::Default::default()));
@@ -91,8 +89,6 @@ pub mod _puroro_impls {
                 }
                 2 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupOne_Simple;
-                    #[allow(unused)]
-                    use ::std::option::Option::Some;
                     if !matches!(&self.group_one, Some(GroupOne_Simple::G1String(_))) {
                         self.group_one =
                             Some(GroupOne_Simple::G1String(::std::default::Default::default()));
@@ -108,8 +104,6 @@ pub mod _puroro_impls {
                 }
                 3 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo_Simple;
-                    #[allow(unused)]
-                    use ::std::option::Option::Some;
                     if !matches!(&self.group_two, Some(GroupTwo_Simple::G2F32(_))) {
                         self.group_two =
                             Some(GroupTwo_Simple::G2F32(::std::default::Default::default()));
@@ -125,8 +119,6 @@ pub mod _puroro_impls {
                 }
                 4 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo_Simple;
-                    #[allow(unused)]
-                    use ::std::option::Option::Some;
                     if !matches!(&self.group_two, Some(GroupTwo_Simple::G2String(_))) {
                         self.group_two =
                             Some(GroupTwo_Simple::G2String(::std::default::Default::default()));
@@ -142,8 +134,6 @@ pub mod _puroro_impls {
                 }
                 5 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo_Simple;
-                    #[allow(unused)]
-                    use ::std::option::Option::Some;
                     if !matches!(&self.group_two, Some(GroupTwo_Simple::G2Submsg(_))) {
                         self.group_two =
                             Some(GroupTwo_Simple::G2Submsg(::std::default::Default::default()));
@@ -161,8 +151,6 @@ pub mod _puroro_impls {
                 }
                 6 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupThree_Simple;
-                    #[allow(unused)]
-                    use ::std::option::Option::Some;
                     if !matches!(&self.group_three, Some(GroupThree_Simple::G3Int32(_))) {
                         self.group_three = Some(GroupThree_Simple::G3Int32(
                             ::std::default::Default::default(),
@@ -721,9 +709,7 @@ pub mod _puroro_nested {
             {
                 fn from(from: &'msg GroupOne_Simple) -> Self {
                     match from {
-                        GroupOne_Simple::G1Int32(v) => {
-                            GroupOne::G1Int32(::std::clone::Clone::clone(&v))
-                        }
+                        GroupOne_Simple::G1Int32(v) => GroupOne::G1Int32(Clone::clone(&v)),
                         GroupOne_Simple::G1String(v) => GroupOne::G1String(v.as_ref()),
                     }
                 }
@@ -783,9 +769,7 @@ pub mod _puroro_nested {
             {
                 fn from(from: &'msg GroupTwo_Simple) -> Self {
                     match from {
-                        GroupTwo_Simple::G2F32(v) => {
-                            GroupTwo::G2F32(::std::clone::Clone::clone(&v))
-                        }
+                        GroupTwo_Simple::G2F32(v) => GroupTwo::G2F32(Clone::clone(&v)),
                         GroupTwo_Simple::G2String(v) => GroupTwo::G2String(v.as_ref()),
                         GroupTwo_Simple::G2Submsg(v) => GroupTwo::G2Submsg(v.as_ref()),
                     }
@@ -842,9 +826,7 @@ pub mod _puroro_nested {
             impl<'msg> ::std::convert::From<&'msg GroupThree_Simple> for GroupThree {
                 fn from(from: &'msg GroupThree_Simple) -> Self {
                     match from {
-                        GroupThree_Simple::G3Int32(v) => {
-                            GroupThree::G3Int32(::std::clone::Clone::clone(&v))
-                        }
+                        GroupThree_Simple::G3Int32(v) => GroupThree::G3Int32(Clone::clone(&v)),
                     }
                 }
             }

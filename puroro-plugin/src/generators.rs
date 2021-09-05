@@ -215,6 +215,7 @@ struct Oneof {
     is_synthetic: bool,
     has_reference_field: bool,
     owner_message_trait_path: String,
+    simple_enum_ident: String,
     simple_owner_message_path: String,
 }
 
@@ -238,6 +239,7 @@ impl Oneof {
                 )
             }),
             owner_message_trait_path: o.message()?.rust_trait_path(),
+            simple_enum_ident: format!("{}_Simple", o.rust_enum_ident()),
             simple_owner_message_path: o.message()?.rust_impl_path("Simple"),
         })
     }
