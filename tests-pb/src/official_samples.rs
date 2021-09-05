@@ -467,6 +467,15 @@ pub mod _puroro_traits {
             (**self).a()
         }
     }
+
+    impl<T> Test1Trait for ::std::boxed::Box<T>
+    where
+        T: Test1Trait,
+    {
+        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
+            (**self).a()
+        }
+    }
     pub trait Test2Trait {
         type Field2StringType<'this>: ::std::ops::Deref<Target = str>;
         fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
@@ -475,6 +484,16 @@ pub mod _puroro_traits {
     }
 
     impl<T> Test2Trait for &'_ T
+    where
+        T: Test2Trait,
+    {
+        type Field2StringType<'this> = T::Field2StringType<'this>;
+        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
+            (**self).b()
+        }
+    }
+
+    impl<T> Test2Trait for ::std::boxed::Box<T>
     where
         T: Test2Trait,
     {
@@ -499,6 +518,16 @@ pub mod _puroro_traits {
             (**self).c()
         }
     }
+
+    impl<T> Test3Trait for ::std::boxed::Box<T>
+    where
+        T: Test3Trait,
+    {
+        type Field3MessageType<'this> = T::Field3MessageType<'this>;
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+            (**self).c()
+        }
+    }
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>;
@@ -506,6 +535,16 @@ pub mod _puroro_traits {
     }
 
     impl<T> Test4Trait for &'_ T
+    where
+        T: Test4Trait,
+    {
+        type Field4RepeatedType<'this> = T::Field4RepeatedType<'this>;
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            (**self).d()
+        }
+    }
+
+    impl<T> Test4Trait for ::std::boxed::Box<T>
     where
         T: Test4Trait,
     {

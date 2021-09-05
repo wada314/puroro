@@ -693,11 +693,46 @@ pub mod _puroro_traits {
             (**self).group_three().map(|v| v.into())
         }
     }
+
+    impl<T> MsgTrait for ::std::boxed::Box<T>
+    where
+        T: MsgTrait,
+    {
+        type Field2StringType<'this> = T::Field2StringType<'this>;
+        type Field4StringType<'this> = T::Field4StringType<'this>;
+        type Field5MessageType<'this> = T::Field5MessageType<'this>;
+        fn group_one<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
+        {
+            (**self).group_one().map(|v| v.into())
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
+        {
+            (**self).group_two().map(|v| v.into())
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            (**self).group_three().map(|v| v.into())
+        }
+    }
     pub trait SubmsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32;
     }
 
     impl<T> SubmsgTrait for &'_ T
+    where
+        T: SubmsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            (**self).i32_unlabeled()
+        }
+    }
+
+    impl<T> SubmsgTrait for ::std::boxed::Box<T>
     where
         T: SubmsgTrait,
     {
@@ -758,6 +793,17 @@ pub mod _puroro_nested {
                     }
                 }
             }
+            impl<'msg, T> ::std::convert::From<GroupOne<'msg, T>> for GroupOne<'msg, ::std::boxed::Box<T>>
+            where
+                T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+            {
+                fn from(value: GroupOne<'msg, T>) -> Self {
+                    match value {
+                        GroupOne::G1Int32(v) => GroupOne::G1Int32(v),
+                        GroupOne::G1String(v) => GroupOne::G1String(v),
+                    }
+                }
+            }
             pub enum GroupTwo<
                 'msg,
                 T: ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
@@ -789,6 +835,18 @@ pub mod _puroro_nested {
                 }
             }
             impl<'msg, T> ::std::convert::From<GroupTwo<'msg, T>> for GroupTwo<'msg, &'_ T>
+            where
+                T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
+            {
+                fn from(value: GroupTwo<'msg, T>) -> Self {
+                    match value {
+                        GroupTwo::G2F32(v) => GroupTwo::G2F32(v),
+                        GroupTwo::G2String(v) => GroupTwo::G2String(v),
+                        GroupTwo::G2Submsg(v) => GroupTwo::G2Submsg(v),
+                    }
+                }
+            }
+            impl<'msg, T> ::std::convert::From<GroupTwo<'msg, T>> for GroupTwo<'msg, ::std::boxed::Box<T>>
             where
                 T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
             {

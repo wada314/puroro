@@ -594,11 +594,49 @@ pub mod _puroro_traits {
             (**self).submsg_unlabeled()
         }
     }
+
+    impl<T> MsgTrait for ::std::boxed::Box<T>
+    where
+        T: MsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            (**self).i32_unlabeled()
+        }
+        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            (**self).i32_optional()
+        }
+        type Field3RepeatedType<'this> = T::Field3RepeatedType<'this>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            (**self).i32_repeated()
+        }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            (**self).f32_unlabeled()
+        }
+        type Field5StringType<'this> = T::Field5StringType<'this>;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+            (**self).string_unlabeled()
+        }
+        type Field6MessageType<'this> = T::Field6MessageType<'this>;
+        fn submsg_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
+            (**self).submsg_unlabeled()
+        }
+    }
     pub trait SubmsgTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32;
     }
 
     impl<T> SubmsgTrait for &'_ T
+    where
+        T: SubmsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            (**self).i32_unlabeled()
+        }
+    }
+
+    impl<T> SubmsgTrait for ::std::boxed::Box<T>
     where
         T: SubmsgTrait,
     {

@@ -1035,6 +1035,60 @@ pub mod _puroro_traits {
             (**self).very_large_field_number()
         }
     }
+
+    impl<T> MsgTrait for ::std::boxed::Box<T>
+    where
+        T: MsgTrait,
+    {
+        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            (**self).i32_optional()
+        }
+        type Field2RepeatedType<'this> = T::Field2RepeatedType<'this>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            (**self).i32_repeated()
+        }
+        fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
+            (**self).float_optional()
+        }
+        type Field4RepeatedType<'this> = T::Field4RepeatedType<'this>;
+        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            (**self).float_repeated()
+        }
+        type Field5StringType<'this> = T::Field5StringType<'this>;
+        fn string_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field5StringType<'this>> {
+            (**self).string_optional()
+        }
+        type Field6StringType<'this> = T::Field6StringType<'this>;
+        type Field6RepeatedType<'this> = T::Field6RepeatedType<'this>;
+        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            (**self).string_repeated()
+        }
+        type Field7MessageType<'this> = T::Field7MessageType<'this>;
+        fn submsg_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
+            (**self).submsg_optional()
+        }
+        type Field8MessageType<'this> = T::Field8MessageType<'this>;
+        type Field8RepeatedType<'this> = T::Field8RepeatedType<'this>;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            (**self).submsg_repeated()
+        }
+        fn enum_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
+            (**self).enum_optional()
+        }
+        type Field10RepeatedType<'this> = T::Field10RepeatedType<'this>;
+        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            (**self).enum_repeated()
+        }
+        fn very_large_field_number<'this>(&'this self) -> ::std::option::Option<i32> {
+            (**self).very_large_field_number()
+        }
+    }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
 pub enum Enum {
@@ -1194,6 +1248,15 @@ pub mod _puroro_nested {
             }
 
             impl<T> SubmsgTrait for &'_ T
+            where
+                T: SubmsgTrait,
+            {
+                fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+                    (**self).i32_optional()
+                }
+            }
+
+            impl<T> SubmsgTrait for ::std::boxed::Box<T>
             where
                 T: SubmsgTrait,
             {
