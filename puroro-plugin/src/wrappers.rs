@@ -1,14 +1,11 @@
 #![allow(unused)]
 
-use crate::protos::google::protobuf;
-use crate::protos::google::protobuf::field_descriptor_proto::{
-    Label as FieldLabelProto, Type as FieldTypeProto,
-};
 use crate::utils::*;
 use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
 use ::once_cell::unsync::{Lazy, OnceCell};
+use ::protobuf_compiled::google::protobuf;
 use ::std::borrow::Borrow;
 use ::std::collections::{HashMap, VecDeque};
 use ::std::convert::TryInto;
@@ -17,6 +14,7 @@ use ::std::iter;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 use protobuf::compiler::CodeGeneratorRequest;
+use protobuf::field_descriptor_proto::{Label as FieldLabelProto, Type as FieldTypeProto};
 use protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
     OneofDescriptorProto,
