@@ -264,7 +264,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::EitherOrBoth<T, U>
+    impl<T, U> super::_puroro_traits::MsgTrait for (T, U)
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
@@ -272,15 +272,7 @@ pub mod _puroro_impls {
         U::Target: super::_puroro_traits::MsgTrait,
     {
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            let left_opt = self
-                .as_ref()
-                .left()
-                .and_then(|t| <T::Target as super::_puroro_traits::MsgTrait>::i32_optional(t));
-            left_opt.or_else(|| {
-                self.as_ref()
-                    .right()
-                    .and_then(|u| <U::Target as super::_puroro_traits::MsgTrait>::i32_optional(u))
-            })
+            todo!()
         }
         type Field2RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
             <T::Target as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>,
@@ -288,22 +280,13 @@ pub mod _puroro_impls {
         >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
-            /*::puroro_internal::impls::merged::MergedRepeatedField::new(
-                <T::Target as super::_puroro_traits::MsgTrait>::i32_repeated(&self.t),
-                <U::Target as super::_puroro_traits::MsgTrait>::i32_repeated(&self.u),
-            )*/
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+                <T::Target as super::_puroro_traits::MsgTrait>::i32_repeated(&self.0),
+                <U::Target as super::_puroro_traits::MsgTrait>::i32_repeated(&self.1),
+            )
         }
         fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
-            let left_opt = self
-                .as_ref()
-                .left()
-                .and_then(|t| <T::Target as super::_puroro_traits::MsgTrait>::float_optional(t));
-            left_opt.or_else(|| {
-                self.as_ref()
-                    .right()
-                    .and_then(|u| <U::Target as super::_puroro_traits::MsgTrait>::float_optional(u))
-            })
+            todo!()
         }
         type Field4RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
             <T::Target as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>,
@@ -311,11 +294,10 @@ pub mod _puroro_impls {
         >;
 
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            /*::puroro_internal::impls::merged::MergedRepeatedField::new(
-                <T::Target as super::_puroro_traits::MsgTrait>::float_repeated(&self.t),
-                <U::Target as super::_puroro_traits::MsgTrait>::float_repeated(&self.u),
-            )*/
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+                <T::Target as super::_puroro_traits::MsgTrait>::float_repeated(&self.0),
+                <U::Target as super::_puroro_traits::MsgTrait>::float_repeated(&self.1),
+            )
         }
         type Field5ScalarGetterType<'this> = ::puroro::Either<
             <T::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
@@ -336,24 +318,43 @@ pub mod _puroro_impls {
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
-            /*::puroro_internal::impls::merged::MergedRepeatedLDField::new(
-                <T::Target as super::_puroro_traits::MsgTrait>::string_repeated(&self.t),
-                <U::Target as super::_puroro_traits::MsgTrait>::string_repeated(&self.u),
-            )*/
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedLDField::new(
+                <T::Target as super::_puroro_traits::MsgTrait>::string_repeated(&self.0),
+                <U::Target as super::_puroro_traits::MsgTrait>::string_repeated(&self.1),
+            )
         }
-        type Field7MessageType<'this> = ::puroro::EitherOrBoth<
-            <T::Target as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>,
-            <U::Target as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>,
+        type Field7MessageType<'this> = ::puroro::Either<
+            ::puroro::Either<
+                <T::Target as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>,
+                <U::Target as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>,
+            >,
+            (
+                <T::Target as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>,
+                <U::Target as super::_puroro_traits::MsgTrait>::Field7ScalarGetterType<'this>,
+            ),
         >;
         type Field7ScalarGetterType<'this> =
             ::puroro_internal::Derefable<Self::Field7MessageType<'this>>;
         fn submsg_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field7ScalarGetterType<'this>> {
-            todo!()
+            match (
+                <T::Target as super::_puroro_traits::MsgTrait>::submsg_optional(&self.0),
+                <U::Target as super::_puroro_traits::MsgTrait>::submsg_optional(&self.1),
+            ) {
+                (None, None) => None,
+                (Some(t), None) => Some(::puroro_internal::Derefable::new(::puroro::Either::Left(
+                    ::puroro::Either::Left(t),
+                ))),
+                (None, Some(u)) => Some(::puroro_internal::Derefable::new(::puroro::Either::Left(
+                    ::puroro::Either::Right(u),
+                ))),
+                (Some(t), Some(u)) => Some(::puroro_internal::Derefable::new(
+                    ::puroro::Either::Right((t, u)),
+                )),
+            }
         }
-        type Field8MessageType<'this> = ::puroro::EitherOrBoth<
+        type Field8MessageType<'this> = ::puroro::Either<
             <T::Target as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>,
             <U::Target as super::_puroro_traits::MsgTrait>::Field8ScalarGetterType<'this>,
         >;
@@ -366,24 +367,15 @@ pub mod _puroro_impls {
             >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
-            /*::puroro_internal::impls::merged::MergedRepeatedMessageField::new(
-                <T::Target as super::_puroro_traits::MsgTrait>::submsg_repeated(&self.t),
-                <U::Target as super::_puroro_traits::MsgTrait>::submsg_repeated(&self.u),
-            )*/
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedMessageField::new(
+                <T::Target as super::_puroro_traits::MsgTrait>::submsg_repeated(&self.0),
+                <U::Target as super::_puroro_traits::MsgTrait>::submsg_repeated(&self.1),
+            )
         }
         fn enum_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
-            let left_opt = self
-                .as_ref()
-                .left()
-                .and_then(|t| <T::Target as super::_puroro_traits::MsgTrait>::enum_optional(t));
-            left_opt.or_else(|| {
-                self.as_ref()
-                    .right()
-                    .and_then(|u| <U::Target as super::_puroro_traits::MsgTrait>::enum_optional(u))
-            })
+            todo!()
         }
         type Field10RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
             <T::Target as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>,
@@ -391,21 +383,13 @@ pub mod _puroro_impls {
         >;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
-            /*::puroro_internal::impls::merged::MergedRepeatedField::new(
-                <T::Target as super::_puroro_traits::MsgTrait>::enum_repeated(&self.t),
-                <U::Target as super::_puroro_traits::MsgTrait>::enum_repeated(&self.u),
-            )*/
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+                <T::Target as super::_puroro_traits::MsgTrait>::enum_repeated(&self.0),
+                <U::Target as super::_puroro_traits::MsgTrait>::enum_repeated(&self.1),
+            )
         }
         fn very_large_field_number<'this>(&'this self) -> ::std::option::Option<i32> {
-            let left_opt = self.as_ref().left().and_then(|t| {
-                <T::Target as super::_puroro_traits::MsgTrait>::very_large_field_number(t)
-            });
-            left_opt.or_else(|| {
-                self.as_ref().right().and_then(|u| {
-                    <U::Target as super::_puroro_traits::MsgTrait>::very_large_field_number(u)
-                })
-            })
+            todo!()
         }
     }
     impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
@@ -1272,7 +1256,7 @@ pub mod _puroro_nested {
                     ::std::result::Result::Ok(())
                 }
             }
-            impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::EitherOrBoth<T, U>
+            impl<T, U> super::_puroro_traits::SubmsgTrait for (T, U)
             where
                 T: ::std::ops::Deref,
                 U: ::std::ops::Deref,
@@ -1280,14 +1264,7 @@ pub mod _puroro_nested {
                 U::Target: super::_puroro_traits::SubmsgTrait,
             {
                 fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-                    let left_opt = self.as_ref().left().and_then(|t| {
-                        <T::Target as super::_puroro_traits::SubmsgTrait>::i32_optional(t)
-                    });
-                    left_opt.or_else(|| {
-                        self.as_ref().right().and_then(|u| {
-                            <U::Target as super::_puroro_traits::SubmsgTrait>::i32_optional(u)
-                        })
-                    })
+                    todo!()
                 }
             }
             impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>

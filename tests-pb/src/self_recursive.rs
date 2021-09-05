@@ -96,23 +96,43 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::EitherOrBoth<T, U>
+    impl<T, U> super::_puroro_traits::MsgTrait for (T, U)
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
         T::Target: super::_puroro_traits::MsgTrait,
         U::Target: super::_puroro_traits::MsgTrait,
     {
-        type Field1MessageType<'this> = ::puroro::EitherOrBoth<
-            <T::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
-            <U::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+        type Field1MessageType<'this> = ::puroro::Either<
+            ::puroro::Either<
+                <T::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+                <U::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+            >,
+            (
+                <T::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+                <U::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+            ),
         >;
         type Field1ScalarGetterType<'this> =
             ::puroro_internal::Derefable<Self::Field1MessageType<'this>>;
         fn recursive_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
-            todo!()
+            match (
+                <T::Target as super::_puroro_traits::MsgTrait>::recursive_unlabeled(&self.0),
+                <U::Target as super::_puroro_traits::MsgTrait>::recursive_unlabeled(&self.1),
+            ) {
+                (None, None) => None,
+                (Some(t), None) => Some(::puroro_internal::Derefable::new(::puroro::Either::Left(
+                    ::puroro::Either::Left(t),
+                ))),
+                (None, Some(u)) => Some(::puroro_internal::Derefable::new(::puroro::Either::Left(
+                    ::puroro::Either::Right(u),
+                ))),
+                (Some(t), Some(u)) => Some(::puroro_internal::Derefable::new(
+                    ::puroro::Either::Right((t, u)),
+                )),
+            }
         }
     }
     impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>

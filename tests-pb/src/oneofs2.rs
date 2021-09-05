@@ -263,7 +263,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::EitherOrBoth<T, U>
+    impl<T, U> super::_puroro_traits::MsgTrait for (T, U)
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
@@ -278,9 +278,15 @@ pub mod _puroro_impls {
             <T::Target as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>,
             <U::Target as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>,
         >;
-        type Field5MessageType<'this> = ::puroro::EitherOrBoth<
-            <T::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
-            <U::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+        type Field5MessageType<'this> = ::puroro::Either<
+            ::puroro::Either<
+                <T::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+                <U::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+            >,
+            (
+                <T::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+                <U::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+            ),
         >;
         type Field5ScalarGetterType<'this> =
             ::puroro_internal::Derefable<Self::Field5MessageType<'this>>;
@@ -616,7 +622,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::EitherOrBoth<T, U>
+    impl<T, U> super::_puroro_traits::SubmsgTrait for (T, U)
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
@@ -624,15 +630,7 @@ pub mod _puroro_impls {
         U::Target: super::_puroro_traits::SubmsgTrait,
     {
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            let left_opt = self
-                .as_ref()
-                .left()
-                .and_then(|t| <T::Target as super::_puroro_traits::SubmsgTrait>::i32_optional(t));
-            left_opt.or_else(|| {
-                self.as_ref().right().and_then(|u| {
-                    <U::Target as super::_puroro_traits::SubmsgTrait>::i32_optional(u)
-                })
-            })
+            todo!()
         }
     }
     impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>

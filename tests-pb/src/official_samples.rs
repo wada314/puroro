@@ -85,7 +85,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl<T, U> super::_puroro_traits::Test1Trait for ::puroro::EitherOrBoth<T, U>
+    impl<T, U> super::_puroro_traits::Test1Trait for (T, U)
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
@@ -93,15 +93,7 @@ pub mod _puroro_impls {
         U::Target: super::_puroro_traits::Test1Trait,
     {
         fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-            let left_opt = self
-                .as_ref()
-                .left()
-                .and_then(|t| <T::Target as super::_puroro_traits::Test1Trait>::a(t));
-            left_opt.or_else(|| {
-                self.as_ref()
-                    .right()
-                    .and_then(|u| <U::Target as super::_puroro_traits::Test1Trait>::a(u))
-            })
+            todo!()
         }
     }
     impl<T, U> super::_puroro_traits::Test1Trait for ::puroro::Either<T, U>
@@ -206,7 +198,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl<T, U> super::_puroro_traits::Test2Trait for ::puroro::EitherOrBoth<T, U>
+    impl<T, U> super::_puroro_traits::Test2Trait for (T, U)
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
@@ -344,21 +336,41 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl<T, U> super::_puroro_traits::Test3Trait for ::puroro::EitherOrBoth<T, U>
+    impl<T, U> super::_puroro_traits::Test3Trait for (T, U)
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
         T::Target: super::_puroro_traits::Test3Trait,
         U::Target: super::_puroro_traits::Test3Trait,
     {
-        type Field3MessageType<'this> = ::puroro::EitherOrBoth<
-            <T::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
-            <U::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
+        type Field3MessageType<'this> = ::puroro::Either<
+            ::puroro::Either<
+                <T::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
+                <U::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
+            >,
+            (
+                <T::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
+                <U::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
+            ),
         >;
         type Field3ScalarGetterType<'this> =
             ::puroro_internal::Derefable<Self::Field3MessageType<'this>>;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
-            todo!()
+            match (
+                <T::Target as super::_puroro_traits::Test3Trait>::c(&self.0),
+                <U::Target as super::_puroro_traits::Test3Trait>::c(&self.1),
+            ) {
+                (None, None) => None,
+                (Some(t), None) => Some(::puroro_internal::Derefable::new(::puroro::Either::Left(
+                    ::puroro::Either::Left(t),
+                ))),
+                (None, Some(u)) => Some(::puroro_internal::Derefable::new(::puroro::Either::Left(
+                    ::puroro::Either::Right(u),
+                ))),
+                (Some(t), Some(u)) => Some(::puroro_internal::Derefable::new(
+                    ::puroro::Either::Right((t, u)),
+                )),
+            }
         }
     }
     impl<T, U> super::_puroro_traits::Test3Trait for ::puroro::Either<T, U>
@@ -484,7 +496,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl<T, U> super::_puroro_traits::Test4Trait for ::puroro::EitherOrBoth<T, U>
+    impl<T, U> super::_puroro_traits::Test4Trait for (T, U)
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
@@ -497,11 +509,10 @@ pub mod _puroro_impls {
         >;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            /*::puroro_internal::impls::merged::MergedRepeatedField::new(
-                <T::Target as super::_puroro_traits::Test4Trait>::d(&self.t),
-                <U::Target as super::_puroro_traits::Test4Trait>::d(&self.u),
-            )*/
-            todo!()
+            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+                <T::Target as super::_puroro_traits::Test4Trait>::d(&self.0),
+                <U::Target as super::_puroro_traits::Test4Trait>::d(&self.1),
+            )
         }
     }
     impl<T, U> super::_puroro_traits::Test4Trait for ::puroro::Either<T, U>

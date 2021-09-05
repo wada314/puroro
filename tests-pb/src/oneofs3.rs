@@ -263,7 +263,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::EitherOrBoth<T, U>
+    impl<T, U> super::_puroro_traits::MsgTrait for (T, U)
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
@@ -278,9 +278,15 @@ pub mod _puroro_impls {
             <T::Target as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>,
             <U::Target as super::_puroro_traits::MsgTrait>::Field4ScalarGetterType<'this>,
         >;
-        type Field5MessageType<'this> = ::puroro::EitherOrBoth<
-            <T::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
-            <U::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+        type Field5MessageType<'this> = ::puroro::Either<
+            ::puroro::Either<
+                <T::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+                <U::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+            >,
+            (
+                <T::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+                <U::Target as super::_puroro_traits::MsgTrait>::Field5ScalarGetterType<'this>,
+            ),
         >;
         type Field5ScalarGetterType<'this> =
             ::puroro_internal::Derefable<Self::Field5MessageType<'this>>;
@@ -620,7 +626,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::EitherOrBoth<T, U>
+    impl<T, U> super::_puroro_traits::SubmsgTrait for (T, U)
     where
         T: ::std::ops::Deref,
         U: ::std::ops::Deref,
@@ -628,21 +634,11 @@ pub mod _puroro_impls {
         U::Target: super::_puroro_traits::SubmsgTrait,
     {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
-            match self {
-                ::puroro::EitherOrBoth::Left(t) => {
-                    <T::Target as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(t)
-                }
-                ::puroro::EitherOrBoth::Right(u) => {
-                    <U::Target as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(u)
-                }
-                ::puroro::EitherOrBoth::Both(t, u) => {
-                    let left = <T::Target as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(t);
-                    if left != ::std::default::Default::default() {
-                        left
-                    } else {
-                        <U::Target as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(u)
-                    }
-                }
+            let left = <T::Target as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(&self.0);
+            if left != ::std::default::Default::default() {
+                left
+            } else {
+                <U::Target as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(&self.1)
             }
         }
     }

@@ -152,6 +152,7 @@ struct Field {
     is_bytes: bool,
     is_length_delimited: bool,
     is_explicit_oneof_field: bool,
+    is_repeated: bool,
     trait_has_scalar_getter: bool,
     trait_has_optional_getter: bool,
     trait_has_repeated_getter: bool,
@@ -198,6 +199,7 @@ impl Field {
                     | wrappers::FieldType::Message(_)
             ),
             is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
+            is_repeated: matches!(f.field_label()?, wrappers::FieldLabel::Repeated),
             trait_has_scalar_getter: f.has_scalar_getter()?,
             trait_has_optional_getter: f.has_scalar_optional_getter()?,
             trait_has_repeated_getter: f.has_repeated_getter()?,

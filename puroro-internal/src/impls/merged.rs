@@ -1,12 +1,12 @@
 use crate::Derefable;
-use ::puroro::{Either, EitherOrBoth};
+use ::puroro::Either;
 use ::std::iter::Chain;
 use ::std::ops::Deref;
 
-pub struct MergedRepeatedField<T, U>(EitherOrBoth<T, U>);
+pub struct MergedRepeatedField<T, U>(T, U);
 impl<T, U> MergedRepeatedField<T, U> {
-    pub fn new(from: EitherOrBoth<T, U>) -> Self {
-        Self(from)
+    pub fn new(t: T, u: U) -> Self {
+        Self(t, u)
     }
 }
 impl<T, U> IntoIterator for MergedRepeatedField<T, U>
@@ -21,10 +21,10 @@ where
     }
 }
 
-pub struct MergedRepeatedLDField<T, U>(EitherOrBoth<T, U>);
+pub struct MergedRepeatedLDField<T, U>(T, U);
 impl<T, U> MergedRepeatedLDField<T, U> {
-    pub fn new(from: EitherOrBoth<T, U>) -> Self {
-        Self(from)
+    pub fn new(t: T, u: U) -> Self {
+        Self(t, u)
     }
 }
 impl<T, U> IntoIterator for MergedRepeatedLDField<T, U>
@@ -45,10 +45,10 @@ where
     }
 }
 
-pub struct MergedRepeatedMessageField<T, U>(EitherOrBoth<T, U>);
+pub struct MergedRepeatedMessageField<T, U>(T, U);
 impl<T, U> MergedRepeatedMessageField<T, U> {
-    pub fn new(from: EitherOrBoth<T, U>) -> Self {
-        Self(from)
+    pub fn new(t: T, u: U) -> Self {
+        Self(t, u)
     }
 }
 impl<T, U> IntoIterator for MergedRepeatedMessageField<T, U>
@@ -58,18 +58,14 @@ where
     <T as IntoIterator>::Item: Deref,
     <U as IntoIterator>::Item: Deref,
 {
-    type Item = Derefable<EitherOrBoth<<T as IntoIterator>::Item, <U as IntoIterator>::Item>>;
+    type Item = Derefable<Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>>;
     type IntoIter = impl Iterator<
-        Item = Derefable<EitherOrBoth<<T as IntoIterator>::Item, <U as IntoIterator>::Item>>,
+        Item = Derefable<Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>>,
     >;
     fn into_iter(self) -> Self::IntoIter {
         self.0
             .into_iter()
-            .map(|v| Derefable::new(EitherOrBoth::Left(v)))
-            .chain(
-                self.1
-                    .into_iter()
-                    .map(|v| Derefable::new(EitherOrBoth::Right(v))),
-            )
+            .map(|v| Derefable::new(Either::Left(v)))
+            .chain(self.1.into_iter().map(|v| Derefable::new(Either::Right(v))))
     }
 }
