@@ -1,4 +1,5 @@
 // A generated source code by puroro library
+#![feature(generic_associated_types)]
 // package (root)
 pub mod google;
 

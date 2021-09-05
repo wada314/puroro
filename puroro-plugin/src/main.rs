@@ -3,10 +3,11 @@
 #![feature(arc_new_cyclic)]
 #![allow(incomplete_features)]
 
+use ::protobuf_compiled as protos;
+
 mod error;
 mod generators;
 mod impls;
-mod protos;
 mod utils;
 mod wrappers;
 

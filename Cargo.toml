@@ -4,5 +4,6 @@ members = [
     "puroro-plugin",
     "puroro-internal",
     "tests",
-    "tests-pb"
+    "tests-pb",
+    "protobuf-compiled",
 ]
