@@ -459,22 +459,26 @@ pub mod _puroro_traits {
         }
     }
 
+    macro_rules! test1_delegate {
+        ($ty:ty) => {
+            fn a<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).a()
+            }
+        };
+    }
+
     impl<T> Test1Trait for &'_ T
     where
         T: Test1Trait,
     {
-        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-            (**self).a()
-        }
+        test1_delegate!(T);
     }
 
     impl<T> Test1Trait for ::std::boxed::Box<T>
     where
         T: Test1Trait,
     {
-        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-            (**self).a()
-        }
+        test1_delegate!(T);
     }
     pub trait Test2Trait {
         type Field2StringType<'this>: ::std::ops::Deref<Target = str>;
@@ -483,24 +487,27 @@ pub mod _puroro_traits {
         }
     }
 
+    macro_rules! test2_delegate {
+        ($ty:ty) => {
+            type Field2StringType<'this> = <$ty>::Field2StringType<'this>;
+            fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
+                (**self).b()
+            }
+        };
+    }
+
     impl<T> Test2Trait for &'_ T
     where
         T: Test2Trait,
     {
-        type Field2StringType<'this> = T::Field2StringType<'this>;
-        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
-            (**self).b()
-        }
+        test2_delegate!(T);
     }
 
     impl<T> Test2Trait for ::std::boxed::Box<T>
     where
         T: Test2Trait,
     {
-        type Field2StringType<'this> = T::Field2StringType<'this>;
-        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
-            (**self).b()
-        }
+        test2_delegate!(T);
     }
     pub trait Test3Trait {
         type Field3MessageType<'this>: self::_puroro_root::official_samples::_puroro_traits::Test1Trait;
@@ -509,24 +516,27 @@ pub mod _puroro_traits {
         }
     }
 
+    macro_rules! test3_delegate {
+        ($ty:ty) => {
+            type Field3MessageType<'this> = <$ty>::Field3MessageType<'this>;
+            fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+                (**self).c()
+            }
+        };
+    }
+
     impl<T> Test3Trait for &'_ T
     where
         T: Test3Trait,
     {
-        type Field3MessageType<'this> = T::Field3MessageType<'this>;
-        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
-            (**self).c()
-        }
+        test3_delegate!(T);
     }
 
     impl<T> Test3Trait for ::std::boxed::Box<T>
     where
         T: Test3Trait,
     {
-        type Field3MessageType<'this> = T::Field3MessageType<'this>;
-        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
-            (**self).c()
-        }
+        test3_delegate!(T);
     }
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
@@ -534,24 +544,27 @@ pub mod _puroro_traits {
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
     }
 
+    macro_rules! test4_delegate {
+        ($ty:ty) => {
+            type Field4RepeatedType<'this> = <$ty>::Field4RepeatedType<'this>;
+            fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+                (**self).d()
+            }
+        };
+    }
+
     impl<T> Test4Trait for &'_ T
     where
         T: Test4Trait,
     {
-        type Field4RepeatedType<'this> = T::Field4RepeatedType<'this>;
-        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            (**self).d()
-        }
+        test4_delegate!(T);
     }
 
     impl<T> Test4Trait for ::std::boxed::Box<T>
     where
         T: Test4Trait,
     {
-        type Field4RepeatedType<'this> = T::Field4RepeatedType<'this>;
-        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            (**self).d()
-        }
+        test4_delegate!(T);
     }
 }
 pub use _puroro_nested::*;

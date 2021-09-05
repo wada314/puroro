@@ -1576,165 +1576,112 @@ pub mod _puroro_traits {
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this>;
     }
 
+    macro_rules! msg_delegate {
+        ($ty:ty) => {
+            fn i32_unlabeled<'this>(&'this self) -> i32 {
+                (**self).i32_unlabeled()
+            }
+            fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).i32_optional()
+            }
+            type Field3RepeatedType<'this> = <$ty>::Field3RepeatedType<'this>;
+            fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+                (**self).i32_repeated()
+            }
+            fn float_unlabeled<'this>(&'this self) -> f32 {
+                (**self).float_unlabeled()
+            }
+            fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
+                (**self).float_optional()
+            }
+            type Field13RepeatedType<'this> = <$ty>::Field13RepeatedType<'this>;
+            fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
+                (**self).float_repeated()
+            }
+            type Field21StringType<'this> = <$ty>::Field21StringType<'this>;
+            fn string_unlabeled<'this>(&'this self) -> Self::Field21StringType<'this> {
+                (**self).string_unlabeled()
+            }
+            type Field22StringType<'this> = <$ty>::Field22StringType<'this>;
+            fn string_optional<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field22StringType<'this>> {
+                (**self).string_optional()
+            }
+            type Field23StringType<'this> = <$ty>::Field23StringType<'this>;
+            type Field23RepeatedType<'this> = <$ty>::Field23RepeatedType<'this>;
+            fn string_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
+                (**self).string_repeated()
+            }
+            fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
+                (**self).enum_unlabeled()
+            }
+            fn enum_optional<'this>(
+                &'this self,
+            ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+                (**self).enum_optional()
+            }
+            type Field33RepeatedType<'this> = <$ty>::Field33RepeatedType<'this>;
+            fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
+                (**self).enum_repeated()
+            }
+            type Field41MessageType<'this> = <$ty>::Field41MessageType<'this>;
+            fn submsg_unlabeled<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field41MessageType<'this>> {
+                (**self).submsg_unlabeled()
+            }
+            type Field42MessageType<'this> = <$ty>::Field42MessageType<'this>;
+            fn submsg_optional<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field42MessageType<'this>> {
+                (**self).submsg_optional()
+            }
+            type Field43MessageType<'this> = <$ty>::Field43MessageType<'this>;
+            type Field43RepeatedType<'this> = <$ty>::Field43RepeatedType<'this>;
+            fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
+                (**self).submsg_repeated()
+            }
+        };
+    }
+
     impl<T> MsgTrait for &'_ T
     where
         T: MsgTrait,
     {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            (**self).i32_unlabeled()
-        }
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            (**self).i32_optional()
-        }
-        type Field3RepeatedType<'this> = T::Field3RepeatedType<'this>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            (**self).i32_repeated()
-        }
-        fn float_unlabeled<'this>(&'this self) -> f32 {
-            (**self).float_unlabeled()
-        }
-        fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
-            (**self).float_optional()
-        }
-        type Field13RepeatedType<'this> = T::Field13RepeatedType<'this>;
-        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            (**self).float_repeated()
-        }
-        type Field21StringType<'this> = T::Field21StringType<'this>;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field21StringType<'this> {
-            (**self).string_unlabeled()
-        }
-        type Field22StringType<'this> = T::Field22StringType<'this>;
-        fn string_optional<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field22StringType<'this>> {
-            (**self).string_optional()
-        }
-        type Field23StringType<'this> = T::Field23StringType<'this>;
-        type Field23RepeatedType<'this> = T::Field23RepeatedType<'this>;
-        fn string_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            (**self).string_repeated()
-        }
-        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
-            (**self).enum_unlabeled()
-        }
-        fn enum_optional<'this>(
-            &'this self,
-        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
-            (**self).enum_optional()
-        }
-        type Field33RepeatedType<'this> = T::Field33RepeatedType<'this>;
-        fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            (**self).enum_repeated()
-        }
-        type Field41MessageType<'this> = T::Field41MessageType<'this>;
-        fn submsg_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field41MessageType<'this>> {
-            (**self).submsg_unlabeled()
-        }
-        type Field42MessageType<'this> = T::Field42MessageType<'this>;
-        fn submsg_optional<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field42MessageType<'this>> {
-            (**self).submsg_optional()
-        }
-        type Field43MessageType<'this> = T::Field43MessageType<'this>;
-        type Field43RepeatedType<'this> = T::Field43RepeatedType<'this>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            (**self).submsg_repeated()
-        }
+        msg_delegate!(T);
     }
 
     impl<T> MsgTrait for ::std::boxed::Box<T>
     where
         T: MsgTrait,
     {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            (**self).i32_unlabeled()
-        }
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            (**self).i32_optional()
-        }
-        type Field3RepeatedType<'this> = T::Field3RepeatedType<'this>;
-        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            (**self).i32_repeated()
-        }
-        fn float_unlabeled<'this>(&'this self) -> f32 {
-            (**self).float_unlabeled()
-        }
-        fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
-            (**self).float_optional()
-        }
-        type Field13RepeatedType<'this> = T::Field13RepeatedType<'this>;
-        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            (**self).float_repeated()
-        }
-        type Field21StringType<'this> = T::Field21StringType<'this>;
-        fn string_unlabeled<'this>(&'this self) -> Self::Field21StringType<'this> {
-            (**self).string_unlabeled()
-        }
-        type Field22StringType<'this> = T::Field22StringType<'this>;
-        fn string_optional<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field22StringType<'this>> {
-            (**self).string_optional()
-        }
-        type Field23StringType<'this> = T::Field23StringType<'this>;
-        type Field23RepeatedType<'this> = T::Field23RepeatedType<'this>;
-        fn string_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            (**self).string_repeated()
-        }
-        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
-            (**self).enum_unlabeled()
-        }
-        fn enum_optional<'this>(
-            &'this self,
-        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
-            (**self).enum_optional()
-        }
-        type Field33RepeatedType<'this> = T::Field33RepeatedType<'this>;
-        fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            (**self).enum_repeated()
-        }
-        type Field41MessageType<'this> = T::Field41MessageType<'this>;
-        fn submsg_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field41MessageType<'this>> {
-            (**self).submsg_unlabeled()
-        }
-        type Field42MessageType<'this> = T::Field42MessageType<'this>;
-        fn submsg_optional<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field42MessageType<'this>> {
-            (**self).submsg_optional()
-        }
-        type Field43MessageType<'this> = T::Field43MessageType<'this>;
-        type Field43RepeatedType<'this> = T::Field43RepeatedType<'this>;
-        fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            (**self).submsg_repeated()
-        }
+        msg_delegate!(T);
     }
     pub trait SomeTrait {
         fn i32_unlabeled<'this>(&'this self) -> i32;
+    }
+
+    macro_rules! some_delegate {
+        ($ty:ty) => {
+            fn i32_unlabeled<'this>(&'this self) -> i32 {
+                (**self).i32_unlabeled()
+            }
+        };
     }
 
     impl<T> SomeTrait for &'_ T
     where
         T: SomeTrait,
     {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            (**self).i32_unlabeled()
-        }
+        some_delegate!(T);
     }
 
     impl<T> SomeTrait for ::std::boxed::Box<T>
     where
         T: SomeTrait,
     {
-        fn i32_unlabeled<'this>(&'this self) -> i32 {
-            (**self).i32_unlabeled()
-        }
+        some_delegate!(T);
     }
 }
 #[derive(::std::fmt::Debug, ::std::clone::Clone, ::std::cmp::PartialEq)]
@@ -1901,22 +1848,26 @@ pub mod _puroro_nested {
                 fn i32_unlabeled<'this>(&'this self) -> i32;
             }
 
+            macro_rules! submsg_delegate {
+                ($ty:ty) => {
+                    fn i32_unlabeled<'this>(&'this self) -> i32 {
+                        (**self).i32_unlabeled()
+                    }
+                };
+            }
+
             impl<T> SubmsgTrait for &'_ T
             where
                 T: SubmsgTrait,
             {
-                fn i32_unlabeled<'this>(&'this self) -> i32 {
-                    (**self).i32_unlabeled()
-                }
+                submsg_delegate!(T);
             }
 
             impl<T> SubmsgTrait for ::std::boxed::Box<T>
             where
                 T: SubmsgTrait,
             {
-                fn i32_unlabeled<'this>(&'this self) -> i32 {
-                    (**self).i32_unlabeled()
-                }
+                submsg_delegate!(T);
             }
         }
         pub use _puroro_nested::*;

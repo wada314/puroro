@@ -153,28 +153,29 @@ pub mod _puroro_traits {
         }
     }
 
+    macro_rules! msg_delegate {
+        ($ty:ty) => {
+            type Field1MessageType<'this> = <$ty>::Field1MessageType<'this>;
+            fn recursive_unlabeled<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+                (**self).recursive_unlabeled()
+            }
+        };
+    }
+
     impl<T> MsgTrait for &'_ T
     where
         T: MsgTrait,
     {
-        type Field1MessageType<'this> = T::Field1MessageType<'this>;
-        fn recursive_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
-            (**self).recursive_unlabeled()
-        }
+        msg_delegate!(T);
     }
 
     impl<T> MsgTrait for ::std::boxed::Box<T>
     where
         T: MsgTrait,
     {
-        type Field1MessageType<'this> = T::Field1MessageType<'this>;
-        fn recursive_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
-            (**self).recursive_unlabeled()
-        }
+        msg_delegate!(T);
     }
 }
 pub use _puroro_nested::*;

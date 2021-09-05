@@ -660,56 +660,45 @@ pub mod _puroro_traits {
         }
     }
 
+    macro_rules! msg_delegate {
+        ($ty:ty) => {
+            type Field2StringType<'this> = <$ty>::Field2StringType<'this>;
+            type Field4StringType<'this> = <$ty>::Field4StringType<'this>;
+            type Field5MessageType<'this> = <$ty>::Field5MessageType<'this>;
+            fn group_one<'this>(
+                &'this self,
+            ) -> ::std::option::Option<
+                super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>,
+            > {
+                (**self).group_one().map(|v| v.into())
+            }
+            fn group_two<'this>(
+                &'this self,
+            ) -> ::std::option::Option<
+                super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>,
+            > {
+                (**self).group_two().map(|v| v.into())
+            }
+            fn group_three<'this>(
+                &'this self,
+            ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+                (**self).group_three().map(|v| v.into())
+            }
+        };
+    }
+
     impl<T> MsgTrait for &'_ T
     where
         T: MsgTrait,
     {
-        type Field2StringType<'this> = T::Field2StringType<'this>;
-        type Field4StringType<'this> = T::Field4StringType<'this>;
-        type Field5MessageType<'this> = T::Field5MessageType<'this>;
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
-            (**self).group_one().map(|v| v.into())
-        }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
-            (**self).group_two().map(|v| v.into())
-        }
-        fn group_three<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            (**self).group_three().map(|v| v.into())
-        }
+        msg_delegate!(T);
     }
 
     impl<T> MsgTrait for ::std::boxed::Box<T>
     where
         T: MsgTrait,
     {
-        type Field2StringType<'this> = T::Field2StringType<'this>;
-        type Field4StringType<'this> = T::Field4StringType<'this>;
-        type Field5MessageType<'this> = T::Field5MessageType<'this>;
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
-            (**self).group_one().map(|v| v.into())
-        }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
-            (**self).group_two().map(|v| v.into())
-        }
-        fn group_three<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            (**self).group_three().map(|v| v.into())
-        }
+        msg_delegate!(T);
     }
     pub trait SubmsgTrait {
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
@@ -717,22 +706,26 @@ pub mod _puroro_traits {
         }
     }
 
+    macro_rules! submsg_delegate {
+        ($ty:ty) => {
+            fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).i32_optional()
+            }
+        };
+    }
+
     impl<T> SubmsgTrait for &'_ T
     where
         T: SubmsgTrait,
     {
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            (**self).i32_optional()
-        }
+        submsg_delegate!(T);
     }
 
     impl<T> SubmsgTrait for ::std::boxed::Box<T>
     where
         T: SubmsgTrait,
     {
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            (**self).i32_optional()
-        }
+        submsg_delegate!(T);
     }
 }
 pub use _puroro_nested::*;

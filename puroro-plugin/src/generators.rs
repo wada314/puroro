@@ -48,6 +48,7 @@ impl MessagesAndEnums {
 struct Message {
     ident: String,
     trait_ident: String,
+    trait_delegate_macro_ident: String,
     submodule_ident: String,
     nested: MessagesAndEnums,
     fields: Vec<Field>,
@@ -82,6 +83,7 @@ impl Message {
         Ok(Self {
             ident: m.rust_ident().to_string(),
             trait_ident: m.rust_trait_ident().to_string(),
+            trait_delegate_macro_ident: format!("{}_delegate", m.rust_nested_module_ident()),
             submodule_ident: m.rust_nested_module_ident().to_string(),
             nested: MessagesAndEnums {
                 messages: nested_messages,
