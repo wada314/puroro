@@ -247,6 +247,7 @@ struct OneofField {
     ident: String,
     number: i32,
     is_length_delimited: bool,
+    is_message: bool,
     trait_field_type: String,
     simple_field_type: String,
     simple_field_type_tag: String,
@@ -263,6 +264,7 @@ impl OneofField {
                     | wrappers::FieldType::String
                     | wrappers::FieldType::Message(_)
             ),
+            is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             trait_field_type: f.trait_oneof_field_type("'msg", "T")?,
             simple_field_type: f.simple_oneof_field_type()?,
             simple_field_type_tag: f.rust_type_tag("Simple")?,

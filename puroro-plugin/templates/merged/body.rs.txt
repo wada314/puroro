@@ -16,7 +16,30 @@ where
             {%- endif %}
         >
     {
-        todo!()
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+        match (self.0.{{ oneof.field_ident }}(), self.1.{{ oneof.field_ident }}()) {
+            {%- for field in oneof.fields %}
+            (
+                Some(E::{{ field.ident }}(left)),
+                Some(E::{{ field.ident }}(right))
+            ) => {
+                {%- if field.is_length_delimited %}
+                {%- if field.is_message %}
+                Some(E::{{ field.ident }}(::puroro::Either::Right((left, right))))
+                {%- else %}
+                Some(E::{{ field.ident }}(if !right.is_empty() {
+                    ::puroro::Either::Right(right)
+                } else {
+                    ::puroro::Either::Left(left)
+                }))
+                {%- endif %}
+                {%- else %}
+                Some(E::{{ field.ident }}(todo!()))
+                {%- endif %}
+            }
+            {%- endfor %}
+            _ => todo!(),
+        }
     }
     {%- endfor %}
 }
