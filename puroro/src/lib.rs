@@ -17,17 +17,11 @@ pub type Result<T> = ::std::result::Result<T, PuroroError>;
 // Re-exports
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
+pub use ::either::Either;
 pub use ::hashbrown;
-pub use ::itertools::{Either, EitherOrBoth};
 
 pub trait Message {}
 impl<T, U> Message for crate::Either<T, U>
-where
-    T: Message,
-    U: Message,
-{
-}
-impl<T, U> Message for crate::EitherOrBoth<T, U>
 where
     T: Message,
     U: Message,
