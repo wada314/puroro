@@ -1,0 +1,58 @@
+{#-################ Message structs ################}
+
+{%- if !messages.is_empty() %}
+{{- messages|print_structs }}
+{%- endif %}
+
+{#-################ Traits ################}
+
+{%- if !messages.is_empty() %}
+pub use _puroro_traits::*;
+pub mod _puroro_traits {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    {{ messages|print_traits|indent(4) }}
+}
+{%- endif %}
+
+{#-################ Enums ################}
+
+{%- if !enums.is_empty() %}
+{%- for enume in enums %}
+{{ enume }}
+{%- endfor %}
+{%- endif %}
+
+{#-################ Nested Items ################}
+
+{%- if !messages.is_empty() %}
+pub use _puroro_nested::*;
+pub mod _puroro_nested {
+    {%- for m in messages %}
+    pub mod {{ m.submodule_ident }} {
+        mod _puroro_root {
+            pub use super::super::super::_puroro_root::*;
+        }
+
+        {#-######## Nested messages & enums ########}
+        {{ m.nested|indent(8) }}
+        
+        {#-######## Oneof enums ########}
+        {%- if !m.oneofs.is_empty() %}
+        pub use _puroro_oneofs::*;
+        pub mod _puroro_oneofs {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+
+            {%- for oneof in m.oneofs %}
+            {{ oneof|indent(12) }}
+            {%- endfor %}
+        }
+        {%- endif %}
+    }
+    {%- endfor %}
+}
+{%- endif %}
+

@@ -9,8 +9,7 @@ edition = "2018"
 [dependencies]
 puroro = { path = "../puroro" }
 puroro-internal = { path = "../puroro-internal" }
-protobuf-pb = { path = "../protobuf-pb" }
-sample-pb = { path = "../sample-pb" }
+tests-pb = { path = "../tests-pb" }
 
 [features]
 puroro-nightly = []

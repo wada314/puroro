@@ -1,0 +1,44 @@
+impl<T, U> {{ m.trait_ident }} for ::puroro::Either<T, U> 
+where
+    T: {{ m.trait_ident }},
+    U: {{ m.trait_ident }},
+{
+    {%- for field in m.fields %}
+    {%- call either_trait_impl_field(field) %}
+    {%- endfor %}
+
+    {%- for oneof in m.oneofs %}
+    fn {{ oneof.field_ident }}<'this>(&'this self) ->
+        Option<
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+            {%- if oneof.has_reference_field %}
+            <'this, Self>
+            {%- endif %}
+        >
+    {
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+        match self.as_ref().either(
+            |t| t.{{ oneof.field_ident }}().map(|t| ::puroro::Either::Left(t)), 
+            |u| u.{{ oneof.field_ident }}().map(|u| ::puroro::Either::Right(u)),
+        ) {
+            {%- for field in oneof.fields %}
+            Some(::puroro::Either::Left(E::{{ field.ident }}(v))) => {
+                {%- if field.is_length_delimited %}
+                Some(E::{{ field.ident }}(::puroro::Either::Left(v)))
+                {%- else %}
+                Some(E::{{ field.ident }}(v))
+                {%- endif %}
+            }
+            Some(::puroro::Either::Right(E::{{ field.ident }}(v))) => {
+                {%- if field.is_length_delimited %}
+                Some(E::{{ field.ident }}(::puroro::Either::Right(v)))
+                {%- else %}
+                Some(E::{{ field.ident }}(v))
+                {%- endif %}
+            }
+            {%- endfor %}
+            None => None,
+        }
+    }
+    {%- endfor %}
+}

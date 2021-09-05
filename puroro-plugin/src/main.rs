@@ -1,55 +1,157 @@
 #![cfg_attr(feature = "puroro-nightly", feature(backtrace))]
-#![cfg_attr(feature = "puroro-nightly", feature(generic_associated_types))]
-#![cfg_attr(feature = "puroro-nightly", feature(min_type_alias_impl_trait))]
+#![feature(generic_associated_types)]
+#![feature(arc_new_cyclic)]
 #![allow(incomplete_features)]
 
-mod context;
 mod error;
 mod generators;
+mod impls;
 mod protos;
 mod utils;
 mod wrappers;
 
-use ::puroro::Serializable;
-use ::puroro_internal::deser::MergeableMessageFromIter;
-use context::Context;
+use ::itertools::Itertools;
+use ::puroro::{DeserFromBytesIter, SerToIoWrite};
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
 
-use std::io::Read;
-use std::io::{stdin, stdout};
+use ::std::collections::{HashMap, HashSet};
+use ::std::env;
+use ::std::io::Read;
+use ::std::io::{stdin, stdout};
+use ::std::process::Command;
+use std::process::Stdio;
 
-pub use protos::simple::google;
-use protos::simple::google::protobuf::compiler::{
-    code_generator_response, CodeGeneratorRequest, CodeGeneratorResponse,
-};
+pub use protos::google;
+use protos::google::protobuf::compiler::code_generator_response::File;
+use protos::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
 
-fn main() -> Result<()> {
-    let mut cgreq = CodeGeneratorRequest::default();
-    cgreq.merge_from_iter(&mut stdin().bytes()).unwrap();
-    let context = Context::new(
-        &cgreq,
-        context::ImplType::Default,
-        context::AllocatorType::Default,
-    );
-    let filename_and_content = generators::do_generate(&context)?;
-    let mut cgres = CodeGeneratorResponse::default();
-    cgres.file = filename_and_content
-        .into_iter()
-        .map(|(filename, content)| {
-            let mut file = code_generator_response::File::default();
-            file.name = Some(filename);
-            file.content = Some(content);
-            file
-        })
-        .collect();
-    cgres.serialize(&mut stdout())?;
-    Ok(())
+use ::askama::Template as _;
+
+fn make_package_to_subpackages_map(
+    files: &Vec<google::protobuf::FileDescriptorProto>,
+) -> HashMap<String, HashSet<String>> {
+    let mut map = HashMap::new();
+    for file in files {
+        let package_string = file.package.clone().unwrap_or_default();
+        let package_vec = package_string
+            .split('.')
+            .filter_map(|p| {
+                if p.is_empty() {
+                    None
+                } else {
+                    Some(p.to_string())
+                }
+            })
+            .collect::<Vec<_>>();
+        for i in 0..(package_vec.len()) {
+            let cur_package = package_vec.iter().take(i).join(".");
+            let subpackage = package_vec[i].clone();
+            map.entry(cur_package)
+                .or_insert(HashSet::new())
+                .insert(subpackage);
+        }
+    }
+    map
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn test() {}
+fn package_to_filename(package: &str) -> String {
+    if package.is_empty() {
+        "lib.rs".to_string()
+    } else {
+        package
+            .split('.')
+            .map(|f| utils::get_keyword_safe_ident(f))
+            .join("/")
+            + ".rs"
+    }
+}
+
+fn format_rust_file(input: &str) -> Option<String> {
+    use ::std::io::Write as _;
+    if input.is_empty() {
+        return None;
+    }
+
+    let rustfmt_exe = env::var("RUSTFMT").unwrap_or("rustfmt".to_string());
+    let mut rustfmt = Command::new(&rustfmt_exe)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
+
+    if let Some(mut stdin) = rustfmt.stdin {
+        //let input_string = input.to_string();
+        //::std::thread::spawn(move || stdin.write_all(input_string.as_bytes()));
+        stdin.write_all(input.as_bytes()).ok()?;
+    }
+
+    if let Some(ref mut stdout) = rustfmt.stdout {
+        let mut out = String::new();
+        stdout.read_to_string(&mut out).ok()?;
+        if !out.is_empty() {
+            return Some(out);
+        }
+    }
+
+    return None;
+}
+
+fn main() -> Result<()> {
+    let mut cgreq: CodeGeneratorRequest = CodeGeneratorRequest::default();
+    cgreq.deser(&mut stdin().bytes()).unwrap();
+
+    let wrapped_cgreq = wrappers::Context::try_from_proto(cgreq.clone())?;
+
+    let mut cgres: CodeGeneratorResponse = CodeGeneratorResponse::default();
+    cgres.supported_features = Some(1); // TODO: Use Feature enum
+
+    let package_to_subpackage_map = make_package_to_subpackages_map(&cgreq.proto_file);
+    let package_to_file_descriptor_map = wrapped_cgreq
+        .input_files()
+        .iter()
+        .map(|file| {
+            Ok((
+                file.package().iter().join("."),
+                generators::MessagesAndEnums::try_new(file)?,
+            ))
+        })
+        .collect::<Result<HashMap<_, _>>>()?;
+
+    // merge 2 hashmaps, create a HashMap of OutputFile
+    let mut output_file_contexts = HashMap::<String, generators::OutputFile>::new();
+    for (package, subpackages) in package_to_subpackage_map {
+        let mut v = subpackages.into_iter().collect_vec();
+        v.sort();
+        output_file_contexts
+            .entry(package.clone())
+            .or_insert_with(|| generators::OutputFile::new(&package))
+            .subpackages = v;
+    }
+    for (package, file) in package_to_file_descriptor_map {
+        output_file_contexts
+            .entry(package.clone())
+            .or_insert_with(|| generators::OutputFile::new(&package))
+            .input_file = Some(file);
+    }
+
+    for output_contexts in output_file_contexts.values() {
+        let filename = package_to_filename(&output_contexts.package);
+        // Do render!
+        let mut contents = output_contexts.render().unwrap();
+        if let Some(new_contents) = format_rust_file(&contents) {
+            contents = dbg!(new_contents);
+        } else {
+            dbg!("failed to run rustfmt");
+        }
+
+        let mut output_file = <File as Default>::default();
+        output_file.name = Some(filename.into());
+        output_file.content = Some(contents.into());
+        cgres.file.push(output_file);
+    }
+
+    cgres.ser(&mut stdout())?;
+    Ok(())
 }

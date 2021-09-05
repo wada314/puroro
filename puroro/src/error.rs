@@ -17,16 +17,20 @@ pub enum ErrorKind {
     InvalidBooleanValue,
     #[error("Unknown field label [optional, repeated, required]")]
     InvalidFieldLabel,
+    #[error("Too large field number. The max value is 2^29 - 1.")]
+    InvalidFieldNumber,
     #[error("A variant integer type is longer than 10 bytes.")]
     TooLargeVariant,
-    #[error("Invalid wire type.")]
-    InvalidWireType,
+    #[error("The serialized message is too long. The upper limit is 2^31 - 1 bytes.")]
+    TooLongToSerialize,
+    #[error("Invalid wire type value: {0}.")]
+    InvalidWireType(i32),
     #[error("Unexpected wire type. e.g. Expected int32, but found a message field.")]
     UnexpectedWireType,
     #[error("Unexpected field type. e.g. Expected int32, but found a uint64 field.")]
     UnexpectedFieldType,
-    #[error("Unexpected field number. In protobuf standard, the deserializer should accept this though.")]
-    UnexpectedFieldId,
+    #[error("Unknown field number. This should be recoverable.")]
+    UnknownFieldNumber,
     #[error("An internal error while converting enum from / into integer type.")]
     EnumConvertError,
     #[error("Failed to parse a boolean value.")]
@@ -39,12 +43,12 @@ pub enum ErrorKind {
     IteratorError(#[from] std::io::Error),
     #[error("The formatter returned an error: {0}")]
     FormatterError(#[from] std::fmt::Error),
-    #[error("The string length is not correct.")]
+    #[error("The length of given field is not valid (Mostly a negative number).")]
     InvalidFieldLength,
     #[error("Internal error in SliceView struct.")]
     InvalidSliceViewType,
     #[error("Invalid UTF8 string is given.")]
-    InvalidUtf8,
+    InvalidUtf8(#[from] std::string::FromUtf8Error),
     #[error("Group is not supported.")]
     GroupNotSupported,
     #[error("Other error: {0}")]

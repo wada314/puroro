@@ -1,0 +1,73 @@
+pub enum {{ enum_ident }}
+{%- if has_reference_field %}
+<'msg, T: ?Sized + {{ owner_message_trait_path }}>
+{%- else %}
+{%- endif %}
+{
+    {%- for field in fields %}
+    {{ field.ident }}({{ field.trait_field_type }}),
+    {%- endfor %}
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Clone, PartialEq, Debug)]
+pub enum {{ simple_enum_ident }}
+{
+    {%- for field in fields %}
+    {{ field.ident }}({{ field.simple_field_type }}),
+    {%- endfor %}
+}
+
+impl<'msg> ::std::convert::From<&'msg {{ simple_enum_ident }}> 
+for {{ enum_ident }}
+{%- if has_reference_field %}
+<'msg, {{ simple_owner_message_path }}>
+{%- endif %}
+{
+    fn from(from: &'msg {{ simple_enum_ident }}) -> Self {
+        match from {
+            {%- for field in fields %}
+            {{ simple_enum_ident }}::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(
+                {%- if field.is_length_delimited %}
+                v.as_ref()
+                {%- else %}
+                Clone::clone(&v)
+                {%- endif %}
+            ),
+            {%- endfor %}
+        }
+    }
+}
+
+{%- if has_reference_field %}
+impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>> 
+for {{ enum_ident }}<'msg, &'_ T>
+where
+    T: {{ owner_message_trait_path }},
+{
+    fn from(value: {{ enum_ident }}<'msg, T>) -> Self {
+        match value {
+            {%- for field in fields %}
+            {{ enum_ident }}::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(v),
+            {%- endfor %}
+        }
+    }
+}
+{%- endif %}
+
+{%- if has_reference_field %}
+impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>> 
+for {{ enum_ident }}<'msg, ::std::boxed::Box<T>>
+where
+    T: {{ owner_message_trait_path }},
+{
+    fn from(value: {{ enum_ident }}<'msg, T>) -> Self {
+        match value {
+            {%- for field in fields %}
+            {{ enum_ident }}::{{ field.ident }}(v) => {{ enum_ident }}::{{ field.ident }}(v),
+            {%- endfor %}
+        }
+    }
+}
+{%- endif %}
+

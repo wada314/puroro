@@ -12,6 +12,7 @@ This library is under development and it is very possible to make breaking chang
     - [ ] Maps
     - [x] OneOfs
     - [ ] Anys, and other well-known types
+    - [ ] Enum allow-alias option
     - [ ] Unit tests
     - [ ] Write document!!
     - [ ] Print comments in the generated files

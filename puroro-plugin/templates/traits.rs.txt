@@ -1,0 +1,107 @@
+{%- for m in messages %}
+pub trait {{ m.trait_ident }} {
+    {%- for field in m.fields %}
+
+    {%- if field.is_bytes %}
+    type Field{{ field.number }}BytesType<'this>: ::std::ops::Deref<Target=[u8]>;
+    {%- endif %}
+    {%- if field.is_string %}
+    type Field{{ field.number }}StringType<'this>: ::std::ops::Deref<Target=str>;
+    {%- endif %}
+    {%- match field.trait_maybe_field_message_trait_path %}
+    {%- when Some with (field_msg_path) %}
+    type Field{{ field.number }}MessageType<'this>: {{ field_msg_path }};
+    {%- else %}
+    {%- endmatch %}
+
+    {%- if field.trait_has_scalar_getter %}
+    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }};
+    {%- endif %}
+    {%- if field.trait_has_optional_getter %}
+    fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
+        ::std::default::Default::default()
+    }
+    {%- endif %}
+    {%- if field.trait_has_repeated_getter %}
+    type Field{{ field.number }}RepeatedType<'this>: 
+        ::puroro::RepeatedField<'this> 
+        + ::std::iter::IntoIterator<Item = {{ field.trait_scalar_getter_type }}>;
+    fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this>;
+    {%- endif %}
+    {%- endfor %}
+
+    {%- for oneof in m.oneofs %}
+    fn {{ oneof.field_ident }}<'this>(&'this self) ->
+        ::std::option::Option<
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+            {%- if oneof.has_reference_field %}
+            <'this, Self>
+            {%- endif %}
+        >
+    {
+        ::std::option::Option::None
+    }
+    {%- endfor %}
+}
+
+macro_rules! {{ m.trait_delegate_macro_ident }} {
+    ($ty:ty) => {
+        {%- for field in m.fields %}
+        {%- if field.is_bytes %}
+        type Field{{ field.number }}BytesType<'this> = <$ty>::Field{{ field.number }}BytesType<'this>;
+        {%- endif %}
+        {%- if field.is_string %}
+        type Field{{ field.number }}StringType<'this> = <$ty>::Field{{ field.number }}StringType<'this>;
+        {%- endif %}
+        {%- if field.is_message %}
+        type Field{{ field.number }}MessageType<'this> = <$ty>::Field{{ field.number }}MessageType<'this>;
+        {%- endif %}
+
+        {%- if field.trait_has_scalar_getter %}
+        fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
+            (**self).{{ field.ident }}()
+        }
+        {%- endif %}
+        {%- if field.trait_has_optional_getter %}
+        fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
+            (**self).{{ field.ident }}()
+        }
+        {%- endif %}
+        {%- if field.trait_has_repeated_getter %}
+        type Field{{ field.number }}RepeatedType<'this> = <$ty>::Field{{ field.number }}RepeatedType<'this>;
+        fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
+            (**self).{{ field.ident }}()
+        }
+        {%- endif %}
+        {%- endfor %}
+
+        {%- for oneof in m.oneofs %}
+        fn {{ oneof.field_ident }}<'this>(&'this self) ->
+            ::std::option::Option<
+                super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+                {%- if oneof.has_reference_field %}
+                <'this, Self>
+                {%- endif %}
+            >
+        {
+            (**self).{{ oneof.field_ident }}().map(|v| v.into())
+        }
+        {%- endfor %}
+    };
+}
+
+impl<T> {{ m.trait_ident }} for &'_ T
+where
+    T: {{ m.trait_ident }}
+{
+    {{ m.trait_delegate_macro_ident }}!(T);
+}
+
+impl<T> {{ m.trait_ident }} for ::std::boxed::Box<T>
+where
+    T: {{ m.trait_ident }}
+{
+    {{ m.trait_delegate_macro_ident }}!(T);
+}
+
+{%- endfor %}

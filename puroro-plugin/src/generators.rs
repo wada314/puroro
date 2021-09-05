@@ -1,309 +1,299 @@
-mod enums;
-mod message_frags;
-mod message_impls;
-mod message_tags;
-mod message_traits;
-mod writer;
+use crate::utils::upgrade;
+use crate::wrappers;
+use crate::{ErrorKind, Result};
+use ::askama::Template;
+use ::itertools::Itertools;
 
-use itertools::Itertools;
+#[derive(Template)]
+#[template(path = "output_file.rs.txt")]
+pub struct OutputFile {
+    pub package: String,
+    pub subpackages: Vec<String>,
+    pub input_file: Option<MessagesAndEnums>,
+}
 
-use crate::context::{AllocatorType, Context, ImplType};
-use crate::utils::{
-    get_keyword_safe_ident, relative_path_over_namespaces, to_lower_snake_case, Indentor,
-};
-use crate::wrappers::{DescriptorVisitor, EnumDescriptor, MessageDescriptor};
-use crate::Result;
-use std::collections::HashMap;
-use std::fmt::Write;
-
-use self::message_impls::MessageImplCodeGenerator;
-use self::message_tags::MessageTagCodeGenerator;
-use self::message_traits::MessageTraitCodeGenerator;
-
-static FILE_HEADER: &str = "\
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(dead_code)]
-\n";
-
-pub fn do_generate<'c>(context: &'c Context<'c>) -> Result<HashMap<String, String>> {
-    let mut filenames_and_contents = HashMap::new();
-    for file_desc in context.file_descriptors() {
-        {
-            // Simple struct impl
-            let file_name = package_to_file_path("simple", file_desc.package());
-            let mut visitor = MessageGeneratingVisitor {
-                output: Indentor::new(FILE_HEADER.to_string()),
-                context: context.clone(),
-                package: file_desc.package().to_string(),
-                submodules: Vec::new(),
-            };
-            file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
-            filenames_and_contents.insert(file_name, visitor.output.into_inner());
-        }
-
-        {
-            // Bumpalo struct impl
-            let file_name = package_to_file_path("bumpalo", file_desc.package());
-            let mut visitor = MessageGeneratingVisitor {
-                output: Indentor::new(FILE_HEADER.to_string()),
-                context: context.with_alloc_type(AllocatorType::Bumpalo),
-                package: file_desc.package().to_string(),
-                submodules: Vec::new(),
-            };
-            file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
-            filenames_and_contents.insert(file_name, visitor.output.into_inner());
-        }
-
-        {
-            // SliceView struct impl
-            let file_name = package_to_file_path("slice_view", file_desc.package());
-            let mut visitor = MessageGeneratingVisitor {
-                output: Indentor::new(FILE_HEADER.to_string()),
-                context: context.with_impl_type(ImplType::SliceView),
-                package: file_desc.package().to_string(),
-                submodules: Vec::new(),
-            };
-            file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
-            filenames_and_contents.insert(file_name, visitor.output.into_inner());
-        }
-
-        {
-            // enums
-            let file_name = package_to_file_path("enums", file_desc.package());
-            let mut visitor = EnumGeneratingVisitor {
-                output: Indentor::new(FILE_HEADER.to_string()),
-            };
-            file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
-            filenames_and_contents.insert(file_name, visitor.output.into_inner());
-        }
-
-        {
-            // traits
-            let file_name = package_to_file_path("traits", file_desc.package());
-            let mut visitor = TraitGeneratingVisitor {
-                output: Indentor::new(FILE_HEADER.to_string()),
-                package: file_desc.package().to_string(),
-                submodules: Vec::new(),
-            };
-            file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
-            filenames_and_contents.insert(file_name, visitor.output.into_inner());
-        }
-
-        {
-            // tags
-            let file_name = package_to_file_path("tags", file_desc.package());
-            let mut visitor = TagGeneratingVisitor {
-                output: Indentor::new(FILE_HEADER.to_string()),
-            };
-            file_desc.visit_messages_and_enums_in_file(&mut visitor)?;
-            filenames_and_contents.insert(file_name, visitor.output.into_inner());
+impl OutputFile {
+    pub fn new(package: &str) -> Self {
+        Self {
+            package: package.to_string(),
+            subpackages: Vec::new(),
+            input_file: None,
         }
     }
+}
 
-    // Generate the submodule declarations. i.e. `pub mod xxx;`
-    let prefixes = ["simple", "bumpalo", "slice_view", "enums", "traits", "tags"];
-    for (package, subpackages_iter) in context.packages_with_subpackages() {
-        for prefix in std::array::IntoIter::new(prefixes) {
-            let file_name = package_to_file_path(prefix, package);
-            let submodule_decls = subpackages_iter
-                .clone()
-                .map(|p| {
-                    format!(
-                        "pub mod {name};\n",
-                        name = get_keyword_safe_ident(&to_lower_snake_case(p))
-                    )
-                })
-                .collect::<String>();
-            let content = filenames_and_contents
-                .entry(file_name)
-                .or_insert(FILE_HEADER.to_string());
-            content.push_str(&format!("\n{}", submodule_decls));
-        }
+#[derive(Template)]
+#[template(path = "messages_and_enums.rs.txt")]
+pub struct MessagesAndEnums {
+    messages: Vec<Message>,
+    enums: Vec<Enum>,
+}
+
+impl MessagesAndEnums {
+    pub fn try_new(f: &wrappers::InputFile) -> Result<Self> {
+        let messages = f
+            .messages()
+            .into_iter()
+            .map(|m| Message::try_new(m))
+            .try_collect()?;
+        let enums = f
+            .enums()
+            .into_iter()
+            .map(|e| Enum::try_new(e))
+            .try_collect()?;
+        Ok(Self { messages, enums })
     }
+}
 
-    // Generate the root `mod.rs` file.
-    let root_file_name = package_to_file_path("", "");
-    let prefix_mods = prefixes
-        .iter()
-        .map(|p| {
-            format!(
-                "{maybe_cfg}pub mod {name};\n",
-                maybe_cfg = if *p == "bumpalo" {
-                    "#[cfg(feature = \"puroro-bumpalo\")]\n"
-                } else {
-                    ""
-                },
-                name = p
-            )
+struct Message {
+    ident: String,
+    trait_ident: String,
+    trait_delegate_macro_ident: String,
+    submodule_ident: String,
+    nested: MessagesAndEnums,
+    fields: Vec<Field>,
+    oneofs: Vec<Oneof>,
+    simple_ident: String,
+    simple_single_field_ident: String,
+}
+
+impl Message {
+    fn try_new(m: &wrappers::Message) -> Result<Self> {
+        let fields = m
+            .fields()
+            .into_iter()
+            .map(|f| Field::try_new(f))
+            .try_collect()?;
+        let oneofs = m
+            .oneofs()
+            .into_iter()
+            .filter(|o| matches!(o.is_synthetic(), Ok(false)))
+            .map(|o| Oneof::try_new(o))
+            .try_collect()?;
+        let nested_messages = m
+            .nested_messages()
+            .into_iter()
+            .map(|m| Message::try_new(m))
+            .try_collect()?;
+        let nested_enums = m
+            .nested_enums()
+            .into_iter()
+            .map(|e| Enum::try_new(e))
+            .try_collect()?;
+        Ok(Self {
+            ident: m.rust_ident().to_string(),
+            trait_ident: m.rust_trait_ident().to_string(),
+            trait_delegate_macro_ident: format!("{}_delegate", m.rust_nested_module_ident()),
+            submodule_ident: m.rust_nested_module_ident().to_string(),
+            nested: MessagesAndEnums {
+                messages: nested_messages,
+                enums: nested_enums,
+            },
+            fields,
+            oneofs,
+            simple_ident: m.rust_impl_ident("Simple"),
+            simple_single_field_ident: m.rust_impl_ident("SimpleField"),
         })
-        .collect::<String>();
-    filenames_and_contents.insert(root_file_name, prefix_mods);
-
-    Ok(filenames_and_contents)
-}
-
-fn package_to_file_path(prefix: &str, package: &str) -> String {
-    if prefix.is_empty() && package.is_empty() {
-        "mod.rs".to_string()
-    } else {
-        let package_items = prefix
-                .split('.')
-                .chain(package.split('.'))
-                .filter(|p| !p.is_empty()) // because `"".split('.').next() == Some("")`
-                ;
-        Itertools::intersperse(
-            package_items.map(|p| get_keyword_safe_ident(&to_lower_snake_case(p))),
-            "/".to_string(),
-        )
-        .collect::<String>()
-            + ".rs"
     }
 }
 
-fn enter_submodule(output: &mut Indentor<String>, name: &str) -> Result<()> {
-    let mod_name = get_keyword_safe_ident(&to_lower_snake_case(name));
-    output.write_fmt(format_args!("pub mod {name} {{\n\n", name = mod_name))?;
-    Ok(())
-}
-fn exit_submodule(output: &mut Indentor<String>, name: &str) -> Result<()> {
-    let mod_name = get_keyword_safe_ident(&to_lower_snake_case(name));
-    output.write_fmt(format_args!("}} // mod {name}\n\n", name = mod_name))?;
-    Ok(())
-}
-fn print_puroro_root(
-    output: &mut Indentor<String>,
-    package: &str,
-    submodules: &Vec<String>,
-) -> Result<()> {
-    let cur_package = format!(
-        "{}{}",
-        package,
-        submodules
-            .iter()
-            .map(|s| format!(".{}", s))
-            .collect::<String>()
-    );
-    output.write_fmt(format_args!(
-        "mod puroro_root {{ pub use {supers}; }}\n",
-        supers = std::iter::repeat("super::")
-            .take(cur_package.split('.').filter(|p| !p.is_empty()).count() + 2)
-            .chain(std::iter::once("*"))
-            .collect::<String>()
-    ))?;
-    Ok(())
+#[derive(Template)]
+#[template(path = "enum.rs.txt")]
+struct Enum {
+    ident: String,
+    values: Vec<EnumValue>,
+    first_value_ident: String,
+    is_proto3: bool,
 }
 
-struct MessageGeneratingVisitor<'c> {
-    output: Indentor<String>,
-    context: Context<'c>,
-    package: String,
-    submodules: Vec<String>,
-}
-
-impl<'c> MessageGeneratingVisitor<'c> {
-    pub fn print_use_enums(&mut self) -> Result<()> {
-        let cur_package = format!(
-            "{}{}",
-            self.package,
-            self.submodules
-                .iter()
-                .map(|s| format!(".{}", s))
-                .collect::<String>()
-        );
-        self.output.write_fmt(format_args!(
-            "pub use {path}::*;\n\n",
-            path = relative_path_over_namespaces(&cur_package, "enums")?
-        ))?;
-        Ok(())
-    }
-}
-impl<'c> DescriptorVisitor<'c> for MessageGeneratingVisitor<'c> {
-    fn file_header(&mut self) -> Result<()> {
-        self.print_use_enums()?;
-        print_puroro_root(&mut self.output, &self.package, &self.submodules)?;
-        Ok(())
-    }
-    fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
-        let impl_gen = MessageImplCodeGenerator::new(&self.context, msg);
-        impl_gen.print_msg(&mut self.output)?;
-        Ok(())
-    }
-    fn enter_submodule(&mut self, name: &str) -> Result<()> {
-        enter_submodule(&mut self.output, name)?;
-        self.submodules.push(name.to_string());
-        self.print_use_enums()?;
-        print_puroro_root(&mut self.output, &self.package, &self.submodules)?;
-        Ok(())
-    }
-    fn exit_submodule(&mut self, name: &str) -> Result<()> {
-        exit_submodule(&mut self.output, name)?;
-        self.submodules.pop();
-        Ok(())
+impl Enum {
+    fn try_new(e: &wrappers::Enum) -> Result<Self> {
+        let values = e
+            .values()
+            .into_iter()
+            .map(|v| -> Result<_> { Ok(EnumValue::try_new(v)?) })
+            .try_collect()?;
+        let first_value_ident = e
+            .values()
+            .first()
+            .ok_or(ErrorKind::EmptyEnum {
+                name: e.proto_name().to_string(),
+            })?
+            .rust_ident()
+            .to_string();
+        Ok(Self {
+            ident: e.rust_ident().to_string(),
+            values,
+            first_value_ident,
+            is_proto3: matches!(e.syntax()?, wrappers::ProtoSyntax::Proto3),
+        })
     }
 }
 
-struct TraitGeneratingVisitor {
-    output: Indentor<String>,
-    package: String,
-    submodules: Vec<String>,
+struct EnumValue {
+    ident: String,
+    number: i32,
 }
-impl<'c> DescriptorVisitor<'c> for TraitGeneratingVisitor {
-    fn file_header(&mut self) -> Result<()> {
-        print_puroro_root(&mut self.output, &self.package, &self.submodules)?;
-        Ok(())
-    }
-    fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
-        let trait_gen = MessageTraitCodeGenerator::new(msg);
-        trait_gen.print_msg_traits(&mut self.output)?;
-        Ok(())
-    }
-    fn handle_enum(&mut self, #[allow(unused)] enume: &'c EnumDescriptor<'c>) -> Result<()> {
-        Ok(())
-    }
 
-    fn enter_submodule(&mut self, name: &str) -> Result<()> {
-        enter_submodule(&mut self.output, name)?;
-        self.submodules.push(name.to_string());
-        print_puroro_root(&mut self.output, &self.package, &self.submodules)?;
-        Ok(())
-    }
-
-    fn exit_submodule(&mut self, name: &str) -> Result<()> {
-        exit_submodule(&mut self.output, name)?;
-        self.submodules.pop();
-        Ok(())
+impl EnumValue {
+    fn try_new(v: &wrappers::EnumValue) -> Result<Self> {
+        Ok(Self {
+            ident: v.rust_ident().to_string(),
+            number: v.number(),
+        })
     }
 }
 
-struct EnumGeneratingVisitor {
-    output: Indentor<String>,
+struct Field {
+    ident: String,
+    number: i32,
+    is_message: bool,
+    is_string: bool,
+    is_bytes: bool,
+    is_length_delimited: bool,
+    is_explicit_oneof_field: bool,
+    is_repeated: bool,
+    trait_has_scalar_getter: bool,
+    trait_has_optional_getter: bool,
+    trait_has_repeated_getter: bool,
+    trait_scalar_getter_type: String,
+    trait_maybe_field_message_trait_path: Option<String>,
+    simple_field_type: String,
+    simple_scalar_field_type: String,
+    simple_maybe_field_message_path: Option<String>,
+    simple_maybe_borrowed_field_type: Option<String>,
+    simple_label_and_type_tags: String,
 }
-impl<'c> DescriptorVisitor<'c> for EnumGeneratingVisitor {
-    fn handle_enum(&mut self, enume: &'c EnumDescriptor<'c>) -> Result<()> {
-        enums::print_enum(&mut self.output, enume)
-    }
-    fn enter_submodule(&mut self, name: &str) -> Result<()> {
-        enter_submodule(&mut self.output, name)
-    }
-    fn exit_submodule(&mut self, name: &str) -> Result<()> {
-        exit_submodule(&mut self.output, name)
+
+impl Field {
+    fn try_new(f: &wrappers::Field) -> Result<Self> {
+        let trait_maybe_field_message_trait_path =
+            if let wrappers::FieldType::Message(m) = f.field_type()? {
+                Some(upgrade(&m)?.rust_trait_path())
+            } else {
+                None
+            };
+        let simple_maybe_field_message_path =
+            if let wrappers::FieldType::Message(m) = f.field_type()? {
+                Some(upgrade(&m)?.rust_impl_path("Simple"))
+            } else {
+                None
+            };
+        Ok(Field {
+            ident: f.rust_ident().to_string(),
+            number: f.number(),
+            is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
+            is_string: matches!(f.field_type()?, wrappers::FieldType::String),
+            is_bytes: matches!(f.field_type()?, wrappers::FieldType::Bytes),
+            is_length_delimited: matches!(
+                f.field_type()?,
+                wrappers::FieldType::Bytes
+                    | wrappers::FieldType::String
+                    | wrappers::FieldType::Message(_)
+            ),
+            is_explicit_oneof_field: f.oneof_index().is_some() && !f.is_optional3(),
+            is_repeated: matches!(f.field_label()?, wrappers::FieldLabel::Repeated),
+            trait_has_scalar_getter: f.has_scalar_getter()?,
+            trait_has_optional_getter: f.has_scalar_optional_getter()?,
+            trait_has_repeated_getter: f.has_repeated_getter()?,
+            trait_scalar_getter_type: f.trait_scalar_getter_type()?,
+            trait_maybe_field_message_trait_path,
+            simple_field_type: f.simple_field_type()?,
+            simple_scalar_field_type: f.simple_scalar_field_type()?,
+            simple_maybe_field_message_path,
+            simple_maybe_borrowed_field_type: f
+                .maybe_trait_scalar_getter_type_borrowed("Simple")?,
+            simple_label_and_type_tags: f.rust_label_and_type_tags("Simple")?,
+        })
     }
 }
 
-struct TagGeneratingVisitor {
-    output: Indentor<String>,
+#[derive(Template)]
+#[template(path = "oneof.rs.txt")]
+struct Oneof {
+    enum_ident: String,
+    field_ident: String,
+    fields: Vec<OneofField>,
+    is_synthetic: bool,
+    has_reference_field: bool,
+    owner_message_trait_path: String,
+    simple_enum_ident: String,
+    simple_owner_message_path: String,
 }
-impl<'c> DescriptorVisitor<'c> for TagGeneratingVisitor {
-    fn handle_msg(&mut self, msg: &'c MessageDescriptor<'c>) -> Result<()> {
-        let tags_gen = MessageTagCodeGenerator::new(&msg);
-        tags_gen.print_msg_tag(&mut self.output)?;
-        Ok(())
+
+impl Oneof {
+    fn try_new(o: &wrappers::Oneof) -> Result<Self> {
+        Ok(Oneof {
+            enum_ident: o.rust_enum_ident().to_string(),
+            field_ident: o.rust_getter_ident().to_string(),
+            fields: o
+                .fields()?
+                .into_iter()
+                .map(|f| OneofField::try_new(f))
+                .try_collect()?,
+            is_synthetic: o.is_synthetic()?,
+            has_reference_field: o.fields()?.into_iter().any(|f| {
+                matches!(
+                    f.field_type(),
+                    Ok(wrappers::FieldType::Bytes
+                        | wrappers::FieldType::String
+                        | wrappers::FieldType::Message(_))
+                )
+            }),
+            owner_message_trait_path: o.message()?.rust_trait_path(),
+            simple_enum_ident: format!("{}_Simple", o.rust_enum_ident()),
+            simple_owner_message_path: o.message()?.rust_impl_path("Simple"),
+        })
     }
-    fn enter_submodule(&mut self, name: &str) -> Result<()> {
-        enter_submodule(&mut self.output, name)
+}
+
+struct OneofField {
+    ident: String,
+    number: i32,
+    is_length_delimited: bool,
+    is_message: bool,
+    trait_field_type: String,
+    simple_field_type: String,
+    simple_field_type_tag: String,
+}
+
+impl OneofField {
+    fn try_new(f: &wrappers::Field) -> Result<Self> {
+        Ok(Self {
+            ident: f.rust_oneof_ident().to_string(),
+            number: f.number(),
+            is_length_delimited: matches!(
+                f.field_type()?,
+                wrappers::FieldType::Bytes
+                    | wrappers::FieldType::String
+                    | wrappers::FieldType::Message(_)
+            ),
+            is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
+            trait_field_type: f.trait_oneof_field_type("'msg", "T")?,
+            simple_field_type: f.simple_oneof_field_type()?,
+            simple_field_type_tag: f.rust_type_tag("Simple")?,
+        })
     }
-    fn exit_submodule(&mut self, name: &str) -> Result<()> {
-        exit_submodule(&mut self.output, name)
+}
+
+#[derive(Template)]
+#[template(path = "structs.rs.txt")]
+struct Structs<'a> {
+    messages: &'a [Message],
+}
+
+#[derive(Template)]
+#[template(path = "traits.rs.txt")]
+struct Traits<'a> {
+    messages: &'a [Message],
+}
+
+mod filters {
+    use super::*;
+    pub(super) fn print_structs(messages: &[Message]) -> ::askama::Result<Structs> {
+        Ok(Structs { messages })
+    }
+    pub(super) fn print_traits(messages: &[Message]) -> ::askama::Result<Traits> {
+        Ok(Traits { messages })
     }
 }

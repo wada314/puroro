@@ -1,0 +1,15 @@
+syntax = "proto3";
+package proto3_defaults;
+
+message Msg {
+    int32 i32_unlabeled = 1;
+    optional int32 i32_optional = 2;
+    repeated int32 i32_repeated = 3;
+    float f32_unlabeled = 4;
+    string string_unlabeled = 5;
+    Submsg submsg_unlabeled = 6;
+}
+
+message Submsg {
+    int32 i32_unlabeled = 1;
+}

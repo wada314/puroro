@@ -1,47 +1,56 @@
 #![cfg_attr(feature = "puroro-nightly", feature(backtrace))]
-#![cfg_attr(feature = "puroro-nightly", feature(generic_associated_types))]
-#![cfg_attr(feature = "puroro-nightly", feature(min_type_alias_impl_trait))]
 #![allow(incomplete_features)]
+#![feature(generic_associated_types)]
 
-pub mod apply;
-mod collections;
+pub mod bool;
 mod error;
+pub mod fixed_bits;
 pub mod tags;
+pub mod types;
+pub mod variant;
 
-pub use error::{ErrorKind, PuroroError};
-pub type Result<T> = std::result::Result<T, PuroroError>;
-pub use collections::RepeatedField;
+use ::std::convert::TryFrom;
+
+pub use self::error::{ErrorKind, PuroroError};
+pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
 // Re-exports
 #[cfg(feature = "puroro-bumpalo")]
 pub use ::bumpalo;
 pub use ::hashbrown;
+pub use ::itertools::{Either, EitherOrBoth};
 
-pub trait DeserializableFromIter {
-    fn merge_from_iter<I>(&mut self, iter: &mut I) -> Result<()>
+pub trait Message {}
+impl<T, U> Message for crate::Either<T, U>
+where
+    T: Message,
+    U: Message,
+{
+}
+impl<T, U> Message for crate::EitherOrBoth<T, U>
+where
+    T: Message,
+    U: Message,
+{
+}
+
+pub trait Enum2:
+    'static + PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32>
+{
+}
+pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {}
+
+pub trait RepeatedField<'msg>: IntoIterator {}
+impl<'msg, T> RepeatedField<'msg> for T where T: IntoIterator {}
+
+pub trait DeserFromBytesIter: Message {
+    fn deser<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
-pub trait DeserializableFromSlice<'slice>: Sized {
-    fn deser_from_slice(slice: &'slice [u8]) -> Result<Self>;
-}
 
-pub trait Serializable: Sized {
-    fn serialize<W: std::io::Write>(&self, write: &mut W) -> Result<()>;
-}
-
-pub trait Message {
-    type InternalData: InternalData;
-    fn puroro_internal_data(&self) -> &Self::InternalData;
-    type BoxedType: AsMut<Self>;
-    fn into_boxed(self) -> Self::BoxedType;
-}
-pub trait Enum {}
-
-pub trait MessageTag {}
-pub trait IsMessageImplOfTag<Tag> {}
-
-pub trait InternalData {
-    #[cfg(feature = "puroro-bumpalo")]
-    fn bumpalo(&self) -> &::bumpalo::Bump;
+pub trait SerToIoWrite: Message {
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: ::std::io::Write;
 }

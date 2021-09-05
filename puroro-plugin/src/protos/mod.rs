@@ -1,7 +1,7 @@
-#[cfg(feature = "puroro-bupmalo")]
-pub mod bumpalo;
-pub mod enums;
-pub mod simple;
-pub mod slice_view;
-pub mod tags;
-pub mod traits;
+// A generated source code by puroro library
+// package (root)
+pub mod google;
+
+pub mod _puroro_root {
+    pub use super::*;
+}

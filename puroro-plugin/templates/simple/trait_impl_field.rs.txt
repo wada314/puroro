@@ -1,0 +1,53 @@
+
+
+{%- if f.is_bytes %}
+type Field{{ f.number }}BytesType<'this> = &'this [u8];
+{%- endif %}
+{%- if f.is_string %}
+type Field{{ f.number }}StringType<'this> = &'this str;
+{%- endif %}
+{%- match f.simple_maybe_field_message_path %}
+{%- when Some with (struct_path) %}
+type Field{{ f.number }}MessageType<'this> = &'this {{ struct_path }};
+{%- else %}
+{%- endmatch %}
+
+{%- if f.trait_has_scalar_getter %}
+fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
+    {%- if f.is_length_delimited %}
+    &self.{{ f.ident }}
+    {%- else %}
+    Clone::clone(&self.{{ f.ident }})
+    {%- endif %}
+}
+{%- endif %}
+
+{%- if f.trait_has_optional_getter %}
+fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
+    {%- if f.is_length_delimited %}
+    self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
+    {%- else %}
+    Clone::clone(&self.{{ f.ident }})
+    {%- endif %}
+}
+{%- endif %}
+
+{%- if f.trait_has_repeated_getter %}
+{%- match f.simple_maybe_borrowed_field_type %}
+{%- when Some with (borrowed) %}
+type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
+    {{ borrowed }},
+    ::std::slice::Iter<'this, {{ f.simple_scalar_field_type }}>>;
+{%- else %}
+type Field{{ f.number }}RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, {{ f.trait_scalar_getter_type }}>>;
+{%- endmatch %}
+
+fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
+    {%- match f.simple_maybe_borrowed_field_type %}
+    {%- when Some with (borrowed) %}
+    ::puroro_internal::impls::simple::BorrowedIter::new(self.{{ f.ident }}.iter())
+    {%- else %}
+    self.{{ f.ident }}.iter().cloned()
+    {%- endmatch %}
+}
+{%- endif %}
