@@ -270,45 +270,59 @@ pub mod _puroro_impls {
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
-            match (self.0.group_one(), self.1.group_one()) {
-                (Some(E::G1Int32(left)), Some(E::G1Int32(right))) => Some(E::G1Int32(todo!())),
-                (Some(E::G1String(left)), Some(E::G1String(right))) => {
-                    Some(E::G1String(if !right.is_empty() {
-                        ::puroro::Either::Right(right)
-                    } else {
-                        ::puroro::Either::Left(left)
-                    }))
+            Some(match (self.0.group_one(), self.1.group_one()) {
+                (None, None) => {
+                    return None;
                 }
-                _ => todo!(),
-            }
+                (Some(E::G1Int32(_)), Some(E::G1Int32(right))) => E::G1Int32(right),
+                (Some(E::G1String(_)), Some(E::G1String(right))) => {
+                    E::G1String(::puroro::Either::Right(right))
+                }
+                (_, Some(E::G1Int32(right))) => E::G1Int32(right),
+                (_, Some(E::G1String(right))) => E::G1String(::puroro::Either::Right(right)),
+                (Some(E::G1Int32(left)), None) => E::G1Int32(left),
+                (Some(E::G1String(left)), None) => E::G1String(::puroro::Either::Left(left)),
+            })
         }
         fn group_two<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
-            match (self.0.group_two(), self.1.group_two()) {
-                (Some(E::G2F32(left)), Some(E::G2F32(right))) => Some(E::G2F32(todo!())),
-                (Some(E::G2String(left)), Some(E::G2String(right))) => {
-                    Some(E::G2String(if !right.is_empty() {
-                        ::puroro::Either::Right(right)
-                    } else {
-                        ::puroro::Either::Left(left)
-                    }))
+            Some(match (self.0.group_two(), self.1.group_two()) {
+                (None, None) => {
+                    return None;
+                }
+                (Some(E::G2F32(_)), Some(E::G2F32(right))) => E::G2F32(right),
+                (Some(E::G2String(_)), Some(E::G2String(right))) => {
+                    E::G2String(::puroro::Either::Right(right))
                 }
                 (Some(E::G2Submsg(left)), Some(E::G2Submsg(right))) => {
-                    Some(E::G2Submsg(::puroro::Either::Right((left, right))))
+                    E::G2Submsg(::puroro::Either::Right((left, right)))
                 }
-                _ => todo!(),
-            }
+                (_, Some(E::G2F32(right))) => E::G2F32(right),
+                (_, Some(E::G2String(right))) => E::G2String(::puroro::Either::Right(right)),
+                (_, Some(E::G2Submsg(right))) => {
+                    E::G2Submsg(::puroro::Either::Left(::puroro::Either::Right(right)))
+                }
+                (Some(E::G2F32(left)), None) => E::G2F32(left),
+                (Some(E::G2String(left)), None) => E::G2String(::puroro::Either::Left(left)),
+                (Some(E::G2Submsg(left)), None) => {
+                    E::G2Submsg(::puroro::Either::Left(::puroro::Either::Left(left)))
+                }
+            })
         }
         fn group_three<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
-            match (self.0.group_three(), self.1.group_three()) {
-                (Some(E::G3Int32(left)), Some(E::G3Int32(right))) => Some(E::G3Int32(todo!())),
-                _ => todo!(),
-            }
+            Some(match (self.0.group_three(), self.1.group_three()) {
+                (None, None) => {
+                    return None;
+                }
+                (Some(E::G3Int32(_)), Some(E::G3Int32(right))) => E::G3Int32(right),
+                (_, Some(E::G3Int32(right))) => E::G3Int32(right),
+                (Some(E::G3Int32(left)), None) => E::G3Int32(left),
+            })
         }
     }
     impl<T, U> MsgTrait for ::puroro::Either<T, U>
