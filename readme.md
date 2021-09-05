@@ -5,13 +5,12 @@ This library is under development and it is very possible to make breaking chang
 ## TODOs
 - proto2
     - [ ] Groups, at least correctly ignore it (where's document!?)
-    - [ ] Enums (In proto2 we need to refuse the unknown value)
+    - [x] Enums (In proto2 we need to refuse the unknown value)
     - [ ] default
     - [ ] extensions
 - proto2 & 3
     - [ ] Maps
-        - [ ] Bumpalo's `field_take_or_init.rs` implementation needs improvement because `bumpalo::boxed::Box` does not support moving out the value like `std::boxed::Box` does.
-    - [ ] OneOfs
+    - [x] OneOfs
     - [ ] Anys, and other well-known types
     - [ ] Enum allow-alias option
     - [ ] Unit tests
@@ -21,17 +20,19 @@ This library is under development and it is very possible to make breaking chang
         - [ ] Support stable (not using nightly features)
     - [ ] More useful message traits
         - [ ] Mutable interface
-        - [ ] Repeated field interface
+        - [ ] (More) Repeated field interface
         - [ ] Map interface
     - [ ] Keep unknown fields
-    - [ ] Deserializer from a slice
-    - [ ] Custom deserializer
+    - [x] Deserializer from a slice
+    - [ ] Custom deserializer (?)
     - [ ] Required field checker
     - [ ] Other implementations
         - [ ] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
         - [ ] SliceView -- A viewer over a `&[u8]` slice
-        - [ ] Default -- A 0 byte size immutable implementation that only returns default value
+        - [x] Empty(Unit) -- A 0 byte size immutable implementation that only returns default value
         - [ ] Append (name TBD) -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
+        - [x] Merged -- `(T, U)`
+        - [x] Either -- `::itertools::Either<T, U>`
     - [ ] Support the `allocator_api`. Waiting for the `String` support
     - [ ] RPCs / services
     - [ ] Deserializer vulnerbility: Need to limit the recursion depth
