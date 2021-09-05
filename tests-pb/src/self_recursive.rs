@@ -10,6 +10,7 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
+    use super::_puroro_traits::*;
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -20,12 +21,10 @@ pub mod _puroro_impls {
     }
     impl ::puroro::Message for MsgSimple {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSimple {
+    impl MsgTrait for MsgSimple {
         type Field1MessageType<'this> =
             &'this self::_puroro_root::self_recursive::_puroro_impls::MsgSimple;
-        fn recursive_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+        fn recursive_unlabeled<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
@@ -75,30 +74,28 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl super::_puroro_traits::MsgTrait for () {
+    impl MsgTrait for () {
         type Field1MessageType<'this> = ();
     }
-    impl<T, U> super::_puroro_traits::MsgTrait for (T, U)
+    impl<T, U> MsgTrait for (T, U)
     where
-        T: super::_puroro_traits::MsgTrait,
-        U: super::_puroro_traits::MsgTrait,
+        T: MsgTrait,
+        U: MsgTrait,
     {
         type Field1MessageType<'this> = ::puroro::Either<
             ::puroro::Either<
-                <T as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
-                <U as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
+                <T as MsgTrait>::Field1MessageType<'this>,
+                <U as MsgTrait>::Field1MessageType<'this>,
             >,
             (
-                <T as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
-                <U as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
+                <T as MsgTrait>::Field1MessageType<'this>,
+                <U as MsgTrait>::Field1MessageType<'this>,
             ),
         >;
-        fn recursive_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+        fn recursive_unlabeled<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             match (
-                <T as super::_puroro_traits::MsgTrait>::recursive_unlabeled(&self.0),
-                <U as super::_puroro_traits::MsgTrait>::recursive_unlabeled(&self.1),
+                <T as MsgTrait>::recursive_unlabeled(&self.0),
+                <U as MsgTrait>::recursive_unlabeled(&self.1),
             ) {
                 (None, None) => None,
                 (Some(t), None) => Some(::puroro::Either::Left(::puroro::Either::Left(t))),
@@ -107,27 +104,19 @@ pub mod _puroro_impls {
             }
         }
     }
-    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
+    impl<T, U> MsgTrait for ::puroro::Either<T, U>
     where
-        T: super::_puroro_traits::MsgTrait,
-        U: super::_puroro_traits::MsgTrait,
+        T: MsgTrait,
+        U: MsgTrait,
     {
         type Field1MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
+            <T as MsgTrait>::Field1MessageType<'this>,
+            <U as MsgTrait>::Field1MessageType<'this>,
         >;
-        fn recursive_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+        fn recursive_unlabeled<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             self.as_ref().either(
-                |t| {
-                    <T as super::_puroro_traits::MsgTrait>::recursive_unlabeled(t)
-                        .map(|t| ::puroro::Either::Left(t))
-                },
-                |u| {
-                    <U as super::_puroro_traits::MsgTrait>::recursive_unlabeled(u)
-                        .map(|u| ::puroro::Either::Right(u))
-                },
+                |t| <T as MsgTrait>::recursive_unlabeled(t).map(|t| ::puroro::Either::Left(t)),
+                |u| <U as MsgTrait>::recursive_unlabeled(u).map(|u| ::puroro::Either::Right(u)),
             )
         }
     }
@@ -144,9 +133,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
         type Field1MessageType<'this> =
             &'this self::_puroro_root::self_recursive::_puroro_impls::MsgSimple;
-        fn recursive_unlabeled<'this>(
-            &'this self,
-        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+        fn recursive_unlabeled<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }

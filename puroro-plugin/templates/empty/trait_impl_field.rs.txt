@@ -18,7 +18,7 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
     {%- endif %}
     {#- No need to consider message type case here, message is always wrapped by Optional -#}
     {%- if !f.is_length_delimited %}
-    ::std::default::Default::default()
+    Default::default()
     {%- endif %}
 }
 {%- endif %}

@@ -6,6 +6,9 @@ pub mod _puroro_impls {
         pub use super::super::_puroro_root::*;
     }
 
+    {#- Guaranteed that the trait idents are never overridden -#}
+    use super::_puroro_traits::*;
+
     {%- for m in messages %}
     {%- include "simple/body.rs.txt" %}
     {%- include "empty/body.rs.txt" %}

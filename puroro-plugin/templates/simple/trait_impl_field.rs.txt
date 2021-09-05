@@ -17,17 +17,17 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
     {%- if f.is_length_delimited %}
     &self.{{ f.ident }}
     {%- else %}
-    ::std::clone::Clone::clone(&self.{{ f.ident }})
+    Clone::clone(&self.{{ f.ident }})
     {%- endif %}
 }
 {%- endif %}
 
 {%- if f.trait_has_optional_getter %}
-fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}> {
+fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
     {%- if f.is_length_delimited %}
     self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
     {%- else %}
-    ::std::clone::Clone::clone(&self.{{ f.ident }})
+    Clone::clone(&self.{{ f.ident }})
     {%- endif %}
 }
 {%- endif %}

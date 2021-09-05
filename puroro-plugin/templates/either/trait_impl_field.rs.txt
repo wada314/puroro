@@ -1,20 +1,20 @@
 
 {%- if f.is_bytes %}
 type Field{{ f.number }}BytesType<'this> = ::puroro::Either<
-    <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
-    <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
+    <T as {{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
+    <U as {{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
 >;
 {%- endif %}
 {%- if f.is_string %}
 type Field{{ f.number }}StringType<'this> = ::puroro::Either<
-    <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
-    <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
+    <T as {{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
+    <U as {{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
 >;
 {%- endif %}
 {%- if f.is_message %}
 type Field{{ f.number }}MessageType<'this> = ::puroro::Either<
-    <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
-    <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
+    <T as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
+    <U as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
 >;
 {%- endif %}
 
@@ -23,41 +23,41 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
 {
     {%- if f.is_length_delimited %}
     self.as_ref().either(
-        |t| ::puroro::Either::Left(<T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t)),
-        |u| ::puroro::Either::Right(<U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u)),
+        |t| ::puroro::Either::Left(<T as {{ m.trait_ident }}>::{{ f.ident }}(t)),
+        |u| ::puroro::Either::Right(<U as {{ m.trait_ident }}>::{{ f.ident }}(u)),
     )
     {%- else %}
     self.as_ref().either(
-        |t| <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t),
-        |u| <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u),
+        |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t),
+        |u| <U as {{ m.trait_ident }}>::{{ f.ident }}(u),
     )
     {%- endif %}
 }
 {%- endif %}
 
 {%- if f.trait_has_optional_getter %}
-fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_getter_type }}>
+fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
 {
     {%- if f.is_length_delimited %}
     {%- if f.is_message %}
     self.as_ref().either(
-        |t| <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t).map(
+        |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t).map(
             |t| ::puroro::Either::Left(t)
         ),
-        |u| <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u).map(
+        |u| <U as {{ m.trait_ident }}>::{{ f.ident }}(u).map(
             |u| ::puroro::Either::Right(u)
         ),
     )
     {%- else %}
     self.as_ref().either(
-        |t| <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t).map(|t| ::puroro::Either::Left(t)),
-        |u| <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u).map(|u| ::puroro::Either::Right(u)),
+        |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t).map(|t| ::puroro::Either::Left(t)),
+        |u| <U as {{ m.trait_ident }}>::{{ f.ident }}(u).map(|u| ::puroro::Either::Right(u)),
     )
     {%- endif %}
     {%- else %}
     self.as_ref().either(
-        |t| <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t),
-        |u| <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u),
+        |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t),
+        |u| <U as {{ m.trait_ident }}>::{{ f.ident }}(u),
     )
     {%- endif %}
 }
@@ -75,8 +75,8 @@ fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_
 {%- let either_repeated_field_type = "EitherRepeatedField" %}
 {%- endif %}
 type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::either::{{ either_repeated_field_type }}<
-    <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
-    <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
+    <T as {{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
+    <U as {{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
 >;
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this>
@@ -84,10 +84,10 @@ fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'t
     ::puroro_internal::impls::either::{{ either_repeated_field_type }}::new(self
         .as_ref()
         .map_left(
-            |t| <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(t)
+            |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t)
         )
         .map_right(
-            |u| <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(u)
+            |u| <U as {{ m.trait_ident }}>::{{ f.ident }}(u)
         )
     )
 }

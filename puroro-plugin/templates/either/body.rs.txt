@@ -1,7 +1,7 @@
-impl<T, U> super::_puroro_traits::{{ m.trait_ident }} for ::puroro::Either<T, U> 
+impl<T, U> {{ m.trait_ident }} for ::puroro::Either<T, U> 
 where
-    T: super::_puroro_traits::{{ m.trait_ident }},
-    U: super::_puroro_traits::{{ m.trait_ident }},
+    T: {{ m.trait_ident }},
+    U: {{ m.trait_ident }},
 {
     {%- for field in m.fields %}
     {%- call either_trait_impl_field(field) %}
@@ -9,7 +9,7 @@ where
 
     {%- for oneof in m.oneofs %}
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
-        ::std::option::Option<
+        Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
             {%- if oneof.has_reference_field %}
             <'this, Self>

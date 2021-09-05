@@ -11,6 +11,7 @@ pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
+    use super::_puroro_traits::*;
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -32,30 +33,28 @@ pub mod _puroro_impls {
     }
     impl ::puroro::Message for MsgSimple {}
 
-    impl super::_puroro_traits::MsgTrait for MsgSimple {
+    impl MsgTrait for MsgSimple {
         type Field2StringType<'this> = &'this str;
         type Field4StringType<'this> = &'this str;
         type Field5MessageType<'this> =
             &'this self::_puroro_root::oneofs2::_puroro_impls::SubmsgSimple;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
             self.group_one
                 .as_ref()
                 .map(|o| ::std::convert::From::from(o))
         }
         fn group_two<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
             self.group_two
                 .as_ref()
                 .map(|o| ::std::convert::From::from(o))
         }
         fn group_three<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             self.group_three
                 .as_ref()
                 .map(|o| ::std::convert::From::from(o))
@@ -224,90 +223,85 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl super::_puroro_traits::MsgTrait for () {
+    impl MsgTrait for () {
         type Field2StringType<'this> = &'static str;
         type Field4StringType<'this> = &'static str;
         type Field5MessageType<'this> = ();
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
             None
         }
         fn group_two<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
             None
         }
         fn group_three<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             None
         }
     }
-    impl<T, U> super::_puroro_traits::MsgTrait for (T, U)
+    impl<T, U> MsgTrait for (T, U)
     where
-        T: super::_puroro_traits::MsgTrait,
-        U: super::_puroro_traits::MsgTrait,
+        T: MsgTrait,
+        U: MsgTrait,
     {
         type Field2StringType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field2StringType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field2StringType<'this>,
+            <T as MsgTrait>::Field2StringType<'this>,
+            <U as MsgTrait>::Field2StringType<'this>,
         >;
         type Field4StringType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field4StringType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field4StringType<'this>,
+            <T as MsgTrait>::Field4StringType<'this>,
+            <U as MsgTrait>::Field4StringType<'this>,
         >;
         type Field5MessageType<'this> = ::puroro::Either<
             ::puroro::Either<
-                <T as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
-                <U as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
+                <T as MsgTrait>::Field5MessageType<'this>,
+                <U as MsgTrait>::Field5MessageType<'this>,
             >,
             (
-                <T as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
-                <U as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
+                <T as MsgTrait>::Field5MessageType<'this>,
+                <U as MsgTrait>::Field5MessageType<'this>,
             ),
         >;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
             todo!()
         }
         fn group_two<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
             todo!()
         }
         fn group_three<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             todo!()
         }
     }
-    impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
+    impl<T, U> MsgTrait for ::puroro::Either<T, U>
     where
-        T: super::_puroro_traits::MsgTrait,
-        U: super::_puroro_traits::MsgTrait,
+        T: MsgTrait,
+        U: MsgTrait,
     {
         type Field2StringType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field2StringType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field2StringType<'this>,
+            <T as MsgTrait>::Field2StringType<'this>,
+            <U as MsgTrait>::Field2StringType<'this>,
         >;
         type Field4StringType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field4StringType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field4StringType<'this>,
+            <T as MsgTrait>::Field4StringType<'this>,
+            <U as MsgTrait>::Field4StringType<'this>,
         >;
         type Field5MessageType<'this> = ::puroro::Either<
-            <T as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
-            <U as super::_puroro_traits::MsgTrait>::Field5MessageType<'this>,
+            <T as MsgTrait>::Field5MessageType<'this>,
+            <U as MsgTrait>::Field5MessageType<'this>,
         >;
         fn group_one<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
             self.as_ref()
                 .either(
                     |t| t.group_one().map(|t| ::puroro::Either::Left(t)),
@@ -317,8 +311,7 @@ pub mod _puroro_impls {
         }
         fn group_two<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
             self.as_ref()
                 .either(
                     |t| t.group_two().map(|t| ::puroro::Either::Left(t)),
@@ -328,7 +321,7 @@ pub mod _puroro_impls {
         }
         fn group_three<'this>(
             &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             self.as_ref()
                 .either(
                     |t| t.group_three().map(|t| ::puroro::Either::Left(t)),
@@ -528,9 +521,9 @@ pub mod _puroro_impls {
     }
     impl ::puroro::Message for SubmsgSimple {}
 
-    impl super::_puroro_traits::SubmsgTrait for SubmsgSimple {
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::clone::Clone::clone(&self.i32_optional)
+    impl SubmsgTrait for SubmsgSimple {
+        fn i32_optional<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.i32_optional)
         }
     }
 
@@ -575,26 +568,26 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    impl super::_puroro_traits::SubmsgTrait for () {}
-    impl<T, U> super::_puroro_traits::SubmsgTrait for (T, U)
+    impl SubmsgTrait for () {}
+    impl<T, U> SubmsgTrait for (T, U)
     where
-        T: super::_puroro_traits::SubmsgTrait,
-        U: super::_puroro_traits::SubmsgTrait,
+        T: SubmsgTrait,
+        U: SubmsgTrait,
     {
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            <U as super::_puroro_traits::SubmsgTrait>::i32_optional(&self.1)
-                .or_else(|| <T as super::_puroro_traits::SubmsgTrait>::i32_optional(&self.0))
+        fn i32_optional<'this>(&'this self) -> Option<i32> {
+            <U as SubmsgTrait>::i32_optional(&self.1)
+                .or_else(|| <T as SubmsgTrait>::i32_optional(&self.0))
         }
     }
-    impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>
+    impl<T, U> SubmsgTrait for ::puroro::Either<T, U>
     where
-        T: super::_puroro_traits::SubmsgTrait,
-        U: super::_puroro_traits::SubmsgTrait,
+        T: SubmsgTrait,
+        U: SubmsgTrait,
     {
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+        fn i32_optional<'this>(&'this self) -> Option<i32> {
             self.as_ref().either(
-                |t| <T as super::_puroro_traits::SubmsgTrait>::i32_optional(t),
-                |u| <U as super::_puroro_traits::SubmsgTrait>::i32_optional(u),
+                |t| <T as SubmsgTrait>::i32_optional(t),
+                |u| <U as SubmsgTrait>::i32_optional(u),
             )
         }
     }
@@ -607,8 +600,8 @@ pub mod _puroro_impls {
     impl ::puroro::Message for SubmsgSimpleField1 {}
 
     impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
-        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::clone::Clone::clone(&self.i32_optional)
+        fn i32_optional<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.i32_optional)
         }
     }
 }

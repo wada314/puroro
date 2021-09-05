@@ -13,14 +13,14 @@ pub struct {{ m.simple_ident }} {
 }
 impl ::puroro::Message for {{ m.simple_ident }} {}
 
-impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_ident }} {
+impl {{ m.trait_ident }} for {{ m.simple_ident }} {
     {%- for field in m.fields %}
     {%- call simple_trait_impl_field(field) %}
     {%- endfor %}
     
     {%- for oneof in m.oneofs %}
     fn {{ oneof.field_ident }}<'this>(&'this self) ->
-        ::std::option::Option<
+        Option<
             super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
             {%- if oneof.has_reference_field %}
             <'this, Self>
