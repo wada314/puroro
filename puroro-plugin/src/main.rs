@@ -141,7 +141,7 @@ fn main() -> Result<()> {
         // Do render!
         let mut contents = output_contexts.render().unwrap();
         if let Some(new_contents) = format_rust_file(&contents) {
-            contents = dbg!(new_contents);
+            contents = new_contents;
         } else {
             dbg!("failed to run rustfmt");
         }
