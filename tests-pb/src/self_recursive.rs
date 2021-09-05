@@ -22,11 +22,10 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSimple {
         type Field1MessageType<'this> =
-            self::_puroro_root::self_recursive::_puroro_impls::MsgSimple;
-        type Field1ScalarGetterType<'this> = &'this Self::Field1MessageType<'this>;
+            &'this self::_puroro_root::self_recursive::_puroro_impls::MsgSimple;
         fn recursive_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
@@ -85,7 +84,6 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgEmpty {
         type Field1MessageType<'this> = self::_puroro_root::self_recursive::_puroro_impls::MsgEmpty;
-        type Field1ScalarGetterType<'this> = &'static Self::Field1MessageType<'this>;
     }
 
     impl ::puroro::SerToIoWrite for MsgEmpty {
@@ -98,67 +96,53 @@ pub mod _puroro_impls {
     }
     impl<T, U> super::_puroro_traits::MsgTrait for (T, U)
     where
-        T: ::std::ops::Deref,
-        U: ::std::ops::Deref,
-        T::Target: super::_puroro_traits::MsgTrait,
-        U::Target: super::_puroro_traits::MsgTrait,
+        T: super::_puroro_traits::MsgTrait,
+        U: super::_puroro_traits::MsgTrait,
     {
         type Field1MessageType<'this> = ::puroro::Either<
             ::puroro::Either<
-                <T::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
-                <U::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+                <T as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
+                <U as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
             >,
             (
-                <T::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
-                <U::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+                <T as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
+                <U as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
             ),
         >;
-        type Field1ScalarGetterType<'this> =
-            ::puroro_internal::Derefable<Self::Field1MessageType<'this>>;
         fn recursive_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
             match (
-                <T::Target as super::_puroro_traits::MsgTrait>::recursive_unlabeled(&self.0),
-                <U::Target as super::_puroro_traits::MsgTrait>::recursive_unlabeled(&self.1),
+                <T as super::_puroro_traits::MsgTrait>::recursive_unlabeled(&self.0),
+                <U as super::_puroro_traits::MsgTrait>::recursive_unlabeled(&self.1),
             ) {
                 (None, None) => None,
-                (Some(t), None) => Some(::puroro_internal::Derefable::new(::puroro::Either::Left(
-                    ::puroro::Either::Left(t),
-                ))),
-                (None, Some(u)) => Some(::puroro_internal::Derefable::new(::puroro::Either::Left(
-                    ::puroro::Either::Right(u),
-                ))),
-                (Some(t), Some(u)) => Some(::puroro_internal::Derefable::new(
-                    ::puroro::Either::Right((t, u)),
-                )),
+                (Some(t), None) => Some(::puroro::Either::Left(::puroro::Either::Left(t))),
+                (None, Some(u)) => Some(::puroro::Either::Left(::puroro::Either::Right(u))),
+                (Some(t), Some(u)) => Some(::puroro::Either::Right((t, u))),
             }
         }
     }
     impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
     where
-        T: ::std::ops::Deref,
-        U: ::std::ops::Deref,
-        T::Target: super::_puroro_traits::MsgTrait,
-        U::Target: super::_puroro_traits::MsgTrait,
+        T: super::_puroro_traits::MsgTrait,
+        U: super::_puroro_traits::MsgTrait,
     {
         type Field1MessageType<'this> = ::puroro::Either<
-            <T::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
-            <U::Target as super::_puroro_traits::MsgTrait>::Field1ScalarGetterType<'this>,
+            <T as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
+            <U as super::_puroro_traits::MsgTrait>::Field1MessageType<'this>,
         >;
-        type Field1ScalarGetterType<'this> =
-            ::puroro_internal::Derefable<Self::Field1MessageType<'this>>;
         fn recursive_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
             self.as_ref().either(
                 |t| {
-                    <T::Target as super::_puroro_traits::MsgTrait>::recursive_unlabeled(t)
-                        .map(|t| ::puroro_internal::Derefable::new(::puroro::Either::Left(t)))
+                    <T as super::_puroro_traits::MsgTrait>::recursive_unlabeled(t)
+                        .map(|t| ::puroro::Either::Left(t))
                 },
                 |u| {
-                    <U::Target as super::_puroro_traits::MsgTrait>::recursive_unlabeled(u)
-                        .map(|u| ::puroro_internal::Derefable::new(::puroro::Either::Right(u)))
+                    <U as super::_puroro_traits::MsgTrait>::recursive_unlabeled(u)
+                        .map(|u| ::puroro::Either::Right(u))
                 },
             )
         }
@@ -175,11 +159,10 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
         type Field1MessageType<'this> =
-            self::_puroro_root::self_recursive::_puroro_impls::MsgSimple;
-        type Field1ScalarGetterType<'this> = &'this Self::Field1MessageType<'this>;
+            &'this self::_puroro_root::self_recursive::_puroro_impls::MsgSimple;
         fn recursive_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
@@ -192,13 +175,22 @@ pub mod _puroro_traits {
 
     pub trait MsgTrait {
         type Field1MessageType<'this>: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait;
-        type Field1ScalarGetterType<'this>: ::std::ops::Deref<
-            Target = Self::Field1MessageType<'this>,
-        >;
         fn recursive_unlabeled<'this>(
             &'this self,
-        ) -> ::std::option::Option<Self::Field1ScalarGetterType<'this>> {
+        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
             ::std::default::Default::default()
+        }
+    }
+
+    impl<T> MsgTrait for &'_ T
+    where
+        T: MsgTrait,
+    {
+        type Field1MessageType<'this> = T::Field1MessageType<'this>;
+        fn recursive_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+            (**self).recursive_unlabeled()
         }
     }
 }

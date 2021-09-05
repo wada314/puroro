@@ -1,18 +1,16 @@
-{%- match f.simple_maybe_field_message_path %}
-{%- when Some with (struct_path) %}
-type Field{{ f.number }}MessageType<'this> = {{ struct_path }};
-{%- else %}
-{%- endmatch %}
+
 
 {%- if f.is_bytes %}
-type Field{{ f.number }}ScalarGetterType<'this> = &'this [u8];
+type Field{{ f.number }}BytesType<'this> = &'this [u8];
 {%- endif %}
 {%- if f.is_string %}
-type Field{{ f.number }}ScalarGetterType<'this> = &'this str;
+type Field{{ f.number }}StringType<'this> = &'this str;
 {%- endif %}
-{%- if f.is_message %}
-type Field{{ f.number }}ScalarGetterType<'this> = &'this Self::Field{{ f.number }}MessageType<'this>;
-{%- endif %}
+{%- match f.simple_maybe_field_message_path %}
+{%- when Some with (struct_path) %}
+type Field{{ f.number }}MessageType<'this> = &'this {{ struct_path }};
+{%- else %}
+{%- endmatch %}
 
 {%- if f.trait_has_scalar_getter %}
 fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {

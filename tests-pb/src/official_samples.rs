@@ -87,10 +87,8 @@ pub mod _puroro_impls {
     }
     impl<T, U> super::_puroro_traits::Test1Trait for (T, U)
     where
-        T: ::std::ops::Deref,
-        U: ::std::ops::Deref,
-        T::Target: super::_puroro_traits::Test1Trait,
-        U::Target: super::_puroro_traits::Test1Trait,
+        T: super::_puroro_traits::Test1Trait,
+        U: super::_puroro_traits::Test1Trait,
     {
         fn a<'this>(&'this self) -> ::std::option::Option<i32> {
             todo!()
@@ -98,15 +96,13 @@ pub mod _puroro_impls {
     }
     impl<T, U> super::_puroro_traits::Test1Trait for ::puroro::Either<T, U>
     where
-        T: ::std::ops::Deref,
-        U: ::std::ops::Deref,
-        T::Target: super::_puroro_traits::Test1Trait,
-        U::Target: super::_puroro_traits::Test1Trait,
+        T: super::_puroro_traits::Test1Trait,
+        U: super::_puroro_traits::Test1Trait,
     {
         fn a<'this>(&'this self) -> ::std::option::Option<i32> {
             self.as_ref().either(
-                |t| <T::Target as super::_puroro_traits::Test1Trait>::a(t),
-                |u| <U::Target as super::_puroro_traits::Test1Trait>::a(u),
+                |t| <T as super::_puroro_traits::Test1Trait>::a(t),
+                |u| <U as super::_puroro_traits::Test1Trait>::a(u),
             )
         }
     }
@@ -132,8 +128,8 @@ pub mod _puroro_impls {
     impl ::puroro::Message for Test2Simple {}
 
     impl super::_puroro_traits::Test2Trait for Test2Simple {
-        type Field2ScalarGetterType<'this> = &'this str;
-        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
+        type Field2StringType<'this> = &'this str;
+        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
             self.b.as_ref().map(|v| v.as_ref())
         }
     }
@@ -187,7 +183,7 @@ pub mod _puroro_impls {
     impl ::puroro::Message for Test2Empty {}
 
     impl super::_puroro_traits::Test2Trait for Test2Empty {
-        type Field2ScalarGetterType<'this> = &'static str;
+        type Field2StringType<'this> = &'static str;
     }
 
     impl ::puroro::SerToIoWrite for Test2Empty {
@@ -200,38 +196,34 @@ pub mod _puroro_impls {
     }
     impl<T, U> super::_puroro_traits::Test2Trait for (T, U)
     where
-        T: ::std::ops::Deref,
-        U: ::std::ops::Deref,
-        T::Target: super::_puroro_traits::Test2Trait,
-        U::Target: super::_puroro_traits::Test2Trait,
+        T: super::_puroro_traits::Test2Trait,
+        U: super::_puroro_traits::Test2Trait,
     {
-        type Field2ScalarGetterType<'this> = ::puroro::Either<
-            <T::Target as super::_puroro_traits::Test2Trait>::Field2ScalarGetterType<'this>,
-            <U::Target as super::_puroro_traits::Test2Trait>::Field2ScalarGetterType<'this>,
+        type Field2StringType<'this> = ::puroro::Either<
+            <T as super::_puroro_traits::Test2Trait>::Field2StringType<'this>,
+            <U as super::_puroro_traits::Test2Trait>::Field2StringType<'this>,
         >;
-        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
+        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
             todo!()
         }
     }
     impl<T, U> super::_puroro_traits::Test2Trait for ::puroro::Either<T, U>
     where
-        T: ::std::ops::Deref,
-        U: ::std::ops::Deref,
-        T::Target: super::_puroro_traits::Test2Trait,
-        U::Target: super::_puroro_traits::Test2Trait,
+        T: super::_puroro_traits::Test2Trait,
+        U: super::_puroro_traits::Test2Trait,
     {
-        type Field2ScalarGetterType<'this> = ::puroro::Either<
-            <T::Target as super::_puroro_traits::Test2Trait>::Field2ScalarGetterType<'this>,
-            <U::Target as super::_puroro_traits::Test2Trait>::Field2ScalarGetterType<'this>,
+        type Field2StringType<'this> = ::puroro::Either<
+            <T as super::_puroro_traits::Test2Trait>::Field2StringType<'this>,
+            <U as super::_puroro_traits::Test2Trait>::Field2StringType<'this>,
         >;
-        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
+        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
             self.as_ref().either(
                 |t| {
-                    <T::Target as super::_puroro_traits::Test2Trait>::b(t)
+                    <T as super::_puroro_traits::Test2Trait>::b(t)
                         .map(|t| ::puroro::Either::Left(t))
                 },
                 |u| {
-                    <U::Target as super::_puroro_traits::Test2Trait>::b(u)
+                    <U as super::_puroro_traits::Test2Trait>::b(u)
                         .map(|u| ::puroro::Either::Right(u))
                 },
             )
@@ -246,8 +238,8 @@ pub mod _puroro_impls {
     impl ::puroro::Message for Test2SimpleField2 {}
 
     impl super::_puroro_traits::Test2Trait for Test2SimpleField2 {
-        type Field2ScalarGetterType<'this> = &'this str;
-        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
+        type Field2StringType<'this> = &'this str;
+        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
             self.b.as_ref().map(|v| v.as_ref())
         }
     }
@@ -263,9 +255,8 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::Test3Trait for Test3Simple {
         type Field3MessageType<'this> =
-            self::_puroro_root::official_samples::_puroro_impls::Test1Simple;
-        type Field3ScalarGetterType<'this> = &'this Self::Field3MessageType<'this>;
-        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
+            &'this self::_puroro_root::official_samples::_puroro_impls::Test1Simple;
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             self.c.as_ref().map(|v| v.as_ref())
         }
     }
@@ -325,7 +316,6 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::Test3Trait for Test3Empty {
         type Field3MessageType<'this> =
             self::_puroro_root::official_samples::_puroro_impls::Test1Empty;
-        type Field3ScalarGetterType<'this> = &'static Self::Field3MessageType<'this>;
     }
 
     impl ::puroro::SerToIoWrite for Test3Empty {
@@ -338,63 +328,49 @@ pub mod _puroro_impls {
     }
     impl<T, U> super::_puroro_traits::Test3Trait for (T, U)
     where
-        T: ::std::ops::Deref,
-        U: ::std::ops::Deref,
-        T::Target: super::_puroro_traits::Test3Trait,
-        U::Target: super::_puroro_traits::Test3Trait,
+        T: super::_puroro_traits::Test3Trait,
+        U: super::_puroro_traits::Test3Trait,
     {
         type Field3MessageType<'this> = ::puroro::Either<
             ::puroro::Either<
-                <T::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
-                <U::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
+                <T as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
+                <U as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
             >,
             (
-                <T::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
-                <U::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
+                <T as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
+                <U as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
             ),
         >;
-        type Field3ScalarGetterType<'this> =
-            ::puroro_internal::Derefable<Self::Field3MessageType<'this>>;
-        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             match (
-                <T::Target as super::_puroro_traits::Test3Trait>::c(&self.0),
-                <U::Target as super::_puroro_traits::Test3Trait>::c(&self.1),
+                <T as super::_puroro_traits::Test3Trait>::c(&self.0),
+                <U as super::_puroro_traits::Test3Trait>::c(&self.1),
             ) {
                 (None, None) => None,
-                (Some(t), None) => Some(::puroro_internal::Derefable::new(::puroro::Either::Left(
-                    ::puroro::Either::Left(t),
-                ))),
-                (None, Some(u)) => Some(::puroro_internal::Derefable::new(::puroro::Either::Left(
-                    ::puroro::Either::Right(u),
-                ))),
-                (Some(t), Some(u)) => Some(::puroro_internal::Derefable::new(
-                    ::puroro::Either::Right((t, u)),
-                )),
+                (Some(t), None) => Some(::puroro::Either::Left(::puroro::Either::Left(t))),
+                (None, Some(u)) => Some(::puroro::Either::Left(::puroro::Either::Right(u))),
+                (Some(t), Some(u)) => Some(::puroro::Either::Right((t, u))),
             }
         }
     }
     impl<T, U> super::_puroro_traits::Test3Trait for ::puroro::Either<T, U>
     where
-        T: ::std::ops::Deref,
-        U: ::std::ops::Deref,
-        T::Target: super::_puroro_traits::Test3Trait,
-        U::Target: super::_puroro_traits::Test3Trait,
+        T: super::_puroro_traits::Test3Trait,
+        U: super::_puroro_traits::Test3Trait,
     {
         type Field3MessageType<'this> = ::puroro::Either<
-            <T::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
-            <U::Target as super::_puroro_traits::Test3Trait>::Field3ScalarGetterType<'this>,
+            <T as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
+            <U as super::_puroro_traits::Test3Trait>::Field3MessageType<'this>,
         >;
-        type Field3ScalarGetterType<'this> =
-            ::puroro_internal::Derefable<Self::Field3MessageType<'this>>;
-        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             self.as_ref().either(
                 |t| {
-                    <T::Target as super::_puroro_traits::Test3Trait>::c(t)
-                        .map(|t| ::puroro_internal::Derefable::new(::puroro::Either::Left(t)))
+                    <T as super::_puroro_traits::Test3Trait>::c(t)
+                        .map(|t| ::puroro::Either::Left(t))
                 },
                 |u| {
-                    <U::Target as super::_puroro_traits::Test3Trait>::c(u)
-                        .map(|u| ::puroro_internal::Derefable::new(::puroro::Either::Right(u)))
+                    <U as super::_puroro_traits::Test3Trait>::c(u)
+                        .map(|u| ::puroro::Either::Right(u))
                 },
             )
         }
@@ -411,9 +387,8 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::Test3Trait for Test3SimpleField3 {
         type Field3MessageType<'this> =
-            self::_puroro_root::official_samples::_puroro_impls::Test1Simple;
-        type Field3ScalarGetterType<'this> = &'this Self::Field3MessageType<'this>;
-        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
+            &'this self::_puroro_root::official_samples::_puroro_impls::Test1Simple;
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             self.c.as_ref().map(|v| v.as_ref())
         }
     }
@@ -498,40 +473,36 @@ pub mod _puroro_impls {
     }
     impl<T, U> super::_puroro_traits::Test4Trait for (T, U)
     where
-        T: ::std::ops::Deref,
-        U: ::std::ops::Deref,
-        T::Target: super::_puroro_traits::Test4Trait,
-        U::Target: super::_puroro_traits::Test4Trait,
+        T: super::_puroro_traits::Test4Trait,
+        U: super::_puroro_traits::Test4Trait,
     {
         type Field4RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
-            <T::Target as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
-            <U::Target as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
+            <T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
+            <U as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
         >;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro_internal::impls::merged::MergedRepeatedField::new(
-                <T::Target as super::_puroro_traits::Test4Trait>::d(&self.0),
-                <U::Target as super::_puroro_traits::Test4Trait>::d(&self.1),
+                <T as super::_puroro_traits::Test4Trait>::d(&self.0),
+                <U as super::_puroro_traits::Test4Trait>::d(&self.1),
             )
         }
     }
     impl<T, U> super::_puroro_traits::Test4Trait for ::puroro::Either<T, U>
     where
-        T: ::std::ops::Deref,
-        U: ::std::ops::Deref,
-        T::Target: super::_puroro_traits::Test4Trait,
-        U::Target: super::_puroro_traits::Test4Trait,
+        T: super::_puroro_traits::Test4Trait,
+        U: super::_puroro_traits::Test4Trait,
     {
         type Field4RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
-            <T::Target as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
-            <U::Target as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
+            <T as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
+            <U as super::_puroro_traits::Test4Trait>::Field4RepeatedType<'this>,
         >;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro_internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
-                    .map_left(|t| <T::Target as super::_puroro_traits::Test4Trait>::d(t))
-                    .map_right(|u| <U::Target as super::_puroro_traits::Test4Trait>::d(u)),
+                    .map_left(|t| <T as super::_puroro_traits::Test4Trait>::d(t))
+                    .map_right(|u| <U as super::_puroro_traits::Test4Trait>::d(u)),
             )
         }
     }
@@ -562,25 +533,61 @@ pub mod _puroro_traits {
             ::std::default::Default::default()
         }
     }
+
+    impl<T> Test1Trait for &'_ T
+    where
+        T: Test1Trait,
+    {
+        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
+            (**self).a()
+        }
+    }
     pub trait Test2Trait {
-        type Field2ScalarGetterType<'this>: ::std::ops::Deref<Target = str>;
-        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2ScalarGetterType<'this>> {
+        type Field2StringType<'this>: ::std::ops::Deref<Target = str>;
+        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
             ::std::default::Default::default()
+        }
+    }
+
+    impl<T> Test2Trait for &'_ T
+    where
+        T: Test2Trait,
+    {
+        type Field2StringType<'this> = T::Field2StringType<'this>;
+        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
+            (**self).b()
         }
     }
     pub trait Test3Trait {
         type Field3MessageType<'this>: self::_puroro_root::official_samples::_puroro_traits::Test1Trait;
-        type Field3ScalarGetterType<'this>: ::std::ops::Deref<
-            Target = Self::Field3MessageType<'this>,
-        >;
-        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3ScalarGetterType<'this>> {
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             ::std::default::Default::default()
+        }
+    }
+
+    impl<T> Test3Trait for &'_ T
+    where
+        T: Test3Trait,
+    {
+        type Field3MessageType<'this> = T::Field3MessageType<'this>;
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+            (**self).c()
         }
     }
     pub trait Test4Trait {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = i32>;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
+    }
+
+    impl<T> Test4Trait for &'_ T
+    where
+        T: Test4Trait,
+    {
+        type Field4RepeatedType<'this> = T::Field4RepeatedType<'this>;
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            (**self).d()
+        }
     }
 }
 pub use _puroro_nested::*;

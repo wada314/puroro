@@ -646,8 +646,16 @@ impl Field {
             FieldType::Bool => "bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::String | FieldType::Bytes | FieldType::Message(_) => format!(
-                "Self::Field{number}ScalarGetterType<'this>",
+            FieldType::String => format!(
+                "Self::Field{number}StringType<'this>",
+                number = self.number()
+            ),
+            FieldType::Bytes => format!(
+                "Self::Field{number}BytesType<'this>",
+                number = self.number()
+            ),
+            FieldType::Message(_) => format!(
+                "Self::Field{number}MessageType<'this>",
                 number = self.number()
             ),
         })
@@ -669,8 +677,22 @@ impl Field {
             FieldType::Bool => "bool".to_string(),
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
             FieldType::Enum2(e) | FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
-            FieldType::String | FieldType::Bytes | FieldType::Message(_) => format!(
-                "<{trait_impl} as {trait_path}>::Field{number}ScalarGetterType<{lt}>",
+            FieldType::String => format!(
+                "<{trait_impl} as {trait_path}>::Field{number}StringType<{lt}>",
+                lt = lt,
+                trait_impl = trait_impl,
+                trait_path = self.message()?.rust_trait_path(),
+                number = self.number(),
+            ),
+            FieldType::Bytes => format!(
+                "<{trait_impl} as {trait_path}>::Field{number}BytesType<{lt}>",
+                lt = lt,
+                trait_impl = trait_impl,
+                trait_path = self.message()?.rust_trait_path(),
+                number = self.number(),
+            ),
+            FieldType::Message(_) => format!(
+                "<{trait_impl} as {trait_path}>::Field{number}MessageType<{lt}>",
                 lt = lt,
                 trait_impl = trait_impl,
                 trait_path = self.message()?.rust_trait_path(),

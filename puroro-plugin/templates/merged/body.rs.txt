@@ -1,9 +1,7 @@
 impl<T, U> super::_puroro_traits::{{ m.trait_ident }} for (T, U)
 where
-    T: ::std::ops::Deref,
-    U: ::std::ops::Deref,
-    T::Target: super::_puroro_traits::{{ m.trait_ident }},
-    U::Target: super::_puroro_traits::{{ m.trait_ident }},
+    T: super::_puroro_traits::{{ m.trait_ident }},
+    U: super::_puroro_traits::{{ m.trait_ident }},
 {
     {%- for field in m.fields %}
     {%- call merged_trait_impl_field(field) %}

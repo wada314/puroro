@@ -1,4 +1,3 @@
-use crate::Derefable;
 use ::puroro::Either;
 use ::std::iter::Chain;
 use ::std::ops::Deref;
@@ -55,17 +54,14 @@ impl<T, U> IntoIterator for MergedRepeatedMessageField<T, U>
 where
     T: IntoIterator,
     U: IntoIterator,
-    <T as IntoIterator>::Item: Deref,
-    <U as IntoIterator>::Item: Deref,
 {
-    type Item = Derefable<Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>>;
-    type IntoIter = impl Iterator<
-        Item = Derefable<Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>>,
-    >;
+    type Item = Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>;
+    type IntoIter =
+        impl Iterator<Item = Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>>;
     fn into_iter(self) -> Self::IntoIter {
         self.0
             .into_iter()
-            .map(|v| Derefable::new(Either::Left(v)))
-            .chain(self.1.into_iter().map(|v| Derefable::new(Either::Right(v))))
+            .map(|v| Either::Left(v))
+            .chain(self.1.into_iter().map(|v| Either::Right(v)))
     }
 }

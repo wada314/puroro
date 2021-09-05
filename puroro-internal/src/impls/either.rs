@@ -55,19 +55,16 @@ impl<'msg, T, U> IntoIterator for EitherRepeatedMessageField<T, U>
 where
     T: RepeatedField<'msg> + IntoIterator,
     U: RepeatedField<'msg> + IntoIterator,
-    <T as IntoIterator>::Item: Deref,
-    <U as IntoIterator>::Item: Deref,
 {
-    type Item = Derefable<Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>>;
-    type IntoIter = DerefableIter<
-        IndependentEitherIter<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>,
-    >;
+    type Item = Either<<T as IntoIterator>::Item, <U as IntoIterator>::Item>;
+    type IntoIter =
+        IndependentEitherIter<<T as IntoIterator>::IntoIter, <U as IntoIterator>::IntoIter>;
     fn into_iter(self) -> Self::IntoIter {
-        DerefableIter(IndependentEitherIter(
+        IndependentEitherIter(
             self.0
                 .map_left(|t| t.into_iter())
                 .map_right(|u| u.into_iter()),
-        ))
+        )
     }
 }
 

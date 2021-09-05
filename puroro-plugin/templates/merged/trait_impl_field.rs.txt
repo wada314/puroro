@@ -3,34 +3,37 @@
 {%- if f.is_repeated %}
 {#- For repeated message field, each message has either `T` or `U` type, never be merged. -#}
 type Field{{ f.number }}MessageType<'this> = ::puroro::Either<
-    <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
-    <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+    <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
+    <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
 >;
 {%- else %}
 {#- For non-repeated message field, the message is `T` and `U` merged type. -#}
 {#- There are 3+1 cases: `T` and `U` both exist, only `T`, only `U`, (and none of them). -#}
 type Field{{ f.number }}MessageType<'this> = ::puroro::Either<
     ::puroro::Either<
-        <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
-        <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
+        <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
     >,
     (
-        <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
-        <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+        <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
+        <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
     )
 >;
 {%- endif %}
 {%- else %}
 {%- endmatch %}
 
-{%- if f.is_bytes || f.is_string %}
-type Field{{ f.number }}ScalarGetterType<'this> = ::puroro::Either<
-    <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
-    <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}ScalarGetterType<'this>,
+{%- if f.is_bytes %}
+type Field{{ f.number }}BytesType<'this> = ::puroro::Either<
+    <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
+    <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}BytesType<'this>,
 >;
 {%- endif %}
-{%- if f.is_message %}
-type Field{{ f.number }}ScalarGetterType<'this> = ::puroro_internal::Derefable<Self::Field{{ f.number }}MessageType<'this>>;
+{%- if f.is_string %}
+type Field{{ f.number }}StringType<'this> = ::puroro::Either<
+    <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
+    <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}StringType<'this>,
+>;
 {%- endif %}
 
 {%- if f.trait_has_scalar_getter %}
@@ -43,11 +46,11 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
     todo!()
     {%- endif %}
     {%- else %}
-    let left = <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.0);
+    let left = <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.0);
     if left != ::std::default::Default::default() {
         left
     } else {
-        <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.1)
+        <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.1)
     }
     {%- endif %}
 }
@@ -59,13 +62,13 @@ fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_
     {%- if f.is_length_delimited %}
     {%- if f.is_message %}
     match (
-        <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.0),
-        <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.1)
+        <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.0),
+        <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.1)
     ) {
         (None, None) => None,
-        (Some(t), None) => Some(::puroro_internal::Derefable::new(::puroro::Either::Left(::puroro::Either::Left(t)))),
-        (None, Some(u)) => Some(::puroro_internal::Derefable::new(::puroro::Either::Left(::puroro::Either::Right(u)))),
-        (Some(t), Some(u)) => Some(::puroro_internal::Derefable::new(::puroro::Either::Right((t, u)))),
+        (Some(t), None) => Some(::puroro::Either::Left(::puroro::Either::Left(t))),
+        (None, Some(u)) => Some(::puroro::Either::Left(::puroro::Either::Right(u))),
+        (Some(t), Some(u)) => Some(::puroro::Either::Right((t, u))),
     }
     {%- else %}
     todo!()
@@ -88,15 +91,15 @@ fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_
 {%- let merged_repeated_field_type = "MergedRepeatedField" %}
 {%- endif %}
 type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::merged::{{ merged_repeated_field_type }}<
-    <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
-    <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
+    <T as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
+    <U as super::_puroro_traits::{{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
 >;
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this>
 {
     ::puroro_internal::impls::merged::{{ merged_repeated_field_type }}::new(
-        <T::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.0),
-        <U::Target as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.1),
+        <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.0),
+        <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.1),
     )
 }
 {%- endif %}
