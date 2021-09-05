@@ -1,7 +1,9 @@
 #[derive(::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 pub struct {{ m.simple_ident }} {
     {%- for field in m.fields %}
+    {%- if !field.is_explicit_oneof_field %}
     pub {{ field.ident }}: {{ field.simple_field_type }},
+    {%- endif %}
     {%- endfor %}
     {%- for oneof in m.oneofs %}
     {%- if !oneof.is_synthetic %}
@@ -97,9 +99,11 @@ impl ::puroro::SerToIoWrite for {{ m.simple_ident }} {
         W: ::std::io::Write
     {
         {%- for field in m.fields %}
+        {%- if !field.is_explicit_oneof_field %}
         ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
             {{ field.simple_label_and_type_tags }}
         >::ser_field(&self.{{ field.ident }}, {{ field.number }}, out)?;
+        {%- endif %}
         {%- endfor %}
         ::std::result::Result::Ok(())
     }

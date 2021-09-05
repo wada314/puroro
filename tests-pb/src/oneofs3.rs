@@ -16,14 +16,6 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct MsgSimple {
-        pub g1_int32: i32,
-        pub g1_string: ::std::string::String,
-        pub g2_f32: f32,
-        pub g2_string: ::std::string::String,
-        pub g2_submsg: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::oneofs3::_puroro_impls::SubmsgSimple>,
-        >,
-        pub g3_int32: i32,
         pub group_one:
             ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne_Simple>,
         pub group_two:
@@ -196,30 +188,6 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Int32,
-            >::ser_field(&self.g1_int32, 1, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::String,
-            >::ser_field(&self.g1_string, 2, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Float,
-            >::ser_field(&self.g2_f32, 3, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::String,
-            >::ser_field(&self.g2_string, 4, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Message<self::_puroro_root::oneofs3::_puroro_impls::SubmsgSimple>,
-            >::ser_field(&self.g2_submsg, 5, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Int32,
-            >::ser_field(&self.g3_int32, 6, out)?;
             ::std::result::Result::Ok(())
         }
     }
