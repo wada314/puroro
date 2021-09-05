@@ -246,7 +246,8 @@ pub mod _puroro_impls {
         U: super::_puroro_traits::MsgTrait,
     {
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            todo!()
+            <U as super::_puroro_traits::MsgTrait>::i32_optional(&self.1)
+                .or_else(|| <T as super::_puroro_traits::MsgTrait>::i32_optional(&self.0))
         }
         type Field2RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field2RepeatedType<'this>,
@@ -260,7 +261,8 @@ pub mod _puroro_impls {
             )
         }
         fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
-            todo!()
+            <U as super::_puroro_traits::MsgTrait>::float_optional(&self.1)
+                .or_else(|| <T as super::_puroro_traits::MsgTrait>::float_optional(&self.0))
         }
         type Field4RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field4RepeatedType<'this>,
@@ -280,7 +282,15 @@ pub mod _puroro_impls {
         fn string_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field5StringType<'this>> {
-            todo!()
+            if let Some(right) = <U as super::_puroro_traits::MsgTrait>::string_optional(&self.1) {
+                Some(::puroro::Either::Right(right))
+            } else if let Some(left) =
+                <T as super::_puroro_traits::MsgTrait>::string_optional(&self.0)
+            {
+                Some(::puroro::Either::Left(left))
+            } else {
+                None
+            }
         }
         type Field6StringType<'this> = ::puroro::Either<
             <T as super::_puroro_traits::MsgTrait>::Field6StringType<'this>,
@@ -339,7 +349,8 @@ pub mod _puroro_impls {
         fn enum_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
-            todo!()
+            <U as super::_puroro_traits::MsgTrait>::enum_optional(&self.1)
+                .or_else(|| <T as super::_puroro_traits::MsgTrait>::enum_optional(&self.0))
         }
         type Field10RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field10RepeatedType<'this>,
@@ -353,7 +364,9 @@ pub mod _puroro_impls {
             )
         }
         fn very_large_field_number<'this>(&'this self) -> ::std::option::Option<i32> {
-            todo!()
+            <U as super::_puroro_traits::MsgTrait>::very_large_field_number(&self.1).or_else(|| {
+                <T as super::_puroro_traits::MsgTrait>::very_large_field_number(&self.0)
+            })
         }
     }
     impl<T, U> super::_puroro_traits::MsgTrait for ::puroro::Either<T, U>
@@ -1175,7 +1188,9 @@ pub mod _puroro_nested {
                 U: super::_puroro_traits::SubmsgTrait,
             {
                 fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-                    todo!()
+                    <U as super::_puroro_traits::SubmsgTrait>::i32_optional(&self.1).or_else(|| {
+                        <T as super::_puroro_traits::SubmsgTrait>::i32_optional(&self.0)
+                    })
                 }
             }
             impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>

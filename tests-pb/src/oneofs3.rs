@@ -586,11 +586,11 @@ pub mod _puroro_impls {
         U: super::_puroro_traits::SubmsgTrait,
     {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
-            let left = <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(&self.0);
-            if left != ::std::default::Default::default() {
-                left
+            let right = <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(&self.1);
+            if right != ::std::default::Default::default() {
+                right
             } else {
-                <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(&self.1)
+                <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(&self.0)
             }
         }
     }

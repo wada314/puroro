@@ -582,7 +582,8 @@ pub mod _puroro_impls {
         U: super::_puroro_traits::SubmsgTrait,
     {
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            todo!()
+            <U as super::_puroro_traits::SubmsgTrait>::i32_optional(&self.1)
+                .or_else(|| <T as super::_puroro_traits::SubmsgTrait>::i32_optional(&self.0))
         }
     }
     impl<T, U> super::_puroro_traits::SubmsgTrait for ::puroro::Either<T, U>

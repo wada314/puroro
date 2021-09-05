@@ -40,11 +40,12 @@ type Field{{ f.number }}StringType<'this> = ::puroro::Either<
 fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
 {
     {%- if f.is_length_delimited %}
-    {%- if f.is_message %}
-    todo!()
-    {%- else %}
-    todo!()
-    {%- endif %}
+    let right = <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.1);
+    if !right.is_empty() {
+        ::puroro::Either::Right(right)
+    } else {
+        ::puroro::Either::Left(<T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.0))
+    }
     {%- else %}
     let right = <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.1);
     if right != ::std::default::Default::default() {
@@ -71,10 +72,17 @@ fn {{ f.ident }}<'this>(&'this self) -> ::std::option::Option<{{ f.trait_scalar_
         (Some(t), Some(u)) => Some(::puroro::Either::Right((t, u))),
     }
     {%- else %}
-    todo!()
+    if let Some(right) = <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.1) {
+        Some(::puroro::Either::Right(right))
+    } else if let Some(left) = <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.0) {
+        Some(::puroro::Either::Left(left))
+    } else {
+        None
+    }
     {%- endif %}
     {%- else %}
-    todo!()
+    <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.1)
+        .or_else(|| <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.0))
     {%- endif %}
 }
 {%- endif %}

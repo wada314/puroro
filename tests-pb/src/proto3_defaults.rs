@@ -162,15 +162,16 @@ pub mod _puroro_impls {
         U: super::_puroro_traits::MsgTrait,
     {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
-            let left = <T as super::_puroro_traits::MsgTrait>::i32_unlabeled(&self.0);
-            if left != ::std::default::Default::default() {
-                left
+            let right = <U as super::_puroro_traits::MsgTrait>::i32_unlabeled(&self.1);
+            if right != ::std::default::Default::default() {
+                right
             } else {
-                <U as super::_puroro_traits::MsgTrait>::i32_unlabeled(&self.1)
+                <T as super::_puroro_traits::MsgTrait>::i32_unlabeled(&self.0)
             }
         }
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            todo!()
+            <U as super::_puroro_traits::MsgTrait>::i32_optional(&self.1)
+                .or_else(|| <T as super::_puroro_traits::MsgTrait>::i32_optional(&self.0))
         }
         type Field3RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
             <T as super::_puroro_traits::MsgTrait>::Field3RepeatedType<'this>,
@@ -184,11 +185,11 @@ pub mod _puroro_impls {
             )
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
-            let left = <T as super::_puroro_traits::MsgTrait>::f32_unlabeled(&self.0);
-            if left != ::std::default::Default::default() {
-                left
+            let right = <U as super::_puroro_traits::MsgTrait>::f32_unlabeled(&self.1);
+            if right != ::std::default::Default::default() {
+                right
             } else {
-                <U as super::_puroro_traits::MsgTrait>::f32_unlabeled(&self.1)
+                <T as super::_puroro_traits::MsgTrait>::f32_unlabeled(&self.0)
             }
         }
         type Field5StringType<'this> = ::puroro::Either<
@@ -196,7 +197,14 @@ pub mod _puroro_impls {
             <U as super::_puroro_traits::MsgTrait>::Field5StringType<'this>,
         >;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
-            todo!()
+            let right = <U as super::_puroro_traits::MsgTrait>::string_unlabeled(&self.1);
+            if !right.is_empty() {
+                ::puroro::Either::Right(right)
+            } else {
+                ::puroro::Either::Left(<T as super::_puroro_traits::MsgTrait>::string_unlabeled(
+                    &self.0,
+                ))
+            }
         }
         type Field6MessageType<'this> = ::puroro::Either<
             ::puroro::Either<
@@ -522,11 +530,11 @@ pub mod _puroro_impls {
         U: super::_puroro_traits::SubmsgTrait,
     {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
-            let left = <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(&self.0);
-            if left != ::std::default::Default::default() {
-                left
+            let right = <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(&self.1);
+            if right != ::std::default::Default::default() {
+                right
             } else {
-                <U as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(&self.1)
+                <T as super::_puroro_traits::SubmsgTrait>::i32_unlabeled(&self.0)
             }
         }
     }

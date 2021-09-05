@@ -75,7 +75,8 @@ pub mod _puroro_impls {
         U: super::_puroro_traits::Test1Trait,
     {
         fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-            todo!()
+            <U as super::_puroro_traits::Test1Trait>::a(&self.1)
+                .or_else(|| <T as super::_puroro_traits::Test1Trait>::a(&self.0))
         }
     }
     impl<T, U> super::_puroro_traits::Test1Trait for ::puroro::Either<T, U>
@@ -172,7 +173,13 @@ pub mod _puroro_impls {
             <U as super::_puroro_traits::Test2Trait>::Field2StringType<'this>,
         >;
         fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
-            todo!()
+            if let Some(right) = <U as super::_puroro_traits::Test2Trait>::b(&self.1) {
+                Some(::puroro::Either::Right(right))
+            } else if let Some(left) = <T as super::_puroro_traits::Test2Trait>::b(&self.0) {
+                Some(::puroro::Either::Left(left))
+            } else {
+                None
+            }
         }
     }
     impl<T, U> super::_puroro_traits::Test2Trait for ::puroro::Either<T, U>

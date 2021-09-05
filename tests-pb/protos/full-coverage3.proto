@@ -23,6 +23,10 @@ message Msg {
     repeated Submsg submsg_repeated = 43;
 }
 
+message Some {
+    int32 i32_unlabeled = 1;
+}
+
 enum Enum {
     ZEROTH = 0;
     FIRST = 1;
