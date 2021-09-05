@@ -85,9 +85,9 @@ fn test_ser_and_then_deser() {
     msg.i32_repeated.extend(vec![10, 20].into_iter());
     msg.float_unlabeled = 10.0;
     msg.float_repeated.extend(vec![10.0, 20.0].into_iter());
-    msg.string_unlabeled = "test".to_string();
+    msg.string_unlabeled = "test".into();
     msg.string_repeated
-        .extend(vec!["abc".to_string(), "def".to_string()].into_iter());
+        .extend(vec!["abc".into(), "def".into()].into_iter());
     msg.submsg_unlabeled = Some(Box::new(Submsg3::default()));
     msg.submsg_unlabeled.as_mut().unwrap().i32_unlabeled = 100;
     msg.submsg_repeated

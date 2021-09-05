@@ -22,9 +22,9 @@ pub mod _puroro_impls {
     pub float_unlabeled: f32,
     pub float_optional: ::std::option::Option<f32>,
     pub float_repeated: ::std::vec::Vec<f32>,
-    pub string_unlabeled: ::std::string::String,
-    pub string_optional: ::std::option::Option<::std::string::String>,
-    pub string_repeated: ::std::vec::Vec<::std::string::String>,
+    pub string_unlabeled: ::std::borrow::Cow<'static, str>,
+    pub string_optional: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+    pub string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
     pub enum_unlabeled: self::_puroro_root::full_coverage3::Enum,
     pub enum_optional: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,
     pub enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,
@@ -68,7 +68,7 @@ pub mod _puroro_impls {
         type Field23StringType<'this> = &'this str;
         type Field23RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
             str,
-            ::std::slice::Iter<'this, ::std::string::String>,
+            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
@@ -931,7 +931,7 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField21 {
-        string_unlabeled: ::std::string::String,
+        string_unlabeled: ::std::borrow::Cow<'static, str>,
     }
 
     impl ::puroro::Message for MsgSimpleField21 {}
@@ -983,7 +983,7 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField22 {
-        string_optional: ::std::option::Option<::std::string::String>,
+        string_optional: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
     impl ::puroro::Message for MsgSimpleField22 {}
@@ -1038,7 +1038,7 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField23 {
-        string_repeated: ::std::vec::Vec<::std::string::String>,
+        string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
     }
 
     impl ::puroro::Message for MsgSimpleField23 {}
@@ -1066,7 +1066,7 @@ pub mod _puroro_impls {
         type Field23StringType<'this> = &'this str;
         type Field23RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
             str,
-            ::std::slice::Iter<'this, ::std::string::String>,
+            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {

@@ -5,6 +5,7 @@ use ::puroro::variant::Variant;
 use ::puroro::variant::VariantTypeTag;
 use ::puroro::SerToIoWrite;
 use ::puroro::{tags, Result};
+use ::std::borrow::Cow;
 use ::std::convert::TryInto;
 use ::std::io::Write;
 use ::std::marker::PhantomData;
@@ -145,7 +146,7 @@ where
 {
     pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<Vec<u8>>,
+        FieldType: VecOrOptionOrBare<Cow<'static, [u8]>>,
         W: Write,
     {
         for item in field.iter() {
@@ -169,7 +170,7 @@ where
 {
     pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<String>,
+        FieldType: VecOrOptionOrBare<Cow<'static, str>>,
         W: Write,
     {
         for item in field.iter() {

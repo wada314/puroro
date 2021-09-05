@@ -91,7 +91,7 @@ fn test_string_unlabeled() {
     let mut msg = <Msg as Default>::default();
     assert_eq!("", msg.string_unlabeled);
 
-    msg.string_unlabeled = "test1".to_string();
+    msg.string_unlabeled = "test1".into();
     assert_eq!("test1", msg.string_unlabeled);
 
     msg.deser(INPUT_FIELD5_STRING_EMPTY.bytes()).unwrap();

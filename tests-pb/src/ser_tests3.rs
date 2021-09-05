@@ -19,8 +19,8 @@ pub mod _puroro_impls {
         pub i32_repeated: ::std::vec::Vec<i32>,
         pub float_unlabeled: f32,
         pub float_repeated: ::std::vec::Vec<f32>,
-        pub string_unlabeled: ::std::string::String,
-        pub string_repeated: ::std::vec::Vec<::std::string::String>,
+        pub string_unlabeled: ::std::borrow::Cow<'static, str>,
+        pub string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
         pub submsg_unlabeled: ::std::option::Option<
             ::std::boxed::Box<
                 self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
@@ -59,7 +59,7 @@ pub mod _puroro_impls {
         type Field6StringType<'this> = &'this str;
         type Field6RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
             str,
-            ::std::slice::Iter<'this, ::std::string::String>,
+            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
@@ -721,7 +721,7 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField5 {
-        string_unlabeled: ::std::string::String,
+        string_unlabeled: ::std::borrow::Cow<'static, str>,
     }
 
     impl ::puroro::Message for MsgSimpleField5 {}
@@ -774,7 +774,7 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField6 {
-        string_repeated: ::std::vec::Vec<::std::string::String>,
+        string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
     }
 
     impl ::puroro::Message for MsgSimpleField6 {}
@@ -801,7 +801,7 @@ pub mod _puroro_impls {
         type Field6StringType<'this> = &'this str;
         type Field6RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
             str,
-            ::std::slice::Iter<'this, ::std::string::String>,
+            ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {

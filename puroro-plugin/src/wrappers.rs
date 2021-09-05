@@ -760,8 +760,8 @@ impl Field {
     pub fn simple_scalar_field_type(&self) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => "::std::string::String".to_string(),
-            FieldType::Bytes => "::std::vec::Vec<u8>".to_string(),
+            FieldType::String => "::std::borrow::Cow<'static, str>".to_string(),
+            FieldType::Bytes => "::std::borrow::Cow<'static, [u8]>".to_string(),
             FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::Message(m) => {

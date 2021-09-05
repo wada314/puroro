@@ -389,7 +389,7 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField2 {
-        g1_string: ::std::option::Option<::std::string::String>,
+        g1_string: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
     impl ::puroro::Message for MsgSimpleField2 {}
@@ -449,7 +449,7 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField4 {
-        g2_string: ::std::option::Option<::std::string::String>,
+        g2_string: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
     impl ::puroro::Message for MsgSimpleField4 {}
@@ -756,7 +756,7 @@ pub mod _puroro_nested {
             #[derive(Clone, PartialEq, Debug)]
             pub enum GroupOne_Simple {
                 G1Int32(i32),
-                G1String(::std::string::String),
+                G1String(::std::borrow::Cow<'static, str>),
             }
 
             impl<'msg> ::std::convert::From<&'msg GroupOne_Simple>
@@ -804,7 +804,7 @@ pub mod _puroro_nested {
             #[derive(Clone, PartialEq, Debug)]
             pub enum GroupTwo_Simple {
                 G2F32(f32),
-                G2String(::std::string::String),
+                G2String(::std::borrow::Cow<'static, str>),
                 G2Submsg(
                     ::std::boxed::Box<self::_puroro_root::oneofs2::_puroro_impls::SubmsgSimple>,
                 ),

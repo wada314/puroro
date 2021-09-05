@@ -6,6 +6,7 @@ use ::puroro::types::FieldData;
 use ::puroro::variant::VariantTypeTag;
 use ::puroro::{tags, Result};
 use ::puroro::{ErrorKind, Message};
+use ::std::borrow::Cow;
 use ::std::marker::PhantomData;
 use ::std::ops::DerefMut;
 
@@ -110,14 +111,14 @@ where
         input: FieldData<&mut ScopedIter<I>>,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<String>,
+        FieldType: VecOrOptionOrBare<Cow<'static, str>>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(iter) = input {
             let string = String::from_utf8(iter.collect::<::std::io::Result<Vec<_>>>()?)
                 .map_err(|e| ErrorKind::InvalidUtf8(e))?;
             if !L::DO_DEFAULT_CHECK || !string.is_empty() {
-                field.push(string);
+                field.push(Cow::Owned(string));
             }
         } else {
             Err(ErrorKind::UnexpectedWireType)?;
@@ -135,13 +136,13 @@ where
         input: FieldData<&mut ScopedIter<I>>,
     ) -> Result<()>
     where
-        FieldType: VecOrOptionOrBare<Vec<u8>>,
+        FieldType: VecOrOptionOrBare<Cow<'static, [u8]>>,
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(iter) = input {
             let bytes = iter.collect::<::std::io::Result<Vec<_>>>()?;
             if !L::DO_DEFAULT_CHECK || !bytes.is_empty() {
-                field.push(bytes);
+                field.push(Cow::Owned(bytes));
             }
         } else {
             Err(ErrorKind::UnexpectedWireType)?;

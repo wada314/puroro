@@ -106,7 +106,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct Test2Simple {
-        pub b: ::std::option::Option<::std::string::String>,
+        pub b: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
     impl ::puroro::Message for Test2Simple {}
 
@@ -199,7 +199,7 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test2SimpleField2 {
-        b: ::std::option::Option<::std::string::String>,
+        b: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
     impl ::puroro::Message for Test2SimpleField2 {}
