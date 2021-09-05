@@ -46,11 +46,11 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
     todo!()
     {%- endif %}
     {%- else %}
-    let left = <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.0);
-    if left != ::std::default::Default::default() {
-        left
+    let right = <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.1);
+    if right != ::std::default::Default::default() {
+        right
     } else {
-        <U as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.1)
+        <T as super::_puroro_traits::{{ m.trait_ident }}>::{{ f.ident }}(&self.0)
     }
     {%- endif %}
 }

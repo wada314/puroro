@@ -2,8 +2,8 @@ use crate::ErrorKind;
 use crate::Result;
 use ::puroro::types::WireType;
 use ::puroro::variant::Variant;
+use ::std::convert::TryInto;
 use ::std::io::Write;
-use std::convert::TryInto;
 
 pub fn write_field_number_and_wire_type<W: Write>(
     out: &mut W,
