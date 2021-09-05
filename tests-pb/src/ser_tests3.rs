@@ -206,14 +206,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct MsgEmpty;
-
-    impl ::puroro::Message for MsgEmpty {}
-
-    impl super::_puroro_traits::MsgTrait for MsgEmpty {
+    impl super::_puroro_traits::MsgTrait for () {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -238,10 +231,8 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field8MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field7MessageType<'this> = ();
+        type Field8MessageType<'this> = ();
         type Field8RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
@@ -258,15 +249,6 @@ pub mod _puroro_impls {
         }
         fn very_large_field_number<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for MsgEmpty {
-        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::std::result::Result::Ok(())
         }
     }
     impl<T, U> super::_puroro_traits::MsgTrait for (T, U)
@@ -569,10 +551,8 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field8MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field7MessageType<'this> = ();
+        type Field8MessageType<'this> = ();
         type Field8RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
@@ -625,10 +605,8 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field8MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field7MessageType<'this> = ();
+        type Field8MessageType<'this> = ();
         type Field8RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
@@ -680,10 +658,8 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field8MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field7MessageType<'this> = ();
+        type Field8MessageType<'this> = ();
         type Field8RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
@@ -736,10 +712,8 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field8MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field7MessageType<'this> = ();
+        type Field8MessageType<'this> = ();
         type Field8RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
@@ -791,10 +765,8 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field8MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field7MessageType<'this> = ();
+        type Field8MessageType<'this> = ();
         type Field8RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
@@ -849,10 +821,8 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro_internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
         }
-        type Field7MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field8MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field7MessageType<'this> = ();
+        type Field8MessageType<'this> = ();
         type Field8RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
@@ -915,8 +885,7 @@ pub mod _puroro_impls {
         ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
-        type Field8MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field8MessageType<'this> = ();
         type Field8RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
@@ -970,8 +939,7 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field7MessageType<'this> = ();
         type Field8MessageType<'this> =
             &'this self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
         type Field8RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
@@ -1031,10 +999,8 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field8MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field7MessageType<'this> = ();
+        type Field8MessageType<'this> = ();
         type Field8RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
@@ -1086,10 +1052,8 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field8MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field7MessageType<'this> = ();
+        type Field8MessageType<'this> = ();
         type Field8RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
@@ -1141,10 +1105,8 @@ pub mod _puroro_impls {
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field7MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field8MessageType<'this> =
-            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field7MessageType<'this> = ();
+        type Field8MessageType<'this> = ();
         type Field8RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
@@ -1360,28 +1322,9 @@ pub mod _puroro_nested {
                     ::std::result::Result::Ok(())
                 }
             }
-            #[derive(
-                ::std::clone::Clone,
-                ::std::default::Default,
-                ::std::cmp::PartialEq,
-                ::std::fmt::Debug,
-            )]
-            pub struct SubmsgEmpty;
-
-            impl ::puroro::Message for SubmsgEmpty {}
-
-            impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {
+            impl super::_puroro_traits::SubmsgTrait for () {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     ::std::default::Default::default()
-                }
-            }
-
-            impl ::puroro::SerToIoWrite for SubmsgEmpty {
-                fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-                where
-                    W: ::std::io::Write,
-                {
-                    ::std::result::Result::Ok(())
                 }
             }
             impl<T, U> super::_puroro_traits::SubmsgTrait for (T, U)

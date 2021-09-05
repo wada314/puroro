@@ -139,14 +139,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct MsgEmpty;
-
-    impl ::puroro::Message for MsgEmpty {}
-
-    impl super::_puroro_traits::MsgTrait for MsgEmpty {
+    impl super::_puroro_traits::MsgTrait for () {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -161,17 +154,7 @@ pub mod _puroro_impls {
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             ""
         }
-        type Field6MessageType<'this> =
-            self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
-    }
-
-    impl ::puroro::SerToIoWrite for MsgEmpty {
-        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::std::result::Result::Ok(())
-        }
+        type Field6MessageType<'this> = ();
     }
     impl<T, U> super::_puroro_traits::MsgTrait for (T, U)
     where
@@ -334,8 +317,7 @@ pub mod _puroro_impls {
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             ""
         }
-        type Field6MessageType<'this> =
-            self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
+        type Field6MessageType<'this> = ();
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -363,8 +345,7 @@ pub mod _puroro_impls {
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             ""
         }
-        type Field6MessageType<'this> =
-            self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
+        type Field6MessageType<'this> = ();
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -390,8 +371,7 @@ pub mod _puroro_impls {
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             ""
         }
-        type Field6MessageType<'this> =
-            self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
+        type Field6MessageType<'this> = ();
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -416,8 +396,7 @@ pub mod _puroro_impls {
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             ""
         }
-        type Field6MessageType<'this> =
-            self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
+        type Field6MessageType<'this> = ();
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -442,8 +421,7 @@ pub mod _puroro_impls {
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
             &self.string_unlabeled
         }
-        type Field6MessageType<'this> =
-            self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgEmpty;
+        type Field6MessageType<'this> = ();
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
@@ -533,25 +511,9 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct SubmsgEmpty;
-
-    impl ::puroro::Message for SubmsgEmpty {}
-
-    impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {
+    impl super::_puroro_traits::SubmsgTrait for () {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for SubmsgEmpty {
-        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::std::result::Result::Ok(())
         }
     }
     impl<T, U> super::_puroro_traits::SubmsgTrait for (T, U)

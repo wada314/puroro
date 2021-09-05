@@ -1,9 +1,4 @@
-#[derive(::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-pub struct {{ m.empty_ident }};
-
-impl ::puroro::Message for {{ m.empty_ident }} {}
-
-impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.empty_ident }} {
+impl super::_puroro_traits::{{ m.ident }}Trait for () {
     {%- for field in m.fields %}
     {%- call empty_trait_impl_field(field) %}
     {%- endfor %}
@@ -20,13 +15,4 @@ impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.empty_ident }} {
         None
     }
     {%- endfor %}
-}
-
-impl ::puroro::SerToIoWrite for {{ m.empty_ident }} {
-    fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-    where
-        W: ::std::io::Write
-    {
-        ::std::result::Result::Ok(())
-    }
 }

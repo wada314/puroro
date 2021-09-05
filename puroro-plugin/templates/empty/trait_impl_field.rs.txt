@@ -4,11 +4,9 @@ type Field{{ f.number }}BytesType<'this> = &'static [u8];
 {%- if f.is_string %}
 type Field{{ f.number }}StringType<'this> = &'static str;
 {%- endif %}
-{%- match f.empty_maybe_field_message_path %}
-{%- when Some with (struct_path) %}
-type Field{{ f.number }}MessageType<'this> = {{ struct_path }};
-{%- else %}
-{%- endmatch %}
+{%- if f.is_message %}
+type Field{{ f.number }}MessageType<'this> = ();
+{%- endif %}
 
 {%- if f.trait_has_scalar_getter %}
 fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {

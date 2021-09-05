@@ -68,23 +68,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct Test1Empty;
-
-    impl ::puroro::Message for Test1Empty {}
-
-    impl super::_puroro_traits::Test1Trait for Test1Empty {}
-
-    impl ::puroro::SerToIoWrite for Test1Empty {
-        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::std::result::Result::Ok(())
-        }
-    }
+    impl super::_puroro_traits::Test1Trait for () {}
     impl<T, U> super::_puroro_traits::Test1Trait for (T, U)
     where
         T: super::_puroro_traits::Test1Trait,
@@ -175,24 +159,8 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct Test2Empty;
-
-    impl ::puroro::Message for Test2Empty {}
-
-    impl super::_puroro_traits::Test2Trait for Test2Empty {
+    impl super::_puroro_traits::Test2Trait for () {
         type Field2StringType<'this> = &'static str;
-    }
-
-    impl ::puroro::SerToIoWrite for Test2Empty {
-        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::std::result::Result::Ok(())
-        }
     }
     impl<T, U> super::_puroro_traits::Test2Trait for (T, U)
     where
@@ -306,25 +274,8 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct Test3Empty;
-
-    impl ::puroro::Message for Test3Empty {}
-
-    impl super::_puroro_traits::Test3Trait for Test3Empty {
-        type Field3MessageType<'this> =
-            self::_puroro_root::official_samples::_puroro_impls::Test1Empty;
-    }
-
-    impl ::puroro::SerToIoWrite for Test3Empty {
-        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::std::result::Result::Ok(())
-        }
+    impl super::_puroro_traits::Test3Trait for () {
+        type Field3MessageType<'this> = ();
     }
     impl<T, U> super::_puroro_traits::Test3Trait for (T, U)
     where
@@ -449,26 +400,10 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct Test4Empty;
-
-    impl ::puroro::Message for Test4Empty {}
-
-    impl super::_puroro_traits::Test4Trait for Test4Empty {
+    impl super::_puroro_traits::Test4Trait for () {
         type Field4RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for Test4Empty {
-        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::std::result::Result::Ok(())
         }
     }
     impl<T, U> super::_puroro_traits::Test4Trait for (T, U)

@@ -53,7 +53,6 @@ struct Message {
     fields: Vec<Field>,
     oneofs: Vec<Oneof>,
     simple_ident: String,
-    empty_ident: String,
     simple_single_field_ident: String,
 }
 
@@ -91,7 +90,6 @@ impl Message {
             fields,
             oneofs,
             simple_ident: m.rust_impl_ident("Simple"),
-            empty_ident: m.rust_impl_ident("Empty"),
             simple_single_field_ident: m.rust_impl_ident("SimpleField"),
         })
     }
@@ -163,7 +161,6 @@ struct Field {
     simple_maybe_field_message_path: Option<String>,
     simple_maybe_borrowed_field_type: Option<String>,
     simple_label_and_type_tags: String,
-    empty_maybe_field_message_path: Option<String>,
 }
 
 impl Field {
@@ -177,12 +174,6 @@ impl Field {
         let simple_maybe_field_message_path =
             if let wrappers::FieldType::Message(m) = f.field_type()? {
                 Some(upgrade(&m)?.rust_impl_path("Simple"))
-            } else {
-                None
-            };
-        let empty_maybe_field_message_path =
-            if let wrappers::FieldType::Message(m) = f.field_type()? {
-                Some(upgrade(&m)?.rust_impl_path("Empty"))
             } else {
                 None
             };
@@ -211,7 +202,6 @@ impl Field {
             simple_maybe_borrowed_field_type: f
                 .maybe_trait_scalar_getter_type_borrowed("Simple")?,
             simple_label_and_type_tags: f.rust_label_and_type_tags("Simple")?,
-            empty_maybe_field_message_path,
         })
     }
 }
@@ -257,7 +247,6 @@ struct OneofField {
     ident: String,
     number: i32,
     is_length_delimited: bool,
-    is_message: bool,
     trait_field_type: String,
     simple_field_type: String,
     simple_field_type_tag: String,
@@ -274,7 +263,6 @@ impl OneofField {
                     | wrappers::FieldType::String
                     | wrappers::FieldType::Message(_)
             ),
-            is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             trait_field_type: f.trait_oneof_field_type("'msg", "T")?,
             simple_field_type: f.simple_oneof_field_type()?,
             simple_field_type_tag: f.rust_type_tag("Simple")?,

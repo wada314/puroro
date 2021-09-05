@@ -224,17 +224,10 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct MsgEmpty;
-
-    impl ::puroro::Message for MsgEmpty {}
-
-    impl super::_puroro_traits::MsgTrait for MsgEmpty {
+    impl super::_puroro_traits::MsgTrait for () {
         type Field2StringType<'this> = &'static str;
         type Field4StringType<'this> = &'static str;
-        type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
+        type Field5MessageType<'this> = ();
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
@@ -251,15 +244,6 @@ pub mod _puroro_impls {
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             None
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for MsgEmpty {
-        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::std::result::Result::Ok(())
         }
     }
     impl<T, U> super::_puroro_traits::MsgTrait for (T, U)
@@ -364,7 +348,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
         type Field2StringType<'this> = &'static str;
         type Field4StringType<'this> = &'static str;
-        type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
+        type Field5MessageType<'this> = ();
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
@@ -394,7 +378,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSimpleField2 {
         type Field2StringType<'this> = &'this str;
         type Field4StringType<'this> = &'static str;
-        type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
+        type Field5MessageType<'this> = ();
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
@@ -424,7 +408,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSimpleField3 {
         type Field2StringType<'this> = &'static str;
         type Field4StringType<'this> = &'static str;
-        type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
+        type Field5MessageType<'this> = ();
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
@@ -454,7 +438,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSimpleField4 {
         type Field2StringType<'this> = &'static str;
         type Field4StringType<'this> = &'this str;
-        type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
+        type Field5MessageType<'this> = ();
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
@@ -517,7 +501,7 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::MsgTrait for MsgSimpleField6 {
         type Field2StringType<'this> = &'static str;
         type Field4StringType<'this> = &'static str;
-        type Field5MessageType<'this> = self::_puroro_root::oneofs3::_puroro_impls::SubmsgEmpty;
+        type Field5MessageType<'this> = ();
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
@@ -591,25 +575,9 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct SubmsgEmpty;
-
-    impl ::puroro::Message for SubmsgEmpty {}
-
-    impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {
+    impl super::_puroro_traits::SubmsgTrait for () {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for SubmsgEmpty {
-        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::std::result::Result::Ok(())
         }
     }
     impl<T, U> super::_puroro_traits::SubmsgTrait for (T, U)

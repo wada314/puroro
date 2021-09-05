@@ -246,14 +246,7 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct MsgEmpty;
-
-    impl ::puroro::Message for MsgEmpty {}
-
-    impl super::_puroro_traits::MsgTrait for MsgEmpty {
+    impl super::_puroro_traits::MsgTrait for () {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             ::std::default::Default::default()
         }
@@ -288,25 +281,13 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for MsgEmpty {
-        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::std::result::Result::Ok(())
         }
     }
     impl<T, U> super::_puroro_traits::MsgTrait for (T, U)
@@ -704,12 +685,9 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -762,12 +740,9 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -818,12 +793,9 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -873,12 +845,9 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -931,12 +900,9 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -987,12 +953,9 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -1042,12 +1005,9 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -1102,12 +1062,9 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -1160,12 +1117,9 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -1215,12 +1169,9 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -1275,12 +1226,9 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -1331,12 +1279,9 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             self.enum_repeated.iter().cloned()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -1392,10 +1337,8 @@ pub mod _puroro_impls {
         ) -> ::std::option::Option<Self::Field41MessageType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field42MessageType<'this> = ();
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -1445,16 +1388,14 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
         type Field42MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
         fn submsg_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field42MessageType<'this>> {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
         }
-        type Field43MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field43MessageType<'this> = ();
         type Field43RepeatedType<'this> =
             ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -1506,10 +1447,8 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             ::puroro_internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field41MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
-        type Field42MessageType<'this> =
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgEmpty;
+        type Field41MessageType<'this> = ();
+        type Field42MessageType<'this> = ();
         type Field43MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
         type Field43RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
     self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
@@ -1758,28 +1697,9 @@ pub mod _puroro_nested {
                     ::std::result::Result::Ok(())
                 }
             }
-            #[derive(
-                ::std::clone::Clone,
-                ::std::default::Default,
-                ::std::cmp::PartialEq,
-                ::std::fmt::Debug,
-            )]
-            pub struct SubmsgEmpty;
-
-            impl ::puroro::Message for SubmsgEmpty {}
-
-            impl super::_puroro_traits::SubmsgTrait for SubmsgEmpty {
+            impl super::_puroro_traits::SubmsgTrait for () {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     ::std::default::Default::default()
-                }
-            }
-
-            impl ::puroro::SerToIoWrite for SubmsgEmpty {
-                fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-                where
-                    W: ::std::io::Write,
-                {
-                    ::std::result::Result::Ok(())
                 }
             }
             impl<T, U> super::_puroro_traits::SubmsgTrait for (T, U)

@@ -75,24 +75,8 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct MsgEmpty;
-
-    impl ::puroro::Message for MsgEmpty {}
-
-    impl super::_puroro_traits::MsgTrait for MsgEmpty {
-        type Field1MessageType<'this> = self::_puroro_root::self_recursive::_puroro_impls::MsgEmpty;
-    }
-
-    impl ::puroro::SerToIoWrite for MsgEmpty {
-        fn ser<W>(&self, _out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            ::std::result::Result::Ok(())
-        }
+    impl super::_puroro_traits::MsgTrait for () {
+        type Field1MessageType<'this> = ();
     }
     impl<T, U> super::_puroro_traits::MsgTrait for (T, U)
     where
