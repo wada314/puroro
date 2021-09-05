@@ -87,7 +87,7 @@ where
             {%- endif %}
         >
     {
-        (**self).{{ oneof.field_ident }}()
+        (**self).{{ oneof.field_ident }}().map(|v| v.into())
     }
     {%- endfor %}
 }
