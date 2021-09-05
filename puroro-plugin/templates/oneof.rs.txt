@@ -40,45 +40,6 @@ for {{ enum_ident }}
 }
 
 {%- if has_reference_field %}
-impl<'msg, T, U> ::std::convert::From<::puroro::Either<
-    {{ enum_ident }}<'msg, T>,
-    {{ enum_ident }}<'msg, U>,
->> for {{ enum_ident }}<'msg, ::puroro::Either<T, U>>
-where
-    T: {{ owner_message_trait_path }},
-    U: {{ owner_message_trait_path }},
-{
-    fn from(value: ::puroro::Either<{{ enum_ident }}<'msg, T>, {{ enum_ident }}<'msg, U>>) -> Self {
-        match value {
-            {%- for field in fields %}
-            ::puroro::Either::Left({{ enum_ident }}::{{ field.ident }}(v)) => {
-                {%- if field.is_length_delimited %}
-                {{ enum_ident }}::{{ field.ident }}(::puroro::Either::Left(v))
-                {%- else %}
-                {{ enum_ident }}::{{ field.ident }}(v)
-                {%- endif %}
-            }
-            ::puroro::Either::Right({{ enum_ident }}::{{ field.ident }}(v)) => {
-                {%- if field.is_length_delimited %}
-                {{ enum_ident }}::{{ field.ident }}(::puroro::Either::Right(v))
-                {%- else %}
-                {{ enum_ident }}::{{ field.ident }}(v)
-                {%- endif %}
-            }
-            {%- endfor %}
-        }
-    }
-}
-{%- else %}
-impl ::std::convert::From<::puroro::Either<{{ enum_ident }}, {{ enum_ident }}>> for {{ enum_ident }}
-{
-    fn from(value: ::puroro::Either<{{ enum_ident }}, {{ enum_ident }}>) -> Self {
-        value.into_inner()
-    }
-}
-{%- endif %}
-
-{%- if has_reference_field %}
 impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>> 
 for {{ enum_ident }}<'msg, &'_ T>
 where

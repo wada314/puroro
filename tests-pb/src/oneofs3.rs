@@ -301,32 +301,59 @@ pub mod _puroro_impls {
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
-            self.as_ref()
-                .either(
-                    |t| t.group_one().map(|t| ::puroro::Either::Left(t)),
-                    |u| u.group_one().map(|u| ::puroro::Either::Right(u)),
-                )
-                .map(|tu| tu.into())
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            match self.as_ref().either(
+                |t| t.group_one().map(|t| ::puroro::Either::Left(t)),
+                |u| u.group_one().map(|u| ::puroro::Either::Right(u)),
+            ) {
+                Some(::puroro::Either::Left(E::G1Int32(v))) => Some(E::G1Int32(v)),
+                Some(::puroro::Either::Right(E::G1Int32(v))) => Some(E::G1Int32(v)),
+                Some(::puroro::Either::Left(E::G1String(v))) => {
+                    Some(E::G1String(::puroro::Either::Left(v)))
+                }
+                Some(::puroro::Either::Right(E::G1String(v))) => {
+                    Some(E::G1String(::puroro::Either::Right(v)))
+                }
+                None => None,
+            }
         }
         fn group_two<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
-            self.as_ref()
-                .either(
-                    |t| t.group_two().map(|t| ::puroro::Either::Left(t)),
-                    |u| u.group_two().map(|u| ::puroro::Either::Right(u)),
-                )
-                .map(|tu| tu.into())
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            match self.as_ref().either(
+                |t| t.group_two().map(|t| ::puroro::Either::Left(t)),
+                |u| u.group_two().map(|u| ::puroro::Either::Right(u)),
+            ) {
+                Some(::puroro::Either::Left(E::G2F32(v))) => Some(E::G2F32(v)),
+                Some(::puroro::Either::Right(E::G2F32(v))) => Some(E::G2F32(v)),
+                Some(::puroro::Either::Left(E::G2String(v))) => {
+                    Some(E::G2String(::puroro::Either::Left(v)))
+                }
+                Some(::puroro::Either::Right(E::G2String(v))) => {
+                    Some(E::G2String(::puroro::Either::Right(v)))
+                }
+                Some(::puroro::Either::Left(E::G2Submsg(v))) => {
+                    Some(E::G2Submsg(::puroro::Either::Left(v)))
+                }
+                Some(::puroro::Either::Right(E::G2Submsg(v))) => {
+                    Some(E::G2Submsg(::puroro::Either::Right(v)))
+                }
+                None => None,
+            }
         }
         fn group_three<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            self.as_ref()
-                .either(
-                    |t| t.group_three().map(|t| ::puroro::Either::Left(t)),
-                    |u| u.group_three().map(|u| ::puroro::Either::Right(u)),
-                )
-                .map(|tu| tu.into())
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            match self.as_ref().either(
+                |t| t.group_three().map(|t| ::puroro::Either::Left(t)),
+                |u| u.group_three().map(|u| ::puroro::Either::Right(u)),
+            ) {
+                Some(::puroro::Either::Left(E::G3Int32(v))) => Some(E::G3Int32(v)),
+                Some(::puroro::Either::Right(E::G3Int32(v))) => Some(E::G3Int32(v)),
+                None => None,
+            }
         }
     }
 
@@ -720,26 +747,6 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            impl<'msg, T, U>
-                ::std::convert::From<::puroro::Either<GroupOne<'msg, T>, GroupOne<'msg, U>>>
-                for GroupOne<'msg, ::puroro::Either<T, U>>
-            where
-                T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
-                U: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
-            {
-                fn from(value: ::puroro::Either<GroupOne<'msg, T>, GroupOne<'msg, U>>) -> Self {
-                    match value {
-                        ::puroro::Either::Left(GroupOne::G1Int32(v)) => GroupOne::G1Int32(v),
-                        ::puroro::Either::Right(GroupOne::G1Int32(v)) => GroupOne::G1Int32(v),
-                        ::puroro::Either::Left(GroupOne::G1String(v)) => {
-                            GroupOne::G1String(::puroro::Either::Left(v))
-                        }
-                        ::puroro::Either::Right(GroupOne::G1String(v)) => {
-                            GroupOne::G1String(::puroro::Either::Right(v))
-                        }
-                    }
-                }
-            }
             impl<'msg, T> ::std::convert::From<GroupOne<'msg, T>> for GroupOne<'msg, &'_ T>
             where
                 T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
@@ -781,32 +788,6 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            impl<'msg, T, U>
-                ::std::convert::From<::puroro::Either<GroupTwo<'msg, T>, GroupTwo<'msg, U>>>
-                for GroupTwo<'msg, ::puroro::Either<T, U>>
-            where
-                T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
-                U: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
-            {
-                fn from(value: ::puroro::Either<GroupTwo<'msg, T>, GroupTwo<'msg, U>>) -> Self {
-                    match value {
-                        ::puroro::Either::Left(GroupTwo::G2F32(v)) => GroupTwo::G2F32(v),
-                        ::puroro::Either::Right(GroupTwo::G2F32(v)) => GroupTwo::G2F32(v),
-                        ::puroro::Either::Left(GroupTwo::G2String(v)) => {
-                            GroupTwo::G2String(::puroro::Either::Left(v))
-                        }
-                        ::puroro::Either::Right(GroupTwo::G2String(v)) => {
-                            GroupTwo::G2String(::puroro::Either::Right(v))
-                        }
-                        ::puroro::Either::Left(GroupTwo::G2Submsg(v)) => {
-                            GroupTwo::G2Submsg(::puroro::Either::Left(v))
-                        }
-                        ::puroro::Either::Right(GroupTwo::G2Submsg(v)) => {
-                            GroupTwo::G2Submsg(::puroro::Either::Right(v))
-                        }
-                    }
-                }
-            }
             impl<'msg, T> ::std::convert::From<GroupTwo<'msg, T>> for GroupTwo<'msg, &'_ T>
             where
                 T: self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
@@ -834,11 +815,6 @@ pub mod _puroro_nested {
                     match from {
                         GroupThree_Simple::G3Int32(v) => GroupThree::G3Int32(Clone::clone(&v)),
                     }
-                }
-            }
-            impl ::std::convert::From<::puroro::Either<GroupThree, GroupThree>> for GroupThree {
-                fn from(value: ::puroro::Either<GroupThree, GroupThree>) -> Self {
-                    value.into_inner()
                 }
             }
         }
