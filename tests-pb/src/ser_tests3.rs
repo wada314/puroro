@@ -1109,6 +1109,61 @@ pub mod _puroro_impls {
             Clone::clone(&self.very_large_field_number)
         }
     }
+    pub struct MsgSimpleByValue {}
+    impl ::puroro::Message for MsgSimpleByValue {}
+
+    impl MsgTrait for MsgSimpleByValue {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        type Field2RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        fn float_unlabeled<'this>(&'this self) -> f32 {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        type Field4RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        type Field5StringType<'this> = ::std::borrow::Cow<'this, str>;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        type Field6StringType<'this> = ::std::borrow::Cow<'this, str>;
+        type Field6RepeatedType<'this> =
+            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field6StringType<'this>>;
+        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        type Field7MessageType<'this> = ::std::boxed::Box<
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+        >;
+        fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        type Field8MessageType<'this> = ::std::boxed::Box<
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+        >;
+        type Field8RepeatedType<'this> =
+            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field8MessageType<'this>>;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        type Field10RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+            self::_puroro_root::ser_tests3::Enum,
+        >;
+        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        fn very_large_field_number<'this>(&'this self) -> i32 {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -1125,19 +1180,27 @@ pub mod _puroro_traits {
         type Field4RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
-        type Field5StringType<'this>: ::std::ops::Deref<Target = str>;
+        type Field5StringType<'this>: ::std::ops::Deref<Target = str>
+            + ::std::fmt::Debug
+            + ::std::cmp::PartialEq
+            + ::std::clone::Clone;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this>;
-        type Field6StringType<'this>: ::std::ops::Deref<Target = str>;
+        type Field6StringType<'this>: ::std::ops::Deref<Target = str>
+            + ::std::fmt::Debug
+            + ::std::cmp::PartialEq
+            + ::std::clone::Clone;
         type Field6RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = Self::Field6StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
-        type Field7MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
+        type Field7MessageType<'this>:
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::fmt::Debug + ::std::cmp::PartialEq + ::std::clone::Clone;
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
             ::std::default::Default::default()
         }
-        type Field8MessageType<'this>: self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait;
+        type Field8MessageType<'this>:
+            self::_puroro_root::ser_tests3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::fmt::Debug + ::std::cmp::PartialEq + ::std::clone::Clone;
         type Field8RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this>;
@@ -1362,6 +1425,14 @@ pub mod _puroro_nested {
             impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     Clone::clone(&self.i32_unlabeled)
+                }
+            }
+            pub struct SubmsgSimpleByValue {}
+            impl ::puroro::Message for SubmsgSimpleByValue {}
+
+            impl SubmsgTrait for SubmsgSimpleByValue {
+                fn i32_unlabeled<'this>(&'this self) -> i32 {
+                    unimplemented!("Please don't use / instantiate this struct!!")
                 }
             }
         }

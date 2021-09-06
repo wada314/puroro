@@ -137,6 +137,16 @@ pub mod _puroro_impls {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
+    pub struct MsgSimpleByValue {}
+    impl ::puroro::Message for MsgSimpleByValue {}
+
+    impl MsgTrait for MsgSimpleByValue {
+        type Field1MessageType<'this> =
+            ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>;
+        fn recursive_unlabeled<'this>(&'this self) -> Option<Self::Field1MessageType<'this>> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -145,7 +155,10 @@ pub mod _puroro_traits {
     }
 
     pub trait MsgTrait {
-        type Field1MessageType<'this>: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait;
+        type Field1MessageType<'this>: self::_puroro_root::self_recursive::_puroro_traits::MsgTrait
+            + ::std::fmt::Debug
+            + ::std::cmp::PartialEq
+            + ::std::clone::Clone;
         fn recursive_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field1MessageType<'this>> {

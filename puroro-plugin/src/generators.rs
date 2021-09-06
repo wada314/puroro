@@ -55,6 +55,7 @@ struct Message {
     oneofs: Vec<Oneof>,
     simple_ident: String,
     simple_single_field_ident: String,
+    simple_by_value_ident: String,
 }
 
 impl Message {
@@ -93,6 +94,7 @@ impl Message {
             oneofs,
             simple_ident: m.rust_impl_ident("Simple"),
             simple_single_field_ident: m.rust_impl_ident("SimpleField"),
+            simple_by_value_ident: m.rust_impl_ident("SimpleByValue"),
         })
     }
 }
@@ -214,7 +216,6 @@ struct Oneof {
     enum_ident: String,
     field_ident: String,
     fields: Vec<OneofField>,
-    is_synthetic: bool,
     has_reference_field: bool,
     owner_message_trait_path: String,
     simple_enum_ident: String,
@@ -231,7 +232,6 @@ impl Oneof {
                 .into_iter()
                 .map(|f| OneofField::try_new(f))
                 .try_collect()?,
-            is_synthetic: o.is_synthetic()?,
             has_reference_field: o.fields()?.into_iter().any(|f| {
                 matches!(
                     f.field_type(),

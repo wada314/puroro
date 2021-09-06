@@ -102,6 +102,14 @@ pub mod _puroro_impls {
             Clone::clone(&self.a)
         }
     }
+    pub struct Test1SimpleByValue {}
+    impl ::puroro::Message for Test1SimpleByValue {}
+
+    impl Test1Trait for Test1SimpleByValue {
+        fn a<'this>(&'this self) -> Option<i32> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -208,6 +216,15 @@ pub mod _puroro_impls {
         type Field2StringType<'this> = &'this str;
         fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
             self.b.as_ref().map(|v| v.as_ref())
+        }
+    }
+    pub struct Test2SimpleByValue {}
+    impl ::puroro::Message for Test2SimpleByValue {}
+
+    impl Test2Trait for Test2SimpleByValue {
+        type Field2StringType<'this> = ::std::borrow::Cow<'this, str>;
+        fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
+            unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
     #[derive(
@@ -333,6 +350,16 @@ pub mod _puroro_impls {
             self.c.as_ref().map(|v| v.as_ref())
         }
     }
+    pub struct Test3SimpleByValue {}
+    impl ::puroro::Message for Test3SimpleByValue {}
+
+    impl Test3Trait for Test3SimpleByValue {
+        type Field3MessageType<'this> =
+            ::std::boxed::Box<self::_puroro_root::official_samples::_puroro_impls::Test1Simple>;
+        fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -446,6 +473,15 @@ pub mod _puroro_impls {
             self.d.iter().cloned()
         }
     }
+    pub struct Test4SimpleByValue {}
+    impl ::puroro::Message for Test4SimpleByValue {}
+
+    impl Test4Trait for Test4SimpleByValue {
+        type Field4RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -481,7 +517,10 @@ pub mod _puroro_traits {
         test1_delegate!(T);
     }
     pub trait Test2Trait {
-        type Field2StringType<'this>: ::std::ops::Deref<Target = str>;
+        type Field2StringType<'this>: ::std::ops::Deref<Target = str>
+            + ::std::fmt::Debug
+            + ::std::cmp::PartialEq
+            + ::std::clone::Clone;
         fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
             ::std::default::Default::default()
         }
@@ -510,7 +549,8 @@ pub mod _puroro_traits {
         test2_delegate!(T);
     }
     pub trait Test3Trait {
-        type Field3MessageType<'this>: self::_puroro_root::official_samples::_puroro_traits::Test1Trait;
+        type Field3MessageType<'this>:
+            self::_puroro_root::official_samples::_puroro_traits::Test1Trait + ::std::fmt::Debug + ::std::cmp::PartialEq + ::std::clone::Clone;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             ::std::default::Default::default()
         }

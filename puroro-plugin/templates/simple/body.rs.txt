@@ -6,11 +6,12 @@ pub struct {{ m.simple_ident }} {
     {%- endif %}
     {%- endfor %}
     {%- for oneof in m.oneofs %}
-    {%- if !oneof.is_synthetic %}
     pub {{ oneof.field_ident }}: ::std::option::Option<
-        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.simple_enum_ident }}
+        super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+        {%- if oneof.has_reference_field %}
+            <'static, {{ m.simple_by_value_ident }}>
+        {%- endif %}
     >,
-    {%- endif %}
     {%- endfor %}
 }
 impl ::puroro::Message for {{ m.simple_ident }} {}
@@ -29,7 +30,16 @@ impl {{ m.trait_ident }} for {{ m.simple_ident }} {
             {%- endif %}
         >
     {
-        self.{{ oneof.field_ident }}.as_ref().map(|o| ::std::convert::From::from(o))
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+        self.{{ oneof.field_ident }}.as_ref().map(|oneof| match oneof {
+            {%- for field in oneof.fields %}
+            {% if field.is_length_delimited %}
+            E::{{ field.ident }}(v) => E::{{ field.ident }}(v.as_ref()),
+            {%- else %}
+            E::{{ field.ident }}(v) => E::{{ field.ident }}(v.clone()),
+            {%- endif %}
+            {%- endfor %}
+        })
     }
     {%- endfor %}
 }
@@ -64,19 +74,19 @@ impl ::puroro_internal::de::DeserFieldsFromBytesIter for {{ m.simple_ident }} {
             {%- for oneof in m.oneofs %}
             {%- for field in oneof.fields %}
             {{ field.number }} => {
-                use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.simple_enum_ident }};
+                use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
                 if !matches!(
                     &self.{{ oneof.field_ident }},
-                    Some({{ oneof.simple_enum_ident }}::{{ field.ident }}(_)))
+                    Some(E::{{ field.ident }}(_)))
                 {
                     self.{{ oneof.field_ident }} = Some(
-                        {{ oneof.simple_enum_ident }}::{{ field.ident }}(
+                        E::{{ field.ident }}(
                             ::std::default::Default::default()
                         )
                     );
                 }
                 let field_value_mut_ref = match &mut self.{{ oneof.field_ident }} {
-                    Some({{ oneof.simple_enum_ident }}::{{ field.ident }}(v)) => v,
+                    Some(E::{{ field.ident }}(v)) => v,
                     _ => unreachable!(),
                 };
                 ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<

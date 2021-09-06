@@ -441,6 +441,33 @@ pub mod _puroro_impls {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
+    pub struct MsgSimpleByValue {}
+    impl ::puroro::Message for MsgSimpleByValue {}
+
+    impl MsgTrait for MsgSimpleByValue {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        fn i32_optional<'this>(&'this self) -> Option<i32> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        type Field5StringType<'this> = ::std::borrow::Cow<'this, str>;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        type Field6MessageType<'this> =
+            ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgSimple>;
+        fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field6MessageType<'this>> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -540,6 +567,14 @@ pub mod _puroro_impls {
             Clone::clone(&self.i32_unlabeled)
         }
     }
+    pub struct SubmsgSimpleByValue {}
+    impl ::puroro::Message for SubmsgSimpleByValue {}
+
+    impl SubmsgTrait for SubmsgSimpleByValue {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -556,9 +591,13 @@ pub mod _puroro_traits {
             + ::std::iter::IntoIterator<Item = i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
         fn f32_unlabeled<'this>(&'this self) -> f32;
-        type Field5StringType<'this>: ::std::ops::Deref<Target = str>;
+        type Field5StringType<'this>: ::std::ops::Deref<Target = str>
+            + ::std::fmt::Debug
+            + ::std::cmp::PartialEq
+            + ::std::clone::Clone;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this>;
-        type Field6MessageType<'this>: self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait;
+        type Field6MessageType<'this>:
+            self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait + ::std::fmt::Debug + ::std::cmp::PartialEq + ::std::clone::Clone;
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
