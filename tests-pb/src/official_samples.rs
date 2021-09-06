@@ -102,6 +102,9 @@ pub mod _puroro_impls {
             Clone::clone(&self.a)
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
     pub struct Test1SimpleByValue {}
     impl ::puroro::Message for Test1SimpleByValue {}
 
@@ -218,6 +221,9 @@ pub mod _puroro_impls {
             self.b.as_ref().map(|v| v.as_ref())
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
     pub struct Test2SimpleByValue {}
     impl ::puroro::Message for Test2SimpleByValue {}
 
@@ -350,6 +356,9 @@ pub mod _puroro_impls {
             self.c.as_ref().map(|v| v.as_ref())
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
     pub struct Test3SimpleByValue {}
     impl ::puroro::Message for Test3SimpleByValue {}
 
@@ -473,6 +482,9 @@ pub mod _puroro_impls {
             self.d.iter().cloned()
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
     pub struct Test4SimpleByValue {}
     impl ::puroro::Message for Test4SimpleByValue {}
 
@@ -518,9 +530,9 @@ pub mod _puroro_traits {
     }
     pub trait Test2Trait {
         type Field2StringType<'this>: ::std::ops::Deref<Target = str>
-            + ::std::fmt::Debug
+            + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::clone::Clone;
+            + ::std::fmt::Debug;
         fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
             ::std::default::Default::default()
         }
@@ -550,7 +562,7 @@ pub mod _puroro_traits {
     }
     pub trait Test3Trait {
         type Field3MessageType<'this>:
-            self::_puroro_root::official_samples::_puroro_traits::Test1Trait + ::std::fmt::Debug + ::std::cmp::PartialEq + ::std::clone::Clone;
+            self::_puroro_root::official_samples::_puroro_traits::Test1Trait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             ::std::default::Default::default()
         }

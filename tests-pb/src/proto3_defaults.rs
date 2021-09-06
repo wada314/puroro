@@ -441,6 +441,9 @@ pub mod _puroro_impls {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
     pub struct MsgSimpleByValue {}
     impl ::puroro::Message for MsgSimpleByValue {}
 
@@ -567,6 +570,9 @@ pub mod _puroro_impls {
             Clone::clone(&self.i32_unlabeled)
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
     pub struct SubmsgSimpleByValue {}
     impl ::puroro::Message for SubmsgSimpleByValue {}
 
@@ -592,12 +598,12 @@ pub mod _puroro_traits {
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this>;
         fn f32_unlabeled<'this>(&'this self) -> f32;
         type Field5StringType<'this>: ::std::ops::Deref<Target = str>
-            + ::std::fmt::Debug
+            + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::clone::Clone;
+            + ::std::fmt::Debug;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this>;
         type Field6MessageType<'this>:
-            self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait + ::std::fmt::Debug + ::std::cmp::PartialEq + ::std::clone::Clone;
+            self::_puroro_root::proto3_defaults::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field6MessageType<'this>> {

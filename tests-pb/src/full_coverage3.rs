@@ -1416,6 +1416,9 @@ pub mod _puroro_impls {
             ::puroro_internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
     pub struct MsgSimpleByValue {}
     impl ::puroro::Message for MsgSimpleByValue {}
 
@@ -1586,6 +1589,9 @@ pub mod _puroro_impls {
             Clone::clone(&self.i32_unlabeled)
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
     pub struct SomeSimpleByValue {}
     impl ::puroro::Message for SomeSimpleByValue {}
 
@@ -1617,23 +1623,23 @@ pub mod _puroro_traits {
             + ::std::iter::IntoIterator<Item = f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this>;
         type Field21StringType<'this>: ::std::ops::Deref<Target = str>
-            + ::std::fmt::Debug
+            + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::clone::Clone;
+            + ::std::fmt::Debug;
         fn string_unlabeled<'this>(&'this self) -> Self::Field21StringType<'this>;
         type Field22StringType<'this>: ::std::ops::Deref<Target = str>
-            + ::std::fmt::Debug
+            + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::clone::Clone;
+            + ::std::fmt::Debug;
         fn string_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field22StringType<'this>> {
             ::std::default::Default::default()
         }
         type Field23StringType<'this>: ::std::ops::Deref<Target = str>
-            + ::std::fmt::Debug
+            + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::clone::Clone;
+            + ::std::fmt::Debug;
         type Field23RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = Self::Field23StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this>;
@@ -1647,21 +1653,21 @@ pub mod _puroro_traits {
             + ::std::iter::IntoIterator<Item = self::_puroro_root::full_coverage3::Enum>;
         fn enum_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this>;
         type Field41MessageType<'this>:
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::fmt::Debug + ::std::cmp::PartialEq + ::std::clone::Clone;
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field41MessageType<'this>> {
             ::std::default::Default::default()
         }
         type Field42MessageType<'this>:
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::fmt::Debug + ::std::cmp::PartialEq + ::std::clone::Clone;
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
         fn submsg_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field42MessageType<'this>> {
             ::std::default::Default::default()
         }
         type Field43MessageType<'this>:
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::fmt::Debug + ::std::cmp::PartialEq + ::std::clone::Clone;
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
         type Field43RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = Self::Field43MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this>;
@@ -1928,6 +1934,12 @@ pub mod _puroro_nested {
                     Clone::clone(&self.i32_unlabeled)
                 }
             }
+            #[derive(
+                ::std::clone::Clone,
+                ::std::default::Default,
+                ::std::cmp::PartialEq,
+                ::std::fmt::Debug,
+            )]
             pub struct SubmsgSimpleByValue {}
             impl ::puroro::Message for SubmsgSimpleByValue {}
 

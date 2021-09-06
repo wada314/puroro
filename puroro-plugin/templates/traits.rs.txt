@@ -3,14 +3,17 @@ pub trait {{ m.trait_ident }} {
     {%- for field in m.fields %}
 
     {%- if field.is_bytes %}
-    type Field{{ field.number }}BytesType<'this>: ::std::ops::Deref<Target=[u8]>;
+    type Field{{ field.number }}BytesType<'this>:
+        ::std::ops::Deref<Target=[u8]> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
     {%- endif %}
     {%- if field.is_string %}
-    type Field{{ field.number }}StringType<'this>: ::std::ops::Deref<Target=str>;
+    type Field{{ field.number }}StringType<'this>:
+        ::std::ops::Deref<Target=str> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
     {%- endif %}
     {%- match field.trait_maybe_field_message_trait_path %}
     {%- when Some with (field_msg_path) %}
-    type Field{{ field.number }}MessageType<'this>: {{ field_msg_path }};
+    type Field{{ field.number }}MessageType<'this>:
+        {{ field_msg_path }} + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
     {%- else %}
     {%- endmatch %}
 

@@ -1,3 +1,4 @@
+#[derive(::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 pub struct {{ m.simple_by_value_ident }} {
 }
 impl ::puroro::Message for {{ m.simple_by_value_ident }} {}

@@ -929,6 +929,9 @@ pub mod _puroro_impls {
             Clone::clone(&self.very_large_field_number)
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
     pub struct MsgSimpleByValue {}
     impl ::puroro::Message for MsgSimpleByValue {}
 
@@ -1005,30 +1008,30 @@ pub mod _puroro_traits {
             + ::std::iter::IntoIterator<Item = f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this>;
         type Field5StringType<'this>: ::std::ops::Deref<Target = str>
-            + ::std::fmt::Debug
+            + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::clone::Clone;
+            + ::std::fmt::Debug;
         fn string_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field5StringType<'this>> {
             ::std::default::Default::default()
         }
         type Field6StringType<'this>: ::std::ops::Deref<Target = str>
-            + ::std::fmt::Debug
+            + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::clone::Clone;
+            + ::std::fmt::Debug;
         type Field6RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = Self::Field6StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this>;
         type Field7MessageType<'this>:
-            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::fmt::Debug + ::std::cmp::PartialEq + ::std::clone::Clone;
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
         fn submsg_optional<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
             ::std::default::Default::default()
         }
         type Field8MessageType<'this>:
-            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::fmt::Debug + ::std::cmp::PartialEq + ::std::clone::Clone;
+            self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_traits::SubmsgTrait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
         type Field8RepeatedType<'this>: ::puroro::RepeatedField<'this>
             + ::std::iter::IntoIterator<Item = Self::Field8MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this>;
@@ -1256,6 +1259,12 @@ pub mod _puroro_nested {
                     Clone::clone(&self.i32_optional)
                 }
             }
+            #[derive(
+                ::std::clone::Clone,
+                ::std::default::Default,
+                ::std::cmp::PartialEq,
+                ::std::fmt::Debug,
+            )]
             pub struct SubmsgSimpleByValue {}
             impl ::puroro::Message for SubmsgSimpleByValue {}
 

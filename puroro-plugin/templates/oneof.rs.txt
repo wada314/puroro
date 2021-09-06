@@ -1,4 +1,4 @@
-#[derive(::std::fmt::Debug, ::std::cmp::PartialEq, ::std::clone::Clone)]
+#[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 pub enum {{ enum_ident }}
 {%- if has_reference_field %}
 <'msg, T: ?Sized + {{ owner_message_trait_path }}>

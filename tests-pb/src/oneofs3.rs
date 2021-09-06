@@ -543,6 +543,9 @@ pub mod _puroro_impls {
             todo!()
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
     pub struct MsgSimpleByValue {}
     impl ::puroro::Message for MsgSimpleByValue {}
 
@@ -666,6 +669,9 @@ pub mod _puroro_impls {
             Clone::clone(&self.i32_unlabeled)
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
     pub struct SubmsgSimpleByValue {}
     impl ::puroro::Message for SubmsgSimpleByValue {}
 
@@ -683,17 +689,17 @@ pub mod _puroro_traits {
 
     pub trait MsgTrait {
         type Field2StringType<'this>: ::std::ops::Deref<Target = str>
-            + ::std::fmt::Debug
+            + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::clone::Clone;
+            + ::std::fmt::Debug;
         type Field4StringType<'this>: ::std::ops::Deref<Target = str>
-            + ::std::fmt::Debug
+            + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::clone::Clone;
+            + ::std::fmt::Debug;
         type Field5MessageType<'this>: self::_puroro_root::oneofs3::_puroro_traits::SubmsgTrait
-            + ::std::fmt::Debug
+            + ::std::clone::Clone
             + ::std::cmp::PartialEq
-            + ::std::clone::Clone;
+            + ::std::fmt::Debug;
         fn group_one<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
@@ -791,7 +797,7 @@ pub mod _puroro_nested {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            #[derive(::std::fmt::Debug, ::std::cmp::PartialEq, ::std::clone::Clone)]
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupOne<
                 'msg,
                 T: ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
@@ -825,7 +831,7 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            #[derive(::std::fmt::Debug, ::std::cmp::PartialEq, ::std::clone::Clone)]
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupTwo<
                 'msg,
                 T: ?Sized + self::_puroro_root::oneofs3::_puroro_traits::MsgTrait,
@@ -858,7 +864,7 @@ pub mod _puroro_nested {
                     }
                 }
             }
-            #[derive(::std::fmt::Debug, ::std::cmp::PartialEq, ::std::clone::Clone)]
+            #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupThree {
                 G3Int32(i32),
             }
