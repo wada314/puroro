@@ -1,5 +1,5 @@
 syntax = "proto2";
-package official_samples;
+package official_samples2;
 
 message Test1 {
   optional int32 a = 1;

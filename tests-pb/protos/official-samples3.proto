@@ -1,0 +1,18 @@
+syntax = "proto3";
+package official_samples3;
+
+message Test1 {
+  int32 a = 1;
+}
+
+message Test2 {
+  string b = 2;
+}
+
+message Test3 {
+  Test1 c = 3;
+}
+
+message Test4 {
+  repeated int32 d = 4;
+}

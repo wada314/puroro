@@ -2,7 +2,8 @@
 #![feature(generic_associated_types)]
 // package (root)
 pub mod full_coverage3;
-pub mod official_samples;
+pub mod official_samples2;
+pub mod official_samples3;
 pub mod oneofs2;
 pub mod oneofs3;
 pub mod proto3_defaults;

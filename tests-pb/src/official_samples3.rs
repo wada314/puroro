@@ -1,5 +1,5 @@
 // A generated source code by puroro library
-// package official_samples
+// package official_samples3
 
 pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
@@ -18,12 +18,12 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct Test1Simple {
-        pub a: ::std::option::Option<i32>,
+        pub a: i32,
     }
     impl ::puroro::Message for Test1Simple {}
 
     impl Test1Trait for Test1Simple {
-        fn a<'this>(&'this self) -> Option<i32> {
+        fn a<'this>(&'this self) -> i32 {
             Clone::clone(&self.a)
         }
     }
@@ -48,7 +48,7 @@ pub mod _puroro_impls {
         {
             match field_number {
                 1 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional,
+                    ::puroro::tags::Unlabeled,
                     ::puroro::tags::Int32,
                 >::deser_field(&mut self.a, data),
 
@@ -63,20 +63,29 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
+                ::puroro::tags::Unlabeled,
                 ::puroro::tags::Int32,
             >::ser_field(&self.a, 1, out)?;
             ::std::result::Result::Ok(())
         }
     }
-    impl Test1Trait for () {}
+    impl Test1Trait for () {
+        fn a<'this>(&'this self) -> i32 {
+            Default::default()
+        }
+    }
     impl<T, U> Test1Trait for (T, U)
     where
         T: Test1Trait,
         U: Test1Trait,
     {
-        fn a<'this>(&'this self) -> Option<i32> {
-            <U as Test1Trait>::a(&self.1).or_else(|| <T as Test1Trait>::a(&self.0))
+        fn a<'this>(&'this self) -> i32 {
+            let right = <U as Test1Trait>::a(&self.1);
+            if right != ::std::default::Default::default() {
+                right
+            } else {
+                <T as Test1Trait>::a(&self.0)
+            }
         }
     }
     impl<T, U> Test1Trait for ::puroro::Either<T, U>
@@ -84,7 +93,7 @@ pub mod _puroro_impls {
         T: Test1Trait,
         U: Test1Trait,
     {
-        fn a<'this>(&'this self) -> Option<i32> {
+        fn a<'this>(&'this self) -> i32 {
             self.as_ref()
                 .either(|t| <T as Test1Trait>::a(t), |u| <U as Test1Trait>::a(u))
         }
@@ -92,13 +101,13 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test1SimpleField1 {
-        a: ::std::option::Option<i32>,
+        a: i32,
     }
 
     impl ::puroro::Message for Test1SimpleField1 {}
 
     impl super::_puroro_traits::Test1Trait for Test1SimpleField1 {
-        fn a<'this>(&'this self) -> Option<i32> {
+        fn a<'this>(&'this self) -> i32 {
             Clone::clone(&self.a)
         }
     }
@@ -109,7 +118,7 @@ pub mod _puroro_impls {
     impl ::puroro::Message for Test1SimpleByValue {}
 
     impl Test1Trait for Test1SimpleByValue {
-        fn a<'this>(&'this self) -> Option<i32> {
+        fn a<'this>(&'this self) -> i32 {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
@@ -117,14 +126,14 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct Test2Simple {
-        pub b: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        pub b: ::std::borrow::Cow<'static, str>,
     }
     impl ::puroro::Message for Test2Simple {}
 
     impl Test2Trait for Test2Simple {
         type Field2StringType<'this> = &'this str;
-        fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            self.b.as_ref().map(|v| v.as_ref())
+        fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
+            &self.b
         }
     }
 
@@ -148,7 +157,7 @@ pub mod _puroro_impls {
         {
             match field_number {
                 2 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional,
+                    ::puroro::tags::Unlabeled,
                     ::puroro::tags::String,
                 >::deser_field(&mut self.b, data),
 
@@ -163,7 +172,7 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
+                ::puroro::tags::Unlabeled,
                 ::puroro::tags::String,
             >::ser_field(&self.b, 2, out)?;
             ::std::result::Result::Ok(())
@@ -171,6 +180,9 @@ pub mod _puroro_impls {
     }
     impl Test2Trait for () {
         type Field2StringType<'this> = &'static str;
+        fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
+            ""
+        }
     }
     impl<T, U> Test2Trait for (T, U)
     where
@@ -181,13 +193,12 @@ pub mod _puroro_impls {
             <T as Test2Trait>::Field2StringType<'this>,
             <U as Test2Trait>::Field2StringType<'this>,
         >;
-        fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            if let Some(right) = <U as Test2Trait>::b(&self.1) {
-                Some(::puroro::Either::Right(right))
-            } else if let Some(left) = <T as Test2Trait>::b(&self.0) {
-                Some(::puroro::Either::Left(left))
+        fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
+            let right = <U as Test2Trait>::b(&self.1);
+            if !right.is_empty() {
+                ::puroro::Either::Right(right)
             } else {
-                None
+                ::puroro::Either::Left(<T as Test2Trait>::b(&self.0))
             }
         }
     }
@@ -200,25 +211,25 @@ pub mod _puroro_impls {
             <T as Test2Trait>::Field2StringType<'this>,
             <U as Test2Trait>::Field2StringType<'this>,
         >;
-        fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
+        fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
             self.as_ref().either(
-                |t| <T as Test2Trait>::b(t).map(|t| ::puroro::Either::Left(t)),
-                |u| <U as Test2Trait>::b(u).map(|u| ::puroro::Either::Right(u)),
+                |t| ::puroro::Either::Left(<T as Test2Trait>::b(t)),
+                |u| ::puroro::Either::Right(<U as Test2Trait>::b(u)),
             )
         }
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test2SimpleField2 {
-        b: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        b: ::std::borrow::Cow<'static, str>,
     }
 
     impl ::puroro::Message for Test2SimpleField2 {}
 
     impl super::_puroro_traits::Test2Trait for Test2SimpleField2 {
         type Field2StringType<'this> = &'this str;
-        fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
-            self.b.as_ref().map(|v| v.as_ref())
+        fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
+            &self.b
         }
     }
     #[derive(
@@ -229,7 +240,7 @@ pub mod _puroro_impls {
 
     impl Test2Trait for Test2SimpleByValue {
         type Field2StringType<'this> = ::std::borrow::Cow<'this, str>;
-        fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
+        fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
@@ -238,14 +249,14 @@ pub mod _puroro_impls {
     )]
     pub struct Test3Simple {
         pub c: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::official_samples::_puroro_impls::Test1Simple>,
+            ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_impls::Test1Simple>,
         >,
     }
     impl ::puroro::Message for Test3Simple {}
 
     impl Test3Trait for Test3Simple {
         type Field3MessageType<'this> =
-            &'this self::_puroro_root::official_samples::_puroro_impls::Test1Simple;
+            &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Simple;
         fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.c.as_ref().map(|v| v.as_ref())
         }
@@ -271,9 +282,9 @@ pub mod _puroro_impls {
         {
             match field_number {
                 3 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional,
+                    ::puroro::tags::Unlabeled,
                     ::puroro::tags::Message<
-                        self::_puroro_root::official_samples::_puroro_impls::Test1Simple,
+                        self::_puroro_root::official_samples3::_puroro_impls::Test1Simple,
                     >,
                 >::deser_field(&mut self.c, data),
 
@@ -288,9 +299,9 @@ pub mod _puroro_impls {
             W: ::std::io::Write,
         {
             ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
+                ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
-                    self::_puroro_root::official_samples::_puroro_impls::Test1Simple,
+                    self::_puroro_root::official_samples3::_puroro_impls::Test1Simple,
                 >,
             >::ser_field(&self.c, 3, out)?;
             ::std::result::Result::Ok(())
@@ -343,7 +354,7 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct Test3SimpleField3 {
         c: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::official_samples::_puroro_impls::Test1Simple>,
+            ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_impls::Test1Simple>,
         >,
     }
 
@@ -351,7 +362,7 @@ pub mod _puroro_impls {
 
     impl super::_puroro_traits::Test3Trait for Test3SimpleField3 {
         type Field3MessageType<'this> =
-            &'this self::_puroro_root::official_samples::_puroro_impls::Test1Simple;
+            &'this self::_puroro_root::official_samples3::_puroro_impls::Test1Simple;
         fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             self.c.as_ref().map(|v| v.as_ref())
         }
@@ -364,7 +375,7 @@ pub mod _puroro_impls {
 
     impl Test3Trait for Test3SimpleByValue {
         type Field3MessageType<'this> =
-            ::std::boxed::Box<self::_puroro_root::official_samples::_puroro_impls::Test1Simple>;
+            ::std::boxed::Box<self::_puroro_root::official_samples3::_puroro_impls::Test1Simple>;
         fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -502,14 +513,12 @@ pub mod _puroro_traits {
     }
 
     pub trait Test1Trait {
-        fn a<'this>(&'this self) -> ::std::option::Option<i32> {
-            ::std::default::Default::default()
-        }
+        fn a<'this>(&'this self) -> i32;
     }
 
     macro_rules! test1_delegate {
         ($ty:ty) => {
-            fn a<'this>(&'this self) -> ::std::option::Option<i32> {
+            fn a<'this>(&'this self) -> i32 {
                 (**self).a()
             }
         };
@@ -533,15 +542,13 @@ pub mod _puroro_traits {
             + ::std::clone::Clone
             + ::std::cmp::PartialEq
             + ::std::fmt::Debug;
-        fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
-            ::std::default::Default::default()
-        }
+        fn b<'this>(&'this self) -> Self::Field2StringType<'this>;
     }
 
     macro_rules! test2_delegate {
         ($ty:ty) => {
             type Field2StringType<'this> = <$ty>::Field2StringType<'this>;
-            fn b<'this>(&'this self) -> ::std::option::Option<Self::Field2StringType<'this>> {
+            fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
                 (**self).b()
             }
         };
@@ -562,7 +569,7 @@ pub mod _puroro_traits {
     }
     pub trait Test3Trait {
         type Field3MessageType<'this>:
-            self::_puroro_root::official_samples::_puroro_traits::Test1Trait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
+            self::_puroro_root::official_samples3::_puroro_traits::Test1Trait + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
             ::std::default::Default::default()
         }
