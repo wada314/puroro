@@ -218,8 +218,6 @@ struct Oneof {
     fields: Vec<OneofField>,
     has_reference_field: bool,
     owner_message_trait_path: String,
-    simple_enum_ident: String,
-    simple_owner_message_path: String,
 }
 
 impl Oneof {
@@ -241,8 +239,6 @@ impl Oneof {
                 )
             }),
             owner_message_trait_path: o.message()?.rust_trait_path(),
-            simple_enum_ident: format!("{}_Simple", o.rust_enum_ident()),
-            simple_owner_message_path: o.message()?.rust_impl_path("Simple"),
         })
     }
 }
@@ -253,7 +249,6 @@ struct OneofField {
     is_length_delimited: bool,
     is_message: bool,
     trait_field_type: String,
-    simple_field_type: String,
     simple_field_type_tag: String,
 }
 
@@ -270,7 +265,6 @@ impl OneofField {
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             trait_field_type: f.trait_oneof_field_type("'msg", "T")?,
-            simple_field_type: f.simple_oneof_field_type()?,
             simple_field_type_tag: f.rust_type_tag("Simple")?,
         })
     }

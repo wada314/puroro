@@ -62,10 +62,11 @@ impl ::puroro_internal::de::DeserFieldsFromBytesIter for {{ m.simple_ident }} {
     where
         I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>
     {
+        use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
         match field_number {
             {%- for field in m.fields %}
             {%- if !field.is_explicit_oneof_field %}
-            {{ field.number }} => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            {{ field.number }} => DeserFieldFromBytesIter::<
                 {{ field.simple_label_and_type_tags }}
             >::deser_field(&mut self.{{ field.ident }}, data),
             {%- endif %}
@@ -89,7 +90,7 @@ impl ::puroro_internal::de::DeserFieldsFromBytesIter for {{ m.simple_ident }} {
                     Some(E::{{ field.ident }}(v)) => v,
                     _ => unreachable!(),
                 };
-                ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                DeserFieldFromBytesIter::<
                     ::puroro::tags::OneofItem, {{ field.simple_field_type_tag }}
                 >::deser_field(field_value_mut_ref, data)
             }
@@ -106,13 +107,29 @@ impl ::puroro::SerToIoWrite for {{ m.simple_ident }} {
     where
         W: ::std::io::Write
     {
+        use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+
         {%- for field in m.fields %}
         {%- if !field.is_explicit_oneof_field %}
-        ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
+        SerFieldToIoWrite::<
             {{ field.simple_label_and_type_tags }}
         >::ser_field(&self.{{ field.ident }}, {{ field.number }}, out)?;
         {%- endif %}
         {%- endfor %}
+        
+        {%- for oneof in m.oneofs %}
+        if let Some(oneof) = self.{{ oneof.field_ident }}.as_ref() {
+            use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+            match oneof {
+                {%- for field in oneof.fields %}
+                E::{{ field.ident }}(v) => SerFieldToIoWrite::<
+                    ::puroro::tags::OneofItem, {{ field.simple_field_type_tag }}
+                >::ser_field(v, {{ field.number }}, out)?,
+                {%- endfor %}
+            }
+        }
+        {%- endfor %}
+
         ::std::result::Result::Ok(())
     }
 }

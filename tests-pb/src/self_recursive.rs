@@ -47,8 +47,9 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
+            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-                1 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                1 => DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled,
                     ::puroro::tags::Message<
                         self::_puroro_root::self_recursive::_puroro_impls::MsgSimple,
@@ -65,12 +66,14 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
+            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
                     self::_puroro_root::self_recursive::_puroro_impls::MsgSimple,
                 >,
             >::ser_field(&self.recursive_unlabeled, 1, out)?;
+
             ::std::result::Result::Ok(())
         }
     }

@@ -71,36 +71,29 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
+            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-                1 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::Int32,
-                >::deser_field(&mut self.i32_unlabeled, data),
-                2 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional,
-                    ::puroro::tags::Int32,
-                >::deser_field(&mut self.i32_optional, data),
-                3 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Repeated,
-                    ::puroro::tags::Int32,
-                >::deser_field(&mut self.i32_repeated, data),
-                4 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::Float,
-                >::deser_field(&mut self.f32_unlabeled, data),
-                5 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::String,
-                >::deser_field(&mut self.string_unlabeled, data),
-                6 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::Message<
-                        self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgSimple,
-                    >,
-                >::deser_field(&mut self.submsg_unlabeled, data),
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_unlabeled, data),
+            2 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_optional, data),
+            3 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Repeated, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_repeated, data),
+            4 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Float
+            >::deser_field(&mut self.f32_unlabeled, data),
+            5 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::String
+            >::deser_field(&mut self.string_unlabeled, data),
+            6 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgSimple>
+            >::deser_field(&mut self.submsg_unlabeled, data),
 
-                _ => unimplemented!("TODO: This case should be handled properly..."),
-            }
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
         }
     }
 
@@ -109,32 +102,39 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Int32,
-            >::ser_field(&self.i32_unlabeled, 1, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Int32,
-            >::ser_field(&self.i32_optional, 2, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Int32,
-            >::ser_field(&self.i32_repeated, 3, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Float,
-            >::ser_field(&self.f32_unlabeled, 4, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::String,
-            >::ser_field(&self.string_unlabeled, 5, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
+            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+                &self.i32_unlabeled,
+                1,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                &self.i32_optional,
+                2,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                &self.i32_repeated,
+                3,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Float>::ser_field(
+                &self.f32_unlabeled,
+                4,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
+                &self.string_unlabeled,
+                5,
+                out,
+            )?;
+            SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
                     self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgSimple,
                 >,
             >::ser_field(&self.submsg_unlabeled, 6, out)?;
+
             ::std::result::Result::Ok(())
         }
     }
@@ -503,14 +503,14 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
+            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-                1 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::Int32,
-                >::deser_field(&mut self.i32_unlabeled, data),
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_unlabeled, data),
 
-                _ => unimplemented!("TODO: This case should be handled properly..."),
-            }
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
         }
     }
 
@@ -519,10 +519,13 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Int32,
-            >::ser_field(&self.i32_unlabeled, 1, out)?;
+            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+                &self.i32_unlabeled,
+                1,
+                out,
+            )?;
+
             ::std::result::Result::Ok(())
         }
     }

@@ -43,9 +43,9 @@ impl NullWrite {
 
 pub struct SerFieldToIoWrite<L, V>(PhantomData<(L, V)>);
 
-impl<V, _1, _2> SerFieldToIoWrite<tags::LabelOptReqUnl<_1, _2>, tags::wire::Variant<V>>
+impl<V, _1, _2, _3> SerFieldToIoWrite<tags::LabelNonRepeated<_1, _2, _3>, tags::wire::Variant<V>>
 where
-    tags::LabelOptReqUnl<_1, _2>: tags::FieldLabelTag,
+    tags::LabelNonRepeated<_1, _2, _3>: tags::FieldLabelTag,
     tags::wire::Variant<V>: VariantTypeTag,
 {
     pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
@@ -56,7 +56,7 @@ where
     {
         use tags::FieldLabelTag as _;
         for item in field.iter() {
-            if !tags::LabelOptReqUnl::<_1, _2>::DO_DEFAULT_CHECK
+            if !tags::LabelNonRepeated::<_1, _2, _3>::DO_DEFAULT_CHECK
                 || item.clone() != Default::default()
             {
                 write_field_number_and_wire_type(out, number, WireType::Variant)?;
@@ -188,15 +188,16 @@ where
     }
 }
 
-impl<M, _1, _2> SerFieldToIoWrite<tags::LabelOptReqUnl<_1, _2>, tags::Message<M>>
+impl<M, _1, _2, _3> SerFieldToIoWrite<tags::LabelNonRepeated<_1, _2, _3>, tags::Message<M>>
 where
     M: SerToIoWrite,
 {
-    pub fn ser_field<W>(field: &Option<Box<M>>, number: i32, out: &mut W) -> Result<()>
+    pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
     where
+        FieldType: VecOrOptionOrBare<Box<M>>,
         W: Write,
     {
-        if let Some(boxed) = field {
+        for boxed in field.iter() {
             let len = {
                 let mut null_out = NullWrite::new();
                 <M as SerToIoWrite>::ser(boxed.deref(), &mut null_out)?;

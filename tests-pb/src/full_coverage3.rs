@@ -283,149 +283,150 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
+            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-            1 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            1 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Int32
             >::deser_field(&mut self.i32_unlabeled, data),
-            2 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            2 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int32
             >::deser_field(&mut self.i32_optional, data),
-            3 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            3 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Int32
             >::deser_field(&mut self.i32_repeated, data),
-            11 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            11 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Float
             >::deser_field(&mut self.float_unlabeled, data),
-            12 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            12 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Float
             >::deser_field(&mut self.float_optional, data),
-            13 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            13 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Float
             >::deser_field(&mut self.float_repeated, data),
-            21 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            21 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Bytes
             >::deser_field(&mut self.bytes_unlabeled, data),
-            22 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            22 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Bytes
             >::deser_field(&mut self.bytes_optional, data),
-            23 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            23 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Bytes
             >::deser_field(&mut self.bytes_repeated, data),
-            31 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            31 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::String
             >::deser_field(&mut self.string_unlabeled, data),
-            32 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            32 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::String
             >::deser_field(&mut self.string_optional, data),
-            33 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            33 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::String
             >::deser_field(&mut self.string_repeated, data),
-            41 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            41 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
             >::deser_field(&mut self.enum_unlabeled, data),
-            42 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            42 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
             >::deser_field(&mut self.enum_optional, data),
-            43 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            43 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
             >::deser_field(&mut self.enum_repeated, data),
-            51 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            51 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
             >::deser_field(&mut self.submsg_unlabeled, data),
-            52 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            52 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
             >::deser_field(&mut self.submsg_optional, data),
-            53 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            53 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
             >::deser_field(&mut self.submsg_repeated, data),
-            101 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            101 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Int64
             >::deser_field(&mut self.i64_unlabeled, data),
-            102 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            102 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int64
             >::deser_field(&mut self.i64_optional, data),
-            103 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            103 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Int64
             >::deser_field(&mut self.i64_repeated, data),
-            111 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            111 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::UInt32
             >::deser_field(&mut self.u32_unlabeled, data),
-            112 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            112 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt32
             >::deser_field(&mut self.u32_optional, data),
-            113 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            113 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::UInt32
             >::deser_field(&mut self.u32_repeated, data),
-            121 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            121 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::UInt64
             >::deser_field(&mut self.u64_unlabeled, data),
-            122 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            122 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::UInt64
             >::deser_field(&mut self.u64_optional, data),
-            123 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            123 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::UInt64
             >::deser_field(&mut self.u64_repeated, data),
-            131 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            131 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::SInt32
             >::deser_field(&mut self.s32_unlabeled, data),
-            132 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            132 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::SInt32
             >::deser_field(&mut self.s32_optional, data),
-            133 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            133 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::SInt32
             >::deser_field(&mut self.s32_repeated, data),
-            141 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            141 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::SInt64
             >::deser_field(&mut self.s64_unlabeled, data),
-            142 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            142 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::SInt64
             >::deser_field(&mut self.s64_optional, data),
-            143 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            143 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::SInt64
             >::deser_field(&mut self.s64_repeated, data),
-            151 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            151 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Fixed32
             >::deser_field(&mut self.fixed32_unlabeled, data),
-            152 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            152 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Fixed32
             >::deser_field(&mut self.fixed32_optional, data),
-            153 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            153 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Fixed32
             >::deser_field(&mut self.fixed32_repeated, data),
-            161 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            161 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Fixed64
             >::deser_field(&mut self.fixed64_unlabeled, data),
-            162 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            162 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Fixed64
             >::deser_field(&mut self.fixed64_optional, data),
-            163 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            163 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Fixed64
             >::deser_field(&mut self.fixed64_repeated, data),
-            171 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            171 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::SFixed32
             >::deser_field(&mut self.sfixed32_unlabeled, data),
-            172 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            172 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::SFixed32
             >::deser_field(&mut self.sfixed32_optional, data),
-            173 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            173 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::SFixed32
             >::deser_field(&mut self.sfixed32_repeated, data),
-            181 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            181 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::SFixed64
             >::deser_field(&mut self.sfixed64_unlabeled, data),
-            182 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            182 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::SFixed64
             >::deser_field(&mut self.sfixed64_optional, data),
-            183 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            183 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::SFixed64
             >::deser_field(&mut self.sfixed64_repeated, data),
-            191 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            191 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Double
             >::deser_field(&mut self.f64_unlabeled, data),
-            192 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            192 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Double
             >::deser_field(&mut self.f64_optional, data),
-            193 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+            193 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Double
             >::deser_field(&mut self.f64_repeated, data),
 
@@ -439,195 +440,239 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Int32,
-            >::ser_field(&self.i32_unlabeled, 1, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Int32,
-            >::ser_field(&self.i32_optional, 2, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Int32,
-            >::ser_field(&self.i32_repeated, 3, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Float,
-            >::ser_field(&self.float_unlabeled, 11, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Float,
-            >::ser_field(&self.float_optional, 12, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Float,
-            >::ser_field(&self.float_repeated, 13, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Bytes,
-            >::ser_field(&self.bytes_unlabeled, 21, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Bytes,
-            >::ser_field(&self.bytes_optional, 22, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Bytes,
-            >::ser_field(&self.bytes_repeated, 23, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::String,
-            >::ser_field(&self.string_unlabeled, 31, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::String,
-            >::ser_field(&self.string_optional, 32, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::String,
-            >::ser_field(&self.string_repeated, 33, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
+            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+                &self.i32_unlabeled,
+                1,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                &self.i32_optional,
+                2,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                &self.i32_repeated,
+                3,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Float>::ser_field(
+                &self.float_unlabeled,
+                11,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
+                &self.float_optional,
+                12,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Float>::ser_field(
+                &self.float_repeated,
+                13,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_unlabeled,
+                21,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_optional,
+                22,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_repeated,
+                23,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
+                &self.string_unlabeled,
+                31,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.string_optional,
+                32,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
+                &self.string_repeated,
+                33,
+                out,
+            )?;
+            SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
             >::ser_field(&self.enum_unlabeled, 41, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
+            SerFieldToIoWrite::<
                 ::puroro::tags::Optional,
                 ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
             >::ser_field(&self.enum_optional, 42, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
+            SerFieldToIoWrite::<
                 ::puroro::tags::Repeated,
                 ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
             >::ser_field(&self.enum_repeated, 43, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
+            SerFieldToIoWrite::<
             ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
         >::ser_field(&self.submsg_unlabeled, 51, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
+            SerFieldToIoWrite::<
             ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
         >::ser_field(&self.submsg_optional, 52, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
+            SerFieldToIoWrite::<
             ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
         >::ser_field(&self.submsg_repeated, 53, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Int64,
-            >::ser_field(&self.i64_unlabeled, 101, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Int64,
-            >::ser_field(&self.i64_optional, 102, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Int64,
-            >::ser_field(&self.i64_repeated, 103, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::UInt32,
-            >::ser_field(&self.u32_unlabeled, 111, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::UInt32,
-            >::ser_field(&self.u32_optional, 112, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::UInt32,
-            >::ser_field(&self.u32_repeated, 113, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::UInt64,
-            >::ser_field(&self.u64_unlabeled, 121, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::UInt64,
-            >::ser_field(&self.u64_optional, 122, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::UInt64,
-            >::ser_field(&self.u64_repeated, 123, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::SInt32,
-            >::ser_field(&self.s32_unlabeled, 131, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::SInt32,
-            >::ser_field(&self.s32_optional, 132, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::SInt32,
-            >::ser_field(&self.s32_repeated, 133, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::SInt64,
-            >::ser_field(&self.s64_unlabeled, 141, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::SInt64,
-            >::ser_field(&self.s64_optional, 142, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::SInt64,
-            >::ser_field(&self.s64_repeated, 143, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Fixed32,
-            >::ser_field(&self.fixed32_unlabeled, 151, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Fixed32,
-            >::ser_field(&self.fixed32_optional, 152, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Fixed32,
-            >::ser_field(&self.fixed32_repeated, 153, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Fixed64,
-            >::ser_field(&self.fixed64_unlabeled, 161, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Fixed64,
-            >::ser_field(&self.fixed64_optional, 162, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Fixed64,
-            >::ser_field(&self.fixed64_repeated, 163, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::SFixed32,
-            >::ser_field(&self.sfixed32_unlabeled, 171, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::SFixed32,
-            >::ser_field(&self.sfixed32_optional, 172, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::SFixed32,
-            >::ser_field(&self.sfixed32_repeated, 173, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::SFixed64,
-            >::ser_field(&self.sfixed64_unlabeled, 181, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::SFixed64,
-            >::ser_field(&self.sfixed64_optional, 182, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::SFixed64,
-            >::ser_field(&self.sfixed64_repeated, 183, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Double,
-            >::ser_field(&self.f64_unlabeled, 191, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Double,
-            >::ser_field(&self.f64_optional, 192, out)?;
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Repeated,
-                ::puroro::tags::Double,
-            >::ser_field(&self.f64_repeated, 193, out)?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int64>::ser_field(
+                &self.i64_unlabeled,
+                101,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
+                &self.i64_optional,
+                102,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int64>::ser_field(
+                &self.i64_repeated,
+                103,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::UInt32>::ser_field(
+                &self.u32_unlabeled,
+                111,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field(
+                &self.u32_optional,
+                112,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::UInt32>::ser_field(
+                &self.u32_repeated,
+                113,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::UInt64>::ser_field(
+                &self.u64_unlabeled,
+                121,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
+                &self.u64_optional,
+                122,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::UInt64>::ser_field(
+                &self.u64_repeated,
+                123,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::SInt32>::ser_field(
+                &self.s32_unlabeled,
+                131,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SInt32>::ser_field(
+                &self.s32_optional,
+                132,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SInt32>::ser_field(
+                &self.s32_repeated,
+                133,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::SInt64>::ser_field(
+                &self.s64_unlabeled,
+                141,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SInt64>::ser_field(
+                &self.s64_optional,
+                142,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SInt64>::ser_field(
+                &self.s64_repeated,
+                143,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Fixed32>::ser_field(
+                &self.fixed32_unlabeled,
+                151,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Fixed32>::ser_field(
+                &self.fixed32_optional,
+                152,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Fixed32>::ser_field(
+                &self.fixed32_repeated,
+                153,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Fixed64>::ser_field(
+                &self.fixed64_unlabeled,
+                161,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Fixed64>::ser_field(
+                &self.fixed64_optional,
+                162,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Fixed64>::ser_field(
+                &self.fixed64_repeated,
+                163,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::SFixed32>::ser_field(
+                &self.sfixed32_unlabeled,
+                171,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SFixed32>::ser_field(
+                &self.sfixed32_optional,
+                172,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SFixed32>::ser_field(
+                &self.sfixed32_repeated,
+                173,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::SFixed64>::ser_field(
+                &self.sfixed64_unlabeled,
+                181,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SFixed64>::ser_field(
+                &self.sfixed64_optional,
+                182,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SFixed64>::ser_field(
+                &self.sfixed64_repeated,
+                183,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Double>::ser_field(
+                &self.f64_unlabeled,
+                191,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Double>::ser_field(
+                &self.f64_optional,
+                192,
+                out,
+            )?;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Double>::ser_field(
+                &self.f64_repeated,
+                193,
+                out,
+            )?;
+
             ::std::result::Result::Ok(())
         }
     }
@@ -8304,14 +8349,14 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
+            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-                1 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Unlabeled,
-                    ::puroro::tags::Int32,
-                >::deser_field(&mut self.i32_unlabeled, data),
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_unlabeled, data),
 
-                _ => unimplemented!("TODO: This case should be handled properly..."),
-            }
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
         }
     }
 
@@ -8320,10 +8365,13 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Unlabeled,
-                ::puroro::tags::Int32,
-            >::ser_field(&self.i32_unlabeled, 1, out)?;
+            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+                &self.i32_unlabeled,
+                1,
+                out,
+            )?;
+
             ::std::result::Result::Ok(())
         }
     }
@@ -8855,8 +8903,9 @@ pub mod _puroro_nested {
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
                 {
+                    use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
                     match field_number {
-                        1 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                        1 => DeserFieldFromBytesIter::<
                             ::puroro::tags::Unlabeled,
                             ::puroro::tags::Int32,
                         >::deser_field(&mut self.i32_unlabeled, data),
@@ -8871,10 +8920,11 @@ pub mod _puroro_nested {
                 where
                     W: ::std::io::Write,
                 {
-                    ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                        ::puroro::tags::Unlabeled,
-                        ::puroro::tags::Int32,
-                    >::ser_field(&self.i32_unlabeled, 1, out)?;
+                    use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+                    SerFieldToIoWrite::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::ser_field(&self.i32_unlabeled, 1, out)?;
+
                     ::std::result::Result::Ok(())
                 }
             }

@@ -82,6 +82,7 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
+            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
                 1 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
@@ -92,10 +93,9 @@ pub mod _puroro_impls {
                         Some(E::G1Int32(v)) => v,
                         _ => unreachable!(),
                     };
-                    ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                        ::puroro::tags::OneofItem,
-                        ::puroro::tags::Int32,
-                    >::deser_field(field_value_mut_ref, data)
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofItem, ::puroro::tags::Int32
+                >::deser_field(field_value_mut_ref, data)
                 }
                 2 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
@@ -106,10 +106,9 @@ pub mod _puroro_impls {
                         Some(E::G1String(v)) => v,
                         _ => unreachable!(),
                     };
-                    ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                        ::puroro::tags::OneofItem,
-                        ::puroro::tags::String,
-                    >::deser_field(field_value_mut_ref, data)
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofItem, ::puroro::tags::String
+                >::deser_field(field_value_mut_ref, data)
                 }
                 3 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
@@ -120,10 +119,9 @@ pub mod _puroro_impls {
                         Some(E::G2F32(v)) => v,
                         _ => unreachable!(),
                     };
-                    ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                        ::puroro::tags::OneofItem,
-                        ::puroro::tags::Float,
-                    >::deser_field(field_value_mut_ref, data)
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofItem, ::puroro::tags::Float
+                >::deser_field(field_value_mut_ref, data)
                 }
                 4 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
@@ -134,10 +132,9 @@ pub mod _puroro_impls {
                         Some(E::G2String(v)) => v,
                         _ => unreachable!(),
                     };
-                    ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                        ::puroro::tags::OneofItem,
-                        ::puroro::tags::String,
-                    >::deser_field(field_value_mut_ref, data)
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofItem, ::puroro::tags::String
+                >::deser_field(field_value_mut_ref, data)
                 }
                 5 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
@@ -148,7 +145,7 @@ pub mod _puroro_impls {
                         Some(E::G2Submsg(v)) => v,
                         _ => unreachable!(),
                     };
-                    ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
+                    DeserFieldFromBytesIter::<
                         ::puroro::tags::OneofItem,
                         ::puroro::tags::Message<
                             self::_puroro_root::oneofs2::_puroro_impls::SubmsgSimple,
@@ -164,10 +161,9 @@ pub mod _puroro_impls {
                         Some(E::G3Int32(v)) => v,
                         _ => unreachable!(),
                     };
-                    ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                        ::puroro::tags::OneofItem,
-                        ::puroro::tags::Int32,
-                    >::deser_field(field_value_mut_ref, data)
+                    DeserFieldFromBytesIter::<
+                    ::puroro::tags::OneofItem, ::puroro::tags::Int32
+                >::deser_field(field_value_mut_ref, data)
                 }
 
                 _ => unimplemented!("TODO: This case should be handled properly..."),
@@ -180,6 +176,49 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
+            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            if let Some(oneof) = self.group_one.as_ref() {
+                use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+                match oneof {
+                    E::G1Int32(v) => SerFieldToIoWrite::<
+                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::Int32,
+                    >::ser_field(v, 1, out)?,
+                    E::G1String(v) => SerFieldToIoWrite::<
+                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::String,
+                    >::ser_field(v, 2, out)?,
+                }
+            }
+            if let Some(oneof) = self.group_two.as_ref() {
+                use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+                match oneof {
+                    E::G2F32(v) => SerFieldToIoWrite::<
+                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::Float,
+                    >::ser_field(v, 3, out)?,
+                    E::G2String(v) => SerFieldToIoWrite::<
+                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::String,
+                    >::ser_field(v, 4, out)?,
+                    E::G2Submsg(v) => SerFieldToIoWrite::<
+                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::Message<
+                            self::_puroro_root::oneofs2::_puroro_impls::SubmsgSimple,
+                        >,
+                    >::ser_field(v, 5, out)?,
+                }
+            }
+            if let Some(oneof) = self.group_three.as_ref() {
+                use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+                match oneof {
+                    E::G3Int32(v) => SerFieldToIoWrite::<
+                        ::puroro::tags::OneofItem,
+                        ::puroro::tags::Int32,
+                    >::ser_field(v, 6, out)?,
+                }
+            }
+
             ::std::result::Result::Ok(())
         }
     }
@@ -602,14 +641,14 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
+            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
-                1 => ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter::<
-                    ::puroro::tags::Optional,
-                    ::puroro::tags::Int32,
-                >::deser_field(&mut self.i32_optional, data),
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_optional, data),
 
-                _ => unimplemented!("TODO: This case should be handled properly..."),
-            }
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
         }
     }
 
@@ -618,10 +657,13 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            ::puroro_internal::impls::simple::se::SerFieldToIoWrite::<
-                ::puroro::tags::Optional,
-                ::puroro::tags::Int32,
-            >::ser_field(&self.i32_optional, 1, out)?;
+            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                &self.i32_optional,
+                1,
+                out,
+            )?;
+
             ::std::result::Result::Ok(())
         }
     }
