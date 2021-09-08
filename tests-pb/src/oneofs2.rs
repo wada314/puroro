@@ -743,6 +743,7 @@ pub mod _puroro_traits {
         fn g1_int32<'this>(&'this self) -> Option<i32> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             self.group_one().and_then(|oneof| {
+                #[allow(irrefutable_let_patterns)]
                 if let E::G1Int32(v) = oneof {
                     Some(v)
                 } else {
@@ -759,6 +760,7 @@ pub mod _puroro_traits {
         > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
             self.group_one().and_then(|oneof| {
+                #[allow(irrefutable_let_patterns)]
                 if let E::G1String(v) = oneof {
                     Some(v)
                 } else {
@@ -775,6 +777,7 @@ pub mod _puroro_traits {
         fn g2_f32<'this>(&'this self) -> Option<f32> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             self.group_two().and_then(|oneof| {
+                #[allow(irrefutable_let_patterns)]
                 if let E::G2F32(v) = oneof {
                     Some(v)
                 } else {
@@ -791,6 +794,7 @@ pub mod _puroro_traits {
         > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             self.group_two().and_then(|oneof| {
+                #[allow(irrefutable_let_patterns)]
                 if let E::G2String(v) = oneof {
                     Some(v)
                 } else {
@@ -807,6 +811,7 @@ pub mod _puroro_traits {
         > {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
             self.group_two().and_then(|oneof| {
+                #[allow(irrefutable_let_patterns)]
                 if let E::G2Submsg(v) = oneof {
                     Some(v)
                 } else {
@@ -822,6 +827,7 @@ pub mod _puroro_traits {
         fn g3_int32<'this>(&'this self) -> Option<i32> {
             use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
             self.group_three().and_then(|oneof| {
+                #[allow(irrefutable_let_patterns)]
                 if let E::G3Int32(v) = oneof {
                     Some(v)
                 } else {
