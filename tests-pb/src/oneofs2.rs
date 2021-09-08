@@ -740,16 +740,94 @@ pub mod _puroro_traits {
         {
             ::std::option::Option::None
         }
+        fn g1_int32<'this>(&'this self) -> Option<i32> {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            self.group_one().and_then(|oneof| {
+                if let E::G1Int32(v) = oneof {
+                    Some(v)
+                } else {
+                    None
+                }
+            })
+        }
+        fn g1_string<'this>(
+            &'this self,
+        ) -> Option<
+            <Self as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field2StringType<
+                'this,
+            >,
+        > {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            self.group_one().and_then(|oneof| {
+                if let E::G1String(v) = oneof {
+                    Some(v)
+                } else {
+                    None
+                }
+            })
+        }
         fn group_two<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
         {
             ::std::option::Option::None
         }
+        fn g2_f32<'this>(&'this self) -> Option<f32> {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            self.group_two().and_then(|oneof| {
+                if let E::G2F32(v) = oneof {
+                    Some(v)
+                } else {
+                    None
+                }
+            })
+        }
+        fn g2_string<'this>(
+            &'this self,
+        ) -> Option<
+            <Self as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field4StringType<
+                'this,
+            >,
+        > {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            self.group_two().and_then(|oneof| {
+                if let E::G2String(v) = oneof {
+                    Some(v)
+                } else {
+                    None
+                }
+            })
+        }
+        fn g2_submsg<'this>(
+            &'this self,
+        ) -> Option<
+            <Self as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5MessageType<
+                'this,
+            >,
+        > {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            self.group_two().and_then(|oneof| {
+                if let E::G2Submsg(v) = oneof {
+                    Some(v)
+                } else {
+                    None
+                }
+            })
+        }
         fn group_three<'this>(
             &'this self,
         ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             ::std::option::Option::None
+        }
+        fn g3_int32<'this>(&'this self) -> Option<i32> {
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            self.group_three().and_then(|oneof| {
+                if let E::G3Int32(v) = oneof {
+                    Some(v)
+                } else {
+                    None
+                }
+            })
         }
     }
 

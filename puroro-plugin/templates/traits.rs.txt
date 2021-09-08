@@ -44,6 +44,19 @@ pub trait {{ m.trait_ident }} {
     {
         ::std::option::Option::None
     }
+        
+    {%- for field in oneof.fields %}
+    pub fn {{ field.getter_ident }}<'this>(&'this self) -> Option<{{ field.trait_getter_type }}> {
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+        self.{{ oneof.field_ident }}().and_then(|oneof| {
+            if let E::{{ field.ident }}(v) = oneof {
+                Some(v)
+            } else {
+                None
+            }
+        })
+    }
+    {%- endfor %}
     {%- endfor %}
 }
 

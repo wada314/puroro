@@ -245,10 +245,12 @@ impl Oneof {
 
 struct OneofField {
     ident: String,
+    getter_ident: String,
     number: i32,
     is_length_delimited: bool,
     is_message: bool,
     trait_field_type: String,
+    trait_getter_type: String,
     simple_field_type_tag: String,
 }
 
@@ -256,6 +258,7 @@ impl OneofField {
     fn try_new(f: &wrappers::Field) -> Result<Self> {
         Ok(Self {
             ident: f.rust_oneof_ident().to_string(),
+            getter_ident: f.rust_ident().to_string(),
             number: f.number(),
             is_length_delimited: matches!(
                 f.field_type()?,
@@ -265,6 +268,7 @@ impl OneofField {
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             trait_field_type: f.trait_oneof_field_type("'msg", "T")?,
+            trait_getter_type: f.trait_oneof_field_type("'this", "Self")?,
             simple_field_type_tag: f.rust_type_tag("Simple")?,
         })
     }
