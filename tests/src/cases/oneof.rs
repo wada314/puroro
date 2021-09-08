@@ -14,6 +14,11 @@ fn test_oneof_simple2() {
     assert!(msg.group_two().is_none());
     assert!(msg.group_three().is_none());
     msg.group_one = Some(GroupOne2::G1Int32(100));
-    assert!(msg.group_one().is_some());
-    assert!(msg.group_one().unwrap() == GroupOne2::G1Int32(100));
+    assert!(matches!(msg.group_one(), Some(GroupOne2::G1Int32(100))));
+    assert!(matches!(msg.g1_int32(), Some(100)));
+    assert!(msg.g1_string().is_none());
+    msg.group_one = Some(GroupOne2::G1String("Test".into()));
+    assert!(matches!(msg.group_one(), Some(GroupOne2::G1String("Test"))));
+    assert!(matches!(msg.g1_string(), Some("Test")));
+    assert!(msg.g1_int32().is_none());
 }
