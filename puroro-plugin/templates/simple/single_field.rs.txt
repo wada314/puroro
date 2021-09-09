@@ -5,7 +5,7 @@ struct {{ m.simple_single_field_ident }}{{ sfield.number }} {
     {{ sfield.ident }}: {{ sfield.simple_field_type }},
 }
 
-impl ::puroro::Message for {{ m.simple_single_field_ident }}{{ sfield.number }} {}
+impl ::puroro::Message<{{ m.simple_ident }}> for {{ m.simple_single_field_ident }}{{ sfield.number }} {}
 
 impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_single_field_ident }}{{ sfield.number }}
 {

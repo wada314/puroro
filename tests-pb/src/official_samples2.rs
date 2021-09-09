@@ -20,7 +20,7 @@ pub mod _puroro_impls {
     pub struct Test1Simple {
         pub a: ::std::option::Option<i32>,
     }
-    impl ::puroro::Message for Test1Simple {}
+    impl ::puroro::Message<Test1Simple> for Test1Simple {}
 
     impl Test1Trait for Test1Simple {
         fn a<'this>(&'this self) -> Option<i32> {
@@ -96,7 +96,7 @@ pub mod _puroro_impls {
         a: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message for Test1SimpleField1 {}
+    impl ::puroro::Message<Test1Simple> for Test1SimpleField1 {}
 
     impl super::_puroro_traits::Test1Trait for Test1SimpleField1 {
         fn a<'this>(&'this self) -> Option<i32> {
@@ -107,7 +107,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct Test1SimpleByValue {}
-    impl ::puroro::Message for Test1SimpleByValue {}
+    impl ::puroro::Message<Test1Simple> for Test1SimpleByValue {}
 
     impl Test1Trait for Test1SimpleByValue {
         fn a<'this>(&'this self) -> Option<i32> {
@@ -120,7 +120,7 @@ pub mod _puroro_impls {
     pub struct Test2Simple {
         pub b: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
-    impl ::puroro::Message for Test2Simple {}
+    impl ::puroro::Message<Test2Simple> for Test2Simple {}
 
     impl Test2Trait for Test2Simple {
         type Field2StringType<'this> = &'this str;
@@ -215,7 +215,7 @@ pub mod _puroro_impls {
         b: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message for Test2SimpleField2 {}
+    impl ::puroro::Message<Test2Simple> for Test2SimpleField2 {}
 
     impl super::_puroro_traits::Test2Trait for Test2SimpleField2 {
         type Field2StringType<'this> = &'this str;
@@ -227,7 +227,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct Test2SimpleByValue {}
-    impl ::puroro::Message for Test2SimpleByValue {}
+    impl ::puroro::Message<Test2Simple> for Test2SimpleByValue {}
 
     impl Test2Trait for Test2SimpleByValue {
         type Field2StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -243,7 +243,7 @@ pub mod _puroro_impls {
             ::std::boxed::Box<self::_puroro_root::official_samples2::_puroro_impls::Test1Simple>,
         >,
     }
-    impl ::puroro::Message for Test3Simple {}
+    impl ::puroro::Message<Test3Simple> for Test3Simple {}
 
     impl Test3Trait for Test3Simple {
         type Field3MessageType<'this> =
@@ -352,7 +352,7 @@ pub mod _puroro_impls {
         >,
     }
 
-    impl ::puroro::Message for Test3SimpleField3 {}
+    impl ::puroro::Message<Test3Simple> for Test3SimpleField3 {}
 
     impl super::_puroro_traits::Test3Trait for Test3SimpleField3 {
         type Field3MessageType<'this> =
@@ -365,7 +365,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct Test3SimpleByValue {}
-    impl ::puroro::Message for Test3SimpleByValue {}
+    impl ::puroro::Message<Test3Simple> for Test3SimpleByValue {}
 
     impl Test3Trait for Test3SimpleByValue {
         type Field3MessageType<'this> =
@@ -380,7 +380,7 @@ pub mod _puroro_impls {
     pub struct Test4Simple {
         pub d: ::std::vec::Vec<i32>,
     }
-    impl ::puroro::Message for Test4Simple {}
+    impl ::puroro::Message<Test4Simple> for Test4Simple {}
 
     impl Test4Trait for Test4Simple {
         type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
@@ -479,7 +479,7 @@ pub mod _puroro_impls {
         d: ::std::vec::Vec<i32>,
     }
 
-    impl ::puroro::Message for Test4SimpleField4 {}
+    impl ::puroro::Message<Test4Simple> for Test4SimpleField4 {}
 
     impl super::_puroro_traits::Test4Trait for Test4SimpleField4 {
         type Field4RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
@@ -492,7 +492,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct Test4SimpleByValue {}
-    impl ::puroro::Message for Test4SimpleByValue {}
+    impl ::puroro::Message<Test4Simple> for Test4SimpleByValue {}
 
     impl Test4Trait for Test4SimpleByValue {
         type Field4RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;

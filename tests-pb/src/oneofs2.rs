@@ -25,7 +25,7 @@ pub mod _puroro_impls {
         pub group_three:
             ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree>,
     }
-    impl ::puroro::Message for MsgSimple {}
+    impl ::puroro::Message<MsgSimple> for MsgSimple {}
 
     impl MsgTrait for MsgSimple {
         type Field2StringType<'this> = &'this str;
@@ -405,7 +405,7 @@ pub mod _puroro_impls {
         g1_int32: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message for MsgSimpleField1 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField1 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
         type Field2StringType<'this> = &'static str;
@@ -435,7 +435,7 @@ pub mod _puroro_impls {
         g1_string: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message for MsgSimpleField2 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField2 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField2 {
         type Field2StringType<'this> = &'this str;
@@ -465,7 +465,7 @@ pub mod _puroro_impls {
         g2_f32: ::std::option::Option<f32>,
     }
 
-    impl ::puroro::Message for MsgSimpleField3 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField3 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField3 {
         type Field2StringType<'this> = &'static str;
@@ -495,7 +495,7 @@ pub mod _puroro_impls {
         g2_string: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message for MsgSimpleField4 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField4 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField4 {
         type Field2StringType<'this> = &'static str;
@@ -527,7 +527,7 @@ pub mod _puroro_impls {
         >,
     }
 
-    impl ::puroro::Message for MsgSimpleField5 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField5 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField5 {
         type Field2StringType<'this> = &'static str;
@@ -558,7 +558,7 @@ pub mod _puroro_impls {
         g3_int32: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message for MsgSimpleField6 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField6 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField6 {
         type Field2StringType<'this> = &'static str;
@@ -586,7 +586,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct MsgSimpleByValue {}
-    impl ::puroro::Message for MsgSimpleByValue {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleByValue {}
 
     impl MsgTrait for MsgSimpleByValue {
         type Field2StringType<'this> = ::std::borrow::Cow<'this, str>;
@@ -615,7 +615,7 @@ pub mod _puroro_impls {
     pub struct SubmsgSimple {
         pub i32_optional: ::std::option::Option<i32>,
     }
-    impl ::puroro::Message for SubmsgSimple {}
+    impl ::puroro::Message<SubmsgSimple> for SubmsgSimple {}
 
     impl SubmsgTrait for SubmsgSimple {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
@@ -696,7 +696,7 @@ pub mod _puroro_impls {
         i32_optional: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message for SubmsgSimpleField1 {}
+    impl ::puroro::Message<SubmsgSimple> for SubmsgSimpleField1 {}
 
     impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
@@ -707,7 +707,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct SubmsgSimpleByValue {}
-    impl ::puroro::Message for SubmsgSimpleByValue {}
+    impl ::puroro::Message<SubmsgSimple> for SubmsgSimpleByValue {}
 
     impl SubmsgTrait for SubmsgSimpleByValue {
         fn i32_optional<'this>(&'this self) -> Option<i32> {

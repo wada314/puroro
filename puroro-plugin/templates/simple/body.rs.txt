@@ -15,7 +15,7 @@ pub struct {{ m.simple_ident }} {
     >,
     {%- endfor %}
 }
-impl ::puroro::Message for {{ m.simple_ident }} {}
+impl ::puroro::Message<{{ m.simple_ident }}> for {{ m.simple_ident }} {}
 
 impl {{ m.trait_ident }} for {{ m.simple_ident }} {
     {%- for field in m.fields %}

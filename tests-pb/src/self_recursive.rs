@@ -19,7 +19,7 @@ pub mod _puroro_impls {
             ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>,
         >,
     }
-    impl ::puroro::Message for MsgSimple {}
+    impl ::puroro::Message<MsgSimple> for MsgSimple {}
 
     impl MsgTrait for MsgSimple {
         type Field1MessageType<'this> =
@@ -131,7 +131,7 @@ pub mod _puroro_impls {
         >,
     }
 
-    impl ::puroro::Message for MsgSimpleField1 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField1 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
         type Field1MessageType<'this> =
@@ -144,7 +144,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct MsgSimpleByValue {}
-    impl ::puroro::Message for MsgSimpleByValue {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleByValue {}
 
     impl MsgTrait for MsgSimpleByValue {
         type Field1MessageType<'this> =

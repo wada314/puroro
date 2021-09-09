@@ -23,13 +23,20 @@ pub use ::bumpalo;
 pub use ::either::Either;
 pub use ::hashbrown;
 
-pub trait Message {}
-impl<T, U> Message for crate::Either<T, U>
+pub trait Message<M> {}
+impl<M, T, U> Message<M> for crate::Either<T, U>
 where
-    T: Message,
-    U: Message,
+    T: Message<M>,
+    U: Message<M>,
 {
 }
+impl<M, T, U> Message<M> for (T, U)
+where
+    T: Message<M>,
+    U: Message<M>,
+{
+}
+impl<M> Message<M> for () {}
 
 pub trait Enum2:
     'static + PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32>
@@ -40,13 +47,13 @@ pub trait Enum3: 'static + PartialEq + Clone + Default + From<i32> + Into<i32> {
 pub trait RepeatedField<'msg>: IntoIterator {}
 impl<'msg, T> RepeatedField<'msg> for T where T: IntoIterator {}
 
-pub trait DeserFromBytesIter: Message {
+pub trait DeserFromBytesIter {
     fn deser<I>(&mut self, iter: I) -> Result<()>
     where
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
 
-pub trait SerToIoWrite: Message {
+pub trait SerToIoWrite {
     fn ser<W>(&self, out: &mut W) -> Result<()>
     where
         W: ::std::io::Write;

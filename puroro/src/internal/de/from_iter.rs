@@ -1,14 +1,13 @@
 use super::DeserFieldsFromBytesIter;
 use crate::types::{FieldData, WireType};
 use crate::variant::Variant;
-use crate::Message;
 use crate::{ErrorKind, Result};
 use ::std::convert::TryFrom;
 use ::std::io::Result as IoResult;
 
 pub fn deser_from_iter<Msg, I>(message: &mut Msg, input_iter: I) -> Result<()>
 where
-    Msg: Message + DeserFieldsFromBytesIter,
+    Msg: DeserFieldsFromBytesIter,
     I: Iterator<Item = IoResult<u8>>,
 {
     let mut scoped_iter = ScopedIter::new(input_iter);
@@ -17,7 +16,7 @@ where
 
 pub fn deser_from_scoped_iter<Msg, I>(message: &mut Msg, iter: &mut ScopedIter<I>) -> Result<()>
 where
-    Msg: Message + DeserFieldsFromBytesIter,
+    Msg: DeserFieldsFromBytesIter,
     I: Iterator<Item = IoResult<u8>>,
 {
     while let Some((wire_type, field_number)) = try_get_wire_type_and_field_number(iter)? {

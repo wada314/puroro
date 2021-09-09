@@ -33,7 +33,7 @@ pub mod _puroro_impls {
         pub enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>,
         pub very_large_field_number: ::std::option::Option<i32>,
     }
-    impl ::puroro::Message for MsgSimple {}
+    impl ::puroro::Message<MsgSimple> for MsgSimple {}
 
     impl MsgTrait for MsgSimple {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
@@ -490,7 +490,7 @@ pub mod _puroro_impls {
         i32_optional: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message for MsgSimpleField1 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField1 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
@@ -531,7 +531,7 @@ pub mod _puroro_impls {
         i32_repeated: ::std::vec::Vec<i32>,
     }
 
-    impl ::puroro::Message for MsgSimpleField2 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField2 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField2 {
         type Field2RepeatedType<'this> = ::std::iter::Cloned<::std::slice::Iter<'this, i32>>;
@@ -570,7 +570,7 @@ pub mod _puroro_impls {
         float_optional: ::std::option::Option<f32>,
     }
 
-    impl ::puroro::Message for MsgSimpleField3 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField3 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField3 {
         type Field2RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
@@ -611,7 +611,7 @@ pub mod _puroro_impls {
         float_repeated: ::std::vec::Vec<f32>,
     }
 
-    impl ::puroro::Message for MsgSimpleField4 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField4 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField4 {
         type Field2RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
@@ -650,7 +650,7 @@ pub mod _puroro_impls {
         string_optional: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message for MsgSimpleField5 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField5 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField5 {
         type Field2RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
@@ -691,7 +691,7 @@ pub mod _puroro_impls {
         string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message for MsgSimpleField6 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField6 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField6 {
         type Field2RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
@@ -736,7 +736,7 @@ pub mod _puroro_impls {
         >,
     }
 
-    impl ::puroro::Message for MsgSimpleField7 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField7 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField7 {
         type Field2RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
@@ -780,7 +780,7 @@ pub mod _puroro_impls {
         >,
     }
 
-    impl ::puroro::Message for MsgSimpleField8 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField8 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField8 {
         type Field2RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
@@ -825,7 +825,7 @@ pub mod _puroro_impls {
         enum_optional: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>,
     }
 
-    impl ::puroro::Message for MsgSimpleField9 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField9 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField9 {
         type Field2RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
@@ -866,7 +866,7 @@ pub mod _puroro_impls {
         enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>,
     }
 
-    impl ::puroro::Message for MsgSimpleField10 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField10 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField10 {
         type Field2RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
@@ -904,7 +904,7 @@ pub mod _puroro_impls {
         very_large_field_number: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message for MsgSimpleField536870911 {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleField536870911 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField536870911 {
         type Field2RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
@@ -943,7 +943,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct MsgSimpleByValue {}
-    impl ::puroro::Message for MsgSimpleByValue {}
+    impl ::puroro::Message<MsgSimple> for MsgSimpleByValue {}
 
     impl MsgTrait for MsgSimpleByValue {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
@@ -1182,7 +1182,7 @@ pub mod _puroro_nested {
             pub struct SubmsgSimple {
                 pub i32_optional: ::std::option::Option<i32>,
             }
-            impl ::puroro::Message for SubmsgSimple {}
+            impl ::puroro::Message<SubmsgSimple> for SubmsgSimple {}
 
             impl SubmsgTrait for SubmsgSimple {
                 fn i32_optional<'this>(&'this self) -> Option<i32> {
@@ -1264,7 +1264,7 @@ pub mod _puroro_nested {
                 i32_optional: ::std::option::Option<i32>,
             }
 
-            impl ::puroro::Message for SubmsgSimpleField1 {}
+            impl ::puroro::Message<SubmsgSimple> for SubmsgSimpleField1 {}
 
             impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
                 fn i32_optional<'this>(&'this self) -> Option<i32> {
@@ -1278,7 +1278,7 @@ pub mod _puroro_nested {
                 ::std::fmt::Debug,
             )]
             pub struct SubmsgSimpleByValue {}
-            impl ::puroro::Message for SubmsgSimpleByValue {}
+            impl ::puroro::Message<SubmsgSimple> for SubmsgSimpleByValue {}
 
             impl SubmsgTrait for SubmsgSimpleByValue {
                 fn i32_optional<'this>(&'this self) -> Option<i32> {

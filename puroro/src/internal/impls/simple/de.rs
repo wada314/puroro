@@ -4,8 +4,8 @@ use crate::internal::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variant
 use crate::internal::de::DeserFieldsFromBytesIter;
 use crate::types::FieldData;
 use crate::variant::VariantTypeTag;
+use crate::ErrorKind;
 use crate::{tags, Result};
-use crate::{ErrorKind, Message};
 use ::std::borrow::Cow;
 use ::std::marker::PhantomData;
 use ::std::ops::DerefMut;
@@ -153,7 +153,7 @@ where
 
 impl<M, _1, _2> DeserFieldFromBytesIter<tags::LabelOptReqUnl<_1, _2>, tags::Message<M>>
 where
-    M: Message + DeserFieldsFromBytesIter + Default,
+    M: DeserFieldsFromBytesIter + Default,
 {
     pub fn deser_field<I>(
         field: &mut Option<Box<M>>,
@@ -174,7 +174,7 @@ where
 
 impl<M> DeserFieldFromBytesIter<tags::Repeated, tags::Message<M>>
 where
-    M: Message + DeserFieldsFromBytesIter + Default,
+    M: DeserFieldsFromBytesIter + Default,
 {
     pub fn deser_field<I>(field: &mut Vec<M>, input: FieldData<&mut ScopedIter<I>>) -> Result<()>
     where
@@ -193,7 +193,7 @@ where
 
 impl<M> DeserFieldFromBytesIter<tags::OneofItem, tags::Message<M>>
 where
-    M: Message + DeserFieldsFromBytesIter + Default,
+    M: DeserFieldsFromBytesIter + Default,
 {
     pub fn deser_field<I>(field: &mut Box<M>, input: FieldData<&mut ScopedIter<I>>) -> Result<()>
     where
