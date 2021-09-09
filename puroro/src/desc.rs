@@ -1,6 +1,6 @@
 use ::once_cell::sync::Lazy;
 
-struct MessageDescriptor {
+pub struct MessageDescriptor {
     lazy_fields: Lazy<&'static [FieldDescriptor]>,
 }
 impl MessageDescriptor {
@@ -9,7 +9,7 @@ impl MessageDescriptor {
     }
 }
 
-struct FieldDescriptor {
+pub struct FieldDescriptor {
     lazy_containing_type: Lazy<&'static MessageDescriptor>,
 }
 impl FieldDescriptor {

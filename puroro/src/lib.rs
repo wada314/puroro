@@ -38,6 +38,10 @@ where
 }
 impl<M> Message<M> for () {}
 
+pub trait MessageRepresentativeImpl {
+    fn descriptor() -> &'static desc::MessageDescriptor;
+}
+
 pub trait Enum2:
     'static + PartialEq + Clone + Default + TryFrom<i32, Error = i32> + Into<i32>
 {
