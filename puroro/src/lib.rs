@@ -3,6 +3,7 @@
 #![feature(generic_associated_types)]
 
 pub mod bool;
+pub mod desc;
 mod error;
 pub mod fixed_bits;
 pub mod tags;
