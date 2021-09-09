@@ -12,7 +12,7 @@ This library is under development and it is very possible to make breaking chang
     - [ ] Maps
     - [ ] OneOfs
         - [x] Type definitions
-        - [ ] serialize / deserialize
+        - [x] serialize / deserialize
     - [ ] Anys, and other well-known types
     - [ ] Enum allow-alias option
     - [ ] Unit tests
@@ -25,7 +25,7 @@ This library is under development and it is very possible to make breaking chang
         - [ ] (More) Repeated field interface
         - [ ] Map interface
     - [ ] Keep unknown fields
-    - [x] Deserializer from a slice
+    - [ ] Deserializer from a slice
     - [ ] Custom deserializer (?)
     - [ ] Required field checker
     - [ ] Other implementations
