@@ -38,7 +38,7 @@ impl {{ m.trait_ident }} for {{ m.simple_by_value_ident }} {
     {%- endif %}
 
     {%- if field.trait_has_repeated_getter %}
-    type Field{{ field.number }}RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<{{ field.trait_scalar_getter_type }}>;
+    type Field{{ field.number }}RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<{{ field.trait_scalar_getter_type }}>;
     fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
         unimplemented!("Please don't use / instantiate this struct!!")
     }

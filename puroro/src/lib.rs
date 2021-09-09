@@ -1,11 +1,13 @@
 #![cfg_attr(feature = "puroro-nightly", feature(backtrace))]
 #![allow(incomplete_features)]
 #![feature(generic_associated_types)]
+#![feature(type_alias_impl_trait)]
 
 pub mod bool;
 pub mod desc;
 mod error;
 pub mod fixed_bits;
+pub mod internal;
 pub mod tags;
 pub mod types;
 pub mod variant;

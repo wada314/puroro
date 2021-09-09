@@ -1,4 +1,4 @@
-use ::puroro::Either;
+use crate::Either;
 use ::std::iter::Chain;
 use ::std::ops::Deref;
 

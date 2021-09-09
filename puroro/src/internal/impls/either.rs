@@ -1,5 +1,4 @@
-use crate::Derefable;
-use ::puroro::{Either, RepeatedField};
+use crate::{Either, RepeatedField};
 use ::std::ops::Deref;
 
 pub struct EitherRepeatedField<T, U>(Either<T, U>);
@@ -86,16 +85,5 @@ where
             |t| t.next().map(|l| Either::Left(l)),
             |u| u.next().map(|r| Either::Right(r)),
         )
-    }
-}
-
-pub struct DerefableIter<I>(I);
-impl<I> Iterator for DerefableIter<I>
-where
-    I: Iterator,
-{
-    type Item = Derefable<<I as Iterator>::Item>;
-    fn next(&mut self) -> Option<Self::Item> {
-        self.0.next().map(|v| Derefable::new(v))
     }
 }

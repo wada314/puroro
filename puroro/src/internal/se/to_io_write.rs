@@ -1,7 +1,7 @@
+use crate::types::WireType;
+use crate::variant::Variant;
 use crate::ErrorKind;
 use crate::Result;
-use ::puroro::types::WireType;
-use ::puroro::variant::Variant;
 use ::std::convert::TryInto;
 use ::std::io::Write;
 

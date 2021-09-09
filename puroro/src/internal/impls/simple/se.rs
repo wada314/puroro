@@ -1,10 +1,10 @@
-use crate::se::to_io_write::write_field_number_and_wire_type;
-use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
-use ::puroro::types::WireType;
-use ::puroro::variant::Variant;
-use ::puroro::variant::VariantTypeTag;
-use ::puroro::SerToIoWrite;
-use ::puroro::{tags, Result};
+use crate::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
+use crate::internal::se::to_io_write::write_field_number_and_wire_type;
+use crate::types::WireType;
+use crate::variant::Variant;
+use crate::variant::VariantTypeTag;
+use crate::SerToIoWrite;
+use crate::{tags, Result};
 use ::std::borrow::Cow;
 use ::std::convert::TryInto;
 use ::std::io::Write;
@@ -90,7 +90,7 @@ where
         }
         let len_i32 = len
             .try_into()
-            .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
+            .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
         write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
         Variant::from_i32(len_i32)?.encode_bytes(out)?;
         for item in field.iter() {
@@ -155,7 +155,7 @@ where
                 let len_i32: i32 = item
                     .len()
                     .try_into()
-                    .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
+                    .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
                 Variant::from_i32(len_i32)?.encode_bytes(out)?;
                 out.write(&item)?;
             }
@@ -179,7 +179,7 @@ where
                 let len_i32: i32 = item
                     .len()
                     .try_into()
-                    .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
+                    .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
                 Variant::from_i32(len_i32)?.encode_bytes(out)?;
                 out.write(item.as_bytes())?;
             }
@@ -205,7 +205,7 @@ where
             };
             let len_i32: i32 = len
                 .try_into()
-                .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
+                .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
             write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
             Variant::from_i32(len_i32)?.encode_bytes(out)?;
             <M as SerToIoWrite>::ser(boxed.deref(), out)?;
@@ -230,7 +230,7 @@ where
             };
             let len_i32: i32 = len
                 .try_into()
-                .map_err(|_| ::puroro::ErrorKind::TooLongToSerialize)?;
+                .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
             write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
             Variant::from_i32(len_i32)?.encode_bytes(out)?;
             <M as SerToIoWrite>::ser(item, out)?;

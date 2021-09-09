@@ -1,11 +1,11 @@
 use super::VecOrOptionOrBare;
-use crate::de::from_iter::{ScopedIter, Variants};
-use crate::de::DeserFieldsFromBytesIter;
-use ::puroro::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
-use ::puroro::types::FieldData;
-use ::puroro::variant::VariantTypeTag;
-use ::puroro::{tags, Result};
-use ::puroro::{ErrorKind, Message};
+use crate::fixed_bits::{Bits32TypeTag, Bits64TypeTag};
+use crate::internal::de::from_iter::{deser_from_scoped_iter, ScopedIter, Variants};
+use crate::internal::de::DeserFieldsFromBytesIter;
+use crate::types::FieldData;
+use crate::variant::VariantTypeTag;
+use crate::{tags, Result};
+use crate::{ErrorKind, Message};
 use ::std::borrow::Cow;
 use ::std::marker::PhantomData;
 use ::std::ops::DerefMut;
@@ -164,7 +164,7 @@ where
     {
         if let FieldData::LengthDelimited(mut iter) = input {
             let msg = field.get_or_insert_with(Default::default);
-            crate::de::from_iter::deser_from_scoped_iter(msg.deref_mut(), &mut iter)?;
+            deser_from_scoped_iter(msg.deref_mut(), &mut iter)?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?;
         }
@@ -183,7 +183,7 @@ where
         if let FieldData::LengthDelimited(mut iter) = input {
             field.push(Default::default());
             let msg = field.last_mut().unwrap();
-            crate::de::from_iter::deser_from_scoped_iter(msg, &mut iter)?;
+            deser_from_scoped_iter(msg, &mut iter)?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?;
         }
@@ -200,7 +200,7 @@ where
         I: Iterator<Item = ::std::io::Result<u8>>,
     {
         if let FieldData::LengthDelimited(mut iter) = input {
-            crate::de::from_iter::deser_from_scoped_iter(field.deref_mut(), &mut iter)?;
+            deser_from_scoped_iter(field.deref_mut(), &mut iter)?;
         } else {
             Err(ErrorKind::UnexpectedWireType)?;
         }

@@ -1,8 +1,9 @@
-use crate::de::from_iter::ScopedIter;
+use crate::types::FieldData;
 use crate::Result;
-use ::puroro::types::FieldData;
+use from_iter::ScopedIter;
 
 pub mod from_iter;
+
 pub trait DeserFieldsFromBytesIter {
     fn deser_field<I>(
         &mut self,

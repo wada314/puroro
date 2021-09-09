@@ -42,7 +42,6 @@ This library is under development and it is very possible to make breaking chang
 ## subcrates
 
 - puroro -- The crate that the library user need to import
-- puroro-internal -- The crate that the generated code need to import
 - puroro-plugin -- A protoc compiler plugin
 
 ## Sample command

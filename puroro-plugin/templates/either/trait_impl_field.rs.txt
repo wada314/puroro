@@ -74,14 +74,14 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
 {%- else %}
 {%- let either_repeated_field_type = "EitherRepeatedField" %}
 {%- endif %}
-type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::either::{{ either_repeated_field_type }}<
+type Field{{ f.number }}RepeatedType<'this> = ::puroro::internal::impls::either::{{ either_repeated_field_type }}<
     <T as {{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
     <U as {{ m.trait_ident }}>::Field{{ f.number }}RepeatedType<'this>,
 >;
 
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this>
 {
-    ::puroro_internal::impls::either::{{ either_repeated_field_type }}::new(self
+    ::puroro::internal::impls::either::{{ either_repeated_field_type }}::new(self
         .as_ref()
         .map_left(
             |t| <T as {{ m.trait_ident }}>::{{ f.ident }}(t)

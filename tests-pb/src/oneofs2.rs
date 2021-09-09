@@ -69,20 +69,20 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            ::puroro_internal::de::from_iter::deser_from_iter(self, iter)
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for MsgSimple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for MsgSimple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
                 1 => {
                     use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
@@ -176,7 +176,7 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             if let Some(oneof) = self.group_one.as_ref() {
                 use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
                 match oneof {
@@ -628,20 +628,20 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            ::puroro_internal::de::from_iter::deser_from_iter(self, iter)
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for SubmsgSimple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for SubmsgSimple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
             1 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Optional, ::puroro::tags::Int32
@@ -657,7 +657,7 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
                 &self.i32_optional,
                 1,

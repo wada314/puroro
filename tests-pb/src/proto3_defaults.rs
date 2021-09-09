@@ -58,20 +58,20 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            ::puroro_internal::de::from_iter::deser_from_iter(self, iter)
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for MsgSimple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for MsgSimple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
             1 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Int32
@@ -102,7 +102,7 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
                 &self.i32_unlabeled,
                 1,
@@ -142,9 +142,9 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
@@ -172,13 +172,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::i32_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::i32_optional(&self.0))
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field3RepeatedType<'this>,
             <U as MsgTrait>::Field3RepeatedType<'this>,
         >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::i32_repeated(&self.0),
                 <U as MsgTrait>::i32_repeated(&self.1),
             )
@@ -242,13 +242,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::i32_optional(u),
             )
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field3RepeatedType<'this>,
             <U as MsgTrait>::Field3RepeatedType<'this>,
         >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::i32_repeated(t))
                     .map_right(|u| <U as MsgTrait>::i32_repeated(u)),
@@ -293,9 +293,9 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Clone::clone(&self.i32_unlabeled)
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
@@ -321,9 +321,9 @@ pub mod _puroro_impls {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
@@ -372,9 +372,9 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Clone::clone(&self.f32_unlabeled)
@@ -397,9 +397,9 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
@@ -424,9 +424,9 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
@@ -454,7 +454,7 @@ pub mod _puroro_impls {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -490,20 +490,20 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            ::puroro_internal::de::from_iter::deser_from_iter(self, iter)
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for SubmsgSimple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for SubmsgSimple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
             1 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Int32
@@ -519,7 +519,7 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
                 &self.i32_unlabeled,
                 1,

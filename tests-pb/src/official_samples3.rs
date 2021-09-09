@@ -33,20 +33,20 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            ::puroro_internal::de::from_iter::deser_from_iter(self, iter)
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Test1Simple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test1Simple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
             1 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Int32
@@ -62,7 +62,7 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
                 &self.a, 1, out,
             )?;
@@ -143,20 +143,20 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            ::puroro_internal::de::from_iter::deser_from_iter(self, iter)
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Test2Simple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test2Simple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
             2 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::String
@@ -172,7 +172,7 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
                 &self.b, 2, out,
             )?;
@@ -269,20 +269,20 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            ::puroro_internal::de::from_iter::deser_from_iter(self, iter)
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Test3Simple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test3Simple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
                 3 => DeserFieldFromBytesIter::<
                     ::puroro::tags::Unlabeled,
@@ -301,7 +301,7 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
                 ::puroro::tags::Unlabeled,
                 ::puroro::tags::Message<
@@ -406,20 +406,20 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            ::puroro_internal::de::from_iter::deser_from_iter(self, iter)
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for Test4Simple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Test4Simple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
             4 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Repeated, ::puroro::tags::Int32
@@ -435,7 +435,7 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
                 &self.d, 4, out,
             )?;
@@ -444,9 +444,9 @@ pub mod _puroro_impls {
         }
     }
     impl Test4Trait for () {
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field4RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
     impl<T, U> Test4Trait for (T, U)
@@ -454,13 +454,13 @@ pub mod _puroro_impls {
         T: Test4Trait,
         U: Test4Trait,
     {
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field4RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as Test4Trait>::Field4RepeatedType<'this>,
             <U as Test4Trait>::Field4RepeatedType<'this>,
         >;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as Test4Trait>::d(&self.0),
                 <U as Test4Trait>::d(&self.1),
             )
@@ -471,13 +471,13 @@ pub mod _puroro_impls {
         T: Test4Trait,
         U: Test4Trait,
     {
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field4RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as Test4Trait>::Field4RepeatedType<'this>,
             <U as Test4Trait>::Field4RepeatedType<'this>,
         >;
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as Test4Trait>::d(t))
                     .map_right(|u| <U as Test4Trait>::d(u)),
@@ -506,7 +506,7 @@ pub mod _puroro_impls {
     impl ::puroro::Message for Test4SimpleByValue {}
 
     impl Test4Trait for Test4SimpleByValue {
-        type Field4RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field4RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }

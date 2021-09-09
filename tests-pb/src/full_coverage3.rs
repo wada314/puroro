@@ -99,13 +99,13 @@ pub mod _puroro_impls {
             self.bytes_optional.as_ref().map(|v| v.as_ref())
         }
         type Field23BytesType<'this> = &'this [u8];
-        type Field23RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
+        type Field23RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
             [u8],
             ::std::slice::Iter<'this, ::std::borrow::Cow<'static, [u8]>>,
         >;
 
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::simple::BorrowedIter::new(self.bytes_repeated.iter())
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.bytes_repeated.iter())
         }
         type Field31StringType<'this> = &'this str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -116,13 +116,13 @@ pub mod _puroro_impls {
             self.string_optional.as_ref().map(|v| v.as_ref())
         }
         type Field33StringType<'this> = &'this str;
-        type Field33RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
+        type Field33RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
             str,
             ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Clone::clone(&self.enum_unlabeled)
@@ -146,12 +146,12 @@ pub mod _puroro_impls {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
         }
         type Field53MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
-        type Field53RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
+        type Field53RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
     self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
     ::std::slice::Iter<'this, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Clone::clone(&self.i64_unlabeled)
@@ -270,20 +270,20 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            ::puroro_internal::de::from_iter::deser_from_iter(self, iter)
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for MsgSimple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for MsgSimple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
             1 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Int32
@@ -440,7 +440,7 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
                 &self.i32_unlabeled,
                 1,
@@ -680,16 +680,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -698,9 +698,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -709,96 +709,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
     impl<T, U> MsgTrait for (T, U)
@@ -818,13 +828,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::i32_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::i32_optional(&self.0))
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field3RepeatedType<'this>,
             <U as MsgTrait>::Field3RepeatedType<'this>,
         >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::i32_repeated(&self.0),
                 <U as MsgTrait>::i32_repeated(&self.1),
             )
@@ -841,13 +851,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::float_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::float_optional(&self.0))
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field13RepeatedType<'this>,
             <U as MsgTrait>::Field13RepeatedType<'this>,
         >;
 
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::float_repeated(&self.0),
                 <U as MsgTrait>::float_repeated(&self.1),
             )
@@ -881,13 +891,13 @@ pub mod _puroro_impls {
             <T as MsgTrait>::Field23BytesType<'this>,
             <U as MsgTrait>::Field23BytesType<'this>,
         >;
-        type Field23RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedLDField<
+        type Field23RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedLDField<
             <T as MsgTrait>::Field23RepeatedType<'this>,
             <U as MsgTrait>::Field23RepeatedType<'this>,
         >;
 
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedLDField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedLDField::new(
                 <T as MsgTrait>::bytes_repeated(&self.0),
                 <U as MsgTrait>::bytes_repeated(&self.1),
             )
@@ -921,13 +931,13 @@ pub mod _puroro_impls {
             <T as MsgTrait>::Field33StringType<'this>,
             <U as MsgTrait>::Field33StringType<'this>,
         >;
-        type Field33RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedLDField<
+        type Field33RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedLDField<
             <T as MsgTrait>::Field33RepeatedType<'this>,
             <U as MsgTrait>::Field33RepeatedType<'this>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedLDField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedLDField::new(
                 <T as MsgTrait>::string_repeated(&self.0),
                 <U as MsgTrait>::string_repeated(&self.1),
             )
@@ -944,13 +954,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::enum_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::enum_optional(&self.0))
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field43RepeatedType<'this>,
             <U as MsgTrait>::Field43RepeatedType<'this>,
         >;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::enum_repeated(&self.0),
                 <U as MsgTrait>::enum_repeated(&self.1),
             )
@@ -1002,13 +1012,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::Field53MessageType<'this>,
         >;
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::merged::MergedRepeatedMessageField<
+            ::puroro::internal::impls::merged::MergedRepeatedMessageField<
                 <T as MsgTrait>::Field53RepeatedType<'this>,
                 <U as MsgTrait>::Field53RepeatedType<'this>,
             >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedMessageField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedMessageField::new(
                 <T as MsgTrait>::submsg_repeated(&self.0),
                 <U as MsgTrait>::submsg_repeated(&self.1),
             )
@@ -1025,13 +1035,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::i64_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::i64_optional(&self.0))
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field103RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field103RepeatedType<'this>,
             <U as MsgTrait>::Field103RepeatedType<'this>,
         >;
 
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::i64_repeated(&self.0),
                 <U as MsgTrait>::i64_repeated(&self.1),
             )
@@ -1048,13 +1058,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::u32_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::u32_optional(&self.0))
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field113RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field113RepeatedType<'this>,
             <U as MsgTrait>::Field113RepeatedType<'this>,
         >;
 
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::u32_repeated(&self.0),
                 <U as MsgTrait>::u32_repeated(&self.1),
             )
@@ -1071,13 +1081,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::u64_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::u64_optional(&self.0))
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field123RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field123RepeatedType<'this>,
             <U as MsgTrait>::Field123RepeatedType<'this>,
         >;
 
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::u64_repeated(&self.0),
                 <U as MsgTrait>::u64_repeated(&self.1),
             )
@@ -1094,13 +1104,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::s32_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::s32_optional(&self.0))
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field133RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field133RepeatedType<'this>,
             <U as MsgTrait>::Field133RepeatedType<'this>,
         >;
 
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::s32_repeated(&self.0),
                 <U as MsgTrait>::s32_repeated(&self.1),
             )
@@ -1117,13 +1127,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::s64_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::s64_optional(&self.0))
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field143RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field143RepeatedType<'this>,
             <U as MsgTrait>::Field143RepeatedType<'this>,
         >;
 
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::s64_repeated(&self.0),
                 <U as MsgTrait>::s64_repeated(&self.1),
             )
@@ -1140,13 +1150,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::fixed32_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::fixed32_optional(&self.0))
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field153RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field153RepeatedType<'this>,
             <U as MsgTrait>::Field153RepeatedType<'this>,
         >;
 
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::fixed32_repeated(&self.0),
                 <U as MsgTrait>::fixed32_repeated(&self.1),
             )
@@ -1163,13 +1173,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::fixed64_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::fixed64_optional(&self.0))
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field163RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field163RepeatedType<'this>,
             <U as MsgTrait>::Field163RepeatedType<'this>,
         >;
 
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::fixed64_repeated(&self.0),
                 <U as MsgTrait>::fixed64_repeated(&self.1),
             )
@@ -1186,13 +1196,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::sfixed32_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::sfixed32_optional(&self.0))
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field173RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field173RepeatedType<'this>,
             <U as MsgTrait>::Field173RepeatedType<'this>,
         >;
 
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::sfixed32_repeated(&self.0),
                 <U as MsgTrait>::sfixed32_repeated(&self.1),
             )
@@ -1209,13 +1219,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::sfixed64_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::sfixed64_optional(&self.0))
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field183RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field183RepeatedType<'this>,
             <U as MsgTrait>::Field183RepeatedType<'this>,
         >;
 
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::sfixed64_repeated(&self.0),
                 <U as MsgTrait>::sfixed64_repeated(&self.1),
             )
@@ -1232,13 +1242,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::f64_optional(&self.1)
                 .or_else(|| <T as MsgTrait>::f64_optional(&self.0))
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::merged::MergedRepeatedField<
+        type Field193RepeatedType<'this> = ::puroro::internal::impls::merged::MergedRepeatedField<
             <T as MsgTrait>::Field193RepeatedType<'this>,
             <U as MsgTrait>::Field193RepeatedType<'this>,
         >;
 
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::merged::MergedRepeatedField::new(
+            ::puroro::internal::impls::merged::MergedRepeatedField::new(
                 <T as MsgTrait>::f64_repeated(&self.0),
                 <U as MsgTrait>::f64_repeated(&self.1),
             )
@@ -1261,13 +1271,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::i32_optional(u),
             )
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field3RepeatedType<'this>,
             <U as MsgTrait>::Field3RepeatedType<'this>,
         >;
 
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::i32_repeated(t))
                     .map_right(|u| <U as MsgTrait>::i32_repeated(u)),
@@ -1285,13 +1295,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::float_optional(u),
             )
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field13RepeatedType<'this>,
             <U as MsgTrait>::Field13RepeatedType<'this>,
         >;
 
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::float_repeated(t))
                     .map_right(|u| <U as MsgTrait>::float_repeated(u)),
@@ -1321,13 +1331,13 @@ pub mod _puroro_impls {
             <T as MsgTrait>::Field23BytesType<'this>,
             <U as MsgTrait>::Field23BytesType<'this>,
         >;
-        type Field23RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedLDField<
+        type Field23RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedLDField<
             <T as MsgTrait>::Field23RepeatedType<'this>,
             <U as MsgTrait>::Field23RepeatedType<'this>,
         >;
 
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedLDField::new(
+            ::puroro::internal::impls::either::EitherRepeatedLDField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::bytes_repeated(t))
                     .map_right(|u| <U as MsgTrait>::bytes_repeated(u)),
@@ -1357,13 +1367,13 @@ pub mod _puroro_impls {
             <T as MsgTrait>::Field33StringType<'this>,
             <U as MsgTrait>::Field33StringType<'this>,
         >;
-        type Field33RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedLDField<
+        type Field33RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedLDField<
             <T as MsgTrait>::Field33RepeatedType<'this>,
             <U as MsgTrait>::Field33RepeatedType<'this>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedLDField::new(
+            ::puroro::internal::impls::either::EitherRepeatedLDField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::string_repeated(t))
                     .map_right(|u| <U as MsgTrait>::string_repeated(u)),
@@ -1381,13 +1391,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::enum_optional(u),
             )
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field43RepeatedType<'this>,
             <U as MsgTrait>::Field43RepeatedType<'this>,
         >;
 
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::enum_repeated(t))
                     .map_right(|u| <U as MsgTrait>::enum_repeated(u)),
@@ -1418,13 +1428,13 @@ pub mod _puroro_impls {
             <U as MsgTrait>::Field53MessageType<'this>,
         >;
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::either::EitherRepeatedMessageField<
+            ::puroro::internal::impls::either::EitherRepeatedMessageField<
                 <T as MsgTrait>::Field53RepeatedType<'this>,
                 <U as MsgTrait>::Field53RepeatedType<'this>,
             >;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedMessageField::new(
+            ::puroro::internal::impls::either::EitherRepeatedMessageField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::submsg_repeated(t))
                     .map_right(|u| <U as MsgTrait>::submsg_repeated(u)),
@@ -1442,13 +1452,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::i64_optional(u),
             )
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field103RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field103RepeatedType<'this>,
             <U as MsgTrait>::Field103RepeatedType<'this>,
         >;
 
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::i64_repeated(t))
                     .map_right(|u| <U as MsgTrait>::i64_repeated(u)),
@@ -1466,13 +1476,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::u32_optional(u),
             )
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field113RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field113RepeatedType<'this>,
             <U as MsgTrait>::Field113RepeatedType<'this>,
         >;
 
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::u32_repeated(t))
                     .map_right(|u| <U as MsgTrait>::u32_repeated(u)),
@@ -1490,13 +1500,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::u64_optional(u),
             )
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field123RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field123RepeatedType<'this>,
             <U as MsgTrait>::Field123RepeatedType<'this>,
         >;
 
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::u64_repeated(t))
                     .map_right(|u| <U as MsgTrait>::u64_repeated(u)),
@@ -1514,13 +1524,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::s32_optional(u),
             )
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field133RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field133RepeatedType<'this>,
             <U as MsgTrait>::Field133RepeatedType<'this>,
         >;
 
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::s32_repeated(t))
                     .map_right(|u| <U as MsgTrait>::s32_repeated(u)),
@@ -1538,13 +1548,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::s64_optional(u),
             )
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field143RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field143RepeatedType<'this>,
             <U as MsgTrait>::Field143RepeatedType<'this>,
         >;
 
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::s64_repeated(t))
                     .map_right(|u| <U as MsgTrait>::s64_repeated(u)),
@@ -1562,13 +1572,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::fixed32_optional(u),
             )
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field153RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field153RepeatedType<'this>,
             <U as MsgTrait>::Field153RepeatedType<'this>,
         >;
 
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::fixed32_repeated(t))
                     .map_right(|u| <U as MsgTrait>::fixed32_repeated(u)),
@@ -1586,13 +1596,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::fixed64_optional(u),
             )
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field163RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field163RepeatedType<'this>,
             <U as MsgTrait>::Field163RepeatedType<'this>,
         >;
 
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::fixed64_repeated(t))
                     .map_right(|u| <U as MsgTrait>::fixed64_repeated(u)),
@@ -1610,13 +1620,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::sfixed32_optional(u),
             )
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field173RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field173RepeatedType<'this>,
             <U as MsgTrait>::Field173RepeatedType<'this>,
         >;
 
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::sfixed32_repeated(t))
                     .map_right(|u| <U as MsgTrait>::sfixed32_repeated(u)),
@@ -1634,13 +1644,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::sfixed64_optional(u),
             )
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field183RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field183RepeatedType<'this>,
             <U as MsgTrait>::Field183RepeatedType<'this>,
         >;
 
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::sfixed64_repeated(t))
                     .map_right(|u| <U as MsgTrait>::sfixed64_repeated(u)),
@@ -1658,13 +1668,13 @@ pub mod _puroro_impls {
                 |u| <U as MsgTrait>::f64_optional(u),
             )
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::either::EitherRepeatedField<
+        type Field193RepeatedType<'this> = ::puroro::internal::impls::either::EitherRepeatedField<
             <T as MsgTrait>::Field193RepeatedType<'this>,
             <U as MsgTrait>::Field193RepeatedType<'this>,
         >;
 
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::either::EitherRepeatedField::new(
+            ::puroro::internal::impls::either::EitherRepeatedField::new(
                 self.as_ref()
                     .map_left(|t| <T as MsgTrait>::f64_repeated(t))
                     .map_right(|u| <U as MsgTrait>::f64_repeated(u)),
@@ -1683,16 +1693,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Clone::clone(&self.i32_unlabeled)
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -1701,9 +1711,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -1712,96 +1722,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -1819,16 +1839,16 @@ pub mod _puroro_impls {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.i32_optional)
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -1837,9 +1857,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -1848,96 +1868,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -1960,9 +1990,9 @@ pub mod _puroro_impls {
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -1971,9 +2001,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -1982,96 +2012,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -2086,16 +2126,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Clone::clone(&self.float_unlabeled)
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -2104,9 +2144,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -2115,96 +2155,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -2219,9 +2269,9 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
@@ -2229,9 +2279,9 @@ pub mod _puroro_impls {
         fn float_optional<'this>(&'this self) -> Option<f32> {
             Clone::clone(&self.float_optional)
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -2240,9 +2290,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -2251,96 +2301,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -2355,9 +2415,9 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
@@ -2374,9 +2434,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -2385,96 +2445,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -2489,16 +2559,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'this [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -2507,9 +2577,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -2518,96 +2588,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -2622,16 +2702,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -2643,9 +2723,9 @@ pub mod _puroro_impls {
         }
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -2654,96 +2734,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -2758,16 +2848,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -2775,13 +2865,13 @@ pub mod _puroro_impls {
         }
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'this [u8];
-        type Field23RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
+        type Field23RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
             [u8],
             ::std::slice::Iter<'this, ::std::borrow::Cow<'static, [u8]>>,
         >;
 
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::simple::BorrowedIter::new(self.bytes_repeated.iter())
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.bytes_repeated.iter())
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -2790,96 +2880,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -2894,16 +2994,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -2912,9 +3012,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'this str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -2923,96 +3023,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -3027,16 +3137,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -3045,9 +3155,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -3059,96 +3169,106 @@ pub mod _puroro_impls {
         }
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -3163,16 +3283,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -3181,9 +3301,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -3191,100 +3311,110 @@ pub mod _puroro_impls {
         }
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'this str;
-        type Field33RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
+        type Field33RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
             str,
             ::std::slice::Iter<'this, ::std::borrow::Cow<'static, str>>,
         >;
 
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.string_repeated.iter())
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -3299,16 +3429,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -3317,9 +3447,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -3328,96 +3458,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Clone::clone(&self.enum_unlabeled)
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -3432,16 +3572,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -3450,9 +3590,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -3461,9 +3601,9 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
@@ -3471,89 +3611,99 @@ pub mod _puroro_impls {
         fn enum_optional<'this>(&'this self) -> Option<self::_puroro_root::full_coverage3::Enum> {
             Clone::clone(&self.enum_optional)
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -3568,16 +3718,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -3586,9 +3736,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -3597,9 +3747,9 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
@@ -3615,79 +3765,89 @@ pub mod _puroro_impls {
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -3702,16 +3862,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -3720,9 +3880,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -3731,18 +3891,18 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
         fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
@@ -3751,79 +3911,89 @@ pub mod _puroro_impls {
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -3838,16 +4008,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -3856,9 +4026,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -3867,18 +4037,18 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
@@ -3887,79 +4057,89 @@ pub mod _puroro_impls {
         }
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -3976,16 +4156,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -3994,9 +4174,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -4005,98 +4185,108 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
-        type Field53RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
+        type Field53RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
     self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
     ::std::slice::Iter<'this, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
+            ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -4111,16 +4301,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -4129,9 +4319,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -4140,96 +4330,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Clone::clone(&self.i64_unlabeled)
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -4244,16 +4444,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -4262,9 +4462,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -4273,26 +4473,26 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
@@ -4300,72 +4500,82 @@ pub mod _puroro_impls {
         fn i64_optional<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.i64_optional)
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -4380,16 +4590,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -4398,9 +4608,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -4409,26 +4619,26 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
@@ -4441,65 +4651,74 @@ pub mod _puroro_impls {
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -4514,16 +4733,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -4532,9 +4751,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -4543,96 +4762,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Clone::clone(&self.u32_unlabeled)
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -4647,16 +4876,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -4665,9 +4894,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -4676,33 +4905,34 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
@@ -4710,65 +4940,74 @@ pub mod _puroro_impls {
         fn u32_optional<'this>(&'this self) -> Option<u32> {
             Clone::clone(&self.u32_optional)
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -4783,16 +5022,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -4801,9 +5040,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -4812,33 +5051,34 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
@@ -4851,58 +5091,66 @@ pub mod _puroro_impls {
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -4917,16 +5165,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -4935,9 +5183,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -4946,96 +5194,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Clone::clone(&self.u64_unlabeled)
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -5050,16 +5308,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -5068,9 +5326,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -5079,40 +5337,42 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
@@ -5120,58 +5380,66 @@ pub mod _puroro_impls {
         fn u64_optional<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.u64_optional)
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -5186,16 +5454,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -5204,9 +5472,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -5215,40 +5483,42 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
@@ -5261,51 +5531,58 @@ pub mod _puroro_impls {
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -5320,16 +5597,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -5338,9 +5615,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -5349,96 +5626,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Clone::clone(&self.s32_unlabeled)
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -5453,16 +5740,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -5471,9 +5758,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -5482,47 +5769,50 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
@@ -5530,51 +5820,58 @@ pub mod _puroro_impls {
         fn s32_optional<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.s32_optional)
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -5589,16 +5886,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -5607,9 +5904,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -5618,47 +5915,50 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
@@ -5671,44 +5971,50 @@ pub mod _puroro_impls {
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -5723,16 +6029,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -5741,9 +6047,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -5752,96 +6058,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Clone::clone(&self.s64_unlabeled)
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -5856,16 +6172,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -5874,9 +6190,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -5885,54 +6201,58 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
@@ -5940,44 +6260,50 @@ pub mod _puroro_impls {
         fn s64_optional<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.s64_optional)
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -5992,16 +6318,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -6010,9 +6336,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -6021,54 +6347,58 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
@@ -6081,37 +6411,42 @@ pub mod _puroro_impls {
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -6126,16 +6461,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -6144,9 +6479,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -6155,96 +6490,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Clone::clone(&self.fixed32_unlabeled)
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -6259,16 +6604,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -6277,9 +6622,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -6288,61 +6633,66 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
@@ -6350,37 +6700,42 @@ pub mod _puroro_impls {
         fn fixed32_optional<'this>(&'this self) -> Option<u32> {
             Clone::clone(&self.fixed32_optional)
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -6395,16 +6750,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -6413,9 +6768,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -6424,61 +6779,66 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
@@ -6491,30 +6851,34 @@ pub mod _puroro_impls {
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -6529,16 +6893,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -6547,9 +6911,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -6558,96 +6922,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Clone::clone(&self.fixed64_unlabeled)
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -6662,16 +7036,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -6680,9 +7054,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -6691,68 +7065,74 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
@@ -6760,30 +7140,34 @@ pub mod _puroro_impls {
         fn fixed64_optional<'this>(&'this self) -> Option<u64> {
             Clone::clone(&self.fixed64_optional)
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -6798,16 +7182,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -6816,9 +7200,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -6827,68 +7211,74 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
@@ -6901,23 +7291,26 @@ pub mod _puroro_impls {
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -6932,16 +7325,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -6950,9 +7343,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -6961,96 +7354,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Clone::clone(&self.sfixed32_unlabeled)
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -7065,16 +7468,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -7083,9 +7486,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -7094,75 +7497,82 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
@@ -7170,23 +7580,26 @@ pub mod _puroro_impls {
         fn sfixed32_optional<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.sfixed32_optional)
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -7201,16 +7614,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -7219,9 +7632,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -7230,75 +7643,82 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
@@ -7311,16 +7731,18 @@ pub mod _puroro_impls {
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -7335,16 +7757,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -7353,9 +7775,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -7364,96 +7786,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Clone::clone(&self.sfixed64_unlabeled)
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -7468,16 +7900,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -7486,9 +7918,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -7497,82 +7929,90 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
@@ -7580,16 +8020,18 @@ pub mod _puroro_impls {
         fn sfixed64_optional<'this>(&'this self) -> Option<i64> {
             Clone::clone(&self.sfixed64_optional)
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -7604,16 +8046,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -7622,9 +8064,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -7633,82 +8075,90 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
@@ -7721,9 +8171,10 @@ pub mod _puroro_impls {
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -7738,16 +8189,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -7756,9 +8207,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -7767,96 +8218,106 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Clone::clone(&self.f64_unlabeled)
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -7871,16 +8332,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -7889,9 +8350,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -7900,89 +8361,98 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
@@ -7990,9 +8460,10 @@ pub mod _puroro_impls {
         fn f64_optional<'this>(&'this self) -> Option<f64> {
             Clone::clone(&self.f64_optional)
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
     }
 
@@ -8007,16 +8478,16 @@ pub mod _puroro_impls {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn float_unlabeled<'this>(&'this self) -> f32 {
             Default::default()
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field21BytesType<'this> = &'static [u8];
         fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
@@ -8025,9 +8496,9 @@ pub mod _puroro_impls {
         type Field22BytesType<'this> = &'static [u8];
         type Field23BytesType<'this> = &'static [u8];
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field31StringType<'this> = &'static str;
         fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
@@ -8036,89 +8507,98 @@ pub mod _puroro_impls {
         type Field32StringType<'this> = &'static str;
         type Field33StringType<'this> = &'static str;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
             Default::default()
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
         type Field53MessageType<'this> = ();
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn i64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn u64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn s64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed32_unlabeled<'this>(&'this self) -> u32 {
             Default::default()
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn fixed64_unlabeled<'this>(&'this self) -> u64 {
             Default::default()
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
             Default::default()
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
-            ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+            ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         fn f64_unlabeled<'this>(&'this self) -> f64 {
             Default::default()
@@ -8142,7 +8622,7 @@ pub mod _puroro_impls {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field3RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field3RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8152,7 +8632,7 @@ pub mod _puroro_impls {
         fn float_optional<'this>(&'this self) -> Option<f32> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field13RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f32>;
+        type Field13RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<f32>;
         fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8166,7 +8646,7 @@ pub mod _puroro_impls {
         }
         type Field23BytesType<'this> = ::std::borrow::Cow<'this, [u8]>;
         type Field23RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field23BytesType<'this>>;
         fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8180,7 +8660,7 @@ pub mod _puroro_impls {
         }
         type Field33StringType<'this> = ::std::borrow::Cow<'this, str>;
         type Field33RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field33StringType<'this>>;
         fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8190,7 +8670,7 @@ pub mod _puroro_impls {
         fn enum_optional<'this>(&'this self) -> Option<self::_puroro_root::full_coverage3::Enum> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field43RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<
+        type Field43RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<
             self::_puroro_root::full_coverage3::Enum,
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
@@ -8212,7 +8692,7 @@ pub mod _puroro_impls {
             self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
         >;
         type Field53RepeatedType<'this> =
-            ::puroro_internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
+            ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8222,7 +8702,8 @@ pub mod _puroro_impls {
         fn i64_optional<'this>(&'this self) -> Option<i64> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field103RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field103RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8232,7 +8713,8 @@ pub mod _puroro_impls {
         fn u32_optional<'this>(&'this self) -> Option<u32> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field113RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field113RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8242,7 +8724,8 @@ pub mod _puroro_impls {
         fn u64_optional<'this>(&'this self) -> Option<u64> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field123RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field123RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8252,7 +8735,8 @@ pub mod _puroro_impls {
         fn s32_optional<'this>(&'this self) -> Option<i32> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field133RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field133RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8262,7 +8746,8 @@ pub mod _puroro_impls {
         fn s64_optional<'this>(&'this self) -> Option<i64> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field143RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field143RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8272,7 +8757,8 @@ pub mod _puroro_impls {
         fn fixed32_optional<'this>(&'this self) -> Option<u32> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field153RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u32>;
+        type Field153RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u32>;
         fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8282,7 +8768,8 @@ pub mod _puroro_impls {
         fn fixed64_optional<'this>(&'this self) -> Option<u64> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field163RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<u64>;
+        type Field163RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<u64>;
         fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8292,7 +8779,8 @@ pub mod _puroro_impls {
         fn sfixed32_optional<'this>(&'this self) -> Option<i32> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field173RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i32>;
+        type Field173RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8302,7 +8790,8 @@ pub mod _puroro_impls {
         fn sfixed64_optional<'this>(&'this self) -> Option<i64> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field183RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<i64>;
+        type Field183RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<i64>;
         fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8312,7 +8801,8 @@ pub mod _puroro_impls {
         fn f64_optional<'this>(&'this self) -> Option<f64> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
-        type Field193RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<f64>;
+        type Field193RepeatedType<'this> =
+            ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -8336,20 +8826,20 @@ pub mod _puroro_impls {
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            ::puroro_internal::de::from_iter::deser_from_iter(self, iter)
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
         }
     }
 
-    impl ::puroro_internal::de::DeserFieldsFromBytesIter for SomeSimple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for SomeSimple {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro_internal::de::from_iter::ScopedIter<I>>,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
         ) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
         {
-            use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
             match field_number {
             1 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Int32
@@ -8365,7 +8855,7 @@ pub mod _puroro_impls {
         where
             W: ::std::io::Write,
         {
-            use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
                 &self.i32_unlabeled,
                 1,
@@ -8888,22 +9378,22 @@ pub mod _puroro_nested {
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
                 {
-                    ::puroro_internal::de::from_iter::deser_from_iter(self, iter)
+                    ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
                 }
             }
 
-            impl ::puroro_internal::de::DeserFieldsFromBytesIter for SubmsgSimple {
+            impl ::puroro::internal::de::DeserFieldsFromBytesIter for SubmsgSimple {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
                     data: ::puroro::types::FieldData<
-                        &mut ::puroro_internal::de::from_iter::ScopedIter<I>,
+                        &mut ::puroro::internal::de::from_iter::ScopedIter<I>,
                     >,
                 ) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
                 {
-                    use ::puroro_internal::impls::simple::de::DeserFieldFromBytesIter;
+                    use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
                     match field_number {
                         1 => DeserFieldFromBytesIter::<
                             ::puroro::tags::Unlabeled,
@@ -8920,7 +9410,7 @@ pub mod _puroro_nested {
                 where
                     W: ::std::io::Write,
                 {
-                    use ::puroro_internal::impls::simple::se::SerFieldToIoWrite;
+                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
                     SerFieldToIoWrite::<
                     ::puroro::tags::Unlabeled, ::puroro::tags::Int32
                 >::ser_field(&self.i32_unlabeled, 1, out)?;

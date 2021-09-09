@@ -1,8 +1,8 @@
 use super::DeserFieldsFromBytesIter;
+use crate::types::{FieldData, WireType};
+use crate::variant::Variant;
+use crate::Message;
 use crate::{ErrorKind, Result};
-use ::puroro::types::{FieldData, WireType};
-use ::puroro::variant::Variant;
-use ::puroro::Message;
 use ::std::convert::TryFrom;
 use ::std::io::Result as IoResult;
 
