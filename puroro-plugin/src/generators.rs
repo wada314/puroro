@@ -52,6 +52,7 @@ struct Message {
     submodule_ident: String,
     nested: MessagesAndEnums,
     fields: Vec<Field>,
+    fields_len: usize,
     oneofs: Vec<Oneof>,
     simple_ident: String,
     simple_single_field_ident: String,
@@ -60,11 +61,12 @@ struct Message {
 
 impl Message {
     fn try_new(m: &wrappers::Message) -> Result<Self> {
-        let fields = m
+        let fields: Vec<Field> = m
             .fields()
             .into_iter()
             .map(|f| Field::try_new(f))
             .try_collect()?;
+        let fields_len = fields.len();
         let oneofs = m
             .oneofs()
             .into_iter()
@@ -91,6 +93,7 @@ impl Message {
                 enums: nested_enums,
             },
             fields,
+            fields_len,
             oneofs,
             simple_ident: m.rust_impl_ident("Simple"),
             simple_single_field_ident: m.rust_impl_ident("SimpleField"),

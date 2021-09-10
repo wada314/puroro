@@ -22,6 +22,7 @@ pub type Result<T> = ::std::result::Result<T, PuroroError>;
 pub use ::bumpalo;
 pub use ::either::Either;
 pub use ::hashbrown;
+pub use ::once_cell;
 
 pub trait Message<M> {}
 impl<M, T, U> Message<M> for crate::Either<T, U>

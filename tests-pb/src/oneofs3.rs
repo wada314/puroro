@@ -64,6 +64,41 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::MessageRepresentativeImpl for MsgSimple {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 6]> =
+                Lazy::new(|| {
+                    [
+                        ::puroro::internal::init_field_descriptor(Lazy::new(|| {
+                            <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                        })),
+                        ::puroro::internal::init_field_descriptor(Lazy::new(|| {
+                            <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                        })),
+                        ::puroro::internal::init_field_descriptor(Lazy::new(|| {
+                            <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                        })),
+                        ::puroro::internal::init_field_descriptor(Lazy::new(|| {
+                            <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                        })),
+                        ::puroro::internal::init_field_descriptor(Lazy::new(|| {
+                            <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                        })),
+                        ::puroro::internal::init_field_descriptor(Lazy::new(|| {
+                            <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                        })),
+                    ]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                ::puroro::internal::init_message_descriptor(Lazy::new(|| {
+                    Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()
+                }))
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
     impl ::puroro::DeserFromBytesIter for MsgSimple {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
@@ -620,6 +655,24 @@ pub mod _puroro_impls {
     impl SubmsgTrait for SubmsgSimple {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Clone::clone(&self.i32_unlabeled)
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for SubmsgSimple {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                Lazy::new(|| {
+                    [::puroro::internal::init_field_descriptor(Lazy::new(|| {
+                        <SubmsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                    }))]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                ::puroro::internal::init_message_descriptor(Lazy::new(|| {
+                    Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()
+                }))
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
         }
     }
 
