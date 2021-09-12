@@ -35,6 +35,7 @@ pub mod _puroro_impls {
                 Lazy::new(|| {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "a",
                             lazy_containing_type: Lazy::new(|| {
                                 <Test1Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
@@ -44,6 +45,7 @@ pub mod _puroro_impls {
                 });
             static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
                 let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Test1",
                     lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
                 };
                 ::puroro::internal::init_message_descriptor(init)
@@ -160,6 +162,7 @@ pub mod _puroro_impls {
                 Lazy::new(|| {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "b",
                             lazy_containing_type: Lazy::new(|| {
                                 <Test2Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
@@ -169,6 +172,7 @@ pub mod _puroro_impls {
                 });
             static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
                 let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Test2",
                     lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
                 };
                 ::puroro::internal::init_message_descriptor(init)
@@ -308,6 +312,7 @@ pub mod _puroro_impls {
                 Lazy::new(|| {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "c",
                             lazy_containing_type: Lazy::new(|| {
                                 <Test3Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
@@ -317,6 +322,7 @@ pub mod _puroro_impls {
                 });
             static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
                 let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Test3",
                     lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
                 };
                 ::puroro::internal::init_message_descriptor(init)
@@ -469,6 +475,7 @@ pub mod _puroro_impls {
                 Lazy::new(|| {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "d",
                             lazy_containing_type: Lazy::new(|| {
                                 <Test4Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
@@ -478,6 +485,7 @@ pub mod _puroro_impls {
                 });
             static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
                 let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Test4",
                     lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
                 };
                 ::puroro::internal::init_message_descriptor(init)

@@ -551,6 +551,9 @@ impl Field {
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
     }
+    pub fn proto_name(&self) -> &str {
+        &self.proto_name
+    }
     pub fn rust_oneof_ident(&self) -> &str {
         &self.rust_oneof_ident
     }

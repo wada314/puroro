@@ -47,6 +47,7 @@ impl MessagesAndEnums {
 
 struct Message {
     ident: String,
+    proto_name: String,
     trait_ident: String,
     trait_delegate_macro_ident: String,
     submodule_ident: String,
@@ -85,6 +86,7 @@ impl Message {
             .try_collect()?;
         Ok(Self {
             ident: m.rust_ident().to_string(),
+            proto_name: m.proto_name().to_string(),
             trait_ident: m.rust_trait_ident().to_string(),
             trait_delegate_macro_ident: format!("{}_delegate", m.rust_nested_module_ident()),
             submodule_ident: m.rust_nested_module_ident().to_string(),
@@ -151,6 +153,7 @@ impl EnumValue {
 
 struct Field {
     ident: String,
+    proto_name: String,
     number: i32,
     is_message: bool,
     is_string: bool,
@@ -186,6 +189,7 @@ impl Field {
             };
         Ok(Field {
             ident: f.rust_ident().to_string(),
+            proto_name: f.proto_name().to_string(),
             number: f.number(),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             is_string: matches!(f.field_type()?, wrappers::FieldType::String),
