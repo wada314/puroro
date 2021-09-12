@@ -37,6 +37,7 @@ pub mod _puroro_impls {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
                             name: "recursive_unlabeled",
+                            number: 1,
                             lazy_containing_type: Lazy::new(|| {
                                 <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),

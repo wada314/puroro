@@ -36,6 +36,7 @@ pub mod _puroro_impls {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
                             name: "a",
+                            number: 1,
                             lazy_containing_type: Lazy::new(|| {
                                 <Test1Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
@@ -163,6 +164,7 @@ pub mod _puroro_impls {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
                             name: "b",
+                            number: 2,
                             lazy_containing_type: Lazy::new(|| {
                                 <Test2Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
@@ -313,6 +315,7 @@ pub mod _puroro_impls {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
                             name: "c",
+                            number: 3,
                             lazy_containing_type: Lazy::new(|| {
                                 <Test3Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
@@ -476,6 +479,7 @@ pub mod _puroro_impls {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
                             name: "d",
+                            number: 4,
                             lazy_containing_type: Lazy::new(|| {
                                 <Test4Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),

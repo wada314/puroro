@@ -54,6 +54,7 @@ impl ::puroro::MessageRepresentativeImpl for {{ m.simple_ident }} {
                 {
                     let init = ::puroro::internal::FieldDescriptorInitializer {
                         name: "{{ field.proto_name }}",
+                        number: {{ field.number }},
                         lazy_containing_type: Lazy::new(|| <{{ m.simple_ident }} as ::puroro::MessageRepresentativeImpl>::descriptor()),
                     };
                     ::puroro::internal::init_field_descriptor(init)

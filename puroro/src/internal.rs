@@ -19,12 +19,14 @@ pub fn init_message_descriptor(init: MessageDescriptorInitializer) -> MessageDes
 
 pub struct FieldDescriptorInitializer {
     pub name: &'static str,
+    pub number: i32,
     pub lazy_containing_type: Lazy<&'static MessageDescriptor>,
 }
 
 pub fn init_field_descriptor(init: FieldDescriptorInitializer) -> FieldDescriptor {
     FieldDescriptor {
         name: init.name,
+        number: init.number,
         lazy_containing_type: init.lazy_containing_type,
     }
 }

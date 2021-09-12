@@ -106,6 +106,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "i32_optional",
+                                number: 1,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -115,6 +116,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "i32_repeated",
+                                number: 2,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -124,6 +126,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "float_optional",
+                                number: 3,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -133,6 +136,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "float_repeated",
+                                number: 4,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -142,6 +146,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "string_optional",
+                                number: 5,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -151,6 +156,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "string_repeated",
+                                number: 6,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -160,6 +166,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "submsg_optional",
+                                number: 7,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -169,6 +176,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "submsg_repeated",
+                                number: 8,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -178,6 +186,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "enum_optional",
+                                number: 9,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -187,6 +196,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "enum_repeated",
+                                number: 10,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -196,6 +206,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "very_large_field_number",
+                                number: 536870911,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -1316,6 +1327,7 @@ pub mod _puroro_nested {
                             [{
                                 let init = ::puroro::internal::FieldDescriptorInitializer {
                                     name: "i32_optional",
+                                    number: 1,
                                     lazy_containing_type: Lazy::new(|| {
                                         <SubmsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                     }),
