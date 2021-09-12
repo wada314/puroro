@@ -24,20 +24,29 @@ pub use ::either::Either;
 pub use ::hashbrown;
 pub use ::once_cell;
 
-pub trait Message<M> {}
+pub trait Message<M>
+where
+    M: MessageRepresentativeImpl,
+{
+    fn descriptor() -> &'static desc::MessageDescriptor {
+        M::descriptor()
+    }
+}
 impl<M, T, U> Message<M> for crate::Either<T, U>
 where
     T: Message<M>,
     U: Message<M>,
+    M: MessageRepresentativeImpl,
 {
 }
 impl<M, T, U> Message<M> for (T, U)
 where
     T: Message<M>,
     U: Message<M>,
+    M: MessageRepresentativeImpl,
 {
 }
-impl<M> Message<M> for () {}
+impl<M> Message<M> for () where M: MessageRepresentativeImpl {}
 
 pub trait MessageRepresentativeImpl {
     fn descriptor() -> &'static desc::MessageDescriptor;
