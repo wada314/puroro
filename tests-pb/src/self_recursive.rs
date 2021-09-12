@@ -167,6 +167,22 @@ pub mod _puroro_impls {
             self.recursive_unlabeled.as_ref().map(|v| v.as_ref())
         }
     }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField1 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Message<
+                    self::_puroro_root::self_recursive::_puroro_impls::MsgSimple,
+                >,
+            >::ser_field(&self.recursive_unlabeled, 1, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]

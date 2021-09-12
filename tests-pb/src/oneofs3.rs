@@ -478,189 +478,6 @@ pub mod _puroro_impls {
             }
         }
     }
-
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField1 {
-        g1_int32: i32,
-    }
-
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField1 {}
-
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
-        type Field2StringType<'this> = &'static str;
-        type Field4StringType<'this> = &'static str;
-        type Field5MessageType<'this> = ();
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_three<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            todo!()
-        }
-    }
-
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField2 {
-        g1_string: ::std::borrow::Cow<'static, str>,
-    }
-
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField2 {}
-
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField2 {
-        type Field2StringType<'this> = &'this str;
-        type Field4StringType<'this> = &'static str;
-        type Field5MessageType<'this> = ();
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_three<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            todo!()
-        }
-    }
-
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField3 {
-        g2_f32: f32,
-    }
-
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField3 {}
-
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField3 {
-        type Field2StringType<'this> = &'static str;
-        type Field4StringType<'this> = &'static str;
-        type Field5MessageType<'this> = ();
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_three<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            todo!()
-        }
-    }
-
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField4 {
-        g2_string: ::std::borrow::Cow<'static, str>,
-    }
-
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField4 {}
-
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField4 {
-        type Field2StringType<'this> = &'static str;
-        type Field4StringType<'this> = &'this str;
-        type Field5MessageType<'this> = ();
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_three<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            todo!()
-        }
-    }
-
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField5 {
-        g2_submsg: ::std::option::Option<
-            ::std::boxed::Box<self::_puroro_root::oneofs3::_puroro_impls::SubmsgSimple>,
-        >,
-    }
-
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField5 {}
-
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField5 {
-        type Field2StringType<'this> = &'static str;
-        type Field4StringType<'this> = &'static str;
-        type Field5MessageType<'this> =
-            &'this self::_puroro_root::oneofs3::_puroro_impls::SubmsgSimple;
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_three<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            todo!()
-        }
-    }
-
-    #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField6 {
-        g3_int32: i32,
-    }
-
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField6 {}
-
-    impl super::_puroro_traits::MsgTrait for MsgSimpleField6 {
-        type Field2StringType<'this> = &'static str;
-        type Field4StringType<'this> = &'static str;
-        type Field5MessageType<'this> = ();
-        fn group_one<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_two<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>>
-        {
-            todo!()
-        }
-        fn group_three<'this>(
-            &'this self,
-        ) -> ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            todo!()
-        }
-    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -815,6 +632,21 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Clone::clone(&self.i32_unlabeled)
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for SubmsgSimpleField1 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+                &self.i32_unlabeled,
+                1,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
     #[derive(

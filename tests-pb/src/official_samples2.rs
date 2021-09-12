@@ -130,6 +130,19 @@ pub mod _puroro_impls {
             Clone::clone(&self.a)
         }
     }
+
+    impl ::puroro::SerToIoWrite for Test1SimpleField1 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                &self.a, 1, out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -275,6 +288,19 @@ pub mod _puroro_impls {
         type Field2StringType<'this> = &'this str;
         fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
             self.b.as_ref().map(|v| v.as_ref())
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for Test2SimpleField2 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.b, 2, out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
     #[derive(
@@ -442,6 +468,22 @@ pub mod _puroro_impls {
             self.c.as_ref().map(|v| v.as_ref())
         }
     }
+
+    impl ::puroro::SerToIoWrite for Test3SimpleField3 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Message<
+                    self::_puroro_root::official_samples2::_puroro_impls::Test1Simple,
+                >,
+            >::ser_field(&self.c, 3, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -594,6 +636,19 @@ pub mod _puroro_impls {
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             self.d.iter().cloned()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for Test4SimpleField4 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                &self.d, 4, out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
     #[derive(

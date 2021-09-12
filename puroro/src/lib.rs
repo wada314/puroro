@@ -72,3 +72,42 @@ pub trait SerToIoWrite {
     where
         W: ::std::io::Write;
 }
+impl SerToIoWrite for () {
+    fn ser<W>(&self, _: &mut W) -> Result<()>
+    where
+        W: ::std::io::Write,
+    {
+        Ok(())
+    }
+}
+impl<T, U> SerToIoWrite for (T, U)
+where
+    T: SerToIoWrite,
+    U: SerToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: ::std::io::Write,
+    {
+        self.0.ser(out)?;
+        self.1.ser(out)?;
+        ::std::result::Result::Ok(())
+    }
+}
+
+impl<T, U> SerToIoWrite for Either<T, U>
+where
+    T: SerToIoWrite,
+    U: SerToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: ::std::io::Write,
+    {
+        match self {
+            Either::Left(v) => v.ser(out)?,
+            Either::Right(v) => v.ser(out)?,
+        }
+        ::std::result::Result::Ok(())
+    }
+}

@@ -2324,6 +2324,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField1 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+                &self.i32_unlabeled,
+                1,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField2 {
         i32_optional: ::std::option::Option<i32>,
@@ -2467,6 +2482,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField2 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                &self.i32_optional,
+                2,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -2614,6 +2644,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField3 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                &self.i32_repeated,
+                3,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField11 {
         float_unlabeled: f32,
@@ -2754,6 +2799,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField11 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Float>::ser_field(
+                &self.float_unlabeled,
+                11,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -2903,6 +2963,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField12 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
+                &self.float_optional,
+                12,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField13 {
         float_repeated: ::std::vec::Vec<f32>,
@@ -3047,6 +3122,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField13 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Float>::ser_field(
+                &self.float_repeated,
+                13,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField21 {
         bytes_unlabeled: ::std::borrow::Cow<'static, [u8]>,
@@ -3187,6 +3277,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField21 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_unlabeled,
+                21,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -3336,6 +3441,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField22 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_optional,
+                22,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField23 {
         bytes_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, [u8]>>,
@@ -3482,6 +3602,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField23 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Bytes>::ser_field(
+                &self.bytes_repeated,
+                23,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField31 {
         string_unlabeled: ::std::borrow::Cow<'static, str>,
@@ -3622,6 +3757,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField31 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
+                &self.string_unlabeled,
+                31,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -3771,6 +3921,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField32 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.string_optional,
+                32,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField33 {
         string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
@@ -3917,6 +4082,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField33 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
+                &self.string_repeated,
+                33,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField41 {
         enum_unlabeled: self::_puroro_root::full_coverage3::Enum,
@@ -4057,6 +4237,20 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField41 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
+            >::ser_field(&self.enum_unlabeled, 41, out)?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -4206,6 +4400,20 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField42 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
+            >::ser_field(&self.enum_optional, 42, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField43 {
         enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,
@@ -4347,6 +4555,20 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField43 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
+            >::ser_field(&self.enum_repeated, 43, out)?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -4496,6 +4718,19 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField51 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+        >::ser_field(&self.submsg_unlabeled, 51, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField52 {
     submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
@@ -4639,6 +4874,19 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField52 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+        >::ser_field(&self.submsg_optional, 52, out)?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -4789,6 +5037,19 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField53 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+        >::ser_field(&self.submsg_repeated, 53, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField101 {
         i64_unlabeled: i64,
@@ -4929,6 +5190,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField101 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int64>::ser_field(
+                &self.i64_unlabeled,
+                101,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -5078,6 +5354,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField102 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int64>::ser_field(
+                &self.i64_optional,
+                102,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField103 {
         i64_repeated: ::std::vec::Vec<i64>,
@@ -5221,6 +5512,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField103 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int64>::ser_field(
+                &self.i64_repeated,
+                103,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField111 {
         u32_unlabeled: u32,
@@ -5361,6 +5667,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField111 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::UInt32>::ser_field(
+                &self.u32_unlabeled,
+                111,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -5510,6 +5831,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField112 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt32>::ser_field(
+                &self.u32_optional,
+                112,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField113 {
         u32_repeated: ::std::vec::Vec<u32>,
@@ -5653,6 +5989,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField113 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::UInt32>::ser_field(
+                &self.u32_repeated,
+                113,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField121 {
         u64_unlabeled: u64,
@@ -5793,6 +6144,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField121 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::UInt64>::ser_field(
+                &self.u64_unlabeled,
+                121,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -5942,6 +6308,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField122 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::UInt64>::ser_field(
+                &self.u64_optional,
+                122,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField123 {
         u64_repeated: ::std::vec::Vec<u64>,
@@ -6085,6 +6466,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField123 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::UInt64>::ser_field(
+                &self.u64_repeated,
+                123,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField131 {
         s32_unlabeled: i32,
@@ -6225,6 +6621,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField131 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::SInt32>::ser_field(
+                &self.s32_unlabeled,
+                131,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -6374,6 +6785,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField132 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SInt32>::ser_field(
+                &self.s32_optional,
+                132,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField133 {
         s32_repeated: ::std::vec::Vec<i32>,
@@ -6517,6 +6943,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField133 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SInt32>::ser_field(
+                &self.s32_repeated,
+                133,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField141 {
         s64_unlabeled: i64,
@@ -6657,6 +7098,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField141 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::SInt64>::ser_field(
+                &self.s64_unlabeled,
+                141,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -6806,6 +7262,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField142 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SInt64>::ser_field(
+                &self.s64_optional,
+                142,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField143 {
         s64_repeated: ::std::vec::Vec<i64>,
@@ -6949,6 +7420,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField143 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SInt64>::ser_field(
+                &self.s64_repeated,
+                143,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField151 {
         fixed32_unlabeled: u32,
@@ -7089,6 +7575,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField151 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Fixed32>::ser_field(
+                &self.fixed32_unlabeled,
+                151,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -7238,6 +7739,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField152 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Fixed32>::ser_field(
+                &self.fixed32_optional,
+                152,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField153 {
         fixed32_repeated: ::std::vec::Vec<u32>,
@@ -7381,6 +7897,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField153 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Fixed32>::ser_field(
+                &self.fixed32_repeated,
+                153,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField161 {
         fixed64_unlabeled: u64,
@@ -7521,6 +8052,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField161 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Fixed64>::ser_field(
+                &self.fixed64_unlabeled,
+                161,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -7670,6 +8216,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField162 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Fixed64>::ser_field(
+                &self.fixed64_optional,
+                162,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField163 {
         fixed64_repeated: ::std::vec::Vec<u64>,
@@ -7813,6 +8374,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField163 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Fixed64>::ser_field(
+                &self.fixed64_repeated,
+                163,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField171 {
         sfixed32_unlabeled: i32,
@@ -7953,6 +8529,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField171 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::SFixed32>::ser_field(
+                &self.sfixed32_unlabeled,
+                171,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -8102,6 +8693,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField172 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SFixed32>::ser_field(
+                &self.sfixed32_optional,
+                172,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField173 {
         sfixed32_repeated: ::std::vec::Vec<i32>,
@@ -8245,6 +8851,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField173 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SFixed32>::ser_field(
+                &self.sfixed32_repeated,
+                173,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField181 {
         sfixed64_unlabeled: i64,
@@ -8385,6 +9006,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField181 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::SFixed64>::ser_field(
+                &self.sfixed64_unlabeled,
+                181,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -8534,6 +9170,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField182 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::SFixed64>::ser_field(
+                &self.sfixed64_optional,
+                182,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField183 {
         sfixed64_repeated: ::std::vec::Vec<i64>,
@@ -8677,6 +9328,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField183 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::SFixed64>::ser_field(
+                &self.sfixed64_repeated,
+                183,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField191 {
         f64_unlabeled: f64,
@@ -8817,6 +9483,21 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField<f64>;
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField191 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Double>::ser_field(
+                &self.f64_unlabeled,
+                191,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -8966,6 +9647,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField192 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Double>::ser_field(
+                &self.f64_optional,
+                192,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField193 {
         f64_repeated: ::std::vec::Vec<f64>,
@@ -9106,6 +9802,21 @@ pub mod _puroro_impls {
 
         fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
             self.f64_repeated.iter().cloned()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField193 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Double>::ser_field(
+                &self.f64_repeated,
+                193,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
     #[derive(
@@ -9433,6 +10144,21 @@ pub mod _puroro_impls {
     impl super::_puroro_traits::SomeTrait for SomeSimpleField1 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Clone::clone(&self.i32_unlabeled)
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for SomeSimpleField1 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+                &self.i32_unlabeled,
+                1,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
     #[derive(
@@ -10016,6 +10742,19 @@ pub mod _puroro_nested {
             impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     Clone::clone(&self.i32_unlabeled)
+                }
+            }
+
+            impl ::puroro::SerToIoWrite for SubmsgSimpleField1 {
+                fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+                where
+                    W: ::std::io::Write,
+                {
+                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+                    SerFieldToIoWrite::<
+                    ::puroro::tags::Unlabeled, ::puroro::tags::Int32
+                >::ser_field(&self.i32_unlabeled, 1, out)?;
+                    ::std::result::Result::Ok(())
                 }
             }
             #[derive(
