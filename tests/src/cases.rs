@@ -1,4 +1,5 @@
 mod descriptors;
+mod empty;
 mod official_samples;
 mod oneof;
 mod proto3_defaults;
