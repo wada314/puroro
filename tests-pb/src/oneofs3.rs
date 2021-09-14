@@ -7,6 +7,8 @@ pub mod _puroro_root {
 
 pub use _puroro_impls::MsgSimple as Msg;
 pub use _puroro_impls::SubmsgSimple as Submsg;
+pub use _puroro_impls::*;
+pub use _puroro_impls::*;
 pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
@@ -623,8 +625,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct SubmsgSimpleField1 {
-        i32_unlabeled: i32,
+    pub struct SubmsgSimpleField1 {
+        pub i32_unlabeled: i32,
     }
 
     impl ::puroro::Message<SubmsgSimple> for SubmsgSimpleField1 {}

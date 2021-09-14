@@ -2,8 +2,8 @@
 {%- if !sfield.is_explicit_oneof_field %}
 
 #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-struct {{ m.simple_single_field_ident }}{{ sfield.number }} {
-    {{ sfield.ident }}: {{ sfield.simple_field_type }},
+pub struct {{ m.simple_single_field_ident }}{{ sfield.number }} {
+    pub {{ sfield.ident }}: {{ sfield.simple_field_type }},
 }
 
 impl ::puroro::Message<{{ m.simple_ident }}> for {{ m.simple_single_field_ident }}{{ sfield.number }} {}

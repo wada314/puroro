@@ -6,6 +6,7 @@ pub mod _puroro_root {
 }
 
 pub use _puroro_impls::MsgSimple as Msg;
+pub use _puroro_impls::*;
 pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
@@ -2086,8 +2087,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField1 {
-        i32_required: ::std::option::Option<i32>,
+    pub struct MsgSimpleField1 {
+        pub i32_required: ::std::option::Option<i32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField1 {}
@@ -2202,8 +2203,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField2 {
-        i32_optional: ::std::option::Option<i32>,
+    pub struct MsgSimpleField2 {
+        pub i32_optional: ::std::option::Option<i32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField2 {}
@@ -2318,8 +2319,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField3 {
-        i32_repeated: ::std::vec::Vec<i32>,
+    pub struct MsgSimpleField3 {
+        pub i32_repeated: ::std::vec::Vec<i32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField3 {}
@@ -2432,8 +2433,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField11 {
-        float_required: ::std::option::Option<f32>,
+    pub struct MsgSimpleField11 {
+        pub float_required: ::std::option::Option<f32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField11 {}
@@ -2548,8 +2549,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField12 {
-        float_optional: ::std::option::Option<f32>,
+    pub struct MsgSimpleField12 {
+        pub float_optional: ::std::option::Option<f32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField12 {}
@@ -2664,8 +2665,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField13 {
-        float_repeated: ::std::vec::Vec<f32>,
+    pub struct MsgSimpleField13 {
+        pub float_repeated: ::std::vec::Vec<f32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField13 {}
@@ -2778,8 +2779,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField21 {
-        bytes_required: ::std::option::Option<::std::borrow::Cow<'static, [u8]>>,
+    pub struct MsgSimpleField21 {
+        pub bytes_required: ::std::option::Option<::std::borrow::Cow<'static, [u8]>>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField21 {}
@@ -2894,8 +2895,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField22 {
-        bytes_optional: ::std::option::Option<::std::borrow::Cow<'static, [u8]>>,
+    pub struct MsgSimpleField22 {
+        pub bytes_optional: ::std::option::Option<::std::borrow::Cow<'static, [u8]>>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField22 {}
@@ -3010,8 +3011,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField23 {
-        bytes_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, [u8]>>,
+    pub struct MsgSimpleField23 {
+        pub bytes_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, [u8]>>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField23 {}
@@ -3126,8 +3127,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField31 {
-        string_required: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+    pub struct MsgSimpleField31 {
+        pub string_required: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField31 {}
@@ -3242,8 +3243,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField32 {
-        string_optional: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+    pub struct MsgSimpleField32 {
+        pub string_optional: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField32 {}
@@ -3358,8 +3359,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField33 {
-        string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
+    pub struct MsgSimpleField33 {
+        pub string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField33 {}
@@ -3474,8 +3475,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField41 {
-        enum_required: ::std::option::Option<self::_puroro_root::full_coverage2::Enum>,
+    pub struct MsgSimpleField41 {
+        pub enum_required: ::std::option::Option<self::_puroro_root::full_coverage2::Enum>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField41 {}
@@ -3589,8 +3590,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField42 {
-        enum_optional: ::std::option::Option<self::_puroro_root::full_coverage2::Enum>,
+    pub struct MsgSimpleField42 {
+        pub enum_optional: ::std::option::Option<self::_puroro_root::full_coverage2::Enum>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField42 {}
@@ -3704,8 +3705,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField43 {
-        enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage2::Enum>,
+    pub struct MsgSimpleField43 {
+        pub enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage2::Enum>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField43 {}
@@ -3817,8 +3818,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField51 {
-    submsg_required: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
+    pub struct MsgSimpleField51 {
+    pub submsg_required: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
 }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField51 {}
@@ -3931,8 +3932,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField52 {
-    submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
+    pub struct MsgSimpleField52 {
+    pub submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
 }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField52 {}
@@ -4045,8 +4046,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField53 {
-        submsg_repeated: ::std::vec::Vec<
+    pub struct MsgSimpleField53 {
+        pub submsg_repeated: ::std::vec::Vec<
             self::_puroro_root::full_coverage2::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
         >,
     }
@@ -4160,8 +4161,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField101 {
-        i64_required: ::std::option::Option<i64>,
+    pub struct MsgSimpleField101 {
+        pub i64_required: ::std::option::Option<i64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField101 {}
@@ -4276,8 +4277,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField102 {
-        i64_optional: ::std::option::Option<i64>,
+    pub struct MsgSimpleField102 {
+        pub i64_optional: ::std::option::Option<i64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField102 {}
@@ -4392,8 +4393,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField103 {
-        i64_repeated: ::std::vec::Vec<i64>,
+    pub struct MsgSimpleField103 {
+        pub i64_repeated: ::std::vec::Vec<i64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField103 {}
@@ -4505,8 +4506,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField111 {
-        u32_required: ::std::option::Option<u32>,
+    pub struct MsgSimpleField111 {
+        pub u32_required: ::std::option::Option<u32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField111 {}
@@ -4621,8 +4622,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField112 {
-        u32_optional: ::std::option::Option<u32>,
+    pub struct MsgSimpleField112 {
+        pub u32_optional: ::std::option::Option<u32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField112 {}
@@ -4737,8 +4738,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField113 {
-        u32_repeated: ::std::vec::Vec<u32>,
+    pub struct MsgSimpleField113 {
+        pub u32_repeated: ::std::vec::Vec<u32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField113 {}
@@ -4850,8 +4851,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField121 {
-        u64_required: ::std::option::Option<u64>,
+    pub struct MsgSimpleField121 {
+        pub u64_required: ::std::option::Option<u64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField121 {}
@@ -4966,8 +4967,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField122 {
-        u64_optional: ::std::option::Option<u64>,
+    pub struct MsgSimpleField122 {
+        pub u64_optional: ::std::option::Option<u64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField122 {}
@@ -5082,8 +5083,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField123 {
-        u64_repeated: ::std::vec::Vec<u64>,
+    pub struct MsgSimpleField123 {
+        pub u64_repeated: ::std::vec::Vec<u64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField123 {}
@@ -5195,8 +5196,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField131 {
-        s32_required: ::std::option::Option<i32>,
+    pub struct MsgSimpleField131 {
+        pub s32_required: ::std::option::Option<i32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField131 {}
@@ -5311,8 +5312,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField132 {
-        s32_optional: ::std::option::Option<i32>,
+    pub struct MsgSimpleField132 {
+        pub s32_optional: ::std::option::Option<i32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField132 {}
@@ -5427,8 +5428,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField133 {
-        s32_repeated: ::std::vec::Vec<i32>,
+    pub struct MsgSimpleField133 {
+        pub s32_repeated: ::std::vec::Vec<i32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField133 {}
@@ -5540,8 +5541,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField141 {
-        s64_required: ::std::option::Option<i64>,
+    pub struct MsgSimpleField141 {
+        pub s64_required: ::std::option::Option<i64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField141 {}
@@ -5656,8 +5657,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField142 {
-        s64_optional: ::std::option::Option<i64>,
+    pub struct MsgSimpleField142 {
+        pub s64_optional: ::std::option::Option<i64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField142 {}
@@ -5772,8 +5773,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField143 {
-        s64_repeated: ::std::vec::Vec<i64>,
+    pub struct MsgSimpleField143 {
+        pub s64_repeated: ::std::vec::Vec<i64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField143 {}
@@ -5885,8 +5886,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField151 {
-        fixed32_required: ::std::option::Option<u32>,
+    pub struct MsgSimpleField151 {
+        pub fixed32_required: ::std::option::Option<u32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField151 {}
@@ -6001,8 +6002,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField152 {
-        fixed32_optional: ::std::option::Option<u32>,
+    pub struct MsgSimpleField152 {
+        pub fixed32_optional: ::std::option::Option<u32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField152 {}
@@ -6117,8 +6118,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField153 {
-        fixed32_repeated: ::std::vec::Vec<u32>,
+    pub struct MsgSimpleField153 {
+        pub fixed32_repeated: ::std::vec::Vec<u32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField153 {}
@@ -6230,8 +6231,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField161 {
-        fixed64_required: ::std::option::Option<u64>,
+    pub struct MsgSimpleField161 {
+        pub fixed64_required: ::std::option::Option<u64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField161 {}
@@ -6346,8 +6347,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField162 {
-        fixed64_optional: ::std::option::Option<u64>,
+    pub struct MsgSimpleField162 {
+        pub fixed64_optional: ::std::option::Option<u64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField162 {}
@@ -6462,8 +6463,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField163 {
-        fixed64_repeated: ::std::vec::Vec<u64>,
+    pub struct MsgSimpleField163 {
+        pub fixed64_repeated: ::std::vec::Vec<u64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField163 {}
@@ -6575,8 +6576,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField171 {
-        sfixed32_required: ::std::option::Option<i32>,
+    pub struct MsgSimpleField171 {
+        pub sfixed32_required: ::std::option::Option<i32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField171 {}
@@ -6691,8 +6692,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField172 {
-        sfixed32_optional: ::std::option::Option<i32>,
+    pub struct MsgSimpleField172 {
+        pub sfixed32_optional: ::std::option::Option<i32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField172 {}
@@ -6807,8 +6808,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField173 {
-        sfixed32_repeated: ::std::vec::Vec<i32>,
+    pub struct MsgSimpleField173 {
+        pub sfixed32_repeated: ::std::vec::Vec<i32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField173 {}
@@ -6920,8 +6921,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField181 {
-        sfixed64_required: ::std::option::Option<i64>,
+    pub struct MsgSimpleField181 {
+        pub sfixed64_required: ::std::option::Option<i64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField181 {}
@@ -7036,8 +7037,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField182 {
-        sfixed64_optional: ::std::option::Option<i64>,
+    pub struct MsgSimpleField182 {
+        pub sfixed64_optional: ::std::option::Option<i64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField182 {}
@@ -7152,8 +7153,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField183 {
-        sfixed64_repeated: ::std::vec::Vec<i64>,
+    pub struct MsgSimpleField183 {
+        pub sfixed64_repeated: ::std::vec::Vec<i64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField183 {}
@@ -7265,8 +7266,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField191 {
-        f64_required: ::std::option::Option<f64>,
+    pub struct MsgSimpleField191 {
+        pub f64_required: ::std::option::Option<f64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField191 {}
@@ -7381,8 +7382,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField192 {
-        f64_optional: ::std::option::Option<f64>,
+    pub struct MsgSimpleField192 {
+        pub f64_optional: ::std::option::Option<f64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField192 {}
@@ -7497,8 +7498,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField193 {
-        f64_repeated: ::std::vec::Vec<f64>,
+    pub struct MsgSimpleField193 {
+        pub f64_repeated: ::std::vec::Vec<f64>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField193 {}
@@ -8253,6 +8254,7 @@ pub mod _puroro_nested {
         }
 
         pub use _puroro_impls::SubmsgSimple as Submsg;
+        pub use _puroro_impls::*;
         pub mod _puroro_impls {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
@@ -8375,8 +8377,8 @@ pub mod _puroro_nested {
             }
 
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-            struct SubmsgSimpleField1 {
-                i32_required: ::std::option::Option<i32>,
+            pub struct SubmsgSimpleField1 {
+                pub i32_required: ::std::option::Option<i32>,
             }
 
             impl ::puroro::Message<SubmsgSimple> for SubmsgSimpleField1 {}

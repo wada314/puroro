@@ -7,6 +7,8 @@ pub mod _puroro_root {
 
 pub use _puroro_impls::MsgSimple as Msg;
 pub use _puroro_impls::SubmsgSimple as Submsg;
+pub use _puroro_impls::*;
+pub use _puroro_impls::*;
 pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
@@ -362,8 +364,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField1 {
-        i32_unlabeled: i32,
+    pub struct MsgSimpleField1 {
+        pub i32_unlabeled: i32,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField1 {}
@@ -402,8 +404,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField2 {
-        i32_optional: ::std::option::Option<i32>,
+    pub struct MsgSimpleField2 {
+        pub i32_optional: ::std::option::Option<i32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField2 {}
@@ -445,8 +447,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField3 {
-        i32_repeated: ::std::vec::Vec<i32>,
+    pub struct MsgSimpleField3 {
+        pub i32_repeated: ::std::vec::Vec<i32>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField3 {}
@@ -486,8 +488,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField4 {
-        f32_unlabeled: f32,
+    pub struct MsgSimpleField4 {
+        pub f32_unlabeled: f32,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField4 {}
@@ -526,8 +528,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField5 {
-        string_unlabeled: ::std::borrow::Cow<'static, str>,
+    pub struct MsgSimpleField5 {
+        pub string_unlabeled: ::std::borrow::Cow<'static, str>,
     }
 
     impl ::puroro::Message<MsgSimple> for MsgSimpleField5 {}
@@ -566,8 +568,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct MsgSimpleField6 {
-        submsg_unlabeled: ::std::option::Option<
+    pub struct MsgSimpleField6 {
+        pub submsg_unlabeled: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgSimple>,
         >,
     }
@@ -759,8 +761,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct SubmsgSimpleField1 {
-        i32_unlabeled: i32,
+    pub struct SubmsgSimpleField1 {
+        pub i32_unlabeled: i32,
     }
 
     impl ::puroro::Message<SubmsgSimple> for SubmsgSimpleField1 {}

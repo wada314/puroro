@@ -9,6 +9,10 @@ pub use _puroro_impls::Test1Simple as Test1;
 pub use _puroro_impls::Test2Simple as Test2;
 pub use _puroro_impls::Test3Simple as Test3;
 pub use _puroro_impls::Test4Simple as Test4;
+pub use _puroro_impls::*;
+pub use _puroro_impls::*;
+pub use _puroro_impls::*;
+pub use _puroro_impls::*;
 pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
@@ -119,8 +123,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct Test1SimpleField1 {
-        a: ::std::option::Option<i32>,
+    pub struct Test1SimpleField1 {
+        pub a: ::std::option::Option<i32>,
     }
 
     impl ::puroro::Message<Test1Simple> for Test1SimpleField1 {}
@@ -278,8 +282,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct Test2SimpleField2 {
-        b: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+    pub struct Test2SimpleField2 {
+        pub b: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
     impl ::puroro::Message<Test2Simple> for Test2SimpleField2 {}
@@ -453,8 +457,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct Test3SimpleField3 {
-        c: ::std::option::Option<
+    pub struct Test3SimpleField3 {
+        pub c: ::std::option::Option<
             ::std::boxed::Box<self::_puroro_root::official_samples2::_puroro_impls::Test1Simple>,
         >,
     }
@@ -625,8 +629,8 @@ pub mod _puroro_impls {
     }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
-    struct Test4SimpleField4 {
-        d: ::std::vec::Vec<i32>,
+    pub struct Test4SimpleField4 {
+        pub d: ::std::vec::Vec<i32>,
     }
 
     impl ::puroro::Message<Test4Simple> for Test4SimpleField4 {}
