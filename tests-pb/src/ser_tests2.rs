@@ -106,6 +106,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "i32_optional",
+                                number: 1,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -115,6 +116,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "i32_repeated",
+                                number: 2,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -124,6 +126,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "float_optional",
+                                number: 3,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -133,6 +136,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "float_repeated",
+                                number: 4,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -142,6 +146,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "string_optional",
+                                number: 5,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -151,6 +156,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "string_repeated",
+                                number: 6,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -160,6 +166,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "submsg_optional",
+                                number: 7,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -169,6 +176,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "submsg_repeated",
+                                number: 8,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -178,6 +186,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "enum_optional",
+                                number: 9,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -187,6 +196,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "enum_repeated",
+                                number: 10,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -196,6 +206,7 @@ pub mod _puroro_impls {
                         {
                             let init = ::puroro::internal::FieldDescriptorInitializer {
                                 name: "very_large_field_number",
+                                number: 536870911,
                                 lazy_containing_type: Lazy::new(|| {
                                     <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
@@ -644,6 +655,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField1 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                &self.i32_optional,
+                1,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField2 {
         i32_repeated: ::std::vec::Vec<i32>,
@@ -680,6 +706,21 @@ pub mod _puroro_impls {
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField2 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                &self.i32_repeated,
+                2,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -724,6 +765,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField3 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Float>::ser_field(
+                &self.float_optional,
+                3,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField4 {
         float_repeated: ::std::vec::Vec<f32>,
@@ -760,6 +816,21 @@ pub mod _puroro_impls {
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField4 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Float>::ser_field(
+                &self.float_repeated,
+                4,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -804,6 +875,21 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField5 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::String>::ser_field(
+                &self.string_optional,
+                5,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField6 {
         string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
@@ -842,6 +928,21 @@ pub mod _puroro_impls {
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField6 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::String>::ser_field(
+                &self.string_repeated,
+                6,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -888,6 +989,19 @@ pub mod _puroro_impls {
         >;
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField7 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+        >::ser_field(&self.submsg_optional, 7, out)?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -938,6 +1052,19 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField8 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+        >::ser_field(&self.submsg_repeated, 8, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField9 {
         enum_optional: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>,
@@ -979,6 +1106,20 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::puroro::SerToIoWrite for MsgSimpleField9 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Optional,
+                ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
+            >::ser_field(&self.enum_optional, 9, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     struct MsgSimpleField10 {
         enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>,
@@ -1014,6 +1155,20 @@ pub mod _puroro_impls {
 
         fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
             self.enum_repeated.iter().cloned()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField10 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Repeated,
+                ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
+            >::ser_field(&self.enum_repeated, 10, out)?;
+            ::std::result::Result::Ok(())
         }
     }
 
@@ -1055,6 +1210,21 @@ pub mod _puroro_impls {
         }
         fn very_large_field_number<'this>(&'this self) -> Option<i32> {
             Clone::clone(&self.very_large_field_number)
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for MsgSimpleField536870911 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                &self.very_large_field_number,
+                536870911,
+                out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
     #[derive(
@@ -1316,6 +1486,7 @@ pub mod _puroro_nested {
                             [{
                                 let init = ::puroro::internal::FieldDescriptorInitializer {
                                     name: "i32_optional",
+                                    number: 1,
                                     lazy_containing_type: Lazy::new(|| {
                                         <SubmsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
                                     }),
@@ -1416,6 +1587,19 @@ pub mod _puroro_nested {
             impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
                 fn i32_optional<'this>(&'this self) -> Option<i32> {
                     Clone::clone(&self.i32_optional)
+                }
+            }
+
+            impl ::puroro::SerToIoWrite for SubmsgSimpleField1 {
+                fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+                where
+                    W: ::std::io::Write,
+                {
+                    use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+                    SerFieldToIoWrite::<
+                    ::puroro::tags::Optional, ::puroro::tags::Int32
+                >::ser_field(&self.i32_optional, 1, out)?;
+                    ::std::result::Result::Ok(())
                 }
             }
             #[derive(

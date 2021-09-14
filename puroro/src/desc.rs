@@ -15,11 +15,15 @@ impl MessageDescriptor {
 
 pub struct FieldDescriptor {
     pub(crate) name: &'static str,
+    pub(crate) number: i32,
     pub(crate) lazy_containing_type: Lazy<&'static MessageDescriptor>,
 }
 impl FieldDescriptor {
     pub fn name(&self) -> &str {
         self.name
+    }
+    pub fn number(&self) -> i32 {
+        self.number
     }
     pub fn containing_type(&self) -> &MessageDescriptor {
         *Lazy::force(&self.lazy_containing_type)

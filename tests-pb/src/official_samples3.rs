@@ -36,6 +36,7 @@ pub mod _puroro_impls {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
                             name: "a",
+                            number: 1,
                             lazy_containing_type: Lazy::new(|| {
                                 <Test1Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
@@ -138,6 +139,19 @@ pub mod _puroro_impls {
             Clone::clone(&self.a)
         }
     }
+
+    impl ::puroro::SerToIoWrite for Test1SimpleField1 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int32>::ser_field(
+                &self.a, 1, out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -172,6 +186,7 @@ pub mod _puroro_impls {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
                             name: "b",
+                            number: 2,
                             lazy_containing_type: Lazy::new(|| {
                                 <Test2Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
@@ -286,6 +301,19 @@ pub mod _puroro_impls {
             &self.b
         }
     }
+
+    impl ::puroro::SerToIoWrite for Test2SimpleField2 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::String>::ser_field(
+                &self.b, 2, out,
+            )?;
+            ::std::result::Result::Ok(())
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -324,6 +352,7 @@ pub mod _puroro_impls {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
                             name: "c",
+                            number: 3,
                             lazy_containing_type: Lazy::new(|| {
                                 <Test3Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
@@ -450,6 +479,22 @@ pub mod _puroro_impls {
             self.c.as_ref().map(|v| v.as_ref())
         }
     }
+
+    impl ::puroro::SerToIoWrite for Test3SimpleField3 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<
+                ::puroro::tags::Unlabeled,
+                ::puroro::tags::Message<
+                    self::_puroro_root::official_samples3::_puroro_impls::Test1Simple,
+                >,
+            >::ser_field(&self.c, 3, out)?;
+            ::std::result::Result::Ok(())
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -487,6 +532,7 @@ pub mod _puroro_impls {
                     [{
                         let init = ::puroro::internal::FieldDescriptorInitializer {
                             name: "d",
+                            number: 4,
                             lazy_containing_type: Lazy::new(|| {
                                 <Test4Simple as ::puroro::MessageRepresentativeImpl>::descriptor()
                             }),
@@ -601,6 +647,19 @@ pub mod _puroro_impls {
 
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             self.d.iter().cloned()
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for Test4SimpleField4 {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Repeated, ::puroro::tags::Int32>::ser_field(
+                &self.d, 4, out,
+            )?;
+            ::std::result::Result::Ok(())
         }
     }
     #[derive(

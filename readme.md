@@ -15,9 +15,11 @@ This library is under development and it is very possible to make breaking chang
         - [x] serialize / deserialize
     - [ ] Anys, and other well-known types
     - [ ] Enum allow-alias option
-    - [ ] Unit tests
-    - [ ] Write document!!
+    - [ ] More more more unit tests
+    - [ ] More more more more documents
     - [ ] Print comments in the generated files
+    - [ ] Reflections
+        - [ ] Get message metadata (descriptors)
     - [ ] Nightly / stable features
         - [ ] Support stable (not using nightly features)
     - [ ] More useful message traits
@@ -32,6 +34,9 @@ This library is under development and it is very possible to make breaking chang
         - [ ] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
         - [ ] SliceView -- A viewer over a `&[u8]` slice
         - [x] Empty(Unit) -- `()`, which only returns default values
+        - [x] SingleField -- Similar with the simple implementation, though has only 1 field and others are same with `()`. Might be useful to make a minimum memory size struct when combined with `(T, U)` message types.
+            - [ ] oneof field support
+            - [ ] Builder pattern?
         - [ ] Append (name TBD) -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
         - [x] Merged -- `(T, U)`
         - [x] Either -- `::itertools::Either<T, U>`
