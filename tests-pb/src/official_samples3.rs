@@ -135,7 +135,8 @@ pub mod _puroro_impls {
         T: Test1Trait,
     {
         fn a<'this>(&'this self) -> i32 {
-            self.map_or_else(::std::default::Default::default, |msg| msg.a())
+            self.as_ref()
+                .map_or_else(::std::default::Default::default, |msg| msg.a())
         }
     }
 
@@ -305,7 +306,7 @@ pub mod _puroro_impls {
     {
         type Field2StringType<'this> = ::puroro::Either<T::Field2StringType<'this>, &'static str>;
         fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
-            self.map_or(::puroro::Either::Right(""), |msg| {
+            self.as_ref().map_or(::puroro::Either::Right(""), |msg| {
                 ::puroro::Either::Left(msg.b())
             })
         }
@@ -491,7 +492,7 @@ pub mod _puroro_impls {
     {
         type Field3MessageType<'this> = T::Field3MessageType<'this>;
         fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
-            self.and_then(|msg| msg.c())
+            self.as_ref().and_then(|msg| msg.c())
         }
     }
 
@@ -676,7 +677,10 @@ pub mod _puroro_impls {
             >,
         >;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
-            self.map(|msg| msg.d().into_iter()).into_iter().flatten()
+            self.as_ref()
+                .map(|msg| msg.d().into_iter())
+                .into_iter()
+                .flatten()
         }
     }
 

@@ -159,7 +159,7 @@ pub mod _puroro_impls {
         fn recursive_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
-            self.and_then(|msg| msg.recursive_unlabeled())
+            self.as_ref().and_then(|msg| msg.recursive_unlabeled())
         }
     }
 

@@ -367,10 +367,11 @@ pub mod _puroro_impls {
         T: MsgTrait,
     {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
-            self.map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
+            self.as_ref()
+                .map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
         }
         fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
-            self.and_then(|msg| msg.i32_optional())
+            self.as_ref().and_then(|msg| msg.i32_optional())
         }
         type Field3RepeatedType<'this> = ::std::iter::Flatten<
             ::std::option::IntoIter<
@@ -378,16 +379,18 @@ pub mod _puroro_impls {
             >,
         >;
         fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
-            self.map(|msg| msg.i32_repeated().into_iter())
+            self.as_ref()
+                .map(|msg| msg.i32_repeated().into_iter())
                 .into_iter()
                 .flatten()
         }
         fn f32_unlabeled<'this>(&'this self) -> f32 {
-            self.map_or_else(::std::default::Default::default, |msg| msg.f32_unlabeled())
+            self.as_ref()
+                .map_or_else(::std::default::Default::default, |msg| msg.f32_unlabeled())
         }
         type Field5StringType<'this> = ::puroro::Either<T::Field5StringType<'this>, &'static str>;
         fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
-            self.map_or(::puroro::Either::Right(""), |msg| {
+            self.as_ref().map_or(::puroro::Either::Right(""), |msg| {
                 ::puroro::Either::Left(msg.string_unlabeled())
             })
         }
@@ -395,7 +398,7 @@ pub mod _puroro_impls {
         fn submsg_unlabeled<'this>(
             &'this self,
         ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
-            self.and_then(|msg| msg.submsg_unlabeled())
+            self.as_ref().and_then(|msg| msg.submsg_unlabeled())
         }
     }
 
@@ -800,7 +803,8 @@ pub mod _puroro_impls {
         T: SubmsgTrait,
     {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
-            self.map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
+            self.as_ref()
+                .map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
         }
     }
 

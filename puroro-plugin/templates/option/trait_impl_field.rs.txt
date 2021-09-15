@@ -20,19 +20,19 @@ type Field{{ field.number }}MessageType<'this> = T::Field{{ field.number }}Messa
 fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
     {%- if field.is_length_delimited %}
     {%- if field.is_bytes %}
-    self.map_or(::puroro::Either::Right(&[]), |msg| ::puroro::Either::Left(msg.{{ field.ident }}()))
+    self.as_ref().map_or(::puroro::Either::Right(&[]), |msg| ::puroro::Either::Left(msg.{{ field.ident }}()))
     {%- endif %}
     {%- if field.is_string %}
-    self.map_or(::puroro::Either::Right(""), |msg| ::puroro::Either::Left(msg.{{ field.ident }}()))
+    self.as_ref().map_or(::puroro::Either::Right(""), |msg| ::puroro::Either::Left(msg.{{ field.ident }}()))
     {%- endif %}
     {%- else %}
-    self.map_or_else(::std::default::Default::default, |msg| msg.{{ field.ident }}())
+    self.as_ref().map_or_else(::std::default::Default::default, |msg| msg.{{ field.ident }}())
     {%- endif %}
 }
 {%- endif %}
 {%- if field.trait_has_optional_getter %}
 fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
-    self.and_then(|msg| msg.{{ field.ident }}())
+    self.as_ref().and_then(|msg| msg.{{ field.ident }}())
 }
 {%- endif %}
 
@@ -44,6 +44,6 @@ type Field{{ field.number }}RepeatedType<'this> =
         >
     >;
 fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
-    self.map(|msg| msg.{{ field.ident }}().into_iter()).into_iter().flatten()
+    self.as_ref().map(|msg| msg.{{ field.ident }}().into_iter()).into_iter().flatten()
 }
 {%- endif %}

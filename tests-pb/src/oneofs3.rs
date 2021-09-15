@@ -490,17 +490,35 @@ pub mod _puroro_impls {
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
-            self.and_then(|msg| msg.group_one())
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupOne as E;
+            self.as_ref().and_then(|msg| {
+                msg.group_one().map(|oneof| match oneof {
+                    E::G1Int32(v) => E::G1Int32(v),
+                    E::G1String(v) => E::G1String(v),
+                })
+            })
         }
         fn group_two<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
-            self.and_then(|msg| msg.group_two())
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupTwo as E;
+            self.as_ref().and_then(|msg| {
+                msg.group_two().map(|oneof| match oneof {
+                    E::G2F32(v) => E::G2F32(v),
+                    E::G2String(v) => E::G2String(v),
+                    E::G2Submsg(v) => E::G2Submsg(v),
+                })
+            })
         }
         fn group_three<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
-            self.and_then(|msg| msg.group_three())
+            use super::_puroro_nested::msg::_puroro_oneofs::GroupThree as E;
+            self.as_ref().and_then(|msg| {
+                msg.group_three().map(|oneof| match oneof {
+                    E::G3Int32(v) => E::G3Int32(v),
+                })
+            })
         }
     }
     #[derive(
@@ -651,7 +669,8 @@ pub mod _puroro_impls {
         T: SubmsgTrait,
     {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
-            self.map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
+            self.as_ref()
+                .map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
         }
     }
 
