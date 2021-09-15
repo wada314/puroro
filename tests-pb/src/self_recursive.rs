@@ -151,6 +151,17 @@ pub mod _puroro_impls {
             )
         }
     }
+    impl<T> MsgTrait for ::std::option::Option<T>
+    where
+        T: MsgTrait,
+    {
+        type Field1MessageType<'this> = T::Field1MessageType<'this>;
+        fn recursive_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field1MessageType<'this>> {
+            self.and_then(|msg| msg.recursive_unlabeled())
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField1 {

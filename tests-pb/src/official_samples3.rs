@@ -130,6 +130,14 @@ pub mod _puroro_impls {
                 .either(|t| <T as Test1Trait>::a(t), |u| <U as Test1Trait>::a(u))
         }
     }
+    impl<T> Test1Trait for ::std::option::Option<T>
+    where
+        T: Test1Trait,
+    {
+        fn a<'this>(&'this self) -> i32 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.a())
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Test1SimpleField1 {
@@ -289,6 +297,17 @@ pub mod _puroro_impls {
                 |t| ::puroro::Either::Left(<T as Test2Trait>::b(t)),
                 |u| ::puroro::Either::Right(<U as Test2Trait>::b(u)),
             )
+        }
+    }
+    impl<T> Test2Trait for ::std::option::Option<T>
+    where
+        T: Test2Trait,
+    {
+        type Field2StringType<'this> = ::puroro::Either<T::Field2StringType<'this>, &'static str>;
+        fn b<'this>(&'this self) -> Self::Field2StringType<'this> {
+            self.map_or(::puroro::Either::Right(""), |msg| {
+                ::puroro::Either::Left(msg.b())
+            })
         }
     }
 
@@ -466,6 +485,15 @@ pub mod _puroro_impls {
             )
         }
     }
+    impl<T> Test3Trait for ::std::option::Option<T>
+    where
+        T: Test3Trait,
+    {
+        type Field3MessageType<'this> = T::Field3MessageType<'this>;
+        fn c<'this>(&'this self) -> ::std::option::Option<Self::Field3MessageType<'this>> {
+            self.and_then(|msg| msg.c())
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct Test3SimpleField3 {
@@ -636,6 +664,19 @@ pub mod _puroro_impls {
                     .map_left(|t| <T as Test4Trait>::d(t))
                     .map_right(|u| <U as Test4Trait>::d(u)),
             )
+        }
+    }
+    impl<T> Test4Trait for ::std::option::Option<T>
+    where
+        T: Test4Trait,
+    {
+        type Field4RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field4RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            self.map(|msg| msg.d().into_iter()).into_iter().flatten()
         }
     }
 

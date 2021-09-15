@@ -644,6 +644,91 @@ pub mod _puroro_impls {
             )
         }
     }
+    impl<T> MsgTrait for ::std::option::Option<T>
+    where
+        T: MsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
+        }
+        type Field2RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field2RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            self.map(|msg| msg.i32_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn float_unlabeled<'this>(&'this self) -> f32 {
+            self.map_or_else(::std::default::Default::default, |msg| {
+                msg.float_unlabeled()
+            })
+        }
+        type Field4RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field4RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            self.map(|msg| msg.float_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        type Field5StringType<'this> = ::puroro::Either<T::Field5StringType<'this>, &'static str>;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+            self.map_or(::puroro::Either::Right(""), |msg| {
+                ::puroro::Either::Left(msg.string_unlabeled())
+            })
+        }
+        type Field6StringType<'this> = T::Field6StringType<'this>;
+        type Field6RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field6RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            self.map(|msg| msg.string_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        type Field7MessageType<'this> = T::Field7MessageType<'this>;
+        fn submsg_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
+            self.and_then(|msg| msg.submsg_unlabeled())
+        }
+        type Field8MessageType<'this> = T::Field8MessageType<'this>;
+        type Field8RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field8RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            self.map(|msg| msg.submsg_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::ser_tests3::Enum {
+            self.map_or_else(::std::default::Default::default, |msg| msg.enum_unlabeled())
+        }
+        type Field10RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field10RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            self.map(|msg| msg.enum_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn very_large_field_number<'this>(&'this self) -> i32 {
+            self.map_or_else(::std::default::Default::default, |msg| {
+                msg.very_large_field_number()
+            })
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField1 {
@@ -1747,6 +1832,14 @@ pub mod _puroro_nested {
                         |t| <T as SubmsgTrait>::i32_unlabeled(t),
                         |u| <U as SubmsgTrait>::i32_unlabeled(u),
                     )
+                }
+            }
+            impl<T> SubmsgTrait for ::std::option::Option<T>
+            where
+                T: SubmsgTrait,
+            {
+                fn i32_unlabeled<'this>(&'this self) -> i32 {
+                    self.map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
                 }
             }
 

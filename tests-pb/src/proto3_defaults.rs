@@ -362,6 +362,42 @@ pub mod _puroro_impls {
             )
         }
     }
+    impl<T> MsgTrait for ::std::option::Option<T>
+    where
+        T: MsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
+        }
+        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.and_then(|msg| msg.i32_optional())
+        }
+        type Field3RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field3RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            self.map(|msg| msg.i32_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn f32_unlabeled<'this>(&'this self) -> f32 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.f32_unlabeled())
+        }
+        type Field5StringType<'this> = ::puroro::Either<T::Field5StringType<'this>, &'static str>;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field5StringType<'this> {
+            self.map_or(::puroro::Either::Right(""), |msg| {
+                ::puroro::Either::Left(msg.string_unlabeled())
+            })
+        }
+        type Field6MessageType<'this> = T::Field6MessageType<'this>;
+        fn submsg_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field6MessageType<'this>> {
+            self.and_then(|msg| msg.submsg_unlabeled())
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField1 {
@@ -757,6 +793,14 @@ pub mod _puroro_impls {
                 |t| <T as SubmsgTrait>::i32_unlabeled(t),
                 |u| <U as SubmsgTrait>::i32_unlabeled(u),
             )
+        }
+    }
+    impl<T> SubmsgTrait for ::std::option::Option<T>
+    where
+        T: SubmsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
         }
     }
 

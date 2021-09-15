@@ -2180,6 +2180,300 @@ pub mod _puroro_impls {
             )
         }
     }
+    impl<T> MsgTrait for ::std::option::Option<T>
+    where
+        T: MsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
+        }
+        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.and_then(|msg| msg.i32_optional())
+        }
+        type Field3RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field3RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn i32_repeated<'this>(&'this self) -> Self::Field3RepeatedType<'this> {
+            self.map(|msg| msg.i32_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn float_unlabeled<'this>(&'this self) -> f32 {
+            self.map_or_else(::std::default::Default::default, |msg| {
+                msg.float_unlabeled()
+            })
+        }
+        fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.and_then(|msg| msg.float_optional())
+        }
+        type Field13RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field13RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn float_repeated<'this>(&'this self) -> Self::Field13RepeatedType<'this> {
+            self.map(|msg| msg.float_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        type Field21BytesType<'this> = ::puroro::Either<T::Field21BytesType<'this>, &'static [u8]>;
+        fn bytes_unlabeled<'this>(&'this self) -> Self::Field21BytesType<'this> {
+            self.map_or(::puroro::Either::Right(&[]), |msg| {
+                ::puroro::Either::Left(msg.bytes_unlabeled())
+            })
+        }
+        type Field22BytesType<'this> = T::Field22BytesType<'this>;
+        fn bytes_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field22BytesType<'this>> {
+            self.and_then(|msg| msg.bytes_optional())
+        }
+        type Field23BytesType<'this> = T::Field23BytesType<'this>;
+        type Field23RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field23RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn bytes_repeated<'this>(&'this self) -> Self::Field23RepeatedType<'this> {
+            self.map(|msg| msg.bytes_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        type Field31StringType<'this> = ::puroro::Either<T::Field31StringType<'this>, &'static str>;
+        fn string_unlabeled<'this>(&'this self) -> Self::Field31StringType<'this> {
+            self.map_or(::puroro::Either::Right(""), |msg| {
+                ::puroro::Either::Left(msg.string_unlabeled())
+            })
+        }
+        type Field32StringType<'this> = T::Field32StringType<'this>;
+        fn string_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field32StringType<'this>> {
+            self.and_then(|msg| msg.string_optional())
+        }
+        type Field33StringType<'this> = T::Field33StringType<'this>;
+        type Field33RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field33RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn string_repeated<'this>(&'this self) -> Self::Field33RepeatedType<'this> {
+            self.map(|msg| msg.string_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn enum_unlabeled<'this>(&'this self) -> self::_puroro_root::full_coverage3::Enum {
+            self.map_or_else(::std::default::Default::default, |msg| msg.enum_unlabeled())
+        }
+        fn enum_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::full_coverage3::Enum> {
+            self.and_then(|msg| msg.enum_optional())
+        }
+        type Field43RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field43RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
+            self.map(|msg| msg.enum_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        type Field51MessageType<'this> = T::Field51MessageType<'this>;
+        fn submsg_unlabeled<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field51MessageType<'this>> {
+            self.and_then(|msg| msg.submsg_unlabeled())
+        }
+        type Field52MessageType<'this> = T::Field52MessageType<'this>;
+        fn submsg_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field52MessageType<'this>> {
+            self.and_then(|msg| msg.submsg_optional())
+        }
+        type Field53MessageType<'this> = T::Field53MessageType<'this>;
+        type Field53RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field53RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
+            self.map(|msg| msg.submsg_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn i64_unlabeled<'this>(&'this self) -> i64 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.i64_unlabeled())
+        }
+        fn i64_optional<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.and_then(|msg| msg.i64_optional())
+        }
+        type Field103RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field103RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn i64_repeated<'this>(&'this self) -> Self::Field103RepeatedType<'this> {
+            self.map(|msg| msg.i64_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn u32_unlabeled<'this>(&'this self) -> u32 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.u32_unlabeled())
+        }
+        fn u32_optional<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.and_then(|msg| msg.u32_optional())
+        }
+        type Field113RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field113RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn u32_repeated<'this>(&'this self) -> Self::Field113RepeatedType<'this> {
+            self.map(|msg| msg.u32_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn u64_unlabeled<'this>(&'this self) -> u64 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.u64_unlabeled())
+        }
+        fn u64_optional<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.and_then(|msg| msg.u64_optional())
+        }
+        type Field123RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field123RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn u64_repeated<'this>(&'this self) -> Self::Field123RepeatedType<'this> {
+            self.map(|msg| msg.u64_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn s32_unlabeled<'this>(&'this self) -> i32 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.s32_unlabeled())
+        }
+        fn s32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.and_then(|msg| msg.s32_optional())
+        }
+        type Field133RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field133RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn s32_repeated<'this>(&'this self) -> Self::Field133RepeatedType<'this> {
+            self.map(|msg| msg.s32_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn s64_unlabeled<'this>(&'this self) -> i64 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.s64_unlabeled())
+        }
+        fn s64_optional<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.and_then(|msg| msg.s64_optional())
+        }
+        type Field143RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field143RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn s64_repeated<'this>(&'this self) -> Self::Field143RepeatedType<'this> {
+            self.map(|msg| msg.s64_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn fixed32_unlabeled<'this>(&'this self) -> u32 {
+            self.map_or_else(::std::default::Default::default, |msg| {
+                msg.fixed32_unlabeled()
+            })
+        }
+        fn fixed32_optional<'this>(&'this self) -> ::std::option::Option<u32> {
+            self.and_then(|msg| msg.fixed32_optional())
+        }
+        type Field153RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field153RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn fixed32_repeated<'this>(&'this self) -> Self::Field153RepeatedType<'this> {
+            self.map(|msg| msg.fixed32_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn fixed64_unlabeled<'this>(&'this self) -> u64 {
+            self.map_or_else(::std::default::Default::default, |msg| {
+                msg.fixed64_unlabeled()
+            })
+        }
+        fn fixed64_optional<'this>(&'this self) -> ::std::option::Option<u64> {
+            self.and_then(|msg| msg.fixed64_optional())
+        }
+        type Field163RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field163RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn fixed64_repeated<'this>(&'this self) -> Self::Field163RepeatedType<'this> {
+            self.map(|msg| msg.fixed64_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn sfixed32_unlabeled<'this>(&'this self) -> i32 {
+            self.map_or_else(::std::default::Default::default, |msg| {
+                msg.sfixed32_unlabeled()
+            })
+        }
+        fn sfixed32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.and_then(|msg| msg.sfixed32_optional())
+        }
+        type Field173RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field173RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn sfixed32_repeated<'this>(&'this self) -> Self::Field173RepeatedType<'this> {
+            self.map(|msg| msg.sfixed32_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn sfixed64_unlabeled<'this>(&'this self) -> i64 {
+            self.map_or_else(::std::default::Default::default, |msg| {
+                msg.sfixed64_unlabeled()
+            })
+        }
+        fn sfixed64_optional<'this>(&'this self) -> ::std::option::Option<i64> {
+            self.and_then(|msg| msg.sfixed64_optional())
+        }
+        type Field183RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field183RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn sfixed64_repeated<'this>(&'this self) -> Self::Field183RepeatedType<'this> {
+            self.map(|msg| msg.sfixed64_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn f64_unlabeled<'this>(&'this self) -> f64 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.f64_unlabeled())
+        }
+        fn f64_optional<'this>(&'this self) -> ::std::option::Option<f64> {
+            self.and_then(|msg| msg.f64_optional())
+        }
+        type Field193RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field193RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn f64_repeated<'this>(&'this self) -> Self::Field193RepeatedType<'this> {
+            self.map(|msg| msg.f64_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField1 {
@@ -10550,6 +10844,14 @@ pub mod _puroro_nested {
                         |t| <T as SubmsgTrait>::i32_unlabeled(t),
                         |u| <U as SubmsgTrait>::i32_unlabeled(u),
                     )
+                }
+            }
+            impl<T> SubmsgTrait for ::std::option::Option<T>
+            where
+                T: SubmsgTrait,
+            {
+                fn i32_unlabeled<'this>(&'this self) -> i32 {
+                    self.map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
                 }
             }
 

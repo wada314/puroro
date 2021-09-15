@@ -614,6 +614,89 @@ pub mod _puroro_impls {
             )
         }
     }
+    impl<T> MsgTrait for ::std::option::Option<T>
+    where
+        T: MsgTrait,
+    {
+        fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.and_then(|msg| msg.i32_optional())
+        }
+        type Field2RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field2RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn i32_repeated<'this>(&'this self) -> Self::Field2RepeatedType<'this> {
+            self.map(|msg| msg.i32_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn float_optional<'this>(&'this self) -> ::std::option::Option<f32> {
+            self.and_then(|msg| msg.float_optional())
+        }
+        type Field4RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field4RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn float_repeated<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
+            self.map(|msg| msg.float_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        type Field5StringType<'this> = T::Field5StringType<'this>;
+        fn string_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field5StringType<'this>> {
+            self.and_then(|msg| msg.string_optional())
+        }
+        type Field6StringType<'this> = T::Field6StringType<'this>;
+        type Field6RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field6RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn string_repeated<'this>(&'this self) -> Self::Field6RepeatedType<'this> {
+            self.map(|msg| msg.string_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        type Field7MessageType<'this> = T::Field7MessageType<'this>;
+        fn submsg_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<Self::Field7MessageType<'this>> {
+            self.and_then(|msg| msg.submsg_optional())
+        }
+        type Field8MessageType<'this> = T::Field8MessageType<'this>;
+        type Field8RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field8RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn submsg_repeated<'this>(&'this self) -> Self::Field8RepeatedType<'this> {
+            self.map(|msg| msg.submsg_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn enum_optional<'this>(
+            &'this self,
+        ) -> ::std::option::Option<self::_puroro_root::ser_tests2::Enum> {
+            self.and_then(|msg| msg.enum_optional())
+        }
+        type Field10RepeatedType<'this> = ::std::iter::Flatten<
+            ::std::option::IntoIter<
+                <T::Field10RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter,
+            >,
+        >;
+        fn enum_repeated<'this>(&'this self) -> Self::Field10RepeatedType<'this> {
+            self.map(|msg| msg.enum_repeated().into_iter())
+                .into_iter()
+                .flatten()
+        }
+        fn very_large_field_number<'this>(&'this self) -> ::std::option::Option<i32> {
+            self.and_then(|msg| msg.very_large_field_number())
+        }
+    }
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField1 {
@@ -1576,6 +1659,14 @@ pub mod _puroro_nested {
                         |t| <T as SubmsgTrait>::i32_optional(t),
                         |u| <U as SubmsgTrait>::i32_optional(u),
                     )
+                }
+            }
+            impl<T> SubmsgTrait for ::std::option::Option<T>
+            where
+                T: SubmsgTrait,
+            {
+                fn i32_optional<'this>(&'this self) -> ::std::option::Option<i32> {
+                    self.and_then(|msg| msg.i32_optional())
                 }
             }
 

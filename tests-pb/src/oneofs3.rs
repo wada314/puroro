@@ -480,6 +480,29 @@ pub mod _puroro_impls {
             }
         }
     }
+    impl<T> MsgTrait for ::std::option::Option<T>
+    where
+        T: MsgTrait,
+    {
+        type Field2StringType<'this> = T::Field2StringType<'this>;
+        type Field4StringType<'this> = T::Field4StringType<'this>;
+        type Field5MessageType<'this> = T::Field5MessageType<'this>;
+        fn group_one<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
+            self.and_then(|msg| msg.group_one())
+        }
+        fn group_two<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'this, Self>> {
+            self.and_then(|msg| msg.group_two())
+        }
+        fn group_three<'this>(
+            &'this self,
+        ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
+            self.and_then(|msg| msg.group_three())
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -621,6 +644,14 @@ pub mod _puroro_impls {
                 |t| <T as SubmsgTrait>::i32_unlabeled(t),
                 |u| <U as SubmsgTrait>::i32_unlabeled(u),
             )
+        }
+    }
+    impl<T> SubmsgTrait for ::std::option::Option<T>
+    where
+        T: SubmsgTrait,
+    {
+        fn i32_unlabeled<'this>(&'this self) -> i32 {
+            self.map_or_else(::std::default::Default::default, |msg| msg.i32_unlabeled())
         }
     }
 
