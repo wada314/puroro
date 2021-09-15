@@ -78,6 +78,7 @@ fn test_get_i32_repeated_field() {
 #[test]
 fn test_get_msg_optional_field() {
     let submsg_3 = Submsg { i32_unlabeled: 3 };
+    let submsg_7 = Submsg { i32_unlabeled: 7 };
     let none = Msg {
         submsg_optional: None,
         ..Default::default()
@@ -86,10 +87,55 @@ fn test_get_msg_optional_field() {
         submsg_optional: Some(Box::new(submsg_3.clone())),
         ..Default::default()
     };
+    let msg_7 = Msg {
+        submsg_optional: Some(Box::new(submsg_7.clone())),
+        ..Default::default()
+    };
     assert_eq!(None, (&none, &none).submsg_optional());
-    assert!((&msg_3, &none).submsg_optional().is_some());
+    assert_eq!(0, (&none, &none).submsg_optional().i32_unlabeled());
+    assert_eq!(3, (&msg_3, &none).submsg_optional().i32_unlabeled());
+    assert_eq!(3, (&none, &msg_3).submsg_optional().i32_unlabeled());
+    assert_eq!(7, (&msg_3, &msg_7).submsg_optional().i32_unlabeled());
+}
+#[test]
+fn test_get_msg_repeated_field() {
+    let submsg_3 = Submsg { i32_unlabeled: 3 };
+    let submsg_7 = Submsg { i32_unlabeled: 7 };
+    let empty = Msg {
+        submsg_repeated: vec![],
+        ..Default::default()
+    };
+    let msg_3 = Msg {
+        submsg_repeated: vec![submsg_3.clone()],
+        ..Default::default()
+    };
+    let msg_7_7 = Msg {
+        submsg_repeated: vec![submsg_7.clone(), submsg_7.clone()],
+        ..Default::default()
+    };
+    assert_eq!(0, (&empty, &empty).submsg_repeated().into_iter().count());
     assert_eq!(
-        3,
-        (&msg_3, &none).submsg_optional().unwrap().i32_unlabeled()
+        vec![3],
+        (&empty, &msg_3)
+            .submsg_repeated()
+            .into_iter()
+            .map(|submsg| submsg.i32_unlabeled)
+            .collect_vec()
+    );
+    assert_eq!(
+        vec![3],
+        (&msg_3, &empty)
+            .submsg_repeated()
+            .into_iter()
+            .map(|submsg| submsg.i32_unlabeled)
+            .collect_vec()
+    );
+    assert_eq!(
+        vec![3, 7, 7],
+        (&msg_3, &msg_7_7)
+            .submsg_repeated()
+            .into_iter()
+            .map(|submsg| submsg.i32_unlabeled)
+            .collect_vec()
     );
 }
