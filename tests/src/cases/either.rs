@@ -1,4 +1,4 @@
-use ::puroro::{Either, Message};
+use ::puroro::Either;
 use ::tests_pb::full_coverage3::{Msg, MsgTrait};
 
 #[test]
