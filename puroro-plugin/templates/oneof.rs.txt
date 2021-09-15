@@ -10,6 +10,24 @@ pub enum {{ enum_ident }}
     {%- endfor %}
 }
 
+
+{%- if has_reference_field %}
+impl <'msg, T: ?Sized + {{ owner_message_trait_path }}> {{ enum_ident }}<'msg, T> 
+{%- else %}
+impl {{ enum_ident }}
+{%- endif %}
+{
+    {%- for field in fields %}
+    pub fn {{ field.getter_ident }}(self) -> ::std::option::Option<{{ field.trait_field_type }}> {
+        match self {
+            Self::{{ field.ident }}(v) => ::std::option::Option::Some(v),
+            #[allow(unreachable_patterns)]
+            _ => None,
+        }
+    }
+    {%- endfor %}
+}
+
 {%- if has_reference_field %}
 impl<'msg, T> ::std::convert::From<{{ enum_ident }}<'msg, T>> 
 for {{ enum_ident }}<'msg, &'_ T>

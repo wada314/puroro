@@ -918,6 +918,28 @@ pub mod _puroro_nested {
                     >,
                 ),
             }
+            impl<'msg, T: ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait> GroupOne<'msg, T> {
+                pub fn g1_int32(self) -> ::std::option::Option<i32> {
+                    match self {
+                        Self::G1Int32(v) => ::std::option::Option::Some(v),
+                        #[allow(unreachable_patterns)]
+                        _ => None,
+                    }
+                }
+                pub fn g1_string(
+                    self,
+                ) -> ::std::option::Option<
+                    <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field2StringType<
+                        'msg,
+                    >,
+                > {
+                    match self {
+                        Self::G1String(v) => ::std::option::Option::Some(v),
+                        #[allow(unreachable_patterns)]
+                        _ => None,
+                    }
+                }
+            }
             impl<'msg, T> ::std::convert::From<GroupOne<'msg, T>> for GroupOne<'msg, &'_ T>
             where
                 T: self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
@@ -949,6 +971,41 @@ pub mod _puroro_nested {
                 G2String(<T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field4StringType<'msg>),
                 G2Submsg(<T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5MessageType<'msg>),
             }
+            impl<'msg, T: ?Sized + self::_puroro_root::oneofs2::_puroro_traits::MsgTrait> GroupTwo<'msg, T> {
+                pub fn g2_f32(self) -> ::std::option::Option<f32> {
+                    match self {
+                        Self::G2F32(v) => ::std::option::Option::Some(v),
+                        #[allow(unreachable_patterns)]
+                        _ => None,
+                    }
+                }
+                pub fn g2_string(
+                    self,
+                ) -> ::std::option::Option<
+                    <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field4StringType<
+                        'msg,
+                    >,
+                > {
+                    match self {
+                        Self::G2String(v) => ::std::option::Option::Some(v),
+                        #[allow(unreachable_patterns)]
+                        _ => None,
+                    }
+                }
+                pub fn g2_submsg(
+                    self,
+                ) -> ::std::option::Option<
+                    <T as self::_puroro_root::oneofs2::_puroro_traits::MsgTrait>::Field5MessageType<
+                        'msg,
+                    >,
+                > {
+                    match self {
+                        Self::G2Submsg(v) => ::std::option::Option::Some(v),
+                        #[allow(unreachable_patterns)]
+                        _ => None,
+                    }
+                }
+            }
             impl<'msg, T> ::std::convert::From<GroupTwo<'msg, T>> for GroupTwo<'msg, &'_ T>
             where
                 T: self::_puroro_root::oneofs2::_puroro_traits::MsgTrait,
@@ -976,6 +1033,15 @@ pub mod _puroro_nested {
             #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
             pub enum GroupThree {
                 G3Int32(i32),
+            }
+            impl GroupThree {
+                pub fn g3_int32(self) -> ::std::option::Option<i32> {
+                    match self {
+                        Self::G3Int32(v) => ::std::option::Option::Some(v),
+                        #[allow(unreachable_patterns)]
+                        _ => None,
+                    }
+                }
             }
         }
     }

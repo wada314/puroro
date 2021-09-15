@@ -187,11 +187,13 @@ fn test_get_oneof_field() {
     assert_eq!(None, (&none, &msg_3).g2_string());
     assert_eq!(None, (&none, &msg_3).g2_submsg());
 
-    if let Some(GroupTwo::G2String(v)) = (&msg_test, &none).group_two() {
-        assert_eq!("Test", v.deref());
-    } else {
-        panic!()
-    }
+    assert_eq!(
+        Some("Test"),
+        (&msg_test, &none)
+            .group_two()
+            .and_then(|o| o.g2_string())
+            .as_deref()
+    );
     assert_eq!(None, (&msg_test, &none).g2_f32());
     assert_eq!(Some("Test"), (&msg_test, &none).g2_string().as_deref());
     assert_eq!(None, (&msg_test, &none).g2_submsg());
