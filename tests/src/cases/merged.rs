@@ -1,7 +1,8 @@
 use ::itertools::Itertools;
+use ::std::borrow::Cow;
+use ::std::ops::Deref;
 use ::tests_pb::full_coverage3::msg::{Submsg, SubmsgTrait as _};
 use ::tests_pb::full_coverage3::{Msg, MsgTrait as _};
-use ::tests_pb::oneofs3::{Msg as OneofMsg, MsgTrait as _};
 
 #[test]
 fn test_get_i32_optional_field() {
@@ -97,6 +98,7 @@ fn test_get_msg_optional_field() {
     assert_eq!(3, (&none, &msg_3).submsg_optional().i32_unlabeled());
     assert_eq!(7, (&msg_3, &msg_7).submsg_optional().i32_unlabeled());
 }
+
 #[test]
 fn test_get_msg_repeated_field() {
     let submsg_3 = Submsg { i32_unlabeled: 3 };
@@ -138,4 +140,59 @@ fn test_get_msg_repeated_field() {
             .map(|submsg| submsg.i32_unlabeled)
             .collect_vec()
     );
+}
+
+#[test]
+fn test_get_oneof_field() {
+    use ::tests_pb::oneofs3::msg::GroupTwo;
+    use ::tests_pb::oneofs3::{Msg, MsgTrait as _, Submsg, SubmsgTrait as _};
+    let none = Msg {
+        group_two: None,
+        ..Default::default()
+    };
+    let msg_3 = Msg {
+        group_two: Some(GroupTwo::G2F32(3.0)),
+        ..Default::default()
+    };
+    let msg_test = Msg {
+        group_two: Some(GroupTwo::G2String(Cow::Borrowed("Test"))),
+        ..Default::default()
+    };
+    let msg_submsg_0 = Msg {
+        group_two: Some(GroupTwo::G2Submsg(Box::new(Submsg {
+            i32_unlabeled: 0,
+            ..Default::default()
+        }))),
+        ..Default::default()
+    };
+    let msg_submsg_3 = Msg {
+        group_two: Some(GroupTwo::G2Submsg(Box::new(Submsg {
+            i32_unlabeled: 3,
+            ..Default::default()
+        }))),
+        ..Default::default()
+    };
+    assert_eq!(None, (&none, &none).group_two());
+    assert_eq!(None, (&none, &none).g2_f32());
+    assert_eq!(None, (&none, &none).g2_string());
+    assert_eq!(None, (&none, &none).g2_submsg());
+
+    assert_eq!(Some(GroupTwo::G2F32(3.0)), (&msg_3, &none).group_two());
+    assert_eq!(Some(3.0), (&msg_3, &none).g2_f32());
+    assert_eq!(None, (&msg_3, &none).g2_string());
+    assert_eq!(None, (&msg_3, &none).g2_submsg());
+
+    assert_eq!(Some(GroupTwo::G2F32(3.0)), (&none, &msg_3).group_two());
+    assert_eq!(Some(3.0), (&none, &msg_3).g2_f32());
+    assert_eq!(None, (&none, &msg_3).g2_string());
+    assert_eq!(None, (&none, &msg_3).g2_submsg());
+
+    if let Some(GroupTwo::G2String(v)) = (&msg_test, &none).group_two() {
+        assert_eq!("Test", v.deref());
+    } else {
+        panic!()
+    }
+    assert_eq!(None, (&msg_test, &none).g2_f32());
+    assert_eq!(Some("Test"), (&msg_test, &none).g2_string().as_deref());
+    assert_eq!(None, (&msg_test, &none).g2_submsg());
 }
