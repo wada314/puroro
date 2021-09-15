@@ -1,3 +1,4 @@
+use ::itertools::Itertools;
 use ::puroro::Either;
 use ::tests_pb::full_coverage3::{Msg, MsgTrait};
 
@@ -44,31 +45,31 @@ fn test_get_i32_repeated_field() {
         ..Default::default()
     };
     assert_eq!(
+        vec![] as Vec<i32>,
         Either::<&Msg, &Msg>::Left(&empty)
             .i32_repeated()
             .into_iter()
-            .collect::<Vec<_>>(),
-        [],
+            .collect_vec(),
     );
     assert_eq!(
+        vec![] as Vec<i32>,
         Either::<&Msg, &Msg>::Right(&empty)
             .i32_repeated()
             .into_iter()
-            .collect::<Vec<_>>(),
-        []
+            .collect_vec()
     );
     assert_eq!(
+        vec![1, 2, 5],
         Either::<&Msg, &Msg>::Left(&val_1_2_5)
             .i32_repeated()
             .into_iter()
-            .collect::<Vec<_>>(),
-        [1, 2, 5]
+            .collect_vec()
     );
     assert_eq!(
+        vec![1, 2, 5],
         Either::<&Msg, &Msg>::Right(&val_1_2_5)
             .i32_repeated()
             .into_iter()
-            .collect::<Vec<_>>(),
-        [1, 2, 5]
+            .collect_vec()
     );
 }

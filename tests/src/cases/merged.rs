@@ -1,3 +1,4 @@
+use ::itertools::Itertools;
 use ::tests_pb::full_coverage3::{Msg, MsgTrait as _};
 use ::tests_pb::oneofs3::{Msg as OneofMsg, MsgTrait as _};
 
@@ -39,4 +40,36 @@ fn test_get_i32_unlabeled_field() {
     assert_eq!(3, (&msg_0, &msg_3).i32_unlabeled());
     assert_eq!(3, (&msg_3, &msg_0).i32_unlabeled());
     assert_eq!(7, (&msg_3, &msg_7).i32_unlabeled());
+}
+
+#[test]
+fn test_get_i32_repeated_field() {
+    let empty = Msg {
+        i32_repeated: vec![],
+        ..Default::default()
+    };
+    let msg_1 = Msg {
+        i32_repeated: vec![1],
+        ..Default::default()
+    };
+    let msg_3_5 = Msg {
+        i32_repeated: vec![3, 5],
+        ..Default::default()
+    };
+    assert_eq!(
+        vec![] as Vec<i32>,
+        (&empty, &empty).i32_repeated().into_iter().collect_vec()
+    );
+    assert_eq!(
+        vec![1],
+        (&empty, &msg_1).i32_repeated().into_iter().collect_vec()
+    );
+    assert_eq!(
+        vec![1],
+        (&msg_1, &empty).i32_repeated().into_iter().collect_vec()
+    );
+    assert_eq!(
+        vec![1, 3, 5],
+        (&msg_1, &msg_3_5).i32_repeated().into_iter().collect_vec()
+    );
 }

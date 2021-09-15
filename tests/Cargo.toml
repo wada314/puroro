@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 puroro = { path = "../puroro" }
 tests-pb = { path = "../tests-pb" }
+itertools = "0.10.1"
 
 [features]
 puroro-nightly = []
