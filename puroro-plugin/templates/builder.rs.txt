@@ -1,0 +1,27 @@
+pub struct {{ m.builder_ident }}<T>(T);
+
+impl<T> {{ m.builder_ident }}<T>
+where
+    T: {{ m.trait_ident }}
+{
+    {%- for field in m.fields %}
+
+    {%- if !field.is_explicit_oneof_field %}
+    pub fn append_{{ field.ident }}(self, value: {{ field.simple_field_type }})
+        -> {{ m.builder_ident }}<(T, {{ m.simple_single_field_ident }}{{ field.number }})>
+    {
+        {{ m.builder_ident }}((self.0, ::std::convert::From::from(value)))
+    }
+    {%- endif %}
+
+    {%- endfor %}
+
+    pub fn build(self) -> T {
+        self.0
+    }
+}
+
+impl {{ m.builder_ident }}<()>
+{
+    pub fn new() -> Self { Self(()) }
+}

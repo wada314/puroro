@@ -753,6 +753,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<i32>> for MsgSimpleField1 {
+        fn from(value: ::std::option::Option<i32>) -> Self {
+            Self {
+                i32_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField2 {
         pub i32_repeated: ::std::vec::Vec<i32>,
@@ -804,6 +812,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::vec::Vec<i32>> for MsgSimpleField2 {
+        fn from(value: ::std::vec::Vec<i32>) -> Self {
+            Self {
+                i32_repeated: value,
+            }
         }
     }
 
@@ -863,6 +879,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<f32>> for MsgSimpleField3 {
+        fn from(value: ::std::option::Option<f32>) -> Self {
+            Self {
+                float_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField4 {
         pub float_repeated: ::std::vec::Vec<f32>,
@@ -914,6 +938,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::vec::Vec<f32>> for MsgSimpleField4 {
+        fn from(value: ::std::vec::Vec<f32>) -> Self {
+            Self {
+                float_repeated: value,
+            }
         }
     }
 
@@ -973,6 +1005,16 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<::std::borrow::Cow<'static, str>>>
+        for MsgSimpleField5
+    {
+        fn from(value: ::std::option::Option<::std::borrow::Cow<'static, str>>) -> Self {
+            Self {
+                string_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField6 {
         pub string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
@@ -1026,6 +1068,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::vec::Vec<::std::borrow::Cow<'static, str>>> for MsgSimpleField6 {
+        fn from(value: ::std::vec::Vec<::std::borrow::Cow<'static, str>>) -> Self {
+            Self {
+                string_repeated: value,
+            }
         }
     }
 
@@ -1088,6 +1138,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<::std::boxed::Box<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>> for MsgSimpleField7 {
+    fn from(value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>) -> Self {
+        Self {
+            submsg_optional: value,
+        }
+    }
+}
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField8 {
         pub submsg_repeated: ::std::vec::Vec<
@@ -1148,6 +1206,24 @@ pub mod _puroro_impls {
         }
     }
 
+    impl
+        ::std::convert::From<
+            ::std::vec::Vec<
+                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+            >,
+        > for MsgSimpleField8
+    {
+        fn from(
+            value: ::std::vec::Vec<
+                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+            >,
+        ) -> Self {
+            Self {
+                submsg_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField9 {
         pub enum_optional: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>,
@@ -1203,6 +1279,16 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<self::_puroro_root::ser_tests2::Enum>>
+        for MsgSimpleField9
+    {
+        fn from(value: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>) -> Self {
+            Self {
+                enum_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField10 {
         pub enum_repeated: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>,
@@ -1252,6 +1338,16 @@ pub mod _puroro_impls {
                 ::puroro::tags::Enum2<self::_puroro_root::ser_tests2::Enum>,
             >::ser_field(&self.enum_repeated, 10, out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>>
+        for MsgSimpleField10
+    {
+        fn from(value: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>) -> Self {
+            Self {
+                enum_repeated: value,
+            }
         }
     }
 
@@ -1308,6 +1404,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::option::Option<i32>> for MsgSimpleField536870911 {
+        fn from(value: ::std::option::Option<i32>) -> Self {
+            Self {
+                very_large_field_number: value,
+            }
         }
     }
     #[derive(
@@ -1368,36 +1472,87 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
-    pub struct MsgComposer<T>(T);
+    pub struct MsgBuilder<T>(T);
 
-    impl<T> MsgComposer<T>
+    impl<T> MsgBuilder<T>
     where
         T: MsgTrait,
     {
-        //pub fn with_i32_optional(&self, value: ::std::option::Option<i32>)
+        pub fn append_i32_optional(
+            self,
+            value: ::std::option::Option<i32>,
+        ) -> MsgBuilder<(T, MsgSimpleField1)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_i32_repeated(
+            self,
+            value: ::std::vec::Vec<i32>,
+        ) -> MsgBuilder<(T, MsgSimpleField2)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_float_optional(
+            self,
+            value: ::std::option::Option<f32>,
+        ) -> MsgBuilder<(T, MsgSimpleField3)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_float_repeated(
+            self,
+            value: ::std::vec::Vec<f32>,
+        ) -> MsgBuilder<(T, MsgSimpleField4)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_string_optional(
+            self,
+            value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        ) -> MsgBuilder<(T, MsgSimpleField5)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_string_repeated(
+            self,
+            value: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
+        ) -> MsgBuilder<(T, MsgSimpleField6)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_submsg_optional(
+            self,
+            value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
+        ) -> MsgBuilder<(T, MsgSimpleField7)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_submsg_repeated(
+            self,
+            value: ::std::vec::Vec<
+                self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+            >,
+        ) -> MsgBuilder<(T, MsgSimpleField8)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_enum_optional(
+            self,
+            value: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>,
+        ) -> MsgBuilder<(T, MsgSimpleField9)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_enum_repeated(
+            self,
+            value: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>,
+        ) -> MsgBuilder<(T, MsgSimpleField10)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_very_large_field_number(
+            self,
+            value: ::std::option::Option<i32>,
+        ) -> MsgBuilder<(T, MsgSimpleField536870911)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
 
-        //pub fn with_i32_repeated(&self, value: ::std::vec::Vec<i32>)
-
-        //pub fn with_float_optional(&self, value: ::std::option::Option<f32>)
-
-        //pub fn with_float_repeated(&self, value: ::std::vec::Vec<f32>)
-
-        //pub fn with_string_optional(&self, value: ::std::option::Option<::std::borrow::Cow<'static, str>>)
-
-        //pub fn with_string_repeated(&self, value: ::std::vec::Vec<::std::borrow::Cow<'static, str>>)
-
-        //pub fn with_submsg_optional(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>)
-
-        //pub fn with_submsg_repeated(&self, value: ::std::vec::Vec<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>)
-
-        //pub fn with_enum_optional(&self, value: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>)
-
-        //pub fn with_enum_repeated(&self, value: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>)
-
-        //pub fn with_very_large_field_number(&self, value: ::std::option::Option<i32>)
+        pub fn build(self) -> T {
+            self.0
+        }
     }
 
-    impl MsgComposer<()> {
+    impl MsgBuilder<()> {
         pub fn new() -> Self {
             Self(())
         }
@@ -1728,6 +1883,14 @@ pub mod _puroro_nested {
                     ::std::result::Result::Ok(())
                 }
             }
+
+            impl ::std::convert::From<::std::option::Option<i32>> for SubmsgSimpleField1 {
+                fn from(value: ::std::option::Option<i32>) -> Self {
+                    Self {
+                        i32_optional: value,
+                    }
+                }
+            }
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
@@ -1742,16 +1905,25 @@ pub mod _puroro_nested {
                     unimplemented!("Please don't use / instantiate this struct!!")
                 }
             }
-            pub struct SubmsgComposer<T>(T);
+            pub struct SubmsgBuilder<T>(T);
 
-            impl<T> SubmsgComposer<T>
+            impl<T> SubmsgBuilder<T>
             where
                 T: SubmsgTrait,
             {
-                //pub fn with_i32_optional(&self, value: ::std::option::Option<i32>)
+                pub fn append_i32_optional(
+                    self,
+                    value: ::std::option::Option<i32>,
+                ) -> SubmsgBuilder<(T, SubmsgSimpleField1)> {
+                    SubmsgBuilder((self.0, ::std::convert::From::from(value)))
+                }
+
+                pub fn build(self) -> T {
+                    self.0
+                }
             }
 
-            impl SubmsgComposer<()> {
+            impl SubmsgBuilder<()> {
                 pub fn new() -> Self {
                     Self(())
                 }

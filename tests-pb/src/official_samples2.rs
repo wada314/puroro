@@ -155,6 +155,12 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    impl ::std::convert::From<::std::option::Option<i32>> for Test1SimpleField1 {
+        fn from(value: ::std::option::Option<i32>) -> Self {
+            Self { a: value }
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -166,16 +172,25 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
-    pub struct Test1Composer<T>(T);
+    pub struct Test1Builder<T>(T);
 
-    impl<T> Test1Composer<T>
+    impl<T> Test1Builder<T>
     where
         T: Test1Trait,
     {
-        //pub fn with_a(&self, value: ::std::option::Option<i32>)
+        pub fn append_a(
+            self,
+            value: ::std::option::Option<i32>,
+        ) -> Test1Builder<(T, Test1SimpleField1)> {
+            Test1Builder((self.0, ::std::convert::From::from(value)))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
     }
 
-    impl Test1Composer<()> {
+    impl Test1Builder<()> {
         pub fn new() -> Self {
             Self(())
         }
@@ -338,6 +353,14 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    impl ::std::convert::From<::std::option::Option<::std::borrow::Cow<'static, str>>>
+        for Test2SimpleField2
+    {
+        fn from(value: ::std::option::Option<::std::borrow::Cow<'static, str>>) -> Self {
+            Self { b: value }
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -350,16 +373,25 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
-    pub struct Test2Composer<T>(T);
+    pub struct Test2Builder<T>(T);
 
-    impl<T> Test2Composer<T>
+    impl<T> Test2Builder<T>
     where
         T: Test2Trait,
     {
-        //pub fn with_b(&self, value: ::std::option::Option<::std::borrow::Cow<'static, str>>)
+        pub fn append_b(
+            self,
+            value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        ) -> Test2Builder<(T, Test2SimpleField2)> {
+            Test2Builder((self.0, ::std::convert::From::from(value)))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
     }
 
-    impl Test2Composer<()> {
+    impl Test2Builder<()> {
         pub fn new() -> Self {
             Self(())
         }
@@ -536,6 +568,26 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    impl
+        ::std::convert::From<
+            ::std::option::Option<
+                ::std::boxed::Box<
+                    self::_puroro_root::official_samples2::_puroro_impls::Test1Simple,
+                >,
+            >,
+        > for Test3SimpleField3
+    {
+        fn from(
+            value: ::std::option::Option<
+                ::std::boxed::Box<
+                    self::_puroro_root::official_samples2::_puroro_impls::Test1Simple,
+                >,
+            >,
+        ) -> Self {
+            Self { c: value }
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -549,16 +601,29 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
-    pub struct Test3Composer<T>(T);
+    pub struct Test3Builder<T>(T);
 
-    impl<T> Test3Composer<T>
+    impl<T> Test3Builder<T>
     where
         T: Test3Trait,
     {
-        //pub fn with_c(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::official_samples2::_puroro_impls::Test1Simple>>)
+        pub fn append_c(
+            self,
+            value: ::std::option::Option<
+                ::std::boxed::Box<
+                    self::_puroro_root::official_samples2::_puroro_impls::Test1Simple,
+                >,
+            >,
+        ) -> Test3Builder<(T, Test3SimpleField3)> {
+            Test3Builder((self.0, ::std::convert::From::from(value)))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
     }
 
-    impl Test3Composer<()> {
+    impl Test3Builder<()> {
         pub fn new() -> Self {
             Self(())
         }
@@ -733,6 +798,12 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    impl ::std::convert::From<::std::vec::Vec<i32>> for Test4SimpleField4 {
+        fn from(value: ::std::vec::Vec<i32>) -> Self {
+            Self { d: value }
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -745,16 +816,22 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
-    pub struct Test4Composer<T>(T);
+    pub struct Test4Builder<T>(T);
 
-    impl<T> Test4Composer<T>
+    impl<T> Test4Builder<T>
     where
         T: Test4Trait,
     {
-        //pub fn with_d(&self, value: ::std::vec::Vec<i32>)
+        pub fn append_d(self, value: ::std::vec::Vec<i32>) -> Test4Builder<(T, Test4SimpleField4)> {
+            Test4Builder((self.0, ::std::convert::From::from(value)))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
     }
 
-    impl Test4Composer<()> {
+    impl Test4Builder<()> {
         pub fn new() -> Self {
             Self(())
         }

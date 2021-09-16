@@ -556,26 +556,18 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
-    pub struct MsgComposer<T>(T);
+    pub struct MsgBuilder<T>(T);
 
-    impl<T> MsgComposer<T>
+    impl<T> MsgBuilder<T>
     where
         T: MsgTrait,
     {
-        //pub fn with_g1_int32(&self, value: ::std::option::Option<i32>)
-
-        //pub fn with_g1_string(&self, value: ::std::option::Option<::std::borrow::Cow<'static, str>>)
-
-        //pub fn with_g2_f32(&self, value: ::std::option::Option<f32>)
-
-        //pub fn with_g2_string(&self, value: ::std::option::Option<::std::borrow::Cow<'static, str>>)
-
-        //pub fn with_g2_submsg(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::oneofs2::_puroro_impls::SubmsgSimple>>)
-
-        //pub fn with_g3_int32(&self, value: ::std::option::Option<i32>)
+        pub fn build(self) -> T {
+            self.0
+        }
     }
 
-    impl MsgComposer<()> {
+    impl MsgBuilder<()> {
         pub fn new() -> Self {
             Self(())
         }
@@ -724,6 +716,14 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    impl ::std::convert::From<::std::option::Option<i32>> for SubmsgSimpleField1 {
+        fn from(value: ::std::option::Option<i32>) -> Self {
+            Self {
+                i32_optional: value,
+            }
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -735,16 +735,25 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
-    pub struct SubmsgComposer<T>(T);
+    pub struct SubmsgBuilder<T>(T);
 
-    impl<T> SubmsgComposer<T>
+    impl<T> SubmsgBuilder<T>
     where
         T: SubmsgTrait,
     {
-        //pub fn with_i32_optional(&self, value: ::std::option::Option<i32>)
+        pub fn append_i32_optional(
+            self,
+            value: ::std::option::Option<i32>,
+        ) -> SubmsgBuilder<(T, SubmsgSimpleField1)> {
+            SubmsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
     }
 
-    impl SubmsgComposer<()> {
+    impl SubmsgBuilder<()> {
         pub fn new() -> Self {
             Self(())
         }

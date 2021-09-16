@@ -189,6 +189,24 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    impl
+        ::std::convert::From<
+            ::std::option::Option<
+                ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>,
+            >,
+        > for MsgSimpleField1
+    {
+        fn from(
+            value: ::std::option::Option<
+                ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>,
+            >,
+        ) -> Self {
+            Self {
+                recursive_unlabeled: value,
+            }
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -202,16 +220,27 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
-    pub struct MsgComposer<T>(T);
+    pub struct MsgBuilder<T>(T);
 
-    impl<T> MsgComposer<T>
+    impl<T> MsgBuilder<T>
     where
         T: MsgTrait,
     {
-        //pub fn with_recursive_unlabeled(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>>)
+        pub fn append_recursive_unlabeled(
+            self,
+            value: ::std::option::Option<
+                ::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>,
+            >,
+        ) -> MsgBuilder<(T, MsgSimpleField1)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+
+        pub fn build(self) -> T {
+            self.0
+        }
     }
 
-    impl MsgComposer<()> {
+    impl MsgBuilder<()> {
         pub fn new() -> Self {
             Self(())
         }

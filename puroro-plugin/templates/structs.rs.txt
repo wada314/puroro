@@ -18,7 +18,7 @@ pub mod _puroro_impls {
     {%- include "option/body.rs.txt" %}
     {%- include "simple/single_field.rs.txt" %}
     {%- include "simple/by_value.rs.txt" %}
-    {%- include "composer.rs.txt" %}
+    {%- include "builder.rs.txt" %}
     {%- endfor %}
 }
 

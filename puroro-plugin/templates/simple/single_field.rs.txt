@@ -45,5 +45,13 @@ impl ::puroro::SerToIoWrite for {{ m.simple_single_field_ident }}{{ sfield.numbe
     }
 }
 
+impl ::std::convert::From<{{ sfield.simple_field_type }}> for {{ m.simple_single_field_ident }}{{ sfield.number }} {
+    fn from(value: {{ sfield.simple_field_type }}) -> Self {
+        Self {
+            {{ sfield.ident }}: value,
+        }
+    }
+}
+
 {%- endif %}
 {%- endfor %}

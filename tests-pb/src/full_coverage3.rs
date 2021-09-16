@@ -2650,6 +2650,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<i32> for MsgSimpleField1 {
+        fn from(value: i32) -> Self {
+            Self {
+                i32_unlabeled: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField2 {
         pub i32_optional: ::std::option::Option<i32>,
@@ -2808,6 +2816,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::option::Option<i32>> for MsgSimpleField2 {
+        fn from(value: ::std::option::Option<i32>) -> Self {
+            Self {
+                i32_optional: value,
+            }
         }
     }
 
@@ -2970,6 +2986,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<i32>> for MsgSimpleField3 {
+        fn from(value: ::std::vec::Vec<i32>) -> Self {
+            Self {
+                i32_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField11 {
         pub float_unlabeled: f32,
@@ -3125,6 +3149,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<f32> for MsgSimpleField11 {
+        fn from(value: f32) -> Self {
+            Self {
+                float_unlabeled: value,
+            }
         }
     }
 
@@ -3289,6 +3321,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<f32>> for MsgSimpleField12 {
+        fn from(value: ::std::option::Option<f32>) -> Self {
+            Self {
+                float_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField13 {
         pub float_repeated: ::std::vec::Vec<f32>,
@@ -3448,6 +3488,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<f32>> for MsgSimpleField13 {
+        fn from(value: ::std::vec::Vec<f32>) -> Self {
+            Self {
+                float_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField21 {
         pub bytes_unlabeled: ::std::borrow::Cow<'static, [u8]>,
@@ -3603,6 +3651,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::borrow::Cow<'static, [u8]>> for MsgSimpleField21 {
+        fn from(value: ::std::borrow::Cow<'static, [u8]>) -> Self {
+            Self {
+                bytes_unlabeled: value,
+            }
         }
     }
 
@@ -3767,6 +3823,16 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<::std::borrow::Cow<'static, [u8]>>>
+        for MsgSimpleField22
+    {
+        fn from(value: ::std::option::Option<::std::borrow::Cow<'static, [u8]>>) -> Self {
+            Self {
+                bytes_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField23 {
         pub bytes_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, [u8]>>,
@@ -3928,6 +3994,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<::std::borrow::Cow<'static, [u8]>>> for MsgSimpleField23 {
+        fn from(value: ::std::vec::Vec<::std::borrow::Cow<'static, [u8]>>) -> Self {
+            Self {
+                bytes_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField31 {
         pub string_unlabeled: ::std::borrow::Cow<'static, str>,
@@ -4083,6 +4157,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::borrow::Cow<'static, str>> for MsgSimpleField31 {
+        fn from(value: ::std::borrow::Cow<'static, str>) -> Self {
+            Self {
+                string_unlabeled: value,
+            }
         }
     }
 
@@ -4247,6 +4329,16 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<::std::borrow::Cow<'static, str>>>
+        for MsgSimpleField32
+    {
+        fn from(value: ::std::option::Option<::std::borrow::Cow<'static, str>>) -> Self {
+            Self {
+                string_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField33 {
         pub string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
@@ -4408,6 +4500,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<::std::borrow::Cow<'static, str>>> for MsgSimpleField33 {
+        fn from(value: ::std::vec::Vec<::std::borrow::Cow<'static, str>>) -> Self {
+            Self {
+                string_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField41 {
         pub enum_unlabeled: self::_puroro_root::full_coverage3::Enum,
@@ -4562,6 +4662,14 @@ pub mod _puroro_impls {
                 ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
             >::ser_field(&self.enum_unlabeled, 41, out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<self::_puroro_root::full_coverage3::Enum> for MsgSimpleField41 {
+        fn from(value: self::_puroro_root::full_coverage3::Enum) -> Self {
+            Self {
+                enum_unlabeled: value,
+            }
         }
     }
 
@@ -4725,6 +4833,16 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<self::_puroro_root::full_coverage3::Enum>>
+        for MsgSimpleField42
+    {
+        fn from(value: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>) -> Self {
+            Self {
+                enum_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField43 {
         pub enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,
@@ -4880,6 +4998,16 @@ pub mod _puroro_impls {
                 ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
             >::ser_field(&self.enum_repeated, 43, out)?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>>
+        for MsgSimpleField43
+    {
+        fn from(value: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>) -> Self {
+            Self {
+                enum_repeated: value,
+            }
         }
     }
 
@@ -5042,6 +5170,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>> for MsgSimpleField51 {
+    fn from(value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>) -> Self {
+        Self {
+            submsg_unlabeled: value,
+        }
+    }
+}
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField52 {
     pub submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
@@ -5200,6 +5336,14 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+
+    impl ::std::convert::From<::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>> for MsgSimpleField52 {
+    fn from(value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>) -> Self {
+        Self {
+            submsg_optional: value,
+        }
+    }
+}
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField53 {
@@ -5361,6 +5505,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>> for MsgSimpleField53 {
+    fn from(value: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>) -> Self {
+        Self {
+            submsg_repeated: value,
+        }
+    }
+}
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField101 {
         pub i64_unlabeled: i64,
@@ -5516,6 +5668,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<i64> for MsgSimpleField101 {
+        fn from(value: i64) -> Self {
+            Self {
+                i64_unlabeled: value,
+            }
         }
     }
 
@@ -5680,6 +5840,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<i64>> for MsgSimpleField102 {
+        fn from(value: ::std::option::Option<i64>) -> Self {
+            Self {
+                i64_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField103 {
         pub i64_repeated: ::std::vec::Vec<i64>,
@@ -5838,6 +6006,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<i64>> for MsgSimpleField103 {
+        fn from(value: ::std::vec::Vec<i64>) -> Self {
+            Self {
+                i64_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField111 {
         pub u32_unlabeled: u32,
@@ -5993,6 +6169,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<u32> for MsgSimpleField111 {
+        fn from(value: u32) -> Self {
+            Self {
+                u32_unlabeled: value,
+            }
         }
     }
 
@@ -6157,6 +6341,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<u32>> for MsgSimpleField112 {
+        fn from(value: ::std::option::Option<u32>) -> Self {
+            Self {
+                u32_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField113 {
         pub u32_repeated: ::std::vec::Vec<u32>,
@@ -6315,6 +6507,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<u32>> for MsgSimpleField113 {
+        fn from(value: ::std::vec::Vec<u32>) -> Self {
+            Self {
+                u32_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField121 {
         pub u64_unlabeled: u64,
@@ -6470,6 +6670,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<u64> for MsgSimpleField121 {
+        fn from(value: u64) -> Self {
+            Self {
+                u64_unlabeled: value,
+            }
         }
     }
 
@@ -6634,6 +6842,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<u64>> for MsgSimpleField122 {
+        fn from(value: ::std::option::Option<u64>) -> Self {
+            Self {
+                u64_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField123 {
         pub u64_repeated: ::std::vec::Vec<u64>,
@@ -6792,6 +7008,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<u64>> for MsgSimpleField123 {
+        fn from(value: ::std::vec::Vec<u64>) -> Self {
+            Self {
+                u64_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField131 {
         pub s32_unlabeled: i32,
@@ -6947,6 +7171,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<i32> for MsgSimpleField131 {
+        fn from(value: i32) -> Self {
+            Self {
+                s32_unlabeled: value,
+            }
         }
     }
 
@@ -7111,6 +7343,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<i32>> for MsgSimpleField132 {
+        fn from(value: ::std::option::Option<i32>) -> Self {
+            Self {
+                s32_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField133 {
         pub s32_repeated: ::std::vec::Vec<i32>,
@@ -7269,6 +7509,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<i32>> for MsgSimpleField133 {
+        fn from(value: ::std::vec::Vec<i32>) -> Self {
+            Self {
+                s32_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField141 {
         pub s64_unlabeled: i64,
@@ -7424,6 +7672,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<i64> for MsgSimpleField141 {
+        fn from(value: i64) -> Self {
+            Self {
+                s64_unlabeled: value,
+            }
         }
     }
 
@@ -7588,6 +7844,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<i64>> for MsgSimpleField142 {
+        fn from(value: ::std::option::Option<i64>) -> Self {
+            Self {
+                s64_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField143 {
         pub s64_repeated: ::std::vec::Vec<i64>,
@@ -7746,6 +8010,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<i64>> for MsgSimpleField143 {
+        fn from(value: ::std::vec::Vec<i64>) -> Self {
+            Self {
+                s64_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField151 {
         pub fixed32_unlabeled: u32,
@@ -7901,6 +8173,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<u32> for MsgSimpleField151 {
+        fn from(value: u32) -> Self {
+            Self {
+                fixed32_unlabeled: value,
+            }
         }
     }
 
@@ -8065,6 +8345,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<u32>> for MsgSimpleField152 {
+        fn from(value: ::std::option::Option<u32>) -> Self {
+            Self {
+                fixed32_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField153 {
         pub fixed32_repeated: ::std::vec::Vec<u32>,
@@ -8223,6 +8511,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<u32>> for MsgSimpleField153 {
+        fn from(value: ::std::vec::Vec<u32>) -> Self {
+            Self {
+                fixed32_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField161 {
         pub fixed64_unlabeled: u64,
@@ -8378,6 +8674,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<u64> for MsgSimpleField161 {
+        fn from(value: u64) -> Self {
+            Self {
+                fixed64_unlabeled: value,
+            }
         }
     }
 
@@ -8542,6 +8846,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<u64>> for MsgSimpleField162 {
+        fn from(value: ::std::option::Option<u64>) -> Self {
+            Self {
+                fixed64_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField163 {
         pub fixed64_repeated: ::std::vec::Vec<u64>,
@@ -8700,6 +9012,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<u64>> for MsgSimpleField163 {
+        fn from(value: ::std::vec::Vec<u64>) -> Self {
+            Self {
+                fixed64_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField171 {
         pub sfixed32_unlabeled: i32,
@@ -8855,6 +9175,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<i32> for MsgSimpleField171 {
+        fn from(value: i32) -> Self {
+            Self {
+                sfixed32_unlabeled: value,
+            }
         }
     }
 
@@ -9019,6 +9347,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<i32>> for MsgSimpleField172 {
+        fn from(value: ::std::option::Option<i32>) -> Self {
+            Self {
+                sfixed32_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField173 {
         pub sfixed32_repeated: ::std::vec::Vec<i32>,
@@ -9177,6 +9513,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<i32>> for MsgSimpleField173 {
+        fn from(value: ::std::vec::Vec<i32>) -> Self {
+            Self {
+                sfixed32_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField181 {
         pub sfixed64_unlabeled: i64,
@@ -9332,6 +9676,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<i64> for MsgSimpleField181 {
+        fn from(value: i64) -> Self {
+            Self {
+                sfixed64_unlabeled: value,
+            }
         }
     }
 
@@ -9496,6 +9848,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<i64>> for MsgSimpleField182 {
+        fn from(value: ::std::option::Option<i64>) -> Self {
+            Self {
+                sfixed64_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField183 {
         pub sfixed64_repeated: ::std::vec::Vec<i64>,
@@ -9654,6 +10014,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::vec::Vec<i64>> for MsgSimpleField183 {
+        fn from(value: ::std::vec::Vec<i64>) -> Self {
+            Self {
+                sfixed64_repeated: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField191 {
         pub f64_unlabeled: f64,
@@ -9809,6 +10177,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<f64> for MsgSimpleField191 {
+        fn from(value: f64) -> Self {
+            Self {
+                f64_unlabeled: value,
+            }
         }
     }
 
@@ -9973,6 +10349,14 @@ pub mod _puroro_impls {
         }
     }
 
+    impl ::std::convert::From<::std::option::Option<f64>> for MsgSimpleField192 {
+        fn from(value: ::std::option::Option<f64>) -> Self {
+            Self {
+                f64_optional: value,
+            }
+        }
+    }
+
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField193 {
         pub f64_repeated: ::std::vec::Vec<f64>,
@@ -10128,6 +10512,14 @@ pub mod _puroro_impls {
                 out,
             )?;
             ::std::result::Result::Ok(())
+        }
+    }
+
+    impl ::std::convert::From<::std::vec::Vec<f64>> for MsgSimpleField193 {
+        fn from(value: ::std::vec::Vec<f64>) -> Self {
+            Self {
+                f64_repeated: value,
+            }
         }
     }
     #[derive(
@@ -10328,110 +10720,271 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
-    pub struct MsgComposer<T>(T);
+    pub struct MsgBuilder<T>(T);
 
-    impl<T> MsgComposer<T>
+    impl<T> MsgBuilder<T>
     where
         T: MsgTrait,
     {
-        //pub fn with_i32_unlabeled(&self, value: i32)
+        pub fn append_i32_unlabeled(self, value: i32) -> MsgBuilder<(T, MsgSimpleField1)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_i32_optional(
+            self,
+            value: ::std::option::Option<i32>,
+        ) -> MsgBuilder<(T, MsgSimpleField2)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_i32_repeated(
+            self,
+            value: ::std::vec::Vec<i32>,
+        ) -> MsgBuilder<(T, MsgSimpleField3)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_float_unlabeled(self, value: f32) -> MsgBuilder<(T, MsgSimpleField11)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_float_optional(
+            self,
+            value: ::std::option::Option<f32>,
+        ) -> MsgBuilder<(T, MsgSimpleField12)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_float_repeated(
+            self,
+            value: ::std::vec::Vec<f32>,
+        ) -> MsgBuilder<(T, MsgSimpleField13)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_bytes_unlabeled(
+            self,
+            value: ::std::borrow::Cow<'static, [u8]>,
+        ) -> MsgBuilder<(T, MsgSimpleField21)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_bytes_optional(
+            self,
+            value: ::std::option::Option<::std::borrow::Cow<'static, [u8]>>,
+        ) -> MsgBuilder<(T, MsgSimpleField22)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_bytes_repeated(
+            self,
+            value: ::std::vec::Vec<::std::borrow::Cow<'static, [u8]>>,
+        ) -> MsgBuilder<(T, MsgSimpleField23)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_string_unlabeled(
+            self,
+            value: ::std::borrow::Cow<'static, str>,
+        ) -> MsgBuilder<(T, MsgSimpleField31)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_string_optional(
+            self,
+            value: ::std::option::Option<::std::borrow::Cow<'static, str>>,
+        ) -> MsgBuilder<(T, MsgSimpleField32)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_string_repeated(
+            self,
+            value: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
+        ) -> MsgBuilder<(T, MsgSimpleField33)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_enum_unlabeled(
+            self,
+            value: self::_puroro_root::full_coverage3::Enum,
+        ) -> MsgBuilder<(T, MsgSimpleField41)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_enum_optional(
+            self,
+            value: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,
+        ) -> MsgBuilder<(T, MsgSimpleField42)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_enum_repeated(
+            self,
+            value: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,
+        ) -> MsgBuilder<(T, MsgSimpleField43)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_submsg_unlabeled(
+            self,
+            value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
+        ) -> MsgBuilder<(T, MsgSimpleField51)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_submsg_optional(
+            self,
+            value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
+        ) -> MsgBuilder<(T, MsgSimpleField52)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_submsg_repeated(
+            self,
+            value: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>,
+        ) -> MsgBuilder<(T, MsgSimpleField53)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_i64_unlabeled(self, value: i64) -> MsgBuilder<(T, MsgSimpleField101)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_i64_optional(
+            self,
+            value: ::std::option::Option<i64>,
+        ) -> MsgBuilder<(T, MsgSimpleField102)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_i64_repeated(
+            self,
+            value: ::std::vec::Vec<i64>,
+        ) -> MsgBuilder<(T, MsgSimpleField103)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_u32_unlabeled(self, value: u32) -> MsgBuilder<(T, MsgSimpleField111)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_u32_optional(
+            self,
+            value: ::std::option::Option<u32>,
+        ) -> MsgBuilder<(T, MsgSimpleField112)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_u32_repeated(
+            self,
+            value: ::std::vec::Vec<u32>,
+        ) -> MsgBuilder<(T, MsgSimpleField113)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_u64_unlabeled(self, value: u64) -> MsgBuilder<(T, MsgSimpleField121)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_u64_optional(
+            self,
+            value: ::std::option::Option<u64>,
+        ) -> MsgBuilder<(T, MsgSimpleField122)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_u64_repeated(
+            self,
+            value: ::std::vec::Vec<u64>,
+        ) -> MsgBuilder<(T, MsgSimpleField123)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_s32_unlabeled(self, value: i32) -> MsgBuilder<(T, MsgSimpleField131)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_s32_optional(
+            self,
+            value: ::std::option::Option<i32>,
+        ) -> MsgBuilder<(T, MsgSimpleField132)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_s32_repeated(
+            self,
+            value: ::std::vec::Vec<i32>,
+        ) -> MsgBuilder<(T, MsgSimpleField133)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_s64_unlabeled(self, value: i64) -> MsgBuilder<(T, MsgSimpleField141)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_s64_optional(
+            self,
+            value: ::std::option::Option<i64>,
+        ) -> MsgBuilder<(T, MsgSimpleField142)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_s64_repeated(
+            self,
+            value: ::std::vec::Vec<i64>,
+        ) -> MsgBuilder<(T, MsgSimpleField143)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_fixed32_unlabeled(self, value: u32) -> MsgBuilder<(T, MsgSimpleField151)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_fixed32_optional(
+            self,
+            value: ::std::option::Option<u32>,
+        ) -> MsgBuilder<(T, MsgSimpleField152)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_fixed32_repeated(
+            self,
+            value: ::std::vec::Vec<u32>,
+        ) -> MsgBuilder<(T, MsgSimpleField153)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_fixed64_unlabeled(self, value: u64) -> MsgBuilder<(T, MsgSimpleField161)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_fixed64_optional(
+            self,
+            value: ::std::option::Option<u64>,
+        ) -> MsgBuilder<(T, MsgSimpleField162)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_fixed64_repeated(
+            self,
+            value: ::std::vec::Vec<u64>,
+        ) -> MsgBuilder<(T, MsgSimpleField163)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_sfixed32_unlabeled(self, value: i32) -> MsgBuilder<(T, MsgSimpleField171)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_sfixed32_optional(
+            self,
+            value: ::std::option::Option<i32>,
+        ) -> MsgBuilder<(T, MsgSimpleField172)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_sfixed32_repeated(
+            self,
+            value: ::std::vec::Vec<i32>,
+        ) -> MsgBuilder<(T, MsgSimpleField173)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_sfixed64_unlabeled(self, value: i64) -> MsgBuilder<(T, MsgSimpleField181)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_sfixed64_optional(
+            self,
+            value: ::std::option::Option<i64>,
+        ) -> MsgBuilder<(T, MsgSimpleField182)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_sfixed64_repeated(
+            self,
+            value: ::std::vec::Vec<i64>,
+        ) -> MsgBuilder<(T, MsgSimpleField183)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_f64_unlabeled(self, value: f64) -> MsgBuilder<(T, MsgSimpleField191)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_f64_optional(
+            self,
+            value: ::std::option::Option<f64>,
+        ) -> MsgBuilder<(T, MsgSimpleField192)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
+        pub fn append_f64_repeated(
+            self,
+            value: ::std::vec::Vec<f64>,
+        ) -> MsgBuilder<(T, MsgSimpleField193)> {
+            MsgBuilder((self.0, ::std::convert::From::from(value)))
+        }
 
-        //pub fn with_i32_optional(&self, value: ::std::option::Option<i32>)
-
-        //pub fn with_i32_repeated(&self, value: ::std::vec::Vec<i32>)
-
-        //pub fn with_float_unlabeled(&self, value: f32)
-
-        //pub fn with_float_optional(&self, value: ::std::option::Option<f32>)
-
-        //pub fn with_float_repeated(&self, value: ::std::vec::Vec<f32>)
-
-        //pub fn with_bytes_unlabeled(&self, value: ::std::borrow::Cow<'static, [u8]>)
-
-        //pub fn with_bytes_optional(&self, value: ::std::option::Option<::std::borrow::Cow<'static, [u8]>>)
-
-        //pub fn with_bytes_repeated(&self, value: ::std::vec::Vec<::std::borrow::Cow<'static, [u8]>>)
-
-        //pub fn with_string_unlabeled(&self, value: ::std::borrow::Cow<'static, str>)
-
-        //pub fn with_string_optional(&self, value: ::std::option::Option<::std::borrow::Cow<'static, str>>)
-
-        //pub fn with_string_repeated(&self, value: ::std::vec::Vec<::std::borrow::Cow<'static, str>>)
-
-        //pub fn with_enum_unlabeled(&self, value: self::_puroro_root::full_coverage3::Enum)
-
-        //pub fn with_enum_optional(&self, value: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>)
-
-        //pub fn with_enum_repeated(&self, value: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>)
-
-        //pub fn with_submsg_unlabeled(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>)
-
-        //pub fn with_submsg_optional(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>)
-
-        //pub fn with_submsg_repeated(&self, value: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>)
-
-        //pub fn with_i64_unlabeled(&self, value: i64)
-
-        //pub fn with_i64_optional(&self, value: ::std::option::Option<i64>)
-
-        //pub fn with_i64_repeated(&self, value: ::std::vec::Vec<i64>)
-
-        //pub fn with_u32_unlabeled(&self, value: u32)
-
-        //pub fn with_u32_optional(&self, value: ::std::option::Option<u32>)
-
-        //pub fn with_u32_repeated(&self, value: ::std::vec::Vec<u32>)
-
-        //pub fn with_u64_unlabeled(&self, value: u64)
-
-        //pub fn with_u64_optional(&self, value: ::std::option::Option<u64>)
-
-        //pub fn with_u64_repeated(&self, value: ::std::vec::Vec<u64>)
-
-        //pub fn with_s32_unlabeled(&self, value: i32)
-
-        //pub fn with_s32_optional(&self, value: ::std::option::Option<i32>)
-
-        //pub fn with_s32_repeated(&self, value: ::std::vec::Vec<i32>)
-
-        //pub fn with_s64_unlabeled(&self, value: i64)
-
-        //pub fn with_s64_optional(&self, value: ::std::option::Option<i64>)
-
-        //pub fn with_s64_repeated(&self, value: ::std::vec::Vec<i64>)
-
-        //pub fn with_fixed32_unlabeled(&self, value: u32)
-
-        //pub fn with_fixed32_optional(&self, value: ::std::option::Option<u32>)
-
-        //pub fn with_fixed32_repeated(&self, value: ::std::vec::Vec<u32>)
-
-        //pub fn with_fixed64_unlabeled(&self, value: u64)
-
-        //pub fn with_fixed64_optional(&self, value: ::std::option::Option<u64>)
-
-        //pub fn with_fixed64_repeated(&self, value: ::std::vec::Vec<u64>)
-
-        //pub fn with_sfixed32_unlabeled(&self, value: i32)
-
-        //pub fn with_sfixed32_optional(&self, value: ::std::option::Option<i32>)
-
-        //pub fn with_sfixed32_repeated(&self, value: ::std::vec::Vec<i32>)
-
-        //pub fn with_sfixed64_unlabeled(&self, value: i64)
-
-        //pub fn with_sfixed64_optional(&self, value: ::std::option::Option<i64>)
-
-        //pub fn with_sfixed64_repeated(&self, value: ::std::vec::Vec<i64>)
-
-        //pub fn with_f64_unlabeled(&self, value: f64)
-
-        //pub fn with_f64_optional(&self, value: ::std::option::Option<f64>)
-
-        //pub fn with_f64_repeated(&self, value: ::std::vec::Vec<f64>)
+        pub fn build(self) -> T {
+            self.0
+        }
     }
 
-    impl MsgComposer<()> {
+    impl MsgBuilder<()> {
         pub fn new() -> Self {
             Self(())
         }
@@ -11006,6 +11559,14 @@ pub mod _puroro_nested {
                     ::std::result::Result::Ok(())
                 }
             }
+
+            impl ::std::convert::From<i32> for SubmsgSimpleField1 {
+                fn from(value: i32) -> Self {
+                    Self {
+                        i32_unlabeled: value,
+                    }
+                }
+            }
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
@@ -11020,16 +11581,25 @@ pub mod _puroro_nested {
                     unimplemented!("Please don't use / instantiate this struct!!")
                 }
             }
-            pub struct SubmsgComposer<T>(T);
+            pub struct SubmsgBuilder<T>(T);
 
-            impl<T> SubmsgComposer<T>
+            impl<T> SubmsgBuilder<T>
             where
                 T: SubmsgTrait,
             {
-                //pub fn with_i32_unlabeled(&self, value: i32)
+                pub fn append_i32_unlabeled(
+                    self,
+                    value: i32,
+                ) -> SubmsgBuilder<(T, SubmsgSimpleField1)> {
+                    SubmsgBuilder((self.0, ::std::convert::From::from(value)))
+                }
+
+                pub fn build(self) -> T {
+                    self.0
+                }
             }
 
-            impl SubmsgComposer<()> {
+            impl SubmsgBuilder<()> {
                 pub fn new() -> Self {
                     Self(())
                 }
