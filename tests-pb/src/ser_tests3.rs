@@ -460,25 +460,19 @@ pub mod _puroro_impls {
                 <U as MsgTrait>::string_repeated(&self.1),
             )
         }
-        type Field7MessageType<'this> = ::puroro::Either<
-            ::puroro::Either<
-                <T as MsgTrait>::Field7MessageType<'this>,
-                <U as MsgTrait>::Field7MessageType<'this>,
-            >,
-            (
-                <T as MsgTrait>::Field7MessageType<'this>,
-                <U as MsgTrait>::Field7MessageType<'this>,
-            ),
-        >;
+        type Field7MessageType<'this> = (
+            ::std::option::Option<<T as MsgTrait>::Field7MessageType<'this>>,
+            ::std::option::Option<<U as MsgTrait>::Field7MessageType<'this>>,
+        );
         fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field7MessageType<'this>> {
             match (
                 <T as MsgTrait>::submsg_unlabeled(&self.0),
                 <U as MsgTrait>::submsg_unlabeled(&self.1),
             ) {
                 (None, None) => None,
-                (Some(t), None) => Some(::puroro::Either::Left(::puroro::Either::Left(t))),
-                (None, Some(u)) => Some(::puroro::Either::Left(::puroro::Either::Right(u))),
-                (Some(t), Some(u)) => Some(::puroro::Either::Right((t, u))),
+                (Some(t), None) => Some((Some(t), None)),
+                (None, Some(u)) => Some((None, Some(u))),
+                (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
         type Field8MessageType<'this> = ::puroro::Either<

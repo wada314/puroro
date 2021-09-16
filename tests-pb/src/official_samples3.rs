@@ -451,22 +451,16 @@ pub mod _puroro_impls {
         T: Test3Trait,
         U: Test3Trait,
     {
-        type Field3MessageType<'this> = ::puroro::Either<
-            ::puroro::Either<
-                <T as Test3Trait>::Field3MessageType<'this>,
-                <U as Test3Trait>::Field3MessageType<'this>,
-            >,
-            (
-                <T as Test3Trait>::Field3MessageType<'this>,
-                <U as Test3Trait>::Field3MessageType<'this>,
-            ),
-        >;
+        type Field3MessageType<'this> = (
+            ::std::option::Option<<T as Test3Trait>::Field3MessageType<'this>>,
+            ::std::option::Option<<U as Test3Trait>::Field3MessageType<'this>>,
+        );
         fn c<'this>(&'this self) -> Option<Self::Field3MessageType<'this>> {
             match (<T as Test3Trait>::c(&self.0), <U as Test3Trait>::c(&self.1)) {
                 (None, None) => None,
-                (Some(t), None) => Some(::puroro::Either::Left(::puroro::Either::Left(t))),
-                (None, Some(u)) => Some(::puroro::Either::Left(::puroro::Either::Right(u))),
-                (Some(t), Some(u)) => Some(::puroro::Either::Right((t, u))),
+                (Some(t), None) => Some((Some(t), None)),
+                (None, Some(u)) => Some((None, Some(u))),
+                (Some(t), Some(u)) => Some((Some(t), Some(u))),
             }
         }
     }

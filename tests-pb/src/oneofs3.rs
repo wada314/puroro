@@ -336,16 +336,10 @@ pub mod _puroro_impls {
             <T as MsgTrait>::Field4StringType<'this>,
             <U as MsgTrait>::Field4StringType<'this>,
         >;
-        type Field5MessageType<'this> = ::puroro::Either<
-            ::puroro::Either<
-                <T as MsgTrait>::Field5MessageType<'this>,
-                <U as MsgTrait>::Field5MessageType<'this>,
-            >,
-            (
-                <T as MsgTrait>::Field5MessageType<'this>,
-                <U as MsgTrait>::Field5MessageType<'this>,
-            ),
-        >;
+        type Field5MessageType<'this> = (
+            ::std::option::Option<<T as MsgTrait>::Field5MessageType<'this>>,
+            ::std::option::Option<<U as MsgTrait>::Field5MessageType<'this>>,
+        );
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
@@ -377,18 +371,14 @@ pub mod _puroro_impls {
                     E::G2String(::puroro::Either::Right(right))
                 }
                 (Some(E::G2Submsg(left)), Some(E::G2Submsg(right))) => {
-                    E::G2Submsg(::puroro::Either::Right((left, right)))
+                    E::G2Submsg((Some(left), Some(right)))
                 }
                 (_, Some(E::G2F32(right))) => E::G2F32(right),
                 (_, Some(E::G2String(right))) => E::G2String(::puroro::Either::Right(right)),
-                (_, Some(E::G2Submsg(right))) => {
-                    E::G2Submsg(::puroro::Either::Left(::puroro::Either::Right(right)))
-                }
+                (_, Some(E::G2Submsg(right))) => E::G2Submsg((None, Some(right))),
                 (Some(E::G2F32(left)), None) => E::G2F32(left),
                 (Some(E::G2String(left)), None) => E::G2String(::puroro::Either::Left(left)),
-                (Some(E::G2Submsg(left)), None) => {
-                    E::G2Submsg(::puroro::Either::Left(::puroro::Either::Left(left)))
-                }
+                (Some(E::G2Submsg(left)), None) => E::G2Submsg((Some(left), None)),
             })
         }
         fn group_three<'this>(

@@ -9,16 +9,10 @@ type Field{{ f.number }}MessageType<'this> = ::puroro::Either<
 {%- else %}
 {#- For non-repeated message field, the message is `T` and `U` merged type. -#}
 {#- There are 3+1 cases: `T` and `U` both exist, only `T`, only `U`, (and none of them). -#}
-type Field{{ f.number }}MessageType<'this> = ::puroro::Either<
-    ::puroro::Either<
-        <T as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
-        <U as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
-    >,
-    (
-        <T as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
-        <U as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>,
-    )
->;
+type Field{{ f.number }}MessageType<'this> = (
+    ::std::option::Option<<T as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>>,
+    ::std::option::Option<<U as {{ m.trait_ident }}>::Field{{ f.number }}MessageType<'this>>,
+);
 {%- endif %}
 {%- else %}
 {%- endmatch %}
@@ -67,9 +61,9 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
         <U as {{ m.trait_ident }}>::{{ f.ident }}(&self.1)
     ) {
         (None, None) => None,
-        (Some(t), None) => Some(::puroro::Either::Left(::puroro::Either::Left(t))),
-        (None, Some(u)) => Some(::puroro::Either::Left(::puroro::Either::Right(u))),
-        (Some(t), Some(u)) => Some(::puroro::Either::Right((t, u))),
+        (Some(t), None) => Some((Some(t), None)),
+        (None, Some(u)) => Some((None, Some(u))),
+        (Some(t), Some(u)) => Some((Some(t), Some(u))),
     }
     {%- else %}
     if let Some(right) = <U as {{ m.trait_ident }}>::{{ f.ident }}(&self.1) {
