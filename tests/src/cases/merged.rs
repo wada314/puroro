@@ -154,8 +154,16 @@ fn test_get_oneof_field() {
         group_two: Some(GroupTwo::G2F32(3.0)),
         ..Default::default()
     };
+    let msg_7 = Msg {
+        group_two: Some(GroupTwo::G2F32(7.0)),
+        ..Default::default()
+    };
     let msg_test = Msg {
         group_two: Some(GroupTwo::G2String(Cow::Borrowed("Test"))),
+        ..Default::default()
+    };
+    let msg_test2 = Msg {
+        group_two: Some(GroupTwo::G2String(Cow::Borrowed("Test2"))),
         ..Default::default()
     };
     let msg_submsg_0 = Msg {
@@ -172,21 +180,18 @@ fn test_get_oneof_field() {
         }))),
         ..Default::default()
     };
+    // None x None
     assert_eq!(None, (&none, &none).group_two());
-    assert_eq!(None, (&none, &none).g2_f32());
-    assert_eq!(None, (&none, &none).g2_string());
-    assert_eq!(None, (&none, &none).g2_submsg());
 
-    assert_eq!(Some(GroupTwo::G2F32(3.0)), (&msg_3, &none).group_two());
-    assert_eq!(Some(3.0), (&msg_3, &none).g2_f32());
-    assert_eq!(None, (&msg_3, &none).g2_string());
-    assert_eq!(None, (&msg_3, &none).g2_submsg());
-
-    assert_eq!(Some(GroupTwo::G2F32(3.0)), (&none, &msg_3).group_two());
-    assert_eq!(Some(3.0), (&none, &msg_3).g2_f32());
-    assert_eq!(None, (&none, &msg_3).g2_string());
-    assert_eq!(None, (&none, &msg_3).g2_submsg());
-
+    // None x Some
+    assert_eq!(
+        Some(3.0),
+        (&msg_3, &none).group_two().and_then(|o| o.g2_f32())
+    );
+    assert_eq!(
+        Some(3.0),
+        (&none, &msg_3).group_two().and_then(|o| o.g2_f32())
+    );
     assert_eq!(
         Some("Test"),
         (&msg_test, &none)
@@ -194,7 +199,84 @@ fn test_get_oneof_field() {
             .and_then(|o| o.g2_string())
             .as_deref()
     );
-    assert_eq!(None, (&msg_test, &none).g2_f32());
-    assert_eq!(Some("Test"), (&msg_test, &none).g2_string().as_deref());
-    assert_eq!(None, (&msg_test, &none).g2_submsg());
+    assert_eq!(
+        Some("Test"),
+        (&none, &msg_test)
+            .group_two()
+            .and_then(|o| o.g2_string())
+            .as_deref()
+    );
+    assert_eq!(
+        Some(3),
+        (&msg_submsg_3, &none)
+            .group_two()
+            .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
+    );
+    assert_eq!(
+        Some(3),
+        (&none, &msg_submsg_3)
+            .group_two()
+            .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
+    );
+
+    // Some x Some, same types
+    assert_eq!(
+        Some(7.0),
+        (&msg_3, &msg_7).group_two().and_then(|o| o.g2_f32())
+    );
+    assert_eq!(
+        Some("Test2"),
+        (&msg_test, &msg_test2)
+            .group_two()
+            .and_then(|o| o.g2_string())
+            .as_deref()
+    );
+    assert_eq!(
+        Some(3),
+        (&msg_submsg_0, &msg_submsg_3)
+            .group_two()
+            .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
+    );
+    assert_eq!(
+        Some(3),
+        (&msg_submsg_3, &msg_submsg_0)
+            .group_two()
+            .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
+    );
+
+    // Some x Some, different types
+    assert_eq!(
+        Some("Test"),
+        (&msg_3, &msg_test)
+            .group_two()
+            .and_then(|o| o.g2_string())
+            .as_deref()
+    );
+    assert_eq!(
+        Some(0),
+        (&msg_3, &msg_submsg_0)
+            .group_two()
+            .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
+    );
+    assert_eq!(
+        Some(3.0),
+        (&msg_test, &msg_3).group_two().and_then(|o| o.g2_f32())
+    );
+    assert_eq!(
+        Some(0),
+        (&msg_test, &msg_submsg_0)
+            .group_two()
+            .and_then(|o| o.g2_submsg().map(|submsg| submsg.i32_unlabeled()))
+    );
+    assert_eq!(
+        Some(7.0),
+        (&msg_submsg_3, &msg_7).group_two().and_then(|o| o.g2_f32())
+    );
+    assert_eq!(
+        Some("Test"),
+        (&msg_submsg_3, &msg_test)
+            .group_two()
+            .and_then(|o| o.g2_string())
+            .as_deref()
+    );
 }
