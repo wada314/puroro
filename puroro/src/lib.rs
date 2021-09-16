@@ -18,10 +18,7 @@ pub use self::error::{ErrorKind, PuroroError};
 pub type Result<T> = ::std::result::Result<T, PuroroError>;
 
 // Re-exports
-#[cfg(feature = "puroro-bumpalo")]
-pub use ::bumpalo;
 pub use ::either::Either;
-pub use ::hashbrown;
 pub use ::once_cell;
 
 pub trait Message<M>
