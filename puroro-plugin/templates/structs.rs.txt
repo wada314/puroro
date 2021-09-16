@@ -1,6 +1,7 @@
+
+pub use _puroro_impls::*;
 {%- for m in messages %}
 pub use _puroro_impls::{{ m.simple_ident }} as {{ m.ident }};
-pub use _puroro_impls::*;
 {%- endfor %}
 pub mod _puroro_impls {
     mod _puroro_root {
