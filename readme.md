@@ -6,11 +6,11 @@ This library is under development and it is very possible to make breaking chang
 - proto2
     - [ ] Groups, at least correctly ignore it (where's document!?)
     - [x] Enums (In proto2 we need to refuse the unknown value)
-    - [ ] default
+    - [ ] default value (which is set like `optional int32 foo = 1; [default=10]`)
     - [ ] extensions
 - proto2 & 3
     - [ ] Maps
-    - [ ] OneOfs
+    - [x] OneOfs
         - [x] Type definitions
         - [x] serialize / deserialize
     - [ ] Anys, and other well-known types
@@ -34,12 +34,12 @@ This library is under development and it is very possible to make breaking chang
         - [ ] Bumpalo -- Use Bumpalo for `Vec` and `String` allocation
         - [ ] SliceView -- A viewer over a `&[u8]` slice
         - [x] Empty(Unit) -- `()`, which only returns default values
-        - [x] SingleField -- Similar with the simple implementation, though has only 1 field and others are same with `()`. Might be useful to make a minimum memory size struct when combined with `(T, U)` message types.
-            - [ ] oneof field support
-            - [ ] Builder pattern?
-        - [ ] Append (name TBD) -- A thin wrapper over other impls, just overriding few fields using `with_myfield()` method
         - [x] Merged -- `(T, U)`
         - [x] Either -- `::itertools::Either<T, U>`
+        - [x] Option -- `Some<T>`
+        - [x] SingleField -- Similar with the simple implementation, though has only 1 field and others are same with `()`. Might be useful to make a minimum memory size struct when combined with `(T, U)` message types.
+            - [ ] oneof field support
+            - [x] Builder
     - [ ] Support the `allocator_api`. Waiting for the `String` support
     - [ ] RPCs / services
     - [ ] Deserializer vulnerbility: Need to limit the recursion depth
