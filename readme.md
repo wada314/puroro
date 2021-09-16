@@ -1,12 +1,12 @@
 # puroro, a protocol buffer implementation for rust
 
-This library is under development and it is very possible to make breaking changes in very near future.
+This library is under development and it is very possible to make breaking changes.
 
 ## TODOs
 - proto2
     - [ ] Groups, at least correctly ignore it (where's document!?)
     - [x] Enums (In proto2 we need to refuse the unknown value)
-    - [ ] default value (which is set like `optional int32 foo = 1; [default=10]`)
+    - [ ] default value (something like `optional int32 foo = 1; [default=10]`)
     - [ ] extensions
 - proto2 & 3
     - [ ] Maps
@@ -48,15 +48,16 @@ This library is under development and it is very possible to make breaking chang
 
 - puroro -- The crate that the library user need to import
 - puroro-plugin -- A protoc compiler plugin
+- tests -- Test cases
+- tests-pb -- Compiling .pb files used by tests crate
+- protobuf -- A git submodule of Google's official protobuf repository
+- protobuf-compiled -- Compiling .pb files in protobuf crate so that puroro-plugin crate can use it
 
 ## Sample command
 Keep in mind that protoc command not work properly with Windows path separator "\\". Use "/" instead.
-
-The below is a sample command for Windows OS.
-Please replace the ".exe" below into your OS's one.
 
 ```
 $ protoc <protofile-path> --plugin=protoc-gen-rust=./target/debug/puroro-plugin.exe --rust_out=<output-dir> --proto_path=<protofile-dir>
 ```
 
-`protobuf-pb/build.rs` is a sample build script.
+Check `protobuf-pb/build.rs` for a sample build script.
