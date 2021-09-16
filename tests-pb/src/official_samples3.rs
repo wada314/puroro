@@ -10,9 +10,6 @@ pub use _puroro_impls::Test2Simple as Test2;
 pub use _puroro_impls::Test3Simple as Test3;
 pub use _puroro_impls::Test4Simple as Test4;
 pub use _puroro_impls::*;
-pub use _puroro_impls::*;
-pub use _puroro_impls::*;
-pub use _puroro_impls::*;
 pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;

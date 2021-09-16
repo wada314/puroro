@@ -8,7 +8,6 @@ pub mod _puroro_root {
 pub use _puroro_impls::MsgSimple as Msg;
 pub use _puroro_impls::SubmsgSimple as Submsg;
 pub use _puroro_impls::*;
-pub use _puroro_impls::*;
 pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
