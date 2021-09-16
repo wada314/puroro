@@ -1,0 +1,15 @@
+pub struct {{ m.composer_ident }}<T>(T);
+
+impl<T> {{ m.composer_ident }}<T>
+where
+    T: {{ m.trait_ident }}
+{
+    {% for field in m.fields %}
+    //pub fn with_{{ field.ident }}(&self, value: {{ field.simple_field_type }})
+    {% endfor %}
+}
+
+impl {{ m.composer_ident }}<()>
+{
+    pub fn new() -> Self { Self(()) }
+}

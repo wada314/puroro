@@ -10328,6 +10328,114 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
+    pub struct MsgComposer<T>(T);
+
+    impl<T> MsgComposer<T>
+    where
+        T: MsgTrait,
+    {
+        //pub fn with_i32_unlabeled(&self, value: i32)
+
+        //pub fn with_i32_optional(&self, value: ::std::option::Option<i32>)
+
+        //pub fn with_i32_repeated(&self, value: ::std::vec::Vec<i32>)
+
+        //pub fn with_float_unlabeled(&self, value: f32)
+
+        //pub fn with_float_optional(&self, value: ::std::option::Option<f32>)
+
+        //pub fn with_float_repeated(&self, value: ::std::vec::Vec<f32>)
+
+        //pub fn with_bytes_unlabeled(&self, value: ::std::borrow::Cow<'static, [u8]>)
+
+        //pub fn with_bytes_optional(&self, value: ::std::option::Option<::std::borrow::Cow<'static, [u8]>>)
+
+        //pub fn with_bytes_repeated(&self, value: ::std::vec::Vec<::std::borrow::Cow<'static, [u8]>>)
+
+        //pub fn with_string_unlabeled(&self, value: ::std::borrow::Cow<'static, str>)
+
+        //pub fn with_string_optional(&self, value: ::std::option::Option<::std::borrow::Cow<'static, str>>)
+
+        //pub fn with_string_repeated(&self, value: ::std::vec::Vec<::std::borrow::Cow<'static, str>>)
+
+        //pub fn with_enum_unlabeled(&self, value: self::_puroro_root::full_coverage3::Enum)
+
+        //pub fn with_enum_optional(&self, value: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>)
+
+        //pub fn with_enum_repeated(&self, value: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>)
+
+        //pub fn with_submsg_unlabeled(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>)
+
+        //pub fn with_submsg_optional(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>)
+
+        //pub fn with_submsg_repeated(&self, value: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>)
+
+        //pub fn with_i64_unlabeled(&self, value: i64)
+
+        //pub fn with_i64_optional(&self, value: ::std::option::Option<i64>)
+
+        //pub fn with_i64_repeated(&self, value: ::std::vec::Vec<i64>)
+
+        //pub fn with_u32_unlabeled(&self, value: u32)
+
+        //pub fn with_u32_optional(&self, value: ::std::option::Option<u32>)
+
+        //pub fn with_u32_repeated(&self, value: ::std::vec::Vec<u32>)
+
+        //pub fn with_u64_unlabeled(&self, value: u64)
+
+        //pub fn with_u64_optional(&self, value: ::std::option::Option<u64>)
+
+        //pub fn with_u64_repeated(&self, value: ::std::vec::Vec<u64>)
+
+        //pub fn with_s32_unlabeled(&self, value: i32)
+
+        //pub fn with_s32_optional(&self, value: ::std::option::Option<i32>)
+
+        //pub fn with_s32_repeated(&self, value: ::std::vec::Vec<i32>)
+
+        //pub fn with_s64_unlabeled(&self, value: i64)
+
+        //pub fn with_s64_optional(&self, value: ::std::option::Option<i64>)
+
+        //pub fn with_s64_repeated(&self, value: ::std::vec::Vec<i64>)
+
+        //pub fn with_fixed32_unlabeled(&self, value: u32)
+
+        //pub fn with_fixed32_optional(&self, value: ::std::option::Option<u32>)
+
+        //pub fn with_fixed32_repeated(&self, value: ::std::vec::Vec<u32>)
+
+        //pub fn with_fixed64_unlabeled(&self, value: u64)
+
+        //pub fn with_fixed64_optional(&self, value: ::std::option::Option<u64>)
+
+        //pub fn with_fixed64_repeated(&self, value: ::std::vec::Vec<u64>)
+
+        //pub fn with_sfixed32_unlabeled(&self, value: i32)
+
+        //pub fn with_sfixed32_optional(&self, value: ::std::option::Option<i32>)
+
+        //pub fn with_sfixed32_repeated(&self, value: ::std::vec::Vec<i32>)
+
+        //pub fn with_sfixed64_unlabeled(&self, value: i64)
+
+        //pub fn with_sfixed64_optional(&self, value: ::std::option::Option<i64>)
+
+        //pub fn with_sfixed64_repeated(&self, value: ::std::vec::Vec<i64>)
+
+        //pub fn with_f64_unlabeled(&self, value: f64)
+
+        //pub fn with_f64_optional(&self, value: ::std::option::Option<f64>)
+
+        //pub fn with_f64_repeated(&self, value: ::std::vec::Vec<f64>)
+    }
+
+    impl MsgComposer<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -10910,6 +11018,20 @@ pub mod _puroro_nested {
             impl SubmsgTrait for SubmsgSimpleByValue {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     unimplemented!("Please don't use / instantiate this struct!!")
+                }
+            }
+            pub struct SubmsgComposer<T>(T);
+
+            impl<T> SubmsgComposer<T>
+            where
+                T: SubmsgTrait,
+            {
+                //pub fn with_i32_unlabeled(&self, value: i32)
+            }
+
+            impl SubmsgComposer<()> {
+                pub fn new() -> Self {
+                    Self(())
                 }
             }
         }

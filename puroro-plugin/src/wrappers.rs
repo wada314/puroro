@@ -727,8 +727,8 @@ impl Field {
             && !matches!(self.field_type(), Ok(FieldType::Message(_))))
     }
     pub fn has_scalar_optional_getter(&self) -> Result<bool> {
-        Ok(!self.is_non_synthetic_oneof_item()?
-            && match self.field_label() {
+        Ok(self.is_non_synthetic_oneof_item()?
+            || match self.field_label() {
                 Ok(FieldLabel::Optional | FieldLabel::Required) => true,
                 Ok(FieldLabel::Unlabeled) => matches!(self.field_type(), Ok(FieldType::Message(_))),
                 _ => false,

@@ -166,6 +166,20 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
+    pub struct Test1Composer<T>(T);
+
+    impl<T> Test1Composer<T>
+    where
+        T: Test1Trait,
+    {
+        //pub fn with_a(&self, value: ::std::option::Option<i32>)
+    }
+
+    impl Test1Composer<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -334,6 +348,20 @@ pub mod _puroro_impls {
         type Field2StringType<'this> = ::std::borrow::Cow<'this, str>;
         fn b<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
+        }
+    }
+    pub struct Test2Composer<T>(T);
+
+    impl<T> Test2Composer<T>
+    where
+        T: Test2Trait,
+    {
+        //pub fn with_b(&self, value: ::std::option::Option<::std::borrow::Cow<'static, str>>)
+    }
+
+    impl Test2Composer<()> {
+        pub fn new() -> Self {
+            Self(())
         }
     }
     #[derive(
@@ -521,6 +549,20 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
+    pub struct Test3Composer<T>(T);
+
+    impl<T> Test3Composer<T>
+    where
+        T: Test3Trait,
+    {
+        //pub fn with_c(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::official_samples2::_puroro_impls::Test1Simple>>)
+    }
+
+    impl Test3Composer<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -701,6 +743,20 @@ pub mod _puroro_impls {
         type Field4RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<i32>;
         fn d<'this>(&'this self) -> Self::Field4RepeatedType<'this> {
             unimplemented!("Please don't use / instantiate this struct!!")
+        }
+    }
+    pub struct Test4Composer<T>(T);
+
+    impl<T> Test4Composer<T>
+    where
+        T: Test4Trait,
+    {
+        //pub fn with_d(&self, value: ::std::vec::Vec<i32>)
+    }
+
+    impl Test4Composer<()> {
+        pub fn new() -> Self {
+            Self(())
         }
     }
 }

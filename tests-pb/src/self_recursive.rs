@@ -202,6 +202,20 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
+    pub struct MsgComposer<T>(T);
+
+    impl<T> MsgComposer<T>
+    where
+        T: MsgTrait,
+    {
+        //pub fn with_recursive_unlabeled(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::self_recursive::_puroro_impls::MsgSimple>>)
+    }
+
+    impl MsgComposer<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {

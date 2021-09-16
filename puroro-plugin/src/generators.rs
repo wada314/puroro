@@ -58,6 +58,7 @@ struct Message {
     simple_ident: String,
     simple_single_field_ident: String,
     simple_by_value_ident: String,
+    composer_ident: String,
 }
 
 impl Message {
@@ -100,6 +101,7 @@ impl Message {
             simple_ident: m.rust_impl_ident("Simple"),
             simple_single_field_ident: m.rust_impl_ident("SimpleField"),
             simple_by_value_ident: m.rust_impl_ident("SimpleByValue"),
+            composer_ident: m.rust_impl_ident("Composer"),
         })
     }
 }

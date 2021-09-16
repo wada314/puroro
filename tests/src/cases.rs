@@ -1,3 +1,4 @@
+mod composer;
 mod descriptors;
 mod either;
 mod empty;

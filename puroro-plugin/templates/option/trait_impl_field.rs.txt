@@ -30,7 +30,7 @@ fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }}
     {%- endif %}
 }
 {%- endif %}
-{%- if field.trait_has_optional_getter %}
+{%- if field.trait_has_optional_getter && !f.is_explicit_oneof_field %}
 fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
     self.as_ref().and_then(|msg| msg.{{ field.ident }}())
 }

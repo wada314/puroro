@@ -35,7 +35,7 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }}
 }
 {%- endif %}
 
-{%- if f.trait_has_optional_getter %}
+{%- if f.trait_has_optional_getter && !f.is_explicit_oneof_field %}
 fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
 {
     {%- if f.is_length_delimited %}

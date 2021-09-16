@@ -518,10 +518,28 @@ pub mod _puroro_impls {
     impl ::puroro::Message<MsgSimple> for MsgSimpleByValue {}
 
     impl MsgTrait for MsgSimpleByValue {
+        fn g1_int32<'this>(&'this self) -> Option<i32> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
         type Field2StringType<'this> = ::std::borrow::Cow<'this, str>;
+        fn g1_string<'this>(&'this self) -> Option<Self::Field2StringType<'this>> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        fn g2_f32<'this>(&'this self) -> Option<f32> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
         type Field4StringType<'this> = ::std::borrow::Cow<'this, str>;
+        fn g2_string<'this>(&'this self) -> Option<Self::Field4StringType<'this>> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
         type Field5MessageType<'this> =
             ::std::boxed::Box<self::_puroro_root::oneofs2::_puroro_impls::SubmsgSimple>;
+        fn g2_submsg<'this>(&'this self) -> Option<Self::Field5MessageType<'this>> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
+        fn g3_int32<'this>(&'this self) -> Option<i32> {
+            unimplemented!("Please don't use / instantiate this struct!!")
+        }
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
@@ -536,6 +554,30 @@ pub mod _puroro_impls {
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree> {
             unimplemented!("Please don't use / instantiate this struct!!")
+        }
+    }
+    pub struct MsgComposer<T>(T);
+
+    impl<T> MsgComposer<T>
+    where
+        T: MsgTrait,
+    {
+        //pub fn with_g1_int32(&self, value: ::std::option::Option<i32>)
+
+        //pub fn with_g1_string(&self, value: ::std::option::Option<::std::borrow::Cow<'static, str>>)
+
+        //pub fn with_g2_f32(&self, value: ::std::option::Option<f32>)
+
+        //pub fn with_g2_string(&self, value: ::std::option::Option<::std::borrow::Cow<'static, str>>)
+
+        //pub fn with_g2_submsg(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::oneofs2::_puroro_impls::SubmsgSimple>>)
+
+        //pub fn with_g3_int32(&self, value: ::std::option::Option<i32>)
+    }
+
+    impl MsgComposer<()> {
+        pub fn new() -> Self {
+            Self(())
         }
     }
     #[derive(
@@ -693,6 +735,20 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
+    pub struct SubmsgComposer<T>(T);
+
+    impl<T> SubmsgComposer<T>
+    where
+        T: SubmsgTrait,
+    {
+        //pub fn with_i32_optional(&self, value: ::std::option::Option<i32>)
+    }
+
+    impl SubmsgComposer<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -818,9 +874,33 @@ pub mod _puroro_traits {
 
     macro_rules! msg_delegate {
         ($ty:ty) => {
+            fn g1_int32<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).g1_int32()
+            }
             type Field2StringType<'this> = <$ty>::Field2StringType<'this>;
+            fn g1_string<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field2StringType<'this>> {
+                (**self).g1_string()
+            }
+            fn g2_f32<'this>(&'this self) -> ::std::option::Option<f32> {
+                (**self).g2_f32()
+            }
             type Field4StringType<'this> = <$ty>::Field4StringType<'this>;
+            fn g2_string<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field4StringType<'this>> {
+                (**self).g2_string()
+            }
             type Field5MessageType<'this> = <$ty>::Field5MessageType<'this>;
+            fn g2_submsg<'this>(
+                &'this self,
+            ) -> ::std::option::Option<Self::Field5MessageType<'this>> {
+                (**self).g2_submsg()
+            }
+            fn g3_int32<'this>(&'this self) -> ::std::option::Option<i32> {
+                (**self).g3_int32()
+            }
             fn group_one<'this>(
                 &'this self,
             ) -> ::std::option::Option<

@@ -676,6 +676,30 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
+    pub struct MsgComposer<T>(T);
+
+    impl<T> MsgComposer<T>
+    where
+        T: MsgTrait,
+    {
+        //pub fn with_i32_unlabeled(&self, value: i32)
+
+        //pub fn with_i32_optional(&self, value: ::std::option::Option<i32>)
+
+        //pub fn with_i32_repeated(&self, value: ::std::vec::Vec<i32>)
+
+        //pub fn with_f32_unlabeled(&self, value: f32)
+
+        //pub fn with_string_unlabeled(&self, value: ::std::borrow::Cow<'static, str>)
+
+        //pub fn with_submsg_unlabeled(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::proto3_defaults::_puroro_impls::SubmsgSimple>>)
+    }
+
+    impl MsgComposer<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
@@ -838,6 +862,20 @@ pub mod _puroro_impls {
     impl SubmsgTrait for SubmsgSimpleByValue {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             unimplemented!("Please don't use / instantiate this struct!!")
+        }
+    }
+    pub struct SubmsgComposer<T>(T);
+
+    impl<T> SubmsgComposer<T>
+    where
+        T: SubmsgTrait,
+    {
+        //pub fn with_i32_unlabeled(&self, value: i32)
+    }
+
+    impl SubmsgComposer<()> {
+        pub fn new() -> Self {
+            Self(())
         }
     }
 }

@@ -1368,6 +1368,40 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
     }
+    pub struct MsgComposer<T>(T);
+
+    impl<T> MsgComposer<T>
+    where
+        T: MsgTrait,
+    {
+        //pub fn with_i32_optional(&self, value: ::std::option::Option<i32>)
+
+        //pub fn with_i32_repeated(&self, value: ::std::vec::Vec<i32>)
+
+        //pub fn with_float_optional(&self, value: ::std::option::Option<f32>)
+
+        //pub fn with_float_repeated(&self, value: ::std::vec::Vec<f32>)
+
+        //pub fn with_string_optional(&self, value: ::std::option::Option<::std::borrow::Cow<'static, str>>)
+
+        //pub fn with_string_repeated(&self, value: ::std::vec::Vec<::std::borrow::Cow<'static, str>>)
+
+        //pub fn with_submsg_optional(&self, value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>)
+
+        //pub fn with_submsg_repeated(&self, value: ::std::vec::Vec<self::_puroro_root::ser_tests2::_puroro_nested::msg::_puroro_impls::SubmsgSimple>)
+
+        //pub fn with_enum_optional(&self, value: ::std::option::Option<self::_puroro_root::ser_tests2::Enum>)
+
+        //pub fn with_enum_repeated(&self, value: ::std::vec::Vec<self::_puroro_root::ser_tests2::Enum>)
+
+        //pub fn with_very_large_field_number(&self, value: ::std::option::Option<i32>)
+    }
+
+    impl MsgComposer<()> {
+        pub fn new() -> Self {
+            Self(())
+        }
+    }
 }
 pub use _puroro_traits::*;
 pub mod _puroro_traits {
@@ -1706,6 +1740,20 @@ pub mod _puroro_nested {
             impl SubmsgTrait for SubmsgSimpleByValue {
                 fn i32_optional<'this>(&'this self) -> Option<i32> {
                     unimplemented!("Please don't use / instantiate this struct!!")
+                }
+            }
+            pub struct SubmsgComposer<T>(T);
+
+            impl<T> SubmsgComposer<T>
+            where
+                T: SubmsgTrait,
+            {
+                //pub fn with_i32_optional(&self, value: ::std::option::Option<i32>)
+            }
+
+            impl SubmsgComposer<()> {
+                pub fn new() -> Self {
+                    Self(())
                 }
             }
         }
