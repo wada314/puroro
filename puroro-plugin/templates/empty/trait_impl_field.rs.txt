@@ -24,8 +24,8 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
 {%- endif %}
 
 {%- if f.trait_has_repeated_getter %}
-type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::empty::EmptyRepeatedField<{{ f.trait_scalar_getter_type }}>;
+type Field{{ f.number }}RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<{{ f.trait_scalar_getter_type }}>;
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
-    ::puroro_internal::impls::empty::EmptyRepeatedField::new()
+    ::puroro::internal::impls::empty::EmptyRepeatedField::new()
 }
 {%- endif %}

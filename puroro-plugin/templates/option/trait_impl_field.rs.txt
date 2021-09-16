@@ -1,0 +1,49 @@
+{%- if field.is_bytes %}
+{%- if field.trait_has_scalar_getter %}
+type Field{{ field.number }}BytesType<'this> = ::puroro::Either<T::Field{{ field.number }}BytesType<'this>, &'static [u8]>;
+{%- else %}
+type Field{{ field.number }}BytesType<'this> = T::Field{{ field.number }}BytesType<'this>;
+{%- endif %}
+{%- endif %}
+{%- if field.is_string %}
+{%- if field.trait_has_scalar_getter %}
+type Field{{ field.number }}StringType<'this> = ::puroro::Either<T::Field{{ field.number }}StringType<'this>, &'static str>;
+{%- else %}
+type Field{{ field.number }}StringType<'this> = T::Field{{ field.number }}StringType<'this>;
+{%- endif %}
+{%- endif %}
+{%- if field.is_message %}
+type Field{{ field.number }}MessageType<'this> = T::Field{{ field.number }}MessageType<'this>;
+{%- endif %}
+
+{%- if field.trait_has_scalar_getter %}
+fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
+    {%- if field.is_length_delimited %}
+    {%- if field.is_bytes %}
+    self.as_ref().map_or(::puroro::Either::Right(&[]), |msg| ::puroro::Either::Left(msg.{{ field.ident }}()))
+    {%- endif %}
+    {%- if field.is_string %}
+    self.as_ref().map_or(::puroro::Either::Right(""), |msg| ::puroro::Either::Left(msg.{{ field.ident }}()))
+    {%- endif %}
+    {%- else %}
+    self.as_ref().map_or_else(::std::default::Default::default, |msg| msg.{{ field.ident }}())
+    {%- endif %}
+}
+{%- endif %}
+{%- if field.trait_has_optional_getter && !f.is_explicit_oneof_field %}
+fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
+    self.as_ref().and_then(|msg| msg.{{ field.ident }}())
+}
+{%- endif %}
+
+{%- if field.trait_has_repeated_getter %}
+type Field{{ field.number }}RepeatedType<'this> = 
+    ::std::iter::Flatten<
+        ::std::option::IntoIter<
+            <T::Field{{ field.number }}RepeatedType<'this> as ::std::iter::IntoIterator>::IntoIter
+        >
+    >;
+fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
+    self.as_ref().map(|msg| msg.{{ field.ident }}().into_iter()).into_iter().flatten()
+}
+{%- endif %}

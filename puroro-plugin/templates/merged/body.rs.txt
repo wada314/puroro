@@ -27,7 +27,7 @@ where
             ) => {
                 {%- if field.is_length_delimited %}
                 {%- if field.is_message %}
-                E::{{ field.ident }}(::puroro::Either::Right((left, right)))
+                E::{{ field.ident }}((Some(left), Some(right)))
                 {%- else %}
                 E::{{ field.ident }}(::puroro::Either::Right(right))
                 {%- endif %}
@@ -41,7 +41,7 @@ where
             (_, Some(E::{{ field.ident }}(right))) => {
                 {%- if field.is_length_delimited %}
                 {%- if field.is_message %}
-                E::{{ field.ident }}(::puroro::Either::Left(::puroro::Either::Right(right)))
+                E::{{ field.ident }}((None, Some(right)))
                 {%- else %}
                 E::{{ field.ident }}(::puroro::Either::Right(right))
                 {%- endif %}
@@ -55,7 +55,7 @@ where
             (Some(E::{{ field.ident }}(left)), None) => {
                 {%- if field.is_length_delimited %}
                 {%- if field.is_message %}
-                E::{{ field.ident }}(::puroro::Either::Left(::puroro::Either::Left(left)))
+                E::{{ field.ident }}((Some(left), None))
                 {%- else %}
                 E::{{ field.ident }}(::puroro::Either::Left(left))
                 {%- endif %}
@@ -68,4 +68,3 @@ where
     }
     {%- endfor %}
 }
-

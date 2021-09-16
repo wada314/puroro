@@ -1,14 +1,11 @@
 #![allow(unused)]
 
-use crate::protos::google::protobuf;
-use crate::protos::google::protobuf::field_descriptor_proto::{
-    Label as FieldLabelProto, Type as FieldTypeProto,
-};
 use crate::utils::*;
 use crate::{ErrorKind, Result};
 use ::askama::Template;
 use ::itertools::Itertools;
 use ::once_cell::unsync::{Lazy, OnceCell};
+use ::protobuf_compiled::google::protobuf;
 use ::std::borrow::Borrow;
 use ::std::collections::{HashMap, VecDeque};
 use ::std::convert::TryInto;
@@ -17,6 +14,7 @@ use ::std::iter;
 use ::std::ops::Deref;
 use ::std::rc::{Rc, Weak};
 use protobuf::compiler::CodeGeneratorRequest;
+use protobuf::field_descriptor_proto::{Label as FieldLabelProto, Type as FieldTypeProto};
 use protobuf::{
     DescriptorProto, EnumDescriptorProto, FieldDescriptorProto, FileDescriptorProto,
     OneofDescriptorProto,
@@ -553,6 +551,9 @@ impl Field {
     pub fn rust_ident(&self) -> &str {
         &self.rust_ident
     }
+    pub fn proto_name(&self) -> &str {
+        &self.proto_name
+    }
     pub fn rust_oneof_ident(&self) -> &str {
         &self.rust_oneof_ident
     }
@@ -726,8 +727,8 @@ impl Field {
             && !matches!(self.field_type(), Ok(FieldType::Message(_))))
     }
     pub fn has_scalar_optional_getter(&self) -> Result<bool> {
-        Ok(!self.is_non_synthetic_oneof_item()?
-            && match self.field_label() {
+        Ok(self.is_non_synthetic_oneof_item()?
+            || match self.field_label() {
                 Ok(FieldLabel::Optional | FieldLabel::Required) => true,
                 Ok(FieldLabel::Unlabeled) => matches!(self.field_type(), Ok(FieldType::Message(_))),
                 _ => false,
@@ -762,8 +763,8 @@ impl Field {
     pub fn simple_scalar_field_type(&self) -> Result<String> {
         Ok(match self.field_type()? {
             FieldType::Group => Err(ErrorKind::GroupNotSupported)?,
-            FieldType::String => "::std::string::String".to_string(),
-            FieldType::Bytes => "::std::vec::Vec<u8>".to_string(),
+            FieldType::String => "::std::borrow::Cow<'static, str>".to_string(),
+            FieldType::Bytes => "::std::borrow::Cow<'static, [u8]>".to_string(),
             FieldType::Enum2(e) => upgrade(&e)?.rust_path(),
             FieldType::Enum3(e) => upgrade(&e)?.rust_path(),
             FieldType::Message(m) => {

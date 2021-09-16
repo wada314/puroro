@@ -94,6 +94,7 @@ pub type OneofItem = (False, False, False, True, False);
 pub type MapEntry = (False, False, False, False, True);
 
 pub type LabelOptReqUnl<_1, _2> = (False, _1, _2, False, False);
+pub type LabelNonRepeated<_1, _2, _3> = (False, _1, _2, _3, False);
 
 pub struct Proto2;
 pub struct Proto3;

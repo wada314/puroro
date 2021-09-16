@@ -5,29 +5,25 @@
 
 mod error;
 mod generators;
-mod impls;
-mod protos;
 mod utils;
 mod wrappers;
 
+use ::askama::Template as _;
 use ::itertools::Itertools;
+use ::protobuf_compiled::google;
+use ::protobuf_compiled::google::protobuf::compiler::code_generator_response::{Feature, File};
+use ::protobuf_compiled::google::protobuf::compiler::{
+    CodeGeneratorRequest, CodeGeneratorResponse,
+};
 use ::puroro::{DeserFromBytesIter, SerToIoWrite};
+use ::std::collections::{HashMap, HashSet};
+use ::std::env;
+use ::std::io::{stdin, stdout, Read};
+use ::std::process::Command;
+use ::std::process::Stdio;
 
 use error::{ErrorKind, GeneratorError};
 type Result<T> = std::result::Result<T, GeneratorError>;
-
-use ::std::collections::{HashMap, HashSet};
-use ::std::env;
-use ::std::io::Read;
-use ::std::io::{stdin, stdout};
-use ::std::process::Command;
-use std::process::Stdio;
-
-pub use protos::google;
-use protos::google::protobuf::compiler::code_generator_response::File;
-use protos::google::protobuf::compiler::{CodeGeneratorRequest, CodeGeneratorResponse};
-
-use ::askama::Template as _;
 
 fn make_package_to_subpackages_map(
     files: &Vec<google::protobuf::FileDescriptorProto>,
@@ -99,13 +95,13 @@ fn format_rust_file(input: &str) -> Option<String> {
 }
 
 fn main() -> Result<()> {
-    let mut cgreq: CodeGeneratorRequest = CodeGeneratorRequest::default();
+    let mut cgreq: CodeGeneratorRequest = Default::default();
     cgreq.deser(&mut stdin().bytes()).unwrap();
 
     let wrapped_cgreq = wrappers::Context::try_from_proto(cgreq.clone())?;
 
-    let mut cgres: CodeGeneratorResponse = CodeGeneratorResponse::default();
-    cgres.supported_features = Some(1); // TODO: Use Feature enum
+    let mut cgres: CodeGeneratorResponse = Default::default();
+    cgres.supported_features = Some(Feature::FeatureProto3Optional as u64);
 
     let package_to_subpackage_map = make_package_to_subpackages_map(&cgreq.proto_file);
     let package_to_file_descriptor_map = wrapped_cgreq

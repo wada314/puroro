@@ -8,23 +8,53 @@ message Msg {
     float float_unlabeled = 11;
     optional float float_optional = 12;
     repeated float float_repeated = 13;
-    string string_unlabeled = 21;
-    optional string string_optional = 22;
-    repeated string string_repeated = 23;
-    Enum enum_unlabeled = 31;
-    optional Enum enum_optional = 32;
-    repeated Enum enum_repeated = 33;
+    bytes bytes_unlabeled = 21;
+    optional bytes bytes_optional = 22;
+    repeated bytes bytes_repeated = 23;
+    string string_unlabeled = 31;
+    optional string string_optional = 32;
+    repeated string string_repeated = 33;
+    Enum enum_unlabeled = 41;
+    optional Enum enum_optional = 42;
+    repeated Enum enum_repeated = 43;
 
     message Submsg {
         int32 i32_unlabeled = 1;
     }
-    Submsg submsg_unlabeled = 41;
-    optional Submsg submsg_optional = 42;
-    repeated Submsg submsg_repeated = 43;
-}
+    Submsg submsg_unlabeled = 51;
+    optional Submsg submsg_optional = 52;
+    repeated Submsg submsg_repeated = 53;
 
-message Some {
-    int32 i32_unlabeled = 1;
+    int64 i64_unlabeled = 101;
+    optional int64 i64_optional = 102;
+    repeated int64 i64_repeated = 103;
+    uint32 u32_unlabeled = 111;
+    optional uint32 u32_optional = 112;
+    repeated uint32 u32_repeated = 113;
+    uint64 u64_unlabeled = 121;
+    optional uint64 u64_optional = 122;
+    repeated uint64 u64_repeated = 123;
+    sint32 s32_unlabeled = 131;
+    optional sint32 s32_optional = 132;
+    repeated sint32 s32_repeated = 133;
+    sint64 s64_unlabeled = 141;
+    optional sint64 s64_optional = 142;
+    repeated sint64 s64_repeated = 143;
+    fixed32 fixed32_unlabeled = 151;
+    optional fixed32 fixed32_optional = 152;
+    repeated fixed32 fixed32_repeated = 153;
+    fixed64 fixed64_unlabeled = 161;
+    optional fixed64 fixed64_optional = 162;
+    repeated fixed64 fixed64_repeated = 163;
+    sfixed32 sfixed32_unlabeled = 171;
+    optional sfixed32 sfixed32_optional = 172;
+    repeated sfixed32 sfixed32_repeated = 173;
+    sfixed64 sfixed64_unlabeled = 181;
+    optional sfixed64 sfixed64_optional = 182;
+    repeated sfixed64 sfixed64_repeated = 183;
+    double f64_unlabeled = 191;
+    optional double f64_optional = 192;
+    repeated double f64_repeated = 193;
 }
 
 enum Enum {

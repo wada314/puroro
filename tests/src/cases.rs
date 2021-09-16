@@ -1,5 +1,11 @@
+mod builder;
+mod descriptors;
+mod either;
+mod empty;
+mod merged;
 mod official_samples;
+mod oneof;
 mod proto3_defaults;
 mod self_recursive;
-mod ser_tests;
+mod simple_ser_tests;
 mod traits;

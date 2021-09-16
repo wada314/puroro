@@ -47,23 +47,28 @@ impl MessagesAndEnums {
 
 struct Message {
     ident: String,
+    proto_name: String,
     trait_ident: String,
     trait_delegate_macro_ident: String,
     submodule_ident: String,
     nested: MessagesAndEnums,
     fields: Vec<Field>,
+    fields_len: usize,
     oneofs: Vec<Oneof>,
     simple_ident: String,
     simple_single_field_ident: String,
+    simple_by_value_ident: String,
+    builder_ident: String,
 }
 
 impl Message {
     fn try_new(m: &wrappers::Message) -> Result<Self> {
-        let fields = m
+        let fields: Vec<Field> = m
             .fields()
             .into_iter()
             .map(|f| Field::try_new(f))
             .try_collect()?;
+        let fields_len = fields.len();
         let oneofs = m
             .oneofs()
             .into_iter()
@@ -82,6 +87,7 @@ impl Message {
             .try_collect()?;
         Ok(Self {
             ident: m.rust_ident().to_string(),
+            proto_name: m.proto_name().to_string(),
             trait_ident: m.rust_trait_ident().to_string(),
             trait_delegate_macro_ident: format!("{}_delegate", m.rust_nested_module_ident()),
             submodule_ident: m.rust_nested_module_ident().to_string(),
@@ -90,9 +96,12 @@ impl Message {
                 enums: nested_enums,
             },
             fields,
+            fields_len,
             oneofs,
             simple_ident: m.rust_impl_ident("Simple"),
             simple_single_field_ident: m.rust_impl_ident("SimpleField"),
+            simple_by_value_ident: m.rust_impl_ident("SimpleByValue"),
+            builder_ident: m.rust_impl_ident("Builder"),
         })
     }
 }
@@ -146,6 +155,7 @@ impl EnumValue {
 
 struct Field {
     ident: String,
+    proto_name: String,
     number: i32,
     is_message: bool,
     is_string: bool,
@@ -181,6 +191,7 @@ impl Field {
             };
         Ok(Field {
             ident: f.rust_ident().to_string(),
+            proto_name: f.proto_name().to_string(),
             number: f.number(),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             is_string: matches!(f.field_type()?, wrappers::FieldType::String),
@@ -214,11 +225,8 @@ struct Oneof {
     enum_ident: String,
     field_ident: String,
     fields: Vec<OneofField>,
-    is_synthetic: bool,
     has_reference_field: bool,
     owner_message_trait_path: String,
-    simple_enum_ident: String,
-    simple_owner_message_path: String,
 }
 
 impl Oneof {
@@ -231,7 +239,6 @@ impl Oneof {
                 .into_iter()
                 .map(|f| OneofField::try_new(f))
                 .try_collect()?,
-            is_synthetic: o.is_synthetic()?,
             has_reference_field: o.fields()?.into_iter().any(|f| {
                 matches!(
                     f.field_type(),
@@ -241,19 +248,18 @@ impl Oneof {
                 )
             }),
             owner_message_trait_path: o.message()?.rust_trait_path(),
-            simple_enum_ident: format!("{}_Simple", o.rust_enum_ident()),
-            simple_owner_message_path: o.message()?.rust_impl_path("Simple"),
         })
     }
 }
 
 struct OneofField {
     ident: String,
+    getter_ident: String,
     number: i32,
     is_length_delimited: bool,
     is_message: bool,
     trait_field_type: String,
-    simple_field_type: String,
+    trait_getter_type: String,
     simple_field_type_tag: String,
 }
 
@@ -261,6 +267,7 @@ impl OneofField {
     fn try_new(f: &wrappers::Field) -> Result<Self> {
         Ok(Self {
             ident: f.rust_oneof_ident().to_string(),
+            getter_ident: f.rust_ident().to_string(),
             number: f.number(),
             is_length_delimited: matches!(
                 f.field_type()?,
@@ -270,7 +277,7 @@ impl OneofField {
             ),
             is_message: matches!(f.field_type()?, wrappers::FieldType::Message(_)),
             trait_field_type: f.trait_oneof_field_type("'msg", "T")?,
-            simple_field_type: f.simple_oneof_field_type()?,
+            trait_getter_type: f.trait_oneof_field_type("'this", "Self")?,
             simple_field_type_tag: f.rust_type_tag("Simple")?,
         })
     }

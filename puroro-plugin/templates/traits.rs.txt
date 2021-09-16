@@ -3,21 +3,24 @@ pub trait {{ m.trait_ident }} {
     {%- for field in m.fields %}
 
     {%- if field.is_bytes %}
-    type Field{{ field.number }}BytesType<'this>: ::std::ops::Deref<Target=[u8]>;
+    type Field{{ field.number }}BytesType<'this>:
+        ::std::ops::Deref<Target=[u8]> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
     {%- endif %}
     {%- if field.is_string %}
-    type Field{{ field.number }}StringType<'this>: ::std::ops::Deref<Target=str>;
+    type Field{{ field.number }}StringType<'this>:
+        ::std::ops::Deref<Target=str> + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
     {%- endif %}
     {%- match field.trait_maybe_field_message_trait_path %}
     {%- when Some with (field_msg_path) %}
-    type Field{{ field.number }}MessageType<'this>: {{ field_msg_path }};
+    type Field{{ field.number }}MessageType<'this>:
+        {{ field_msg_path }} + ::std::clone::Clone + ::std::cmp::PartialEq + ::std::fmt::Debug;
     {%- else %}
     {%- endmatch %}
 
     {%- if field.trait_has_scalar_getter %}
     fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }};
     {%- endif %}
-    {%- if field.trait_has_optional_getter %}
+    {%- if field.trait_has_optional_getter && !field.is_explicit_oneof_field %}
     fn {{ field.ident }}<'this>(&'this self) -> ::std::option::Option<{{ field.trait_scalar_getter_type }}> {
         ::std::default::Default::default()
     }
@@ -41,6 +44,20 @@ pub trait {{ m.trait_ident }} {
     {
         ::std::option::Option::None
     }
+        
+    {%- for field in oneof.fields %}
+    pub fn {{ field.getter_ident }}<'this>(&'this self) -> Option<{{ field.trait_getter_type }}> {
+        use super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }} as E;
+        self.{{ oneof.field_ident }}().and_then(|oneof| {
+            #[allow(irrefutable_let_patterns)]
+            if let E::{{ field.ident }}(v) = oneof {
+                Some(v)
+            } else {
+                None
+            }
+        })
+    }
+    {%- endfor %}
     {%- endfor %}
 }
 

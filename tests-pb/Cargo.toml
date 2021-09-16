@@ -7,7 +7,6 @@ edition = "2018"
 
 [dependencies]
 puroro = { path = "../puroro", features = ["puroro-bumpalo"] }
-puroro-internal = { path = "../puroro-internal" }
 
 [build-dependencies]
 puroro-plugin = { path = "../puroro-plugin" }

@@ -1,7 +1,10 @@
 /// The sample cases documented in the Protobuf official encoding document:
 /// https://developers.google.com/protocol-buffers/docs/encoding
 use ::puroro::DeserFromBytesIter;
+use ::std::borrow::Cow;
 use ::std::default::Default;
+use ::tests_pb::official_samples2 as s2;
+use ::tests_pb::official_samples3 as s3;
 
 const TEST1_INPUT: &[u8] = &[0x08, 0x96, 0x01];
 const TEST2_INPUT: &[u8] = &[0x12, 0x07, 0x74, 0x65, 0x73, 0x74, 0x69, 0x6e, 0x67];
@@ -14,36 +17,67 @@ const TEST3_EXPECTED: i32 = 150;
 const TEST4_EXPECTED: &[i32] = &[3, 270, 86942];
 
 #[test]
-fn test1_simple() {
+fn proto2_test1_simple() {
     use std::io::Read as _;
-    let mut t1 = <tests_pb::official_samples::Test1 as Default>::default();
+    let mut t1 = s2::Test1::default();
     t1.deser(TEST1_INPUT.bytes()).unwrap();
     assert_eq!(Some(TEST1_EXPECTED), t1.a);
 }
 
 #[test]
-fn test2_simple() {
+fn proto3_test1_simple() {
     use std::io::Read as _;
-    use std::ops::Deref as _;
-    let mut t2 = <tests_pb::official_samples::Test2 as Default>::default();
-    t2.deser(TEST2_INPUT.bytes()).unwrap();
-    assert_eq!(Some(TEST2_EXPECTED.into()), t2.b);
+    let mut t1 = s3::Test1::default();
+    t1.deser(TEST1_INPUT.bytes()).unwrap();
+    assert_eq!(TEST1_EXPECTED, t1.a);
 }
 
 #[test]
-fn test3_simple() {
+fn proto2_test2_simple() {
     use std::io::Read as _;
-    use std::ops::Deref as _;
-    let mut t3 = <tests_pb::official_samples::Test3 as Default>::default();
+    let mut t2 = s2::Test2::default();
+    t2.deser(TEST2_INPUT.bytes()).unwrap();
+    assert_eq!(Some(Cow::Borrowed(TEST2_EXPECTED)), t2.b);
+}
+
+#[test]
+fn proto3_test2_simple() {
+    use std::io::Read as _;
+    let mut t2 = s3::Test2::default();
+    t2.deser(TEST2_INPUT.bytes()).unwrap();
+    assert_eq!(TEST2_EXPECTED, t2.b);
+}
+
+#[test]
+fn proto2_test3_simple() {
+    use std::io::Read as _;
+    let mut t3 = s2::Test3::default();
     t3.deser(TEST3_INPUT.bytes()).unwrap();
     assert!(t3.c.is_some());
-    assert_eq!(Some(TEST3_EXPECTED), t3.c.as_ref().unwrap().a);
+    assert_eq!(Some(TEST3_EXPECTED), t3.c.unwrap().a);
 }
 
 #[test]
-fn test4_simple() {
+fn proto3_test3_simple() {
     use std::io::Read as _;
-    let mut t4 = <tests_pb::official_samples::Test4 as Default>::default();
+    let mut t3 = s3::Test3::default();
+    t3.deser(TEST3_INPUT.bytes()).unwrap();
+    assert!(t3.c.is_some());
+    assert_eq!(TEST3_EXPECTED, t3.c.unwrap().a);
+}
+
+#[test]
+fn proto2_test4_simple() {
+    use std::io::Read as _;
+    let mut t4 = s2::Test4::default();
+    t4.deser(TEST4_INPUT.bytes()).unwrap();
+    assert_eq!(TEST4_EXPECTED, &t4.d);
+}
+
+#[test]
+fn proto3_test4_simple() {
+    use std::io::Read as _;
+    let mut t4 = s3::Test4::default();
     t4.deser(TEST4_INPUT.bytes()).unwrap();
     assert_eq!(TEST4_EXPECTED, &t4.d);
 }

@@ -22,12 +22,14 @@ fn {{ f.ident }}<'this>(&'this self) -> {{ f.trait_scalar_getter_type }} {
 }
 {%- endif %}
 
-{%- if f.trait_has_optional_getter %}
+{%- if f.trait_has_optional_getter && !f.is_explicit_oneof_field %}
 fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}> {
+    {%- if !f.is_explicit_oneof_field %}
     {%- if f.is_length_delimited %}
     self.{{ f.ident }}.as_ref().map(|v| v.as_ref())
     {%- else %}
     Clone::clone(&self.{{ f.ident }})
+    {%- endif %}
     {%- endif %}
 }
 {%- endif %}
@@ -35,7 +37,7 @@ fn {{ f.ident }}<'this>(&'this self) -> Option<{{ f.trait_scalar_getter_type }}>
 {%- if f.trait_has_repeated_getter %}
 {%- match f.simple_maybe_borrowed_field_type %}
 {%- when Some with (borrowed) %}
-type Field{{ f.number }}RepeatedType<'this> = ::puroro_internal::impls::simple::BorrowedIter<
+type Field{{ f.number }}RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
     {{ borrowed }},
     ::std::slice::Iter<'this, {{ f.simple_scalar_field_type }}>>;
 {%- else %}
@@ -45,7 +47,7 @@ type Field{{ f.number }}RepeatedType<'this> = ::std::iter::Cloned<::std::slice::
 fn {{ f.ident }}<'this>(&'this self) -> Self::Field{{ f.number }}RepeatedType<'this> {
     {%- match f.simple_maybe_borrowed_field_type %}
     {%- when Some with (borrowed) %}
-    ::puroro_internal::impls::simple::BorrowedIter::new(self.{{ f.ident }}.iter())
+    ::puroro::internal::impls::simple::BorrowedIter::new(self.{{ f.ident }}.iter())
     {%- else %}
     self.{{ f.ident }}.iter().cloned()
     {%- endmatch %}

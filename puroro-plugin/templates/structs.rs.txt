@@ -1,3 +1,5 @@
+
+pub use _puroro_impls::*;
 {%- for m in messages %}
 pub use _puroro_impls::{{ m.simple_ident }} as {{ m.ident }};
 {%- endfor %}
@@ -6,7 +8,7 @@ pub mod _puroro_impls {
         pub use super::super::_puroro_root::*;
     }
 
-    {#- Guaranteed that the trait idents are never overridden -#}
+    {#- Guaranteed that the trait idents will never conflict -#}
     use super::_puroro_traits::*;
 
     {%- for m in messages %}
@@ -14,7 +16,10 @@ pub mod _puroro_impls {
     {%- include "empty/body.rs.txt" %}
     {%- include "merged/body.rs.txt" %}
     {%- include "either/body.rs.txt" %}
+    {%- include "option/body.rs.txt" %}
     {%- include "simple/single_field.rs.txt" %}
+    {%- include "simple/by_value.rs.txt" %}
+    {%- include "builder.rs.txt" %}
     {%- endfor %}
 }
 
@@ -34,4 +39,8 @@ pub mod _puroro_impls {
 
 {%- macro merged_trait_impl_field(f) -%}
 {%- include "merged/trait_impl_field.rs.txt" %}
+{%- endmacro -%}
+
+{%- macro option_trait_impl_field(f) -%}
+{%- include "option/trait_impl_field.rs.txt" %}
 {%- endmacro -%}

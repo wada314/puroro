@@ -1,0 +1,60 @@
+#[derive(::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug)]
+pub struct {{ m.simple_by_value_ident }} {
+}
+impl ::puroro::Message<{{ m.simple_ident }}> for {{ m.simple_by_value_ident }} {}
+
+impl {{ m.trait_ident }} for {{ m.simple_by_value_ident }} {
+    {%- for field in m.fields %}
+
+    {#- 
+     # The core part of this struct: BytesType, StringType, and MessageType are
+     # defined as an owned type instead of the normal `MyMessageSimple` struct's
+     # ref types. 
+     # For `MyMessageSimple` type's owned `oneof` `enum` types, they refer
+     # these owned types for the corresponding `oneof` fields.
+     #}    
+    {%- if field.is_bytes %}
+    type Field{{ field.number }}BytesType<'this> = ::std::borrow::Cow<'this, [u8]>;
+    {%- endif %}
+    {%- if field.is_string %}
+    type Field{{ field.number }}StringType<'this> = ::std::borrow::Cow<'this, str>;
+    {%- endif %}
+    {%- match field.simple_maybe_field_message_path %}
+    {%- when Some with (struct_path) %}
+    type Field{{ field.number }}MessageType<'this> = ::std::boxed::Box<{{ struct_path }}>;
+    {%- else %}
+    {%- endmatch %}
+
+    {%- if field.trait_has_scalar_getter %}
+    fn {{ field.ident }}<'this>(&'this self) -> {{ field.trait_scalar_getter_type }} {
+        unimplemented!("Please don't use / instantiate this struct!!")
+    }
+    {%- endif %}
+
+    {%- if field.trait_has_optional_getter %}
+    fn {{ field.ident }}<'this>(&'this self) -> Option<{{ field.trait_scalar_getter_type }}> {
+        unimplemented!("Please don't use / instantiate this struct!!")
+    }
+    {%- endif %}
+
+    {%- if field.trait_has_repeated_getter %}
+    type Field{{ field.number }}RepeatedType<'this> = ::puroro::internal::impls::empty::EmptyRepeatedField<{{ field.trait_scalar_getter_type }}>;
+    fn {{ field.ident }}<'this>(&'this self) -> Self::Field{{ field.number }}RepeatedType<'this> {
+        unimplemented!("Please don't use / instantiate this struct!!")
+    }
+    {%- endif %}
+    {%- endfor %}
+    
+    {%- for oneof in m.oneofs %}
+    fn {{ oneof.field_ident }}<'this>(&'this self) ->
+        Option<
+            super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
+            {%- if oneof.has_reference_field %}
+            <'this, Self>
+            {%- endif %}
+        >
+    {
+        unimplemented!("Please don't use / instantiate this struct!!")
+    }
+    {%- endfor %}
+}
