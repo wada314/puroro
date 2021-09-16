@@ -13,8 +13,6 @@ itertools = "0.10.1"
 
 [features]
 puroro-nightly = []
-puroro-bumpalo = ["puroro/puroro-bumpalo"]
 default = [
     "puroro-nightly", 
-    "puroro-bumpalo",
 ]
