@@ -1,7 +1,7 @@
 #[derive(::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug)]
 pub struct {{ m.simple_by_value_ident }} {
 }
-impl ::puroro::Message<{{ m.simple_ident }}> for {{ m.simple_by_value_ident }} {}
+impl ::puroro::Message<super::{{ m.simple_ident }}> for {{ m.simple_by_value_ident }} {}
 
 impl {{ m.trait_ident }} for {{ m.simple_by_value_ident }} {
     {%- for field in m.fields %}

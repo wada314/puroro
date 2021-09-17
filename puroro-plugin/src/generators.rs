@@ -98,7 +98,7 @@ impl Message {
             fields,
             fields_len,
             oneofs,
-            simple_ident: m.rust_impl_ident("Simple"),
+            simple_ident: m.rust_impl_ident(""),
             simple_single_field_ident: m.rust_impl_ident("SimpleField"),
             simple_by_value_ident: m.rust_impl_ident("SimpleByValue"),
             builder_ident: m.rust_impl_ident("Builder"),

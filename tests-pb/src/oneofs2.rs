@@ -5,34 +5,38 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-pub use _puroro_impls::MsgSimple as Msg;
-pub use _puroro_impls::SubmsgSimple as Submsg;
-pub use _puroro_impls::*;
-pub mod _puroro_impls {
+pub use _puroro_simple_impl::Msg;
+pub use _puroro_simple_impl::Submsg;
+pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    use super::_puroro_traits::*;
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
-    pub struct MsgSimple {
+    pub struct Msg {
         pub group_one: ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'static, MsgSimpleByValue>,
+            super::_puroro_nested::msg::_puroro_oneofs::GroupOne<
+                'static,
+                super::_puroro_impls::MsgSimpleByValue,
+            >,
         >,
         pub group_two: ::std::option::Option<
-            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<'static, MsgSimpleByValue>,
+            super::_puroro_nested::msg::_puroro_oneofs::GroupTwo<
+                'static,
+                super::_puroro_impls::MsgSimpleByValue,
+            >,
         >,
         pub group_three:
             ::std::option::Option<super::_puroro_nested::msg::_puroro_oneofs::GroupThree>,
     }
-    impl ::puroro::Message<MsgSimple> for MsgSimple {}
+    impl ::puroro::Message<Msg> for Msg {}
 
-    impl MsgTrait for MsgSimple {
+    impl super::_puroro_traits::MsgTrait for Msg {
         type Field2StringType<'this> = &'this str;
         type Field4StringType<'this> = &'this str;
         type Field5MessageType<'this> =
-            &'this self::_puroro_root::oneofs2::_puroro_impls::SubmsgSimple;
+            &'this self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg;
         fn group_one<'this>(
             &'this self,
         ) -> Option<super::_puroro_nested::msg::_puroro_oneofs::GroupOne<'this, Self>> {
@@ -65,7 +69,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for MsgSimple {
+    impl ::puroro::MessageRepresentativeImpl for Msg {
         fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
             use ::puroro::once_cell::sync::Lazy;
             static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 6]> =
@@ -76,7 +80,7 @@ pub mod _puroro_impls {
                                 name: "g1_int32",
                                 number: 1,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -86,7 +90,7 @@ pub mod _puroro_impls {
                                 name: "g1_string",
                                 number: 2,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -96,7 +100,7 @@ pub mod _puroro_impls {
                                 name: "g2_f32",
                                 number: 3,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -106,7 +110,7 @@ pub mod _puroro_impls {
                                 name: "g2_string",
                                 number: 4,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -116,7 +120,7 @@ pub mod _puroro_impls {
                                 name: "g2_submsg",
                                 number: 5,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -126,7 +130,7 @@ pub mod _puroro_impls {
                                 name: "g3_int32",
                                 number: 6,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -144,7 +148,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for MsgSimple {
+    impl ::puroro::DeserFromBytesIter for Msg {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -153,7 +157,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for MsgSimple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Msg {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -228,7 +232,7 @@ pub mod _puroro_impls {
                     DeserFieldFromBytesIter::<
                         ::puroro::tags::OneofItem,
                         ::puroro::tags::Message<
-                            self::_puroro_root::oneofs2::_puroro_impls::SubmsgSimple,
+                            self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg,
                         >,
                     >::deser_field(field_value_mut_ref, data)
                 }
@@ -251,7 +255,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MsgSimple {
+    impl ::puroro::SerToIoWrite for Msg {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -284,7 +288,7 @@ pub mod _puroro_impls {
                     E::G2Submsg(v) => SerFieldToIoWrite::<
                         ::puroro::tags::OneofItem,
                         ::puroro::tags::Message<
-                            self::_puroro_root::oneofs2::_puroro_impls::SubmsgSimple,
+                            self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg,
                         >,
                     >::ser_field(v, 5, out)?,
                 }
@@ -302,6 +306,99 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+    #[derive(
+        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
+    )]
+    pub struct Submsg {
+        pub i32_optional: ::std::option::Option<i32>,
+    }
+    impl ::puroro::Message<Submsg> for Submsg {}
+
+    impl super::_puroro_traits::SubmsgTrait for Submsg {
+        fn i32_optional<'this>(&'this self) -> Option<i32> {
+            Clone::clone(&self.i32_optional)
+        }
+    }
+
+    impl ::puroro::MessageRepresentativeImpl for Submsg {
+        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
+            use ::puroro::once_cell::sync::Lazy;
+            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
+                Lazy::new(|| {
+                    [{
+                        let init = ::puroro::internal::FieldDescriptorInitializer {
+                            name: "i32_optional",
+                            number: 1,
+                            lazy_containing_type: Lazy::new(|| {
+                                <Submsg as ::puroro::MessageRepresentativeImpl>::descriptor()
+                            }),
+                        };
+                        ::puroro::internal::init_field_descriptor(init)
+                    }]
+                });
+            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
+                let init = ::puroro::internal::MessageDescriptorInitializer {
+                    name: "Submsg",
+                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
+                };
+                ::puroro::internal::init_message_descriptor(init)
+            });
+            Lazy::force(&LAZY_DESCRIPTOR)
+        }
+    }
+
+    impl ::puroro::DeserFromBytesIter for Submsg {
+        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
+        }
+    }
+
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Submsg {
+        fn deser_field<I>(
+            &mut self,
+            field_number: i32,
+            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
+        ) -> ::puroro::Result<()>
+        where
+            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
+        {
+            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
+            match field_number {
+            1 => DeserFieldFromBytesIter::<
+                ::puroro::tags::Optional, ::puroro::tags::Int32
+            >::deser_field(&mut self.i32_optional, data),
+
+            _ => unimplemented!("TODO: This case should be handled properly..."),
+        }
+        }
+    }
+
+    impl ::puroro::SerToIoWrite for Submsg {
+        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
+        where
+            W: ::std::io::Write,
+        {
+            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
+            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
+                &self.i32_optional,
+                1,
+                out,
+            )?;
+
+            ::std::result::Result::Ok(())
+        }
+    }
+}
+
+pub use _puroro_impls::*;
+pub mod _puroro_impls {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    use super::_puroro_traits::*;
     impl MsgTrait for () {
         type Field2StringType<'this> = &'static str;
         type Field4StringType<'this> = &'static str;
@@ -514,7 +611,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct MsgSimpleByValue {}
-    impl ::puroro::Message<MsgSimple> for MsgSimpleByValue {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleByValue {}
 
     impl MsgTrait for MsgSimpleByValue {
         fn g1_int32<'this>(&'this self) -> Option<i32> {
@@ -532,7 +629,7 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field5MessageType<'this> =
-            ::std::boxed::Box<self::_puroro_root::oneofs2::_puroro_impls::SubmsgSimple>;
+            ::std::boxed::Box<self::_puroro_root::oneofs2::_puroro_simple_impl::Submsg>;
         fn g2_submsg<'this>(&'this self) -> Option<Self::Field5MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
@@ -569,91 +666,6 @@ pub mod _puroro_impls {
     impl MsgBuilder<()> {
         pub fn new() -> Self {
             Self(())
-        }
-    }
-    #[derive(
-        ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
-    )]
-    pub struct SubmsgSimple {
-        pub i32_optional: ::std::option::Option<i32>,
-    }
-    impl ::puroro::Message<SubmsgSimple> for SubmsgSimple {}
-
-    impl SubmsgTrait for SubmsgSimple {
-        fn i32_optional<'this>(&'this self) -> Option<i32> {
-            Clone::clone(&self.i32_optional)
-        }
-    }
-
-    impl ::puroro::MessageRepresentativeImpl for SubmsgSimple {
-        fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
-            use ::puroro::once_cell::sync::Lazy;
-            static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
-                Lazy::new(|| {
-                    [{
-                        let init = ::puroro::internal::FieldDescriptorInitializer {
-                            name: "i32_optional",
-                            number: 1,
-                            lazy_containing_type: Lazy::new(|| {
-                                <SubmsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
-                            }),
-                        };
-                        ::puroro::internal::init_field_descriptor(init)
-                    }]
-                });
-            static LAZY_DESCRIPTOR: Lazy<::puroro::desc::MessageDescriptor> = Lazy::new(|| {
-                let init = ::puroro::internal::MessageDescriptorInitializer {
-                    name: "Submsg",
-                    lazy_fields: Lazy::new(|| Lazy::force(&LAZY_FIELD_DESCRIPTOR_ARRAY).as_ref()),
-                };
-                ::puroro::internal::init_message_descriptor(init)
-            });
-            Lazy::force(&LAZY_DESCRIPTOR)
-        }
-    }
-
-    impl ::puroro::DeserFromBytesIter for SubmsgSimple {
-        fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            ::puroro::internal::de::from_iter::deser_from_iter(self, iter)
-        }
-    }
-
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for SubmsgSimple {
-        fn deser_field<I>(
-            &mut self,
-            field_number: i32,
-            data: ::puroro::types::FieldData<&mut ::puroro::internal::de::from_iter::ScopedIter<I>>,
-        ) -> ::puroro::Result<()>
-        where
-            I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
-        {
-            use ::puroro::internal::impls::simple::de::DeserFieldFromBytesIter;
-            match field_number {
-            1 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Int32
-            >::deser_field(&mut self.i32_optional, data),
-
-            _ => unimplemented!("TODO: This case should be handled properly..."),
-        }
-        }
-    }
-
-    impl ::puroro::SerToIoWrite for SubmsgSimple {
-        fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
-        where
-            W: ::std::io::Write,
-        {
-            use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
-            SerFieldToIoWrite::<::puroro::tags::Optional, ::puroro::tags::Int32>::ser_field(
-                &self.i32_optional,
-                1,
-                out,
-            )?;
-
-            ::std::result::Result::Ok(())
         }
     }
     impl SubmsgTrait for () {}
@@ -693,7 +705,7 @@ pub mod _puroro_impls {
         pub i32_optional: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<SubmsgSimple> for SubmsgSimpleField1 {}
+    impl ::puroro::Message<super::Submsg> for SubmsgSimpleField1 {}
 
     impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
         fn i32_optional<'this>(&'this self) -> Option<i32> {
@@ -727,7 +739,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct SubmsgSimpleByValue {}
-    impl ::puroro::Message<SubmsgSimple> for SubmsgSimpleByValue {}
+    impl ::puroro::Message<super::Submsg> for SubmsgSimpleByValue {}
 
     impl SubmsgTrait for SubmsgSimpleByValue {
         fn i32_optional<'this>(&'this self) -> Option<i32> {

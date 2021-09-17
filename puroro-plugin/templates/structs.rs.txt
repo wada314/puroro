@@ -1,18 +1,31 @@
 
-pub use _puroro_impls::*;
+{#-
+ # The default simple impl, which is using a same name with messages
+ # (e.g. `message MyMessage` => `struct MyMessage`)
+ # must be separated out to standalone namespace to avoid name conflict.
+ #}
 {%- for m in messages %}
-pub use _puroro_impls::{{ m.simple_ident }} as {{ m.ident }};
+pub use _puroro_simple_impl::{{ m.simple_ident }};
 {%- endfor %}
+pub mod _puroro_simple_impl {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    {%- for m in messages %}
+    {%- include "simple/body.rs.txt" %}
+    {%- endfor %}
+}
+
+pub use _puroro_impls::*;
 pub mod _puroro_impls {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
 
-    {#- Guaranteed that the trait idents will never conflict -#}
+    {#- It is guaranteed that the trait idents will never conflict with structs names -#}
     use super::_puroro_traits::*;
 
     {%- for m in messages %}
-    {%- include "simple/body.rs.txt" %}
     {%- include "empty/body.rs.txt" %}
     {%- include "merged/body.rs.txt" %}
     {%- include "either/body.rs.txt" %}

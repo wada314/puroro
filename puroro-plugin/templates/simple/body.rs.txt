@@ -10,14 +10,14 @@ pub struct {{ m.simple_ident }} {
     pub {{ oneof.field_ident }}: ::std::option::Option<
         super::_puroro_nested::{{ m.submodule_ident }}::_puroro_oneofs::{{ oneof.enum_ident }}
         {%- if oneof.has_reference_field %}
-            <'static, {{ m.simple_by_value_ident }}>
+            <'static, super::_puroro_impls::{{ m.simple_by_value_ident }}>
         {%- endif %}
     >,
     {%- endfor %}
 }
 impl ::puroro::Message<{{ m.simple_ident }}> for {{ m.simple_ident }} {}
 
-impl {{ m.trait_ident }} for {{ m.simple_ident }} {
+impl super::_puroro_traits::{{ m.trait_ident }} for {{ m.simple_ident }} {
     {%- for field in m.fields %}
     {%- call simple_trait_impl_field(field) %}
     {%- endfor %}

@@ -387,9 +387,16 @@ impl Message {
         )
     }
     pub fn rust_impl_path(&self, impl_name: &str) -> String {
+        // "Simple" impls are separeted out to a special namespace.
+        let module = if impl_name == "Simple" {
+            "_puroro_simple_impl"
+        } else {
+            "_puroro_impls"
+        };
         format!(
-            "{path}::_puroro_impls::{ident}",
+            "{path}::{module}::{ident}",
             path = self.rust_module_path(),
+            module = module,
             ident = self.rust_impl_ident(impl_name),
         )
     }
@@ -404,7 +411,12 @@ impl Message {
         format!("{}Trait", &self.rust_ident)
     }
     pub fn rust_impl_ident(&self, impl_name: &str) -> String {
-        format!("{}{}", &self.rust_ident, impl_name)
+        // Simple impl uses raw name without suffix.
+        if impl_name == "Simple" {
+            self.rust_ident.clone()
+        } else {
+            format!("{}{}", &self.rust_ident, impl_name)
+        }
     }
     pub fn rust_nested_module_ident(&self) -> &str {
         &self.rust_nested_module_ident

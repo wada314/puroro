@@ -5,17 +5,15 @@ pub mod _puroro_root {
     pub use super::super::_puroro_root::*;
 }
 
-pub use _puroro_impls::MsgSimple as Msg;
-pub use _puroro_impls::*;
-pub mod _puroro_impls {
+pub use _puroro_simple_impl::Msg;
+pub mod _puroro_simple_impl {
     mod _puroro_root {
         pub use super::super::_puroro_root::*;
     }
-    use super::_puroro_traits::*;
     #[derive(
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
-    pub struct MsgSimple {
+    pub struct Msg {
     pub i32_unlabeled: i32,
     pub i32_optional: ::std::option::Option<i32>,
     pub i32_repeated: ::std::vec::Vec<i32>,
@@ -31,9 +29,9 @@ pub mod _puroro_impls {
     pub enum_unlabeled: self::_puroro_root::full_coverage3::Enum,
     pub enum_optional: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,
     pub enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,
-    pub submsg_unlabeled: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
-    pub submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
-    pub submsg_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>,
+    pub submsg_unlabeled: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>,
+    pub submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>,
+    pub submsg_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>,
     pub i64_unlabeled: i64,
     pub i64_optional: ::std::option::Option<i64>,
     pub i64_repeated: ::std::vec::Vec<i64>,
@@ -65,9 +63,9 @@ pub mod _puroro_impls {
     pub f64_optional: ::std::option::Option<f64>,
     pub f64_repeated: ::std::vec::Vec<f64>,
 }
-    impl ::puroro::Message<MsgSimple> for MsgSimple {}
+    impl ::puroro::Message<Msg> for Msg {}
 
-    impl MsgTrait for MsgSimple {
+    impl super::_puroro_traits::MsgTrait for Msg {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Clone::clone(&self.i32_unlabeled)
         }
@@ -137,18 +135,18 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
             self.enum_repeated.iter().cloned()
         }
-        type Field51MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
+        type Field51MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
-        type Field52MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
+        type Field52MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
         }
-        type Field53MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
+        type Field53MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         type Field53RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>;
+    self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+    ::std::slice::Iter<'this, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
@@ -265,7 +263,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::MessageRepresentativeImpl for MsgSimple {
+    impl ::puroro::MessageRepresentativeImpl for Msg {
         fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
             use ::puroro::once_cell::sync::Lazy;
             static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 48]> =
@@ -276,7 +274,7 @@ pub mod _puroro_impls {
                                 name: "i32_unlabeled",
                                 number: 1,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -286,7 +284,7 @@ pub mod _puroro_impls {
                                 name: "i32_optional",
                                 number: 2,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -296,7 +294,7 @@ pub mod _puroro_impls {
                                 name: "i32_repeated",
                                 number: 3,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -306,7 +304,7 @@ pub mod _puroro_impls {
                                 name: "float_unlabeled",
                                 number: 11,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -316,7 +314,7 @@ pub mod _puroro_impls {
                                 name: "float_optional",
                                 number: 12,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -326,7 +324,7 @@ pub mod _puroro_impls {
                                 name: "float_repeated",
                                 number: 13,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -336,7 +334,7 @@ pub mod _puroro_impls {
                                 name: "bytes_unlabeled",
                                 number: 21,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -346,7 +344,7 @@ pub mod _puroro_impls {
                                 name: "bytes_optional",
                                 number: 22,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -356,7 +354,7 @@ pub mod _puroro_impls {
                                 name: "bytes_repeated",
                                 number: 23,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -366,7 +364,7 @@ pub mod _puroro_impls {
                                 name: "string_unlabeled",
                                 number: 31,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -376,7 +374,7 @@ pub mod _puroro_impls {
                                 name: "string_optional",
                                 number: 32,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -386,7 +384,7 @@ pub mod _puroro_impls {
                                 name: "string_repeated",
                                 number: 33,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -396,7 +394,7 @@ pub mod _puroro_impls {
                                 name: "enum_unlabeled",
                                 number: 41,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -406,7 +404,7 @@ pub mod _puroro_impls {
                                 name: "enum_optional",
                                 number: 42,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -416,7 +414,7 @@ pub mod _puroro_impls {
                                 name: "enum_repeated",
                                 number: 43,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -426,7 +424,7 @@ pub mod _puroro_impls {
                                 name: "submsg_unlabeled",
                                 number: 51,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -436,7 +434,7 @@ pub mod _puroro_impls {
                                 name: "submsg_optional",
                                 number: 52,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -446,7 +444,7 @@ pub mod _puroro_impls {
                                 name: "submsg_repeated",
                                 number: 53,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -456,7 +454,7 @@ pub mod _puroro_impls {
                                 name: "i64_unlabeled",
                                 number: 101,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -466,7 +464,7 @@ pub mod _puroro_impls {
                                 name: "i64_optional",
                                 number: 102,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -476,7 +474,7 @@ pub mod _puroro_impls {
                                 name: "i64_repeated",
                                 number: 103,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -486,7 +484,7 @@ pub mod _puroro_impls {
                                 name: "u32_unlabeled",
                                 number: 111,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -496,7 +494,7 @@ pub mod _puroro_impls {
                                 name: "u32_optional",
                                 number: 112,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -506,7 +504,7 @@ pub mod _puroro_impls {
                                 name: "u32_repeated",
                                 number: 113,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -516,7 +514,7 @@ pub mod _puroro_impls {
                                 name: "u64_unlabeled",
                                 number: 121,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -526,7 +524,7 @@ pub mod _puroro_impls {
                                 name: "u64_optional",
                                 number: 122,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -536,7 +534,7 @@ pub mod _puroro_impls {
                                 name: "u64_repeated",
                                 number: 123,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -546,7 +544,7 @@ pub mod _puroro_impls {
                                 name: "s32_unlabeled",
                                 number: 131,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -556,7 +554,7 @@ pub mod _puroro_impls {
                                 name: "s32_optional",
                                 number: 132,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -566,7 +564,7 @@ pub mod _puroro_impls {
                                 name: "s32_repeated",
                                 number: 133,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -576,7 +574,7 @@ pub mod _puroro_impls {
                                 name: "s64_unlabeled",
                                 number: 141,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -586,7 +584,7 @@ pub mod _puroro_impls {
                                 name: "s64_optional",
                                 number: 142,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -596,7 +594,7 @@ pub mod _puroro_impls {
                                 name: "s64_repeated",
                                 number: 143,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -606,7 +604,7 @@ pub mod _puroro_impls {
                                 name: "fixed32_unlabeled",
                                 number: 151,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -616,7 +614,7 @@ pub mod _puroro_impls {
                                 name: "fixed32_optional",
                                 number: 152,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -626,7 +624,7 @@ pub mod _puroro_impls {
                                 name: "fixed32_repeated",
                                 number: 153,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -636,7 +634,7 @@ pub mod _puroro_impls {
                                 name: "fixed64_unlabeled",
                                 number: 161,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -646,7 +644,7 @@ pub mod _puroro_impls {
                                 name: "fixed64_optional",
                                 number: 162,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -656,7 +654,7 @@ pub mod _puroro_impls {
                                 name: "fixed64_repeated",
                                 number: 163,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -666,7 +664,7 @@ pub mod _puroro_impls {
                                 name: "sfixed32_unlabeled",
                                 number: 171,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -676,7 +674,7 @@ pub mod _puroro_impls {
                                 name: "sfixed32_optional",
                                 number: 172,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -686,7 +684,7 @@ pub mod _puroro_impls {
                                 name: "sfixed32_repeated",
                                 number: 173,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -696,7 +694,7 @@ pub mod _puroro_impls {
                                 name: "sfixed64_unlabeled",
                                 number: 181,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -706,7 +704,7 @@ pub mod _puroro_impls {
                                 name: "sfixed64_optional",
                                 number: 182,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -716,7 +714,7 @@ pub mod _puroro_impls {
                                 name: "sfixed64_repeated",
                                 number: 183,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -726,7 +724,7 @@ pub mod _puroro_impls {
                                 name: "f64_unlabeled",
                                 number: 191,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -736,7 +734,7 @@ pub mod _puroro_impls {
                                 name: "f64_optional",
                                 number: 192,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -746,7 +744,7 @@ pub mod _puroro_impls {
                                 name: "f64_repeated",
                                 number: 193,
                                 lazy_containing_type: Lazy::new(|| {
-                                    <MsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                    <Msg as ::puroro::MessageRepresentativeImpl>::descriptor()
                                 }),
                             };
                             ::puroro::internal::init_field_descriptor(init)
@@ -764,7 +762,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::DeserFromBytesIter for MsgSimple {
+    impl ::puroro::DeserFromBytesIter for Msg {
         fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
         where
             I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -773,7 +771,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::internal::de::DeserFieldsFromBytesIter for MsgSimple {
+    impl ::puroro::internal::de::DeserFieldsFromBytesIter for Msg {
         fn deser_field<I>(
             &mut self,
             field_number: i32,
@@ -830,13 +828,13 @@ pub mod _puroro_impls {
                 ::puroro::tags::Repeated, ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>
             >::deser_field(&mut self.enum_repeated, data),
             51 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+                ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
             >::deser_field(&mut self.submsg_unlabeled, data),
             52 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+                ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
             >::deser_field(&mut self.submsg_optional, data),
             53 => DeserFieldFromBytesIter::<
-                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+                ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
             >::deser_field(&mut self.submsg_repeated, data),
             101 => DeserFieldFromBytesIter::<
                 ::puroro::tags::Unlabeled, ::puroro::tags::Int64
@@ -934,7 +932,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MsgSimple {
+    impl ::puroro::SerToIoWrite for Msg {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1013,13 +1011,13 @@ pub mod _puroro_impls {
                 ::puroro::tags::Enum3<self::_puroro_root::full_coverage3::Enum>,
             >::ser_field(&self.enum_repeated, 43, out)?;
             SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+            ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
         >::ser_field(&self.submsg_unlabeled, 51, out)?;
             SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+            ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
         >::ser_field(&self.submsg_optional, 52, out)?;
             SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
         >::ser_field(&self.submsg_repeated, 53, out)?;
             SerFieldToIoWrite::<::puroro::tags::Unlabeled, ::puroro::tags::Int64>::ser_field(
                 &self.i64_unlabeled,
@@ -1175,6 +1173,14 @@ pub mod _puroro_impls {
             ::std::result::Result::Ok(())
         }
     }
+}
+
+pub use _puroro_impls::*;
+pub mod _puroro_impls {
+    mod _puroro_root {
+        pub use super::super::_puroro_root::*;
+    }
+    use super::_puroro_traits::*;
     impl MsgTrait for () {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
             Default::default()
@@ -2497,7 +2503,7 @@ pub mod _puroro_impls {
         pub i32_unlabeled: i32,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField1 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField1 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField1 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -2663,7 +2669,7 @@ pub mod _puroro_impls {
         pub i32_optional: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField2 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField2 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField2 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -2832,7 +2838,7 @@ pub mod _puroro_impls {
         pub i32_repeated: ::std::vec::Vec<i32>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField3 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField3 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField3 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -2999,7 +3005,7 @@ pub mod _puroro_impls {
         pub float_unlabeled: f32,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField11 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField11 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField11 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -3165,7 +3171,7 @@ pub mod _puroro_impls {
         pub float_optional: ::std::option::Option<f32>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField12 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField12 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField12 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -3334,7 +3340,7 @@ pub mod _puroro_impls {
         pub float_repeated: ::std::vec::Vec<f32>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField13 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField13 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField13 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -3501,7 +3507,7 @@ pub mod _puroro_impls {
         pub bytes_unlabeled: ::std::borrow::Cow<'static, [u8]>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField21 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField21 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField21 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -3667,7 +3673,7 @@ pub mod _puroro_impls {
         pub bytes_optional: ::std::option::Option<::std::borrow::Cow<'static, [u8]>>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField22 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField22 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField22 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -3838,7 +3844,7 @@ pub mod _puroro_impls {
         pub bytes_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, [u8]>>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField23 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField23 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField23 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -4007,7 +4013,7 @@ pub mod _puroro_impls {
         pub string_unlabeled: ::std::borrow::Cow<'static, str>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField31 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField31 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField31 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -4173,7 +4179,7 @@ pub mod _puroro_impls {
         pub string_optional: ::std::option::Option<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField32 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField32 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField32 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -4344,7 +4350,7 @@ pub mod _puroro_impls {
         pub string_repeated: ::std::vec::Vec<::std::borrow::Cow<'static, str>>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField33 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField33 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField33 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -4513,7 +4519,7 @@ pub mod _puroro_impls {
         pub enum_unlabeled: self::_puroro_root::full_coverage3::Enum,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField41 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField41 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField41 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -4678,7 +4684,7 @@ pub mod _puroro_impls {
         pub enum_optional: ::std::option::Option<self::_puroro_root::full_coverage3::Enum>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField42 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField42 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField42 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -4848,7 +4854,7 @@ pub mod _puroro_impls {
         pub enum_repeated: ::std::vec::Vec<self::_puroro_root::full_coverage3::Enum>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField43 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField43 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField43 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -5013,10 +5019,10 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField51 {
-    pub submsg_unlabeled: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
+    pub submsg_unlabeled: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>,
 }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField51 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField51 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField51 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -5064,7 +5070,7 @@ pub mod _puroro_impls {
         fn enum_repeated<'this>(&'this self) -> Self::Field43RepeatedType<'this> {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
-        type Field51MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
+        type Field51MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             self.submsg_unlabeled.as_ref().map(|v| v.as_ref())
         }
@@ -5164,14 +5170,14 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+            ::puroro::tags::Unlabeled, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
         >::ser_field(&self.submsg_unlabeled, 51, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>> for MsgSimpleField51 {
-    fn from(value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>) -> Self {
+    impl ::std::convert::From<::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>> for MsgSimpleField51 {
+    fn from(value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>) -> Self {
         Self {
             submsg_unlabeled: value,
         }
@@ -5180,10 +5186,10 @@ pub mod _puroro_impls {
 
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField52 {
-    pub submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
+    pub submsg_optional: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>,
 }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField52 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField52 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField52 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -5232,7 +5238,7 @@ pub mod _puroro_impls {
             ::puroro::internal::impls::empty::EmptyRepeatedField::new()
         }
         type Field51MessageType<'this> = ();
-        type Field52MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
+        type Field52MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         fn submsg_optional<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             self.submsg_optional.as_ref().map(|v| v.as_ref())
         }
@@ -5331,14 +5337,14 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+            ::puroro::tags::Optional, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
         >::ser_field(&self.submsg_optional, 52, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>> for MsgSimpleField52 {
-    fn from(value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>) -> Self {
+    impl ::std::convert::From<::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>> for MsgSimpleField52 {
+    fn from(value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>) -> Self {
         Self {
             submsg_optional: value,
         }
@@ -5348,11 +5354,11 @@ pub mod _puroro_impls {
     #[derive(::std::clone::Clone, ::std::cmp::PartialEq, ::std::fmt::Debug)]
     pub struct MsgSimpleField53 {
         pub submsg_repeated: ::std::vec::Vec<
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField53 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField53 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField53 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -5402,10 +5408,10 @@ pub mod _puroro_impls {
         }
         type Field51MessageType<'this> = ();
         type Field52MessageType<'this> = ();
-        type Field53MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple;
+        type Field53MessageType<'this> = &'this self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg;
         type Field53RepeatedType<'this> = ::puroro::internal::impls::simple::BorrowedIter<
-    self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
-    ::std::slice::Iter<'this, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>;
+    self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
+    ::std::slice::Iter<'this, self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>;
 
         fn submsg_repeated<'this>(&'this self) -> Self::Field53RepeatedType<'this> {
             ::puroro::internal::impls::simple::BorrowedIter::new(self.submsg_repeated.iter())
@@ -5499,14 +5505,14 @@ pub mod _puroro_impls {
         {
             use ::puroro::internal::impls::simple::se::SerFieldToIoWrite;
             SerFieldToIoWrite::<
-            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>
+            ::puroro::tags::Repeated, ::puroro::tags::Message<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>
         >::ser_field(&self.submsg_repeated, 53, out)?;
             ::std::result::Result::Ok(())
         }
     }
 
-    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>> for MsgSimpleField53 {
-    fn from(value: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>) -> Self {
+    impl ::std::convert::From<::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>> for MsgSimpleField53 {
+    fn from(value: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>) -> Self {
         Self {
             submsg_repeated: value,
         }
@@ -5518,7 +5524,7 @@ pub mod _puroro_impls {
         pub i64_unlabeled: i64,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField101 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField101 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField101 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -5684,7 +5690,7 @@ pub mod _puroro_impls {
         pub i64_optional: ::std::option::Option<i64>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField102 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField102 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField102 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -5853,7 +5859,7 @@ pub mod _puroro_impls {
         pub i64_repeated: ::std::vec::Vec<i64>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField103 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField103 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField103 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -6019,7 +6025,7 @@ pub mod _puroro_impls {
         pub u32_unlabeled: u32,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField111 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField111 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField111 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -6185,7 +6191,7 @@ pub mod _puroro_impls {
         pub u32_optional: ::std::option::Option<u32>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField112 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField112 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField112 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -6354,7 +6360,7 @@ pub mod _puroro_impls {
         pub u32_repeated: ::std::vec::Vec<u32>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField113 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField113 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField113 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -6520,7 +6526,7 @@ pub mod _puroro_impls {
         pub u64_unlabeled: u64,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField121 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField121 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField121 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -6686,7 +6692,7 @@ pub mod _puroro_impls {
         pub u64_optional: ::std::option::Option<u64>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField122 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField122 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField122 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -6855,7 +6861,7 @@ pub mod _puroro_impls {
         pub u64_repeated: ::std::vec::Vec<u64>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField123 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField123 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField123 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -7021,7 +7027,7 @@ pub mod _puroro_impls {
         pub s32_unlabeled: i32,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField131 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField131 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField131 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -7187,7 +7193,7 @@ pub mod _puroro_impls {
         pub s32_optional: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField132 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField132 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField132 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -7356,7 +7362,7 @@ pub mod _puroro_impls {
         pub s32_repeated: ::std::vec::Vec<i32>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField133 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField133 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField133 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -7522,7 +7528,7 @@ pub mod _puroro_impls {
         pub s64_unlabeled: i64,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField141 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField141 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField141 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -7688,7 +7694,7 @@ pub mod _puroro_impls {
         pub s64_optional: ::std::option::Option<i64>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField142 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField142 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField142 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -7857,7 +7863,7 @@ pub mod _puroro_impls {
         pub s64_repeated: ::std::vec::Vec<i64>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField143 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField143 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField143 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -8023,7 +8029,7 @@ pub mod _puroro_impls {
         pub fixed32_unlabeled: u32,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField151 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField151 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField151 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -8189,7 +8195,7 @@ pub mod _puroro_impls {
         pub fixed32_optional: ::std::option::Option<u32>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField152 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField152 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField152 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -8358,7 +8364,7 @@ pub mod _puroro_impls {
         pub fixed32_repeated: ::std::vec::Vec<u32>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField153 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField153 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField153 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -8524,7 +8530,7 @@ pub mod _puroro_impls {
         pub fixed64_unlabeled: u64,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField161 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField161 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField161 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -8690,7 +8696,7 @@ pub mod _puroro_impls {
         pub fixed64_optional: ::std::option::Option<u64>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField162 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField162 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField162 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -8859,7 +8865,7 @@ pub mod _puroro_impls {
         pub fixed64_repeated: ::std::vec::Vec<u64>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField163 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField163 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField163 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -9025,7 +9031,7 @@ pub mod _puroro_impls {
         pub sfixed32_unlabeled: i32,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField171 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField171 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField171 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -9191,7 +9197,7 @@ pub mod _puroro_impls {
         pub sfixed32_optional: ::std::option::Option<i32>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField172 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField172 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField172 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -9360,7 +9366,7 @@ pub mod _puroro_impls {
         pub sfixed32_repeated: ::std::vec::Vec<i32>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField173 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField173 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField173 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -9526,7 +9532,7 @@ pub mod _puroro_impls {
         pub sfixed64_unlabeled: i64,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField181 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField181 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField181 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -9692,7 +9698,7 @@ pub mod _puroro_impls {
         pub sfixed64_optional: ::std::option::Option<i64>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField182 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField182 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField182 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -9861,7 +9867,7 @@ pub mod _puroro_impls {
         pub sfixed64_repeated: ::std::vec::Vec<i64>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField183 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField183 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField183 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -10027,7 +10033,7 @@ pub mod _puroro_impls {
         pub f64_unlabeled: f64,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField191 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField191 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField191 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -10193,7 +10199,7 @@ pub mod _puroro_impls {
         pub f64_optional: ::std::option::Option<f64>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField192 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField192 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField192 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -10362,7 +10368,7 @@ pub mod _puroro_impls {
         pub f64_repeated: ::std::vec::Vec<f64>,
     }
 
-    impl ::puroro::Message<MsgSimple> for MsgSimpleField193 {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleField193 {}
 
     impl super::_puroro_traits::MsgTrait for MsgSimpleField193 {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -10526,7 +10532,7 @@ pub mod _puroro_impls {
         ::std::clone::Clone, ::std::default::Default, ::std::cmp::PartialEq, ::std::fmt::Debug,
     )]
     pub struct MsgSimpleByValue {}
-    impl ::puroro::Message<MsgSimple> for MsgSimpleByValue {}
+    impl ::puroro::Message<super::Msg> for MsgSimpleByValue {}
 
     impl MsgTrait for MsgSimpleByValue {
         fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -10590,19 +10596,19 @@ pub mod _puroro_impls {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field51MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >;
         fn submsg_unlabeled<'this>(&'this self) -> Option<Self::Field51MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field52MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >;
         fn submsg_optional<'this>(&'this self) -> Option<Self::Field52MessageType<'this>> {
             unimplemented!("Please don't use / instantiate this struct!!")
         }
         type Field53MessageType<'this> = ::std::boxed::Box<
-            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple,
+            self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg,
         >;
         type Field53RepeatedType<'this> =
             ::puroro::internal::impls::empty::EmptyRepeatedField<Self::Field53MessageType<'this>>;
@@ -10812,19 +10818,19 @@ pub mod _puroro_impls {
         }
         pub fn append_submsg_unlabeled(
             self,
-            value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
+            value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>,
         ) -> MsgBuilder<(T, MsgSimpleField51)> {
             MsgBuilder((self.0, ::std::convert::From::from(value)))
         }
         pub fn append_submsg_optional(
             self,
-            value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>>,
+            value: ::std::option::Option<::std::boxed::Box<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>>,
         ) -> MsgBuilder<(T, MsgSimpleField52)> {
             MsgBuilder((self.0, ::std::convert::From::from(value)))
         }
         pub fn append_submsg_repeated(
             self,
-            value: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_impls::SubmsgSimple>,
+            value: ::std::vec::Vec<self::_puroro_root::full_coverage3::_puroro_nested::msg::_puroro_simple_impl::Submsg>,
         ) -> MsgBuilder<(T, MsgSimpleField53)> {
             MsgBuilder((self.0, ::std::convert::From::from(value)))
         }
@@ -11394,31 +11400,29 @@ pub mod _puroro_nested {
             pub use super::super::super::_puroro_root::*;
         }
 
-        pub use _puroro_impls::SubmsgSimple as Submsg;
-        pub use _puroro_impls::*;
-        pub mod _puroro_impls {
+        pub use _puroro_simple_impl::Submsg;
+        pub mod _puroro_simple_impl {
             mod _puroro_root {
                 pub use super::super::_puroro_root::*;
             }
-            use super::_puroro_traits::*;
             #[derive(
                 ::std::clone::Clone,
                 ::std::default::Default,
                 ::std::cmp::PartialEq,
                 ::std::fmt::Debug,
             )]
-            pub struct SubmsgSimple {
+            pub struct Submsg {
                 pub i32_unlabeled: i32,
             }
-            impl ::puroro::Message<SubmsgSimple> for SubmsgSimple {}
+            impl ::puroro::Message<Submsg> for Submsg {}
 
-            impl SubmsgTrait for SubmsgSimple {
+            impl super::_puroro_traits::SubmsgTrait for Submsg {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     Clone::clone(&self.i32_unlabeled)
                 }
             }
 
-            impl ::puroro::MessageRepresentativeImpl for SubmsgSimple {
+            impl ::puroro::MessageRepresentativeImpl for Submsg {
                 fn descriptor() -> &'static ::puroro::desc::MessageDescriptor {
                     use ::puroro::once_cell::sync::Lazy;
                     static LAZY_FIELD_DESCRIPTOR_ARRAY: Lazy<[::puroro::desc::FieldDescriptor; 1]> =
@@ -11428,7 +11432,8 @@ pub mod _puroro_nested {
                                     name: "i32_unlabeled",
                                     number: 1,
                                     lazy_containing_type: Lazy::new(|| {
-                                        <SubmsgSimple as ::puroro::MessageRepresentativeImpl>::descriptor()
+                                        <Submsg as ::puroro::MessageRepresentativeImpl>::descriptor(
+                                        )
                                     }),
                                 };
                                 ::puroro::internal::init_field_descriptor(init)
@@ -11448,7 +11453,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::DeserFromBytesIter for SubmsgSimple {
+            impl ::puroro::DeserFromBytesIter for Submsg {
                 fn deser<I>(&mut self, iter: I) -> ::puroro::Result<()>
                 where
                     I: ::std::iter::Iterator<Item = ::std::io::Result<u8>>,
@@ -11457,7 +11462,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::internal::de::DeserFieldsFromBytesIter for SubmsgSimple {
+            impl ::puroro::internal::de::DeserFieldsFromBytesIter for Submsg {
                 fn deser_field<I>(
                     &mut self,
                     field_number: i32,
@@ -11480,7 +11485,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for SubmsgSimple {
+            impl ::puroro::SerToIoWrite for Submsg {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -11493,6 +11498,14 @@ pub mod _puroro_nested {
                     ::std::result::Result::Ok(())
                 }
             }
+        }
+
+        pub use _puroro_impls::*;
+        pub mod _puroro_impls {
+            mod _puroro_root {
+                pub use super::super::_puroro_root::*;
+            }
+            use super::_puroro_traits::*;
             impl SubmsgTrait for () {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
                     Default::default()
@@ -11539,7 +11552,7 @@ pub mod _puroro_nested {
                 pub i32_unlabeled: i32,
             }
 
-            impl ::puroro::Message<SubmsgSimple> for SubmsgSimpleField1 {}
+            impl ::puroro::Message<super::Submsg> for SubmsgSimpleField1 {}
 
             impl super::_puroro_traits::SubmsgTrait for SubmsgSimpleField1 {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
@@ -11574,7 +11587,7 @@ pub mod _puroro_nested {
                 ::std::fmt::Debug,
             )]
             pub struct SubmsgSimpleByValue {}
-            impl ::puroro::Message<SubmsgSimple> for SubmsgSimpleByValue {}
+            impl ::puroro::Message<super::Submsg> for SubmsgSimpleByValue {}
 
             impl SubmsgTrait for SubmsgSimpleByValue {
                 fn i32_unlabeled<'this>(&'this self) -> i32 {
