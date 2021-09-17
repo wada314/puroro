@@ -113,7 +113,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorSet {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorSet {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -460,7 +460,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProto {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -825,7 +825,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for DescriptorProto {
+    impl ::puroro::SerializableMessageToIoWrite for DescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -967,7 +967,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for ExtensionRangeOptions {
+    impl ::puroro::SerializableMessageToIoWrite for ExtensionRangeOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1248,7 +1248,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FieldDescriptorProto {
+    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1404,7 +1404,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for OneofDescriptorProto {
+    impl ::puroro::SerializableMessageToIoWrite for OneofDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1586,7 +1586,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumDescriptorProto {
+    impl ::puroro::SerializableMessageToIoWrite for EnumDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1729,7 +1729,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumValueDescriptorProto {
+    impl ::puroro::SerializableMessageToIoWrite for EnumValueDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -1878,7 +1878,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for ServiceDescriptorProto {
+    impl ::puroro::SerializableMessageToIoWrite for ServiceDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -2066,7 +2066,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MethodDescriptorProto {
+    impl ::puroro::SerializableMessageToIoWrite for MethodDescriptorProto {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -2565,7 +2565,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptions {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -2831,7 +2831,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MessageOptions {
+    impl ::puroro::SerializableMessageToIoWrite for MessageOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3063,7 +3063,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FieldOptions {
+    impl ::puroro::SerializableMessageToIoWrite for FieldOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3189,7 +3189,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for OneofOptions {
+    impl ::puroro::SerializableMessageToIoWrite for OneofOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3326,7 +3326,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumOptions {
+    impl ::puroro::SerializableMessageToIoWrite for EnumOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3453,7 +3453,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumValueOptions {
+    impl ::puroro::SerializableMessageToIoWrite for EnumValueOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3575,7 +3575,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for ServiceOptions {
+    impl ::puroro::SerializableMessageToIoWrite for ServiceOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3720,7 +3720,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MethodOptions {
+    impl ::puroro::SerializableMessageToIoWrite for MethodOptions {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -3926,7 +3926,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for UninterpretedOption {
+    impl ::puroro::SerializableMessageToIoWrite for UninterpretedOption {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -4045,7 +4045,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for SourceCodeInfo {
+    impl ::puroro::SerializableMessageToIoWrite for SourceCodeInfo {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -4133,7 +4133,7 @@ pub mod _puroro_simple_impl {
         }
     }
 
-    impl ::puroro::SerToIoWrite for GeneratedCodeInfo {
+    impl ::puroro::SerializableMessageToIoWrite for GeneratedCodeInfo {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -4250,7 +4250,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorSetSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorSetSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -4879,7 +4879,7 @@ pub mod _puroro_impls {
         type Field12StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -4956,7 +4956,7 @@ pub mod _puroro_impls {
         type Field12StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSimpleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -5035,7 +5035,7 @@ pub mod _puroro_impls {
         type Field12StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSimpleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -5112,7 +5112,7 @@ pub mod _puroro_impls {
         type Field12StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimpleField10 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSimpleField10 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -5189,7 +5189,7 @@ pub mod _puroro_impls {
         type Field12StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimpleField11 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSimpleField11 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -5274,7 +5274,7 @@ pub mod _puroro_impls {
         type Field12StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimpleField4 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSimpleField4 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -5370,7 +5370,7 @@ pub mod _puroro_impls {
         type Field12StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimpleField5 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSimpleField5 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -5463,7 +5463,7 @@ pub mod _puroro_impls {
         type Field12StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimpleField6 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSimpleField6 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -5554,7 +5554,7 @@ pub mod _puroro_impls {
         type Field12StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimpleField7 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSimpleField7 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -5647,7 +5647,7 @@ pub mod _puroro_impls {
         type Field12StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimpleField8 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSimpleField8 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -5744,7 +5744,7 @@ pub mod _puroro_impls {
         type Field12StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimpleField9 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSimpleField9 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -5838,7 +5838,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileDescriptorProtoSimpleField12 {
+    impl ::puroro::SerializableMessageToIoWrite for FileDescriptorProtoSimpleField12 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -6590,7 +6590,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for DescriptorProtoSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for DescriptorProtoSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -6680,7 +6680,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for DescriptorProtoSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for DescriptorProtoSimpleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -6781,7 +6781,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for DescriptorProtoSimpleField6 {
+    impl ::puroro::SerializableMessageToIoWrite for DescriptorProtoSimpleField6 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -6882,7 +6882,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for DescriptorProtoSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for DescriptorProtoSimpleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -6983,7 +6983,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for DescriptorProtoSimpleField4 {
+    impl ::puroro::SerializableMessageToIoWrite for DescriptorProtoSimpleField4 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -7077,7 +7077,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for DescriptorProtoSimpleField5 {
+    impl ::puroro::SerializableMessageToIoWrite for DescriptorProtoSimpleField5 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -7167,7 +7167,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for DescriptorProtoSimpleField8 {
+    impl ::puroro::SerializableMessageToIoWrite for DescriptorProtoSimpleField8 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -7267,7 +7267,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for DescriptorProtoSimpleField7 {
+    impl ::puroro::SerializableMessageToIoWrite for DescriptorProtoSimpleField7 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -7365,7 +7365,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for DescriptorProtoSimpleField9 {
+    impl ::puroro::SerializableMessageToIoWrite for DescriptorProtoSimpleField9 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -7449,7 +7449,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for DescriptorProtoSimpleField10 {
+    impl ::puroro::SerializableMessageToIoWrite for DescriptorProtoSimpleField10 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -7736,7 +7736,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for ExtensionRangeOptionsSimpleField999 {
+    impl ::puroro::SerializableMessageToIoWrite for ExtensionRangeOptionsSimpleField999 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8135,7 +8135,7 @@ pub mod _puroro_impls {
         type Field8MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for FieldDescriptorProtoSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8175,7 +8175,7 @@ pub mod _puroro_impls {
         type Field8MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for FieldDescriptorProtoSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSimpleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8221,7 +8221,7 @@ pub mod _puroro_impls {
         type Field8MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for FieldDescriptorProtoSimpleField4 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSimpleField4 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8275,7 +8275,7 @@ pub mod _puroro_impls {
         type Field8MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for FieldDescriptorProtoSimpleField5 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSimpleField5 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8323,7 +8323,7 @@ pub mod _puroro_impls {
         type Field8MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for FieldDescriptorProtoSimpleField6 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSimpleField6 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8365,7 +8365,7 @@ pub mod _puroro_impls {
         type Field8MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for FieldDescriptorProtoSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSimpleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8407,7 +8407,7 @@ pub mod _puroro_impls {
         type Field8MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for FieldDescriptorProtoSimpleField7 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSimpleField7 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8451,7 +8451,7 @@ pub mod _puroro_impls {
         type Field8MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for FieldDescriptorProtoSimpleField9 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSimpleField9 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8491,7 +8491,7 @@ pub mod _puroro_impls {
         type Field8MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for FieldDescriptorProtoSimpleField10 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSimpleField10 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8538,7 +8538,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FieldDescriptorProtoSimpleField8 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSimpleField8 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8593,7 +8593,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FieldDescriptorProtoSimpleField17 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldDescriptorProtoSimpleField17 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8858,7 +8858,7 @@ pub mod _puroro_impls {
         type Field2MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for OneofDescriptorProtoSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for OneofDescriptorProtoSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -8899,7 +8899,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for OneofDescriptorProtoSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for OneofDescriptorProtoSimpleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -9247,7 +9247,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumDescriptorProtoSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumDescriptorProtoSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -9306,7 +9306,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumDescriptorProtoSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumDescriptorProtoSimpleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -9373,7 +9373,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumDescriptorProtoSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumDescriptorProtoSimpleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -9441,7 +9441,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumDescriptorProtoSimpleField4 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumDescriptorProtoSimpleField4 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -9495,7 +9495,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumDescriptorProtoSimpleField5 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumDescriptorProtoSimpleField5 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -9727,7 +9727,7 @@ pub mod _puroro_impls {
         type Field3MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for EnumValueDescriptorProtoSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumValueDescriptorProtoSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -9763,7 +9763,7 @@ pub mod _puroro_impls {
         type Field3MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for EnumValueDescriptorProtoSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumValueDescriptorProtoSimpleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -9804,7 +9804,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumValueDescriptorProtoSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumValueDescriptorProtoSimpleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10055,7 +10055,7 @@ pub mod _puroro_impls {
         type Field3MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for ServiceDescriptorProtoSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for ServiceDescriptorProtoSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10103,7 +10103,7 @@ pub mod _puroro_impls {
         type Field3MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for ServiceDescriptorProtoSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for ServiceDescriptorProtoSimpleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10158,7 +10158,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for ServiceDescriptorProtoSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for ServiceDescriptorProtoSimpleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10454,7 +10454,7 @@ pub mod _puroro_impls {
         type Field4MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for MethodDescriptorProtoSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for MethodDescriptorProtoSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10492,7 +10492,7 @@ pub mod _puroro_impls {
         type Field4MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for MethodDescriptorProtoSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for MethodDescriptorProtoSimpleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10532,7 +10532,7 @@ pub mod _puroro_impls {
         type Field4MessageType<'this> = ();
     }
 
-    impl ::puroro::SerToIoWrite for MethodDescriptorProtoSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for MethodDescriptorProtoSimpleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10577,7 +10577,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MethodDescriptorProtoSimpleField4 {
+    impl ::puroro::SerializableMessageToIoWrite for MethodDescriptorProtoSimpleField4 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10630,7 +10630,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MethodDescriptorProtoSimpleField5 {
+    impl ::puroro::SerializableMessageToIoWrite for MethodDescriptorProtoSimpleField5 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -10670,7 +10670,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MethodDescriptorProtoSimpleField6 {
+    impl ::puroro::SerializableMessageToIoWrite for MethodDescriptorProtoSimpleField6 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11341,7 +11341,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11395,7 +11395,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField8 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField8 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11449,7 +11449,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField10 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField10 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11501,7 +11501,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField20 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField20 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11553,7 +11553,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField27 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField27 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11610,7 +11610,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField9 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField9 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11670,7 +11670,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField11 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField11 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11722,7 +11722,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField16 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField16 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11774,7 +11774,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField17 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField17 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11826,7 +11826,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField18 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField18 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11878,7 +11878,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField42 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField42 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11930,7 +11930,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField23 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField23 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -11980,7 +11980,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField31 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField31 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12032,7 +12032,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField36 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField36 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12086,7 +12086,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField37 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField37 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12140,7 +12140,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField39 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField39 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12194,7 +12194,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField40 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField40 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12248,7 +12248,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField41 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField41 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12302,7 +12302,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField44 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField44 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12356,7 +12356,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField45 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField45 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12416,7 +12416,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FileOptionsSimpleField999 {
+    impl ::puroro::SerializableMessageToIoWrite for FileOptionsSimpleField999 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12828,7 +12828,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MessageOptionsSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for MessageOptionsSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12870,7 +12870,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MessageOptionsSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for MessageOptionsSimpleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12912,7 +12912,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MessageOptionsSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for MessageOptionsSimpleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12952,7 +12952,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MessageOptionsSimpleField7 {
+    impl ::puroro::SerializableMessageToIoWrite for MessageOptionsSimpleField7 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -12998,7 +12998,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MessageOptionsSimpleField999 {
+    impl ::puroro::SerializableMessageToIoWrite for MessageOptionsSimpleField999 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -13301,7 +13301,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FieldOptionsSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -13352,7 +13352,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FieldOptionsSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSimpleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -13397,7 +13397,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FieldOptionsSimpleField6 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSimpleField6 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -13448,7 +13448,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FieldOptionsSimpleField5 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSimpleField5 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -13486,7 +13486,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FieldOptionsSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSimpleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -13526,7 +13526,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FieldOptionsSimpleField10 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSimpleField10 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -13570,7 +13570,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for FieldOptionsSimpleField999 {
+    impl ::puroro::SerializableMessageToIoWrite for FieldOptionsSimpleField999 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -13804,7 +13804,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for OneofOptionsSimpleField999 {
+    impl ::puroro::SerializableMessageToIoWrite for OneofOptionsSimpleField999 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -13994,7 +13994,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumOptionsSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumOptionsSimpleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -14034,7 +14034,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumOptionsSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumOptionsSimpleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -14080,7 +14080,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumOptionsSimpleField999 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumOptionsSimpleField999 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -14275,7 +14275,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumValueOptionsSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumValueOptionsSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -14321,7 +14321,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for EnumValueOptionsSimpleField999 {
+    impl ::puroro::SerializableMessageToIoWrite for EnumValueOptionsSimpleField999 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -14507,7 +14507,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for ServiceOptionsSimpleField33 {
+    impl ::puroro::SerializableMessageToIoWrite for ServiceOptionsSimpleField33 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -14553,7 +14553,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for ServiceOptionsSimpleField999 {
+    impl ::puroro::SerializableMessageToIoWrite for ServiceOptionsSimpleField999 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -14764,7 +14764,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MethodOptionsSimpleField33 {
+    impl ::puroro::SerializableMessageToIoWrite for MethodOptionsSimpleField33 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -14810,7 +14810,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MethodOptionsSimpleField34 {
+    impl ::puroro::SerializableMessageToIoWrite for MethodOptionsSimpleField34 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -14856,7 +14856,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for MethodOptionsSimpleField999 {
+    impl ::puroro::SerializableMessageToIoWrite for MethodOptionsSimpleField999 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15189,7 +15189,7 @@ pub mod _puroro_impls {
         type Field8StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for UninterpretedOptionSimpleField2 {
+    impl ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSimpleField2 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15232,7 +15232,7 @@ pub mod _puroro_impls {
         type Field8StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for UninterpretedOptionSimpleField3 {
+    impl ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSimpleField3 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15279,7 +15279,7 @@ pub mod _puroro_impls {
         type Field8StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for UninterpretedOptionSimpleField4 {
+    impl ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSimpleField4 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15324,7 +15324,7 @@ pub mod _puroro_impls {
         type Field8StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for UninterpretedOptionSimpleField5 {
+    impl ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSimpleField5 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15369,7 +15369,7 @@ pub mod _puroro_impls {
         type Field8StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for UninterpretedOptionSimpleField6 {
+    impl ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSimpleField6 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15414,7 +15414,7 @@ pub mod _puroro_impls {
         type Field8StringType<'this> = &'static str;
     }
 
-    impl ::puroro::SerToIoWrite for UninterpretedOptionSimpleField7 {
+    impl ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSimpleField7 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15461,7 +15461,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for UninterpretedOptionSimpleField8 {
+    impl ::puroro::SerializableMessageToIoWrite for UninterpretedOptionSimpleField8 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15668,7 +15668,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for SourceCodeInfoSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for SourceCodeInfoSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -15814,7 +15814,7 @@ pub mod _puroro_impls {
         }
     }
 
-    impl ::puroro::SerToIoWrite for GeneratedCodeInfoSimpleField1 {
+    impl ::puroro::SerializableMessageToIoWrite for GeneratedCodeInfoSimpleField1 {
         fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
         where
             W: ::std::io::Write,
@@ -17526,7 +17526,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for ExtensionRange {
+            impl ::puroro::SerializableMessageToIoWrite for ExtensionRange {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -17644,7 +17644,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for ReservedRange {
+            impl ::puroro::SerializableMessageToIoWrite for ReservedRange {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -17766,7 +17766,7 @@ pub mod _puroro_nested {
                 type Field3MessageType<'this> = ();
             }
 
-            impl ::puroro::SerToIoWrite for ExtensionRangeSimpleField1 {
+            impl ::puroro::SerializableMessageToIoWrite for ExtensionRangeSimpleField1 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -17799,7 +17799,7 @@ pub mod _puroro_nested {
                 type Field3MessageType<'this> = ();
             }
 
-            impl ::puroro::SerToIoWrite for ExtensionRangeSimpleField2 {
+            impl ::puroro::SerializableMessageToIoWrite for ExtensionRangeSimpleField2 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -17832,7 +17832,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for ExtensionRangeSimpleField3 {
+            impl ::puroro::SerializableMessageToIoWrite for ExtensionRangeSimpleField3 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -17966,7 +17966,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for ReservedRangeSimpleField1 {
+            impl ::puroro::SerializableMessageToIoWrite for ReservedRangeSimpleField1 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -17998,7 +17998,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for ReservedRangeSimpleField2 {
+            impl ::puroro::SerializableMessageToIoWrite for ReservedRangeSimpleField2 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -18403,7 +18403,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for EnumReservedRange {
+            impl ::puroro::SerializableMessageToIoWrite for EnumReservedRange {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -18485,7 +18485,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for EnumReservedRangeSimpleField1 {
+            impl ::puroro::SerializableMessageToIoWrite for EnumReservedRangeSimpleField1 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -18517,7 +18517,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for EnumReservedRangeSimpleField2 {
+            impl ::puroro::SerializableMessageToIoWrite for EnumReservedRangeSimpleField2 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -18939,7 +18939,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for NamePart {
+            impl ::puroro::SerializableMessageToIoWrite for NamePart {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -19042,7 +19042,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for NamePartSimpleField1 {
+            impl ::puroro::SerializableMessageToIoWrite for NamePartSimpleField1 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -19077,7 +19077,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for NamePartSimpleField2 {
+            impl ::puroro::SerializableMessageToIoWrite for NamePartSimpleField2 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -19392,7 +19392,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for Location {
+            impl ::puroro::SerializableMessageToIoWrite for Location {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -19693,7 +19693,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for LocationSimpleField1 {
+            impl ::puroro::SerializableMessageToIoWrite for LocationSimpleField1 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -19745,7 +19745,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for LocationSimpleField2 {
+            impl ::puroro::SerializableMessageToIoWrite for LocationSimpleField2 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -19799,7 +19799,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for LocationSimpleField3 {
+            impl ::puroro::SerializableMessageToIoWrite for LocationSimpleField3 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -19857,7 +19857,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for LocationSimpleField4 {
+            impl ::puroro::SerializableMessageToIoWrite for LocationSimpleField4 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -19915,7 +19915,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for LocationSimpleField6 {
+            impl ::puroro::SerializableMessageToIoWrite for LocationSimpleField6 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -20269,7 +20269,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for Annotation {
+            impl ::puroro::SerializableMessageToIoWrite for Annotation {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -20439,7 +20439,7 @@ pub mod _puroro_nested {
                 type Field2StringType<'this> = &'static str;
             }
 
-            impl ::puroro::SerToIoWrite for AnnotationSimpleField1 {
+            impl ::puroro::SerializableMessageToIoWrite for AnnotationSimpleField1 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -20477,7 +20477,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for AnnotationSimpleField2 {
+            impl ::puroro::SerializableMessageToIoWrite for AnnotationSimpleField2 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -20517,7 +20517,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for AnnotationSimpleField3 {
+            impl ::puroro::SerializableMessageToIoWrite for AnnotationSimpleField3 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,
@@ -20555,7 +20555,7 @@ pub mod _puroro_nested {
                 }
             }
 
-            impl ::puroro::SerToIoWrite for AnnotationSimpleField4 {
+            impl ::puroro::SerializableMessageToIoWrite for AnnotationSimpleField4 {
                 fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
                 where
                     W: ::std::io::Write,

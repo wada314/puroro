@@ -32,7 +32,7 @@ impl super::_puroro_traits::{{ m.ident }}Trait for {{ m.simple_single_field_iden
     {%- endfor %}
 }
 
-impl ::puroro::SerToIoWrite for {{ m.simple_single_field_ident }}{{ sfield.number }} {
+impl ::puroro::SerializableMessageToIoWrite for {{ m.simple_single_field_ident }}{{ sfield.number }} {
     fn ser<W>(&self, out: &mut W) -> ::puroro::Result<()>
     where
         W: ::std::io::Write

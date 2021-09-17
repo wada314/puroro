@@ -1,4 +1,4 @@
-use ::puroro::SerToIoWrite;
+use ::puroro::SerializableMessageToIoWrite;
 use ::tests_pb::full_coverage2::MsgTrait as MsgTrait2;
 use ::tests_pb::full_coverage3::Enum as Enum3;
 use ::tests_pb::full_coverage3::MsgTrait as MsgTrait3;
@@ -50,6 +50,6 @@ fn test_getters3() {
 #[test]
 fn test_ser() {
     let mut buffer = Vec::new();
-    <() as SerToIoWrite>::ser(&(), &mut buffer).unwrap();
+    <() as SerializableMessageToIoWrite>::ser(&(), &mut buffer).unwrap();
     assert_eq!(0, buffer.len());
 }

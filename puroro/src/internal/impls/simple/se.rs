@@ -3,7 +3,7 @@ use crate::internal::se::to_io_write::write_field_number_and_wire_type;
 use crate::types::WireType;
 use crate::variant::Variant;
 use crate::variant::VariantTypeTag;
-use crate::SerToIoWrite;
+use crate::SerializableMessageToIoWrite;
 use crate::{tags, Result};
 use ::std::borrow::Cow;
 use ::std::convert::TryInto;
@@ -190,7 +190,7 @@ where
 
 impl<M, _1, _2, _3> SerFieldToIoWrite<tags::LabelNonRepeated<_1, _2, _3>, tags::Message<M>>
 where
-    M: SerToIoWrite,
+    M: SerializableMessageToIoWrite,
 {
     pub fn ser_field<FieldType, W>(field: &FieldType, number: i32, out: &mut W) -> Result<()>
     where
@@ -200,7 +200,7 @@ where
         for boxed in field.iter() {
             let len = {
                 let mut null_out = NullWrite::new();
-                <M as SerToIoWrite>::ser(boxed.deref(), &mut null_out)?;
+                <M as SerializableMessageToIoWrite>::ser(boxed.deref(), &mut null_out)?;
                 null_out.len()
             };
             let len_i32: i32 = len
@@ -208,7 +208,7 @@ where
                 .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
             write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
             Variant::from_i32(len_i32)?.encode_bytes(out)?;
-            <M as SerToIoWrite>::ser(boxed.deref(), out)?;
+            <M as SerializableMessageToIoWrite>::ser(boxed.deref(), out)?;
         }
         Ok(())
     }
@@ -216,7 +216,7 @@ where
 
 impl<M> SerFieldToIoWrite<tags::Repeated, tags::Message<M>>
 where
-    M: SerToIoWrite,
+    M: SerializableMessageToIoWrite,
 {
     pub fn ser_field<W>(field: &Vec<M>, number: i32, out: &mut W) -> Result<()>
     where
@@ -225,7 +225,7 @@ where
         for item in field {
             let len = {
                 let mut null_out = NullWrite::new();
-                <M as SerToIoWrite>::ser(item, &mut null_out)?;
+                <M as SerializableMessageToIoWrite>::ser(item, &mut null_out)?;
                 null_out.len()
             };
             let len_i32: i32 = len
@@ -233,7 +233,7 @@ where
                 .map_err(|_| crate::ErrorKind::TooLongToSerialize)?;
             write_field_number_and_wire_type(out, number, WireType::LengthDelimited)?;
             Variant::from_i32(len_i32)?.encode_bytes(out)?;
-            <M as SerToIoWrite>::ser(item, out)?;
+            <M as SerializableMessageToIoWrite>::ser(item, out)?;
         }
         Ok(())
     }

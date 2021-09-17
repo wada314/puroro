@@ -3,7 +3,7 @@ use crate::tests_pb::ser_tests2::{Enum as Enum2, Msg as Msg2};
 use crate::tests_pb::ser_tests3::msg::Submsg as Submsg3;
 use crate::tests_pb::ser_tests3::{Enum as Enum3, Msg as Msg3};
 use ::puroro::DeserializableMessageFromBytesIterator;
-use ::puroro::SerToIoWrite;
+use ::puroro::SerializableMessageToIoWrite;
 
 #[test]
 fn test_empty2() {

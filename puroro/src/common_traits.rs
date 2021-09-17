@@ -1,6 +1,7 @@
 use crate::desc::MessageDescriptor;
 use crate::{Either, Result};
 use ::std::convert::TryFrom;
+use ::std::io::Write;
 
 pub trait Message<M>
 where
@@ -26,6 +27,14 @@ where
         let mut msg = <Self as Default>::default();
         msg.merge_from_bytes(iter)?;
         Ok(msg)
+    }
+
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        Self: SerializableMessageToIoWrite,
+        W: Write,
+    {
+        <Self as SerializableMessageToIoWrite>::ser(&self, out)
     }
 }
 impl<M, T, U> Message<M> for crate::Either<T, U>
@@ -69,47 +78,60 @@ pub trait DeserializableMessageFromBytesIterator {
         I: Iterator<Item = ::std::io::Result<u8>>;
 }
 
-pub trait SerToIoWrite {
+pub trait SerializableMessageToIoWrite {
     fn ser<W>(&self, out: &mut W) -> Result<()>
     where
-        W: ::std::io::Write;
+        W: Write;
 }
-impl SerToIoWrite for () {
+impl SerializableMessageToIoWrite for () {
     fn ser<W>(&self, _: &mut W) -> Result<()>
     where
-        W: ::std::io::Write,
+        W: Write,
     {
         Ok(())
     }
 }
-impl<T, U> SerToIoWrite for (T, U)
+impl<T, U> SerializableMessageToIoWrite for (T, U)
 where
-    T: SerToIoWrite,
-    U: SerToIoWrite,
+    T: SerializableMessageToIoWrite,
+    U: SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> Result<()>
     where
-        W: ::std::io::Write,
+        W: Write,
     {
         self.0.ser(out)?;
         self.1.ser(out)?;
-        ::std::result::Result::Ok(())
+        Ok(())
     }
 }
-
-impl<T, U> SerToIoWrite for Either<T, U>
+impl<T, U> SerializableMessageToIoWrite for Either<T, U>
 where
-    T: SerToIoWrite,
-    U: SerToIoWrite,
+    T: SerializableMessageToIoWrite,
+    U: SerializableMessageToIoWrite,
 {
     fn ser<W>(&self, out: &mut W) -> Result<()>
     where
-        W: ::std::io::Write,
+        W: Write,
     {
         match self {
             Either::Left(v) => v.ser(out)?,
             Either::Right(v) => v.ser(out)?,
         }
-        ::std::result::Result::Ok(())
+        Ok(())
+    }
+}
+impl<T> SerializableMessageToIoWrite for Option<T>
+where
+    T: SerializableMessageToIoWrite,
+{
+    fn ser<W>(&self, out: &mut W) -> Result<()>
+    where
+        W: Write,
+    {
+        if let Some(ref msg) = self {
+            msg.ser(out)?;
+        }
+        Ok(())
     }
 }
