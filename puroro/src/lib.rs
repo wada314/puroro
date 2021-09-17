@@ -7,7 +7,7 @@
 //! syntax = "proto3";
 //! message MyMessage {
 //!     int32 my_number = 1;
-//!     repeated String my_name = 2;
+//!     repeated string my_name = 2;
 //!     MyMessage my_child = 3;
 //! }
 //! ```
@@ -20,6 +20,11 @@
 //!     pub my_name: Vec<Cow<'static, str>>,
 //!     pub my_child: Option<Box<MyMessage>>,
 //! }
+//! ```
+//!
+//! You can serialize a struct:
+//! ```rust
+//!
 //! ```
 //!
 #![cfg_attr(feature = "puroro-nightly", feature(backtrace))]
